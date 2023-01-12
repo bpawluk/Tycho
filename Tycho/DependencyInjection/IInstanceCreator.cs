@@ -1,6 +1,7 @@
-﻿namespace Tycho.DependencyInjection;
-
-public interface IInstanceCreator
+﻿namespace Tycho.DependencyInjection
 {
-    T CreateInstance<T>() where T : class;
+    public interface IInstanceCreator
+    {
+        T CreateInstance<T>() where T : class;
+    }
 }

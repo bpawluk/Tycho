@@ -1,6 +1,7 @@
-﻿namespace Tycho.Messaging.Contracts;
-
-public interface IOutboxBuilder
+﻿namespace Tycho.Messaging.Contracts
 {
-    IMessageBroker Build();
+    public interface IOutboxBuilder
+    {
+        IMessageBroker Build();
+    }
 }

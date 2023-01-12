@@ -1,5 +1,6 @@
-﻿namespace Tycho.Structure;
-
-public interface ISubmodulesBuilder
+﻿namespace Tycho.Structure
 {
+    public interface ISubmodulesBuilder
+    {
+    }
 }

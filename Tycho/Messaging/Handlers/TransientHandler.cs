@@ -3,59 +3,60 @@ using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Messaging.Payload;
 
-namespace Tycho.Messaging.Handlers;
-
-internal abstract class TransientBase<Handler>
+namespace Tycho.Messaging.Handlers
 {
-    protected readonly Func<Handler> _createHandler;
-
-    public TransientBase(Func<Handler> handlerCreator)
+    internal abstract class TransientBase<Handler>
     {
-        _createHandler = handlerCreator;
+        protected readonly Func<Handler> _createHandler;
+
+        public TransientBase(Func<Handler> handlerCreator)
+        {
+            _createHandler = handlerCreator;
+        }
     }
-}
 
-internal class TransientEventHandler<Event>
-    : TransientBase<IEventHandler<Event>>
-    , IEventHandler<Event>
-    where Event : class, IEvent
-{
-    public TransientEventHandler(Func<IEventHandler<Event>> handlerCreator)
-        : base(handlerCreator) { }
-
-    public Task Handle(Event eventData, CancellationToken cancellationToken = default)
+    internal class TransientEventHandler<Event>
+        : TransientBase<IEventHandler<Event>>
+        , IEventHandler<Event>
+        where Event : class, IEvent
     {
-        var handler = _createHandler();
-        return handler.Handle(eventData, cancellationToken);
+        public TransientEventHandler(Func<IEventHandler<Event>> handlerCreator)
+            : base(handlerCreator) { }
+
+        public Task Handle(Event eventData, CancellationToken cancellationToken = default)
+        {
+            var handler = _createHandler();
+            return handler.Handle(eventData, cancellationToken);
+        }
     }
-}
 
-internal class TransientCommandHandler<Command>
-    : TransientBase<ICommandHandler<Command>>
-    , ICommandHandler<Command>
-    where Command : class, ICommand
-{
-    public TransientCommandHandler(Func<ICommandHandler<Command>> handlerCreator)
-        : base(handlerCreator) { }
-
-    public Task Handle(Command commandData, CancellationToken cancellationToken = default)
+    internal class TransientCommandHandler<Command>
+        : TransientBase<ICommandHandler<Command>>
+        , ICommandHandler<Command>
+        where Command : class, ICommand
     {
-        var handler = _createHandler();
-        return handler.Handle(commandData, cancellationToken);
+        public TransientCommandHandler(Func<ICommandHandler<Command>> handlerCreator)
+            : base(handlerCreator) { }
+
+        public Task Handle(Command commandData, CancellationToken cancellationToken = default)
+        {
+            var handler = _createHandler();
+            return handler.Handle(commandData, cancellationToken);
+        }
     }
-}
 
-internal class TransientQueryHandler<Query, Response>
-    : TransientBase<IQueryHandler<Query, Response>>
-    , IQueryHandler<Query, Response>
-    where Query : class, IQuery<Response>
-{
-    public TransientQueryHandler(Func<IQueryHandler<Query, Response>> handlerCreator)
-        : base(handlerCreator) { }
-
-    public Task<Response> Handle(Query queryData, CancellationToken cancellationToken = default)
+    internal class TransientQueryHandler<Query, Response>
+        : TransientBase<IQueryHandler<Query, Response>>
+        , IQueryHandler<Query, Response>
+        where Query : class, IQuery<Response>
     {
-        var handler = _createHandler();
-        return handler.Handle(queryData, cancellationToken);
+        public TransientQueryHandler(Func<IQueryHandler<Query, Response>> handlerCreator)
+            : base(handlerCreator) { }
+
+        public Task<Response> Handle(Query queryData, CancellationToken cancellationToken = default)
+        {
+            var handler = _createHandler();
+            return handler.Handle(queryData, cancellationToken);
+        }
     }
 }

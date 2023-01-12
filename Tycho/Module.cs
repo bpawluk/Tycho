@@ -1,5 +1,6 @@
-﻿namespace Tycho;
-
-internal class Module<T> : IModule<T>
+﻿namespace Tycho
 {
+    internal class Module<T> : IModule<T>
+    {
+    }
 }

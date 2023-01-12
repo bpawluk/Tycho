@@ -1,3 +1,4 @@
-﻿namespace Tycho.Messaging.Payload;
-
-public interface IQuery<Response> { }
+﻿namespace Tycho.Messaging.Payload
+{
+    public interface IQuery<Response> { }
+}

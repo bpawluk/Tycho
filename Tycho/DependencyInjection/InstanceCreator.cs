@@ -1,16 +1,17 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace Tycho.DependencyInjection;
-
-internal class InstanceCreator : IInstanceCreator
+namespace Tycho.DependencyInjection
 {
-    private readonly IServiceProvider _serviceProvider;
-
-    public InstanceCreator(IServiceProvider serviceProvider)
+    internal class InstanceCreator : IInstanceCreator
     {
-        _serviceProvider = serviceProvider;
-    }
+        private readonly IServiceProvider _serviceProvider;
 
-    public T CreateInstance<T>() where T : class => ActivatorUtilities.CreateInstance<T>(_serviceProvider);
+        public InstanceCreator(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
+        public T CreateInstance<T>() where T : class => ActivatorUtilities.CreateInstance<T>(_serviceProvider);
+    }
 }

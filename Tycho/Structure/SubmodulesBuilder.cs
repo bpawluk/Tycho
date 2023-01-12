@@ -1,19 +1,20 @@
 ﻿using System;
 using Tycho.Messaging.Contracts;
 
-namespace Tycho.Structure;
-
-internal class SubmodulesBuilder : ISubmodulesDefiner, ISubmodulesBuilder
+namespace Tycho.Structure
 {
-    public ISubmodulesDefiner Add<Module>(Action<IOutboxConsumer> contractFullfilment) 
-        where Module : ModuleDefinition
+    internal class SubmodulesBuilder : ISubmodulesDefiner, ISubmodulesBuilder
     {
-        throw new NotImplementedException();
-    }
+        public ISubmodulesDefiner Add<Module>(Action<IOutboxConsumer> contractFullfilment)
+            where Module : ModuleDefinition
+        {
+            throw new NotImplementedException();
+        }
 
-    public ISubmodulesDefiner Add<Module>(Action<IOutboxConsumer, IServiceProvider> contractFullfilment) 
-        where Module : ModuleDefinition
-    {
-        throw new NotImplementedException();
+        public ISubmodulesDefiner Add<Module>(Action<IOutboxConsumer, IServiceProvider> contractFullfilment)
+            where Module : ModuleDefinition
+        {
+            throw new NotImplementedException();
+        }
     }
 }

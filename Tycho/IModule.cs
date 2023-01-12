@@ -1,10 +1,11 @@
-﻿namespace Tycho;
-
-public interface IModule
+﻿namespace Tycho
 {
+    public interface IModule
+    {
 
-}
+    }
 
-internal interface IModule<T> : IModule
-{
+    internal interface IModule<T> : IModule
+    {
+    }
 }

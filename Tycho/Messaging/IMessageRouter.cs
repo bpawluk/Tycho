@@ -2,25 +2,26 @@
 using Tycho.Messaging.Handlers;
 using Tycho.Messaging.Payload;
 
-namespace Tycho.Messaging;
-
-public interface IMessageRouter
+namespace Tycho.Messaging
 {
-    IEnumerable<IEventHandler<Event>> GetEventHandlers<Event>()
-        where Event : class, IEvent;
+    public interface IMessageRouter
+    {
+        IEnumerable<IEventHandler<Event>> GetEventHandlers<Event>()
+            where Event : class, IEvent;
 
-    ICommandHandler<Command> GetCommandHandler<Command>()
-        where Command : class, ICommand;
+        ICommandHandler<Command> GetCommandHandler<Command>()
+            where Command : class, ICommand;
 
-    IQueryHandler<Query, Response> GetQueryHandler<Query, Response>()
-        where Query : class, IQuery<Response>;
+        IQueryHandler<Query, Response> GetQueryHandler<Query, Response>()
+            where Query : class, IQuery<Response>;
 
-    void RegisterEventHandler<Event>(IEventHandler<Event> eventHandler)
-        where Event : class, IEvent;
+        void RegisterEventHandler<Event>(IEventHandler<Event> eventHandler)
+            where Event : class, IEvent;
 
-    void RegisterCommandHandler<Command>(ICommandHandler<Command> commandHandler)
-        where Command : class, ICommand;
+        void RegisterCommandHandler<Command>(ICommandHandler<Command> commandHandler)
+            where Command : class, ICommand;
 
-    void RegisterQueryHandler<Query, Response>(IQueryHandler<Query, Response> queryHandler)
-        where Query : class, IQuery<Response>;
+        void RegisterQueryHandler<Query, Response>(IQueryHandler<Query, Response> queryHandler)
+            where Query : class, IQuery<Response>;
+    }
 }

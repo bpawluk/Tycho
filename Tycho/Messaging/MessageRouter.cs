@@ -5,91 +5,92 @@ using System.Linq;
 using Tycho.Messaging.Handlers;
 using Tycho.Messaging.Payload;
 
-namespace Tycho.Messaging;
-
-internal class MessageRouter : IMessageRouter
+namespace Tycho.Messaging
 {
-    private readonly ConcurrentDictionary<Type, List<IEventHandler>> _eventHandlers;
-    private readonly IDictionary<Type, ICommandHandler> _commandHandlers;
-    private readonly IDictionary<Type, IQueryHandler> _queryHandlers;
-
-    public MessageRouter()
+    internal class MessageRouter : IMessageRouter
     {
-        _eventHandlers = new ConcurrentDictionary<Type, List<IEventHandler>>();
-        _commandHandlers = new ConcurrentDictionary<Type, ICommandHandler>();
-        _queryHandlers = new ConcurrentDictionary<Type, IQueryHandler>();
-    }
+        private readonly ConcurrentDictionary<Type, List<IEventHandler>> _eventHandlers;
+        private readonly IDictionary<Type, ICommandHandler> _commandHandlers;
+        private readonly IDictionary<Type, IQueryHandler> _queryHandlers;
 
-    public IEnumerable<IEventHandler<Event>> GetEventHandlers<Event>()
-        where Event : class, IEvent
-    {
-        if (_eventHandlers.TryGetValue(typeof(Event), out var eventHandlers))
+        public MessageRouter()
         {
-            return eventHandlers.Select(handler => (IEventHandler<Event>)handler);
+            _eventHandlers = new ConcurrentDictionary<Type, List<IEventHandler>>();
+            _commandHandlers = new ConcurrentDictionary<Type, ICommandHandler>();
+            _queryHandlers = new ConcurrentDictionary<Type, IQueryHandler>();
         }
 
-        return Enumerable.Empty<IEventHandler<Event>>();
-    }
-
-    public ICommandHandler<Command> GetCommandHandler<Command>()
-        where Command : class, ICommand
-    {
-        if (_commandHandlers.TryGetValue(typeof(Command), out var commandHandler))
+        public IEnumerable<IEventHandler<Event>> GetEventHandlers<Event>()
+            where Event : class, IEvent
         {
-            return (ICommandHandler<Command>)commandHandler;
+            if (_eventHandlers.TryGetValue(typeof(Event), out var eventHandlers))
+            {
+                return eventHandlers.Select(handler => (IEventHandler<Event>)handler);
+            }
+
+            return Enumerable.Empty<IEventHandler<Event>>();
         }
 
-        throw new KeyNotFoundException($"Command handler for {typeof(Command).Name} was not registered");
-    }
-
-    public IQueryHandler<Query, Response> GetQueryHandler<Query, Response>()
-        where Query : class, IQuery<Response>
-    {
-        if (_queryHandlers.TryGetValue(typeof(Query), out var queryHandler))
+        public ICommandHandler<Command> GetCommandHandler<Command>()
+            where Command : class, ICommand
         {
-            return (IQueryHandler<Query, Response>)queryHandler;
+            if (_commandHandlers.TryGetValue(typeof(Command), out var commandHandler))
+            {
+                return (ICommandHandler<Command>)commandHandler;
+            }
+
+            throw new KeyNotFoundException($"Command handler for {typeof(Command).Name} was not registered");
         }
 
-        throw new KeyNotFoundException($"Query handler for {typeof(Query).Name} was not registered");
-    }
-
-    public void RegisterEventHandler<Event>(IEventHandler<Event> eventHandler)
-        where Event : class, IEvent
-    {
-        if (eventHandler is null)
+        public IQueryHandler<Query, Response> GetQueryHandler<Query, Response>()
+            where Query : class, IQuery<Response>
         {
-            throw new ArgumentException($"{nameof(eventHandler)} cannot be null", nameof(eventHandler));
+            if (_queryHandlers.TryGetValue(typeof(Query), out var queryHandler))
+            {
+                return (IQueryHandler<Query, Response>)queryHandler;
+            }
+
+            throw new KeyNotFoundException($"Query handler for {typeof(Query).Name} was not registered");
         }
 
-        var handlers = _eventHandlers.GetOrAdd(typeof(Event), new List<IEventHandler>());
-        handlers.Add(eventHandler);
-    }
-
-    public void RegisterCommandHandler<Command>(ICommandHandler<Command> commandHandler)
-        where Command : class, ICommand
-    {
-        if (commandHandler is null)
+        public void RegisterEventHandler<Event>(IEventHandler<Event> eventHandler)
+            where Event : class, IEvent
         {
-            throw new ArgumentException($"{nameof(commandHandler)} cannot be null", nameof(commandHandler));
+            if (eventHandler is null)
+            {
+                throw new ArgumentException($"{nameof(eventHandler)} cannot be null", nameof(eventHandler));
+            }
+
+            var handlers = _eventHandlers.GetOrAdd(typeof(Event), new List<IEventHandler>());
+            handlers.Add(eventHandler);
         }
 
-        if (!_commandHandlers.TryAdd(typeof(Command), commandHandler))
+        public void RegisterCommandHandler<Command>(ICommandHandler<Command> commandHandler)
+            where Command : class, ICommand
         {
-            throw new ArgumentException($"Command handler for {typeof(Command).Name} already registered", nameof(commandHandler));
-        }
-    }
+            if (commandHandler is null)
+            {
+                throw new ArgumentException($"{nameof(commandHandler)} cannot be null", nameof(commandHandler));
+            }
 
-    public void RegisterQueryHandler<Query, Response>(IQueryHandler<Query, Response> queryHandler)
-        where Query : class, IQuery<Response>
-    {
-        if (queryHandler is null)
-        {
-            throw new ArgumentException($"{nameof(queryHandler)} cannot be null", nameof(queryHandler));
+            if (!_commandHandlers.TryAdd(typeof(Command), commandHandler))
+            {
+                throw new ArgumentException($"Command handler for {typeof(Command).Name} already registered", nameof(commandHandler));
+            }
         }
 
-        if (!_queryHandlers.TryAdd(typeof(Query), queryHandler))
+        public void RegisterQueryHandler<Query, Response>(IQueryHandler<Query, Response> queryHandler)
+            where Query : class, IQuery<Response>
         {
-            throw new ArgumentException($"Query handler for {typeof(Query).Name} already registered", nameof(queryHandler));
+            if (queryHandler is null)
+            {
+                throw new ArgumentException($"{nameof(queryHandler)} cannot be null", nameof(queryHandler));
+            }
+
+            if (!_queryHandlers.TryAdd(typeof(Query), queryHandler))
+            {
+                throw new ArgumentException($"Query handler for {typeof(Query).Name} already registered", nameof(queryHandler));
+            }
         }
     }
 }

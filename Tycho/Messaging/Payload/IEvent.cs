@@ -1,3 +1,4 @@
-﻿namespace Tycho.Messaging.Payload;
-
-public interface IEvent{ }
+﻿namespace Tycho.Messaging.Payload
+{
+    public interface IEvent { }
+}
