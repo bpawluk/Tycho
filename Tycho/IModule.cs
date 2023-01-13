@@ -1,11 +1,6 @@
-﻿namespace Tycho
+﻿using Tycho.Messaging;
+
+namespace Tycho
 {
-    public interface IModule
-    {
-
-    }
-
-    internal interface IModule<T> : IModule
-    {
-    }
+    public interface IModule : IMessageBroker { }
 }

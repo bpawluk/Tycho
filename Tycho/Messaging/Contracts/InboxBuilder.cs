@@ -7,7 +7,7 @@ using Tycho.Messaging.Payload;
 
 namespace Tycho.Messaging.Contracts
 {
-    internal class InboxBuilder : IInboxDefiner, IInboxBuilder
+    internal class InboxBuilder : IInboxBuilder
     {
         private readonly IInstanceCreator _instanceCreator;
         private readonly IMessageRouter _moduleInbox;
@@ -19,7 +19,7 @@ namespace Tycho.Messaging.Contracts
         }
 
         #region IInboxDefiner.Events
-        public IInboxDefiner SubscribesTo<Event>(Action<Event> action)
+        public IInboxBuilder SubscribesTo<Event>(Action<Event> action)
             where Event : class, IEvent
         {
             var handler = new LambdaWrappingEventHandler<Event>(action);
@@ -27,7 +27,7 @@ namespace Tycho.Messaging.Contracts
             return this;
         }
 
-        public IInboxDefiner SubscribesTo<Event>(Func<Event, Task> function)
+        public IInboxBuilder SubscribesTo<Event>(Func<Event, Task> function)
             where Event : class, IEvent
         {
             var handler = new LambdaWrappingEventHandler<Event>(function);
@@ -35,7 +35,7 @@ namespace Tycho.Messaging.Contracts
             return this;
         }
 
-        public IInboxDefiner SubscribesTo<Event>(Func<Event, CancellationToken, Task> function)
+        public IInboxBuilder SubscribesTo<Event>(Func<Event, CancellationToken, Task> function)
             where Event : class, IEvent
         {
             var handler = new LambdaWrappingEventHandler<Event>(function);
@@ -43,14 +43,14 @@ namespace Tycho.Messaging.Contracts
             return this;
         }
 
-        public IInboxDefiner SubscribesTo<Event>(IEventHandler<Event> handler)
+        public IInboxBuilder SubscribesTo<Event>(IEventHandler<Event> handler)
             where Event : class, IEvent
         {
             _moduleInbox.RegisterEventHandler(handler);
             return this;
         }
 
-        public IInboxDefiner SubscribesTo<Event, Handler>()
+        public IInboxBuilder SubscribesTo<Event, Handler>()
             where Handler : class, IEventHandler<Event>
             where Event : class, IEvent
         {
@@ -62,7 +62,7 @@ namespace Tycho.Messaging.Contracts
         #endregion
 
         #region IInboxDefiner.Commands
-        public IInboxDefiner Executes<Command>(Action<Command> action)
+        public IInboxBuilder Executes<Command>(Action<Command> action)
             where Command : class, ICommand
         {
             var handler = new LambdaWrappingCommandHandler<Command>(action);
@@ -70,7 +70,7 @@ namespace Tycho.Messaging.Contracts
             return this;
         }
 
-        public IInboxDefiner Executes<Command>(Func<Command, Task> function)
+        public IInboxBuilder Executes<Command>(Func<Command, Task> function)
             where Command : class, ICommand
         {
             var handler = new LambdaWrappingCommandHandler<Command>(function);
@@ -78,7 +78,7 @@ namespace Tycho.Messaging.Contracts
             return this;
         }
 
-        public IInboxDefiner Executes<Command>(Func<Command, CancellationToken, Task> function)
+        public IInboxBuilder Executes<Command>(Func<Command, CancellationToken, Task> function)
             where Command : class, ICommand
         {
             var handler = new LambdaWrappingCommandHandler<Command>(function);
@@ -86,14 +86,14 @@ namespace Tycho.Messaging.Contracts
             return this;
         }
 
-        public IInboxDefiner Executes<Command>(ICommandHandler<Command> handler)
+        public IInboxBuilder Executes<Command>(ICommandHandler<Command> handler)
             where Command : class, ICommand
         {
             _moduleInbox.RegisterCommandHandler(handler);
             return this;
         }
 
-        public IInboxDefiner Executes<Command, Handler>()
+        public IInboxBuilder Executes<Command, Handler>()
             where Handler : class, ICommandHandler<Command>
             where Command : class, ICommand
         {
@@ -105,7 +105,7 @@ namespace Tycho.Messaging.Contracts
         #endregion
 
         #region IInboxDefiner.Queries
-        public IInboxDefiner RespondsTo<Query, Response>(Func<Query, Response> function)
+        public IInboxBuilder RespondsTo<Query, Response>(Func<Query, Response> function)
             where Query : class, IQuery<Response>
         {
             var handler = new LambdaWrappingQueryHandler<Query, Response>(function);
@@ -113,7 +113,7 @@ namespace Tycho.Messaging.Contracts
             return this;
         }
 
-        public IInboxDefiner RespondsTo<Query, Response>(Func<Query, Task<Response>> function)
+        public IInboxBuilder RespondsTo<Query, Response>(Func<Query, Task<Response>> function)
             where Query : class, IQuery<Response>
         {
             var handler = new LambdaWrappingQueryHandler<Query, Response>(function);
@@ -121,7 +121,7 @@ namespace Tycho.Messaging.Contracts
             return this;
         }
 
-        public IInboxDefiner RespondsTo<Query, Response>(Func<Query, CancellationToken, Task<Response>> function)
+        public IInboxBuilder RespondsTo<Query, Response>(Func<Query, CancellationToken, Task<Response>> function)
             where Query : class, IQuery<Response>
         {
             var handler = new LambdaWrappingQueryHandler<Query, Response>(function);
@@ -129,14 +129,14 @@ namespace Tycho.Messaging.Contracts
             return this;
         }
 
-        public IInboxDefiner RespondsTo<Query, Response>(IQueryHandler<Query, Response> handler)
+        public IInboxBuilder RespondsTo<Query, Response>(IQueryHandler<Query, Response> handler)
             where Query : class, IQuery<Response>
         {
             _moduleInbox.RegisterQueryHandler(handler);
             return this;
         }
 
-        public IInboxDefiner RespondsTo<Query, Response, Handler>()
+        public IInboxBuilder RespondsTo<Query, Response, Handler>()
             where Handler : class, IQueryHandler<Query, Response>
             where Query : class, IQuery<Response>
         {

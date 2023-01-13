@@ -2,15 +2,15 @@
 
 namespace Tycho.Messaging.Contracts
 {
-    public interface IOutboxDefiner
+    public interface IOutboxProducer
     {
-        IOutboxDefiner Publishes<Event>()
+        IOutboxProducer Publishes<Event>()
             where Event : class, IEvent;
 
-        IOutboxDefiner Requires<Command>()
+        IOutboxProducer Sends<Command>()
             where Command : class, ICommand;
 
-        IOutboxDefiner Requires<Query, Response>()
+        IOutboxProducer Sends<Query, Response>()
             where Query : class, IQuery<Response>;
     }
 }

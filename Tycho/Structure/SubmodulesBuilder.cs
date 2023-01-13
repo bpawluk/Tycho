@@ -1,18 +1,31 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Tycho.Messaging.Contracts;
 
 namespace Tycho.Structure
 {
-    internal class SubmodulesBuilder : ISubmodulesDefiner, ISubmodulesBuilder
+    internal class SubmodulesBuilder : ISubmodulesDefiner
     {
-        public ISubmodulesDefiner Add<Module>(Action<IOutboxConsumer> contractFullfilment)
-            where Module : ModuleDefinition
+        private HashSet<ModuleDefinition> _submodules;
+
+        public SubmodulesBuilder()
         {
-            throw new NotImplementedException();
+            _submodules = new HashSet<ModuleDefinition>();
         }
 
-        public ISubmodulesDefiner Add<Module>(Action<IOutboxConsumer, IServiceProvider> contractFullfilment)
-            where Module : ModuleDefinition
+        public ISubmodulesDefiner Add<Module>(Action<IOutboxConsumer> contractFullfilment)
+            where Module : ModuleDefinition, new()
+        {
+            var submodule = new Module().Setup(contractFullfilment);
+            if (!_submodules.Add(submodule))
+            {
+                throw new InvalidOperationException("");
+            }
+            return this;
+        }
+
+        internal Task<IEnumerable<IModule>> Build()
         {
             throw new NotImplementedException();
         }

@@ -13,7 +13,7 @@ public sealed class AppModule : ModuleDefinition
     public record IncomingCommand() : ICommand;
     public record IncomingQuery() : IQuery<bool>;
 
-    protected override void DeclareIncomingMessages(IInboxDefiner module, IServiceProvider services)
+    protected override void DeclareIncomingMessages(IInboxBuilder module, IServiceProvider services)
     {
         module.SubscribesTo((IncomingEvent eventData) => { })
               .Executes((IncomingCommand commandData) => { })
@@ -24,14 +24,14 @@ public sealed class AppModule : ModuleDefinition
     public record OutgoingCommand() : ICommand;
     public record OutgoingQuery() : IQuery<bool>;
 
-    protected override void DeclareOutgoingMessages(IOutboxDefiner module, IServiceProvider services)
+    protected override void DeclareOutgoingMessages(IOutboxProducer module, IServiceProvider services)
     {
         module.Publishes<OutgoingEvent>()
-              .Requires<OutgoingCommand>()
-              .Requires<OutgoingQuery, bool>();
+              .Sends<OutgoingCommand>()
+              .Sends<OutgoingQuery, bool>();
     }
 
-    protected override void IncludeSubmodules(ISubmodulesDefiner submodules)
+    protected override void IncludeSubmodules(ISubmodulesDefiner submodules, IServiceProvider services)
     {
         submodules.Add<AppModule>((IOutboxConsumer submodule) =>
         {
@@ -41,5 +41,8 @@ public sealed class AppModule : ModuleDefinition
         });
     }
 
-    protected override void RegisterServices(IServiceCollection services) { }
+    protected override void RegisterServices(IServiceCollection services) 
+    { 
+
+    }
 }

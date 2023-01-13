@@ -8,7 +8,7 @@ using Tycho.Messaging.Payload;
 
 namespace Tycho.Messaging.Contracts
 {
-    internal class OutboxBuilder : IOutboxDefiner, IOutboxConsumer, IOutboxBuilder
+    internal class OutboxBuilder : IOutboxProducer, IOutboxConsumer
     {
         private readonly IMessageRouter _moduleInbox;
         private readonly ConcurrentDictionary<Type, bool> _messageRegistry;
@@ -20,21 +20,21 @@ namespace Tycho.Messaging.Contracts
         }
 
         #region IOutboxDefiner
-        public IOutboxDefiner Publishes<Event>() where Event
+        public IOutboxProducer Publishes<Event>() where Event
             : class, IEvent
         {
             AddMessageDefinition(typeof(Event), nameof(Event));
             return this;
         }
 
-        public IOutboxDefiner Requires<Command>() where Command
+        public IOutboxProducer Sends<Command>() where Command
             : class, ICommand
         {
             AddMessageDefinition(typeof(Command), nameof(Command));
             return this;
         }
 
-        public IOutboxDefiner Requires<Query, Response>()
+        public IOutboxProducer Sends<Query, Response>()
             where Query : class, IQuery<Response>
         {
             AddMessageDefinition(typeof(Query), nameof(Query));
