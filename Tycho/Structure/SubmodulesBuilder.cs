@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Tycho.Messaging.Contracts;
 
@@ -7,10 +8,12 @@ namespace Tycho.Structure
 {
     internal class SubmodulesBuilder : ISubmodulesDefiner
     {
-        private HashSet<ModuleDefinition> _submodules;
+        private readonly object _submodulesLock;
+        private readonly HashSet<ModuleDefinition> _submodules;
 
         public SubmodulesBuilder()
         {
+            _submodulesLock = new object();
             _submodules = new HashSet<ModuleDefinition>();
         }
 
@@ -18,16 +21,29 @@ namespace Tycho.Structure
             where Module : ModuleDefinition, new()
         {
             var submodule = new Module().Setup(contractFullfilment);
-            if (!_submodules.Add(submodule))
+
+            lock (_submodulesLock)
             {
-                throw new InvalidOperationException("");
+                if (!_submodules.Add(submodule))
+                {
+                    throw new InvalidOperationException(
+                        $"{typeof(Module).Name} is already defined as a submodule for this module");
+                }
             }
+
             return this;
         }
 
-        internal Task<IEnumerable<IModule>> Build()
+        internal async Task<IEnumerable<IModule>> Build()
         {
-            throw new NotImplementedException();
+            List<ModuleDefinition> submodulesSnapshot;
+
+            lock (_submodulesLock)
+            {
+                submodulesSnapshot = _submodules.ToList();
+            }
+
+            return await Task.WhenAll(submodulesSnapshot.Select(async module => await module.Build().ConfigureAwait(false)));
         }
     }
 }
