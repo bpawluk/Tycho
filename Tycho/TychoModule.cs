@@ -15,6 +15,7 @@ namespace Tycho
 {
     public abstract class TychoModule
     {
+        private IServiceProvider? _externalServiceProvider;
         private Action<IOutboxConsumer>? _contractFullfilment;
 
         protected abstract void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services);
@@ -30,6 +31,12 @@ namespace Tycho
         public TychoModule Configure()
         {
             // TODO: Providing and using configuration data
+            return this;
+        }
+
+        public TychoModule Setup(IServiceProvider serviceProvider)
+        {
+            _externalServiceProvider = serviceProvider;
             return this;
         }
 
@@ -61,7 +68,7 @@ namespace Tycho
 
         private async Task<IEnumerable<IModule>> BuildModuleSubtree(IServiceProvider serviceProvider)
         {
-            var submodulesBuilder = new SubstructureBuilder();
+            var submodulesBuilder = new SubstructureBuilder(serviceProvider);
             IncludeSubmodules(submodulesBuilder, serviceProvider);
             return await submodulesBuilder.Build().ConfigureAwait(false);
         }
@@ -69,7 +76,8 @@ namespace Tycho
         private IMessageBroker BuildInternalMessageBroker(IServiceProvider serviceProvider)
         {
             var outboxRouter = new MessageRouter();
-            var outboxBuilder = new OutboxBuilder(outboxRouter);
+            var instanceCreator = new InstanceCreator(_externalServiceProvider);
+            var outboxBuilder = new OutboxBuilder(instanceCreator, outboxRouter);
             DeclareOutgoingMessages(outboxBuilder, serviceProvider);
             _contractFullfilment?.Invoke(outboxBuilder);
             return outboxBuilder.Build();

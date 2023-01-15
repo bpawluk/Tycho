@@ -10,31 +10,32 @@ namespace Tycho.Structure.Builders
     {
         private readonly object _submodulesLock;
         private readonly HashSet<TychoModule> _submodules;
+        private readonly IServiceProvider _serviceProvider;
 
-        public SubstructureBuilder()
+        public SubstructureBuilder(IServiceProvider services)
         {
             _submodulesLock = new object();
             _submodules = new HashSet<TychoModule>();
+            _serviceProvider = services;
+        }
+
+        public ISubstructureDefinition AddSubmodule<Module>() 
+            where Module : TychoModule, new()
+        {
+            var submodule = new Module().Setup(_serviceProvider);
+            AddSubmodule(submodule);
+            return this;
         }
 
         public ISubstructureDefinition AddSubmodule<Module>(Action<IOutboxConsumer> contractFullfilment)
             where Module : TychoModule, new()
         {
-            var submodule = new Module().Setup(contractFullfilment);
-
-            lock (_submodulesLock)
-            {
-                if (!_submodules.Add(submodule))
-                {
-                    throw new InvalidOperationException(
-                        $"{typeof(Module).Name} is already defined as a submodule for this module");
-                }
-            }
-
+            var submodule = new Module().Setup(_serviceProvider).Setup(contractFullfilment);
+            AddSubmodule(submodule);
             return this;
         }
-
-        internal async Task<IEnumerable<IModule>> Build()
+        
+        public async Task<IEnumerable<IModule>> Build()
         {
             List<TychoModule> submodulesSnapshot;
 
@@ -44,6 +45,18 @@ namespace Tycho.Structure.Builders
             }
 
             return await Task.WhenAll(submodulesSnapshot.Select(async module => await module.Build().ConfigureAwait(false)));
+        }
+
+        private void AddSubmodule(TychoModule submodule)
+        {
+            lock (_submodulesLock)
+            {
+                if (!_submodules.Add(submodule))
+                {
+                    throw new InvalidOperationException(submodule.GetType().Name +
+                        "is already defined as a submodule for this module");
+                }
+            }
         }
     }
 }

@@ -7,9 +7,9 @@ namespace Tycho.DependencyInjection
     {
         private readonly IServiceProvider _serviceProvider;
 
-        public InstanceCreator(IServiceProvider serviceProvider)
+        public InstanceCreator(IServiceProvider? serviceProvider = null)
         {
-            _serviceProvider = serviceProvider;
+            _serviceProvider = serviceProvider ?? new StubServiceProvider();
         }
 
         public T CreateInstance<T>() where T : class => ActivatorUtilities.CreateInstance<T>(_serviceProvider);

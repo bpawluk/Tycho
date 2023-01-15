@@ -21,7 +21,8 @@ namespace Tycho.Contract
         IOutboxConsumer OnEvent<Event>(IEventHandler<Event> handler)
             where Event : class, IEvent;
 
-        IOutboxConsumer OnEvent<Event>(Func<IEventHandler<Event>> handlerCreator)
+        IOutboxConsumer OnEvent<Event, Handler>()
+            where Handler : class, IEventHandler<Event>
             where Event : class, IEvent;
         #endregion
 
@@ -38,7 +39,8 @@ namespace Tycho.Contract
         IOutboxConsumer OnCommand<Command>(ICommandHandler<Command> handler)
             where Command : class, ICommand;
 
-        IOutboxConsumer OnCommand<Command>(Func<ICommandHandler<Command>> handlerCreator)
+        IOutboxConsumer OnCommand<Command, Handler>()
+            where Handler : class, ICommandHandler<Command>
             where Command : class, ICommand;
 
         IOutboxConsumer Ignore<Command>()
@@ -58,7 +60,8 @@ namespace Tycho.Contract
         IOutboxConsumer OnQuery<Query, Response>(IQueryHandler<Query, Response> handler)
             where Query : class, IQuery<Response>;
 
-        IOutboxConsumer OnQuery<Query, Response>(Func<IQueryHandler<Query, Response>> handlerCreator)
+        IOutboxConsumer OnQuery<Query, Response, Handler>()
+            where Handler : class, IQueryHandler<Query, Response>
             where Query : class, IQuery<Response>;
 
         IOutboxConsumer Return<Query, Response>(Response response)

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Tycho.DependencyInjection;
 using Tycho.Messaging;
 using Tycho.Messaging.Handlers;
 using Tycho.Messaging.Payload;
@@ -11,11 +12,13 @@ namespace Tycho.Contract.Builders
 {
     internal class OutboxBuilder : IOutboxDefinition, IOutboxConsumer
     {
+        private readonly IInstanceCreator _instanceCreator;
         private readonly IMessageRouter _moduleInbox;
         private readonly ConcurrentDictionary<Type, bool> _messageRegistry;
 
-        public OutboxBuilder(IMessageRouter moduleInbox)
+        public OutboxBuilder(IInstanceCreator instanceCreator, IMessageRouter moduleInbox)
         {
+            _instanceCreator = instanceCreator;
             _moduleInbox = moduleInbox;
             _messageRegistry = new ConcurrentDictionary<Type, bool>();
         }
@@ -75,9 +78,11 @@ namespace Tycho.Contract.Builders
             return this;
         }
 
-        public IOutboxConsumer OnEvent<Event>(Func<IEventHandler<Event>> handlerCreator)
+        public IOutboxConsumer OnEvent<Event, Handler>()
+            where Handler : class, IEventHandler<Event>
             where Event : class, IEvent
         {
+            Func<Handler> handlerCreator = () => _instanceCreator.CreateInstance<Handler>();
             var handler = new TransientEventHandler<Event>(handlerCreator);
             RegisterEventHandler(handler);
             return this;
@@ -124,9 +129,11 @@ namespace Tycho.Contract.Builders
             return this;
         }
 
-        public IOutboxConsumer OnCommand<Command>(Func<ICommandHandler<Command>> handlerCreator)
+        public IOutboxConsumer OnCommand<Command, Handler>()
+            where Handler : class, ICommandHandler<Command>
             where Command : class, ICommand
         {
+            Func<Handler> handlerCreator = () => _instanceCreator.CreateInstance<Handler>();
             var handler = new TransientCommandHandler<Command>(handlerCreator);
             RegisterCommandHandler(handler);
             return this;
@@ -181,9 +188,11 @@ namespace Tycho.Contract.Builders
             return this;
         }
 
-        public IOutboxConsumer OnQuery<Query, Response>(Func<IQueryHandler<Query, Response>> handlerCreator)
+        public IOutboxConsumer OnQuery<Query, Response, Handler>()
+            where Handler : class, IQueryHandler<Query, Response>
             where Query : class, IQuery<Response>
         {
+            Func<Handler> handlerCreator = () => _instanceCreator.CreateInstance<Handler>();
             var handler = new TransientQueryHandler<Query, Response>(handlerCreator);
             RegisterQueryHandler(handler);
             return this;
