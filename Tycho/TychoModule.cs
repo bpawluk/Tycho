@@ -2,34 +2,38 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Tycho.Contract;
+using Tycho.Contract.Builders;
 using Tycho.DependencyInjection;
 using Tycho.Messaging;
-using Tycho.Messaging.Contracts;
 using Tycho.Structure;
+using Tycho.Structure.Builders;
+using Tycho.Structure.Modules;
+using Tycho.Structure.Submodules;
 
 namespace Tycho
 {
-    public abstract class ModuleDefinition
+    public abstract class TychoModule
     {
         private Action<IOutboxConsumer>? _contractFullfilment;
 
-        protected abstract void DeclareIncomingMessages(IInboxBuilder module, IServiceProvider services);
+        protected abstract void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services);
 
-        protected abstract void DeclareOutgoingMessages(IOutboxProducer module, IServiceProvider services);
+        protected abstract void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services);
 
-        protected abstract void IncludeSubmodules(ISubmodulesDefiner submodules, IServiceProvider services);
+        protected abstract void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services);
 
         protected abstract void RegisterServices(IServiceCollection services);
 
         protected virtual Task Startup(IServiceProvider services) { return Task.CompletedTask; }
 
-        public ModuleDefinition Configure()
+        public TychoModule Configure()
         {
             // TODO: Providing and using configuration data
             return this;
         }
 
-        public ModuleDefinition Setup(Action<IOutboxConsumer> contractFullfilment)
+        public TychoModule Setup(Action<IOutboxConsumer> contractFullfilment)
         {
             _contractFullfilment = contractFullfilment;
             return this;
@@ -49,6 +53,7 @@ namespace Tycho
         private IServiceProvider CollectServices(Module module)
         {
             var serviceCollection = new ServiceCollection();
+            // TODO EXPOSE INTERNAL API
             serviceCollection.AddSingleton<IModule>(module);
             serviceCollection.AddSingleton(typeof(ISubmodule<>), typeof(SubmoduleProxy<>));
             RegisterServices(serviceCollection);
@@ -57,7 +62,7 @@ namespace Tycho
 
         private async Task<IEnumerable<IModule>> BuildModuleSubtree(IServiceProvider serviceProvider)
         {
-            var submodulesBuilder = new SubmodulesBuilder();
+            var submodulesBuilder = new SubstructureBuilder();
             IncludeSubmodules(submodulesBuilder, serviceProvider);
             return await submodulesBuilder.Build().ConfigureAwait(false);
         }

@@ -3,12 +3,13 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Tycho.Messaging;
 using Tycho.Messaging.Handlers;
 using Tycho.Messaging.Payload;
 
-namespace Tycho.Messaging.Contracts
+namespace Tycho.Contract.Builders
 {
-    internal class OutboxBuilder : IOutboxProducer, IOutboxConsumer
+    internal class OutboxBuilder : IOutboxDefinition, IOutboxConsumer
     {
         private readonly IMessageRouter _moduleInbox;
         private readonly ConcurrentDictionary<Type, bool> _messageRegistry;
@@ -20,21 +21,21 @@ namespace Tycho.Messaging.Contracts
         }
 
         #region IOutboxDefiner
-        public IOutboxProducer Publishes<Event>() where Event
+        public IOutboxDefinition Publishes<Event>() where Event
             : class, IEvent
         {
             AddMessageDefinition(typeof(Event), nameof(Event));
             return this;
         }
 
-        public IOutboxProducer Sends<Command>() where Command
+        public IOutboxDefinition Sends<Command>() where Command
             : class, ICommand
         {
             AddMessageDefinition(typeof(Command), nameof(Command));
             return this;
         }
 
-        public IOutboxProducer Sends<Query, Response>()
+        public IOutboxDefinition Sends<Query, Response>()
             where Query : class, IQuery<Response>
         {
             AddMessageDefinition(typeof(Query), nameof(Query));
@@ -217,7 +218,7 @@ namespace Tycho.Messaging.Contracts
             if (!_messageRegistry.TryAdd(messageType, false))
             {
                 throw new ArgumentException(
-                    $"The {messageType.Name} {messageKind} is already defined for this module", 
+                    $"The {messageType.Name} {messageKind} is already defined for this module",
                     nameof(messageType));
             }
         }

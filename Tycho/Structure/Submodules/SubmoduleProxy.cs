@@ -1,11 +1,12 @@
-﻿using System.Threading.Tasks;
-using System.Threading;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using Tycho.Messaging.Payload;
+using Tycho.Structure.Modules;
 
-namespace Tycho.Structure
+namespace Tycho.Structure.Submodules
 {
     internal class SubmoduleProxy<Definition> : ISubmodule<Definition>
-        where Definition : ModuleDefinition
+        where Definition : TychoModule
     {
         private readonly IModule _submodule;
 

@@ -2,23 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Tycho.Messaging.Contracts;
+using Tycho.Contract;
 
-namespace Tycho.Structure
+namespace Tycho.Structure.Builders
 {
-    internal class SubmodulesBuilder : ISubmodulesDefiner
+    internal class SubstructureBuilder : ISubstructureDefinition
     {
         private readonly object _submodulesLock;
-        private readonly HashSet<ModuleDefinition> _submodules;
+        private readonly HashSet<TychoModule> _submodules;
 
-        public SubmodulesBuilder()
+        public SubstructureBuilder()
         {
             _submodulesLock = new object();
-            _submodules = new HashSet<ModuleDefinition>();
+            _submodules = new HashSet<TychoModule>();
         }
 
-        public ISubmodulesDefiner Add<Module>(Action<IOutboxConsumer> contractFullfilment)
-            where Module : ModuleDefinition, new()
+        public ISubstructureDefinition AddSubmodule<Module>(Action<IOutboxConsumer> contractFullfilment)
+            where Module : TychoModule, new()
         {
             var submodule = new Module().Setup(contractFullfilment);
 
@@ -36,7 +36,7 @@ namespace Tycho.Structure
 
         internal async Task<IEnumerable<IModule>> Build()
         {
-            List<ModuleDefinition> submodulesSnapshot;
+            List<TychoModule> submodulesSnapshot;
 
             lock (_submodulesLock)
             {

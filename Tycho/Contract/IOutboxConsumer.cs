@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Tycho.Messaging.Handlers;
 using Tycho.Messaging.Payload;
 
-namespace Tycho.Messaging.Contracts
+namespace Tycho.Contract
 {
     public interface IOutboxConsumer
     {

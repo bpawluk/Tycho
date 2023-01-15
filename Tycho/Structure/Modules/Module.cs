@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Tycho.Messaging;
 using Tycho.Messaging.Payload;
 
-namespace Tycho.Structure
+namespace Tycho.Structure.Modules
 {
     internal class Module : IModule
     {
