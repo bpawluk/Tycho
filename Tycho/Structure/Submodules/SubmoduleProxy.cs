@@ -12,7 +12,7 @@ namespace Tycho.Structure.Submodules
 
         public SubmoduleProxy(IModule supermodule)
         {
-            _submodule = (supermodule as Module)!.GetSubmodule<Definition>();
+            _submodule = (supermodule as ModuleInternals)!.GetSubmodule<Definition>();
         }
 
         public void PublishEvent<Event>(Event eventData, CancellationToken cancellationToken)
