@@ -1,49 +1,21 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Tycho.Messaging;
-using Tycho.Messaging.Payload;
 
 namespace Tycho.Structure.Modules
 {
-    internal class Module : IModule
+    internal class Module : ModuleBase, IModule
     {
-        public void PublishEvent<Event>(Event eventData, CancellationToken cancellationToken)
-            where Event : class, IEvent
-        {
+        public ModuleInternals Internals { get; }
 
+        public Module()
+        {
+            Internals = new ModuleInternals();
         }
 
-        public Task ExecuteCommand<Command>(Command commandData, CancellationToken cancellationToken)
-            where Command : class, ICommand
-        {
-            return Task.CompletedTask;
-        }
+        public void SetExternalBroker(IMessageBroker broker) => SetMessageBroker(broker);
 
-        public Task<Response> ExecuteQuery<Query, Response>(Query queryData, CancellationToken cancellationToken)
-            where Query : class, IQuery<Response>
-        {
-            return Task.FromResult<Response>(default!);
-        }
+        public void SetInternalBroker(IMessageBroker broker) => Internals.SetMessageBroker(broker);
 
-        public IModule GetSubmodule<T>()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        internal void AddSubmodules(IEnumerable<IModule> submodules)
-        {
-
-        }
-
-        internal void SetInternalBroker(IMessageBroker internalBroker)
-        {
-
-        }
-
-        internal void SetExternalBroker(IMessageBroker internalBroker)
-        {
-
-        }
+        public void SetSubmodules(IEnumerable<IModule> submodules) => Internals.SetSubmodules(submodules);
     }
 }

@@ -43,7 +43,7 @@ namespace Tycho
         {
             var module = CreateModule();
             var services = CollectServices(module);
-            module.AddSubmodules(await BuildModuleSubtree(services).ConfigureAwait(false));
+            module.SetSubmodules(await BuildModuleSubtree(services).ConfigureAwait(false));
             module.SetInternalBroker(BuildInternalMessageBroker(services));
             module.SetExternalBroker(BuildExternalMessageBroker(services));
             await Startup(services).ConfigureAwait(false);
@@ -53,8 +53,7 @@ namespace Tycho
         private IServiceProvider CollectServices(Module module)
         {
             var serviceCollection = new ServiceCollection();
-            // TODO EXPOSE INTERNAL API
-            serviceCollection.AddSingleton<IModule>(module);
+            serviceCollection.AddSingleton<IModule>(module.Internals);
             serviceCollection.AddSingleton(typeof(ISubmodule<>), typeof(SubmoduleProxy<>));
             RegisterServices(serviceCollection);
             return serviceCollection.BuildServiceProvider();
