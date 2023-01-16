@@ -16,7 +16,7 @@ namespace Tycho.Messaging.Handlers
 
         protected static Func<Message, CancellationToken, Result> Wrap(Action<Message> handler, Result result)
         {
-            return (Message message, CancellationToken _) =>
+            return (message, _) =>
             {
                 handler(message);
                 return result;
@@ -25,7 +25,7 @@ namespace Tycho.Messaging.Handlers
 
         protected static Func<Message, CancellationToken, Result> Wrap(Func<Message, Result> handler)
         {
-            return (Message message, CancellationToken _) => handler(message);
+            return (message, _) => handler(message);
         }
     }
 
@@ -43,7 +43,7 @@ namespace Tycho.Messaging.Handlers
         public LambdaWrappingEventHandler(Func<Event, CancellationToken, Task> handler)
             : base(handler) { }
 
-        public Task Handle(Event eventData, CancellationToken cancellationToken = default)
+        public Task Handle(Event eventData, CancellationToken cancellationToken)
         {
             return _handle(eventData, cancellationToken);
         }
@@ -63,7 +63,7 @@ namespace Tycho.Messaging.Handlers
         public LambdaWrappingCommandHandler(Func<Command, CancellationToken, Task> handler)
             : base(handler) { }
 
-        public Task Handle(Command commandData, CancellationToken cancellationToken = default)
+        public Task Handle(Command commandData, CancellationToken cancellationToken)
         {
             return _handle(commandData, cancellationToken);
         }
@@ -83,14 +83,14 @@ namespace Tycho.Messaging.Handlers
         public LambdaWrappingQueryHandler(Func<Query, CancellationToken, Task<Response>> handler)
             : base(handler) { }
 
-        public Task<Response> Handle(Query queryData, CancellationToken cancellationToken = default)
+        public Task<Response> Handle(Query queryData, CancellationToken cancellationToken)
         {
             return _handle(queryData, cancellationToken);
         }
 
-        protected static Func<Query, CancellationToken, Task<Response>> Wrap(Func<Query, Response> handler)
+        private static Func<Query, CancellationToken, Task<Response>> Wrap(Func<Query, Response> handler)
         {
-            return (Query message, CancellationToken _) => Task.FromResult(handler(message));
+            return (message, _) => Task.FromResult(handler(message));
         }
     }
 }

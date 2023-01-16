@@ -23,7 +23,7 @@ namespace Tycho.Messaging.Handlers
         public TransientEventHandler(Func<IEventHandler<Event>> handlerCreator)
             : base(handlerCreator) { }
 
-        public Task Handle(Event eventData, CancellationToken cancellationToken = default)
+        public Task Handle(Event eventData, CancellationToken cancellationToken)
         {
             var handler = _createHandler();
             return handler.Handle(eventData, cancellationToken);
@@ -38,7 +38,7 @@ namespace Tycho.Messaging.Handlers
         public TransientCommandHandler(Func<ICommandHandler<Command>> handlerCreator)
             : base(handlerCreator) { }
 
-        public Task Handle(Command commandData, CancellationToken cancellationToken = default)
+        public Task Handle(Command commandData, CancellationToken cancellationToken)
         {
             var handler = _createHandler();
             return handler.Handle(commandData, cancellationToken);
@@ -53,7 +53,7 @@ namespace Tycho.Messaging.Handlers
         public TransientQueryHandler(Func<IQueryHandler<Query, Response>> handlerCreator)
             : base(handlerCreator) { }
 
-        public Task<Response> Handle(Query queryData, CancellationToken cancellationToken = default)
+        public Task<Response> Handle(Query queryData, CancellationToken cancellationToken)
         {
             var handler = _createHandler();
             return handler.Handle(queryData, cancellationToken);

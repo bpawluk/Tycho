@@ -6,8 +6,7 @@ namespace Tycho.Messaging.Handlers
 {
     public interface ICommandHandler { }
 
-    public interface ICommandHandler<in Command>
-        : ICommandHandler
+    public interface ICommandHandler<in Command> : ICommandHandler
         where Command : class, ICommand
     {
         Task Handle(Command commandData, CancellationToken cancellationToken = default);
