@@ -9,7 +9,7 @@ namespace SampleApp.App;
 
 internal class Program
 {
-    static async Task Main(string[] args)
+    static async Task Main()
     {
         var app = await new AppModule().Build();
 
@@ -17,11 +17,11 @@ internal class Program
         await PrintStoreCatalog(app);
         
         Console.WriteLine("\nLook for watches...");
-        var watchData = await app.ExecuteQuery<FindProductQuery, Product>(new("watch"));
-        Console.WriteLine(watchData);
+        var watch = await app.ExecuteQuery<FindProductQuery, Product>(new("watch"));
+        Console.WriteLine(watch);
 
         Console.WriteLine("... and buy 10 of them.");
-        await app.ExecuteCommand<BuyProductCommand>(new(watchData.Id, 10));
+        await app.ExecuteCommand<BuyProductCommand>(new(watch.Id, 10));
 
         Console.WriteLine("\nNow the store catalog looks like this:");
         await PrintStoreCatalog(app);
