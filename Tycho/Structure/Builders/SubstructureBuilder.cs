@@ -22,7 +22,7 @@ namespace Tycho.Structure.Builders
         public ISubstructureDefinition AddSubmodule<Module>() 
             where Module : TychoModule, new()
         {
-            var submodule = new Module().Setup(_serviceProvider);
+            var submodule = new Module().UseServices(_serviceProvider);
             AddSubmodule(submodule);
             return this;
         }
@@ -30,7 +30,7 @@ namespace Tycho.Structure.Builders
         public ISubstructureDefinition AddSubmodule<Module>(Action<IOutboxConsumer> contractFullfilment)
             where Module : TychoModule, new()
         {
-            var submodule = new Module().Setup(_serviceProvider).Setup(contractFullfilment);
+            var submodule = new Module().UseServices(_serviceProvider).FulfillContract(contractFullfilment);
             AddSubmodule(submodule);
             return this;
         }
@@ -44,7 +44,7 @@ namespace Tycho.Structure.Builders
                 submodulesSnapshot = _submodules.ToList();
             }
 
-            return await Task.WhenAll(submodulesSnapshot.Select(async module => await module.Build().ConfigureAwait(false)));
+            return await Task.WhenAll(submodulesSnapshot.Select(module => module.Build())).ConfigureAwait(false);
         }
 
         private void AddSubmodule(TychoModule submodule)

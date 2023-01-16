@@ -15,7 +15,7 @@ namespace Tycho
 {
     public abstract class TychoModule
     {
-        private IServiceProvider? _externalServiceProvider;
+        private IServiceProvider? _externalServices;
         private Action<IOutboxConsumer>? _contractFullfilment;
 
         protected abstract void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services);
@@ -28,19 +28,13 @@ namespace Tycho
 
         protected virtual Task Startup(IServiceProvider services) { return Task.CompletedTask; }
 
-        public TychoModule Configure()
+        public TychoModule UseServices(IServiceProvider services)
         {
-            // TODO: Providing and using configuration data
+            _externalServices = services;
             return this;
         }
 
-        public TychoModule Setup(IServiceProvider serviceProvider)
-        {
-            _externalServiceProvider = serviceProvider;
-            return this;
-        }
-
-        public TychoModule Setup(Action<IOutboxConsumer> contractFullfilment)
+        public TychoModule FulfillContract(Action<IOutboxConsumer> contractFullfilment)
         {
             _contractFullfilment = contractFullfilment;
             return this;
@@ -49,46 +43,50 @@ namespace Tycho
         public async Task<IModule> Build()
         {
             var module = CreateModule();
-            var services = CollectServices(module);
-            module.SetSubmodules(await BuildModuleSubtree(services).ConfigureAwait(false));
-            module.SetInternalBroker(BuildInternalMessageBroker(services));
-            module.SetExternalBroker(BuildExternalMessageBroker(services));
-            await Startup(services).ConfigureAwait(false);
+            var internalServices = CollectInternalServices(module);
+
+            var submodules = await BuildSubstructure(internalServices).ConfigureAwait(false);
+            module.SetSubmodules(submodules);
+
+            module.SetInternalBroker(BuildMessageOutbox(internalServices));
+            module.SetExternalBroker(BuildMessageInbox(internalServices));
+
+            await Startup(internalServices).ConfigureAwait(false);
             return module;
         }
 
-        private IServiceProvider CollectServices(Module module)
+        private IServiceProvider CollectInternalServices(Module module)
         {
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddSingleton<IModule>(module.Internals);
-            serviceCollection.AddSingleton(typeof(ISubmodule<>), typeof(SubmoduleProxy<>));
-            RegisterServices(serviceCollection);
-            return serviceCollection.BuildServiceProvider();
+            var services = new ServiceCollection();
+            services.AddModuleInternals(module);
+            services.AddSubmodules();
+            RegisterServices(services);
+            return services.BuildServiceProvider();
         }
 
-        private async Task<IEnumerable<IModule>> BuildModuleSubtree(IServiceProvider serviceProvider)
+        private async Task<IEnumerable<IModule>> BuildSubstructure(IServiceProvider internalServices)
         {
-            var submodulesBuilder = new SubstructureBuilder(serviceProvider);
-            IncludeSubmodules(submodulesBuilder, serviceProvider);
-            return await submodulesBuilder.Build().ConfigureAwait(false);
+            var builder = new SubstructureBuilder(internalServices);
+            IncludeSubmodules(builder, internalServices);
+            return await builder.Build().ConfigureAwait(false);
         }
 
-        private IMessageBroker BuildInternalMessageBroker(IServiceProvider serviceProvider)
+        private IMessageBroker BuildMessageOutbox(IServiceProvider internalServices)
         {
             var outboxRouter = new MessageRouter();
-            var instanceCreator = new InstanceCreator(_externalServiceProvider);
+            var instanceCreator = new InstanceCreator(_externalServices);
             var outboxBuilder = new OutboxBuilder(instanceCreator, outboxRouter);
-            DeclareOutgoingMessages(outboxBuilder, serviceProvider);
+            DeclareOutgoingMessages(outboxBuilder, internalServices);
             _contractFullfilment?.Invoke(outboxBuilder);
             return outboxBuilder.Build();
         }
 
-        private IMessageBroker BuildExternalMessageBroker(IServiceProvider serviceProvider)
+        private IMessageBroker BuildMessageInbox(IServiceProvider internalServices)
         {
             var inboxRouter = new MessageRouter();
-            var instanceCreator = new InstanceCreator(serviceProvider);
+            var instanceCreator = new InstanceCreator(internalServices);
             var inboxBuilder = new InboxBuilder(instanceCreator, inboxRouter);
-            DeclareIncomingMessages(inboxBuilder, serviceProvider);
+            DeclareIncomingMessages(inboxBuilder, internalServices);
             return inboxBuilder.Build();
         }
 
