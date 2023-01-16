@@ -21,7 +21,7 @@ namespace Tycho.Structure.Modules
         {
             if (_submodules is null)
             {
-                _submodules = submodules.ToDictionary(x => x.GetType());
+                _submodules = submodules.ToDictionary(x => x.GetType().GetGenericArguments()[0]);
             }
             else
             {
