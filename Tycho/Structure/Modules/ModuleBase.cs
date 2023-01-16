@@ -13,7 +13,7 @@ namespace Tycho.Structure.Modules
         public void PublishEvent<Event>(Event eventData, CancellationToken cancellationToken)
             where Event : class, IEvent
         {
-            if (_messageBroker == null)
+            if (_messageBroker is null)
             {
                 throw new InvalidOperationException("Could not publish an event " +
                     "because this module does have a message broker defined");
@@ -24,7 +24,7 @@ namespace Tycho.Structure.Modules
         public Task ExecuteCommand<Command>(Command commandData, CancellationToken cancellationToken)
             where Command : class, ICommand
         {
-            if (_messageBroker == null)
+            if (_messageBroker is null)
             {
                 throw new InvalidOperationException("Could not execute a command " +
                     "because this module does have a message broker defined");
@@ -35,7 +35,7 @@ namespace Tycho.Structure.Modules
         public Task<Response> ExecuteQuery<Query, Response>(Query queryData, CancellationToken cancellationToken)
             where Query : class, IQuery<Response>
         {
-            if (_messageBroker == null)
+            if (_messageBroker is null)
             {
                 throw new InvalidOperationException("Could not execute a query " +
                     "because this module does have a message broker defined");
