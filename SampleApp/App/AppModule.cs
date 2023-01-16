@@ -1,48 +1,49 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SampleApp.App.Handlers;
+using SampleApp.Catalog;
+using SampleApp.Catalog.Model;
+using SampleApp.Inventory;
+using SampleApp.Pricing;
 using System;
+using System.Collections.Generic;
 using Tycho;
-using Tycho.Messaging.Contracts;
+using Tycho.Contract;
 using Tycho.Messaging.Payload;
 using Tycho.Structure;
 
 namespace SampleApp.App;
 
-public sealed class AppModule : ModuleDefinition
+// Incoming
+public record BuyProductCommand(string ProductId, int Amount) : ICommand;
+
+// Outgoing
+// - no outgoing messages
+
+public sealed class AppModule : TychoModule
 {
-    public record IncomingEvent() : IEvent;
-    public record IncomingCommand() : ICommand;
-    public record IncomingQuery() : IQuery<bool>;
-
-    protected override void DeclareIncomingMessages(IInboxBuilder module, IServiceProvider services)
+    protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
-        module.SubscribesTo((IncomingEvent eventData) => { })
-              .Executes((IncomingCommand commandData) => { })
-              .RespondsTo((IncomingQuery queryData) => false);
+        module.RespondsTo<GetProductsQuery, IEnumerable<Product>, GetProductsQueryHandler>()
+              .RespondsTo<FindProductQuery, Product, FindProductQueryHandler>()
+              .Executes<BuyProductCommand, BuyProductCommandHandler>();
     }
 
-    public record OutgoingEvent() : IEvent;
-    public record OutgoingCommand() : ICommand;
-    public record OutgoingQuery() : IQuery<bool>;
+    protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services) { }
 
-    protected override void DeclareOutgoingMessages(IOutboxProducer module, IServiceProvider services)
+    protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services)
     {
-        module.Publishes<OutgoingEvent>()
-              .Sends<OutgoingCommand>()
-              .Sends<OutgoingQuery, bool>();
-    }
+        module.AddSubmodule<CatalogModule>();
 
-    protected override void IncludeSubmodules(ISubmodulesDefiner submodules, IServiceProvider services)
-    {
-        submodules.Add<AppModule>((IOutboxConsumer submodule) =>
+        module.AddSubmodule<InventoryModule>((IOutboxConsumer act) =>
         {
-            submodule.OnEvent((OutgoingEvent eventData) => { })
-                     .OnCommand((OutgoingCommand commandData) => { })
-                     .OnQuery((OutgoingQuery queryData) => false);
+            act.OnEvent<Inventory.StockLevelChangedEvent, StockLevelChangedEventHandler>();
+        });
+
+        module.AddSubmodule<PricingModule>((IOutboxConsumer act) =>
+        {
+            act.OnEvent<Pricing.PriceChangedEvent, PriceChangedEventHandler>();
         });
     }
 
-    protected override void RegisterServices(IServiceCollection services) 
-    { 
-
-    }
+    protected override void RegisterServices(IServiceCollection services) { }
 }
