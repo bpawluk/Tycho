@@ -47,7 +47,7 @@ namespace Tycho.Contract.Builders
         #endregion
 
         #region IOutboxConsumer.Events
-        public IOutboxConsumer OnEvent<Event>(Action<Event> action)
+        public IOutboxConsumer HandleEvent<Event>(Action<Event> action)
             where Event : class, IEvent
         {
             var handler = new LambdaWrappingEventHandler<Event>(action);
@@ -55,7 +55,7 @@ namespace Tycho.Contract.Builders
             return this;
         }
 
-        public IOutboxConsumer OnEvent<Event>(Func<Event, Task> function)
+        public IOutboxConsumer HandleEvent<Event>(Func<Event, Task> function)
             where Event : class, IEvent
         {
             var handler = new LambdaWrappingEventHandler<Event>(function);
@@ -63,7 +63,7 @@ namespace Tycho.Contract.Builders
             return this;
         }
 
-        public IOutboxConsumer OnEvent<Event>(Func<Event, CancellationToken, Task> function)
+        public IOutboxConsumer HandleEvent<Event>(Func<Event, CancellationToken, Task> function)
             where Event : class, IEvent
         {
             var handler = new LambdaWrappingEventHandler<Event>(function);
@@ -71,14 +71,14 @@ namespace Tycho.Contract.Builders
             return this;
         }
 
-        public IOutboxConsumer OnEvent<Event>(IEventHandler<Event> handler)
+        public IOutboxConsumer HandleEvent<Event>(IEventHandler<Event> handler)
             where Event : class, IEvent
         {
             RegisterEventHandler(handler);
             return this;
         }
 
-        public IOutboxConsumer OnEvent<Event, Handler>()
+        public IOutboxConsumer HandleEvent<Event, Handler>()
             where Handler : class, IEventHandler<Event>
             where Event : class, IEvent
         {
@@ -98,7 +98,7 @@ namespace Tycho.Contract.Builders
         #endregion
 
         #region IOutboxConsumer.Commands
-        public IOutboxConsumer OnCommand<Command>(Action<Command> action)
+        public IOutboxConsumer HandleCommand<Command>(Action<Command> action)
             where Command : class, ICommand
         {
             var handler = new LambdaWrappingCommandHandler<Command>(action);
@@ -106,7 +106,7 @@ namespace Tycho.Contract.Builders
             return this;
         }
 
-        public IOutboxConsumer OnCommand<Command>(Func<Command, Task> function)
+        public IOutboxConsumer HandleCommand<Command>(Func<Command, Task> function)
             where Command : class, ICommand
         {
             var handler = new LambdaWrappingCommandHandler<Command>(function);
@@ -114,7 +114,7 @@ namespace Tycho.Contract.Builders
             return this;
         }
 
-        public IOutboxConsumer OnCommand<Command>(Func<Command, CancellationToken, Task> function)
+        public IOutboxConsumer HandleCommand<Command>(Func<Command, CancellationToken, Task> function)
             where Command : class, ICommand
         {
             var handler = new LambdaWrappingCommandHandler<Command>(function);
@@ -122,14 +122,14 @@ namespace Tycho.Contract.Builders
             return this;
         }
 
-        public IOutboxConsumer OnCommand<Command>(ICommandHandler<Command> handler)
+        public IOutboxConsumer HandleCommand<Command>(ICommandHandler<Command> handler)
             where Command : class, ICommand
         {
             RegisterCommandHandler(handler);
             return this;
         }
 
-        public IOutboxConsumer OnCommand<Command, Handler>()
+        public IOutboxConsumer HandleCommand<Command, Handler>()
             where Handler : class, ICommandHandler<Command>
             where Command : class, ICommand
         {
@@ -139,7 +139,7 @@ namespace Tycho.Contract.Builders
             return this;
         }
 
-        public IOutboxConsumer Ignore<Command>()
+        public IOutboxConsumer IgnoreCommand<Command>()
             where Command : class, ICommand
         {
             var handler = new StubCommandHandler<Command>();
@@ -157,7 +157,7 @@ namespace Tycho.Contract.Builders
         #endregion
 
         #region IOutboxConsumer.Queries
-        public IOutboxConsumer OnQuery<Query, Response>(Func<Query, Response> function)
+        public IOutboxConsumer HandleQuery<Query, Response>(Func<Query, Response> function)
             where Query : class, IQuery<Response>
         {
             var handler = new LambdaWrappingQueryHandler<Query, Response>(function);
@@ -165,7 +165,7 @@ namespace Tycho.Contract.Builders
             return this;
         }
 
-        public IOutboxConsumer OnQuery<Query, Response>(Func<Query, Task<Response>> function)
+        public IOutboxConsumer HandleQuery<Query, Response>(Func<Query, Task<Response>> function)
             where Query : class, IQuery<Response>
         {
             var handler = new LambdaWrappingQueryHandler<Query, Response>(function);
@@ -173,7 +173,7 @@ namespace Tycho.Contract.Builders
             return this;
         }
 
-        public IOutboxConsumer OnQuery<Query, Response>(Func<Query, CancellationToken, Task<Response>> function)
+        public IOutboxConsumer HandleQuery<Query, Response>(Func<Query, CancellationToken, Task<Response>> function)
             where Query : class, IQuery<Response>
         {
             var handler = new LambdaWrappingQueryHandler<Query, Response>(function);
@@ -181,14 +181,14 @@ namespace Tycho.Contract.Builders
             return this;
         }
 
-        public IOutboxConsumer OnQuery<Query, Response>(IQueryHandler<Query, Response> handler)
+        public IOutboxConsumer HandleQuery<Query, Response>(IQueryHandler<Query, Response> handler)
             where Query : class, IQuery<Response>
         {
             RegisterQueryHandler(handler);
             return this;
         }
 
-        public IOutboxConsumer OnQuery<Query, Response, Handler>()
+        public IOutboxConsumer HandleQuery<Query, Response, Handler>()
             where Handler : class, IQueryHandler<Query, Response>
             where Query : class, IQuery<Response>
         {
@@ -198,7 +198,7 @@ namespace Tycho.Contract.Builders
             return this;
         }
 
-        public IOutboxConsumer Return<Query, Response>(Response response)
+        public IOutboxConsumer HandleQuery<Query, Response>(Response response)
             where Query : class, IQuery<Response>
         {
             var handler = new StubQueryHandler<Query, Response>(response);

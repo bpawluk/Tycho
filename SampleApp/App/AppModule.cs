@@ -34,14 +34,14 @@ public sealed class AppModule : TychoModule
     {
         module.AddSubmodule<CatalogModule>();
 
-        module.AddSubmodule<InventoryModule>((IOutboxConsumer act) =>
+        module.AddSubmodule<InventoryModule>((IOutboxConsumer thisModule) =>
         {
-            act.OnEvent<Inventory.StockLevelChangedEvent, StockLevelChangedEventHandler>();
+            thisModule.HandleEvent<Inventory.StockLevelChangedEvent, StockLevelChangedEventHandler>();
         });
 
-        module.AddSubmodule<PricingModule>((IOutboxConsumer act) =>
+        module.AddSubmodule<PricingModule>((IOutboxConsumer thisModule) =>
         {
-            act.OnEvent<Pricing.PriceChangedEvent, PriceChangedEventHandler>();
+            thisModule.HandleEvent<Pricing.PriceChangedEvent, PriceChangedEventHandler>();
         });
     }
 

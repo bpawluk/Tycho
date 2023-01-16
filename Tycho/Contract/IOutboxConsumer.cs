@@ -9,62 +9,62 @@ namespace Tycho.Contract
     public interface IOutboxConsumer
     {
         #region Events
-        IOutboxConsumer OnEvent<Event>(Action<Event> action)
+        IOutboxConsumer HandleEvent<Event>(Action<Event> action)
             where Event : class, IEvent;
 
-        IOutboxConsumer OnEvent<Event>(Func<Event, Task> function)
+        IOutboxConsumer HandleEvent<Event>(Func<Event, Task> function)
             where Event : class, IEvent;
 
-        IOutboxConsumer OnEvent<Event>(Func<Event, CancellationToken, Task> function)
+        IOutboxConsumer HandleEvent<Event>(Func<Event, CancellationToken, Task> function)
             where Event : class, IEvent;
 
-        IOutboxConsumer OnEvent<Event>(IEventHandler<Event> handler)
+        IOutboxConsumer HandleEvent<Event>(IEventHandler<Event> handler)
             where Event : class, IEvent;
 
-        IOutboxConsumer OnEvent<Event, Handler>()
+        IOutboxConsumer HandleEvent<Event, Handler>()
             where Handler : class, IEventHandler<Event>
             where Event : class, IEvent;
         #endregion
 
         #region Commands
-        IOutboxConsumer OnCommand<Command>(Action<Command> action)
+        IOutboxConsumer HandleCommand<Command>(Action<Command> action)
             where Command : class, ICommand;
 
-        IOutboxConsumer OnCommand<Command>(Func<Command, Task> function)
+        IOutboxConsumer HandleCommand<Command>(Func<Command, Task> function)
             where Command : class, ICommand;
 
-        IOutboxConsumer OnCommand<Command>(Func<Command, CancellationToken, Task> function)
+        IOutboxConsumer HandleCommand<Command>(Func<Command, CancellationToken, Task> function)
             where Command : class, ICommand;
 
-        IOutboxConsumer OnCommand<Command>(ICommandHandler<Command> handler)
+        IOutboxConsumer HandleCommand<Command>(ICommandHandler<Command> handler)
             where Command : class, ICommand;
 
-        IOutboxConsumer OnCommand<Command, Handler>()
+        IOutboxConsumer HandleCommand<Command, Handler>()
             where Handler : class, ICommandHandler<Command>
             where Command : class, ICommand;
 
-        IOutboxConsumer Ignore<Command>()
+        IOutboxConsumer IgnoreCommand<Command>()
             where Command : class, ICommand;
         #endregion
 
         #region Queries
-        IOutboxConsumer OnQuery<Query, Response>(Func<Query, Response> function)
+        IOutboxConsumer HandleQuery<Query, Response>(Func<Query, Response> function)
             where Query : class, IQuery<Response>;
 
-        IOutboxConsumer OnQuery<Query, Response>(Func<Query, Task<Response>> function)
+        IOutboxConsumer HandleQuery<Query, Response>(Func<Query, Task<Response>> function)
             where Query : class, IQuery<Response>;
 
-        IOutboxConsumer OnQuery<Query, Response>(Func<Query, CancellationToken, Task<Response>> function)
+        IOutboxConsumer HandleQuery<Query, Response>(Func<Query, CancellationToken, Task<Response>> function)
             where Query : class, IQuery<Response>;
 
-        IOutboxConsumer OnQuery<Query, Response>(IQueryHandler<Query, Response> handler)
+        IOutboxConsumer HandleQuery<Query, Response>(IQueryHandler<Query, Response> handler)
             where Query : class, IQuery<Response>;
 
-        IOutboxConsumer OnQuery<Query, Response, Handler>()
+        IOutboxConsumer HandleQuery<Query, Response, Handler>()
             where Handler : class, IQueryHandler<Query, Response>
             where Query : class, IQuery<Response>;
 
-        IOutboxConsumer Return<Query, Response>(Response response)
+        IOutboxConsumer HandleQuery<Query, Response>(Response response)
             where Query : class, IQuery<Response>;
         #endregion
     }

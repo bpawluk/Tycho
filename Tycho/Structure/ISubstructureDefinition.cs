@@ -8,7 +8,7 @@ namespace Tycho.Structure
         ISubstructureDefinition AddSubmodule<Module>()
             where Module : TychoModule, new();
 
-        ISubstructureDefinition AddSubmodule<Module>(Action<IOutboxConsumer> contractFullfilment)
+        ISubstructureDefinition AddSubmodule<Module>(Action<IOutboxConsumer> consumeMessages)
             where Module : TychoModule, new();
     }
 }
