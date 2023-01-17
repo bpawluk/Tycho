@@ -9,7 +9,7 @@ namespace Test.Messaging;
 
 public class MessageRouterTests
 {
-    private readonly IMessageRouter _messageRouter;
+    private readonly MessageRouter _messageRouter;
 
     public MessageRouterTests()
     {

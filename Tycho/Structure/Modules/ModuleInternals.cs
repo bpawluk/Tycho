@@ -8,20 +8,32 @@ namespace Tycho.Structure.Modules
     {
         private IReadOnlyDictionary<Type, IModule>? _submodules;
 
-        public IModule GetSubmodule<T>()
+        public IModule GetSubmodule<Definition>() where Definition : TychoModule
         {
-            if (_submodules?.ContainsKey(typeof(T)) is true)
+            if (_submodules?.ContainsKey(typeof(Definition)) is true)
             {
-                return _submodules[typeof(T)];
+                return _submodules[typeof(Definition)];
             }
-            throw new InvalidOperationException($"{typeof(T).Name} is not a submodule of this module");
+            throw new InvalidOperationException($"{typeof(Definition).Name} is not a submodule of this module");
         }
 
         public void SetSubmodules(IEnumerable<IModule> submodules)
         {
             if (_submodules is null)
             {
-                _submodules = submodules.ToDictionary(x => x.GetType().GetGenericArguments()[0]);
+                var submodulesCollection = new Dictionary<Type, IModule>();
+
+                foreach (var submodule in submodules)
+                {
+                    var submoduleDefinitionType = submodule.GetType().GetGenericArguments()[0];
+                    if (!submodulesCollection.TryAdd(submoduleDefinitionType, submodule))
+                    {
+                        throw new InvalidOperationException($"{submoduleDefinitionType.Name} " +
+                            $"is already defined as a submodule of this module");
+                    }
+                }
+
+                _submodules = submodulesCollection;
             }
             else
             {

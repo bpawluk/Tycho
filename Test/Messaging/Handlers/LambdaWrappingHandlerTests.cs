@@ -17,7 +17,7 @@ public class LambdaWrappingHandlerTests
 
         // Act
         var eventToPublish = new TestEvent("test-event");
-        await handler.Handle(eventToPublish);
+        await handler.Handle(eventToPublish, CancellationToken.None);
 
         // Assert
         Assert.Equal(eventToPublish, passedEvent);
@@ -37,7 +37,7 @@ public class LambdaWrappingHandlerTests
 
         // Act
         var eventToPublish = new TestEvent("test-event");
-        await handler.Handle(eventToPublish);
+        await handler.Handle(eventToPublish, CancellationToken.None);
 
         // Assert
         Assert.Equal(eventToPublish, passedEvent);
@@ -77,7 +77,7 @@ public class LambdaWrappingHandlerTests
 
         // Act
         var commandToExecute = new TestCommand("test-command");
-        await handler.Handle(commandToExecute);
+        await handler.Handle(commandToExecute, CancellationToken.None);
 
         // Assert
         Assert.Equal(commandToExecute, passedCommand);
@@ -97,7 +97,7 @@ public class LambdaWrappingHandlerTests
 
         // Act
         var commandToExecute = new TestCommand("test-command");
-        await handler.Handle(commandToExecute);
+        await handler.Handle(commandToExecute, CancellationToken.None);
 
         // Assert
         Assert.Equal(commandToExecute, passedCommand);
@@ -142,7 +142,7 @@ public class LambdaWrappingHandlerTests
 
         // Act
         var queryToExecute = new TestQuery("test-query");
-        var result = await handler.Handle(queryToExecute);
+        var result = await handler.Handle(queryToExecute, CancellationToken.None);
 
         // Assert
         Assert.Equal(queryToExecute, passedQuery);
@@ -165,7 +165,7 @@ public class LambdaWrappingHandlerTests
 
         // Act
         var queryToExecute = new TestQuery("test-query");
-        var result = await handler.Handle(queryToExecute);
+        var result = await handler.Handle(queryToExecute, CancellationToken.None);
 
         // Assert
         Assert.Equal(queryToExecute, passedQuery);

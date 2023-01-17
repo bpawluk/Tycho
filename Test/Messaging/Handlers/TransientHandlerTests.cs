@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Test.Utils;
 using Tycho.Messaging.Handlers;
@@ -21,10 +22,10 @@ public class TransientHandlerTests
         var handler = new TransientEventHandler<TestEvent>(TestHandlerCreator<TestMessageHandler>);
 
         // Act & Assert
-        await handler.Handle(new TestEvent("test-event"));
+        await handler.Handle(new TestEvent("test-event"), CancellationToken.None);
         Assert.Equal(1, _testHandlerCreatorInvocationCount);
 
-        await handler.Handle(new TestEvent("test-event"));
+        await handler.Handle(new TestEvent("test-event"), CancellationToken.None);
         Assert.Equal(2, _testHandlerCreatorInvocationCount);
     }
 
@@ -35,10 +36,10 @@ public class TransientHandlerTests
         var handler = new TransientCommandHandler<TestCommand>(TestHandlerCreator<TestMessageHandler>);
 
         // Act & Assert
-        await handler.Handle(new TestCommand("test-command"));
+        await handler.Handle(new TestCommand("test-command"), CancellationToken.None);
         Assert.Equal(1, _testHandlerCreatorInvocationCount);
 
-        await handler.Handle(new TestCommand("test-command"));
+        await handler.Handle(new TestCommand("test-command"), CancellationToken.None);
         Assert.Equal(2, _testHandlerCreatorInvocationCount);
     }
 
@@ -49,10 +50,10 @@ public class TransientHandlerTests
         var handler = new TransientQueryHandler<TestQuery, string>(TestHandlerCreator<TestMessageHandler>);
 
         // Act & Assert
-        await handler.Handle(new TestQuery("test-query"));
+        await handler.Handle(new TestQuery("test-query"), CancellationToken.None);
         Assert.Equal(1, _testHandlerCreatorInvocationCount);
 
-        await handler.Handle(new TestQuery("test-query"));
+        await handler.Handle(new TestQuery("test-query"), CancellationToken.None);
         Assert.Equal(2, _testHandlerCreatorInvocationCount);
     }
 

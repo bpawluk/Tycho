@@ -15,7 +15,7 @@ public class MessageBrokerTests
     private readonly Mock<ICommandHandler<TestCommand>> _commandHandlerMock;
     private readonly Mock<IQueryHandler<TestQuery, string>> _queryHandlerMock;
     private readonly Mock<IMessageRouter> _messageRouterMock;
-    private readonly IMessageBroker _messageBroker;
+    private readonly MessageBroker _messageBroker;
 
     public MessageBrokerTests()
     {
@@ -35,11 +35,11 @@ public class MessageBrokerTests
                           .Returns(new[] { _eventHandlerMock.Object, _otherEventHandlerMock.Object });
 
         // Act
-        Assert.Throws<ArgumentException>(() => _messageBroker.PublishEvent<TestEvent>(null!));
+        Assert.Throws<ArgumentException>(() => _messageBroker.PublishEvent<TestEvent>(null!, CancellationToken.None));
 
         // Assert
-        _eventHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestEvent>(), default), Times.Never());
-        _otherEventHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestEvent>(), default), Times.Never());
+        _eventHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestEvent>(), It.IsAny<CancellationToken>()), Times.Never());
+        _otherEventHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestEvent>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
@@ -50,11 +50,11 @@ public class MessageBrokerTests
                           .Returns(Enumerable.Empty<IEventHandler<TestEvent>>());
 
         // Act
-        _messageBroker.PublishEvent(new TestEvent("test-event"));
+        _messageBroker.PublishEvent(new TestEvent("test-event"), CancellationToken.None);
 
         // Assert
-        _eventHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestEvent>(), default), Times.Never());
-        _otherEventHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestEvent>(), default), Times.Never());
+        _eventHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestEvent>(), It.IsAny<CancellationToken>()), Times.Never());
+        _otherEventHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestEvent>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
@@ -64,12 +64,15 @@ public class MessageBrokerTests
         _messageRouterMock.Setup(router => router.GetEventHandlers<TestEvent>())
                           .Returns(new[] { _eventHandlerMock.Object });
 
+        var eventToPublish = new TestEvent("test-event");
+        var tokenToPass = new CancellationToken();
+
         // Act
-        _messageBroker.PublishEvent(new TestEvent("test-event"));
+        _messageBroker.PublishEvent(eventToPublish, tokenToPass);
 
         // Assert
-        _eventHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestEvent>(), default), Times.Once());
-        _otherEventHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestEvent>(), default), Times.Never());
+        _eventHandlerMock.Verify(handler => handler.Handle(eventToPublish, tokenToPass), Times.Once());
+        _otherEventHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestEvent>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
@@ -79,12 +82,15 @@ public class MessageBrokerTests
         _messageRouterMock.Setup(router => router.GetEventHandlers<TestEvent>())
                           .Returns(new[] { _eventHandlerMock.Object, _otherEventHandlerMock.Object });
 
+        var eventToPublish = new TestEvent("test-event");
+        var tokenToPass = new CancellationToken();
+
         // Act
-        _messageBroker.PublishEvent(new TestEvent("test-event"));
+        _messageBroker.PublishEvent(eventToPublish, tokenToPass);
 
         // Assert
-        _eventHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestEvent>(), default), Times.Once());
-        _otherEventHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestEvent>(), default), Times.Once());
+        _eventHandlerMock.Verify(handler => handler.Handle(eventToPublish, tokenToPass), Times.Once());
+        _otherEventHandlerMock.Verify(handler => handler.Handle(eventToPublish, tokenToPass), Times.Once());
     }
 
     [Fact]
@@ -97,45 +103,22 @@ public class MessageBrokerTests
             await Task.Delay(250);
             handlerFinished = true;
         };
+
         _eventHandlerMock.Setup(handler => handler.Handle(It.IsAny<TestEvent>(), default))
                          .Returns(handlerWorkload);
+
         _messageRouterMock.Setup(router => router.GetEventHandlers<TestEvent>())
                           .Returns(new[] { _eventHandlerMock.Object });
 
-        // Act
-        _messageBroker.PublishEvent(new TestEvent("test-event"));
-
-        // Assert
-        Assert.False(handlerFinished);
-        _eventHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestEvent>(), default), Times.Once());
-        _otherEventHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestEvent>(), default), Times.Never());
-    }
-
-    [Fact]
-    public void PublishEvent_WithCancellationToken_PassesTheToken()
-    {
-        // Arrange
-        TestEvent? passedEvent = null;
-        CancellationToken? passedToken = null;
-        _eventHandlerMock.Setup(handler => handler.Handle(It.IsAny<TestEvent>(), It.IsAny<CancellationToken>()))
-                         .Returns((TestEvent eventData, CancellationToken token) =>
-                         {
-                             passedEvent = eventData;
-                             passedToken = token;
-                             return Task.CompletedTask;
-                         });
-        _messageRouterMock.Setup(router => router.GetEventHandlers<TestEvent>())
-                          .Returns(new[] { _eventHandlerMock.Object });
-
-        // Act
         var eventToPublish = new TestEvent("test-event");
         var tokenToPass = new CancellationToken();
+
+        // Act
         _messageBroker.PublishEvent(eventToPublish, tokenToPass);
 
         // Assert
-        Assert.Equal(eventToPublish, passedEvent);
-        Assert.Equal(tokenToPass, passedToken);
-        _eventHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestEvent>(), It.IsAny<CancellationToken>()), Times.Once());
+        Assert.False(handlerFinished);
+        _eventHandlerMock.Verify(handler => handler.Handle(eventToPublish, tokenToPass), Times.Once());
         _otherEventHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestEvent>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
@@ -147,10 +130,10 @@ public class MessageBrokerTests
                           .Returns(_commandHandlerMock.Object);
 
         // Act
-        await Assert.ThrowsAsync<ArgumentException>(() => _messageBroker.ExecuteCommand<TestCommand>(null!));
+        await Assert.ThrowsAsync<ArgumentException>(() => _messageBroker.ExecuteCommand<TestCommand>(null!, CancellationToken.None));
 
         // Assert
-        _commandHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestCommand>(), default), Times.Never());
+        _commandHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestCommand>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
@@ -160,10 +143,10 @@ public class MessageBrokerTests
         // - no arrangement required
 
         // Act
-        await Assert.ThrowsAsync<NullReferenceException>(() => _messageBroker.ExecuteCommand<TestCommand>(new TestCommand("test-command")));
+        await Assert.ThrowsAsync<NullReferenceException>(() => _messageBroker.ExecuteCommand<TestCommand>(new TestCommand("test-command"), CancellationToken.None));
 
         // Assert
-        _commandHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestCommand>(), default), Times.Never());
+        _commandHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestCommand>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
@@ -173,11 +156,14 @@ public class MessageBrokerTests
         _messageRouterMock.Setup(router => router.GetCommandHandler<TestCommand>())
                           .Returns(_commandHandlerMock.Object);
 
+        var commandToExecute = new TestCommand("test-command");
+        var tokenToPass = new CancellationToken();
+
         // Act
-        await _messageBroker.ExecuteCommand(new TestCommand("test-command"));
+        await _messageBroker.ExecuteCommand(commandToExecute, tokenToPass);
 
         // Assert
-        _commandHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestCommand>(), default), Times.Once());
+        _commandHandlerMock.Verify(handler => handler.Handle(commandToExecute, tokenToPass), Times.Once());
     }
 
     [Fact]
@@ -190,44 +176,22 @@ public class MessageBrokerTests
             await Task.Delay(250);
             handlerFinished = true;
         };
+
         _commandHandlerMock.Setup(handler => handler.Handle(It.IsAny<TestCommand>(), default))
                            .Returns(handlerWorkload);
+
         _messageRouterMock.Setup(router => router.GetCommandHandler<TestCommand>())
                           .Returns(_commandHandlerMock.Object);
 
-        // Act
-        await _messageBroker.ExecuteCommand(new TestCommand("test-command"));
-
-        // Assert
-        Assert.True(handlerFinished);
-        _commandHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestCommand>(), default), Times.Once());
-    }
-
-    [Fact]
-    public async Task ExecuteCommand_WithCancellationToken_PassesTheToken()
-    {
-        // Arrange
-        TestCommand? passedCommand = null;
-        CancellationToken? passedToken = null;
-        _commandHandlerMock.Setup(handler => handler.Handle(It.IsAny<TestCommand>(), It.IsAny<CancellationToken>()))
-                           .Returns((TestCommand commandData, CancellationToken token) =>
-                           {
-                               passedCommand = commandData;
-                               passedToken = token;
-                               return Task.CompletedTask;
-                           });
-        _messageRouterMock.Setup(router => router.GetCommandHandler<TestCommand>())
-                          .Returns(_commandHandlerMock.Object);
-
-        // Act
         var commandToExecute = new TestCommand("test-command");
         var tokenToPass = new CancellationToken();
+
+        // Act
         await _messageBroker.ExecuteCommand(commandToExecute, tokenToPass);
 
         // Assert
-        Assert.Equal(commandToExecute, passedCommand);
-        Assert.Equal(tokenToPass, passedToken);
-        _commandHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestCommand>(), default), Times.Once());
+        Assert.True(handlerFinished);
+        _commandHandlerMock.Verify(handler => handler.Handle(commandToExecute, tokenToPass), Times.Once());
     }
 
     [Fact]
@@ -238,10 +202,10 @@ public class MessageBrokerTests
                           .Returns(_queryHandlerMock.Object);
 
         // Act
-        await Assert.ThrowsAsync<ArgumentException>(() => _messageBroker.ExecuteQuery<TestQuery, string>(null!));
+        await Assert.ThrowsAsync<ArgumentException>(() => _messageBroker.ExecuteQuery<TestQuery, string>(null!, CancellationToken.None));
 
         // Assert
-        _queryHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestQuery>(), default), Times.Never());
+        _queryHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestQuery>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
@@ -251,10 +215,10 @@ public class MessageBrokerTests
         // - no arrangement required
 
         // Act
-        await Assert.ThrowsAsync<NullReferenceException>(() => _messageBroker.ExecuteQuery<TestQuery, string>(new TestQuery("test-query")));
+        await Assert.ThrowsAsync<NullReferenceException>(() => _messageBroker.ExecuteQuery<TestQuery, string>(new TestQuery("test-query"), CancellationToken.None));
 
         // Assert
-        _queryHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestQuery>(), default), Times.Never());
+        _queryHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestQuery>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
@@ -262,17 +226,22 @@ public class MessageBrokerTests
     {
         // Arrange
         var expectedResult = "result";
+
         _queryHandlerMock.Setup(handler => handler.Handle(It.IsAny<TestQuery>(), default))
                          .ReturnsAsync(expectedResult);
+
         _messageRouterMock.Setup(router => router.GetQueryHandler<TestQuery, string>())
                           .Returns(_queryHandlerMock.Object);
 
+        var queryToExecute = new TestQuery("test-query");
+        var tokenToPass = new CancellationToken();
+
         // Act
-        var result = await _messageBroker.ExecuteQuery<TestQuery, string>(new TestQuery("test-query"));
+        var result = await _messageBroker.ExecuteQuery<TestQuery, string>(queryToExecute, tokenToPass);
 
         // Assert
         Assert.Equal(expectedResult, result);
-        _queryHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestQuery>(), default), Times.Once());
+        _queryHandlerMock.Verify(handler => handler.Handle(queryToExecute, tokenToPass), Times.Once());
     }
 
     [Fact]
@@ -280,6 +249,7 @@ public class MessageBrokerTests
     {
         // Arrange
         var expectedResult = "result";
+
         var handlerFinished = false;
         var handlerWorkload = async () =>
         {
@@ -287,46 +257,22 @@ public class MessageBrokerTests
             handlerFinished = true;
             return expectedResult;
         };
+
         _queryHandlerMock.Setup(handler => handler.Handle(It.IsAny<TestQuery>(), default))
                          .Returns(handlerWorkload);
+
         _messageRouterMock.Setup(router => router.GetQueryHandler<TestQuery, string>())
                           .Returns(_queryHandlerMock.Object);
 
+        var queryToExecute = new TestQuery("test-query");
+        var tokenToPass = new CancellationToken();
+
         // Act
-        var result = await _messageBroker.ExecuteQuery<TestQuery, string>(new TestQuery("test-query"));
+        var result = await _messageBroker.ExecuteQuery<TestQuery, string>(queryToExecute, tokenToPass);
 
         // Assert
         Assert.True(handlerFinished);
         Assert.Equal(expectedResult, result);
-        _queryHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestQuery>(), default), Times.Once());
-    }
-
-    [Fact]
-    public async Task ExecuteQuery_WithCancellationToken_PassesTheToken()
-    {
-        // Arrange
-        var expectedResult = "result";
-        TestQuery? passedQuery = null;
-        CancellationToken? passedToken = null;
-        _queryHandlerMock.Setup(handler => handler.Handle(It.IsAny<TestQuery>(), It.IsAny<CancellationToken>()))
-                         .Returns((TestQuery queryData, CancellationToken token) =>
-                         {
-                             passedQuery = queryData;
-                             passedToken = token;
-                             return Task.FromResult(expectedResult);
-                         });
-        _messageRouterMock.Setup(router => router.GetQueryHandler<TestQuery, string>())
-                          .Returns(_queryHandlerMock.Object);
-
-        // Act
-        var queryToExecute = new TestQuery("test-query");
-        var tokenToPass = new CancellationToken();
-        var result = await _messageBroker.ExecuteQuery<TestQuery, string>(queryToExecute, tokenToPass);
-
-        // Assert
-        Assert.Equal(expectedResult, result);
-        Assert.Equal(queryToExecute, passedQuery);
-        Assert.Equal(tokenToPass, passedToken);
-        _queryHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestQuery>(), default), Times.Once());
+        _queryHandlerMock.Verify(handler => handler.Handle(queryToExecute, tokenToPass), Times.Once());
     }
 }

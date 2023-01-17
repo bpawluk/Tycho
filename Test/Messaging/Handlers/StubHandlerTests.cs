@@ -1,4 +1,5 @@
-﻿using Test.Utils;
+﻿using System.Threading;
+using Test.Utils;
 using Tycho.Messaging.Handlers;
 
 namespace Test.Messaging.Handlers;
@@ -12,7 +13,7 @@ public class StubHandlerTests
         var handler = new StubEventHandler<TestEvent>();
 
         // Act
-        var result = handler.Handle(new TestEvent("test-event"));
+        var result = handler.Handle(new TestEvent("test-event"), CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -26,7 +27,7 @@ public class StubHandlerTests
         var handler = new StubCommandHandler<TestCommand>();
 
         // Act
-        var result = handler.Handle(new TestCommand("test-command"));
+        var result = handler.Handle(new TestCommand("test-command"), CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -41,7 +42,7 @@ public class StubHandlerTests
         var handler = new StubQueryHandler<TestQuery, string>(expectedResult);
 
         // Act
-        var result = handler.Handle(new TestQuery("test-query"));
+        var result = handler.Handle(new TestQuery("test-query"), CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
