@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Tycho.Structure.Modules
 {
@@ -28,8 +27,8 @@ namespace Tycho.Structure.Modules
                     var submoduleDefinitionType = submodule.GetType().GetGenericArguments()[0];
                     if (!submodulesCollection.TryAdd(submoduleDefinitionType, submodule))
                     {
-                        throw new InvalidOperationException($"{submoduleDefinitionType.Name} " +
-                            $"is already defined as a submodule of this module");
+                        throw new InvalidOperationException(submoduleDefinitionType.Name +
+                            " is already defined as a submodule of this module");
                     }
                 }
 

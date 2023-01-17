@@ -54,7 +54,7 @@ namespace Tycho.Structure.Builders
                 if (!_submodules.Add(submodule))
                 {
                     throw new InvalidOperationException(submodule.GetType().Name +
-                        "is already defined as a submodule for this module");
+                        " is already defined as a submodule for this module");
                 }
             }
         }
