@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,13 +14,13 @@ namespace Tycho.Contract.Builders
     {
         private readonly IInstanceCreator _instanceCreator;
         private readonly IMessageRouter _moduleInbox;
-        private readonly ConcurrentDictionary<Type, bool> _messageRegistry;
+        private readonly IDictionary<Type, bool> _messageRegistry;
 
         public OutboxBuilder(IInstanceCreator instanceCreator, IMessageRouter moduleInbox)
         {
             _instanceCreator = instanceCreator;
             _moduleInbox = moduleInbox;
-            _messageRegistry = new ConcurrentDictionary<Type, bool>();
+            _messageRegistry = new Dictionary<Type, bool>();
         }
 
         #region IOutboxDefiner
@@ -254,7 +254,7 @@ namespace Tycho.Contract.Builders
             }
         }
 
-        private void MarkMessageAsHandled(Type type) => _messageRegistry.TryUpdate(type, true, false);
+        private void MarkMessageAsHandled(Type type) => _messageRegistry[type] = true;
 
         private bool ShouldMessageBeHandled(Type type) => !typeof(IEvent).IsAssignableFrom(type);
     }

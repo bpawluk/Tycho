@@ -15,6 +15,9 @@ namespace Tycho
 {
     public abstract class TychoModule
     {
+        private readonly object _buildingLock = new object();
+        private bool _wasAlreadyBuilt = false;
+
         private IServiceProvider? _externalServices;
         private Action<IOutboxConsumer>? _contractFullfilment;
 
@@ -42,6 +45,8 @@ namespace Tycho
 
         public async Task<IModule> Build()
         {
+            EnsureItIsBuiltOnlyOnce();
+
             var module = CreateModule();
             var internalServices = CollectInternalServices(module);
 
@@ -94,6 +99,15 @@ namespace Tycho
         {
             var thisModuleType = typeof(Submodule<>).MakeGenericType(new Type[] { GetType() });
             return (Activator.CreateInstance(thisModuleType) as Module)!;
+        }
+
+        private void EnsureItIsBuiltOnlyOnce()
+        {
+            lock (_buildingLock)
+            {
+                if (_wasAlreadyBuilt) throw new InvalidOperationException("This module has already been built");
+                _wasAlreadyBuilt = true;
+            }
         }
     }
 }

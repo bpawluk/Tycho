@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Tycho.Messaging.Handlers;
@@ -9,15 +8,15 @@ namespace Tycho.Messaging
 {
     internal class MessageRouter : IMessageRouter
     {
-        private readonly ConcurrentDictionary<Type, List<IEventHandler>> _eventHandlers;
+        private readonly IDictionary<Type, List<IEventHandler>> _eventHandlers;
         private readonly IDictionary<Type, ICommandHandler> _commandHandlers;
         private readonly IDictionary<Type, IQueryHandler> _queryHandlers;
 
         public MessageRouter()
         {
-            _eventHandlers = new ConcurrentDictionary<Type, List<IEventHandler>>();
-            _commandHandlers = new ConcurrentDictionary<Type, ICommandHandler>();
-            _queryHandlers = new ConcurrentDictionary<Type, IQueryHandler>();
+            _eventHandlers = new Dictionary<Type, List<IEventHandler>>();
+            _commandHandlers = new Dictionary<Type, ICommandHandler>();
+            _queryHandlers = new Dictionary<Type, IQueryHandler>();
         }
 
         public IEnumerable<IEventHandler<Event>> GetEventHandlers<Event>()
@@ -61,8 +60,12 @@ namespace Tycho.Messaging
                 throw new ArgumentException($"{nameof(eventHandler)} cannot be null", nameof(eventHandler));
             }
 
-            var handlers = _eventHandlers.GetOrAdd(typeof(Event), new List<IEventHandler>());
-            handlers.Add(eventHandler);
+            if (!_eventHandlers.ContainsKey(typeof(Event)))
+            {
+                _eventHandlers[typeof(Event)] = new List<IEventHandler>();
+            }
+
+            _eventHandlers[typeof(Event)].Add(eventHandler);
         }
 
         public void RegisterCommandHandler<Command>(ICommandHandler<Command> commandHandler)
