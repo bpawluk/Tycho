@@ -17,7 +17,7 @@ namespace SampleApp.App;
 public record BuyProductCommand(string ProductId, int Amount) : ICommand;
 
 // Outgoing
-// - no outgoing messages
+// - no outgoing messages specific to this module
 
 public sealed class AppModule : TychoModule
 {
@@ -34,14 +34,14 @@ public sealed class AppModule : TychoModule
     {
         module.AddSubmodule<CatalogModule>();
 
-        module.AddSubmodule<InventoryModule>((IOutboxConsumer thisModule) =>
+        module.AddSubmodule<InventoryModule>((IOutboxConsumer thisConsumer) =>
         {
-            thisModule.HandleEvent<Inventory.StockLevelChangedEvent, StockLevelChangedEventHandler>();
+            thisConsumer.HandleEvent<Inventory.StockLevelChangedEvent, StockLevelChangedEventHandler>();
         });
 
-        module.AddSubmodule<PricingModule>((IOutboxConsumer thisModule) =>
+        module.AddSubmodule<PricingModule>((IOutboxConsumer thisConsumer) =>
         {
-            thisModule.HandleEvent<Pricing.PriceChangedEvent, PriceChangedEventHandler>();
+            thisConsumer.HandleEvent<Pricing.PriceChangedEvent, PriceChangedEventHandler>();
         });
     }
 
