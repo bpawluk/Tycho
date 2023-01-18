@@ -9,13 +9,26 @@ public record TestMessageHandler()
     , ICommandHandler<TestCommand>
     , IQueryHandler<TestQuery, string>
 {
+    public bool HandlerCalled { get; private set; } = false;
     public string QueryResponse { get; } = $"response from {nameof(TestMessageHandler)}";
 
-    public Task Handle(TestEvent eventData, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task Handle(TestEvent eventData, CancellationToken cancellationToken)
+    {
+        HandlerCalled = true;
+        return Task.CompletedTask;
+    }
 
-    public Task Handle(TestCommand commandData, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task Handle(TestCommand commandData, CancellationToken cancellationToken)
+    {
+        HandlerCalled = true;
+        return Task.CompletedTask;
+    }
 
-    public Task<string> Handle(TestQuery query, CancellationToken cancellationToken) => Task.FromResult(QueryResponse);
+    public Task<string> Handle(TestQuery query, CancellationToken cancellationToken)
+    {
+        HandlerCalled = true;
+        return Task.FromResult(QueryResponse);
+    }
 }
 
 public record OtherTestMessageHandler()
