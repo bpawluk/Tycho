@@ -10,15 +10,14 @@ namespace Test.Contract;
 
 public class InboxBuilderTests
 {
-    private readonly Mock<IInstanceCreator> _instanceCreatorMock;
     private readonly Mock<IMessageRouter> _messageRouterMock;
     private readonly InboxBuilder _inboxBuilder;
 
     public InboxBuilderTests()
     {
-        _instanceCreatorMock = new Mock<IInstanceCreator>();
+        var instanceCreatorMock = new Mock<IInstanceCreator>();
         _messageRouterMock = new Mock<IMessageRouter>();
-        _inboxBuilder = new InboxBuilder(_instanceCreatorMock.Object, _messageRouterMock.Object);
+        _inboxBuilder = new InboxBuilder(instanceCreatorMock.Object, _messageRouterMock.Object);
     }
 
     [Fact]
