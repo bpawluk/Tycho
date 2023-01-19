@@ -42,7 +42,7 @@ public class PricingModule : TychoModule
 
     protected override void RegisterServices(IServiceCollection services)
     {
-        services.AddTransient<IPricingStrategy, PricingStrategy>();
-        services.AddSingleton<IPricesRepository, PricesRepository>();
+        services.AddTransient<IPricingStrategy, PricingStrategy>()
+                .AddSingleton<IPricesRepository, PricesRepository>();
     }
 }

@@ -22,16 +22,28 @@ internal class GammaModule : TychoModule
     protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
         var thisModule = services.GetRequiredService<IModule>();
-        module.SubscribesTo<FromBetaEvent>(eventData => thisModule.PublishEvent<GammaEvent>(new(eventData.Id)));
-        module.Executes<FromBetaCommand>(commandData => thisModule.ExecuteCommand<GammaCommand>(new(commandData.Id)));
-        module.RespondsTo<FromBetaQuery, string>(queryData => thisModule.ExecuteQuery<GammaQuery, string>(new(queryData.Id)));
+
+        module.SubscribesTo<FromBetaEvent>(eventData =>
+        {
+            thisModule.PublishEvent<GammaEvent>(new(eventData.Id));
+        });
+
+        module.Executes<FromBetaCommand>(commandData =>
+        {
+            thisModule.ExecuteCommand<GammaCommand>(new(commandData.Id));
+        });
+
+        module.RespondsTo<FromBetaQuery, string>(queryData =>
+        {
+            return thisModule.ExecuteQuery<GammaQuery, string>(new(queryData.Id));
+        });
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services)
     {
-        module.Publishes<GammaEvent>();
-        module.Sends<GammaCommand>();
-        module.Sends<GammaQuery, string>();
+        module.Publishes<GammaEvent>()
+              .Sends<GammaCommand>()
+              .Sends<GammaQuery, string>();
     }
 
     protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services) { }

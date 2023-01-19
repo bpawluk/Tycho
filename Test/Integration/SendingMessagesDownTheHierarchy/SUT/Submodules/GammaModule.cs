@@ -22,16 +22,28 @@ internal class GammaModule : TychoModule
     protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
         var thisModule = services.GetRequiredService<IModule>();
-        module.SubscribesTo<GammaDownstreamEvent>(eventData => thisModule.PublishEvent<GammaUpstreamEvent>(new(eventData.Id)));
-        module.Executes<GammaDownstreamCommand>(commandData => thisModule.ExecuteCommand<GammaUpstreamCommand>(new(commandData.Id)));
-        module.RespondsTo<GammaDownstreamQuery, string>(queryData => thisModule.ExecuteQuery<GammaUpstreamQuery, string>(new(queryData.Id)));
+
+        module.SubscribesTo<GammaDownstreamEvent>(eventData =>
+        {
+            thisModule.PublishEvent<GammaUpstreamEvent>(new(eventData.Id));
+        });
+
+        module.Executes<GammaDownstreamCommand>(commandData =>
+        {
+            thisModule.ExecuteCommand<GammaUpstreamCommand>(new(commandData.Id));
+        });
+
+        module.RespondsTo<GammaDownstreamQuery, string>(queryData =>
+        {
+            return thisModule.ExecuteQuery<GammaUpstreamQuery, string>(new(queryData.Id));
+        });
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services)
     {
-        module.Publishes<GammaUpstreamEvent>();
-        module.Sends<GammaUpstreamCommand>();
-        module.Sends<GammaUpstreamQuery, string>();
+        module.Publishes<GammaUpstreamEvent>()
+              .Sends<GammaUpstreamCommand>()
+              .Sends<GammaUpstreamQuery, string>();
     }
 
     protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services) { }

@@ -22,16 +22,28 @@ internal class AlphaModule : TychoModule
     protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
         var thisModule = services.GetRequiredService<IModule>();
-        module.Executes<BeginEventWorkflowCommand>(commandData => thisModule.PublishEvent<AlphaEvent>(new(commandData.Id)));
-        module.Executes<BeginCommandWorkflowCommand>(commandData => thisModule.ExecuteCommand<AlphaCommand>(new(commandData.Id)));
-        module.Executes<BeginQueryWorkflowCommand>(commandData => thisModule.ExecuteQuery<AlphaQuery, string>(new(commandData.Id)));
+
+        module.Executes<BeginEventWorkflowCommand>(commandData =>
+        {
+            thisModule.PublishEvent<AlphaEvent>(new(commandData.Id));
+        });
+
+        module.Executes<BeginCommandWorkflowCommand>(commandData =>
+        {
+            thisModule.ExecuteCommand<AlphaCommand>(new(commandData.Id));
+        });
+
+        module.Executes<BeginQueryWorkflowCommand>(commandData =>
+        {
+            thisModule.ExecuteQuery<AlphaQuery, string>(new(commandData.Id));
+        });
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services)
     {
-        module.Publishes<AlphaEvent>();
-        module.Sends<AlphaCommand>();
-        module.Sends<AlphaQuery, string>();
+        module.Publishes<AlphaEvent>()
+              .Sends<AlphaCommand>()
+              .Sends<AlphaQuery, string>();
     }
 
     protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services) { }
