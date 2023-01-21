@@ -31,15 +31,10 @@ namespace Tycho
 
         protected virtual Task Startup(IServiceProvider services) { return Task.CompletedTask; }
 
-        public TychoModule UseServices(IServiceProvider services)
-        {
-            _externalServices = services;
-            return this;
-        }
-
-        public TychoModule FulfillContract(Action<IOutboxConsumer> contractFullfilment)
+        public TychoModule FulfillContract(Action<IOutboxConsumer> contractFullfilment, IServiceProvider? serviceProvider = null)
         {
             _contractFullfilment = contractFullfilment;
+            _externalServices = serviceProvider;
             return this;
         }
 

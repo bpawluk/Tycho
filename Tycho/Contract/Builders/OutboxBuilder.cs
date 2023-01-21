@@ -198,7 +198,7 @@ namespace Tycho.Contract.Builders
             return this;
         }
 
-        public IOutboxConsumer HandleQuery<Query, Response>(Response response)
+        public IOutboxConsumer IgnoreQuery<Query, Response>(Response response)
             where Query : class, IQuery<Response>
         {
             var handler = new StubQueryHandler<Query, Response>(response);

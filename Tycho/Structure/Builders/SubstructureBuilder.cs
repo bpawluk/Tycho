@@ -20,7 +20,7 @@ namespace Tycho.Structure.Builders
         public ISubstructureDefinition AddSubmodule<Module>()
             where Module : TychoModule, new()
         {
-            var submodule = new Module().UseServices(_serviceProvider);
+            var submodule = new Module();
             AddSubmodule(submodule);
             return this;
         }
@@ -28,7 +28,7 @@ namespace Tycho.Structure.Builders
         public ISubstructureDefinition AddSubmodule<Module>(Action<IOutboxConsumer> contractFullfilment)
             where Module : TychoModule, new()
         {
-            var submodule = new Module().UseServices(_serviceProvider).FulfillContract(contractFullfilment);
+            var submodule = new Module().FulfillContract(contractFullfilment, _serviceProvider);
             AddSubmodule(submodule);
             return this;
         }

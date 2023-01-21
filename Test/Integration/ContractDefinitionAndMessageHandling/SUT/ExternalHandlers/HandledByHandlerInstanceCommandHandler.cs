@@ -1,0 +1,21 @@
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Tycho.Messaging.Handlers;
+
+namespace Test.Integration.ContractDefinitionAndMessageHandling.SUT.ExternalHandlers;
+
+internal class HandledByHandlerInstanceCommandHandler : ICommandHandler<HandledByHandlerInstanceCommand>
+{
+    private readonly ContractDefinitionAndMessageHandlingTests _tests;
+
+    public HandledByHandlerInstanceCommandHandler(ContractDefinitionAndMessageHandlingTests tests)
+    {
+        _tests = tests;
+    }
+
+    public Task Handle(HandledByHandlerInstanceCommand commandData, CancellationToken cancellationToken)
+    {
+        _tests.CommandWorkflowCompleted = true;
+        return Task.CompletedTask;
+    }
+}

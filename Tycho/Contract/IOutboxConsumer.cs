@@ -64,7 +64,7 @@ namespace Tycho.Contract
             where Handler : class, IQueryHandler<Query, Response>
             where Query : class, IQuery<Response>;
 
-        IOutboxConsumer HandleQuery<Query, Response>(Response response)
+        IOutboxConsumer IgnoreQuery<Query, Response>(Response response)
             where Query : class, IQuery<Response>;
         #endregion
     }
