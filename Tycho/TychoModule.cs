@@ -73,8 +73,8 @@ namespace Tycho
         /// Builds your module accordingly to its definition
         /// </summary>
         /// <returns>A fresh and ready-to-use instance of your module</returns>
-        /// <exception cref="ArgumentException"></exception>
-        /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="ArgumentException"/>
+        /// <exception cref="InvalidOperationException"/>
         public async Task<IModule> Build()
         {
             EnsureItIsBuiltOnlyOnce();
