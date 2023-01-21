@@ -13,31 +13,68 @@ using Tycho.Structure.Submodules;
 
 namespace Tycho
 {
+    /// <summary>
+    /// The base class for all module definitions in Tycho.NET
+    /// </summary>
     public abstract class TychoModule
     {
         private readonly object _buildingLock = new object();
         private bool _wasAlreadyBuilt = false;
 
-        private IServiceProvider? _externalServices;
         private Action<IOutboxConsumer>? _contractFullfilment;
+        private IServiceProvider? _contractFullfilmentServices;
 
+        /// <summary>
+        /// Use this method to declare the interface that your module exposes to its clients
+        /// </summary>
+        /// <param name="module">An interface for declaring the incoming messages of your module</param>
+        /// <param name="services">A provider of the services configured for your module</param>
         protected abstract void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services);
 
+        /// <summary>
+        /// Use this method to declare the contract that your module requires its clients to fulfill
+        /// </summary>
+        /// <param name="module">An interface for declaring the messages that your module sends out</param>
+        /// <param name="services">A provider of the services configured for your module</param>
         protected abstract void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services);
 
+        /// <summary>
+        /// Use this method to configure the submodules that your module will be using
+        /// </summary>
+        /// <param name="module">An interface for defining the substructure of your module</param>
+        /// <param name="services">A provider of the services configured for your module</param>
         protected abstract void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services);
 
+        /// <summary>
+        /// Use this method to configure the services required by your module's code
+        /// </summary>
+        /// <param name="services">An interface for defining the collection of services available for your module</param>
         protected abstract void RegisterServices(IServiceCollection services);
 
+        /// <summary>
+        /// Override this method if you need to run some code just before your module is created
+        /// </summary>
+        /// <param name="services">A provider of the services configured for your module</param>
         protected virtual Task Startup(IServiceProvider services) { return Task.CompletedTask; }
 
-        public TychoModule FulfillContract(Action<IOutboxConsumer> contractFullfilment, IServiceProvider? serviceProvider = null)
+        /// <summary>
+        /// Call this method before building your module to handle the messages required by its contract
+        /// </summary>
+        /// <param name="contractFulfillment">A method that conducts the contract fulfillment</param>
+        /// <param name="serviceProvider">A service provider to be used for message handler instantiation</param>
+        public TychoModule FulfillContract(Action<IOutboxConsumer> contractFulfillment, IServiceProvider? serviceProvider = null)
         {
-            _contractFullfilment = contractFullfilment;
-            _externalServices = serviceProvider;
+            _contractFullfilment = contractFulfillment;
+            _contractFullfilmentServices = serviceProvider;
             return this;
         }
 
+        /// <summary>
+        /// Builds your module accordingly to its definition
+        /// </summary>
+        /// <returns>A fresh and ready-to-use instance of your module</returns>
+        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
         public async Task<IModule> Build()
         {
             EnsureItIsBuiltOnlyOnce();
@@ -74,7 +111,7 @@ namespace Tycho
         private IMessageBroker BuildMessageOutbox(IServiceProvider internalServices)
         {
             var outboxRouter = new MessageRouter();
-            var instanceCreator = new InstanceCreator(_externalServices);
+            var instanceCreator = new InstanceCreator(_contractFullfilmentServices);
             var outboxBuilder = new OutboxBuilder(instanceCreator, outboxRouter);
             DeclareOutgoingMessages(outboxBuilder, internalServices);
             _contractFullfilment?.Invoke(outboxBuilder);
