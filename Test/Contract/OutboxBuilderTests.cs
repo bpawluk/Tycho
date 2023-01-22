@@ -140,9 +140,9 @@ public class OutboxBuilderTests
 
         // Act
         var broker = _outboxBuilder.Build();
-        broker.PublishEvent(new TestEvent("test-event"));
-        await broker.ExecuteCommand(new TestCommand("test-command"));
-        var queryResponse = await broker.ExecuteQuery<TestQuery, string>(new TestQuery("test-query"));
+        broker.Publish(new TestEvent("test-event"));
+        await broker.Execute(new TestCommand("test-command"));
+        var queryResponse = await broker.Execute<TestQuery, string>(new TestQuery("test-query"));
 
         // Assert
         Assert.True(commandHandler.HandlerCalled);
@@ -168,9 +168,9 @@ public class OutboxBuilderTests
 
         // Act
         var broker = _outboxBuilder.Build();
-        broker.PublishEvent(new TestEvent("test-event"));
-        await broker.ExecuteCommand(new TestCommand("test-command"));
-        var queryResponse = await broker.ExecuteQuery<TestQuery, string>(new TestQuery("test-query"));
+        broker.Publish(new TestEvent("test-event"));
+        await broker.Execute(new TestCommand("test-command"));
+        var queryResponse = await broker.Execute<TestQuery, string>(new TestQuery("test-query"));
 
         // Assert
         Assert.True(eventHandler.HandlerCalled);

@@ -35,7 +35,7 @@ public class MessageBrokerTests
                           .Returns(new[] { _eventHandlerMock.Object, _otherEventHandlerMock.Object });
 
         // Act
-        Assert.Throws<ArgumentException>(() => _messageBroker.PublishEvent<TestEvent>(null!, CancellationToken.None));
+        Assert.Throws<ArgumentException>(() => _messageBroker.Publish<TestEvent>(null!, CancellationToken.None));
 
         // Assert
         _eventHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestEvent>(), It.IsAny<CancellationToken>()), Times.Never());
@@ -50,7 +50,7 @@ public class MessageBrokerTests
                           .Returns(Enumerable.Empty<IEventHandler<TestEvent>>());
 
         // Act
-        _messageBroker.PublishEvent(new TestEvent("test-event"), CancellationToken.None);
+        _messageBroker.Publish(new TestEvent("test-event"), CancellationToken.None);
 
         // Assert
         _eventHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestEvent>(), It.IsAny<CancellationToken>()), Times.Never());
@@ -68,7 +68,7 @@ public class MessageBrokerTests
         var tokenToPass = new CancellationToken();
 
         // Act
-        _messageBroker.PublishEvent(eventToPublish, tokenToPass);
+        _messageBroker.Publish(eventToPublish, tokenToPass);
 
         // Assert
         _eventHandlerMock.Verify(handler => handler.Handle(eventToPublish, tokenToPass), Times.Once());
@@ -86,7 +86,7 @@ public class MessageBrokerTests
         var tokenToPass = new CancellationToken();
 
         // Act
-        _messageBroker.PublishEvent(eventToPublish, tokenToPass);
+        _messageBroker.Publish(eventToPublish, tokenToPass);
 
         // Assert
         _eventHandlerMock.Verify(handler => handler.Handle(eventToPublish, tokenToPass), Times.Once());
@@ -114,7 +114,7 @@ public class MessageBrokerTests
         var tokenToPass = new CancellationToken();
 
         // Act
-        _messageBroker.PublishEvent(eventToPublish, tokenToPass);
+        _messageBroker.Publish(eventToPublish, tokenToPass);
 
         // Assert
         Assert.False(handlerFinished);
@@ -130,7 +130,7 @@ public class MessageBrokerTests
                           .Returns(_commandHandlerMock.Object);
 
         // Act
-        await Assert.ThrowsAsync<ArgumentException>(() => _messageBroker.ExecuteCommand<TestCommand>(null!, CancellationToken.None));
+        await Assert.ThrowsAsync<ArgumentException>(() => _messageBroker.Execute<TestCommand>(null!, CancellationToken.None));
 
         // Assert
         _commandHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestCommand>(), It.IsAny<CancellationToken>()), Times.Never());
@@ -143,7 +143,7 @@ public class MessageBrokerTests
         // - no arrangement required
 
         // Act
-        await Assert.ThrowsAsync<NullReferenceException>(() => _messageBroker.ExecuteCommand<TestCommand>(new TestCommand("test-command"), CancellationToken.None));
+        await Assert.ThrowsAsync<NullReferenceException>(() => _messageBroker.Execute<TestCommand>(new TestCommand("test-command"), CancellationToken.None));
 
         // Assert
         _commandHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestCommand>(), It.IsAny<CancellationToken>()), Times.Never());
@@ -160,7 +160,7 @@ public class MessageBrokerTests
         var tokenToPass = new CancellationToken();
 
         // Act
-        await _messageBroker.ExecuteCommand(commandToExecute, tokenToPass);
+        await _messageBroker.Execute(commandToExecute, tokenToPass);
 
         // Assert
         _commandHandlerMock.Verify(handler => handler.Handle(commandToExecute, tokenToPass), Times.Once());
@@ -187,7 +187,7 @@ public class MessageBrokerTests
         var tokenToPass = new CancellationToken();
 
         // Act
-        await _messageBroker.ExecuteCommand(commandToExecute, tokenToPass);
+        await _messageBroker.Execute(commandToExecute, tokenToPass);
 
         // Assert
         Assert.True(handlerFinished);
@@ -202,7 +202,7 @@ public class MessageBrokerTests
                           .Returns(_queryHandlerMock.Object);
 
         // Act
-        await Assert.ThrowsAsync<ArgumentException>(() => _messageBroker.ExecuteQuery<TestQuery, string>(null!, CancellationToken.None));
+        await Assert.ThrowsAsync<ArgumentException>(() => _messageBroker.Execute<TestQuery, string>(null!, CancellationToken.None));
 
         // Assert
         _queryHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestQuery>(), It.IsAny<CancellationToken>()), Times.Never());
@@ -215,7 +215,7 @@ public class MessageBrokerTests
         // - no arrangement required
 
         // Act
-        await Assert.ThrowsAsync<NullReferenceException>(() => _messageBroker.ExecuteQuery<TestQuery, string>(new TestQuery("test-query"), CancellationToken.None));
+        await Assert.ThrowsAsync<NullReferenceException>(() => _messageBroker.Execute<TestQuery, string>(new TestQuery("test-query"), CancellationToken.None));
 
         // Assert
         _queryHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestQuery>(), It.IsAny<CancellationToken>()), Times.Never());
@@ -237,7 +237,7 @@ public class MessageBrokerTests
         var tokenToPass = new CancellationToken();
 
         // Act
-        var result = await _messageBroker.ExecuteQuery<TestQuery, string>(queryToExecute, tokenToPass);
+        var result = await _messageBroker.Execute<TestQuery, string>(queryToExecute, tokenToPass);
 
         // Assert
         Assert.Equal(expectedResult, result);
@@ -268,7 +268,7 @@ public class MessageBrokerTests
         var tokenToPass = new CancellationToken();
 
         // Act
-        var result = await _messageBroker.ExecuteQuery<TestQuery, string>(queryToExecute, tokenToPass);
+        var result = await _messageBroker.Execute<TestQuery, string>(queryToExecute, tokenToPass);
 
         // Assert
         Assert.True(handlerFinished);

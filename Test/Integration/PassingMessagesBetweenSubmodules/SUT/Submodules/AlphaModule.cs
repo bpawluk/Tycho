@@ -25,17 +25,17 @@ internal class AlphaModule : TychoModule
 
         module.Executes<BeginEventWorkflowCommand>(commandData =>
         {
-            thisModule.PublishEvent<AlphaEvent>(new(commandData.Id));
+            thisModule.Publish<AlphaEvent>(new(commandData.Id));
         });
 
         module.Executes<BeginCommandWorkflowCommand>(commandData =>
         {
-            thisModule.ExecuteCommand<AlphaCommand>(new(commandData.Id));
+            thisModule.Execute<AlphaCommand>(new(commandData.Id));
         });
 
         module.Executes<BeginQueryWorkflowCommand>(commandData =>
         {
-            thisModule.ExecuteQuery<AlphaQuery, string>(new(commandData.Id));
+            thisModule.Execute<AlphaQuery, string>(new(commandData.Id));
         });
     }
 

@@ -18,6 +18,6 @@ internal class FindProductQueryHandler : IQueryHandler<FindProductQuery, Product
 
     public Task<Product> Handle(FindProductQuery query, CancellationToken cancellationToken)
     {
-        return _catalogModule.ExecuteQuery<FindProductQuery, Product>(query, cancellationToken);
+        return _catalogModule.Execute<FindProductQuery, Product>(query, cancellationToken);
     }
 }

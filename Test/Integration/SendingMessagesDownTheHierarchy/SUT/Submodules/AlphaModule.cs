@@ -25,17 +25,17 @@ internal class AlphaModule : TychoModule
 
         module.SubscribesTo<AlphaDownstreamEvent>(eventData =>
         {
-            betaModule.PublishEvent<BetaDownstreamEvent>(new(eventData.Id));
+            betaModule.Publish<BetaDownstreamEvent>(new(eventData.Id));
         });
 
         module.Executes<AlphaDownstreamCommand>(commandData =>
         {
-            betaModule.ExecuteCommand<BetaDownstreamCommand>(new(commandData.Id));
+            betaModule.Execute<BetaDownstreamCommand>(new(commandData.Id));
         });
 
         module.RespondsTo<AlphaDownstreamQuery, string>(queryData =>
         {
-            return betaModule.ExecuteQuery<BetaDownstreamQuery, string>(new(queryData.Id));
+            return betaModule.Execute<BetaDownstreamQuery, string>(new(queryData.Id));
         });
     }
 
@@ -54,17 +54,17 @@ internal class AlphaModule : TychoModule
 
             consumer.HandleEvent<BetaUpstreamEvent>(eventData =>
             {
-                thisModule.PublishEvent<AlphaUpstreamEvent>(new(eventData.Id));
+                thisModule.Publish<AlphaUpstreamEvent>(new(eventData.Id));
             });
 
             consumer.HandleCommand<BetaUpstreamCommand>(commandData =>
             {
-                thisModule.ExecuteCommand<AlphaUpstreamCommand>(new(commandData.Id));
+                thisModule.Execute<AlphaUpstreamCommand>(new(commandData.Id));
             });
 
             consumer.HandleQuery<BetaUpstreamQuery, string>(queryData =>
             {
-                return thisModule.ExecuteQuery<AlphaUpstreamQuery, string>(new(queryData.Id));
+                return thisModule.Execute<AlphaUpstreamQuery, string>(new(queryData.Id));
             });
         });
     }

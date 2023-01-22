@@ -27,8 +27,8 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var firstResult = await _sut!.ExecuteQuery<SingletonServiceWorkflowQuery, int>(new());
-        var secondResult = await _sut.ExecuteQuery<SingletonServiceWorkflowQuery, int>(new());
+        var firstResult = await _sut!.Execute<SingletonServiceWorkflowQuery, int>(new());
+        var secondResult = await _sut.Execute<SingletonServiceWorkflowQuery, int>(new());
 
         // Assert
         Assert.Equal(1, firstResult);
@@ -42,8 +42,8 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var firstResult = await _sut!.ExecuteQuery<TransientServiceWorkflowQuery, int>(new());
-        var secondResult = await _sut.ExecuteQuery<TransientServiceWorkflowQuery, int>(new());
+        var firstResult = await _sut!.Execute<TransientServiceWorkflowQuery, int>(new());
+        var secondResult = await _sut.Execute<TransientServiceWorkflowQuery, int>(new());
 
         // Assert
         Assert.Equal(1, firstResult);
@@ -57,7 +57,7 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var result = await _sut!.ExecuteQuery<SubmoduleResolvingWorkflowQuery, string>(new());
+        var result = await _sut!.Execute<SubmoduleResolvingWorkflowQuery, string>(new());
 
         // Assert
         Assert.Equal($"Response from {typeof(AppSubmodule).Name}", result);
@@ -70,7 +70,7 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var result = await _sut!.ExecuteQuery<ModuleResolvingWorkflowQuery, string>(new());
+        var result = await _sut!.Execute<ModuleResolvingWorkflowQuery, string>(new());
 
         // Assert
         Assert.Equal($"Response from {typeof(ServiceRegistrationAndResolvingTests).Name}", result);

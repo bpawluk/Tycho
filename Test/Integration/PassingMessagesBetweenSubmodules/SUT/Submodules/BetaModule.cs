@@ -25,17 +25,17 @@ internal class BetaModule : TychoModule
 
         module.SubscribesTo<FromAlphaEvent>(eventData =>
         {
-            thisModule.PublishEvent<BetaEvent>(new(eventData.Id));
+            thisModule.Publish<BetaEvent>(new(eventData.Id));
         });
 
         module.Executes<FromAlphaCommand>(commandData =>
         {
-            thisModule.ExecuteCommand<BetaCommand>(new(commandData.Id));
+            thisModule.Execute<BetaCommand>(new(commandData.Id));
         });
 
         module.RespondsTo<FromAlphaQuery, string>(queryData =>
         {
-            return thisModule.ExecuteQuery<BetaQuery, string>(new(queryData.Id));
+            return thisModule.Execute<BetaQuery, string>(new(queryData.Id));
         });
     }
 

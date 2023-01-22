@@ -20,14 +20,14 @@ internal class StockLevelChangedEventHandler : IEventHandler<Inventory.StockLeve
 
     public Task Handle(Inventory.StockLevelChangedEvent eventData, CancellationToken cancellationToken)
     {
-        _catalogModule.PublishEvent(
+        _catalogModule.Publish(
             new Catalog.StockLevelChangedEvent(
                 eventData.ProductId,
                 eventData.PreviousLevel,
                 eventData.CurrentLevel),
             cancellationToken);
 
-        _pricingModule.PublishEvent(
+        _pricingModule.Publish(
             new Pricing.StockLevelChangedEvent(
                 eventData.ProductId,
                 eventData.PreviousLevel,

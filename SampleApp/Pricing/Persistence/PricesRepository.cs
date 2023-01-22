@@ -32,6 +32,6 @@ internal class PricesRepository : IPricesRepository
     {
         var oldPrice = _pricesData.ContainsKey(productId) ? _pricesData[productId] : default;
         _pricesData[productId] = price;
-        _thisModule.PublishEvent<PriceChangedEvent>(new(productId, oldPrice, price));
+        _thisModule.Publish<PriceChangedEvent>(new(productId, oldPrice, price));
     }
 }

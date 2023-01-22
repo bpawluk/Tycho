@@ -30,6 +30,6 @@ internal class StockLevelsRepository : IStockLevelsRepository
         var newLevel = previousLevel - amount;
         _stockLevelData[productId] = newLevel;
 
-        _thisModule.PublishEvent(new StockLevelChangedEvent(productId, previousLevel, newLevel));
+        _thisModule.Publish(new StockLevelChangedEvent(productId, previousLevel, newLevel));
     }
 }

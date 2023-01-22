@@ -35,10 +35,10 @@ public abstract class BaseModuleTests
         var tokenToPass = new CancellationToken();
 
         // Act
-        Assert.Throws<InvalidOperationException>(() => _module.PublishEvent(eventToPublish, tokenToPass));
+        Assert.Throws<InvalidOperationException>(() => _module.Publish(eventToPublish, tokenToPass));
 
         // Assert
-        _messageBrokerMock.Verify(broker => broker.PublishEvent(It.IsAny<TestEvent>(), It.IsAny<CancellationToken>()),  Times.Never());
+        _messageBrokerMock.Verify(broker => broker.Publish(It.IsAny<TestEvent>(), It.IsAny<CancellationToken>()),  Times.Never());
     }
 
     [Fact]
@@ -50,10 +50,10 @@ public abstract class BaseModuleTests
         var tokenToPass = new CancellationToken();
 
         // Act
-        _module.PublishEvent(eventToPublish, tokenToPass);
+        _module.Publish(eventToPublish, tokenToPass);
 
         // Assert
-        _messageBrokerMock.Verify(broker => broker.PublishEvent(eventToPublish, tokenToPass), Times.Once());
+        _messageBrokerMock.Verify(broker => broker.Publish(eventToPublish, tokenToPass), Times.Once());
     }
 
     [Fact]
@@ -64,10 +64,10 @@ public abstract class BaseModuleTests
         var tokenToPass = new CancellationToken();
 
         // Act
-        Assert.ThrowsAsync<InvalidOperationException>(() => _module.ExecuteCommand(commandToExecute, tokenToPass));
+        Assert.ThrowsAsync<InvalidOperationException>(() => _module.Execute(commandToExecute, tokenToPass));
 
         // Assert
-        _messageBrokerMock.Verify(broker => broker.ExecuteCommand(It.IsAny<TestCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        _messageBrokerMock.Verify(broker => broker.Execute(It.IsAny<TestCommand>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
@@ -79,10 +79,10 @@ public abstract class BaseModuleTests
         var tokenToPass = new CancellationToken();
 
         // Act
-        _module.ExecuteCommand(commandToExecute, tokenToPass);
+        _module.Execute(commandToExecute, tokenToPass);
 
         // Assert
-        _messageBrokerMock.Verify(broker => broker.ExecuteCommand(commandToExecute, tokenToPass), Times.Once());
+        _messageBrokerMock.Verify(broker => broker.Execute(commandToExecute, tokenToPass), Times.Once());
     }
 
     [Fact]
@@ -93,10 +93,10 @@ public abstract class BaseModuleTests
         var tokenToPass = new CancellationToken();
 
         // Act
-        Assert.ThrowsAsync<InvalidOperationException>(() => _module.ExecuteQuery<TestQuery, string>(queryToExecute, tokenToPass));
+        Assert.ThrowsAsync<InvalidOperationException>(() => _module.Execute<TestQuery, string>(queryToExecute, tokenToPass));
 
         // Assert
-        _messageBrokerMock.Verify(broker => broker.ExecuteQuery<TestQuery, string>(It.IsAny<TestQuery>(), It.IsAny<CancellationToken>()), Times.Never());
+        _messageBrokerMock.Verify(broker => broker.Execute<TestQuery, string>(It.IsAny<TestQuery>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
@@ -108,10 +108,10 @@ public abstract class BaseModuleTests
         var tokenToPass = new CancellationToken();
 
         // Act
-        _module.ExecuteQuery<TestQuery, string>(queryToExecute, tokenToPass);
+        _module.Execute<TestQuery, string>(queryToExecute, tokenToPass);
 
         // Assert
-        _messageBrokerMock.Verify(broker => broker.ExecuteQuery<TestQuery, string>(queryToExecute, tokenToPass), Times.Once());
+        _messageBrokerMock.Verify(broker => broker.Execute<TestQuery, string>(queryToExecute, tokenToPass), Times.Once());
     }
 
     protected abstract IModule CreateModuleUnderTest();

@@ -16,6 +16,6 @@ internal class HandledByHandlerInstanceQueryHandler : IQueryHandler<HandledByHan
 
     public Task<string> Handle(HandledByHandlerInstanceQuery queryData, CancellationToken cancellationToken = default)
     {
-        return _thisModule.ExecuteQuery<HandledByHandlerInstanceQuery, string>(queryData);
+        return _thisModule.Execute<HandledByHandlerInstanceQuery, string>(queryData);
     }
 }

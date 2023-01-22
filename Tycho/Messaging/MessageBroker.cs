@@ -14,7 +14,7 @@ namespace Tycho.Messaging
             _messageRouter = messageRouter;
         }
 
-        public void PublishEvent<Event>(Event eventData, CancellationToken cancellationToken)
+        public void Publish<Event>(Event eventData, CancellationToken cancellationToken)
             where Event : class, IEvent
         {
             if (eventData is null)
@@ -28,7 +28,7 @@ namespace Tycho.Messaging
             }
         }
 
-        public Task ExecuteCommand<Command>(Command commandData, CancellationToken cancellationToken)
+        public Task Execute<Command>(Command commandData, CancellationToken cancellationToken)
             where Command : class, ICommand
         {
             if (commandData is null)
@@ -40,7 +40,7 @@ namespace Tycho.Messaging
             return commandHandler.Handle(commandData, cancellationToken);
         }
 
-        public Task<Response> ExecuteQuery<Query, Response>(Query queryData, CancellationToken cancellationToken)
+        public Task<Response> Execute<Query, Response>(Query queryData, CancellationToken cancellationToken)
             where Query : class, IQuery<Response>
         {
             if (queryData is null)

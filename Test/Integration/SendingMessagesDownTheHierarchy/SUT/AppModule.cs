@@ -26,17 +26,17 @@ internal class AppModule : TychoModule
 
         module.Executes<BeginEventWorkflowCommand>(commandData =>
         {
-            alphaModule.PublishEvent<AlphaDownstreamEvent>(new(commandData.Id));
+            alphaModule.Publish<AlphaDownstreamEvent>(new(commandData.Id));
         });
 
         module.Executes<BeginCommandWorkflowCommand>(commandData =>
         {
-            alphaModule.ExecuteCommand<AlphaDownstreamCommand>(new(commandData.Id));
+            alphaModule.Execute<AlphaDownstreamCommand>(new(commandData.Id));
         });
 
         module.Executes<BeginQueryWorkflowCommand>(commandData =>
         {
-            alphaModule.ExecuteQuery<AlphaDownstreamQuery, string>(new(commandData.Id));
+            alphaModule.Execute<AlphaDownstreamQuery, string>(new(commandData.Id));
         });
     }
 
@@ -55,17 +55,17 @@ internal class AppModule : TychoModule
 
             consumer.HandleEvent<AlphaUpstreamEvent>(eventData =>
             {
-                thisModule.PublishEvent<EventWorkflowCompletedEvent>(new(eventData.Id));
+                thisModule.Publish<EventWorkflowCompletedEvent>(new(eventData.Id));
             });
 
             consumer.HandleCommand<AlphaUpstreamCommand>(commandData =>
             {
-                thisModule.PublishEvent<CommandWorkflowCompletedEvent>(new(commandData.Id));
+                thisModule.Publish<CommandWorkflowCompletedEvent>(new(commandData.Id));
             });
 
             consumer.HandleQuery<AlphaUpstreamQuery, string>(queryData =>
             {
-                thisModule.PublishEvent<QueryWorkflowCompletedEvent>(new(queryData.Id));
+                thisModule.Publish<QueryWorkflowCompletedEvent>(new(queryData.Id));
                 return "Hello world!";
             });
         });

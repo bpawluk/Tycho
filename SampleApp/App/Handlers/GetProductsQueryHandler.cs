@@ -19,6 +19,6 @@ internal class GetProductsQueryHandler : IQueryHandler<GetProductsQuery, IEnumer
 
     public Task<IEnumerable<Product>> Handle(GetProductsQuery query, CancellationToken cancellationToken)
     {
-        return _catalogModule.ExecuteQuery<GetProductsQuery, IEnumerable<Product>>(query, cancellationToken);
+        return _catalogModule.Execute<GetProductsQuery, IEnumerable<Product>>(query, cancellationToken);
     }
 }

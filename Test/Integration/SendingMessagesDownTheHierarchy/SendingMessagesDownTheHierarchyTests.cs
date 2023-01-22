@@ -37,7 +37,7 @@ public class SendingMessagesDownTheHierarchyTests : IAsyncLifetime
         var workflowId = "event-workflow";
 
         // Act
-        await _sut!.ExecuteCommand<BeginEventWorkflowCommand>(new(workflowId));
+        await _sut!.Execute<BeginEventWorkflowCommand>(new(workflowId));
         var returnedId = await _eventWorkflowTcs.Task;
 
         // Assert
@@ -51,7 +51,7 @@ public class SendingMessagesDownTheHierarchyTests : IAsyncLifetime
         var workflowId = "command-workflow";
 
         // Act
-        await _sut!.ExecuteCommand<BeginCommandWorkflowCommand>(new(workflowId));
+        await _sut!.Execute<BeginCommandWorkflowCommand>(new(workflowId));
         var returnedId = await _commandWorkflowTcs.Task;
 
         // Assert
@@ -65,7 +65,7 @@ public class SendingMessagesDownTheHierarchyTests : IAsyncLifetime
         var workflowId = "query-workflow";
 
         // Act
-        await _sut!.ExecuteCommand<BeginQueryWorkflowCommand>(new(workflowId));
+        await _sut!.Execute<BeginQueryWorkflowCommand>(new(workflowId));
         var returnedId = await _queryWorkflowTcs.Task;
 
         // Assert

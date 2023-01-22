@@ -17,7 +17,7 @@ internal class PriceChangedEventHandler : IEventHandler<Pricing.PriceChangedEven
 
     public Task Handle(Pricing.PriceChangedEvent eventData, CancellationToken cancellationToken)
     {
-        _catalogModule.PublishEvent(
+        _catalogModule.Publish(
             new Catalog.PriceChangedEvent(
                 eventData.ProductId,
                 eventData.OldPrice,

@@ -20,17 +20,17 @@ internal class AlphaBetaProxyHandler
 
     public Task Handle(AlphaEvent eventData, CancellationToken cancellationToken)
     {
-        _betaModule.PublishEvent<FromAlphaEvent>(new(eventData.Id), cancellationToken);
+        _betaModule.Publish<FromAlphaEvent>(new(eventData.Id), cancellationToken);
         return Task.CompletedTask;
     }
 
     public Task Handle(AlphaCommand commandData, CancellationToken cancellationToken)
     {
-        return _betaModule.ExecuteCommand<FromAlphaCommand>(new(commandData.Id), cancellationToken);
+        return _betaModule.Execute<FromAlphaCommand>(new(commandData.Id), cancellationToken);
     }
 
     public Task<string> Handle(AlphaQuery queryData, CancellationToken cancellationToken)
     {
-        return _betaModule.ExecuteQuery<FromAlphaQuery, string>(new(queryData.Id), cancellationToken);
+        return _betaModule.Execute<FromAlphaQuery, string>(new(queryData.Id), cancellationToken);
     }
 }

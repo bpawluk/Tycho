@@ -17,7 +17,7 @@ internal class BuyProductCommandHandler : ICommandHandler<BuyProductCommand>
 
     public Task Handle(BuyProductCommand commandData, CancellationToken cancellationToken)
     {
-        return _inventoryModule.ExecuteCommand(
+        return _inventoryModule.Execute(
             new ReserveProductCommand(
                 commandData.ProductId, 
                 commandData.Amount), 

@@ -20,17 +20,17 @@ internal class BetaGammaProxyHandler
 
     public Task Handle(BetaEvent eventData, CancellationToken cancellationToken)
     {
-        _gammaModule.PublishEvent<FromBetaEvent>(new(eventData.Id), cancellationToken);
+        _gammaModule.Publish<FromBetaEvent>(new(eventData.Id), cancellationToken);
         return Task.CompletedTask;
     }
 
     public Task Handle(BetaCommand commandData, CancellationToken cancellationToken)
     {
-        return _gammaModule.ExecuteCommand<FromBetaCommand>(new(commandData.Id), cancellationToken);
+        return _gammaModule.Execute<FromBetaCommand>(new(commandData.Id), cancellationToken);
     }
 
     public Task<string> Handle(BetaQuery queryData, CancellationToken cancellationToken)
     {
-        return _gammaModule.ExecuteQuery<FromBetaQuery, string>(new(queryData.Id), cancellationToken);
+        return _gammaModule.Execute<FromBetaQuery, string>(new(queryData.Id), cancellationToken);
     }
 }

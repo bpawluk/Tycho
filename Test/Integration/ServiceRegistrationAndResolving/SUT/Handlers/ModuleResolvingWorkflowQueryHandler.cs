@@ -16,6 +16,6 @@ internal class ModuleResolvingWorkflowQueryHandler : IQueryHandler<ModuleResolvi
 
     public Task<string> Handle(ModuleResolvingWorkflowQuery query, CancellationToken cancellationToken)
     {
-        return _module.ExecuteQuery<GetDataFromThisModulesClientQuery, string>(new(), cancellationToken);
+        return _module.Execute<GetDataFromThisModulesClientQuery, string>(new(), cancellationToken);
     }
 }

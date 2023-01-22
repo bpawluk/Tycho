@@ -22,9 +22,9 @@ internal class AppModule : TychoModule
     protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
         var alphaSubmodule = services.GetRequiredService<ISubmodule<AlphaModule>>()!;
-        module.Executes<BeginEventWorkflowCommand>(commandData => alphaSubmodule.ExecuteCommand(commandData))
-              .Executes<BeginCommandWorkflowCommand>(commandData => alphaSubmodule.ExecuteCommand(commandData))
-              .Executes<BeginQueryWorkflowCommand>(commandData => alphaSubmodule.ExecuteCommand(commandData));
+        module.Executes<BeginEventWorkflowCommand>(commandData => alphaSubmodule.Execute(commandData))
+              .Executes<BeginCommandWorkflowCommand>(commandData => alphaSubmodule.Execute(commandData))
+              .Executes<BeginQueryWorkflowCommand>(commandData => alphaSubmodule.Execute(commandData));
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services)
@@ -56,17 +56,17 @@ internal class AppModule : TychoModule
 
             consumer.HandleEvent<GammaEvent>(eventData =>
             {
-                thisModule.PublishEvent<EventWorkflowCompletedEvent>(new(eventData.Id));
+                thisModule.Publish<EventWorkflowCompletedEvent>(new(eventData.Id));
             });
 
             consumer.HandleCommand<GammaCommand>(commandData =>
             {
-                thisModule.PublishEvent<CommandWorkflowCompletedEvent>(new(commandData.Id));
+                thisModule.Publish<CommandWorkflowCompletedEvent>(new(commandData.Id));
             });
 
             consumer.HandleQuery<GammaQuery, string>(queryData =>
             {
-                thisModule.PublishEvent<QueryWorkflowCompletedEvent>(new(queryData.Id));
+                thisModule.Publish<QueryWorkflowCompletedEvent>(new(queryData.Id));
                 return "Hello world!";
             });
         }));

@@ -15,22 +15,22 @@ namespace Tycho.Structure.Submodules
             _submodule = (supermodule as ModuleInternals)!.GetSubmodule<Definition>();
         }
 
-        public void PublishEvent<Event>(Event eventData, CancellationToken cancellationToken)
+        public void Publish<Event>(Event eventData, CancellationToken cancellationToken)
             where Event : class, IEvent
         {
-            _submodule.PublishEvent(eventData, cancellationToken);
+            _submodule.Publish(eventData, cancellationToken);
         }
 
-        public Task ExecuteCommand<Command>(Command commandData, CancellationToken cancellationToken)
+        public Task Execute<Command>(Command commandData, CancellationToken cancellationToken)
             where Command : class, ICommand
         {
-            return _submodule.ExecuteCommand(commandData, cancellationToken);
+            return _submodule.Execute(commandData, cancellationToken);
         }
 
-        public Task<Response> ExecuteQuery<Query, Response>(Query queryData, CancellationToken cancellationToken)
+        public Task<Response> Execute<Query, Response>(Query queryData, CancellationToken cancellationToken)
             where Query : class, IQuery<Response>
         {
-            return _submodule.ExecuteQuery<Query, Response>(queryData, cancellationToken);
+            return _submodule.Execute<Query, Response>(queryData, cancellationToken);
         }
     }
 }

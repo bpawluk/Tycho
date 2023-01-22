@@ -56,9 +56,9 @@ public class ContractDefinitionAndMessageHandlingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        _sut!.PublishEvent<HandledByLambdaEvent>(new());
-        await _sut.ExecuteCommand<HandledByLambdaCommand>(new());
-        var queryResponse = await _sut.ExecuteQuery<HandledByLambdaQuery, string>(new());
+        _sut!.Publish<HandledByLambdaEvent>(new());
+        await _sut.Execute<HandledByLambdaCommand>(new());
+        var queryResponse = await _sut.Execute<HandledByLambdaQuery, string>(new());
 
         // Assert
         Assert.True(EventWorkflowCompleted);
@@ -74,9 +74,9 @@ public class ContractDefinitionAndMessageHandlingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        _sut!.PublishEvent<HandledByAsyncLambdaEvent>(new());
-        await _sut.ExecuteCommand<HandledByAsyncLambdaCommand>(new());
-        var queryResponse = await _sut.ExecuteQuery<HandledByAsyncLambdaQuery, string>(new());
+        _sut!.Publish<HandledByAsyncLambdaEvent>(new());
+        await _sut.Execute<HandledByAsyncLambdaCommand>(new());
+        var queryResponse = await _sut.Execute<HandledByAsyncLambdaQuery, string>(new());
 
         // Assert
         Assert.True(EventWorkflowCompleted);
@@ -91,9 +91,9 @@ public class ContractDefinitionAndMessageHandlingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        _sut!.PublishEvent<HandledByHandlerInstanceEvent>(new());
-        await _sut.ExecuteCommand<HandledByHandlerInstanceCommand>(new());
-        var queryResponse = await _sut.ExecuteQuery<HandledByHandlerInstanceQuery, string>(new());
+        _sut!.Publish<HandledByHandlerInstanceEvent>(new());
+        await _sut.Execute<HandledByHandlerInstanceCommand>(new());
+        var queryResponse = await _sut.Execute<HandledByHandlerInstanceQuery, string>(new());
 
         // Assert
         Assert.True(EventWorkflowCompleted);
@@ -108,9 +108,9 @@ public class ContractDefinitionAndMessageHandlingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        _sut!.PublishEvent<HandledByHandlerTypeEvent>(new());
-        await _sut.ExecuteCommand<HandledByHandlerTypeCommand>(new());
-        var queryResponse = await _sut.ExecuteQuery<HandledByHandlerTypeQuery, string>(new());
+        _sut!.Publish<HandledByHandlerTypeEvent>(new());
+        await _sut.Execute<HandledByHandlerTypeCommand>(new());
+        var queryResponse = await _sut.Execute<HandledByHandlerTypeQuery, string>(new());
 
         // Assert
         Assert.True(EventWorkflowCompleted);

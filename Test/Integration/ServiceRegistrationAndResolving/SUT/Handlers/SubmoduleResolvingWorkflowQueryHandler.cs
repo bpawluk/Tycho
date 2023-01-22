@@ -17,6 +17,6 @@ internal class SubmoduleResolvingWorkflowQueryHandler : IQueryHandler<SubmoduleR
 
     public Task<string> Handle(SubmoduleResolvingWorkflowQuery query, CancellationToken cancellationToken = default)
     {
-        return _submodule.ExecuteQuery<GetDataFromSubmoduleQuery, string>(new());
+        return _submodule.Execute<GetDataFromSubmoduleQuery, string>(new());
     }
 }

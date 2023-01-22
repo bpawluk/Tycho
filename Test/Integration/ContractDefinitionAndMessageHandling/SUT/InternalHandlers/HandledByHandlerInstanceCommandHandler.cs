@@ -16,7 +16,7 @@ internal class HandledByHandlerInstanceCommandHandler : ICommandHandler<HandledB
 
     public Task Handle(HandledByHandlerInstanceCommand commandData, CancellationToken cancellationToken)
     {
-        _thisModule.ExecuteCommand(commandData);
+        _thisModule.Execute(commandData);
         return Task.CompletedTask;
     }
 }

@@ -16,7 +16,7 @@ internal class HandledByHandlerTypeEventHandler : IEventHandler<HandledByHandler
 
     public Task Handle(HandledByHandlerTypeEvent eventData, CancellationToken cancellationToken)
     {
-        _thisModule.PublishEvent(eventData);
+        _thisModule.Publish(eventData);
         return Task.CompletedTask;
     }
 }

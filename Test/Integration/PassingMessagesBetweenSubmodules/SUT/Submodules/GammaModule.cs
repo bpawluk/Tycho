@@ -25,17 +25,17 @@ internal class GammaModule : TychoModule
 
         module.SubscribesTo<FromBetaEvent>(eventData =>
         {
-            thisModule.PublishEvent<GammaEvent>(new(eventData.Id));
+            thisModule.Publish<GammaEvent>(new(eventData.Id));
         });
 
         module.Executes<FromBetaCommand>(commandData =>
         {
-            thisModule.ExecuteCommand<GammaCommand>(new(commandData.Id));
+            thisModule.Execute<GammaCommand>(new(commandData.Id));
         });
 
         module.RespondsTo<FromBetaQuery, string>(queryData =>
         {
-            return thisModule.ExecuteQuery<GammaQuery, string>(new(queryData.Id));
+            return thisModule.Execute<GammaQuery, string>(new(queryData.Id));
         });
     }
 
