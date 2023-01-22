@@ -55,6 +55,9 @@ namespace Tycho.Contract
         /// <summary>
         /// Defines logic for handling the specified <b>event</b> message
         /// </summary>
+        /// <remarks>
+        /// Note: A fresh instance of the event handler will be created each time the event is published
+        /// </remarks>
         /// <typeparam name="Event">The type of the event being handled</typeparam>
         /// <typeparam name="Handler">A handler to be used when the event is published</typeparam>
         /// <exception cref="ArgumentException"/>
@@ -108,6 +111,9 @@ namespace Tycho.Contract
         /// <summary>
         /// Defines logic for handling the specified <b>command</b> message
         /// </summary>
+        /// <remarks>
+        /// Note: A fresh instance of the command handler will be created each time the command is received
+        /// </remarks>
         /// <typeparam name="Command">The type of the command being handled</typeparam>
         /// <typeparam name="Handler">A handler to be used when the command is received</typeparam>
         /// <exception cref="ArgumentException"/>
@@ -174,6 +180,9 @@ namespace Tycho.Contract
         /// <summary>
         /// Defines logic for handling the specified <b>query</b> message
         /// </summary>
+        /// <remarks>
+        /// Note: A fresh instance of the query handler will be created each time the query is received
+        /// </remarks>
         /// <typeparam name="Query">The type of the query being handled</typeparam>
         /// <typeparam name="Response">The type of the query response</typeparam>
         /// <typeparam name="Handler">A handler to be used when the query is received</typeparam>
