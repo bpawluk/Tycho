@@ -20,6 +20,26 @@ namespace Tycho.Contract.Builders
         }
 
         #region IInboxDefiner.Events
+        public IInboxDefinition PassesOn<Event, Module>()
+            where Event : class, IEvent
+            where Module : TychoModule
+        {
+            Func<Event, Event> mapping = eventData => eventData;
+            var handler = _instanceCreator.CreateInstance<DownForwardingEventHandler<Event, Event, Module>>(mapping);
+            _moduleInbox.RegisterEventHandler(handler);
+            return this;
+        }
+
+        public IInboxDefinition PassesOn<EventIn, EventOut, Module>(Func<EventIn, EventOut> mapping)
+            where EventIn : class, IEvent
+            where EventOut : class, IEvent
+            where Module : TychoModule
+        {
+            var handler = _instanceCreator.CreateInstance<DownForwardingEventHandler<EventIn, EventOut, Module>>(mapping);
+            _moduleInbox.RegisterEventHandler(handler);
+            return this;
+        }
+
         public IInboxDefinition SubscribesTo<Event>(Action<Event> action)
             where Event : class, IEvent
         {
@@ -63,6 +83,27 @@ namespace Tycho.Contract.Builders
         #endregion
 
         #region IInboxDefiner.Commands
+        public IInboxDefinition Forwards<Command, Module>()
+            where Command : class, ICommand
+            where Module : TychoModule
+        {
+            Func<Command, Command> mapping = commandData => commandData;
+            var handler = _instanceCreator.CreateInstance<DownForwardingCommandHandler<Command, Command, Module>>(mapping);
+            _moduleInbox.RegisterCommandHandler(handler);
+            return this;
+        }
+
+        public IInboxDefinition Forwards<CommandIn, CommandOut, Module>(Func<CommandIn, CommandOut> mapping)
+            where CommandIn : class, ICommand
+            where CommandOut : class, ICommand
+            where Module : TychoModule
+        {
+            var handler = _instanceCreator
+                .CreateInstance<DownForwardingCommandHandler<CommandIn, CommandOut, Module>>(mapping);
+            _moduleInbox.RegisterCommandHandler(handler);
+            return this;
+        }
+
         public IInboxDefinition Executes<Command>(Action<Command> action)
             where Command : class, ICommand
         {
@@ -106,6 +147,28 @@ namespace Tycho.Contract.Builders
         #endregion
 
         #region IInboxDefiner.Queries
+        public IInboxDefinition Forwards<Query, Response, Module>()
+            where Query : class, IQuery<Response>
+            where Module : TychoModule
+        {
+            Func<Query, Query> mapping = queryData => queryData;
+            var handler = _instanceCreator
+                .CreateInstance<DownForwardingQueryHandler<Query, Query, Response, Module>>(mapping);
+            _moduleInbox.RegisterQueryHandler(handler);
+            return this;
+        }
+
+        public IInboxDefinition Forwards<QueryIn, QueryOut, Response, Module>(Func<QueryIn, QueryOut> mapping)
+            where QueryIn : class, IQuery<Response>
+            where QueryOut : class, IQuery<Response>
+            where Module : TychoModule
+        {
+            var handler = _instanceCreator
+                .CreateInstance<DownForwardingQueryHandler<QueryIn, QueryOut, Response, Module>>(mapping);
+            _moduleInbox.RegisterQueryHandler(handler);
+            return this;
+        }
+
         public IInboxDefinition RespondsTo<Query, Response>(Func<Query, Response> function)
             where Query : class, IQuery<Response>
         {

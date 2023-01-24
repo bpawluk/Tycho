@@ -47,6 +47,48 @@ namespace Tycho.Contract.Builders
         #endregion
 
         #region IOutboxConsumer.Events
+        public IOutboxConsumer PassOn<Event, Module>()
+            where Event : class, IEvent
+            where Module : TychoModule
+        {
+            Func<Event, Event> mapping = eventData => eventData;
+            Func<IEventHandler<Event>> handlerCreator = () => _instanceCreator
+                .CreateInstance<DownForwardingEventHandler<Event, Event, Module>>(mapping);
+            var handler = new TransientEventHandler<Event>(handlerCreator);
+            RegisterEventHandler(handler);
+            return this;
+        }
+
+        public IOutboxConsumer PassOn<EventIn, EventOut, Module>(Func<EventIn, EventOut> mapping)
+            where EventIn : class, IEvent
+            where EventOut : class, IEvent
+            where Module : TychoModule
+        {
+            Func<IEventHandler<EventIn>> handlerCreator = () => _instanceCreator
+                .CreateInstance<DownForwardingEventHandler<EventIn, EventOut, Module>>(mapping);
+            var handler = new TransientEventHandler<EventIn>(handlerCreator);
+            RegisterEventHandler(handler);
+            return this;
+        }
+
+        public IOutboxConsumer ExposeEvent<Event>()
+            where Event : class, IEvent
+        {
+            Func<Event, Event> mapping = eventData => eventData;
+            var handler = _instanceCreator.CreateInstance<UpForwardingEventHandler<Event, Event>>(mapping);
+            RegisterEventHandler(handler);
+            return this;
+        }
+
+        public IOutboxConsumer ExposeEvent<EventIn, EventOut>(Func<EventIn, EventOut> mapping)
+            where EventIn : class, IEvent
+            where EventOut : class, IEvent
+        {
+            var handler = _instanceCreator.CreateInstance<UpForwardingEventHandler<EventIn, EventOut>>(mapping);
+            RegisterEventHandler(handler);
+            return this;
+        }
+
         public IOutboxConsumer HandleEvent<Event>(Action<Event> action)
             where Event : class, IEvent
         {
@@ -98,6 +140,48 @@ namespace Tycho.Contract.Builders
         #endregion
 
         #region IOutboxConsumer.Commands
+        public IOutboxConsumer Forward<Command, Module>()
+            where Command : class, ICommand
+            where Module : TychoModule
+        {
+            Func<Command, Command> mapping = commandData => commandData;
+            Func<ICommandHandler<Command>> handlerCreator = () => _instanceCreator
+                .CreateInstance<DownForwardingCommandHandler<Command, Command, Module>>(mapping);
+            var handler = new TransientCommandHandler<Command>(handlerCreator);
+            RegisterCommandHandler(handler);
+            return this;
+        }
+
+        public IOutboxConsumer Forward<CommandIn, CommandOut, Module>(Func<CommandIn, CommandOut> mapping)
+            where CommandIn : class, ICommand
+            where CommandOut : class, ICommand
+            where Module : TychoModule
+        {
+            Func<ICommandHandler<CommandIn>> handlerCreator = () => _instanceCreator
+                .CreateInstance<DownForwardingCommandHandler<CommandIn, CommandOut, Module>>(mapping);
+            var handler = new TransientCommandHandler<CommandIn>(handlerCreator);
+            RegisterCommandHandler(handler);
+            return this;
+        }
+
+        public IOutboxConsumer ExposeCommand<Command>()
+            where Command : class, ICommand
+        {
+            Func<Command, Command> mapping = commandData => commandData;
+            var handler = _instanceCreator.CreateInstance<UpForwardingCommandHandler<Command, Command>>(mapping);
+            RegisterCommandHandler(handler);
+            return this;
+        }
+
+        public IOutboxConsumer ExposeCommand<CommandIn, CommandOut>(Func<CommandIn, CommandOut> mapping)
+            where CommandIn : class, ICommand
+            where CommandOut : class, ICommand
+        {
+            var handler = _instanceCreator.CreateInstance<UpForwardingCommandHandler<CommandIn, CommandOut>>(mapping);
+            RegisterCommandHandler(handler);
+            return this;
+        }
+
         public IOutboxConsumer HandleCommand<Command>(Action<Command> action)
             where Command : class, ICommand
         {
@@ -157,6 +241,50 @@ namespace Tycho.Contract.Builders
         #endregion
 
         #region IOutboxConsumer.Queries
+        public IOutboxConsumer Forward<Query, Response, Module>()
+            where Query : class, IQuery<Response>
+            where Module : TychoModule
+        {
+            Func<Query, Query> mapping = queryData => queryData;
+            Func<IQueryHandler<Query, Response>> handlerCreator = () => _instanceCreator
+                .CreateInstance<DownForwardingQueryHandler<Query, Query, Response, Module>>(mapping);
+            var handler = new TransientQueryHandler<Query, Response>(handlerCreator);
+            RegisterQueryHandler(handler);
+            return this;
+        }
+
+        public IOutboxConsumer Forward<QueryIn, QueryOut, Response, Module>(Func<QueryIn, QueryOut> mapping)
+            where QueryIn : class, IQuery<Response>
+            where QueryOut : class, IQuery<Response>
+            where Module : TychoModule
+        {
+            Func<IQueryHandler<QueryIn, Response>> handlerCreator = () => _instanceCreator
+                .CreateInstance<DownForwardingQueryHandler<QueryIn, QueryOut, Response, Module>>(mapping);
+            var handler = new TransientQueryHandler<QueryIn, Response>(handlerCreator);
+            RegisterQueryHandler(handler);
+            return this;
+        }
+
+        public IOutboxConsumer ExposeQuery<Query, Response>()
+            where Query : class, IQuery<Response>
+        {
+            Func<Query, Query> mapping = queryData => queryData;
+            var handler = _instanceCreator
+                .CreateInstance<UpForwardingQueryHandler<Query, Query, Response>>(mapping);
+            RegisterQueryHandler(handler);
+            return this;
+        }
+
+        public IOutboxConsumer ExposeQuery<QueryIn, QueryOut, Response>(Func<QueryIn, QueryOut> mapping)
+            where QueryIn : class, IQuery<Response>
+            where QueryOut : class, IQuery<Response>
+        {
+            var handler = _instanceCreator
+                .CreateInstance<UpForwardingQueryHandler<QueryIn, QueryOut, Response>>(mapping);
+            RegisterQueryHandler(handler);
+            return this;
+        }
+
         public IOutboxConsumer HandleQuery<Query, Response>(Func<Query, Response> function)
             where Query : class, IQuery<Response>
         {

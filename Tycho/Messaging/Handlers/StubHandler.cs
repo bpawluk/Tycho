@@ -26,6 +26,6 @@ namespace Tycho.Messaging.Handlers
             _defaultResponse = defaultResponse;
         }
 
-        public Task<Response> Handle(Query commandData, CancellationToken cancellationToken) => Task.FromResult(_defaultResponse);
+        public Task<Response> Handle(Query queryData, CancellationToken cancellationToken) => Task.FromResult(_defaultResponse);
     }
 }

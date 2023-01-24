@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SampleApp.App.Contract;
 using SampleApp.App.Handlers;
 using SampleApp.Catalog;
 using SampleApp.Catalog.Model;
@@ -8,24 +9,19 @@ using System;
 using System.Collections.Generic;
 using Tycho;
 using Tycho.Contract;
-using Tycho.Messaging.Payload;
 using Tycho.Structure;
 
+using static SampleApp.App.Contract.Mapper;
+
 namespace SampleApp.App;
-
-// Incoming
-public record BuyProductCommand(string ProductId, int Amount) : ICommand;
-
-// Outgoing
-// - no outgoing messages specific to this module
 
 public sealed class AppModule : TychoModule
 {
     protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
-        module.RespondsTo<GetProductsQuery, IEnumerable<Product>, GetProductsQueryHandler>()
-              .RespondsTo<FindProductQuery, Product, FindProductQueryHandler>()
-              .Executes<BuyProductCommand, BuyProductCommandHandler>();
+        module.Executes<BuyProductCommand, BuyProductCommandHandler>()
+              .Forwards<GetProductsQuery, IEnumerable<Product>, CatalogModule>()
+              .Forwards<FindProductQuery, Product, CatalogModule>();
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services) { }
@@ -36,12 +32,17 @@ public sealed class AppModule : TychoModule
 
         module.AddSubmodule<InventoryModule>((IOutboxConsumer thisConsumer) =>
         {
-            thisConsumer.HandleEvent<Inventory.StockLevelChangedEvent, StockLevelChangedEventHandler>();
+            thisConsumer.PassOn<Inventory.StockLevelChangedEvent, Pricing.StockLevelChangedEvent, PricingModule>(
+                MapToPricing);
+
+            thisConsumer.PassOn<Inventory.StockLevelChangedEvent, Catalog.StockLevelChangedEvent, CatalogModule>(
+                MapToCatalog);
         });
 
         module.AddSubmodule<PricingModule>((IOutboxConsumer thisConsumer) =>
         {
-            thisConsumer.HandleEvent<Pricing.PriceChangedEvent, PriceChangedEventHandler>();
+            thisConsumer.PassOn<Pricing.PriceChangedEvent, Catalog.PriceChangedEvent, CatalogModule>(
+                MapToCatalog);
         });
     }
 

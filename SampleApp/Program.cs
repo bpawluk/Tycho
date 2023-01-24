@@ -1,4 +1,5 @@
-﻿using SampleApp.Catalog;
+﻿using SampleApp.App.Contract;
+using SampleApp.Catalog;
 using SampleApp.Catalog.Model;
 using System;
 using System.Collections.Generic;

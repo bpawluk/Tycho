@@ -12,6 +12,9 @@ namespace Tycho.DependencyInjection
             _serviceProvider = serviceProvider ?? new StubServiceProvider();
         }
 
-        public T CreateInstance<T>() where T : class => ActivatorUtilities.CreateInstance<T>(_serviceProvider);
+        public T CreateInstance<T>(params object[] parameters) where T : class
+        {
+            return ActivatorUtilities.CreateInstance<T>(_serviceProvider, parameters);
+        }
     }
 }

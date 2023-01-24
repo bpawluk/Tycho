@@ -1,4 +1,5 @@
-﻿using SampleApp.Inventory;
+﻿using SampleApp.App.Contract;
+using SampleApp.Inventory;
 using System.Threading;
 using System.Threading.Tasks;
 using Tycho;

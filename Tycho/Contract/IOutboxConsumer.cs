@@ -7,11 +7,27 @@ using Tycho.Messaging.Payload;
 namespace Tycho.Contract
 {
     /// <summary>
-    /// Lets you define logic for handling messages sent out by a module you want to use
+    /// Lets you define logic for handling messages sent out by a module that you want to use
     /// </summary>
     public interface IOutboxConsumer
     {
         #region Events
+        IOutboxConsumer PassOn<Event, Module>()
+            where Event : class, IEvent
+            where Module : TychoModule;
+
+        IOutboxConsumer PassOn<EventIn, EventOut, Module>(Func<EventIn, EventOut> mapping)
+            where EventIn : class, IEvent
+            where EventOut : class, IEvent
+            where Module : TychoModule;
+
+        IOutboxConsumer ExposeEvent<Event>()
+            where Event : class, IEvent;
+
+        IOutboxConsumer ExposeEvent<EventIn, EventOut>(Func<EventIn, EventOut> mapping)
+            where EventIn : class, IEvent
+            where EventOut : class, IEvent;
+
         /// <summary>
         /// Defines logic for handling the specified <b>event</b> message
         /// </summary>
@@ -68,6 +84,22 @@ namespace Tycho.Contract
         #endregion
 
         #region Commands
+        IOutboxConsumer Forward<Command, Module>()
+            where Command : class, ICommand
+            where Module : TychoModule;
+
+        IOutboxConsumer Forward<CommandIn, CommandOut, Module>(Func<CommandIn, CommandOut> mapping)
+            where CommandIn : class, ICommand
+            where CommandOut : class, ICommand
+            where Module : TychoModule;
+
+        IOutboxConsumer ExposeCommand<Command>()
+            where Command : class, ICommand;
+
+        IOutboxConsumer ExposeCommand<CommandIn, CommandOut>(Func<CommandIn, CommandOut> mapping)
+            where CommandIn : class, ICommand
+            where CommandOut : class, ICommand;
+
         /// <summary>
         /// Defines logic for handling the specified <b>command</b> message
         /// </summary>
@@ -133,6 +165,22 @@ namespace Tycho.Contract
         #endregion
 
         #region Queries
+        IOutboxConsumer Forward<Query, Response, Module>()
+            where Query : class, IQuery<Response>
+            where Module : TychoModule;
+
+        IOutboxConsumer Forward<QueryIn, QueryOut, Response, Module>(Func<QueryIn, QueryOut> mapping)
+            where QueryIn : class, IQuery<Response>
+            where QueryOut : class, IQuery<Response>
+            where Module : TychoModule;
+
+        IOutboxConsumer ExposeQuery<Query, Response>()
+            where Query : class, IQuery<Response>;
+
+        IOutboxConsumer ExposeQuery<QueryIn, QueryOut, Response>(Func<QueryIn, QueryOut> mapping)
+            where QueryIn : class, IQuery<Response>
+            where QueryOut : class, IQuery<Response>;
+
         /// <summary>
         /// Defines logic for handling the specified <b>query</b> message
         /// </summary>

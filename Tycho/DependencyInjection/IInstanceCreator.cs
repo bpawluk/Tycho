@@ -2,6 +2,6 @@
 {
     public interface IInstanceCreator
     {
-        T CreateInstance<T>() where T : class;
+        T CreateInstance<T>(params object[] parameters) where T : class;
     }
 }

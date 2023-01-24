@@ -13,6 +13,15 @@ namespace Tycho.Contract
     public interface IInboxDefinition
     {
         #region Events
+        IInboxDefinition PassesOn<Event, Module>()
+            where Event : class, IEvent
+            where Module : TychoModule;
+
+        IInboxDefinition PassesOn<EventIn, EventOut, Module>(Func<EventIn, EventOut> mapping)
+            where EventIn : class, IEvent
+            where EventOut : class, IEvent
+            where Module : TychoModule;
+
         /// <summary>
         /// Declares that the specified <b>event</b> message is handled by your module 
         /// and defines logic for doing so
@@ -69,6 +78,15 @@ namespace Tycho.Contract
         #endregion
 
         #region Commands
+        IInboxDefinition Forwards<Command, Module>()
+            where Command : class, ICommand
+            where Module : TychoModule;
+        
+        IInboxDefinition Forwards<CommandIn, CommandOut, Module>(Func<CommandIn, CommandOut> mapping)
+            where CommandIn : class, ICommand
+            where CommandOut : class, ICommand
+            where Module : TychoModule;
+
         /// <summary>
         /// Declares that the specified <b>command</b> message is handled by your module 
         /// and defines logic for doing so
@@ -125,6 +143,15 @@ namespace Tycho.Contract
         #endregion
 
         #region Queries
+        public IInboxDefinition Forwards<Query, Response, Module>()
+            where Query : class, IQuery<Response>
+            where Module : TychoModule;
+
+        public IInboxDefinition Forwards<QueryIn, QueryOut, Response, Module>(Func<QueryIn, QueryOut> mapping)
+            where QueryIn : class, IQuery<Response>
+            where QueryOut : class, IQuery<Response>
+            where Module : TychoModule;
+
         /// <summary>
         /// Declares that the specified <b>query</b> message is handled by your module 
         /// and defines logic for doing so
