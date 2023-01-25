@@ -16,7 +16,7 @@ namespace Tycho.Messaging.Handlers
 
         public Task Handle(EventIn eventData, CancellationToken cancellationToken)
         {
-            _target.Publish(_mapping(eventData), cancellationToken);
+            _target.Publish(_messageMapping(eventData), cancellationToken);
             return Task.CompletedTask;
         }
     }
@@ -32,22 +32,31 @@ namespace Tycho.Messaging.Handlers
 
         public Task Handle(CommandIn commandData, CancellationToken cancellationToken)
         {
-            return _target.Execute(_mapping(commandData), cancellationToken);
+            return _target.Execute(_messageMapping(commandData), cancellationToken);
         }
     }
 
-    internal class UpForwardingQueryHandler<QueryIn, QueryOut, Response>
+    internal class UpForwardingQueryHandler<QueryIn, ResponseIn, QueryOut, ResponseOut>
         : ForwardingHandlerBase<QueryIn, QueryOut>
-        , IQueryHandler<QueryIn, Response>
-        where QueryIn : class, IQuery<Response>
-        where QueryOut : class, IQuery<Response>
+        , IQueryHandler<QueryIn, ResponseIn>
+        where QueryIn : class, IQuery<ResponseIn>
+        where QueryOut : class, IQuery<ResponseOut>
     {
-        public UpForwardingQueryHandler(IModule module, Func<QueryIn, QueryOut> mapping) 
-            : base(module, mapping) { }
+        private readonly Func<ResponseOut, ResponseIn> _responseMapping;
 
-        public Task<Response> Handle(QueryIn queryData, CancellationToken cancellationToken)
+        public UpForwardingQueryHandler(
+            IModule submodule,
+            Func<QueryIn, QueryOut> queryMapping,
+            Func<ResponseOut, ResponseIn> responseMapping)
+            : base(submodule, queryMapping)
         {
-            return _target.Execute<QueryOut, Response>(_mapping(queryData), cancellationToken);
+            _responseMapping = responseMapping;
+        }
+
+        public async Task<ResponseIn> Handle(QueryIn queryData, CancellationToken cancellationToken)
+        {
+            var result = await _target.Execute<QueryOut, ResponseOut>(_messageMapping(queryData), cancellationToken);
+            return _responseMapping(result);
         }
     }
 }

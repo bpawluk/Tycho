@@ -143,13 +143,20 @@ namespace Tycho.Contract
         #endregion
 
         #region Queries
-        public IInboxDefinition Forwards<Query, Response, Module>()
+        IInboxDefinition Forwards<Query, Response, Module>()
             where Query : class, IQuery<Response>
             where Module : TychoModule;
 
-        public IInboxDefinition Forwards<QueryIn, QueryOut, Response, Module>(Func<QueryIn, QueryOut> mapping)
+        IInboxDefinition Forwards<QueryIn, QueryOut, Response, Module>(Func<QueryIn, QueryOut> mapping)
             where QueryIn : class, IQuery<Response>
             where QueryOut : class, IQuery<Response>
+            where Module : TychoModule;
+
+        IInboxDefinition Forwards<QueryIn, ResponseIn, QueryOut, ResponseOut, Module>(
+            Func<QueryIn, QueryOut> queryMapping,
+            Func<ResponseIn, ResponseOut> responseMapping)
+            where QueryIn : class, IQuery<ResponseIn>
+            where QueryOut : class, IQuery<ResponseOut>
             where Module : TychoModule;
 
         /// <summary>

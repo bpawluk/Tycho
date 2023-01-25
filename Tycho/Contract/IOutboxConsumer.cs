@@ -174,12 +174,25 @@ namespace Tycho.Contract
             where QueryOut : class, IQuery<Response>
             where Module : TychoModule;
 
+        IOutboxConsumer Forward<QueryIn, ResponseIn, QueryOut, ResponseOut, Module>(
+            Func<QueryIn, QueryOut> queryMapping,
+            Func<ResponseIn, ResponseOut> responseMapping)
+            where QueryIn : class, IQuery<ResponseIn>
+            where QueryOut : class, IQuery<ResponseOut>
+            where Module : TychoModule;
+
         IOutboxConsumer ExposeQuery<Query, Response>()
             where Query : class, IQuery<Response>;
 
         IOutboxConsumer ExposeQuery<QueryIn, QueryOut, Response>(Func<QueryIn, QueryOut> mapping)
             where QueryIn : class, IQuery<Response>
             where QueryOut : class, IQuery<Response>;
+
+        IOutboxConsumer ExposeQuery<QueryIn, ResponseIn, QueryOut, ResponseOut>(
+            Func<QueryIn, QueryOut> queryMapping,
+            Func<ResponseIn, ResponseOut> responseMapping)
+            where QueryIn : class, IQuery<ResponseIn>
+            where QueryOut : class, IQuery<ResponseOut>;
 
         /// <summary>
         /// Defines logic for handling the specified <b>query</b> message

@@ -59,13 +59,13 @@ namespace Tycho.Contract.Builders
             return this;
         }
 
-        public IOutboxConsumer PassOn<EventIn, EventOut, Module>(Func<EventIn, EventOut> mapping)
+        public IOutboxConsumer PassOn<EventIn, EventOut, Module>(Func<EventIn, EventOut> eventMapping)
             where EventIn : class, IEvent
             where EventOut : class, IEvent
             where Module : TychoModule
         {
             Func<IEventHandler<EventIn>> handlerCreator = () => _instanceCreator
-                .CreateInstance<DownForwardingEventHandler<EventIn, EventOut, Module>>(mapping);
+                .CreateInstance<DownForwardingEventHandler<EventIn, EventOut, Module>>(eventMapping);
             var handler = new TransientEventHandler<EventIn>(handlerCreator);
             RegisterEventHandler(handler);
             return this;
@@ -80,11 +80,11 @@ namespace Tycho.Contract.Builders
             return this;
         }
 
-        public IOutboxConsumer ExposeEvent<EventIn, EventOut>(Func<EventIn, EventOut> mapping)
+        public IOutboxConsumer ExposeEvent<EventIn, EventOut>(Func<EventIn, EventOut> eventMapping)
             where EventIn : class, IEvent
             where EventOut : class, IEvent
         {
-            var handler = _instanceCreator.CreateInstance<UpForwardingEventHandler<EventIn, EventOut>>(mapping);
+            var handler = _instanceCreator.CreateInstance<UpForwardingEventHandler<EventIn, EventOut>>(eventMapping);
             RegisterEventHandler(handler);
             return this;
         }
@@ -152,13 +152,13 @@ namespace Tycho.Contract.Builders
             return this;
         }
 
-        public IOutboxConsumer Forward<CommandIn, CommandOut, Module>(Func<CommandIn, CommandOut> mapping)
+        public IOutboxConsumer Forward<CommandIn, CommandOut, Module>(Func<CommandIn, CommandOut> commandMapping)
             where CommandIn : class, ICommand
             where CommandOut : class, ICommand
             where Module : TychoModule
         {
             Func<ICommandHandler<CommandIn>> handlerCreator = () => _instanceCreator
-                .CreateInstance<DownForwardingCommandHandler<CommandIn, CommandOut, Module>>(mapping);
+                .CreateInstance<DownForwardingCommandHandler<CommandIn, CommandOut, Module>>(commandMapping);
             var handler = new TransientCommandHandler<CommandIn>(handlerCreator);
             RegisterCommandHandler(handler);
             return this;
@@ -173,11 +173,12 @@ namespace Tycho.Contract.Builders
             return this;
         }
 
-        public IOutboxConsumer ExposeCommand<CommandIn, CommandOut>(Func<CommandIn, CommandOut> mapping)
+        public IOutboxConsumer ExposeCommand<CommandIn, CommandOut>(Func<CommandIn, CommandOut> commandMapping)
             where CommandIn : class, ICommand
             where CommandOut : class, ICommand
         {
-            var handler = _instanceCreator.CreateInstance<UpForwardingCommandHandler<CommandIn, CommandOut>>(mapping);
+            var handler = _instanceCreator
+                .CreateInstance<UpForwardingCommandHandler<CommandIn, CommandOut>>(commandMapping);
             RegisterCommandHandler(handler);
             return this;
         }
@@ -245,22 +246,41 @@ namespace Tycho.Contract.Builders
             where Query : class, IQuery<Response>
             where Module : TychoModule
         {
-            Func<Query, Query> mapping = queryData => queryData;
+            Func<Query, Query> queryMapping = queryData => queryData;
+            Func<Response, Response> responseMapping = response => response;
             Func<IQueryHandler<Query, Response>> handlerCreator = () => _instanceCreator
-                .CreateInstance<DownForwardingQueryHandler<Query, Query, Response, Module>>(mapping);
+                .CreateInstance<DownForwardingQueryHandler<Query, Response, Query, Response, Module>>(
+                    queryMapping, responseMapping);
             var handler = new TransientQueryHandler<Query, Response>(handlerCreator);
             RegisterQueryHandler(handler);
             return this;
         }
 
-        public IOutboxConsumer Forward<QueryIn, QueryOut, Response, Module>(Func<QueryIn, QueryOut> mapping)
+        public IOutboxConsumer Forward<QueryIn, QueryOut, Response, Module>(Func<QueryIn, QueryOut> queryMapping)
             where QueryIn : class, IQuery<Response>
             where QueryOut : class, IQuery<Response>
             where Module : TychoModule
         {
+            Func<Response, Response> responseMapping = response => response;
             Func<IQueryHandler<QueryIn, Response>> handlerCreator = () => _instanceCreator
-                .CreateInstance<DownForwardingQueryHandler<QueryIn, QueryOut, Response, Module>>(mapping);
+                .CreateInstance<DownForwardingQueryHandler<QueryIn, Response, QueryOut, Response, Module>>(
+                    queryMapping, responseMapping);
             var handler = new TransientQueryHandler<QueryIn, Response>(handlerCreator);
+            RegisterQueryHandler(handler);
+            return this;
+        }
+
+        public IOutboxConsumer Forward<QueryIn, ResponseIn, QueryOut, ResponseOut, Module>(
+            Func<QueryIn, QueryOut> queryMapping,
+            Func<ResponseIn, ResponseOut> responseMapping)
+            where QueryIn : class, IQuery<ResponseIn>
+            where QueryOut : class, IQuery<ResponseOut>
+            where Module : TychoModule
+        {
+            Func<IQueryHandler<QueryIn, ResponseIn>> handlerCreator = () => _instanceCreator
+                .CreateInstance<DownForwardingQueryHandler<QueryIn, ResponseIn, QueryOut, ResponseOut, Module>>(
+                    queryMapping, responseMapping);
+            var handler = new TransientQueryHandler<QueryIn, ResponseIn>(handlerCreator);
             RegisterQueryHandler(handler);
             return this;
         }
@@ -268,19 +288,36 @@ namespace Tycho.Contract.Builders
         public IOutboxConsumer ExposeQuery<Query, Response>()
             where Query : class, IQuery<Response>
         {
-            Func<Query, Query> mapping = queryData => queryData;
+            Func<Query, Query> queryMapping = queryData => queryData;
+            Func<Response, Response> responseMapping = response => response;
             var handler = _instanceCreator
-                .CreateInstance<UpForwardingQueryHandler<Query, Query, Response>>(mapping);
+                .CreateInstance<UpForwardingQueryHandler<Query, Response, Query, Response>>(
+                    queryMapping,responseMapping);
             RegisterQueryHandler(handler);
             return this;
         }
 
-        public IOutboxConsumer ExposeQuery<QueryIn, QueryOut, Response>(Func<QueryIn, QueryOut> mapping)
+        public IOutboxConsumer ExposeQuery<QueryIn, QueryOut, Response>(Func<QueryIn, QueryOut> queryMapping)
             where QueryIn : class, IQuery<Response>
             where QueryOut : class, IQuery<Response>
         {
+            Func<Response, Response> responseMapping = response => response;
             var handler = _instanceCreator
-                .CreateInstance<UpForwardingQueryHandler<QueryIn, QueryOut, Response>>(mapping);
+                .CreateInstance<UpForwardingQueryHandler<QueryIn, Response, QueryOut, Response>>(
+                    queryMapping, responseMapping);
+            RegisterQueryHandler(handler);
+            return this;
+        }
+
+        public IOutboxConsumer ExposeQuery<QueryIn, ResponseIn, QueryOut, ResponseOut>(
+            Func<QueryIn, QueryOut> queryMapping,
+            Func<ResponseIn, ResponseOut> responseMapping)
+            where QueryIn : class, IQuery<ResponseIn>
+            where QueryOut : class, IQuery<ResponseOut>
+        {
+            var handler = _instanceCreator
+                .CreateInstance<UpForwardingQueryHandler<QueryIn, ResponseIn, QueryOut, ResponseOut>>(
+                    queryMapping, responseMapping);
             RegisterQueryHandler(handler);
             return this;
         }
