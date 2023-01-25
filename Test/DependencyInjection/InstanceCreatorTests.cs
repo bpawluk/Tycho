@@ -32,6 +32,25 @@ public class InstanceCreatorTests
     }
 
     [Fact]
+    public void CreateInstance_DependencyProvidedThroughParams_ReturnsANewInstance()
+    {
+        // Arrange
+        _serviceProviderMock.Setup(provider => provider.GetService(typeof(ISomeInterface)))
+                            .Returns(new SomeClass());
+        _serviceProviderMock.Setup(provider => provider.GetService(typeof(ISomeGenericInterface<string>)))
+                            .Returns(new SomeGenericClass<string>());
+
+        // Act
+        var result = _instanceCreator.CreateInstance<TestClass>(new SomeOtherClass());
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.NotNull(result.SomeInterface);
+        Assert.NotNull(result.SomeGenericInterface);
+        Assert.NotNull(result.SomeOtherClass);
+    }
+
+    [Fact]
     public void CreateInstance_AllDependenciesAvailable_ReturnsANewInstance()
     {
         // Arrange

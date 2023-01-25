@@ -9,4 +9,5 @@ public record TestCommand(string Name) : ICommand;
 public record OtherCommand(int Age) : ICommand;
 
 public record TestQuery(string Name) : IQuery<string>;
+public record OtherTestQuery(string Name) : IQuery<string>;
 public record OtherQuery(int Age) : IQuery<object>;

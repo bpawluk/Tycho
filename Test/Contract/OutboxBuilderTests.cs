@@ -51,6 +51,30 @@ public class OutboxBuilderTests
     }
 
     [Fact]
+    public void PassOn_EventNotDefined_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        // - no arrangement required
+
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(_outboxBuilder.PassOn<TestEvent, TestModule>);
+        Assert.Throws<InvalidOperationException>(
+            () => _outboxBuilder.PassOn<TestEvent, OtherEvent, TestModule>(eventData => new(int.MinValue)));
+    }
+
+    [Fact]
+    public void ExposeEvent_EventNotDefined_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        // - no arrangement required
+
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(_outboxBuilder.ExposeEvent<TestEvent>);
+        Assert.Throws<InvalidOperationException>(
+            () => _outboxBuilder.ExposeEvent<TestEvent, OtherEvent>(eventData => new(int.MinValue)));
+    }
+
+    [Fact]
     public void HandleEvent_EventNotDefined_ThrowsInvalidOperationException()
     {
         // Arrange
@@ -61,6 +85,30 @@ public class OutboxBuilderTests
     }
 
     [Fact]
+    public void Forward_CommandNotDefined_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        // - no arrangement required
+
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(_outboxBuilder.Forward<TestCommand, TestModule>);
+        Assert.Throws<InvalidOperationException>(
+            () => _outboxBuilder.Forward<TestCommand, OtherCommand, TestModule>(commandData => new(int.MinValue)));
+    }
+
+    [Fact]
+    public void ExposeCommand_CommandNotDefined_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        // - no arrangement required
+
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(_outboxBuilder.ExposeCommand<TestCommand>);
+        Assert.Throws<InvalidOperationException>(
+            () => _outboxBuilder.ExposeCommand<TestCommand, OtherCommand>(commandData => new(int.MinValue)));
+    }
+
+    [Fact]
     public void HandleCommand_CommandNotDefined_ThrowsInvalidOperationException()
     {
         // Arrange
@@ -68,6 +116,38 @@ public class OutboxBuilderTests
 
         // Act & Assert
         Assert.Throws<InvalidOperationException>(() => _outboxBuilder.HandleCommand<TestCommand>(_ => Task.CompletedTask));
+    }
+
+    [Fact]
+    public void Forward_QueryNotDefined_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        // - no arrangement required
+
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(_outboxBuilder.Forward<TestQuery, string, TestModule>);
+        Assert.Throws<InvalidOperationException>(
+            () => _outboxBuilder.Forward<TestQuery, OtherTestQuery, string, TestModule>(
+                commandData => new(commandData.Name)));
+        Assert.Throws<InvalidOperationException>(
+            () => _outboxBuilder.Forward<TestQuery, string, OtherQuery, object, TestModule>(
+                commandData => new(int.MinValue), response => response.ToString()));
+    }
+
+    [Fact]
+    public void ExposeQuery_QueryNotDefined_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        // - no arrangement required
+
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(_outboxBuilder.ExposeQuery<TestQuery, string>);
+        Assert.Throws<InvalidOperationException>(
+            () => _outboxBuilder.ExposeQuery<TestQuery, OtherTestQuery, string>(
+                commandData => new(commandData.Name)));
+        Assert.Throws<InvalidOperationException>(
+            () => _outboxBuilder.ExposeQuery<TestQuery, string, OtherQuery, object>(
+                commandData => new(int.MinValue), response => response.ToString()));
     }
 
     [Fact]

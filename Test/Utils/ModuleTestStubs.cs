@@ -6,7 +6,7 @@ using Tycho.Structure;
 
 namespace Test.Utils
 {
-    internal class TestModule : TychoModule
+    public class TestModule : TychoModule
     {
         protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services) { }
         protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services) { }
@@ -14,7 +14,7 @@ namespace Test.Utils
         protected override void RegisterServices(IServiceCollection services) { }
     }
 
-    internal class OtherModule : TychoModule
+    public class OtherModule : TychoModule
     {
         protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services) { }
         protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services) { }
@@ -22,7 +22,7 @@ namespace Test.Utils
         protected override void RegisterServices(IServiceCollection services) { }
     }
 
-    internal class YetAnotherModule : TychoModule
+    public class YetAnotherModule : TychoModule
     {
         protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services) { }
         protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services) { }

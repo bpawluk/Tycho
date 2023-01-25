@@ -21,6 +21,20 @@ public class InboxBuilderTests
     }
 
     [Fact]
+    public void PassesOn_RegistersEventHandler()
+    {
+        // Arrange
+        // - no arrangement required
+
+        // Act
+        _inboxBuilder.PassesOn<TestEvent, TestModule>();
+        _inboxBuilder.PassesOn<TestEvent, OtherEvent, TestModule>(eventData => new(int.MinValue));
+
+        // Assert
+        _messageRouterMock.Verify(router => router.RegisterEventHandler(It.IsAny<IEventHandler<TestEvent>>()), Times.Exactly(2));
+    }
+
+    [Fact]
     public void SubsribesTo_RegistersEventHandler()
     {
         // Arrange
@@ -38,6 +52,22 @@ public class InboxBuilderTests
     }
 
     [Fact]
+    public void Forwards_RegistersCommandHandler()
+    {
+        // Arrange
+        // - no arrangement required
+
+        // Act
+        _inboxBuilder.Forwards<TestCommand, TestModule>();
+        _inboxBuilder.Forwards<TestCommand, OtherCommand, TestModule>(commandData => new(int.MinValue));
+
+        // Assert
+        _messageRouterMock.Verify(
+            router => router.RegisterCommandHandler(It.IsAny<ICommandHandler<TestCommand>>()), 
+            Times.Exactly(2));
+    }
+
+    [Fact]
     public void Executes_RegistersCommandHandler()
     {
         // Arrange
@@ -52,6 +82,24 @@ public class InboxBuilderTests
 
         // Assert
         _messageRouterMock.Verify(router => router.RegisterCommandHandler(It.IsAny<ICommandHandler<TestCommand>>()), Times.Exactly(5));
+    }
+
+    [Fact]
+    public void Forwards_RegistersQueryHandler()
+    {
+        // Arrange
+        // - no arrangement required
+
+        // Act
+        _inboxBuilder.Forwards<TestQuery, string, TestModule>();
+        _inboxBuilder.Forwards<TestQuery, OtherTestQuery, string, TestModule>(queryData => new(queryData.Name));
+        _inboxBuilder.Forwards<TestQuery, string, OtherQuery, object, TestModule>(
+            queryData => new(int.MinValue), response => response.ToString());
+
+        // Assert
+        _messageRouterMock.Verify(
+            router => router.RegisterQueryHandler(It.IsAny<IQueryHandler<TestQuery, string>>()), 
+            Times.Exactly(3));
     }
 
     [Fact]
