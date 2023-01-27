@@ -131,7 +131,7 @@ public class OutboxBuilderTests
                 commandData => new(commandData.Name)));
         Assert.Throws<InvalidOperationException>(
             () => _outboxBuilder.Forward<TestQuery, string, OtherQuery, object, TestModule>(
-                commandData => new(int.MinValue), response => response.ToString()));
+                commandData => new(int.MinValue), response => response.ToString()!));
     }
 
     [Fact]
@@ -147,7 +147,7 @@ public class OutboxBuilderTests
                 commandData => new(commandData.Name)));
         Assert.Throws<InvalidOperationException>(
             () => _outboxBuilder.ExposeQuery<TestQuery, string, OtherQuery, object>(
-                commandData => new(int.MinValue), response => response.ToString()));
+                commandData => new(int.MinValue), response => response.ToString()!));
     }
 
     [Fact]

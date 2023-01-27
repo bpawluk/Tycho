@@ -94,7 +94,7 @@ public class InboxBuilderTests
         _inboxBuilder.Forwards<TestQuery, string, TestModule>();
         _inboxBuilder.Forwards<TestQuery, OtherTestQuery, string, TestModule>(queryData => new(queryData.Name));
         _inboxBuilder.Forwards<TestQuery, string, OtherQuery, object, TestModule>(
-            queryData => new(int.MinValue), response => response.ToString());
+            queryData => new(int.MinValue), response => response.ToString()!);
 
         // Assert
         _messageRouterMock.Verify(

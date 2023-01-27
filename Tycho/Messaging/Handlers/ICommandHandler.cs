@@ -20,5 +20,8 @@ namespace Tycho.Messaging.Handlers
         Task Handle(Command commandData, CancellationToken cancellationToken = default);
     }
 
+    /// <summary>
+    /// Base interface for command handlers
+    /// </summary>
     public interface ICommandHandler { }
 }

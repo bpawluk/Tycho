@@ -4,7 +4,7 @@ using Tycho.Messaging.Payload;
 
 namespace Tycho.Messaging
 {
-    public interface IMessageRouter
+    internal interface IMessageRouter
     {
         IEnumerable<IEventHandler<Event>> GetEventHandlers<Event>()
             where Event : class, IEvent;

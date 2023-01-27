@@ -21,5 +21,8 @@ namespace Tycho.Messaging.Handlers
         Task<Response> Handle(Query queryData, CancellationToken cancellationToken = default);
     }
 
+    /// <summary>
+    /// Base interface for query handlers
+    /// </summary>
     public interface IQueryHandler { }
 }

@@ -20,5 +20,8 @@ namespace Tycho.Messaging.Handlers
         Task Handle(Event eventData, CancellationToken cancellationToken = default);
     }
 
+    /// <summary>
+    /// Base interface for event handlers
+    /// </summary>
     public interface IEventHandler { }
 }
