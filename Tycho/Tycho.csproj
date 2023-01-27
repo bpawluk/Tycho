@@ -17,6 +17,7 @@
     <PackageTags>tycho; module; modular; architecture; framework</PackageTags>
     <Description>Lightweight framework for writing modular .NET apps</Description>
     <PackageIcon>logo-128x128.png</PackageIcon>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
