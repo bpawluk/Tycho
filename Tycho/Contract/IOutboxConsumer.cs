@@ -12,18 +12,52 @@ namespace Tycho.Contract
     public interface IOutboxConsumer
     {
         #region Events
+        /// <summary>
+        /// Defines logic for handling the specified <b>event</b> message
+        /// by passing it on to the specified submodule
+        /// </summary>
+        /// <typeparam name="Event">The type of the event being handled</typeparam>
+        /// <typeparam name="Module">The type of the submodule to receive the event</typeparam>
+        /// <exception cref="ArgumentException"/>
+        /// <exception cref="InvalidOperationException"/>
         IOutboxConsumer PassOn<Event, Module>()
             where Event : class, IEvent
             where Module : TychoModule;
 
+        /// <summary>
+        /// Defines logic for handling the specified <b>event</b> message
+        /// by passing it on to the specified submodule
+        /// </summary>
+        /// <typeparam name="EventIn">The type of the event being handled</typeparam>
+        /// <typeparam name="EventOut">The type of the event being passed on</typeparam>
+        /// <typeparam name="Module">The type of the submodule to receive the event</typeparam>
+        /// <param name="mapping">A mapping between the events</param>
+        /// <exception cref="ArgumentException"/>
+        /// <exception cref="InvalidOperationException"/>
         IOutboxConsumer PassOn<EventIn, EventOut, Module>(Func<EventIn, EventOut> mapping)
             where EventIn : class, IEvent
             where EventOut : class, IEvent
             where Module : TychoModule;
 
+        /// <summary>
+        /// Defines logic for handling the specified <b>event</b> message
+        /// by exposing it as your module's outgoing message
+        /// </summary>
+        /// <typeparam name="Event">The type of the event being handled</typeparam>
+        /// <exception cref="ArgumentException"/>
+        /// <exception cref="InvalidOperationException"/>
         IOutboxConsumer ExposeEvent<Event>()
             where Event : class, IEvent;
 
+        /// <summary>
+        /// Defines logic for handling the specified <b>event</b> message
+        /// by exposing it as your module's outgoing message
+        /// </summary>
+        /// <typeparam name="EventIn">The type of the event being handled</typeparam>
+        /// <typeparam name="EventOut">The type of the event being exposed</typeparam>
+        /// <param name="mapping">A mapping between the events</param>
+        /// <exception cref="ArgumentException"/>
+        /// <exception cref="InvalidOperationException"/>
         IOutboxConsumer ExposeEvent<EventIn, EventOut>(Func<EventIn, EventOut> mapping)
             where EventIn : class, IEvent
             where EventOut : class, IEvent;
@@ -84,18 +118,52 @@ namespace Tycho.Contract
         #endregion
 
         #region Commands
+        /// <summary>
+        /// Defines logic for handling the specified <b>command</b> message
+        /// by forwarding it to the specified submodule
+        /// </summary>
+        /// <typeparam name="Command">The type of the command being handled</typeparam>
+        /// <typeparam name="Module">The type of the submodule to receive the command</typeparam>
+        /// <exception cref="ArgumentException"/>
+        /// <exception cref="InvalidOperationException"/>
         IOutboxConsumer Forward<Command, Module>()
             where Command : class, ICommand
             where Module : TychoModule;
 
+        /// <summary>
+        /// Defines logic for handling the specified <b>command</b> message
+        /// by forwarding it to the specified submodule
+        /// </summary>
+        /// <typeparam name="CommandIn">The type of the command being handled</typeparam>
+        /// <typeparam name="CommandOut">The type of the command being forwarded</typeparam>
+        /// <typeparam name="Module">The type of the submodule to receive the command</typeparam>
+        /// <param name="mapping">A mapping between the commands</param>
+        /// <exception cref="ArgumentException"/>
+        /// <exception cref="InvalidOperationException"/>
         IOutboxConsumer Forward<CommandIn, CommandOut, Module>(Func<CommandIn, CommandOut> mapping)
             where CommandIn : class, ICommand
             where CommandOut : class, ICommand
             where Module : TychoModule;
 
+        /// <summary>
+        /// Defines logic for handling the specified <b>command</b> message
+        /// by exposing it as your module's outgoing message
+        /// </summary>
+        /// <typeparam name="Command">The type of the command being handled</typeparam>
+        /// <exception cref="ArgumentException"/>
+        /// <exception cref="InvalidOperationException"/>
         IOutboxConsumer ExposeCommand<Command>()
             where Command : class, ICommand;
 
+        /// <summary>
+        /// Defines logic for handling the specified <b>command</b> message
+        /// by exposing it as your module's outgoing message
+        /// </summary>
+        /// <typeparam name="CommandIn">The type of the command being handled</typeparam>
+        /// <typeparam name="CommandOut">The type of the command being exposed</typeparam>
+        /// <param name="mapping">A mapping between the commands</param>
+        /// <exception cref="ArgumentException"/>
+        /// <exception cref="InvalidOperationException"/>
         IOutboxConsumer ExposeCommand<CommandIn, CommandOut>(Func<CommandIn, CommandOut> mapping)
             where CommandIn : class, ICommand
             where CommandOut : class, ICommand;
@@ -165,15 +233,48 @@ namespace Tycho.Contract
         #endregion
 
         #region Queries
+        /// <summary>
+        /// Defines logic for handling the specified <b>query</b> message
+        /// by forwarding it to the specified submodule
+        /// </summary>
+        /// <typeparam name="Query">The type of the query being handled</typeparam>
+        /// <typeparam name="Response">The type of the response expected by the query</typeparam>
+        /// <typeparam name="Module">The type of the submodule to receive the query</typeparam>
+        /// <exception cref="ArgumentException"/>
+        /// <exception cref="InvalidOperationException"/>
         IOutboxConsumer Forward<Query, Response, Module>()
             where Query : class, IQuery<Response>
             where Module : TychoModule;
 
+        /// <summary>
+        /// Defines logic for handling the specified <b>query</b> message
+        /// by forwarding it to the specified submodule
+        /// </summary>
+        /// <typeparam name="QueryIn">The type of the query being handled</typeparam>
+        /// <typeparam name="QueryOut">The type of the query being forwarded</typeparam>
+        /// <typeparam name="Response">The type of the response expected by the query</typeparam>
+        /// <typeparam name="Module">The type of the submodule to receive the query</typeparam>
+        /// <param name="mapping">A mapping between the queries</param>
+        /// <exception cref="ArgumentException"/>
+        /// <exception cref="InvalidOperationException"/>
         IOutboxConsumer Forward<QueryIn, QueryOut, Response, Module>(Func<QueryIn, QueryOut> mapping)
             where QueryIn : class, IQuery<Response>
             where QueryOut : class, IQuery<Response>
             where Module : TychoModule;
 
+        /// <summary>
+        /// Defines logic for handling the specified <b>query</b> message
+        /// by forwarding it to the specified submodule
+        /// </summary>
+        /// <typeparam name="QueryIn">The type of the query being handled</typeparam>
+        /// <typeparam name="ResponseIn">The type of the response expected by the query being handled</typeparam>
+        /// <typeparam name="QueryOut">The type of the query being forwarded</typeparam>
+        /// <typeparam name="ResponseOut">The type of the response expected by the query being forwarded</typeparam>
+        /// <typeparam name="Module">The type of the submodule to receive the query</typeparam>
+        /// <param name="queryMapping">A mapping between the queries</param>
+        /// <param name="responseMapping">A mapping between the responses</param>
+        /// <exception cref="ArgumentException"/>
+        /// <exception cref="InvalidOperationException"/>
         IOutboxConsumer Forward<QueryIn, ResponseIn, QueryOut, ResponseOut, Module>(
             Func<QueryIn, QueryOut> queryMapping,
             Func<ResponseOut, ResponseIn> responseMapping)
@@ -181,13 +282,43 @@ namespace Tycho.Contract
             where QueryOut : class, IQuery<ResponseOut>
             where Module : TychoModule;
 
+        /// <summary>
+        /// Defines logic for handling the specified <b>query</b> message
+        /// by exposing it as your module's outgoing message
+        /// </summary>
+        /// <typeparam name="Query">The type of the query being handled</typeparam>
+        /// <typeparam name="Response">The type of the response expected by the query</typeparam>
+        /// <exception cref="ArgumentException"/>
+        /// <exception cref="InvalidOperationException"/>
         IOutboxConsumer ExposeQuery<Query, Response>()
             where Query : class, IQuery<Response>;
 
+        /// <summary>
+        /// Defines logic for handling the specified <b>query</b> message
+        /// by exposing it as your module's outgoing message
+        /// </summary>
+        /// <typeparam name="QueryIn">The type of the query being handled</typeparam>
+        /// <typeparam name="QueryOut">The type of the query being exposed</typeparam>
+        /// <typeparam name="Response">The type of the response expected by the query</typeparam>
+        /// <param name="mapping">A mapping between the queries</param>
+        /// <exception cref="ArgumentException"/>
+        /// <exception cref="InvalidOperationException"/>
         IOutboxConsumer ExposeQuery<QueryIn, QueryOut, Response>(Func<QueryIn, QueryOut> mapping)
             where QueryIn : class, IQuery<Response>
             where QueryOut : class, IQuery<Response>;
 
+        /// <summary>
+        /// Defines logic for handling the specified <b>query</b> message
+        /// by exposing it as your module's outgoing message
+        /// </summary>
+        /// <typeparam name="QueryIn">The type of the query being handled</typeparam>
+        /// <typeparam name="ResponseIn">The type of the response expected by the query being handled</typeparam>
+        /// <typeparam name="QueryOut">The type of the query being exposed</typeparam>
+        /// <typeparam name="ResponseOut">The type of the response expected by the query being exposed</typeparam>
+        /// <param name="queryMapping">A mapping between the queries</param>
+        /// <param name="responseMapping">A mapping between the responses</param>
+        /// <exception cref="ArgumentException"/>
+        /// <exception cref="InvalidOperationException"/>
         IOutboxConsumer ExposeQuery<QueryIn, ResponseIn, QueryOut, ResponseOut>(
             Func<QueryIn, QueryOut> queryMapping,
             Func<ResponseOut, ResponseIn> responseMapping)
