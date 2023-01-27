@@ -7,16 +7,12 @@ namespace Test.Integration.PassingMessagesBetweenSubmodules;
 
 public class PassingMessagesBetweenSubmodulesTests : IAsyncLifetime
 {
-    private readonly TaskCompletionSource<string> _eventWorkflowTcs; 
-    private readonly TaskCompletionSource<string> _commandWorkflowTcs; 
-    private readonly TaskCompletionSource<string> _queryWorkflowTcs; 
+    private readonly TaskCompletionSource<string> _testWorkflowTcs; 
     private IModule? _sut;
 
     public PassingMessagesBetweenSubmodulesTests()
     {
-        _eventWorkflowTcs = new TaskCompletionSource<string>();
-        _commandWorkflowTcs = new TaskCompletionSource<string>();
-        _queryWorkflowTcs = new TaskCompletionSource<string>();
+        _testWorkflowTcs = new TaskCompletionSource<string>();
     }
 
     public async Task InitializeAsync()
@@ -24,9 +20,9 @@ public class PassingMessagesBetweenSubmodulesTests : IAsyncLifetime
         _sut = await new AppModule()
             .FulfillContract(consumer =>
             {
-                consumer.HandleEvent<EventWorkflowCompletedEvent>(eventData => _eventWorkflowTcs.SetResult(eventData.Id));
-                consumer.HandleEvent<CommandWorkflowCompletedEvent>(commandData => _commandWorkflowTcs.SetResult(commandData.Id));
-                consumer.HandleEvent<QueryWorkflowCompletedEvent>(queryData => _queryWorkflowTcs.SetResult(queryData.Id));
+                consumer.HandleEvent<EventWorkflowCompletedEvent>(eventData => _testWorkflowTcs.SetResult(eventData.Id));
+                consumer.HandleEvent<CommandWorkflowCompletedEvent>(commandData => _testWorkflowTcs.SetResult(commandData.Id));
+                consumer.HandleEvent<QueryWorkflowCompletedEvent>(queryData => _testWorkflowTcs.SetResult(queryData.Id));
             })
             .Build();
     }
@@ -39,7 +35,7 @@ public class PassingMessagesBetweenSubmodulesTests : IAsyncLifetime
 
         // Act
         await _sut!.Execute<BeginEventWorkflowCommand>(new(workflowId));
-        var returnedId = await _eventWorkflowTcs.Task;
+        var returnedId = await _testWorkflowTcs.Task;
 
         // Assert
         Assert.Equal(workflowId, returnedId);
@@ -53,7 +49,7 @@ public class PassingMessagesBetweenSubmodulesTests : IAsyncLifetime
 
         // Act
         await _sut!.Execute<BeginCommandWorkflowCommand>(new(workflowId));
-        var returnedId = await _commandWorkflowTcs.Task;
+        var returnedId = await _testWorkflowTcs.Task;
 
         // Assert
         Assert.Equal(workflowId, returnedId);
@@ -67,7 +63,7 @@ public class PassingMessagesBetweenSubmodulesTests : IAsyncLifetime
 
         // Act
         await _sut!.Execute<BeginQueryWorkflowCommand>(new(workflowId));
-        var returnedId = await _queryWorkflowTcs.Task;
+        var returnedId = await _testWorkflowTcs.Task;
 
         // Assert
         Assert.Equal(workflowId, returnedId);

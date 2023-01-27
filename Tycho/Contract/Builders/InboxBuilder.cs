@@ -178,7 +178,7 @@ namespace Tycho.Contract.Builders
 
         public IInboxDefinition Forwards<QueryIn, ResponseIn, QueryOut, ResponseOut, Module>(
             Func<QueryIn, QueryOut> queryMapping,
-            Func<ResponseIn, ResponseOut> responseMapping)
+            Func<ResponseOut, ResponseIn> responseMapping)
             where QueryIn : class, IQuery<ResponseIn>
             where QueryOut : class, IQuery<ResponseOut>
             where Module : TychoModule

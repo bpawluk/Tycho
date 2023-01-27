@@ -272,7 +272,7 @@ namespace Tycho.Contract.Builders
 
         public IOutboxConsumer Forward<QueryIn, ResponseIn, QueryOut, ResponseOut, Module>(
             Func<QueryIn, QueryOut> queryMapping,
-            Func<ResponseIn, ResponseOut> responseMapping)
+            Func<ResponseOut, ResponseIn> responseMapping)
             where QueryIn : class, IQuery<ResponseIn>
             where QueryOut : class, IQuery<ResponseOut>
             where Module : TychoModule
@@ -311,7 +311,7 @@ namespace Tycho.Contract.Builders
 
         public IOutboxConsumer ExposeQuery<QueryIn, ResponseIn, QueryOut, ResponseOut>(
             Func<QueryIn, QueryOut> queryMapping,
-            Func<ResponseIn, ResponseOut> responseMapping)
+            Func<ResponseOut, ResponseIn> responseMapping)
             where QueryIn : class, IQuery<ResponseIn>
             where QueryOut : class, IQuery<ResponseOut>
         {
