@@ -3,11 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33103.184
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tycho", "Tycho\Tycho.csproj", "{8774D167-57E3-4598-8B9F-CB5A376E656A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tycho", "Tycho\Tycho.csproj", "{8774D167-57E3-4598-8B9F-CB5A376E656A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{D4C75946-56C2-44B0-9C62-F620F40BB18E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp", "SampleApp\SampleApp.csproj", "{5BFD630A-830E-48F0-8748-C083CA333C87}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Test\Test.csproj", "{D4C75946-56C2-44B0-9C62-F620F40BB18E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +21,6 @@ Global
 		{D4C75946-56C2-44B0-9C62-F620F40BB18E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4C75946-56C2-44B0-9C62-F620F40BB18E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4C75946-56C2-44B0-9C62-F620F40BB18E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5BFD630A-830E-48F0-8748-C083CA333C87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5BFD630A-830E-48F0-8748-C083CA333C87}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5BFD630A-830E-48F0-8748-C083CA333C87}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5BFD630A-830E-48F0-8748-C083CA333C87}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
