@@ -11,10 +11,10 @@ namespace Tycho
     public interface IModule : IMessageBroker { }
 
     /// <summary>
-    /// An interface that represents an instance of the specific module type
+    /// An interface that represents an instance of a specific module
     /// </summary>
     /// <remarks>
-    /// Use it in your code to inject an instance of the required module into it
+    /// Use it in your code to inject an instance of a required module into it
     /// </remarks>
     /// <typeparam name="Definition">A type that defines the module</typeparam>
     public interface IModule<Definition> : IModule
