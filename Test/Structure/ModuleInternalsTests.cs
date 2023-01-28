@@ -2,7 +2,6 @@
 using Test.Utils;
 using Tycho;
 using Tycho.Structure.Modules;
-using Tycho.Structure.Submodules;
 
 namespace Test.Structure;
 
@@ -35,8 +34,8 @@ public class ModuleInternalsTests : BaseModuleTests
         // Arrange
         var submodules = new IModule[]
         {
-            new Submodule<OtherModule>(),
-            new Submodule<YetAnotherModule>()
+            new Module<OtherModule>(),
+            new Module<YetAnotherModule>()
         };
         _actualModule!.SetSubmodules(submodules);
 
@@ -50,8 +49,8 @@ public class ModuleInternalsTests : BaseModuleTests
         // Arrange
         var submodules = new IModule[]
         {
-            new Submodule<TestModule>(),
-            new Submodule<TestModule>(),
+            new Module<TestModule>(),
+            new Module<TestModule>(),
         };
 
         // Act & Assert
@@ -64,9 +63,9 @@ public class ModuleInternalsTests : BaseModuleTests
         // Arrange
         var submodules = new IModule[]
         {
-            new Submodule<TestModule>(),
-            new Submodule<OtherModule>(),
-            new Submodule<YetAnotherModule>()
+            new Module<TestModule>(),
+            new Module<OtherModule>(),
+            new Module<YetAnotherModule>()
         };
         _actualModule!.SetSubmodules(submodules);
 
@@ -80,9 +79,9 @@ public class ModuleInternalsTests : BaseModuleTests
         // Arrange
         var submodules = new IModule[]
         {
-            new Submodule<TestModule>(),
-            new Submodule<OtherModule>(),
-            new Submodule<YetAnotherModule>()
+            new Module<TestModule>(),
+            new Module<OtherModule>(),
+            new Module<YetAnotherModule>()
         };
 
         // Act

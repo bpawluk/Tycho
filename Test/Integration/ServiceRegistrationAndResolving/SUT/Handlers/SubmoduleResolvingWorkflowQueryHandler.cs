@@ -10,7 +10,7 @@ internal class SubmoduleResolvingWorkflowQueryHandler : IQueryHandler<SubmoduleR
 {
     private readonly IModule _submodule;
 
-    public SubmoduleResolvingWorkflowQueryHandler(ISubmodule<AppSubmodule> submodule)
+    public SubmoduleResolvingWorkflowQueryHandler(IModule<AppSubmodule> submodule)
     {
         _submodule = submodule;
     }

@@ -9,7 +9,6 @@ using Tycho.Messaging;
 using Tycho.Structure;
 using Tycho.Structure.Builders;
 using Tycho.Structure.Modules;
-using Tycho.Structure.Submodules;
 
 namespace Tycho
 {
@@ -129,7 +128,7 @@ namespace Tycho
 
         private Module CreateModule()
         {
-            var thisModuleType = typeof(Submodule<>).MakeGenericType(new Type[] { GetType() });
+            var thisModuleType = typeof(Module<>).MakeGenericType(new Type[] { GetType() });
             return (Activator.CreateInstance(thisModuleType) as Module)!;
         }
 

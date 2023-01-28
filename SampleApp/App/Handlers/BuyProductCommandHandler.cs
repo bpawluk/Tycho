@@ -9,9 +9,9 @@ namespace SampleApp.App.Handlers;
 
 internal class BuyProductCommandHandler : ICommandHandler<BuyProductCommand>
 {
-    private readonly ISubmodule<InventoryModule> _inventoryModule;
+    private readonly IModule<InventoryModule> _inventoryModule;
 
-    public BuyProductCommandHandler(ISubmodule<InventoryModule> inventoryModule)
+    public BuyProductCommandHandler(IModule<InventoryModule> inventoryModule)
     {
         _inventoryModule = inventoryModule;
     }

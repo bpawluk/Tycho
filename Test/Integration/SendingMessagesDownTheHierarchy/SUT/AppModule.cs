@@ -22,7 +22,7 @@ internal class AppModule : TychoModule
 {
     protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
-        var alphaModule = services.GetRequiredService<ISubmodule<AlphaModule>>();
+        var alphaModule = services.GetRequiredService<IModule<AlphaModule>>();
 
         module.Executes<BeginEventWorkflowCommand>(commandData =>
         {

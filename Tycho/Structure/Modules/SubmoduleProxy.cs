@@ -1,18 +1,17 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Messaging.Payload;
-using Tycho.Structure.Modules;
 
-namespace Tycho.Structure.Submodules
+namespace Tycho.Structure.Modules
 {
-    internal class SubmoduleProxy<Definition> : ISubmodule<Definition>
+    internal class SubmoduleProxy<Definition> : IModule<Definition>
         where Definition : TychoModule
     {
         private readonly IModule _submodule;
 
-        public SubmoduleProxy(IModule supermodule)
+        public SubmoduleProxy(IModule module)
         {
-            _submodule = (supermodule as ModuleInternals)!.GetSubmodule<Definition>();
+            _submodule = (module as ModuleInternals)!.GetSubmodule<Definition>();
         }
 
         public void Publish<Event>(Event eventData, CancellationToken cancellationToken)

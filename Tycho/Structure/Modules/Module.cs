@@ -18,4 +18,8 @@ namespace Tycho.Structure.Modules
 
         public void SetSubmodules(IEnumerable<IModule> submodules) => Internals.SetSubmodules(submodules);
     }
+
+    internal class Module<Definition> : Module, IModule<Definition>
+        where Definition : TychoModule
+    { }
 }

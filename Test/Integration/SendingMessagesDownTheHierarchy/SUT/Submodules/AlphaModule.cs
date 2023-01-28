@@ -21,7 +21,7 @@ internal class AlphaModule : TychoModule
 {
     protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
-        var betaModule = services.GetRequiredService<ISubmodule<BetaModule>>();
+        var betaModule = services.GetRequiredService<IModule<BetaModule>>();
 
         module.SubscribesTo<AlphaDownstreamEvent>(eventData =>
         {

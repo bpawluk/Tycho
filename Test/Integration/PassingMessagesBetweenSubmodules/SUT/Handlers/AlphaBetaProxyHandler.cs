@@ -13,7 +13,7 @@ internal class AlphaBetaProxyHandler
 {
     private readonly IModule _betaModule;
 
-    public AlphaBetaProxyHandler(ISubmodule<BetaModule> betaModule)
+    public AlphaBetaProxyHandler(IModule<BetaModule> betaModule)
     {
         _betaModule = betaModule;
     }

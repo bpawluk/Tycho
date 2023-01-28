@@ -13,7 +13,7 @@ internal class BetaGammaProxyHandler
 {
     private readonly IModule _gammaModule;
 
-    public BetaGammaProxyHandler(ISubmodule<GammaModule> gammaModule)
+    public BetaGammaProxyHandler(IModule<GammaModule> gammaModule)
     {
         _gammaModule = gammaModule;
     }

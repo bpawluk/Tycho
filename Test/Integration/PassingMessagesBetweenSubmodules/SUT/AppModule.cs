@@ -21,7 +21,7 @@ internal class AppModule : TychoModule
 {
     protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
-        var alphaSubmodule = services.GetRequiredService<ISubmodule<AlphaModule>>()!;
+        var alphaSubmodule = services.GetRequiredService<IModule<AlphaModule>>()!;
         module.Executes<BeginEventWorkflowCommand>(commandData => alphaSubmodule.Execute(commandData))
               .Executes<BeginCommandWorkflowCommand>(commandData => alphaSubmodule.Execute(commandData))
               .Executes<BeginQueryWorkflowCommand>(commandData => alphaSubmodule.Execute(commandData));

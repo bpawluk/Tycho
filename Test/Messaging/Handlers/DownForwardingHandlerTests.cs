@@ -12,7 +12,7 @@ public class DownForwardingHandlerTests
     public async Task DownForwardingEventHandler_PassesEventToAnotherModule()
     {
         // Arrange
-        var moduleMock = new Mock<ISubmodule<TestModule>>();
+        var moduleMock = new Mock<IModule<TestModule>>();
         var expectedEvent = new OtherEvent(int.MinValue);
         var expectedToken = new CancellationToken();
         var handler = new DownForwardingEventHandler<TestEvent, OtherEvent, TestModule>(
@@ -29,7 +29,7 @@ public class DownForwardingHandlerTests
     public async Task DownForwardingCommandHandler_ForwardsCommandToAnotherModule()
     {
         // Arrange
-        var moduleMock = new Mock<ISubmodule<TestModule>>();
+        var moduleMock = new Mock<IModule<TestModule>>();
         var expectedCommand = new OtherCommand(int.MinValue);
         var expectedToken = new CancellationToken();
         var handler = new DownForwardingCommandHandler<TestCommand, OtherCommand, TestModule>(
@@ -47,7 +47,7 @@ public class DownForwardingHandlerTests
     {
         // Arrange
         var moduleResponse = new object();
-        var moduleMock = new Mock<ISubmodule<TestModule>>();
+        var moduleMock = new Mock<IModule<TestModule>>();
         moduleMock.Setup(module => module.Execute<OtherQuery, object>(
             It.IsAny<OtherQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(moduleResponse);
 

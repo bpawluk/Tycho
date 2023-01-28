@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tycho.Structure.Modules;
-using Tycho.Structure.Submodules;
 
 namespace Tycho.DependencyInjection
 {
@@ -14,7 +13,7 @@ namespace Tycho.DependencyInjection
 
         public static IServiceCollection AddSubmodules(this ServiceCollection services)
         {
-            services.AddSingleton(typeof(ISubmodule<>), typeof(SubmoduleProxy<>));
+            services.AddSingleton(typeof(IModule<>), typeof(SubmoduleProxy<>));
             return services;
         }
     }

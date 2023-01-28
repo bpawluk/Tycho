@@ -12,7 +12,7 @@ namespace Tycho.Messaging.Handlers
         where EventOut: class, IEvent
         where Module : TychoModule
     {
-        public DownForwardingEventHandler(ISubmodule<Module> submodule, Func<EventIn, EventOut> mapping) 
+        public DownForwardingEventHandler(IModule<Module> submodule, Func<EventIn, EventOut> mapping) 
             : base(submodule, mapping) { }
 
         public Task Handle(EventIn eventData, CancellationToken cancellationToken)
@@ -29,7 +29,7 @@ namespace Tycho.Messaging.Handlers
         where CommandOut : class, ICommand
         where Module : TychoModule
     {
-        public DownForwardingCommandHandler(ISubmodule<Module> submodule, Func<CommandIn, CommandOut> mapping) 
+        public DownForwardingCommandHandler(IModule<Module> submodule, Func<CommandIn, CommandOut> mapping) 
             : base(submodule, mapping) { }
 
         public Task Handle(CommandIn commandData, CancellationToken cancellationToken)
@@ -48,7 +48,7 @@ namespace Tycho.Messaging.Handlers
         private readonly Func<ResponseOut, ResponseIn> _responseMapping;
 
         public DownForwardingQueryHandler(
-            ISubmodule<Module> submodule, 
+            IModule<Module> submodule, 
             Func<QueryIn, QueryOut> queryMapping,
             Func<ResponseOut, ResponseIn> responseMapping) 
             : base(submodule, queryMapping) 
