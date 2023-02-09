@@ -1,7 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using IntegrationTests.ContractDefinitionAndMessageHandling.SUT.InternalHandlers;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
-using IntegrationTests.ContractDefinitionAndMessageHandling.SUT.InternalHandlers;
 using Tycho;
 using Tycho.Contract;
 using Tycho.Messaging.Payload;
@@ -73,7 +74,7 @@ internal class AppModule : TychoModule
 
     protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services) { }
 
-    protected override void RegisterServices(IServiceCollection services)
+    protected override void RegisterServices(IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton(this);
     }

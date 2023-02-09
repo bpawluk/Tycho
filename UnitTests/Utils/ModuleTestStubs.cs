@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using Tycho;
 using Tycho.Contract;
@@ -11,7 +12,7 @@ namespace UnitTests.Utils
         protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services) { }
         protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services) { }
         protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services) { }
-        protected override void RegisterServices(IServiceCollection services) { }
+        protected override void RegisterServices(IServiceCollection services, IConfiguration configuration) { }
     }
 
     public class OtherModule : TychoModule
@@ -19,7 +20,7 @@ namespace UnitTests.Utils
         protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services) { }
         protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services) { }
         protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services) { }
-        protected override void RegisterServices(IServiceCollection services) { }
+        protected override void RegisterServices(IServiceCollection services, IConfiguration configuration) { }
     }
 
     public class YetAnotherModule : TychoModule
@@ -27,6 +28,6 @@ namespace UnitTests.Utils
         protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services) { }
         protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services) { }
         protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services) { }
-        protected override void RegisterServices(IServiceCollection services) { }
+        protected override void RegisterServices(IServiceCollection services, IConfiguration configuration) { }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using Tycho;
 using Tycho.Contract;
@@ -69,5 +70,5 @@ internal class AlphaModule : TychoModule
         });
     }
 
-    protected override void RegisterServices(IServiceCollection services) { }
+    protected override void RegisterServices(IServiceCollection services, IConfiguration configuration) { }
 }

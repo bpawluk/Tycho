@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -20,6 +21,7 @@ namespace Tycho
         private readonly object _buildingLock = new object();
         private bool _wasAlreadyBuilt = false;
 
+        private Action<IConfigurationBuilder>? _configurationDefinition;
         private Action<IOutboxConsumer>? _contractFullfilment;
         private IServiceProvider? _contractFullfilmentServices;
 
@@ -48,13 +50,24 @@ namespace Tycho
         /// Use this method to configure the services required by your module's code
         /// </summary>
         /// <param name="services">An interface for defining the collection of services available for your module</param>
-        protected abstract void RegisterServices(IServiceCollection services);
+        /// <param name="configuration">The configuration defined for your module</param>
+        protected abstract void RegisterServices(IServiceCollection services, IConfiguration configuration);
 
         /// <summary>
         /// Override this method if you need to run some code just before your module is created
         /// </summary>
         /// <param name="services">A provider of the services configured for your module</param>
         protected virtual Task Startup(IServiceProvider services) { return Task.CompletedTask; }
+
+        /// <summary>
+        /// Call this method before building your module to define its configuration
+        /// </summary>
+        /// <param name="configurationDefinition">A method that defines your module's configuration</param>
+        public TychoModule Configure(Action<IConfigurationBuilder> configurationDefinition)
+        {
+            _configurationDefinition = configurationDefinition;
+            return this;
+        }
 
         /// <summary>
         /// Call this method before building your module to handle the messages required by its contract
@@ -79,7 +92,8 @@ namespace Tycho
             EnsureItIsBuiltOnlyOnce();
 
             var module = CreateModule();
-            var internalServices = CollectInternalServices(module);
+            var configuration = BuildConfiguration();
+            var internalServices = CollectInternalServices(module, configuration);
 
             var submodules = await BuildSubstructure(internalServices).ConfigureAwait(false);
             module.SetSubmodules(submodules);
@@ -91,12 +105,20 @@ namespace Tycho
             return module;
         }
 
-        private IServiceProvider CollectInternalServices(Module module)
+        private IConfiguration BuildConfiguration()
+        {
+            var configurationBuilder = new ConfigurationBuilder();
+            _configurationDefinition?.Invoke(configurationBuilder);
+            return configurationBuilder.Build();
+        }
+
+        private IServiceProvider CollectInternalServices(Module module, IConfiguration configuration)
         {
             var services = new ServiceCollection();
+            services.AddSingleton(configuration);
             services.AddModuleInternals(module);
             services.AddSubmodules();
-            RegisterServices(services);
+            RegisterServices(services, configuration);
             return services.BuildServiceProvider();
         }
 

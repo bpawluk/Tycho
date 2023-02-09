@@ -1,7 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using IntegrationTests.PassingMessagesBetweenSubmodules.SUT.Handlers;
+﻿using IntegrationTests.PassingMessagesBetweenSubmodules.SUT.Handlers;
 using IntegrationTests.PassingMessagesBetweenSubmodules.SUT.Submodules;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using Tycho;
 using Tycho.Contract;
 using Tycho.Messaging.Payload;
@@ -72,5 +73,5 @@ internal class AppModule : TychoModule
         }));
     }
 
-    protected override void RegisterServices(IServiceCollection services) { }
+    protected override void RegisterServices(IServiceCollection services, IConfiguration configuration) { }
 }

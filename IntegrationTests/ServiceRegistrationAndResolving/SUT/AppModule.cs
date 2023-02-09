@@ -1,8 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using IntegrationTests.ServiceRegistrationAndResolving.SUT.Handlers;
+﻿using IntegrationTests.ServiceRegistrationAndResolving.SUT.Handlers;
 using IntegrationTests.ServiceRegistrationAndResolving.SUT.Services;
 using IntegrationTests.ServiceRegistrationAndResolving.SUT.Submodules;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using Tycho;
 using Tycho.Contract;
 using Tycho.Messaging.Payload;
@@ -39,7 +40,7 @@ internal class AppModule : TychoModule
         module.AddSubmodule<AppSubmodule>();
     }
 
-    protected override void RegisterServices(IServiceCollection services)
+    protected override void RegisterServices(IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<ISingletonService, SingletonService>()
                 .AddTransient<ITransientService, TransientService>();
