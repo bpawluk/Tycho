@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,18 +18,14 @@ namespace Tycho.Structure.Builders
             _serviceProvider = services;
         }
 
-        public ISubstructureDefinition AddSubmodule<Module>()
+        public ISubstructureDefinition AddSubmodule<Module>(
+            Action<IOutboxConsumer>? contractFulfillment = null,
+            Action<IConfigurationBuilder>? configurationDefinition = null)
             where Module : TychoModule, new()
         {
             var submodule = new Module();
-            AddSubmodule(submodule);
-            return this;
-        }
-
-        public ISubstructureDefinition AddSubmodule<Module>(Action<IOutboxConsumer> contractFullfilment)
-            where Module : TychoModule, new()
-        {
-            var submodule = new Module().FulfillContract(contractFullfilment, _serviceProvider);
+            if (contractFulfillment != null) submodule.FulfillContract(contractFulfillment, _serviceProvider);
+            if (configurationDefinition != null) submodule.Configure(configurationDefinition);
             AddSubmodule(submodule);
             return this;
         }

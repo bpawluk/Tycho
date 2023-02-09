@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using Tycho.Contract;
 
 namespace Tycho.Structure
@@ -9,20 +10,15 @@ namespace Tycho.Structure
     public interface ISubstructureDefinition
     {
         /// <summary>
-        /// Adds the specified module to the substructure of your module
+        /// Adds the specified module to the substructure of your module.
+        /// Defines how it handles its outgoing messages and provides required configuration.
         /// </summary>
         /// <typeparam name="Module">A type that defines the submodule</typeparam>
-        ISubstructureDefinition AddSubmodule<Module>()
-            where Module : TychoModule, new();
-
-        /// <summary>
-        /// Adds the specified module to the substructure of your module 
-        /// and defines how it handles its outgoing messages
-        /// </summary>
-        /// <typeparam name="Module">A type that defines the submodule</typeparam>
-        /// <param name="contractFulfillment">A method that defines 
-        /// how your module fulfills the submodule's contract</param>
-        ISubstructureDefinition AddSubmodule<Module>(Action<IOutboxConsumer> contractFulfillment)
+        /// <param name="contractFulfillment">A method that defines how your module fulfills the submodule's contract</param>
+        /// <param name="configurationDefinition">A method that defines the submodule's configuration</param>
+        ISubstructureDefinition AddSubmodule<Module>(
+            Action<IOutboxConsumer>? contractFulfillment = null,
+            Action<IConfigurationBuilder>? configurationDefinition = null)
             where Module : TychoModule, new();
     }
 }
