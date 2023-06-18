@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Major>2</Major>
     <Minor>1</Minor>
-    <Patch>0</Patch>
+    <Patch>1</Patch>
     <VersionPrefix>$(Major).$(Minor).$(Patch)</VersionPrefix>
     <AssemblyVersion>$(Major).0.0.0</AssemblyVersion>
     <TargetFramework>netstandard2.1</TargetFramework>
