@@ -1,10 +1,10 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using UnitTests.Utils;
-using Tycho.Contract.Builders;
 using Tycho.DependencyInjection;
 using Tycho.Messaging;
 using Tycho.Messaging.Handlers;
+using Tycho.Contract.Inbox.Builder;
 
 namespace UnitTests.Contract;
 
@@ -27,8 +27,8 @@ public class InboxBuilderTests
         // - no arrangement required
 
         // Act
-        _inboxBuilder.PassesOn<TestEvent, TestModule>();
-        _inboxBuilder.PassesOn<TestEvent, OtherEvent, TestModule>(eventData => new(int.MinValue));
+        _inboxBuilder.ForwardsEvent<TestEvent, TestModule>();
+        _inboxBuilder.ForwardsEvent<TestEvent, OtherEvent, TestModule>(eventData => new(int.MinValue));
 
         // Assert
         _messageRouterMock.Verify(router => router.RegisterEventHandler(It.IsAny<IEventHandler<TestEvent>>()), Times.Exactly(2));
@@ -58,8 +58,8 @@ public class InboxBuilderTests
         // - no arrangement required
 
         // Act
-        _inboxBuilder.Forwards<TestCommand, TestModule>();
-        _inboxBuilder.Forwards<TestCommand, OtherCommand, TestModule>(commandData => new(int.MinValue));
+        _inboxBuilder.ForwardsCommand<TestCommand, TestModule>();
+        _inboxBuilder.ForwardsCommand<TestCommand, OtherCommand, TestModule>(commandData => new(int.MinValue));
 
         // Assert
         _messageRouterMock.Verify(
@@ -91,9 +91,9 @@ public class InboxBuilderTests
         // - no arrangement required
 
         // Act
-        _inboxBuilder.Forwards<TestQuery, string, TestModule>();
-        _inboxBuilder.Forwards<TestQuery, OtherTestQuery, string, TestModule>(queryData => new(queryData.Name));
-        _inboxBuilder.Forwards<TestQuery, string, OtherQuery, object, TestModule>(
+        _inboxBuilder.ForwardsQuery<TestQuery, string, TestModule>();
+        _inboxBuilder.ForwardsQuery<TestQuery, string, OtherTestQuery, string, TestModule>(queryData => new(queryData.Name), response => response);
+        _inboxBuilder.ForwardsQuery<TestQuery, string, OtherQuery, object, TestModule>(
             queryData => new(int.MinValue), response => response.ToString()!);
 
         // Assert

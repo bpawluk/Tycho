@@ -1,19 +1,21 @@
-﻿using System.Threading.Tasks;
-using IntegrationTests.ForwardingMessages.SUT;
-using IntegrationTests.ForwardingMessages.SUT.Submodules;
+﻿using IntegrationTests.ForwardingMessages.SUT;
+using System.Threading.Tasks;
 using Tycho;
 
 namespace IntegrationTests.ForwardingMessages;
 
+public record TestResult(string Id, int PreInterceptions, int PostInterceptions);
+
 public class ForwardingMessagesTests : IAsyncLifetime
 {
     private const string _queryResponse = "query-response";
-    private readonly TaskCompletionSource<string> _testWorkflowTcs;
+    private const int _numberOfInterceptions = 4;
+    private readonly TaskCompletionSource<TestResult> _testWorkflowTcs;
     private IModule? _sut;
 
     public ForwardingMessagesTests()
     {
-        _testWorkflowTcs = new TaskCompletionSource<string>();
+        _testWorkflowTcs = new TaskCompletionSource<TestResult>();
     }
 
     public async Task InitializeAsync()
@@ -21,23 +23,18 @@ public class ForwardingMessagesTests : IAsyncLifetime
         _sut = await new AppModule()
             .FulfillContract(consumer =>
             {
-                consumer.HandleEvent<BetaEvent>(eventData => _testWorkflowTcs.SetResult(eventData.Id))
-                        .HandleEvent<MappedEvent>(eventData => _testWorkflowTcs.SetResult(eventData.Id))
-                        .HandleCommand<BetaCommand>(commandData => _testWorkflowTcs.SetResult(commandData.Id))
-                        .HandleCommand<MappedCommand>(commandData => _testWorkflowTcs.SetResult(commandData.Id))
-                        .HandleQuery<BetaQuery, string>(queryData =>
+                consumer.HandleEvent<EventToForward>(eventData => _testWorkflowTcs.SetResult(new(eventData.Id, eventData.PreInterceptions, eventData.PostInterceptions)))
+                        .HandleEvent<MappedEvent>(eventData => _testWorkflowTcs.SetResult(new(eventData.Id, eventData.PreInterceptions, eventData.PostInterceptions)))
+                        .HandleCommand<CommandToForward>(commandData => _testWorkflowTcs.SetResult(new(commandData.Id, commandData.PreInterceptions, commandData.PostInterceptions)))
+                        .HandleCommand<MappedCommand>(commandData => _testWorkflowTcs.SetResult(new(commandData.Id, commandData.PreInterceptions, commandData.PostInterceptions)))
+                        .HandleQuery<QueryToForward, string>(queryData =>
                         {
-                            _testWorkflowTcs.SetResult(queryData.Id);
+                            _testWorkflowTcs.SetResult(new(queryData.Id, queryData.PreInterceptions, queryData.PostInterceptions));
                             return _queryResponse;
                         })
                         .HandleQuery<MappedQuery, string>(queryData =>
                         {
-                            _testWorkflowTcs.SetResult(queryData.Id);
-                            return _queryResponse;
-                        })
-                        .HandleQuery<MappedQueryAndResponse, string>(queryData =>
-                        {
-                            _testWorkflowTcs.SetResult(queryData.Id);
+                            _testWorkflowTcs.SetResult(new(queryData.Id, queryData.PreInterceptions, queryData.PostInterceptions));
                             return _queryResponse;
                         });
             })
@@ -45,31 +42,37 @@ public class ForwardingMessagesTests : IAsyncLifetime
     }
 
     [Fact(Timeout = 1000)]
-    public async Task Tycho_Enables_PassingOnEvents()
+    public async Task Tycho_Enables_ForwardingEvents()
     {
         // Arrange
         var workflowId = "event-workflow";
+        var message = new EventToForward(workflowId, 0, 0);
 
         // Act
-        _sut!.Publish<EventToPass>(new(workflowId));
-        var returnedId = await _testWorkflowTcs.Task;
+        _sut!.Publish(message);
+        var result = await _testWorkflowTcs.Task;
 
         // Assert
-        Assert.Equal(workflowId, returnedId);
+        Assert.Equal(workflowId, result.Id);
+        Assert.Equal(_numberOfInterceptions, result.PreInterceptions);
+        Assert.Equal(_numberOfInterceptions, message.PostInterceptions);
     }
 
     [Fact(Timeout = 1000)]
-    public async Task Tycho_Enables_PassingOnEventsWithMapping()
+    public async Task Tycho_Enables_ForwardingEventsWithMapping()
     {
         // Arrange
         var workflowId = "event-mapping-workflow";
+        var message = new EventToForwardWithMapping(workflowId, 0, 0);
 
         // Act
-        _sut!.Publish<EventToPassWithMapping>(new(workflowId));
-        var returnedId = await _testWorkflowTcs.Task;
+        _sut!.Publish(message);
+        var result = await _testWorkflowTcs.Task;
 
         // Assert
-        Assert.Equal(workflowId, returnedId);
+        Assert.Equal(workflowId, result.Id);
+        Assert.Equal(_numberOfInterceptions, result.PreInterceptions);
+        // PostInterceptions counter lost due to mapping
     }
 
     [Fact(Timeout = 1000)]
@@ -77,13 +80,16 @@ public class ForwardingMessagesTests : IAsyncLifetime
     {
         // Arrange
         var workflowId = "command-workflow";
+        var message = new CommandToForward(workflowId, 0, 0);
 
         // Act
-        await _sut!.Execute<CommandToForward>(new(workflowId));
-        var returnedId = await _testWorkflowTcs.Task;
+        await _sut!.Execute(message);
+        var result = await _testWorkflowTcs.Task;
 
         // Assert
-        Assert.Equal(workflowId, returnedId);
+        Assert.Equal(workflowId, result.Id);
+        Assert.Equal(_numberOfInterceptions, result.PreInterceptions);
+        Assert.Equal(_numberOfInterceptions, message.PostInterceptions);
     }
 
     [Fact(Timeout = 1000)]
@@ -91,13 +97,16 @@ public class ForwardingMessagesTests : IAsyncLifetime
     {
         // Arrange
         var workflowId = "command-mapping-workflow";
+        var message = new CommandToForwardWithMapping(workflowId, 0, 0);
 
         // Act
-        await _sut!.Execute<CommandToForwardWithMapping>(new(workflowId));
-        var returnedId = await _testWorkflowTcs.Task;
+        await _sut!.Execute(message);
+        var result = await _testWorkflowTcs.Task;
 
         // Assert
-        Assert.Equal(workflowId, returnedId);
+        Assert.Equal(workflowId, result.Id);
+        Assert.Equal(_numberOfInterceptions, result.PreInterceptions);
+        // PostInterceptions counter lost due to mapping
     }
 
     [Fact(Timeout = 1000)]
@@ -105,44 +114,35 @@ public class ForwardingMessagesTests : IAsyncLifetime
     {
         // Arrange
         var workflowId = "query-workflow";
+        var message = new QueryToForward(workflowId, 0, 0);
 
         // Act
-        var response = await _sut!.Execute<QueryToForward, string>(new(workflowId));
-        var returnedId = await _testWorkflowTcs.Task;
+        var response = await _sut!.Execute<QueryToForward, string>(message);
+        var result = await _testWorkflowTcs.Task;
 
         // Assert
         Assert.Equal(_queryResponse, response);
-        Assert.Equal(workflowId, returnedId);
+        Assert.Equal(workflowId, result.Id);
+        Assert.Equal(_numberOfInterceptions, result.PreInterceptions);
+        Assert.Equal(_numberOfInterceptions, message.PostInterceptions);
     }
 
     [Fact(Timeout = 1000)]
-    public async Task Tycho_Enables_ForwardingQueriesWithMessageMapping()
+    public async Task Tycho_Enables_ForwardingQueriesWithMapping()
     {
         // Arrange
-        var workflowId = "query-message-mapping-workflow";
+        var workflowId = "query-mapping-workflow";
+        var message = new QueryToForwardWithMapping(workflowId, 0, 0);
 
         // Act
-        var response = await _sut!.Execute<QueryToForwardWithMessageMapping, string>(new(workflowId));
-        var returnedId = await _testWorkflowTcs.Task;
+        var response = await _sut!.Execute<QueryToForwardWithMapping, string>(message);
+        var result = await _testWorkflowTcs.Task;
 
         // Assert
         Assert.Equal(_queryResponse, response);
-        Assert.Equal(workflowId, returnedId);
-    }
-
-    [Fact(Timeout = 1000)]
-    public async Task Tycho_Enables_ForwardingQueriesWithMessageAndResponseMapping()
-    {
-        // Arrange
-        var workflowId = "query-message-and-response-mapping-workflow";
-
-        // Act
-        var response = await _sut!.Execute<QueryToForwardWithMessageAndResponseMapping, string>(new(workflowId));
-        var returnedId = await _testWorkflowTcs.Task;
-
-        // Assert
-        Assert.Equal(_queryResponse, response);
-        Assert.Equal(workflowId, returnedId);
+        Assert.Equal(workflowId, result.Id);
+        Assert.Equal(_numberOfInterceptions, result.PreInterceptions);
+        // PostInterceptions counter lost due to mapping
     }
 
     public Task DisposeAsync() => Task.CompletedTask;

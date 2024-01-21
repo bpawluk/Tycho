@@ -4,7 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 using Tycho;
-using Tycho.Contract;
+using Tycho.Contract.Inbox;
+using Tycho.Contract.Outbox;
 using Tycho.Messaging.Payload;
 using Tycho.Structure;
 

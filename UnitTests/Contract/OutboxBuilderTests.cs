@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnitTests.Utils;
-using Tycho.Contract.Builders;
 using Tycho.DependencyInjection;
 using Tycho.Messaging;
 using Tycho.Messaging.Handlers;
+using Tycho.Contract.Outbox.Builder;
 
 namespace UnitTests.Contract;
 
@@ -57,9 +57,9 @@ public class OutboxBuilderTests
         // - no arrangement required
 
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(_outboxBuilder.PassOn<TestEvent, TestModule>);
+        Assert.Throws<InvalidOperationException>(_outboxBuilder.ForwardEvent<TestEvent, TestModule>);
         Assert.Throws<InvalidOperationException>(
-            () => _outboxBuilder.PassOn<TestEvent, OtherEvent, TestModule>(eventData => new(int.MinValue)));
+            () => _outboxBuilder.ForwardEvent<TestEvent, OtherEvent, TestModule>(eventData => new(int.MinValue)));
     }
 
     [Fact]
@@ -91,9 +91,9 @@ public class OutboxBuilderTests
         // - no arrangement required
 
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(_outboxBuilder.Forward<TestCommand, TestModule>);
+        Assert.Throws<InvalidOperationException>(_outboxBuilder.ForwardCommand<TestCommand, TestModule>);
         Assert.Throws<InvalidOperationException>(
-            () => _outboxBuilder.Forward<TestCommand, OtherCommand, TestModule>(commandData => new(int.MinValue)));
+            () => _outboxBuilder.ForwardCommand<TestCommand, OtherCommand, TestModule>(commandData => new(int.MinValue)));
     }
 
     [Fact]
@@ -125,12 +125,12 @@ public class OutboxBuilderTests
         // - no arrangement required
 
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(_outboxBuilder.Forward<TestQuery, string, TestModule>);
+        Assert.Throws<InvalidOperationException>(_outboxBuilder.ForwardQuery<TestQuery, string, TestModule>);
         Assert.Throws<InvalidOperationException>(
-            () => _outboxBuilder.Forward<TestQuery, OtherTestQuery, string, TestModule>(
-                commandData => new(commandData.Name)));
+            () => _outboxBuilder.ForwardQuery<TestQuery, string, OtherTestQuery, string, TestModule>(
+                queryData => new(queryData.Name), response => response));
         Assert.Throws<InvalidOperationException>(
-            () => _outboxBuilder.Forward<TestQuery, string, OtherQuery, object, TestModule>(
+            () => _outboxBuilder.ForwardQuery<TestQuery, string, OtherQuery, object, TestModule>(
                 commandData => new(int.MinValue), response => response.ToString()!));
     }
 
@@ -143,8 +143,8 @@ public class OutboxBuilderTests
         // Act & Assert
         Assert.Throws<InvalidOperationException>(_outboxBuilder.ExposeQuery<TestQuery, string>);
         Assert.Throws<InvalidOperationException>(
-            () => _outboxBuilder.ExposeQuery<TestQuery, OtherTestQuery, string>(
-                commandData => new(commandData.Name)));
+            () => _outboxBuilder.ExposeQuery<TestQuery, string, OtherTestQuery, string>(
+                queryData => new(queryData.Name), response => response));
         Assert.Throws<InvalidOperationException>(
             () => _outboxBuilder.ExposeQuery<TestQuery, string, OtherQuery, object>(
                 commandData => new(int.MinValue), response => response.ToString()!));

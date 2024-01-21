@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Tycho.Contract;
+using Tycho.Contract.Outbox;
 
 namespace Tycho.Structure.Builders
 {

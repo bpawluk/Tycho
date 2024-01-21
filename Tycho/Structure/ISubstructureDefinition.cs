@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
-using Tycho.Contract;
+using Tycho.Contract.Outbox;
 
 namespace Tycho.Structure
 {

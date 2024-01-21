@@ -1,6 +1,6 @@
 ﻿using Tycho.Messaging.Payload;
 
-namespace Tycho.Contract
+namespace Tycho.Contract.Outbox
 {
     /// <summary>
     /// Lets you define all the outgoing messages that your module will send out.

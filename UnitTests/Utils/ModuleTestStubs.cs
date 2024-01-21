@@ -2,7 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using Tycho;
-using Tycho.Contract;
+using Tycho.Contract.Inbox;
+using Tycho.Contract.Outbox;
 using Tycho.Structure;
 
 namespace UnitTests.Utils
