@@ -8,8 +8,8 @@ namespace IntegrationTests.PassingMessagesBetweenSubmodules.SUT.Handlers;
 
 internal class BetaGammaProxyHandler
     : IEventHandler<BetaEvent>
-    , ICommandHandler<BetaCommand>
-    , IQueryHandler<BetaQuery, string>
+    , IRequestHandler<BetaCommand>
+    , IRequestHandler<BetaQuery, string>
 {
     private readonly IModule _gammaModule;
 

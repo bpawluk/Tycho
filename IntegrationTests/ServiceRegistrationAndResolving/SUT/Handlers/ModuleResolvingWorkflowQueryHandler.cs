@@ -5,7 +5,7 @@ using Tycho.Messaging.Handlers;
 
 namespace IntegrationTests.ServiceRegistrationAndResolving.SUT.Handlers;
 
-internal class ModuleResolvingWorkflowQueryHandler : IQueryHandler<ModuleResolvingWorkflowQuery, string>
+internal class ModuleResolvingWorkflowQueryHandler : IRequestHandler<ModuleResolvingWorkflowQuery, string>
 {
     private readonly IModule _module;
 

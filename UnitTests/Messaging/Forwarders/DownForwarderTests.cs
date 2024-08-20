@@ -33,10 +33,10 @@ public class DownForwarderTests
     {
         // Arrange
         var moduleMock = new Mock<IModule<TestModule>>();
-        var interceptorMock = new Mock<ICommandInterceptor<OtherCommand>>();
+        var interceptorMock = new Mock<IRequestInterceptor<OtherCommand>>();
         var expectedCommand = new OtherCommand(int.MinValue);
         var expectedToken = new CancellationToken();
-        var handler = new CommandDownForwarder<TestCommand, OtherCommand, TestModule>(moduleMock.Object, _ => expectedCommand, interceptorMock.Object);
+        var handler = new RequestDownForwarder<TestCommand, OtherCommand, TestModule>(moduleMock.Object, _ => expectedCommand, interceptorMock.Object);
 
         // Act
         await handler.Handle(new TestCommand("command-name"), expectedToken);
@@ -55,13 +55,13 @@ public class DownForwarderTests
         var moduleMock = new Mock<IModule<TestModule>>();
         moduleMock.Setup(module => module.Execute<OtherQuery, object>(It.IsAny<OtherQuery>(), It.IsAny<CancellationToken>()))
                   .ReturnsAsync(moduleResponse);
-        var interceptorMock = new Mock<IQueryInterceptor<OtherQuery, object>>();
+        var interceptorMock = new Mock<IRequestInterceptor<OtherQuery, object>>();
         interceptorMock.Setup(interceptor => interceptor.ExecuteAfter(It.IsAny<OtherQuery>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
                        .ReturnsAsync((OtherQuery  query, object result, CancellationToken token) => result);
 
         var expectedQuery = new OtherQuery(int.MinValue);
         var expectedToken = new CancellationToken();
-        var handler = new QueryDownForwarder<TestQuery, string, OtherQuery, object, TestModule>(moduleMock.Object, _ => expectedQuery, response => response.ToString()!, interceptorMock.Object);
+        var handler = new RequestDownForwarder<TestQuery, string, OtherQuery, object, TestModule>(moduleMock.Object, _ => expectedQuery, response => response.ToString()!, interceptorMock.Object);
 
         // Act
         var result = await handler.Handle(new TestQuery("query-name"), expectedToken);

@@ -5,7 +5,7 @@ using Tycho.Messaging.Handlers;
 
 namespace IntegrationTests.ServiceRegistrationAndResolving.SUT.Handlers;
 
-internal class TransientServiceWorkflowQueryHandler : IQueryHandler<TransientServiceWorkflowQuery, int>
+internal class TransientServiceWorkflowQueryHandler : IRequestHandler<TransientServiceWorkflowQuery, int>
 {
     private readonly ITransientService _service;
 

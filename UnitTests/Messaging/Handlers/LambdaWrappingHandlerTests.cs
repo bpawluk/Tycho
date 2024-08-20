@@ -73,7 +73,7 @@ public class LambdaWrappingHandlerTests
         // Arrange
         TestCommand? passedCommand = null;
         var lambda = (TestCommand commandData) => { passedCommand = commandData; };
-        var handler = new LambdaWrappingCommandHandler<TestCommand>(lambda);
+        var handler = new LambdaWrappingRequestHandler<TestCommand>(lambda);
 
         // Act
         var commandToExecute = new TestCommand("test-command");
@@ -93,7 +93,7 @@ public class LambdaWrappingHandlerTests
             await Task.Delay(100);
             passedCommand = commandData;
         };
-        var handler = new LambdaWrappingCommandHandler<TestCommand>(lambda);
+        var handler = new LambdaWrappingRequestHandler<TestCommand>(lambda);
 
         // Act
         var commandToExecute = new TestCommand("test-command");
@@ -115,7 +115,7 @@ public class LambdaWrappingHandlerTests
             passedCommand = commandData;
             passedToken = token;
         };
-        var handler = new LambdaWrappingCommandHandler<TestCommand>(lambda);
+        var handler = new LambdaWrappingRequestHandler<TestCommand>(lambda);
 
         // Act
         var commandToExecute = new TestCommand("test-command");
@@ -138,7 +138,7 @@ public class LambdaWrappingHandlerTests
             passedQuery = queryData;
             return expectedResult;
         };
-        var handler = new LambdaWrappingQueryHandler<TestQuery, string>(lambda);
+        var handler = new LambdaWrappingRequestHandler<TestQuery, string>(lambda);
 
         // Act
         var queryToExecute = new TestQuery("test-query");
@@ -161,7 +161,7 @@ public class LambdaWrappingHandlerTests
             passedQuery = queryData;
             return expectedResult;
         };
-        var handler = new LambdaWrappingQueryHandler<TestQuery, string>(lambda);
+        var handler = new LambdaWrappingRequestHandler<TestQuery, string>(lambda);
 
         // Act
         var queryToExecute = new TestQuery("test-query");
@@ -186,7 +186,7 @@ public class LambdaWrappingHandlerTests
             passedToken = token;
             return expectedResult;
         };
-        var handler = new LambdaWrappingQueryHandler<TestQuery, string>(lambda);
+        var handler = new LambdaWrappingRequestHandler<TestQuery, string>(lambda);
 
         // Act
         var queryToExecute = new TestQuery("test-query");

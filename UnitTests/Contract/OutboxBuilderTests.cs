@@ -285,19 +285,19 @@ public class OutboxBuilderTests
             return Array.Empty<IEventHandler<Event>>();
         }
 
-        ICommandHandler<Command> IMessageRouter.GetCommandHandler<Command>() =>
-            (_handlers[typeof(Command)] as ICommandHandler<Command>)!;
+        IRequestHandler<Command> IMessageRouter.GetRequestHandler<Command>() =>
+            (_handlers[typeof(Command)] as IRequestHandler<Command>)!;
 
-        IQueryHandler<Query, Response> IMessageRouter.GetQueryHandler<Query, Response>() =>
-            (_handlers[typeof(Query)] as IQueryHandler<Query, Response>)!;
+        IRequestHandler<Query, Response> IMessageRouter.GetRequestWithResponseHandler<Query, Response>() =>
+            (_handlers[typeof(Query)] as IRequestHandler<Query, Response>)!;
 
         void IMessageRouter.RegisterEventHandler<Event>(IEventHandler<Event> eventHandler) =>
             _handlers[typeof(Event)] = eventHandler;
 
-        void IMessageRouter.RegisterCommandHandler<Command>(ICommandHandler<Command> commandHandler) =>
+        void IMessageRouter.RegisterRequestHandler<Command>(IRequestHandler<Command> commandHandler) =>
             _handlers[typeof(Command)] = commandHandler;
 
-        void IMessageRouter.RegisterQueryHandler<Query, Response>(IQueryHandler<Query, Response> queryHandler) =>
+        void IMessageRouter.RegisterRequestWithResponseHandler<Query, Response>(IRequestHandler<Query, Response> queryHandler) =>
             _handlers[typeof(Query)] = queryHandler;
     }
 }

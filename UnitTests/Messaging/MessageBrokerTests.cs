@@ -12,8 +12,8 @@ public class MessageBrokerTests
 {
     private readonly Mock<IEventHandler<TestEvent>> _eventHandlerMock;
     private readonly Mock<IEventHandler<TestEvent>> _otherEventHandlerMock;
-    private readonly Mock<ICommandHandler<TestCommand>> _commandHandlerMock;
-    private readonly Mock<IQueryHandler<TestQuery, string>> _queryHandlerMock;
+    private readonly Mock<IRequestHandler<TestCommand>> _commandHandlerMock;
+    private readonly Mock<IRequestHandler<TestQuery, string>> _queryHandlerMock;
     private readonly Mock<IMessageRouter> _messageRouterMock;
     private readonly MessageBroker _messageBroker;
 
@@ -21,8 +21,8 @@ public class MessageBrokerTests
     {
         _eventHandlerMock = new Mock<IEventHandler<TestEvent>>();
         _otherEventHandlerMock = new Mock<IEventHandler<TestEvent>>();
-        _commandHandlerMock = new Mock<ICommandHandler<TestCommand>>();
-        _queryHandlerMock = new Mock<IQueryHandler<TestQuery, string>>();
+        _commandHandlerMock = new Mock<IRequestHandler<TestCommand>>();
+        _queryHandlerMock = new Mock<IRequestHandler<TestQuery, string>>();
         _messageRouterMock = new Mock<IMessageRouter>();
         _messageBroker = new MessageBroker(_messageRouterMock.Object);
     }
@@ -126,7 +126,7 @@ public class MessageBrokerTests
     public async Task ExecuteCommand_NullCommandData_ThrowsArgumentException()
     {
         // Arrange
-        _messageRouterMock.Setup(router => router.GetCommandHandler<TestCommand>())
+        _messageRouterMock.Setup(router => router.GetRequestHandler<TestCommand>())
                           .Returns(_commandHandlerMock.Object);
 
         // Act
@@ -153,7 +153,7 @@ public class MessageBrokerTests
     public async Task ExecuteCommand_HandlerPresent_CallsTheHandler()
     {
         // Arrange
-        _messageRouterMock.Setup(router => router.GetCommandHandler<TestCommand>())
+        _messageRouterMock.Setup(router => router.GetRequestHandler<TestCommand>())
                           .Returns(_commandHandlerMock.Object);
 
         var commandToExecute = new TestCommand("test-command");
@@ -180,7 +180,7 @@ public class MessageBrokerTests
         _commandHandlerMock.Setup(handler => handler.Handle(It.IsAny<TestCommand>(), default))
                            .Returns(handlerWorkload);
 
-        _messageRouterMock.Setup(router => router.GetCommandHandler<TestCommand>())
+        _messageRouterMock.Setup(router => router.GetRequestHandler<TestCommand>())
                           .Returns(_commandHandlerMock.Object);
 
         var commandToExecute = new TestCommand("test-command");
@@ -198,7 +198,7 @@ public class MessageBrokerTests
     public async Task ExecuteQuery_NullQueryData_ThrowsArgumentException()
     {
         // Arrange
-        _messageRouterMock.Setup(router => router.GetQueryHandler<TestQuery, string>())
+        _messageRouterMock.Setup(router => router.GetRequestWithResponseHandler<TestQuery, string>())
                           .Returns(_queryHandlerMock.Object);
 
         // Act
@@ -230,7 +230,7 @@ public class MessageBrokerTests
         _queryHandlerMock.Setup(handler => handler.Handle(It.IsAny<TestQuery>(), default))
                          .ReturnsAsync(expectedResult);
 
-        _messageRouterMock.Setup(router => router.GetQueryHandler<TestQuery, string>())
+        _messageRouterMock.Setup(router => router.GetRequestWithResponseHandler<TestQuery, string>())
                           .Returns(_queryHandlerMock.Object);
 
         var queryToExecute = new TestQuery("test-query");
@@ -261,7 +261,7 @@ public class MessageBrokerTests
         _queryHandlerMock.Setup(handler => handler.Handle(It.IsAny<TestQuery>(), default))
                          .Returns(handlerWorkload);
 
-        _messageRouterMock.Setup(router => router.GetQueryHandler<TestQuery, string>())
+        _messageRouterMock.Setup(router => router.GetRequestWithResponseHandler<TestQuery, string>())
                           .Returns(_queryHandlerMock.Object);
 
         var queryToExecute = new TestQuery("test-query");

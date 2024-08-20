@@ -9,19 +9,19 @@ namespace Tycho.Messaging
         IEnumerable<IEventHandler<Event>> GetEventHandlers<Event>()
             where Event : class, IEvent;
 
-        ICommandHandler<Command> GetCommandHandler<Command>()
-            where Command : class, IRequest;
+        IRequestHandler<Request> GetRequestHandler<Request>()
+            where Request : class, IRequest;
 
-        IQueryHandler<Query, Response> GetQueryHandler<Query, Response>()
-            where Query : class, IRequest<Response>;
+        IRequestHandler<Request, Response> GetRequestWithResponseHandler<Request, Response>()
+            where Request : class, IRequest<Response>;
 
         void RegisterEventHandler<Event>(IEventHandler<Event> eventHandler)
             where Event : class, IEvent;
 
-        void RegisterCommandHandler<Command>(ICommandHandler<Command> commandHandler)
-            where Command : class, IRequest;
+        void RegisterRequestHandler<Request>(IRequestHandler<Request> requestHandler)
+            where Request : class, IRequest;
 
-        void RegisterQueryHandler<Query, Response>(IQueryHandler<Query, Response> queryHandler)
-            where Query : class, IRequest<Response>;
+        void RegisterRequestWithResponseHandler<Request, Response>(IRequestHandler<Request, Response> requestHandler)
+            where Request : class, IRequest<Response>;
     }
 }

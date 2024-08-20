@@ -6,10 +6,10 @@ using Tycho.Messaging.Interceptors;
 namespace IntegrationTests.ForwardingMessages.SUT.Interceptors;
 
 internal class CommandInterceptor :
-    ICommandInterceptor<CommandToForward>,
-    ICommandInterceptor<MappedAlphaCommand>,
-    ICommandInterceptor<MappedBetaCommand>,
-    ICommandInterceptor<MappedCommand>
+    IRequestInterceptor<CommandToForward>,
+    IRequestInterceptor<MappedAlphaCommand>,
+    IRequestInterceptor<MappedBetaCommand>,
+    IRequestInterceptor<MappedCommand>
 {
     public Task ExecuteAfter(CommandToForward commandData, CancellationToken cancellationToken = default)
     {

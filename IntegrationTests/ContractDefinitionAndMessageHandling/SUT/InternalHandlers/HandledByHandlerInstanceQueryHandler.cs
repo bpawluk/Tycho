@@ -5,7 +5,7 @@ using Tycho.Messaging.Handlers;
 
 namespace IntegrationTests.ContractDefinitionAndMessageHandling.SUT.InternalHandlers;
 
-internal class HandledByHandlerInstanceQueryHandler : IQueryHandler<HandledByHandlerInstanceQuery, string>
+internal class HandledByHandlerInstanceQueryHandler : IRequestHandler<HandledByHandlerInstanceQuery, string>
 {
     private readonly IModule _thisModule;
 

@@ -8,8 +8,8 @@ namespace IntegrationTests.PassingMessagesBetweenSubmodules.SUT.Handlers;
 
 internal class AlphaBetaProxyHandler
     : IEventHandler<AlphaEvent>
-    , ICommandHandler<AlphaCommand>
-    , IQueryHandler<AlphaQuery, string>
+    , IRequestHandler<AlphaCommand>
+    , IRequestHandler<AlphaQuery, string>
 {
     private readonly IModule _betaModule;
 

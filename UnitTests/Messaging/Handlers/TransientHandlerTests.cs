@@ -33,7 +33,7 @@ public class TransientHandlerTests
     public async Task TransientCommandHandler_CreatesNewHandlerEachTime()
     {
         // Arrange
-        var handler = new TransientCommandHandler<TestCommand>(TestHandlerCreator<TestMessageHandler>);
+        var handler = new TransientRequestHandler<TestCommand>(TestHandlerCreator<TestMessageHandler>);
 
         // Act & Assert
         await handler.Handle(new TestCommand("test-command"), CancellationToken.None);
@@ -47,7 +47,7 @@ public class TransientHandlerTests
     public async Task TransientQueryHandler_CreatesNewHandlerEachTime()
     {
         // Arrange
-        var handler = new TransientQueryHandler<TestQuery, string>(TestHandlerCreator<TestMessageHandler>);
+        var handler = new TransientRequestHandler<TestQuery, string>(TestHandlerCreator<TestMessageHandler>);
 
         // Act & Assert
         await handler.Handle(new TestQuery("test-query"), CancellationToken.None);

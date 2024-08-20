@@ -5,7 +5,7 @@ using Tycho.Messaging.Payload;
 namespace Tycho.Messaging.Interceptors
 {
     /// <summary>
-    /// Lets you run additional logic before and after forwarding an event message
+    /// Lets you run additional logic before and after forwarding an event
     /// </summary>
     /// <typeparam name="Event">The type of the event being intercepted</typeparam>
     public interface IEventInterceptor<Event> where Event : class, IEvent

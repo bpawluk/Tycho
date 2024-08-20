@@ -8,15 +8,15 @@ namespace Tycho.Messaging
 {
     internal class MessageRouter : IMessageRouter
     {
-        private readonly IDictionary<Type, List<IEventHandler>> _eventHandlers;
-        private readonly IDictionary<Type, ICommandHandler> _commandHandlers;
-        private readonly IDictionary<Type, IQueryHandler> _queryHandlers;
+        private readonly IDictionary<Type, List<IMessageHandler>> _eventHandlers;
+        private readonly IDictionary<Type, IMessageHandler> _requestHandlers;
+        private readonly IDictionary<Type, IMessageHandler> _requestWithResponseHandlers;
 
         public MessageRouter()
         {
-            _eventHandlers = new Dictionary<Type, List<IEventHandler>>();
-            _commandHandlers = new Dictionary<Type, ICommandHandler>();
-            _queryHandlers = new Dictionary<Type, IQueryHandler>();
+            _eventHandlers = new Dictionary<Type, List<IMessageHandler>>();
+            _requestHandlers = new Dictionary<Type, IMessageHandler>();
+            _requestWithResponseHandlers = new Dictionary<Type, IMessageHandler>();
         }
 
         public IEnumerable<IEventHandler<Event>> GetEventHandlers<Event>()
@@ -30,26 +30,26 @@ namespace Tycho.Messaging
             return Enumerable.Empty<IEventHandler<Event>>();
         }
 
-        public ICommandHandler<Command> GetCommandHandler<Command>()
-            where Command : class, IRequest
+        public IRequestHandler<Request> GetRequestHandler<Request>()
+            where Request : class, IRequest
         {
-            if (_commandHandlers.TryGetValue(typeof(Command), out var commandHandler))
+            if (_requestHandlers.TryGetValue(typeof(Request), out var requestHandler))
             {
-                return (ICommandHandler<Command>)commandHandler;
+                return (IRequestHandler<Request>)requestHandler;
             }
 
-            throw new KeyNotFoundException($"Command handler for {typeof(Command).Name} was not registered");
+            throw new KeyNotFoundException($"Request handler for {typeof(Request).Name} was not registered");
         }
 
-        public IQueryHandler<Query, Response> GetQueryHandler<Query, Response>()
-            where Query : class, IRequest<Response>
+        public IRequestHandler<Request, Response> GetRequestWithResponseHandler<Request, Response>()
+            where Request : class, IRequest<Response>
         {
-            if (_queryHandlers.TryGetValue(typeof(Query), out var queryHandler))
+            if (_requestWithResponseHandlers.TryGetValue(typeof(Request), out var requestHandler))
             {
-                return (IQueryHandler<Query, Response>)queryHandler;
+                return (IRequestHandler<Request, Response>)requestHandler;
             }
 
-            throw new KeyNotFoundException($"Query handler for {typeof(Query).Name} was not registered");
+            throw new KeyNotFoundException($"Request handler for {typeof(Request).Name} was not registered");
         }
 
         public void RegisterEventHandler<Event>(IEventHandler<Event> eventHandler)
@@ -62,37 +62,37 @@ namespace Tycho.Messaging
 
             if (!_eventHandlers.ContainsKey(typeof(Event)))
             {
-                _eventHandlers[typeof(Event)] = new List<IEventHandler>();
+                _eventHandlers[typeof(Event)] = new List<IMessageHandler>();
             }
 
             _eventHandlers[typeof(Event)].Add(eventHandler);
         }
 
-        public void RegisterCommandHandler<Command>(ICommandHandler<Command> commandHandler)
-            where Command : class, IRequest
+        public void RegisterRequestHandler<Request>(IRequestHandler<Request> requestHandler)
+            where Request : class, IRequest
         {
-            if (commandHandler is null)
+            if (requestHandler is null)
             {
-                throw new ArgumentException($"{nameof(commandHandler)} cannot be null", nameof(commandHandler));
+                throw new ArgumentException($"{nameof(requestHandler)} cannot be null", nameof(requestHandler));
             }
 
-            if (!_commandHandlers.TryAdd(typeof(Command), commandHandler))
+            if (!_requestHandlers.TryAdd(typeof(Request), requestHandler))
             {
-                throw new ArgumentException($"Command handler for {typeof(Command).Name} already registered", nameof(commandHandler));
+                throw new ArgumentException($"Request handler for {typeof(Request).Name} already registered", nameof(requestHandler));
             }
         }
 
-        public void RegisterQueryHandler<Query, Response>(IQueryHandler<Query, Response> queryHandler)
-            where Query : class, IRequest<Response>
+        public void RegisterRequestWithResponseHandler<Request, Response>(IRequestHandler<Request, Response> requestHandler)
+            where Request : class, IRequest<Response>
         {
-            if (queryHandler is null)
+            if (requestHandler is null)
             {
-                throw new ArgumentException($"{nameof(queryHandler)} cannot be null", nameof(queryHandler));
+                throw new ArgumentException($"{nameof(requestHandler)} cannot be null", nameof(requestHandler));
             }
 
-            if (!_queryHandlers.TryAdd(typeof(Query), queryHandler))
+            if (!_requestWithResponseHandlers.TryAdd(typeof(Request), requestHandler))
             {
-                throw new ArgumentException($"Query handler for {typeof(Query).Name} already registered", nameof(queryHandler));
+                throw new ArgumentException($"Request handler for {typeof(Request).Name} already registered", nameof(requestHandler));
             }
         }
     }

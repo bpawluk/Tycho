@@ -6,7 +6,7 @@ using Tycho.Messaging.Handlers;
 
 namespace IntegrationTests.ProvidingConfiguration.SUT.Handlers;
 
-internal class GetConfiguredValueViaIConfigurationQueryHandler : IQueryHandler<GetConfiguredValueViaIConfigurationQuery, DateTime>
+internal class GetConfiguredValueViaIConfigurationQueryHandler : IRequestHandler<GetConfiguredValueViaIConfigurationQuery, DateTime>
 {
     private readonly IConfiguration _config;
 

@@ -5,7 +5,7 @@ using Tycho.Messaging.Handlers;
 
 namespace IntegrationTests.ProvidingConfiguration.SUT.Handlers;
 
-internal class GetConfiguredValueViaBindingQueryHandler : IQueryHandler<GetConfiguredValueViaBindingQuery, int>
+internal class GetConfiguredValueViaBindingQueryHandler : IRequestHandler<GetConfiguredValueViaBindingQuery, int>
 {
     private readonly TestConfig _config;
 

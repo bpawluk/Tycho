@@ -82,7 +82,7 @@ namespace Tycho.Contract.Outbox
         /// <param name="handler">A handler to be used when the request is received</param>
         /// <exception cref="ArgumentException"/>
         /// <exception cref="InvalidOperationException"/>
-        IOutboxConsumer Handle<Request>(ICommandHandler<Request> handler)
+        IOutboxConsumer Handle<Request>(IRequestHandler<Request> handler)
             where Request : class, IRequest;
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace Tycho.Contract.Outbox
         /// <param name="handler">A handler to be used when the request is received</param>
         /// <exception cref="ArgumentException"/>
         /// <exception cref="InvalidOperationException"/>
-        IOutboxConsumer Handle<Request, Response>(IQueryHandler<Request, Response> handler)
+        IOutboxConsumer Handle<Request, Response>(IRequestHandler<Request, Response> handler)
             where Request : class, IRequest<Response>;
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace Tycho.Contract.Outbox
         /// <exception cref="ArgumentException"/>
         /// <exception cref="InvalidOperationException"/>
         IOutboxConsumer Handle<Request, Handler>()
-            where Handler : class, ICommandHandler<Request>
+            where Handler : class, IRequestHandler<Request>
             where Request : class, IRequest;
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace Tycho.Contract.Outbox
         /// <exception cref="ArgumentException"/>
         /// <exception cref="InvalidOperationException"/>
         IOutboxConsumer Handle<Request, Response, Handler>()
-            where Handler : class, IQueryHandler<Request, Response>
+            where Handler : class, IRequestHandler<Request, Response>
             where Request : class, IRequest<Response>;
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace Tycho.Contract.Outbox
         /// <exception cref="InvalidOperationException"/>
         IOutboxConsumer ForwardWithInterception<Request, Interceptor, Module>()
             where Request : class, IRequest
-            where Interceptor : class, ICommandInterceptor<Request>
+            where Interceptor : class, IRequestInterceptor<Request>
             where Module : TychoModule;
 
         /// <summary>
@@ -211,7 +211,7 @@ namespace Tycho.Contract.Outbox
         /// <exception cref="InvalidOperationException"/>
         IOutboxConsumer ForwardWithInterception<Request, Response, Interceptor, Module>()
             where Request : class, IRequest<Response>
-            where Interceptor : class, IQueryInterceptor<Request, Response>
+            where Interceptor : class, IRequestInterceptor<Request, Response>
             where Module : TychoModule;
 
         /// <summary>
@@ -228,7 +228,7 @@ namespace Tycho.Contract.Outbox
         IOutboxConsumer ForwardWithInterception<RequestIn, RequestOut, Interceptor, Module>(Func<RequestIn, RequestOut> mapping)
             where RequestIn : class, IRequest
             where RequestOut : class, IRequest
-            where Interceptor : class, ICommandInterceptor<RequestOut>
+            where Interceptor : class, IRequestInterceptor<RequestOut>
             where Module : TychoModule;
 
         /// <summary>
@@ -250,7 +250,7 @@ namespace Tycho.Contract.Outbox
             Func<ResponseOut, ResponseIn> responseMapping)
             where RequestIn : class, IRequest<ResponseIn>
             where RequestOut : class, IRequest<ResponseOut>
-            where Interceptor : class, IQueryInterceptor<RequestOut, ResponseOut>
+            where Interceptor : class, IRequestInterceptor<RequestOut, ResponseOut>
             where Module : TychoModule;
 
         /// <summary>
@@ -315,7 +315,7 @@ namespace Tycho.Contract.Outbox
         /// <exception cref="InvalidOperationException"/>
         IOutboxConsumer ExposeWithInterception<Request, Interceptor>()
             where Request : class, IRequest
-            where Interceptor : class, ICommandInterceptor<Request>;
+            where Interceptor : class, IRequestInterceptor<Request>;
 
         /// <summary>
         /// Defines logic for handling the specified <b>request</b>
@@ -328,7 +328,7 @@ namespace Tycho.Contract.Outbox
         /// <exception cref="InvalidOperationException"/>
         IOutboxConsumer ExposeWithInterception<Request, Response, Interceptor>()
             where Request : class, IRequest<Response>
-            where Interceptor : class, IQueryInterceptor<Request, Response>;
+            where Interceptor : class, IRequestInterceptor<Request, Response>;
 
         /// <summary>
         /// Defines logic for handling the specified <b>request</b>
@@ -343,7 +343,7 @@ namespace Tycho.Contract.Outbox
         IOutboxConsumer ExposeWithInterception<RequestIn, RequestOut, Interceptor>(Func<RequestIn, RequestOut> mapping)
             where RequestIn : class, IRequest
             where RequestOut : class, IRequest
-            where Interceptor : class, ICommandInterceptor<RequestOut>;
+            where Interceptor : class, IRequestInterceptor<RequestOut>;
 
         /// <summary>
         /// Defines logic for handling the specified <b>request</b>
@@ -363,7 +363,7 @@ namespace Tycho.Contract.Outbox
             Func<ResponseOut, ResponseIn> responseMapping)
             where RequestIn : class, IRequest<ResponseIn>
             where RequestOut : class, IRequest<ResponseOut>
-            where Interceptor : class, IQueryInterceptor<RequestOut, ResponseOut>;
+            where Interceptor : class, IRequestInterceptor<RequestOut, ResponseOut>;
 
         /// <summary>
         /// Ignores the specified <b>request</b> 

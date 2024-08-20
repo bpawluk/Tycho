@@ -6,8 +6,8 @@ namespace UnitTests.Utils;
 
 public record TestMessageHandler()
     : IEventHandler<TestEvent>
-    , ICommandHandler<TestCommand>
-    , IQueryHandler<TestQuery, string>
+    , IRequestHandler<TestCommand>
+    , IRequestHandler<TestQuery, string>
 {
     public bool HandlerCalled { get; private set; } = false;
     public string QueryResponse { get; } = $"response from {nameof(TestMessageHandler)}";
@@ -33,8 +33,8 @@ public record TestMessageHandler()
 
 public record OtherTestMessageHandler()
     : IEventHandler<TestEvent>
-    , ICommandHandler<TestCommand>
-    , IQueryHandler<TestQuery, string>
+    , IRequestHandler<TestCommand>
+    , IRequestHandler<TestQuery, string>
 {
     public string QueryResponse { get; } = $"response from {nameof(OtherTestMessageHandler)}";
 
@@ -47,8 +47,8 @@ public record OtherTestMessageHandler()
 
 public record YetAnotherTestMessageHandler()
     : IEventHandler<TestEvent>
-    , ICommandHandler<TestCommand>
-    , IQueryHandler<TestQuery, string>
+    , IRequestHandler<TestCommand>
+    , IRequestHandler<TestQuery, string>
 {
     public string QueryResponse { get; } = $"response from {nameof(YetAnotherTestMessageHandler)}";
 
@@ -61,8 +61,8 @@ public record YetAnotherTestMessageHandler()
 
 public record OtherMessageHandler()
     : IEventHandler<OtherEvent>
-    , ICommandHandler<OtherCommand>
-    , IQueryHandler<OtherQuery, object>
+    , IRequestHandler<OtherCommand>
+    , IRequestHandler<OtherQuery, object>
 {
     public object QueryResponse { get; } = new();
 

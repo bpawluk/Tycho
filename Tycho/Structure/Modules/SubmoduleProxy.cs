@@ -20,16 +20,16 @@ namespace Tycho.Structure.Modules
             _submodule.Publish(eventData, cancellationToken);
         }
 
-        public Task Execute<Command>(Command commandData, CancellationToken cancellationToken)
-            where Command : class, IRequest
+        public Task Execute<Request>(Request requestData, CancellationToken cancellationToken)
+            where Request : class, IRequest
         {
-            return _submodule.Execute(commandData, cancellationToken);
+            return _submodule.Execute(requestData, cancellationToken);
         }
 
-        public Task<Response> Execute<Query, Response>(Query queryData, CancellationToken cancellationToken)
-            where Query : class, IRequest<Response>
+        public Task<Response> Execute<Request, Response>(Request requestData, CancellationToken cancellationToken)
+            where Request : class, IRequest<Response>
         {
-            return _submodule.Execute<Query, Response>(queryData, cancellationToken);
+            return _submodule.Execute<Request, Response>(requestData, cancellationToken);
         }
     }
 }

@@ -15,8 +15,8 @@ public class MessageRouterTests
     {
         _messageRouter = new MessageRouter();
         _messageRouter.RegisterEventHandler<OtherEvent>(new OtherMessageHandler());
-        _messageRouter.RegisterCommandHandler<OtherCommand>(new OtherMessageHandler());
-        _messageRouter.RegisterQueryHandler<OtherQuery, object>(new OtherMessageHandler());
+        _messageRouter.RegisterRequestHandler<OtherCommand>(new OtherMessageHandler());
+        _messageRouter.RegisterRequestWithResponseHandler<OtherQuery, object>(new OtherMessageHandler());
     }
 
     [Fact]
@@ -69,10 +69,10 @@ public class MessageRouterTests
     public void GetCommandHandler_NoHandler_ThrowsKeyNotFoundException()
     {
         // Arrange
-        ICommandHandler<TestCommand>? result = null;
+        IRequestHandler<TestCommand>? result = null;
 
         // Act
-        Assert.Throws<KeyNotFoundException>(() => result = _messageRouter.GetCommandHandler<TestCommand>());
+        Assert.Throws<KeyNotFoundException>(() => result = _messageRouter.GetRequestHandler<TestCommand>());
 
         // Assert
         Assert.Null(result);
@@ -83,10 +83,10 @@ public class MessageRouterTests
     {
         // Arrange
         var registeredHandler = new TestMessageHandler();
-        _messageRouter.RegisterCommandHandler<TestCommand>(registeredHandler);
+        _messageRouter.RegisterRequestHandler<TestCommand>(registeredHandler);
 
         // Act
-        var result = _messageRouter.GetCommandHandler<TestCommand>();
+        var result = _messageRouter.GetRequestHandler<TestCommand>();
 
         // Assert
         Assert.Equal(registeredHandler, result);
@@ -96,10 +96,10 @@ public class MessageRouterTests
     public void GetQueryHandler_NoHandler_ThrowsKeyNotFoundException()
     {
         // Arrange
-        IQueryHandler<TestQuery, string>? result = null;
+        IRequestHandler<TestQuery, string>? result = null;
 
         // Act
-        Assert.Throws<KeyNotFoundException>(() => result = _messageRouter.GetQueryHandler<TestQuery, string>());
+        Assert.Throws<KeyNotFoundException>(() => result = _messageRouter.GetRequestWithResponseHandler<TestQuery, string>());
 
         // Assert
         Assert.Null(result);
@@ -110,10 +110,10 @@ public class MessageRouterTests
     {
         // Arrange
         var registeredHandler = new TestMessageHandler();
-        _messageRouter.RegisterQueryHandler<TestQuery, string>(registeredHandler);
+        _messageRouter.RegisterRequestWithResponseHandler<TestQuery, string>(registeredHandler);
 
         // Act
-        var result = _messageRouter.GetQueryHandler<TestQuery, string>();
+        var result = _messageRouter.GetRequestWithResponseHandler<TestQuery, string>();
 
         // Assert
         Assert.Equal(registeredHandler, result);
@@ -172,10 +172,10 @@ public class MessageRouterTests
         // - no arrangement required
 
         // Act
-        Assert.Throws<ArgumentException>(() => _messageRouter.RegisterCommandHandler<TestCommand>(null!));
+        Assert.Throws<ArgumentException>(() => _messageRouter.RegisterRequestHandler<TestCommand>(null!));
 
         // Assert
-        Assert.Throws<KeyNotFoundException>(_messageRouter.GetCommandHandler<TestCommand>);
+        Assert.Throws<KeyNotFoundException>(_messageRouter.GetRequestHandler<TestCommand>);
     }
 
     [Fact]
@@ -185,10 +185,10 @@ public class MessageRouterTests
         var handlerToRegister = new TestMessageHandler();
 
         // Act
-        _messageRouter.RegisterCommandHandler<TestCommand>(handlerToRegister);
+        _messageRouter.RegisterRequestHandler<TestCommand>(handlerToRegister);
 
         // Assert
-        Assert.Equal(handlerToRegister, _messageRouter.GetCommandHandler<TestCommand>());
+        Assert.Equal(handlerToRegister, _messageRouter.GetRequestHandler<TestCommand>());
     }
 
     [Fact]
@@ -197,13 +197,13 @@ public class MessageRouterTests
         // Arrange
         var handlerToRegister = new TestMessageHandler();
         var registeredHandler = new OtherTestMessageHandler();
-        _messageRouter.RegisterCommandHandler<TestCommand>(registeredHandler);
+        _messageRouter.RegisterRequestHandler<TestCommand>(registeredHandler);
 
         // Act
-        Assert.Throws<ArgumentException>(() => _messageRouter.RegisterCommandHandler<TestCommand>(handlerToRegister));
+        Assert.Throws<ArgumentException>(() => _messageRouter.RegisterRequestHandler<TestCommand>(handlerToRegister));
 
         // Assert
-        Assert.Equal(registeredHandler, _messageRouter.GetCommandHandler<TestCommand>());
+        Assert.Equal(registeredHandler, _messageRouter.GetRequestHandler<TestCommand>());
     }
 
     [Fact]
@@ -213,10 +213,10 @@ public class MessageRouterTests
         // - no arrangement required
 
         // Act
-        Assert.Throws<ArgumentException>(() => _messageRouter.RegisterQueryHandler<TestQuery, string>(null!));
+        Assert.Throws<ArgumentException>(() => _messageRouter.RegisterRequestWithResponseHandler<TestQuery, string>(null!));
 
         // Assert
-        Assert.Throws<KeyNotFoundException>(_messageRouter.GetQueryHandler<TestQuery, string>);
+        Assert.Throws<KeyNotFoundException>(_messageRouter.GetRequestWithResponseHandler<TestQuery, string>);
     }
 
     [Fact]
@@ -226,10 +226,10 @@ public class MessageRouterTests
         var handlerToRegister = new TestMessageHandler();
 
         // Act
-        _messageRouter.RegisterQueryHandler<TestQuery, string>(handlerToRegister);
+        _messageRouter.RegisterRequestWithResponseHandler<TestQuery, string>(handlerToRegister);
 
         // Assert
-        Assert.Equal(handlerToRegister, _messageRouter.GetQueryHandler<TestQuery, string>());
+        Assert.Equal(handlerToRegister, _messageRouter.GetRequestWithResponseHandler<TestQuery, string>());
     }
 
     [Fact]
@@ -238,12 +238,12 @@ public class MessageRouterTests
         // Arrange
         var handlerToRegister = new TestMessageHandler();
         var registeredHandler = new OtherTestMessageHandler();
-        _messageRouter.RegisterQueryHandler<TestQuery, string>(registeredHandler);
+        _messageRouter.RegisterRequestWithResponseHandler<TestQuery, string>(registeredHandler);
 
         // Act
-        Assert.Throws<ArgumentException>(() => _messageRouter.RegisterQueryHandler<TestQuery, string>(handlerToRegister));
+        Assert.Throws<ArgumentException>(() => _messageRouter.RegisterRequestWithResponseHandler<TestQuery, string>(handlerToRegister));
 
         // Assert
-        Assert.Equal(registeredHandler, _messageRouter.GetQueryHandler<TestQuery, string>());
+        Assert.Equal(registeredHandler, _messageRouter.GetRequestWithResponseHandler<TestQuery, string>());
     }
 }

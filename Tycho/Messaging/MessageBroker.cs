@@ -28,28 +28,28 @@ namespace Tycho.Messaging
             }
         }
 
-        public Task Execute<Command>(Command commandData, CancellationToken cancellationToken)
-            where Command : class, IRequest
+        public Task Execute<Request>(Request requestData, CancellationToken cancellationToken)
+            where Request : class, IRequest
         {
-            if (commandData is null)
+            if (requestData is null)
             {
-                throw new ArgumentException($"{nameof(commandData)} cannot be null", nameof(commandData));
+                throw new ArgumentException($"{nameof(requestData)} cannot be null", nameof(requestData));
             }
 
-            var commandHandler = _messageRouter.GetCommandHandler<Command>();
-            return commandHandler.Handle(commandData, cancellationToken);
+            var requestHandler = _messageRouter.GetRequestHandler<Request>();
+            return requestHandler.Handle(requestData, cancellationToken);
         }
 
-        public Task<Response> Execute<Query, Response>(Query queryData, CancellationToken cancellationToken)
-            where Query : class, IRequest<Response>
+        public Task<Response> Execute<Request, Response>(Request requestData, CancellationToken cancellationToken)
+            where Request : class, IRequest<Response>
         {
-            if (queryData is null)
+            if (requestData is null)
             {
-                throw new ArgumentException($"{nameof(queryData)} cannot be null", nameof(queryData));
+                throw new ArgumentException($"{nameof(requestData)} cannot be null", nameof(requestData));
             }
 
-            var queryHandler = _messageRouter.GetQueryHandler<Query, Response>();
-            return queryHandler.Handle(queryData, cancellationToken);
+            var requestHandler = _messageRouter.GetRequestWithResponseHandler<Request, Response>();
+            return requestHandler.Handle(requestData, cancellationToken);
         }
     }
 }

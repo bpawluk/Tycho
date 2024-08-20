@@ -21,26 +21,26 @@ namespace Tycho.Structure.Modules
             _messageBroker.Publish(eventData, cancellationToken);
         }
 
-        public Task Execute<Command>(Command commandData, CancellationToken cancellationToken)
-            where Command : class, IRequest
+        public Task Execute<Request>(Request requestData, CancellationToken cancellationToken)
+            where Request : class, IRequest
         {
             if (_messageBroker is null)
             {
-                throw new InvalidOperationException("Could not execute a command " +
+                throw new InvalidOperationException("Could not execute a request " +
                     "because this module does have a message broker defined");
             }
-            return _messageBroker.Execute(commandData, cancellationToken);
+            return _messageBroker.Execute(requestData, cancellationToken);
         }
 
-        public Task<Response> Execute<Query, Response>(Query queryData, CancellationToken cancellationToken)
-            where Query : class, IRequest<Response>
+        public Task<Response> Execute<Request, Response>(Request requestData, CancellationToken cancellationToken)
+            where Request : class, IRequest<Response>
         {
             if (_messageBroker is null)
             {
-                throw new InvalidOperationException("Could not execute a query " +
+                throw new InvalidOperationException("Could not execute a request " +
                     "because this module does have a message broker defined");
             }
-            return _messageBroker.Execute<Query, Response>(queryData, cancellationToken);
+            return _messageBroker.Execute<Request, Response>(requestData, cancellationToken);
         }
 
         public void SetMessageBroker(IMessageBroker broker)

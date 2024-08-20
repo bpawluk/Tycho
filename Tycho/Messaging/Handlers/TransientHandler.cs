@@ -30,33 +30,33 @@ namespace Tycho.Messaging.Handlers
         }
     }
 
-    internal class TransientCommandHandler<Command>
-        : TransientBase<ICommandHandler<Command>>
-        , ICommandHandler<Command>
-        where Command : class, IRequest
+    internal class TransientRequestHandler<Request>
+        : TransientBase<IRequestHandler<Request>>
+        , IRequestHandler<Request>
+        where Request : class, IRequest
     {
-        public TransientCommandHandler(Func<ICommandHandler<Command>> handlerCreator)
+        public TransientRequestHandler(Func<IRequestHandler<Request>> handlerCreator)
             : base(handlerCreator) { }
 
-        public Task Handle(Command commandData, CancellationToken cancellationToken)
+        public Task Handle(Request requestData, CancellationToken cancellationToken)
         {
             var handler = _createHandler();
-            return handler.Handle(commandData, cancellationToken);
+            return handler.Handle(requestData, cancellationToken);
         }
     }
 
-    internal class TransientQueryHandler<Query, Response>
-        : TransientBase<IQueryHandler<Query, Response>>
-        , IQueryHandler<Query, Response>
-        where Query : class, IRequest<Response>
+    internal class TransientRequestHandler<Request, Response>
+        : TransientBase<IRequestHandler<Request, Response>>
+        , IRequestHandler<Request, Response>
+        where Request : class, IRequest<Response>
     {
-        public TransientQueryHandler(Func<IQueryHandler<Query, Response>> handlerCreator)
+        public TransientRequestHandler(Func<IRequestHandler<Request, Response>> handlerCreator)
             : base(handlerCreator) { }
 
-        public Task<Response> Handle(Query queryData, CancellationToken cancellationToken)
+        public Task<Response> Handle(Request requestData, CancellationToken cancellationToken)
         {
             var handler = _createHandler();
-            return handler.Handle(queryData, cancellationToken);
+            return handler.Handle(requestData, cancellationToken);
         }
     }
 }

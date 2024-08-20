@@ -1,13 +1,13 @@
 ﻿namespace Tycho.Messaging.Payload
 {
     /// <summary>
-    /// An interface that represents a command message
+    /// An interface that represents a request
     /// </summary>
     public interface IRequest { }
 
     /// <summary>
-    /// An interface that represents a query message
+    /// An interface that represents a request with a response
     /// </summary>
-    /// <typeparam name="Response">The type of the query response</typeparam>
+    /// <typeparam name="Response">The type of the request response</typeparam>
     public interface IRequest<out Response> { }
 }

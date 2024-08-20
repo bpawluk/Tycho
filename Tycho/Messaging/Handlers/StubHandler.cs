@@ -10,22 +10,22 @@ namespace Tycho.Messaging.Handlers
         public Task Handle(Event eventData, CancellationToken cancellationToken) => Task.CompletedTask;
     }
 
-    internal class StubCommandHandler<Command> : ICommandHandler<Command>
-        where Command : class, IRequest
+    internal class StubRequestHandler<Request> : IRequestHandler<Request>
+        where Request : class, IRequest
     {
-        public Task Handle(Command commandData, CancellationToken cancellationToken) => Task.CompletedTask;
+        public Task Handle(Request requestData, CancellationToken cancellationToken) => Task.CompletedTask;
     }
 
-    internal class StubQueryHandler<Query, Response> : IQueryHandler<Query, Response>
-        where Query : class, IRequest<Response>
+    internal class StubRequestHandler<Request, Response> : IRequestHandler<Request, Response>
+        where Request : class, IRequest<Response>
     {
         private readonly Response _defaultResponse;
 
-        public StubQueryHandler(Response defaultResponse)
+        public StubRequestHandler(Response defaultResponse)
         {
             _defaultResponse = defaultResponse;
         }
 
-        public Task<Response> Handle(Query queryData, CancellationToken cancellationToken) => Task.FromResult(_defaultResponse);
+        public Task<Response> Handle(Request requestData, CancellationToken cancellationToken) => Task.FromResult(_defaultResponse);
     }
 }

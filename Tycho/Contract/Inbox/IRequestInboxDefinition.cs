@@ -82,7 +82,7 @@ namespace Tycho.Contract.Inbox
         /// <typeparam name="Request">The type of the request being handled</typeparam>
         /// <param name="handler">A handler to be used when the request is received</param>
         /// <exception cref="ArgumentException"/>
-        IInboxDefinition Handle<Request>(ICommandHandler<Request> handler)
+        IInboxDefinition Handle<Request>(IRequestHandler<Request> handler)
             where Request : class, IRequest;
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace Tycho.Contract.Inbox
         /// <typeparam name="Response">The type of the response expected by the request</typeparam>
         /// <param name="handler">A handler to be used when the request is received</param>
         /// <exception cref="ArgumentException"/>
-        IInboxDefinition Handle<Request, Response>(IQueryHandler<Request, Response> handler)
+        IInboxDefinition Handle<Request, Response>(IRequestHandler<Request, Response> handler)
             where Request : class, IRequest<Response>;
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace Tycho.Contract.Inbox
         /// <typeparam name="Handler">A handler to be used when the request is received</typeparam>
         /// <exception cref="ArgumentException"/>
         IInboxDefinition Handle<Request, Handler>()
-            where Handler : class, ICommandHandler<Request>
+            where Handler : class, IRequestHandler<Request>
             where Request : class, IRequest;
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace Tycho.Contract.Inbox
         /// <typeparam name="Handler">A handler to be used when the request is received</typeparam>
         /// <exception cref="ArgumentException"/>
         IInboxDefinition Handle<Request, Response, Handler>()
-            where Handler : class, IQueryHandler<Request, Response>
+            where Handler : class, IRequestHandler<Request, Response>
             where Request : class, IRequest<Response>;
 
         /// <summary>
@@ -191,7 +191,7 @@ namespace Tycho.Contract.Inbox
         /// <exception cref="ArgumentException"/>
         IInboxDefinition ForwardWithInterception<Request, Interceptor, Module>()
             where Request : class, IRequest
-            where Interceptor : class, ICommandInterceptor<Request>
+            where Interceptor : class, IRequestInterceptor<Request>
             where Module : TychoModule;
 
         /// <summary>
@@ -205,7 +205,7 @@ namespace Tycho.Contract.Inbox
         /// <exception cref="ArgumentException"/>
         IInboxDefinition ForwardWithInterception<Request, Response, Interceptor, Module>()
             where Request : class, IRequest<Response>
-            where Interceptor : class, IQueryInterceptor<Request, Response>
+            where Interceptor : class, IRequestInterceptor<Request, Response>
             where Module : TychoModule;
 
         /// <summary>
@@ -221,7 +221,7 @@ namespace Tycho.Contract.Inbox
         IInboxDefinition ForwardWithInterception<RequestIn, RequestOut, Interceptor, Module>(Func<RequestIn, RequestOut> mapping)
             where RequestIn : class, IRequest
             where RequestOut : class, IRequest
-            where Interceptor : class, ICommandInterceptor<RequestOut>
+            where Interceptor : class, IRequestInterceptor<RequestOut>
             where Module : TychoModule;
 
         /// <summary>
@@ -242,7 +242,7 @@ namespace Tycho.Contract.Inbox
             Func<ResponseOut, ResponseIn> responseMapping)
             where RequestIn : class, IRequest<ResponseIn>
             where RequestOut : class, IRequest<ResponseOut>
-            where Interceptor : class, IQueryInterceptor<RequestOut, ResponseOut>
+            where Interceptor : class, IRequestInterceptor<RequestOut, ResponseOut>
             where Module : TychoModule;
     }
 }

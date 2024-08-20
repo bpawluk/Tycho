@@ -5,7 +5,7 @@ using Tycho.Messaging.Handlers;
 
 namespace IntegrationTests.ServiceRegistrationAndResolving.SUT.Handlers;
 
-internal class SingletonServiceWorkflowQueryHandler : IQueryHandler<SingletonServiceWorkflowQuery, int>
+internal class SingletonServiceWorkflowQueryHandler : IRequestHandler<SingletonServiceWorkflowQuery, int>
 {
     private readonly ISingletonService _service;
 

@@ -6,10 +6,10 @@ using Tycho.Messaging.Interceptors;
 namespace IntegrationTests.ForwardingMessages.SUT.Interceptors;
 
 internal class QueryInterceptor :
-    IQueryInterceptor<QueryToForward, string>,
-    IQueryInterceptor<MappedAlphaQuery, AlphaResponse>,
-    IQueryInterceptor<MappedBetaQuery, BetaResponse>,
-    IQueryInterceptor<MappedQuery, string>
+    IRequestInterceptor<QueryToForward, string>,
+    IRequestInterceptor<MappedAlphaQuery, AlphaResponse>,
+    IRequestInterceptor<MappedBetaQuery, BetaResponse>,
+    IRequestInterceptor<MappedQuery, string>
 {
     public Task<string> ExecuteAfter(QueryToForward queryData, string result, CancellationToken cancellationToken = default)
     {

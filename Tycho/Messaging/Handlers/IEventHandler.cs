@@ -5,10 +5,10 @@ using Tycho.Messaging.Payload;
 namespace Tycho.Messaging.Handlers
 {
     /// <summary>
-    /// An interface that represents an event message handler
+    /// An interface that represents an event handler
     /// </summary>
     /// <typeparam name="Event">The type of the event being handled</typeparam>
-    public interface IEventHandler<in Event> : IEventHandler
+    public interface IEventHandler<in Event> : IMessageHandler
         where Event : class, IEvent
     {
         /// <summary>
@@ -19,9 +19,4 @@ namespace Tycho.Messaging.Handlers
         /// <returns>A task that represents the asynchronous operation</returns>
         Task Handle(Event eventData, CancellationToken cancellationToken = default);
     }
-
-    /// <summary>
-    /// Base interface for event handlers
-    /// </summary>
-    public interface IEventHandler { }
 }

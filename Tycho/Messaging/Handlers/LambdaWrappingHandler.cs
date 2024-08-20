@@ -49,46 +49,46 @@ namespace Tycho.Messaging.Handlers
         }
     }
 
-    internal class LambdaWrappingCommandHandler<Command>
-        : LambdaWrappingBase<Command, Task>
-        , ICommandHandler<Command>
-        where Command : class, IRequest
+    internal class LambdaWrappingRequestHandler<Request>
+        : LambdaWrappingBase<Request, Task>
+        , IRequestHandler<Request>
+        where Request : class, IRequest
     {
-        public LambdaWrappingCommandHandler(Action<Command> handler)
+        public LambdaWrappingRequestHandler(Action<Request> handler)
             : base(Wrap(handler, Task.CompletedTask)) { }
 
-        public LambdaWrappingCommandHandler(Func<Command, Task> handler)
+        public LambdaWrappingRequestHandler(Func<Request, Task> handler)
             : base(Wrap(handler)) { }
 
-        public LambdaWrappingCommandHandler(Func<Command, CancellationToken, Task> handler)
+        public LambdaWrappingRequestHandler(Func<Request, CancellationToken, Task> handler)
             : base(handler) { }
 
-        public Task Handle(Command commandData, CancellationToken cancellationToken)
+        public Task Handle(Request requestData, CancellationToken cancellationToken)
         {
-            return _handle(commandData, cancellationToken);
+            return _handle(requestData, cancellationToken);
         }
     }
 
-    internal class LambdaWrappingQueryHandler<Query, Response>
-        : LambdaWrappingBase<Query, Task<Response>>
-        , IQueryHandler<Query, Response>
-        where Query : class, IRequest<Response>
+    internal class LambdaWrappingRequestHandler<Request, Response>
+        : LambdaWrappingBase<Request, Task<Response>>
+        , IRequestHandler<Request, Response>
+        where Request : class, IRequest<Response>
     {
-        public LambdaWrappingQueryHandler(Func<Query, Response> handler)
+        public LambdaWrappingRequestHandler(Func<Request, Response> handler)
             : base(Wrap(handler)) { }
 
-        public LambdaWrappingQueryHandler(Func<Query, Task<Response>> handler)
+        public LambdaWrappingRequestHandler(Func<Request, Task<Response>> handler)
             : base(Wrap(handler)) { }
 
-        public LambdaWrappingQueryHandler(Func<Query, CancellationToken, Task<Response>> handler)
+        public LambdaWrappingRequestHandler(Func<Request, CancellationToken, Task<Response>> handler)
             : base(handler) { }
 
-        public Task<Response> Handle(Query queryData, CancellationToken cancellationToken)
+        public Task<Response> Handle(Request requestData, CancellationToken cancellationToken)
         {
-            return _handle(queryData, cancellationToken);
+            return _handle(requestData, cancellationToken);
         }
 
-        private static Func<Query, CancellationToken, Task<Response>> Wrap(Func<Query, Response> handler)
+        private static Func<Request, CancellationToken, Task<Response>> Wrap(Func<Request, Response> handler)
         {
             return (message, _) => Task.FromResult(handler(message));
         }

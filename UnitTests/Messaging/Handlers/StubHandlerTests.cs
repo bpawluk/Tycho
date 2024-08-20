@@ -24,7 +24,7 @@ public class StubHandlerTests
     public void StubCommandHandler_ReturnsCompletedTask()
     {
         // Arrange
-        var handler = new StubCommandHandler<TestCommand>();
+        var handler = new StubRequestHandler<TestCommand>();
 
         // Act
         var result = handler.Handle(new TestCommand("test-command"), CancellationToken.None);
@@ -39,7 +39,7 @@ public class StubHandlerTests
     {
         // Arrange
         var expectedResult = "result";
-        var handler = new StubQueryHandler<TestQuery, string>(expectedResult);
+        var handler = new StubRequestHandler<TestQuery, string>(expectedResult);
 
         // Act
         var result = handler.Handle(new TestQuery("test-query"), CancellationToken.None);

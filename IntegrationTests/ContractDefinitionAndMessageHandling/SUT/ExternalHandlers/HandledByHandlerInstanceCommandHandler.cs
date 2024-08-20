@@ -4,7 +4,7 @@ using Tycho.Messaging.Handlers;
 
 namespace IntegrationTests.ContractDefinitionAndMessageHandling.SUT.ExternalHandlers;
 
-internal class HandledByHandlerInstanceCommandHandler : ICommandHandler<HandledByHandlerInstanceCommand>
+internal class HandledByHandlerInstanceCommandHandler : IRequestHandler<HandledByHandlerInstanceCommand>
 {
     private readonly ContractDefinitionAndMessageHandlingTests _tests;
 

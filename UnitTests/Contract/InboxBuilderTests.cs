@@ -63,7 +63,7 @@ public class InboxBuilderTests
 
         // Assert
         _messageRouterMock.Verify(
-            router => router.RegisterCommandHandler(It.IsAny<ICommandHandler<TestCommand>>()), 
+            router => router.RegisterRequestHandler(It.IsAny<IRequestHandler<TestCommand>>()), 
             Times.Exactly(2));
     }
 
@@ -81,7 +81,7 @@ public class InboxBuilderTests
         _inboxBuilder.Executes<TestCommand, TestMessageHandler>();
 
         // Assert
-        _messageRouterMock.Verify(router => router.RegisterCommandHandler(It.IsAny<ICommandHandler<TestCommand>>()), Times.Exactly(5));
+        _messageRouterMock.Verify(router => router.RegisterRequestHandler(It.IsAny<IRequestHandler<TestCommand>>()), Times.Exactly(5));
     }
 
     [Fact]
@@ -98,7 +98,7 @@ public class InboxBuilderTests
 
         // Assert
         _messageRouterMock.Verify(
-            router => router.RegisterQueryHandler(It.IsAny<IQueryHandler<TestQuery, string>>()), 
+            router => router.RegisterRequestWithResponseHandler(It.IsAny<IRequestHandler<TestQuery, string>>()), 
             Times.Exactly(3));
     }
 
@@ -116,7 +116,7 @@ public class InboxBuilderTests
         _inboxBuilder.RespondsTo<TestQuery, string, TestMessageHandler>();
 
         // Assert
-        _messageRouterMock.Verify(router => router.RegisterQueryHandler(It.IsAny<IQueryHandler<TestQuery, string>>()), Times.Exactly(5));
+        _messageRouterMock.Verify(router => router.RegisterRequestWithResponseHandler(It.IsAny<IRequestHandler<TestQuery, string>>()), Times.Exactly(5));
     }
 
     [Fact]
@@ -128,11 +128,11 @@ public class InboxBuilderTests
                           .Returns(new[] { eventHandler });
 
         var commandHandler = new TestMessageHandler();
-        _messageRouterMock.Setup(router => router.GetCommandHandler<TestCommand>())
+        _messageRouterMock.Setup(router => router.GetRequestHandler<TestCommand>())
                           .Returns(commandHandler);
 
         var queryHandler = new TestMessageHandler();
-        _messageRouterMock.Setup(router => router.GetQueryHandler<TestQuery, string>())
+        _messageRouterMock.Setup(router => router.GetRequestWithResponseHandler<TestQuery, string>())
                           .Returns(queryHandler);
 
         // Act
