@@ -21,13 +21,13 @@ namespace Tycho.Structure.Modules
         }
 
         public Task Execute<Command>(Command commandData, CancellationToken cancellationToken)
-            where Command : class, ICommand
+            where Command : class, IRequest
         {
             return _submodule.Execute(commandData, cancellationToken);
         }
 
         public Task<Response> Execute<Query, Response>(Query queryData, CancellationToken cancellationToken)
-            where Query : class, IQuery<Response>
+            where Query : class, IRequest<Response>
         {
             return _submodule.Execute<Query, Response>(queryData, cancellationToken);
         }

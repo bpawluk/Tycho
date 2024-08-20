@@ -22,7 +22,7 @@ namespace Tycho.Structure.Modules
         }
 
         public Task Execute<Command>(Command commandData, CancellationToken cancellationToken)
-            where Command : class, ICommand
+            where Command : class, IRequest
         {
             if (_messageBroker is null)
             {
@@ -33,7 +33,7 @@ namespace Tycho.Structure.Modules
         }
 
         public Task<Response> Execute<Query, Response>(Query queryData, CancellationToken cancellationToken)
-            where Query : class, IQuery<Response>
+            where Query : class, IRequest<Response>
         {
             if (_messageBroker is null)
             {

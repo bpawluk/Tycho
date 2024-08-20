@@ -13,17 +13,17 @@ using Tycho.Structure;
 namespace IntegrationTests.ServiceRegistrationAndResolving.SUT;
 
 // Incoming
-internal record SingletonServiceWorkflowQuery : IQuery<int>;
-internal record TransientServiceWorkflowQuery : IQuery<int>;
-internal record SubmoduleResolvingWorkflowQuery : IQuery<string>;
-internal record ModuleResolvingWorkflowQuery : IQuery<string>;
+internal record SingletonServiceWorkflowQuery : IRequest<int>;
+internal record TransientServiceWorkflowQuery : IRequest<int>;
+internal record SubmoduleResolvingWorkflowQuery : IRequest<string>;
+internal record ModuleResolvingWorkflowQuery : IRequest<string>;
 
 // Outgoing
-internal record GetDataFromThisModulesClientQuery() : IQuery<string>;
+internal record GetDataFromThisModulesClientQuery() : IRequest<string>;
 
 internal class AppModule : TychoModule
 {
-    protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services)
+    protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
         module.RespondsTo<SingletonServiceWorkflowQuery, int, SingletonServiceWorkflowQueryHandler>()
               .RespondsTo<TransientServiceWorkflowQuery, int, TransientServiceWorkflowQueryHandler>()

@@ -33,7 +33,7 @@ namespace Tycho.Messaging.Handlers
     internal class TransientCommandHandler<Command>
         : TransientBase<ICommandHandler<Command>>
         , ICommandHandler<Command>
-        where Command : class, ICommand
+        where Command : class, IRequest
     {
         public TransientCommandHandler(Func<ICommandHandler<Command>> handlerCreator)
             : base(handlerCreator) { }
@@ -48,7 +48,7 @@ namespace Tycho.Messaging.Handlers
     internal class TransientQueryHandler<Query, Response>
         : TransientBase<IQueryHandler<Query, Response>>
         , IQueryHandler<Query, Response>
-        where Query : class, IQuery<Response>
+        where Query : class, IRequest<Response>
     {
         public TransientQueryHandler(Func<IQueryHandler<Query, Response>> handlerCreator)
             : base(handlerCreator) { }

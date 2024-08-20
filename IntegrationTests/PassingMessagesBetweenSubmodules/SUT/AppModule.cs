@@ -21,7 +21,7 @@ internal record QueryWorkflowCompletedEvent(string Id) : IEvent;
 
 internal class AppModule : TychoModule
 {
-    protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services)
+    protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
         var alphaSubmodule = services.GetRequiredService<IModule<AlphaModule>>()!;
         module.Executes<BeginEventWorkflowCommand>(commandData => alphaSubmodule.Execute(commandData))

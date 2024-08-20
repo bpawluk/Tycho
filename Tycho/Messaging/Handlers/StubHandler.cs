@@ -11,13 +11,13 @@ namespace Tycho.Messaging.Handlers
     }
 
     internal class StubCommandHandler<Command> : ICommandHandler<Command>
-        where Command : class, ICommand
+        where Command : class, IRequest
     {
         public Task Handle(Command commandData, CancellationToken cancellationToken) => Task.CompletedTask;
     }
 
     internal class StubQueryHandler<Query, Response> : IQueryHandler<Query, Response>
-        where Query : class, IQuery<Response>
+        where Query : class, IRequest<Response>
     {
         private readonly Response _defaultResponse;
 

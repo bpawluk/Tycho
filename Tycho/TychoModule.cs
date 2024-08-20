@@ -28,25 +28,25 @@ namespace Tycho
         private IServiceProvider? _contractFullfilmentServices;
 
         /// <summary>
-        /// Use this method to declare the interface that your module exposes to its clients
-        /// </summary>
-        /// <param name="module">An interface for declaring the incoming messages of your module</param>
-        /// <param name="services">A provider of the services configured for your module</param>
-        protected abstract void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services);
-
-        /// <summary>
         /// Use this method to declare the contract that your module requires its clients to fulfill
         /// </summary>
-        /// <param name="module">An interface for declaring the messages that your module sends out</param>
+        /// <param name="outbox">An interface for declaring the messages that your module sends out</param>
         /// <param name="services">A provider of the services configured for your module</param>
-        protected abstract void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services);
+        protected abstract void DeclareOutgoingMessages(IOutboxDefinition outbox, IServiceProvider services);
+
+        /// <summary>
+        /// Use this method to declare the interface that your module exposes to its clients
+        /// </summary>
+        /// <param name="inbox">An interface for declaring the incoming messages of your module</param>
+        /// <param name="services">A provider of the services configured for your module</param>
+        protected abstract void HandleIncomingMessages(IInboxDefinition inbox, IServiceProvider services);
 
         /// <summary>
         /// Use this method to configure the submodules that your module will be using
         /// </summary>
-        /// <param name="module">An interface for defining the substructure of your module</param>
+        /// <param name="structure">An interface for defining the substructure of your module</param>
         /// <param name="services">A provider of the services configured for your module</param>
-        protected abstract void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services);
+        protected abstract void IncludeSubmodules(ISubstructureDefinition structure, IServiceProvider services);
 
         /// <summary>
         /// Use this method to configure the services required by your module's code
@@ -146,7 +146,7 @@ namespace Tycho
             var inboxRouter = new MessageRouter();
             var instanceCreator = new InstanceCreator(internalServices);
             var inboxBuilder = new InboxBuilder(instanceCreator, inboxRouter);
-            DeclareIncomingMessages(inboxBuilder, internalServices);
+            HandleIncomingMessages(inboxBuilder, internalServices);
             return inboxBuilder.Build();
         }
 

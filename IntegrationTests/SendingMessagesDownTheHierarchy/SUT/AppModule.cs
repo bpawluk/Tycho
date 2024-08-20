@@ -11,9 +11,9 @@ using Tycho.Structure;
 namespace IntegrationTests.SendingMessagesDownTheHierarchy.SUT;
 
 // Incoming
-internal record BeginEventWorkflowCommand(string Id) : ICommand;
-internal record BeginCommandWorkflowCommand(string Id) : ICommand;
-internal record BeginQueryWorkflowCommand(string Id) : ICommand;
+internal record BeginEventWorkflowCommand(string Id) : IRequest;
+internal record BeginCommandWorkflowCommand(string Id) : IRequest;
+internal record BeginQueryWorkflowCommand(string Id) : IRequest;
 
 // Outgoing
 internal record EventWorkflowCompletedEvent(string Id) : IEvent;
@@ -22,7 +22,7 @@ internal record QueryWorkflowCompletedEvent(string Id) : IEvent;
 
 internal class AppModule : TychoModule
 {
-    protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services)
+    protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
         var alphaModule = services.GetRequiredService<IModule<AlphaModule>>();
 

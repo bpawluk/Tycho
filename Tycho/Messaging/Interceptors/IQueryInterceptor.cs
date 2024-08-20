@@ -9,7 +9,7 @@ namespace Tycho.Messaging.Interceptors
     /// </summary>
     /// <typeparam name="Query">The type of the query being intercepted</typeparam>
     /// <typeparam name="Response">The type of the query response</typeparam>
-    public interface IQueryInterceptor<Query, Response> where Query : class, IQuery<Response>
+    public interface IQueryInterceptor<Query, Response> where Query : class, IRequest<Response>
     {
         /// <summary>
         /// A method to be executed before the specified query is forwarded

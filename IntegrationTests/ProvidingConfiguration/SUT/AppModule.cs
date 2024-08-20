@@ -12,15 +12,15 @@ using Tycho.Structure;
 namespace IntegrationTests.ProvidingConfiguration.SUT;
 
 // Incoming
-internal record GetConfiguredValueViaBindingQuery() : IQuery<int>;
-internal record GetConfiguredValueViaIConfigurationQuery() : IQuery<DateTime>;
+internal record GetConfiguredValueViaBindingQuery() : IRequest<int>;
+internal record GetConfiguredValueViaIConfigurationQuery() : IRequest<DateTime>;
 
 // Outgoing
 // - no incoming messages specific to this module
 
 internal class AppModule : TychoModule
 {
-    protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services)
+    protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
         module.RespondsTo<GetConfiguredValueViaBindingQuery, int, GetConfiguredValueViaBindingQueryHandler>()
               .RespondsTo<GetConfiguredValueViaIConfigurationQuery, DateTime, GetConfiguredValueViaIConfigurationQueryHandler>();

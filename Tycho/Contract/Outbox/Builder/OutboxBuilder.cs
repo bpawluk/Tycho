@@ -7,11 +7,19 @@ using Tycho.Messaging.Payload;
 
 namespace Tycho.Contract.Outbox.Builder
 {
-    internal partial class OutboxBuilder : IOutboxDefinition, IOutboxConsumer
+    internal partial class OutboxBuilder : IOutboxConsumer, IEventOutboxConsumer, IRequestOutboxConsumer, IOutboxDefinition, IEventOutboxDefinition, IRequestOutboxDefinition
     {
         private readonly IInstanceCreator _instanceCreator;
         private readonly IMessageRouter _moduleInbox;
         private readonly IDictionary<Type, bool> _messageRegistry;
+
+        IEventOutboxConsumer IOutboxConsumer.Events => this;
+
+        IEventOutboxDefinition IOutboxDefinition.Events => this;
+
+        IRequestOutboxConsumer IOutboxConsumer.Requests => this;
+
+        IRequestOutboxDefinition IOutboxDefinition.Requests => this;
 
         public OutboxBuilder(IInstanceCreator instanceCreator, IMessageRouter moduleInbox)
         {

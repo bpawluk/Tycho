@@ -10,8 +10,8 @@ namespace Tycho.Messaging.Forwarders
     internal abstract class CommandForwarder<CommandIn, CommandOut>
         : ForwarderBase<CommandIn, CommandOut>
         , ICommandHandler<CommandIn>
-        where CommandIn : class, ICommand
-        where CommandOut : class, ICommand
+        where CommandIn : class, IRequest
+        where CommandOut : class, IRequest
     {
         private readonly ICommandInterceptor<CommandOut>? _interceptor;
 
@@ -45,8 +45,8 @@ namespace Tycho.Messaging.Forwarders
     internal class CommandUpForwarder<CommandIn, CommandOut>
         : CommandForwarder<CommandIn, CommandOut>
         , ICommandHandler<CommandIn>
-        where CommandIn : class, ICommand
-        where CommandOut : class, ICommand
+        where CommandIn : class, IRequest
+        where CommandOut : class, IRequest
     {
         public CommandUpForwarder(
             IModule module,
@@ -58,8 +58,8 @@ namespace Tycho.Messaging.Forwarders
     internal class CommandDownForwarder<CommandIn, CommandOut, Module>
         : CommandForwarder<CommandIn, CommandOut>
         , ICommandHandler<CommandIn>
-        where CommandIn : class, ICommand
-        where CommandOut : class, ICommand
+        where CommandIn : class, IRequest
+        where CommandOut : class, IRequest
         where Module : TychoModule
     {
         public CommandDownForwarder(

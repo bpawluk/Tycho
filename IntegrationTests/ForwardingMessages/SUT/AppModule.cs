@@ -24,25 +24,25 @@ internal record EventToForwardWithMapping(string Id, int preInterceptions, int p
     public int PostInterceptions { get; set; } = postInterceptions;
 };
 
-internal record CommandToForward(string Id, int preInterceptions, int postInterceptions) : ICommand
+internal record CommandToForward(string Id, int preInterceptions, int postInterceptions) : IRequest
 {
     public int PreInterceptions { get; set; } = preInterceptions;
     public int PostInterceptions { get; set; } = postInterceptions;
 };
 
-internal record CommandToForwardWithMapping(string Id, int preInterceptions, int postInterceptions) : ICommand
+internal record CommandToForwardWithMapping(string Id, int preInterceptions, int postInterceptions) : IRequest
 {
     public int PreInterceptions { get; set; } = preInterceptions;
     public int PostInterceptions { get; set; } = postInterceptions;
 };
 
-internal record QueryToForward(string Id, int preInterceptions, int postInterceptions) : IQuery<string>
+internal record QueryToForward(string Id, int preInterceptions, int postInterceptions) : IRequest<string>
 {
     public int PreInterceptions { get; set; } = preInterceptions;
     public int PostInterceptions { get; set; } = postInterceptions;
 };
 
-internal record QueryToForwardWithMapping(string Id, int preInterceptions, int postInterceptions) : IQuery<string>
+internal record QueryToForwardWithMapping(string Id, int preInterceptions, int postInterceptions) : IRequest<string>
 {
     public int PreInterceptions { get; set; } = preInterceptions;
     public int PostInterceptions { get; set; } = postInterceptions;
@@ -55,13 +55,13 @@ internal record MappedEvent(string Id, int preInterceptions, int postInterceptio
     public int PostInterceptions { get; set; } = postInterceptions;
 };
 
-internal record MappedCommand(string Id, int preInterceptions, int postInterceptions) : ICommand
+internal record MappedCommand(string Id, int preInterceptions, int postInterceptions) : IRequest
 {
     public int PreInterceptions { get; set; } = preInterceptions;
     public int PostInterceptions { get; set; } = postInterceptions;
 };
 
-internal record MappedQuery(string Id, int preInterceptions, int postInterceptions) : IQuery<string>
+internal record MappedQuery(string Id, int preInterceptions, int postInterceptions) : IRequest<string>
 {
     public int PreInterceptions { get; set; } = preInterceptions;
     public int PostInterceptions { get; set; } = postInterceptions;
@@ -69,7 +69,7 @@ internal record MappedQuery(string Id, int preInterceptions, int postInterceptio
 
 internal class AppModule : TychoModule
 {
-    protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services)
+    protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
         module.ForwardsEvent<EventToForward, EventInterceptor, AlphaModule>()
               .ForwardsEvent<EventToForwardWithMapping, MappedAlphaEvent, EventInterceptor, AlphaModule>(

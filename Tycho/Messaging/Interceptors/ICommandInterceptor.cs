@@ -8,7 +8,7 @@ namespace Tycho.Messaging.Interceptors
     /// Lets you run additional logic before and after forwarding a command message
     /// </summary>
     /// <typeparam name="Command">The type of the command being intercepted</typeparam>
-    public interface ICommandInterceptor<Command> where Command : class, ICommand
+    public interface ICommandInterceptor<Command> where Command : class, IRequest
     {
         /// <summary>
         /// A method to be executed before the specified command is forwarded

@@ -10,18 +10,18 @@ using Tycho.Structure;
 namespace IntegrationTests.PassingMessagesBetweenSubmodules.SUT.Submodules;
 
 // Incoming
-internal record BeginEventWorkflowCommand(string Id) : ICommand;
-internal record BeginCommandWorkflowCommand(string Id) : ICommand;
-internal record BeginQueryWorkflowCommand(string Id) : ICommand;
+internal record BeginEventWorkflowCommand(string Id) : IRequest;
+internal record BeginCommandWorkflowCommand(string Id) : IRequest;
+internal record BeginQueryWorkflowCommand(string Id) : IRequest;
 
 // Outgoing
 internal record AlphaEvent(string Id) : IEvent;
-internal record AlphaCommand(string Id) : ICommand;
-internal record AlphaQuery(string Id) : IQuery<string>;
+internal record AlphaCommand(string Id) : IRequest;
+internal record AlphaQuery(string Id) : IRequest<string>;
 
 internal class AlphaModule : TychoModule
 {
-    protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services)
+    protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
         var thisModule = services.GetRequiredService<IModule>();
 

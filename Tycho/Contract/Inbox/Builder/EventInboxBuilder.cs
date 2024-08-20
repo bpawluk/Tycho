@@ -3,47 +3,39 @@ using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Messaging.Forwarders;
 using Tycho.Messaging.Handlers;
-using Tycho.Messaging.Interceptors;
-using Tycho.Messaging.Payload;
 
 namespace Tycho.Contract.Inbox.Builder
 {
-    internal partial class InboxBuilder : IInboxDefinition
+    internal partial class InboxBuilder : IInboxDefinition, IRequestInboxDefinition, IEventInboxDefinition
     {
-        public IInboxDefinition SubscribesTo<Event>(Action<Event> action)
-            where Event : class, IEvent
+        IInboxDefinition IEventInboxDefinition.Handle<Event>(Action<Event> action)
         {
             var handler = new LambdaWrappingEventHandler<Event>(action);
             _moduleInbox.RegisterEventHandler(handler);
             return this;
         }
 
-        public IInboxDefinition SubscribesTo<Event>(Func<Event, Task> function)
-            where Event : class, IEvent
+        IInboxDefinition IEventInboxDefinition.Handle<Event>(Func<Event, Task> function)
         {
             var handler = new LambdaWrappingEventHandler<Event>(function);
             _moduleInbox.RegisterEventHandler(handler);
             return this;
         }
 
-        public IInboxDefinition SubscribesTo<Event>(Func<Event, CancellationToken, Task> function)
-            where Event : class, IEvent
+        IInboxDefinition IEventInboxDefinition.Handle<Event>(Func<Event, CancellationToken, Task> function)
         {
             var handler = new LambdaWrappingEventHandler<Event>(function);
             _moduleInbox.RegisterEventHandler(handler);
             return this;
         }
 
-        public IInboxDefinition SubscribesTo<Event>(IEventHandler<Event> handler)
-            where Event : class, IEvent
+        IInboxDefinition IEventInboxDefinition.Handle<Event>(IEventHandler<Event> handler)
         {
             _moduleInbox.RegisterEventHandler(handler);
             return this;
         }
 
-        public IInboxDefinition SubscribesTo<Event, Handler>()
-            where Handler : class, IEventHandler<Event>
-            where Event : class, IEvent
+        IInboxDefinition IEventInboxDefinition.Handle<Event, Handler>()
         {
             Func<Handler> handlerCreator = () => _instanceCreator.CreateInstance<Handler>();
             var handler = new TransientEventHandler<Event>(handlerCreator);
@@ -51,9 +43,7 @@ namespace Tycho.Contract.Inbox.Builder
             return this;
         }
 
-        public IInboxDefinition ForwardsEvent<Event, Module>()
-            where Event : class, IEvent
-            where Module : TychoModule
+        IInboxDefinition IEventInboxDefinition.Forward<Event, Module>()
         {
             Func<Event, Event> mapping = eventData => eventData;
             Func<EventDownForwarder<Event, Event, Module>> forwarderCreator = () =>
@@ -65,10 +55,7 @@ namespace Tycho.Contract.Inbox.Builder
             return this;
         }
 
-        public IInboxDefinition ForwardsEvent<Event, Interceptor, Module>()
-            where Event : class, IEvent
-            where Interceptor : class, IEventInterceptor<Event>
-            where Module : TychoModule
+        IInboxDefinition IEventInboxDefinition.ForwardWithInterception<Event, Interceptor, Module>()
         {
             Func<Event, Event> mapping = eventData => eventData;
             Func<EventDownForwarder<Event, Event, Module>> forwarderCreator = () =>
@@ -81,10 +68,7 @@ namespace Tycho.Contract.Inbox.Builder
             return this;
         }
 
-        public IInboxDefinition ForwardsEvent<EventIn, EventOut, Module>(Func<EventIn, EventOut> eventMapping)
-            where EventIn : class, IEvent
-            where EventOut : class, IEvent
-            where Module : TychoModule
+        IInboxDefinition IEventInboxDefinition.Forward<EventIn, EventOut, Module>(Func<EventIn, EventOut> eventMapping)
         {
             Func<EventDownForwarder<EventIn, EventOut, Module>> forwarderCreator = () =>
             {
@@ -95,11 +79,7 @@ namespace Tycho.Contract.Inbox.Builder
             return this;
         }
 
-        public IInboxDefinition ForwardsEvent<EventIn, EventOut, Interceptor, Module>(Func<EventIn, EventOut> eventMapping)
-            where EventIn : class, IEvent
-            where EventOut : class, IEvent
-            where Interceptor : class, IEventInterceptor<EventOut>
-            where Module : TychoModule
+        IInboxDefinition IEventInboxDefinition.ForwardWithInterception<EventIn, EventOut, Interceptor, Module>(Func<EventIn, EventOut> eventMapping)
         {
             Func<EventDownForwarder<EventIn, EventOut, Module>> forwarderCreator = () =>
             {

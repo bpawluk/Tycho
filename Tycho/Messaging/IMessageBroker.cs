@@ -33,7 +33,7 @@ namespace Tycho.Messaging
         /// <exception cref="InvalidOperationException"/>
         /// <exception cref="KeyNotFoundException"/>
         Task Execute<Command>(Command commandData, CancellationToken cancellationToken = default)
-            where Command : class, ICommand;
+            where Command : class, IRequest;
 
         /// <summary>
         /// Sends a <b>query</b> message than needs to be handled by exactly one registered recipient 
@@ -48,6 +48,6 @@ namespace Tycho.Messaging
         /// <exception cref="InvalidOperationException"/>
         /// <exception cref="KeyNotFoundException"/>
         Task<Response> Execute<Query, Response>(Query queryData, CancellationToken cancellationToken = default)
-            where Query : class, IQuery<Response>;
+            where Query : class, IRequest<Response>;
     }
 }

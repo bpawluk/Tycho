@@ -10,7 +10,7 @@ namespace Tycho.Messaging.Handlers
     /// <typeparam name="Query">The type of the query being handled</typeparam>
     /// <typeparam name="Response">The type of the query response</typeparam>
     public interface IQueryHandler<in Query, Response> : IQueryHandler
-        where Query : class, IQuery<Response>
+        where Query : class, IRequest<Response>
     {
         /// <summary>
         /// A method to be executed when the specified query is received

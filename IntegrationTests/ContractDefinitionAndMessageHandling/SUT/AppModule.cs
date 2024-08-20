@@ -18,21 +18,21 @@ public record HandledByHandlerInstanceEvent() : IEvent;
 public record HandledByHandlerTypeEvent() : IEvent;
 
 // Commands
-public record HandledByLambdaCommand() : ICommand;
-public record HandledByAsyncLambdaCommand() : ICommand;
-public record HandledByHandlerInstanceCommand() : ICommand;
-public record HandledByHandlerTypeCommand() : ICommand;
+public record HandledByLambdaCommand() : IRequest;
+public record HandledByAsyncLambdaCommand() : IRequest;
+public record HandledByHandlerInstanceCommand() : IRequest;
+public record HandledByHandlerTypeCommand() : IRequest;
 
 // Queries
-public record HandledByLambdaQuery() : IQuery<string>;
-public record HandledByAsyncLambdaQuery() : IQuery<string>;
-public record HandledByHandlerInstanceQuery() : IQuery<string>;
-public record HandledByHandlerTypeQuery() : IQuery<string>;
+public record HandledByLambdaQuery() : IRequest<string>;
+public record HandledByAsyncLambdaQuery() : IRequest<string>;
+public record HandledByHandlerInstanceQuery() : IRequest<string>;
+public record HandledByHandlerTypeQuery() : IRequest<string>;
 
 
 internal class AppModule : TychoModule
 {
-    protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services)
+    protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
         var thisModule = services.GetRequiredService<IModule>();
         module.SubscribesTo<HandledByLambdaEvent>(e => thisModule.Publish(e))

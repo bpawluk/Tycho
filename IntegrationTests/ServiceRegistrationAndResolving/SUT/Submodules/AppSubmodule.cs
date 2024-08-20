@@ -10,7 +10,7 @@ using Tycho.Structure;
 namespace IntegrationTests.ServiceRegistrationAndResolving.SUT.Submodules;
 
 // Incoming
-internal record GetDataFromSubmoduleQuery() : IQuery<string>;
+internal record GetDataFromSubmoduleQuery() : IRequest<string>;
 
 // Outgoing
 // - no outgoing messages specific to this module
@@ -18,7 +18,7 @@ internal record GetDataFromSubmoduleQuery() : IQuery<string>;
 
 internal class AppSubmodule : TychoModule
 {
-    protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services) 
+    protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services) 
     {
         module.RespondsTo<GetDataFromSubmoduleQuery, string>(_ => $"Response from {typeof(AppSubmodule).Name}");
     }

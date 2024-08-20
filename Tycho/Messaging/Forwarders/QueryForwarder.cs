@@ -11,8 +11,8 @@ namespace Tycho.Messaging.Forwarders
     internal abstract class QueryForwarder<QueryIn, ResponseIn, QueryOut, ResponseOut>
         : ForwarderBase<QueryIn, QueryOut>
         , IQueryHandler<QueryIn, ResponseIn>
-        where QueryIn : class, IQuery<ResponseIn>
-        where QueryOut : class, IQuery<ResponseOut>
+        where QueryIn : class, IRequest<ResponseIn>
+        where QueryOut : class, IRequest<ResponseOut>
     {
         private readonly Func<ResponseOut, ResponseIn> _responseMapping;
         private readonly IQueryInterceptor<QueryOut, ResponseOut>? _interceptor;
@@ -51,8 +51,8 @@ namespace Tycho.Messaging.Forwarders
     internal class QueryUpForwarder<QueryIn, ResponseIn, QueryOut, ResponseOut>
         : QueryForwarder<QueryIn, ResponseIn, QueryOut, ResponseOut>
         , IQueryHandler<QueryIn, ResponseIn>
-        where QueryIn : class, IQuery<ResponseIn>
-        where QueryOut : class, IQuery<ResponseOut>
+        where QueryIn : class, IRequest<ResponseIn>
+        where QueryOut : class, IRequest<ResponseOut>
     {
         public QueryUpForwarder(
             IModule module,
@@ -65,8 +65,8 @@ namespace Tycho.Messaging.Forwarders
     internal class QueryDownForwarder<QueryIn, ResponseIn, QueryOut, ResponseOut, Module>
         : QueryForwarder<QueryIn, ResponseIn, QueryOut, ResponseOut>
         , IQueryHandler<QueryIn, ResponseIn>
-        where QueryIn : class, IQuery<ResponseIn>
-        where QueryOut : class, IQuery<ResponseOut>
+        where QueryIn : class, IRequest<ResponseIn>
+        where QueryOut : class, IRequest<ResponseOut>
         where Module : TychoModule
     {
         public QueryDownForwarder(

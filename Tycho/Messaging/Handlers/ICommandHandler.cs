@@ -9,7 +9,7 @@ namespace Tycho.Messaging.Handlers
     /// </summary>
     /// <typeparam name="Command">The type of the command being handled</typeparam>
     public interface ICommandHandler<in Command> : ICommandHandler
-        where Command : class, ICommand
+        where Command : class, IRequest
     {
         /// <summary>
         /// A method to be executed when the specified command is received

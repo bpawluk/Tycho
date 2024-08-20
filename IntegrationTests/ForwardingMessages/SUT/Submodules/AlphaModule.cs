@@ -17,13 +17,13 @@ internal record MappedAlphaEvent(string Id, int preInterceptions, int postInterc
     public int PostInterceptions { get; set; } = postInterceptions;
 };
 
-internal record MappedAlphaCommand(string Id, int preInterceptions, int postInterceptions) : ICommand
+internal record MappedAlphaCommand(string Id, int preInterceptions, int postInterceptions) : IRequest
 {
     public int PreInterceptions { get; set; } = preInterceptions;
     public int PostInterceptions { get; set; } = postInterceptions;
 };
 
-internal record MappedAlphaQuery(string Id, int preInterceptions, int postInterceptions) : IQuery<AlphaResponse>
+internal record MappedAlphaQuery(string Id, int preInterceptions, int postInterceptions) : IRequest<AlphaResponse>
 {
     public int PreInterceptions { get; set; } = preInterceptions;
     public int PostInterceptions { get; set; } = postInterceptions;
@@ -36,7 +36,7 @@ internal record AlphaResponse(string Content);
 
 internal class AlphaModule : TychoModule
 {
-    protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services)
+    protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
         module.ForwardsEvent<EventToForward, EventInterceptor, BetaModule>()
               .ForwardsEvent<MappedAlphaEvent, MappedBetaEvent, EventInterceptor, BetaModule>(

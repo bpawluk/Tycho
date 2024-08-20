@@ -16,13 +16,13 @@ internal record MappedBetaEvent(string Id, int preInterceptions, int postInterce
     public int PostInterceptions { get; set; } = postInterceptions;
 };
 
-internal record MappedBetaCommand(string Id, int preInterceptions, int postInterceptions) : ICommand
+internal record MappedBetaCommand(string Id, int preInterceptions, int postInterceptions) : IRequest
 {
     public int PreInterceptions { get; set; } = preInterceptions;
     public int PostInterceptions { get; set; } = postInterceptions;
 };
 
-internal record MappedBetaQuery(string Id, int preInterceptions, int postInterceptions) : IQuery<BetaResponse>
+internal record MappedBetaQuery(string Id, int preInterceptions, int postInterceptions) : IRequest<BetaResponse>
 {
     public int PreInterceptions { get; set; } = preInterceptions;
     public int PostInterceptions { get; set; } = postInterceptions;
@@ -32,7 +32,7 @@ internal record BetaResponse(string Content);
 
 internal class BetaModule : TychoModule
 {
-    protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services)
+    protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
         var thisModule = services.GetRequiredService<IModule>();
         module.SubscribesTo<EventToForward>(eventData => thisModule.Publish(eventData))

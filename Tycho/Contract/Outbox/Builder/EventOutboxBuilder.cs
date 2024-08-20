@@ -3,54 +3,46 @@ using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Messaging.Forwarders;
 using Tycho.Messaging.Handlers;
-using Tycho.Messaging.Interceptors;
 using Tycho.Messaging.Payload;
 
 namespace Tycho.Contract.Outbox.Builder
 {
-    internal partial class OutboxBuilder : IOutboxDefinition, IOutboxConsumer
+    internal partial class OutboxBuilder : IOutboxConsumer, IEventOutboxConsumer, IRequestOutboxConsumer, IOutboxDefinition, IEventOutboxDefinition, IRequestOutboxDefinition
     {
-        public IOutboxDefinition Publishes<Event>() where Event
-            : class, IEvent
+        IOutboxDefinition IEventOutboxDefinition.Declare<Event>()
         {
             AddMessageDefinition(typeof(Event), nameof(Event));
             return this;
         }
 
-        public IOutboxConsumer HandleEvent<Event>(Action<Event> action)
-            where Event : class, IEvent
+        IOutboxConsumer IEventOutboxConsumer.Handle<Event>(Action<Event> action)
         {
             var handler = new LambdaWrappingEventHandler<Event>(action);
             RegisterEventHandler(handler);
             return this;
         }
 
-        public IOutboxConsumer HandleEvent<Event>(Func<Event, Task> function)
-            where Event : class, IEvent
+        IOutboxConsumer IEventOutboxConsumer.Handle<Event>(Func<Event, Task> function)
         {
             var handler = new LambdaWrappingEventHandler<Event>(function);
             RegisterEventHandler(handler);
             return this;
         }
 
-        public IOutboxConsumer HandleEvent<Event>(Func<Event, CancellationToken, Task> function)
-            where Event : class, IEvent
+        IOutboxConsumer IEventOutboxConsumer.Handle<Event>(Func<Event, CancellationToken, Task> function)
         {
             var handler = new LambdaWrappingEventHandler<Event>(function);
             RegisterEventHandler(handler);
             return this;
         }
 
-        public IOutboxConsumer HandleEvent<Event>(IEventHandler<Event> handler)
-            where Event : class, IEvent
+        IOutboxConsumer IEventOutboxConsumer.Handle<Event>(IEventHandler<Event> handler)
         {
             RegisterEventHandler(handler);
             return this;
         }
 
-        public IOutboxConsumer HandleEvent<Event, Handler>()
-            where Handler : class, IEventHandler<Event>
-            where Event : class, IEvent
+        IOutboxConsumer IEventOutboxConsumer.Handle<Event, Handler>()
         {
             Func<Handler> handlerCreator = () => _instanceCreator.CreateInstance<Handler>();
             var handler = new TransientEventHandler<Event>(handlerCreator);
@@ -58,9 +50,7 @@ namespace Tycho.Contract.Outbox.Builder
             return this;
         }
 
-        public IOutboxConsumer ForwardEvent<Event, Module>()
-            where Event : class, IEvent
-            where Module : TychoModule
+        IOutboxConsumer IEventOutboxConsumer.Forward<Event, Module>()
         {
             Func<Event, Event> mapping = eventData => eventData;
             Func<IEventHandler<Event>> handlerCreator = () =>
@@ -72,10 +62,18 @@ namespace Tycho.Contract.Outbox.Builder
             return this;
         }
 
-        public IOutboxConsumer ForwardEvent<Event, Interceptor, Module>()
-            where Event : class, IEvent
-            where Interceptor : class, IEventInterceptor<Event>
-            where Module : TychoModule
+        IOutboxConsumer IEventOutboxConsumer.Forward<EventIn, EventOut, Module>(Func<EventIn, EventOut> eventMapping)
+        {
+            Func<IEventHandler<EventIn>> handlerCreator = () =>
+            {
+                return _instanceCreator.CreateInstance<EventDownForwarder<EventIn, EventOut, Module>>(eventMapping);
+            };
+            var handler = new TransientEventHandler<EventIn>(handlerCreator);
+            RegisterEventHandler(handler);
+            return this;
+        }
+
+        IOutboxConsumer IEventOutboxConsumer.ForwardWithInterception<Event, Interceptor, Module>()
         {
             Func<Event, Event> mapping = eventData => eventData;
             Func<IEventHandler<Event>> handlerCreator = () =>
@@ -88,25 +86,7 @@ namespace Tycho.Contract.Outbox.Builder
             return this;
         }
 
-        public IOutboxConsumer ForwardEvent<EventIn, EventOut, Module>(Func<EventIn, EventOut> eventMapping)
-            where EventIn : class, IEvent
-            where EventOut : class, IEvent
-            where Module : TychoModule
-        {
-            Func<IEventHandler<EventIn>> handlerCreator = () =>
-            {
-                return _instanceCreator.CreateInstance<EventDownForwarder<EventIn, EventOut, Module>>(eventMapping);
-            };
-            var handler = new TransientEventHandler<EventIn>(handlerCreator);
-            RegisterEventHandler(handler);
-            return this;
-        }
-
-        public IOutboxConsumer ForwardEvent<EventIn, EventOut, Interceptor, Module>(Func<EventIn, EventOut> eventMapping)
-            where EventIn : class, IEvent
-            where EventOut : class, IEvent
-            where Interceptor : class, IEventInterceptor<EventOut>
-            where Module : TychoModule
+        IOutboxConsumer IEventOutboxConsumer.ForwardWithInterception<EventIn, EventOut, Interceptor, Module>(Func<EventIn, EventOut> eventMapping)
         {
             Func<IEventHandler<EventIn>> handlerCreator = () =>
             {
@@ -118,8 +98,7 @@ namespace Tycho.Contract.Outbox.Builder
             return this;
         }
 
-        public IOutboxConsumer ExposeEvent<Event>()
-            where Event : class, IEvent
+        IOutboxConsumer IEventOutboxConsumer.Expose<Event>()
         {
             Func<Event, Event> mapping = eventData => eventData;
             Func<IEventHandler<Event>> handlerCreator = () =>
@@ -131,9 +110,18 @@ namespace Tycho.Contract.Outbox.Builder
             return this;
         }
 
-        public IOutboxConsumer ExposeEvent<Event, Interceptor>()
-            where Event : class, IEvent
-            where Interceptor : class, IEventInterceptor<Event>
+        IOutboxConsumer IEventOutboxConsumer.Expose<EventIn, EventOut>(Func<EventIn, EventOut> eventMapping)
+        {
+            Func<IEventHandler<EventIn>> handlerCreator = () =>
+            {
+                return _instanceCreator.CreateInstance<EventUpForwarder<EventIn, EventOut>>(eventMapping);
+            };
+            var handler = new TransientEventHandler<EventIn>(handlerCreator);
+            RegisterEventHandler(handler);
+            return this;
+        }
+
+        IOutboxConsumer IEventOutboxConsumer.ExposeWithInterception<Event, Interceptor>()
         {
             Func<Event, Event> mapping = eventData => eventData;
             Func<IEventHandler<Event>> handlerCreator = () =>
@@ -146,23 +134,7 @@ namespace Tycho.Contract.Outbox.Builder
             return this;
         }
 
-        public IOutboxConsumer ExposeEvent<EventIn, EventOut>(Func<EventIn, EventOut> eventMapping)
-            where EventIn : class, IEvent
-            where EventOut : class, IEvent
-        {
-            Func<IEventHandler<EventIn>> handlerCreator = () =>
-            {
-                return _instanceCreator.CreateInstance<EventUpForwarder<EventIn, EventOut>>(eventMapping);
-            };
-            var handler = new TransientEventHandler<EventIn>(handlerCreator);
-            RegisterEventHandler(handler);
-            return this;
-        }
-
-        public IOutboxConsumer ExposeEvent<EventIn, EventOut, Interceptor>(Func<EventIn, EventOut> eventMapping)
-            where EventIn : class, IEvent
-            where EventOut : class, IEvent
-            where Interceptor : class, IEventInterceptor<EventOut>
+        IOutboxConsumer IEventOutboxConsumer.ExposeWithInterception<EventIn, EventOut, Interceptor>(Func<EventIn, EventOut> eventMapping)
         {
             Func<IEventHandler<EventIn>> handlerCreator = () =>
             {

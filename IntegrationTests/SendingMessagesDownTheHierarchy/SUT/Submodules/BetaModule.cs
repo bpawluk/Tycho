@@ -11,17 +11,17 @@ namespace IntegrationTests.SendingMessagesDownTheHierarchy.SUT.Submodules;
 
 // Incoming
 internal record BetaDownstreamEvent(string Id) : IEvent;
-internal record BetaDownstreamCommand(string Id) : ICommand;
-internal record BetaDownstreamQuery(string Id) : IQuery<string>;
+internal record BetaDownstreamCommand(string Id) : IRequest;
+internal record BetaDownstreamQuery(string Id) : IRequest<string>;
 
 // Outgoing
 internal record BetaUpstreamEvent(string Id) : IEvent;
-internal record BetaUpstreamCommand(string Id) : ICommand;
-internal record BetaUpstreamQuery(string Id) : IQuery<string>;
+internal record BetaUpstreamCommand(string Id) : IRequest;
+internal record BetaUpstreamQuery(string Id) : IRequest<string>;
 
 internal class BetaModule : TychoModule
 {
-    protected override void DeclareIncomingMessages(IInboxDefinition module, IServiceProvider services)
+    protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
         var gammaModule = services.GetRequiredService<IModule<GammaModule>>();
 

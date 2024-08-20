@@ -52,7 +52,7 @@ namespace Tycho.Messaging.Handlers
     internal class LambdaWrappingCommandHandler<Command>
         : LambdaWrappingBase<Command, Task>
         , ICommandHandler<Command>
-        where Command : class, ICommand
+        where Command : class, IRequest
     {
         public LambdaWrappingCommandHandler(Action<Command> handler)
             : base(Wrap(handler, Task.CompletedTask)) { }
@@ -72,7 +72,7 @@ namespace Tycho.Messaging.Handlers
     internal class LambdaWrappingQueryHandler<Query, Response>
         : LambdaWrappingBase<Query, Task<Response>>
         , IQueryHandler<Query, Response>
-        where Query : class, IQuery<Response>
+        where Query : class, IRequest<Response>
     {
         public LambdaWrappingQueryHandler(Func<Query, Response> handler)
             : base(Wrap(handler)) { }

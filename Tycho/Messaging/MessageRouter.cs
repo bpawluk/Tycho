@@ -31,7 +31,7 @@ namespace Tycho.Messaging
         }
 
         public ICommandHandler<Command> GetCommandHandler<Command>()
-            where Command : class, ICommand
+            where Command : class, IRequest
         {
             if (_commandHandlers.TryGetValue(typeof(Command), out var commandHandler))
             {
@@ -42,7 +42,7 @@ namespace Tycho.Messaging
         }
 
         public IQueryHandler<Query, Response> GetQueryHandler<Query, Response>()
-            where Query : class, IQuery<Response>
+            where Query : class, IRequest<Response>
         {
             if (_queryHandlers.TryGetValue(typeof(Query), out var queryHandler))
             {
@@ -69,7 +69,7 @@ namespace Tycho.Messaging
         }
 
         public void RegisterCommandHandler<Command>(ICommandHandler<Command> commandHandler)
-            where Command : class, ICommand
+            where Command : class, IRequest
         {
             if (commandHandler is null)
             {
@@ -83,7 +83,7 @@ namespace Tycho.Messaging
         }
 
         public void RegisterQueryHandler<Query, Response>(IQueryHandler<Query, Response> queryHandler)
-            where Query : class, IQuery<Response>
+            where Query : class, IRequest<Response>
         {
             if (queryHandler is null)
             {
