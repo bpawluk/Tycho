@@ -25,17 +25,17 @@ internal class BetaModule : TychoModule
     {
         var gammaModule = services.GetRequiredService<IModule<GammaModule>>();
 
-        module.SubscribesTo<BetaDownstreamEvent>(eventData =>
+        module.Events.Handle<BetaDownstreamEvent>(eventData =>
         {
             gammaModule.Publish<GammaDownstreamEvent>(new(eventData.Id));
         });
 
-        module.Executes<BetaDownstreamCommand>(commandData =>
+        module.Requests.Handle<BetaDownstreamCommand>(commandData =>
         {
             gammaModule.Execute<GammaDownstreamCommand>(new(commandData.Id));
         });
 
-        module.RespondsTo<BetaDownstreamQuery, string>(queryData =>
+        module.Requests.Handle<BetaDownstreamQuery, string>(queryData =>
         {
             return gammaModule.Execute<GammaDownstreamQuery, string>(new(queryData.Id));
         });
@@ -43,9 +43,9 @@ internal class BetaModule : TychoModule
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services)
     {
-        module.Publishes<BetaUpstreamEvent>()
-              .Sends<BetaUpstreamCommand>()
-              .Sends<BetaUpstreamQuery, string>();
+        module.Events.Declare<BetaUpstreamEvent>()
+              .Requests.Declare<BetaUpstreamCommand>()
+              .Requests.Declare<BetaUpstreamQuery, string>();
     }
 
     protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services)
@@ -54,17 +54,17 @@ internal class BetaModule : TychoModule
         {
             var thisModule = services.GetRequiredService<IModule>();
 
-            consumer.HandleEvent<GammaUpstreamEvent>(eventData =>
+            consumer.Events.Handle<GammaUpstreamEvent>(eventData =>
             {
                 thisModule.Publish<BetaUpstreamEvent>(new(eventData.Id));
             });
 
-            consumer.HandleCommand<GammaUpstreamCommand>(commandData =>
+            consumer.Requests.Handle<GammaUpstreamCommand>(commandData =>
             {
                 thisModule.Execute<BetaUpstreamCommand>(new(commandData.Id));
             });
 
-            consumer.HandleQuery<GammaUpstreamQuery, string>(queryData =>
+            consumer.Requests.Handle<GammaUpstreamQuery, string>(queryData =>
             {
                 return thisModule.Execute<BetaUpstreamQuery, string>(new(queryData.Id));
             });

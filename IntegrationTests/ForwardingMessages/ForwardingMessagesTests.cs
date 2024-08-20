@@ -23,16 +23,16 @@ public class ForwardingMessagesTests : IAsyncLifetime
         _sut = await new AppModule()
             .FulfillContract(consumer =>
             {
-                consumer.HandleEvent<EventToForward>(eventData => _testWorkflowTcs.SetResult(new(eventData.Id, eventData.PreInterceptions, eventData.PostInterceptions)))
-                        .HandleEvent<MappedEvent>(eventData => _testWorkflowTcs.SetResult(new(eventData.Id, eventData.PreInterceptions, eventData.PostInterceptions)))
-                        .HandleCommand<CommandToForward>(commandData => _testWorkflowTcs.SetResult(new(commandData.Id, commandData.PreInterceptions, commandData.PostInterceptions)))
-                        .HandleCommand<MappedCommand>(commandData => _testWorkflowTcs.SetResult(new(commandData.Id, commandData.PreInterceptions, commandData.PostInterceptions)))
-                        .HandleQuery<QueryToForward, string>(queryData =>
+                consumer.Events.Handle<EventToForward>(eventData => _testWorkflowTcs.SetResult(new(eventData.Id, eventData.PreInterceptions, eventData.PostInterceptions)))
+                        .Events.Handle<MappedEvent>(eventData => _testWorkflowTcs.SetResult(new(eventData.Id, eventData.PreInterceptions, eventData.PostInterceptions)))
+                        .Requests.Handle<CommandToForward>(commandData => _testWorkflowTcs.SetResult(new(commandData.Id, commandData.PreInterceptions, commandData.PostInterceptions)))
+                        .Requests.Handle<MappedCommand>(commandData => _testWorkflowTcs.SetResult(new(commandData.Id, commandData.PreInterceptions, commandData.PostInterceptions)))
+                        .Requests.Handle<QueryToForward, string>(queryData =>
                         {
                             _testWorkflowTcs.SetResult(new(queryData.Id, queryData.PreInterceptions, queryData.PostInterceptions));
                             return _queryResponse;
                         })
-                        .HandleQuery<MappedQuery, string>(queryData =>
+                        .Requests.Handle<MappedQuery, string>(queryData =>
                         {
                             _testWorkflowTcs.SetResult(new(queryData.Id, queryData.PreInterceptions, queryData.PostInterceptions));
                             return _queryResponse;

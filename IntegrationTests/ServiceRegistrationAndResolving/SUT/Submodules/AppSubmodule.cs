@@ -20,7 +20,7 @@ internal class AppSubmodule : TychoModule
 {
     protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services) 
     {
-        module.RespondsTo<GetDataFromSubmoduleQuery, string>(_ => $"Response from {typeof(AppSubmodule).Name}");
+        module.Requests.Handle<GetDataFromSubmoduleQuery, string>(_ => $"Response from {typeof(AppSubmodule).Name}");
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services) { }

@@ -24,49 +24,49 @@ internal class AppModule : TychoModule
     protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
         var alphaSubmodule = services.GetRequiredService<IModule<AlphaModule>>()!;
-        module.Executes<BeginEventWorkflowCommand>(commandData => alphaSubmodule.Execute(commandData))
-              .Executes<BeginCommandWorkflowCommand>(commandData => alphaSubmodule.Execute(commandData))
-              .Executes<BeginQueryWorkflowCommand>(commandData => alphaSubmodule.Execute(commandData));
+        module.Requests.Handle<BeginEventWorkflowCommand>(commandData => alphaSubmodule.Execute(commandData))
+              .Requests.Handle<BeginCommandWorkflowCommand>(commandData => alphaSubmodule.Execute(commandData))
+              .Requests.Handle<BeginQueryWorkflowCommand>(commandData => alphaSubmodule.Execute(commandData));
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services)
     {
-        module.Publishes<EventWorkflowCompletedEvent>()
-              .Publishes<CommandWorkflowCompletedEvent>()
-              .Publishes<QueryWorkflowCompletedEvent>();
+        module.Events.Declare<EventWorkflowCompletedEvent>()
+              .Events.Declare<CommandWorkflowCompletedEvent>()
+              .Events.Declare<QueryWorkflowCompletedEvent>();
     }
 
     protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services)
     {
         module.AddSubmodule<AlphaModule>(consumer =>
         {
-            consumer.HandleEvent<AlphaEvent, AlphaBetaProxyHandler>()
-                    .HandleCommand<AlphaCommand, AlphaBetaProxyHandler>()
-                    .HandleQuery<AlphaQuery, string, AlphaBetaProxyHandler>();
+            consumer.Events.Handle<AlphaEvent, AlphaBetaProxyHandler>()
+                    .Requests.Handle<AlphaCommand, AlphaBetaProxyHandler>()
+                    .Requests.Handle<AlphaQuery, string, AlphaBetaProxyHandler>();
         });
 
         module.AddSubmodule<BetaModule>(consumer =>
         {
-            consumer.HandleEvent<BetaEvent, BetaGammaProxyHandler>()
-                    .HandleCommand<BetaCommand, BetaGammaProxyHandler>()
-                    .HandleQuery<BetaQuery, string, BetaGammaProxyHandler>();
+            consumer.Events.Handle<BetaEvent, BetaGammaProxyHandler>()
+                    .Requests.Handle<BetaCommand, BetaGammaProxyHandler>()
+                    .Requests.Handle<BetaQuery, string, BetaGammaProxyHandler>();
         });
 
         module.AddSubmodule<GammaModule>((consumer =>
         {
             var thisModule = services.GetService<IModule>()!;
 
-            consumer.HandleEvent<GammaEvent>(eventData =>
+            consumer.Events.Handle<GammaEvent>(eventData =>
             {
                 thisModule.Publish<EventWorkflowCompletedEvent>(new(eventData.Id));
             });
 
-            consumer.HandleCommand<GammaCommand>(commandData =>
+            consumer.Requests.Handle<GammaCommand>(commandData =>
             {
                 thisModule.Publish<CommandWorkflowCompletedEvent>(new(commandData.Id));
             });
 
-            consumer.HandleQuery<GammaQuery, string>(queryData =>
+            consumer.Requests.Handle<GammaQuery, string>(queryData =>
             {
                 thisModule.Publish<QueryWorkflowCompletedEvent>(new(queryData.Id));
                 return "Hello world!";

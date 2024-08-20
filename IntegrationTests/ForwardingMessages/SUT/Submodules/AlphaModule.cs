@@ -38,40 +38,40 @@ internal class AlphaModule : TychoModule
 {
     protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
-        module.ForwardsEvent<EventToForward, EventInterceptor, BetaModule>()
-              .ForwardsEvent<MappedAlphaEvent, MappedBetaEvent, EventInterceptor, BetaModule>(
+        module.Events.ForwardWithInterception<EventToForward, EventInterceptor, BetaModule>()
+              .Events.ForwardWithInterception<MappedAlphaEvent, MappedBetaEvent, EventInterceptor, BetaModule>(
                   eventData => new(eventData.Id, eventData.PreInterceptions, eventData.PostInterceptions))
-              .ForwardsCommand<CommandToForward, CommandInterceptor, BetaModule>()
-              .ForwardsCommand<MappedAlphaCommand, MappedBetaCommand, CommandInterceptor, BetaModule>(
+              .Requests.ForwardWithInterception<CommandToForward, CommandInterceptor, BetaModule>()
+              .Requests.ForwardWithInterception<MappedAlphaCommand, MappedBetaCommand, CommandInterceptor, BetaModule>(
                   commandData => new(commandData.Id, commandData.PreInterceptions, commandData.PostInterceptions))
-              .ForwardsQuery<QueryToForward, string, QueryInterceptor, BetaModule>()
-              .ForwardsQuery<MappedAlphaQuery, AlphaResponse, MappedBetaQuery, BetaResponse, QueryInterceptor, BetaModule>(
+              .Requests.ForwardWithInterception<QueryToForward, string, QueryInterceptor, BetaModule>()
+              .Requests.ForwardWithInterception<MappedAlphaQuery, AlphaResponse, MappedBetaQuery, BetaResponse, QueryInterceptor, BetaModule>(
                   queryData => new(queryData.Id, queryData.PreInterceptions, queryData.PostInterceptions), 
                   result => new(result.Content));
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services) 
     {
-        module.Publishes<EventToForward>()
-              .Publishes<MappedAlphaEvent>()
-              .Sends<CommandToForward>()
-              .Sends<MappedAlphaCommand>()
-              .Sends<QueryToForward, string>()
-              .Sends<MappedAlphaQuery, AlphaResponse>();
+        module.Events.Declare<EventToForward>()
+              .Events.Declare<MappedAlphaEvent>()
+              .Requests.Declare<CommandToForward>()
+              .Requests.Declare<MappedAlphaCommand>()
+              .Requests.Declare<QueryToForward, string>()
+              .Requests.Declare<MappedAlphaQuery, AlphaResponse>();
     }
 
     protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services) 
     {
         module.AddSubmodule<BetaModule>(consumer =>
         {
-            consumer.ExposeEvent<EventToForward, EventInterceptor>()
-                    .ExposeEvent<MappedBetaEvent, MappedAlphaEvent, EventInterceptor>(
+            consumer.Events.ExposeWithInterception<EventToForward, EventInterceptor>()
+                    .Events.ExposeWithInterception<MappedBetaEvent, MappedAlphaEvent, EventInterceptor>(
                         eventData => new(eventData.Id, eventData.PreInterceptions, eventData.PostInterceptions))
-                    .ExposeCommand<CommandToForward, CommandInterceptor>()
-                    .ExposeCommand<MappedBetaCommand, MappedAlphaCommand, CommandInterceptor>(
+                    .Requests.ExposeWithInterception<CommandToForward, CommandInterceptor>()
+                    .Requests.ExposeWithInterception<MappedBetaCommand, MappedAlphaCommand, CommandInterceptor>(
                         commandData => new(commandData.Id, commandData.PreInterceptions, commandData.PostInterceptions))
-                    .ExposeQuery<QueryToForward, string, QueryInterceptor>()
-                    .ExposeQuery<MappedBetaQuery, BetaResponse, MappedAlphaQuery, AlphaResponse, QueryInterceptor>(
+                    .Requests.ExposeWithInterception<QueryToForward, string, QueryInterceptor>()
+                    .Requests.ExposeWithInterception<MappedBetaQuery, BetaResponse, MappedAlphaQuery, AlphaResponse, QueryInterceptor>(
                         queryData => new(queryData.Id, queryData.PreInterceptions, queryData.PostInterceptions), 
                         result => new(result.Content));
         });

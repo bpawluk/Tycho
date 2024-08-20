@@ -35,22 +35,22 @@ internal class BetaModule : TychoModule
     protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
         var thisModule = services.GetRequiredService<IModule>();
-        module.SubscribesTo<EventToForward>(eventData => thisModule.Publish(eventData))
-              .SubscribesTo<MappedBetaEvent>(eventData => thisModule.Publish(eventData))
-              .Executes<CommandToForward>(commandData => thisModule.Execute(commandData))
-              .Executes<MappedBetaCommand>(commandData => thisModule.Execute(commandData))
-              .RespondsTo<QueryToForward, string>(queryData => thisModule.Execute<QueryToForward, string>(queryData))
-              .RespondsTo<MappedBetaQuery, BetaResponse>(queryData => thisModule.Execute<MappedBetaQuery, BetaResponse>(queryData));
+        module.Events.Handle<EventToForward>(eventData => thisModule.Publish(eventData))
+              .Events.Handle<MappedBetaEvent>(eventData => thisModule.Publish(eventData))
+              .Requests.Handle<CommandToForward>(commandData => thisModule.Execute(commandData))
+              .Requests.Handle<MappedBetaCommand>(commandData => thisModule.Execute(commandData))
+              .Requests.Handle<QueryToForward, string>(queryData => thisModule.Execute<QueryToForward, string>(queryData))
+              .Requests.Handle<MappedBetaQuery, BetaResponse>(queryData => thisModule.Execute<MappedBetaQuery, BetaResponse>(queryData));
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services)
     {
-        module.Publishes<EventToForward>()
-              .Publishes<MappedBetaEvent>()
-              .Sends<CommandToForward>()
-              .Sends<MappedBetaCommand>()
-              .Sends<QueryToForward, string>()
-              .Sends<MappedBetaQuery, BetaResponse>();
+        module.Events.Declare<EventToForward>()
+              .Events.Declare<MappedBetaEvent>()
+              .Requests.Declare<CommandToForward>()
+              .Requests.Declare<MappedBetaCommand>()
+              .Requests.Declare<QueryToForward, string>()
+              .Requests.Declare<MappedBetaQuery, BetaResponse>();
     }
 
     protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services) { }

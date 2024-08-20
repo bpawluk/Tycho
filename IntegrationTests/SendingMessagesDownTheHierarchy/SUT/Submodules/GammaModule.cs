@@ -25,17 +25,17 @@ internal class GammaModule : TychoModule
     {
         var thisModule = services.GetRequiredService<IModule>();
 
-        module.SubscribesTo<GammaDownstreamEvent>(eventData =>
+        module.Events.Handle<GammaDownstreamEvent>(eventData =>
         {
             thisModule.Publish<GammaUpstreamEvent>(new(eventData.Id));
         });
 
-        module.Executes<GammaDownstreamCommand>(commandData =>
+        module.Requests.Handle<GammaDownstreamCommand>(commandData =>
         {
             thisModule.Execute<GammaUpstreamCommand>(new(commandData.Id));
         });
 
-        module.RespondsTo<GammaDownstreamQuery, string>(queryData =>
+        module.Requests.Handle<GammaDownstreamQuery, string>(queryData =>
         {
             return thisModule.Execute<GammaUpstreamQuery, string>(new(queryData.Id));
         });
@@ -43,9 +43,9 @@ internal class GammaModule : TychoModule
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services)
     {
-        module.Publishes<GammaUpstreamEvent>()
-              .Sends<GammaUpstreamCommand>()
-              .Sends<GammaUpstreamQuery, string>();
+        module.Events.Declare<GammaUpstreamEvent>()
+              .Requests.Declare<GammaUpstreamCommand>()
+              .Requests.Declare<GammaUpstreamQuery, string>();
     }
 
     protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services) { }

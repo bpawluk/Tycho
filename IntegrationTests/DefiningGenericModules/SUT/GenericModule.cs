@@ -19,7 +19,7 @@ internal class GenericModule<T> : TychoModule
 {
     protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
-        module.RespondsTo<GenericQuery<T>, T>((query) => query.Data);
+        module.Requests.Handle<GenericQuery<T>, T>((query) => query.Data);
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services) { }

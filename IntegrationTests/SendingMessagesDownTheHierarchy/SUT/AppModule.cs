@@ -26,17 +26,17 @@ internal class AppModule : TychoModule
     {
         var alphaModule = services.GetRequiredService<IModule<AlphaModule>>();
 
-        module.Executes<BeginEventWorkflowCommand>(commandData =>
+        module.Requests.Handle<BeginEventWorkflowCommand>(commandData =>
         {
             alphaModule.Publish<AlphaDownstreamEvent>(new(commandData.Id));
         });
 
-        module.Executes<BeginCommandWorkflowCommand>(commandData =>
+        module.Requests.Handle<BeginCommandWorkflowCommand>(commandData =>
         {
             alphaModule.Execute<AlphaDownstreamCommand>(new(commandData.Id));
         });
 
-        module.Executes<BeginQueryWorkflowCommand>(commandData =>
+        module.Requests.Handle<BeginQueryWorkflowCommand>(commandData =>
         {
             alphaModule.Execute<AlphaDownstreamQuery, string>(new(commandData.Id));
         });
@@ -44,9 +44,9 @@ internal class AppModule : TychoModule
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services)
     {
-        module.Publishes<EventWorkflowCompletedEvent>()
-              .Publishes<CommandWorkflowCompletedEvent>()
-              .Publishes<QueryWorkflowCompletedEvent>();
+        module.Events.Declare<EventWorkflowCompletedEvent>()
+              .Events.Declare<CommandWorkflowCompletedEvent>()
+              .Events.Declare<QueryWorkflowCompletedEvent>();
     }
 
     protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services)
@@ -55,17 +55,17 @@ internal class AppModule : TychoModule
         {
             var thisModule = services.GetRequiredService<IModule>();
 
-            consumer.HandleEvent<AlphaUpstreamEvent>(eventData =>
+            consumer.Events.Handle<AlphaUpstreamEvent>(eventData =>
             {
                 thisModule.Publish<EventWorkflowCompletedEvent>(new(eventData.Id));
             });
 
-            consumer.HandleCommand<AlphaUpstreamCommand>(commandData =>
+            consumer.Requests.Handle<AlphaUpstreamCommand>(commandData =>
             {
                 thisModule.Publish<CommandWorkflowCompletedEvent>(new(commandData.Id));
             });
 
-            consumer.HandleQuery<AlphaUpstreamQuery, string>(queryData =>
+            consumer.Requests.Handle<AlphaUpstreamQuery, string>(queryData =>
             {
                 thisModule.Publish<QueryWorkflowCompletedEvent>(new(queryData.Id));
                 return "Hello world!";

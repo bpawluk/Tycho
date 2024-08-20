@@ -25,17 +25,17 @@ internal class BetaModule : TychoModule
     {
         var thisModule = services.GetRequiredService<IModule>();
 
-        module.SubscribesTo<FromAlphaEvent>(eventData =>
+        module.Events.Handle<FromAlphaEvent>(eventData =>
         {
             thisModule.Publish<BetaEvent>(new(eventData.Id));
         });
 
-        module.Executes<FromAlphaCommand>(commandData =>
+        module.Requests.Handle<FromAlphaCommand>(commandData =>
         {
             thisModule.Execute<BetaCommand>(new(commandData.Id));
         });
 
-        module.RespondsTo<FromAlphaQuery, string>(queryData =>
+        module.Requests.Handle<FromAlphaQuery, string>(queryData =>
         {
             return thisModule.Execute<BetaQuery, string>(new(queryData.Id));
         });
@@ -43,9 +43,9 @@ internal class BetaModule : TychoModule
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services)
     {
-        module.Publishes<BetaEvent>()
-              .Sends<BetaCommand>()
-              .Sends<BetaQuery, string>();
+        module.Events.Declare<BetaEvent>()
+              .Requests.Declare<BetaCommand>()
+              .Requests.Declare<BetaQuery, string>();
     }
 
     protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services) { }

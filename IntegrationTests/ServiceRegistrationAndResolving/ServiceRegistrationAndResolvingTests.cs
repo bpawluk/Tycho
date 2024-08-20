@@ -14,7 +14,7 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         _sut = await new AppModule()
             .FulfillContract(consumer =>
             {
-                consumer.IgnoreQuery<GetDataFromThisModulesClientQuery, string>(
+                consumer.Requests.Ignore<GetDataFromThisModulesClientQuery, string>(
                     $"Response from {typeof(ServiceRegistrationAndResolvingTests).Name}");
             })
             .Build();

@@ -35,42 +35,42 @@ internal class AppModule : TychoModule
     protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
         var thisModule = services.GetRequiredService<IModule>();
-        module.SubscribesTo<HandledByLambdaEvent>(e => thisModule.Publish(e))
-              .SubscribesTo<HandledByAsyncLambdaEvent>((e, t) =>
+        module.Events.Handle<HandledByLambdaEvent>(e => thisModule.Publish(e))
+              .Events.Handle<HandledByAsyncLambdaEvent>((e, t) =>
               {
                   thisModule.Publish(e, t);
                   return Task.CompletedTask;
               })
-              .SubscribesTo(new HandledByHandlerInstanceEventHandler(thisModule))
-              .SubscribesTo<HandledByHandlerTypeEvent, HandledByHandlerTypeEventHandler>();
+              .Events.Handle(new HandledByHandlerInstanceEventHandler(thisModule))
+              .Events.Handle<HandledByHandlerTypeEvent, HandledByHandlerTypeEventHandler>();
 
-        module.Executes<HandledByLambdaCommand>(c => { thisModule.Execute(c); })
-              .Executes<HandledByAsyncLambdaCommand>((c, t) => thisModule.Execute(c, t))
-              .Executes(new HandledByHandlerInstanceCommandHandler(thisModule))
-              .Executes<HandledByHandlerTypeCommand, HandledByHandlerTypeCommandHandler>();
+        module.Requests.Handle<HandledByLambdaCommand>(c => { thisModule.Execute(c); })
+              .Requests.Handle<HandledByAsyncLambdaCommand>((c, t) => thisModule.Execute(c, t))
+              .Requests.Handle(new HandledByHandlerInstanceCommandHandler(thisModule))
+              .Requests.Handle<HandledByHandlerTypeCommand, HandledByHandlerTypeCommandHandler>();
 
-        module.RespondsTo<HandledByLambdaQuery, string>(q => thisModule.Execute<HandledByLambdaQuery, string>(q).Result)
-              .RespondsTo<HandledByAsyncLambdaQuery, string>(thisModule.Execute<HandledByAsyncLambdaQuery, string>)
-              .RespondsTo(new HandledByHandlerInstanceQueryHandler(thisModule))
-              .RespondsTo<HandledByHandlerTypeQuery, string, HandledByHandlerTypeQueryHandler>();
+        module.Requests.Handle<HandledByLambdaQuery, string>(q => thisModule.Execute<HandledByLambdaQuery, string>(q).Result)
+              .Requests.Handle<HandledByAsyncLambdaQuery, string>(thisModule.Execute<HandledByAsyncLambdaQuery, string>)
+              .Requests.Handle(new HandledByHandlerInstanceQueryHandler(thisModule))
+              .Requests.Handle<HandledByHandlerTypeQuery, string, HandledByHandlerTypeQueryHandler>();
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services)
     {
-        module.Publishes<HandledByLambdaEvent>()
-              .Publishes<HandledByAsyncLambdaEvent>()
-              .Publishes<HandledByHandlerInstanceEvent>()
-              .Publishes<HandledByHandlerTypeEvent>();
+        module.Events.Declare<HandledByLambdaEvent>()
+              .Events.Declare<HandledByAsyncLambdaEvent>()
+              .Events.Declare<HandledByHandlerInstanceEvent>()
+              .Events.Declare<HandledByHandlerTypeEvent>();
 
-        module.Sends<HandledByLambdaCommand>()
-              .Sends<HandledByAsyncLambdaCommand>()
-              .Sends<HandledByHandlerInstanceCommand>()
-              .Sends<HandledByHandlerTypeCommand>();
+        module.Requests.Declare<HandledByLambdaCommand>()
+              .Requests.Declare<HandledByAsyncLambdaCommand>()
+              .Requests.Declare<HandledByHandlerInstanceCommand>()
+              .Requests.Declare<HandledByHandlerTypeCommand>();
 
-        module.Sends<HandledByLambdaQuery, string>()
-              .Sends<HandledByAsyncLambdaQuery, string>()
-              .Sends<HandledByHandlerInstanceQuery, string>()
-              .Sends<HandledByHandlerTypeQuery, string>();
+        module.Requests.Declare<HandledByLambdaQuery, string>()
+              .Requests.Declare<HandledByAsyncLambdaQuery, string>()
+              .Requests.Declare<HandledByHandlerInstanceQuery, string>()
+              .Requests.Declare<HandledByHandlerTypeQuery, string>();
     }
 
     protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services) { }

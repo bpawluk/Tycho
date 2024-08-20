@@ -20,9 +20,9 @@ public class PassingMessagesBetweenSubmodulesTests : IAsyncLifetime
         _sut = await new AppModule()
             .FulfillContract(consumer =>
             {
-                consumer.HandleEvent<EventWorkflowCompletedEvent>(eventData => _testWorkflowTcs.SetResult(eventData.Id));
-                consumer.HandleEvent<CommandWorkflowCompletedEvent>(commandData => _testWorkflowTcs.SetResult(commandData.Id));
-                consumer.HandleEvent<QueryWorkflowCompletedEvent>(queryData => _testWorkflowTcs.SetResult(queryData.Id));
+                consumer.Events.Handle<EventWorkflowCompletedEvent>(eventData => _testWorkflowTcs.SetResult(eventData.Id));
+                consumer.Events.Handle<CommandWorkflowCompletedEvent>(commandData => _testWorkflowTcs.SetResult(commandData.Id));
+                consumer.Events.Handle<QueryWorkflowCompletedEvent>(queryData => _testWorkflowTcs.SetResult(queryData.Id));
             })
             .Build();
     }

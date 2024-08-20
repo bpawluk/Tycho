@@ -22,8 +22,8 @@ internal class AppModule : TychoModule
 {
     protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
-        module.RespondsTo<GetConfiguredValueViaBindingQuery, int, GetConfiguredValueViaBindingQueryHandler>()
-              .RespondsTo<GetConfiguredValueViaIConfigurationQuery, DateTime, GetConfiguredValueViaIConfigurationQueryHandler>();
+        module.Requests.Handle<GetConfiguredValueViaBindingQuery, int, GetConfiguredValueViaBindingQueryHandler>()
+              .Requests.Handle<GetConfiguredValueViaIConfigurationQuery, DateTime, GetConfiguredValueViaIConfigurationQueryHandler>();
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services) { }

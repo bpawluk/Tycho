@@ -25,15 +25,15 @@ internal class AppModule : TychoModule
 {
     protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
-        module.RespondsTo<SingletonServiceWorkflowQuery, int, SingletonServiceWorkflowQueryHandler>()
-              .RespondsTo<TransientServiceWorkflowQuery, int, TransientServiceWorkflowQueryHandler>()
-              .RespondsTo<SubmoduleResolvingWorkflowQuery, string, SubmoduleResolvingWorkflowQueryHandler>()
-              .RespondsTo<ModuleResolvingWorkflowQuery, string, ModuleResolvingWorkflowQueryHandler>();
+        module.Requests.Handle<SingletonServiceWorkflowQuery, int, SingletonServiceWorkflowQueryHandler>()
+              .Requests.Handle<TransientServiceWorkflowQuery, int, TransientServiceWorkflowQueryHandler>()
+              .Requests.Handle<SubmoduleResolvingWorkflowQuery, string, SubmoduleResolvingWorkflowQueryHandler>()
+              .Requests.Handle<ModuleResolvingWorkflowQuery, string, ModuleResolvingWorkflowQueryHandler>();
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services) 
     {
-        module.Sends<GetDataFromThisModulesClientQuery, string>();
+        module.Requests.Declare<GetDataFromThisModulesClientQuery, string>();
     }
 
     protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services)

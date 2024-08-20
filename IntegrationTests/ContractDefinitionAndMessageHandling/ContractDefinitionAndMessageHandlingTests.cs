@@ -20,31 +20,31 @@ public class ContractDefinitionAndMessageHandlingTests : IAsyncLifetime
         _sut = await new AppModule()
             .FulfillContract(consumer =>
             {
-                consumer.HandleEvent<HandledByLambdaEvent>(_ => EventWorkflowCompleted = true)
-                        .HandleEvent<HandledByAsyncLambdaEvent>((_, _) =>
+                consumer.Events.Handle<HandledByLambdaEvent>(_ => EventWorkflowCompleted = true)
+                        .Events.Handle<HandledByAsyncLambdaEvent>((_, _) =>
                         {
                             EventWorkflowCompleted = true;
                             return Task.CompletedTask;
                         })
-                        .HandleEvent(new HandledByHandlerInstanceEventHandler(this))
-                        .HandleEvent<HandledByHandlerTypeEvent, HandledByHandlerTypeEventHandler>();
+                        .Events.Handle(new HandledByHandlerInstanceEventHandler(this))
+                        .Events.Handle<HandledByHandlerTypeEvent, HandledByHandlerTypeEventHandler>();
 
-                consumer.HandleCommand<HandledByLambdaCommand>(_ => CommandWorkflowCompleted = true)
-                        .HandleCommand<HandledByAsyncLambdaCommand>((_, _) =>
+                consumer.Requests.Handle<HandledByLambdaCommand>(_ => CommandWorkflowCompleted = true)
+                        .Requests.Handle<HandledByAsyncLambdaCommand>((_, _) =>
                         {
                             CommandWorkflowCompleted = true;
                             return Task.CompletedTask;
                         })
-                        .HandleCommand(new HandledByHandlerInstanceCommandHandler(this))
-                        .HandleCommand<HandledByHandlerTypeCommand, HandledByHandlerTypeCommandHandler>();
+                        .Requests.Handle(new HandledByHandlerInstanceCommandHandler(this))
+                        .Requests.Handle<HandledByHandlerTypeCommand, HandledByHandlerTypeCommandHandler>();
 
-                consumer.HandleQuery<HandledByLambdaQuery, string>(_ => QueryResponse)
-                        .HandleQuery<HandledByAsyncLambdaQuery, string>((_, _) =>
+                consumer.Requests.Handle<HandledByLambdaQuery, string>(_ => QueryResponse)
+                        .Requests.Handle<HandledByAsyncLambdaQuery, string>((_, _) =>
                         {
                             return Task.FromResult(QueryResponse);
                         })
-                        .HandleQuery(new HandledByHandlerInstanceQueryHandler(this))
-                        .HandleQuery<HandledByHandlerTypeQuery, string, HandledByHandlerTypeQueryHandler>();
+                        .Requests.Handle(new HandledByHandlerInstanceQueryHandler(this))
+                        .Requests.Handle<HandledByHandlerTypeQuery, string, HandledByHandlerTypeQueryHandler>();
             }, externalServiceCollection.BuildServiceProvider())
             .Build();
     }
