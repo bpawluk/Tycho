@@ -6,11 +6,11 @@ namespace UnitTests.Utils;
 
 public record TestMessageHandler()
     : IEventHandler<TestEvent>
-    , IRequestHandler<TestCommand>
-    , IRequestHandler<TestQuery, string>
+    , IRequestHandler<TestRequest>
+    , IRequestHandler<TestRequestWithResponse, string>
 {
     public bool HandlerCalled { get; private set; } = false;
-    public string QueryResponse { get; } = $"response from {nameof(TestMessageHandler)}";
+    public string RequestResponse { get; } = $"response from {nameof(TestMessageHandler)}";
 
     public Task Handle(TestEvent eventData, CancellationToken cancellationToken)
     {
@@ -18,57 +18,57 @@ public record TestMessageHandler()
         return Task.CompletedTask;
     }
 
-    public Task Handle(TestCommand commandData, CancellationToken cancellationToken)
+    public Task Handle(TestRequest requestData, CancellationToken cancellationToken)
     {
         HandlerCalled = true;
         return Task.CompletedTask;
     }
 
-    public Task<string> Handle(TestQuery query, CancellationToken cancellationToken)
+    public Task<string> Handle(TestRequestWithResponse request, CancellationToken cancellationToken)
     {
         HandlerCalled = true;
-        return Task.FromResult(QueryResponse);
+        return Task.FromResult(RequestResponse);
     }
 }
 
 public record OtherTestMessageHandler()
     : IEventHandler<TestEvent>
-    , IRequestHandler<TestCommand>
-    , IRequestHandler<TestQuery, string>
+    , IRequestHandler<TestRequest>
+    , IRequestHandler<TestRequestWithResponse, string>
 {
-    public string QueryResponse { get; } = $"response from {nameof(OtherTestMessageHandler)}";
+    public string RequestResponse { get; } = $"response from {nameof(OtherTestMessageHandler)}";
 
     public Task Handle(TestEvent eventData, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task Handle(TestCommand commandData, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task Handle(TestRequest requestData, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task<string> Handle(TestQuery query, CancellationToken cancellationToken) => Task.FromResult(QueryResponse);
+    public Task<string> Handle(TestRequestWithResponse request, CancellationToken cancellationToken) => Task.FromResult(RequestResponse);
 }
 
 public record YetAnotherTestMessageHandler()
     : IEventHandler<TestEvent>
-    , IRequestHandler<TestCommand>
-    , IRequestHandler<TestQuery, string>
+    , IRequestHandler<TestRequest>
+    , IRequestHandler<TestRequestWithResponse, string>
 {
-    public string QueryResponse { get; } = $"response from {nameof(YetAnotherTestMessageHandler)}";
+    public string RequestResponse { get; } = $"response from {nameof(YetAnotherTestMessageHandler)}";
 
     public Task Handle(TestEvent eventData, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task Handle(TestCommand commandData, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task Handle(TestRequest requestData, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task<string> Handle(TestQuery query, CancellationToken cancellationToken) => Task.FromResult(QueryResponse);
+    public Task<string> Handle(TestRequestWithResponse request, CancellationToken cancellationToken) => Task.FromResult(RequestResponse);
 }
 
 public record OtherMessageHandler()
     : IEventHandler<OtherEvent>
-    , IRequestHandler<OtherCommand>
-    , IRequestHandler<OtherQuery, object>
+    , IRequestHandler<OtherRequest>
+    , IRequestHandler<OtherRequestWithResponse, object>
 {
-    public object QueryResponse { get; } = new();
+    public object RequestResponse { get; } = new();
 
     public Task Handle(OtherEvent eventData, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task Handle(OtherCommand commandData, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task Handle(OtherRequest requestData, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task<object> Handle(OtherQuery query, CancellationToken cancellationToken) => Task.FromResult(QueryResponse);
+    public Task<object> Handle(OtherRequestWithResponse request, CancellationToken cancellationToken) => Task.FromResult(RequestResponse);
 }

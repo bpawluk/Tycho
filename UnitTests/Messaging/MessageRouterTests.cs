@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnitTests.Utils;
 using Tycho.Messaging;
 using Tycho.Messaging.Handlers;
+using UnitTests.Utils;
 
 namespace UnitTests.Messaging;
 
@@ -14,9 +14,9 @@ public class MessageRouterTests
     public MessageRouterTests()
     {
         _messageRouter = new MessageRouter();
-        _messageRouter.RegisterEventHandler<OtherEvent>(new OtherMessageHandler());
-        _messageRouter.RegisterRequestHandler<OtherCommand>(new OtherMessageHandler());
-        _messageRouter.RegisterRequestWithResponseHandler<OtherQuery, object>(new OtherMessageHandler());
+        _messageRouter.RegisterEventHandler(new OtherMessageHandler());
+        _messageRouter.RegisterRequestHandler(new OtherMessageHandler());
+        _messageRouter.RegisterRequestWithResponseHandler(new OtherMessageHandler());
     }
 
     [Fact]
@@ -37,7 +37,7 @@ public class MessageRouterTests
     {
         // Arrange
         var registeredHandler = new TestMessageHandler();
-        _messageRouter.RegisterEventHandler<TestEvent>(registeredHandler);
+        _messageRouter.RegisterEventHandler(registeredHandler);
 
         // Act
         var result = _messageRouter.GetEventHandlers<TestEvent>();
@@ -56,7 +56,7 @@ public class MessageRouterTests
             new OtherTestMessageHandler(),
             new YetAnotherTestMessageHandler()
         };
-        registeredHandlers.ForEach(_messageRouter.RegisterEventHandler<TestEvent>);
+        registeredHandlers.ForEach(_messageRouter.RegisterEventHandler);
 
         // Act
         var result = _messageRouter.GetEventHandlers<TestEvent>();
@@ -66,54 +66,54 @@ public class MessageRouterTests
     }
 
     [Fact]
-    public void GetCommandHandler_NoHandler_ThrowsKeyNotFoundException()
+    public void GetRequestHandler_NoHandler_ThrowsKeyNotFoundException()
     {
         // Arrange
-        IRequestHandler<TestCommand>? result = null;
+        IRequestHandler<TestRequest>? result = null;
 
         // Act
-        Assert.Throws<KeyNotFoundException>(() => result = _messageRouter.GetRequestHandler<TestCommand>());
+        Assert.Throws<KeyNotFoundException>(() => result = _messageRouter.GetRequestHandler<TestRequest>());
 
         // Assert
         Assert.Null(result);
     }
 
     [Fact]
-    public void GetCommandHandler_HandlerRegistered_ReturnsTheHandler()
+    public void GetRequestHandler_HandlerRegistered_ReturnsTheHandler()
     {
         // Arrange
         var registeredHandler = new TestMessageHandler();
-        _messageRouter.RegisterRequestHandler<TestCommand>(registeredHandler);
+        _messageRouter.RegisterRequestHandler(registeredHandler);
 
         // Act
-        var result = _messageRouter.GetRequestHandler<TestCommand>();
+        var result = _messageRouter.GetRequestHandler<TestRequest>();
 
         // Assert
         Assert.Equal(registeredHandler, result);
     }
 
     [Fact]
-    public void GetQueryHandler_NoHandler_ThrowsKeyNotFoundException()
+    public void GetRequestWithResponseHandler_NoHandler_ThrowsKeyNotFoundException()
     {
         // Arrange
-        IRequestHandler<TestQuery, string>? result = null;
+        IRequestHandler<TestRequestWithResponse, string>? result = null;
 
         // Act
-        Assert.Throws<KeyNotFoundException>(() => result = _messageRouter.GetRequestWithResponseHandler<TestQuery, string>());
+        Assert.Throws<KeyNotFoundException>(() => result = _messageRouter.GetRequestWithResponseHandler<TestRequestWithResponse, string>());
 
         // Assert
         Assert.Null(result);
     }
 
     [Fact]
-    public void GetQueryHandler_HandlerRegistered_ReturnsTheHandler()
+    public void GetRequestWithResponseHandler_HandlerRegistered_ReturnsTheHandler()
     {
         // Arrange
         var registeredHandler = new TestMessageHandler();
-        _messageRouter.RegisterRequestWithResponseHandler<TestQuery, string>(registeredHandler);
+        _messageRouter.RegisterRequestWithResponseHandler(registeredHandler);
 
         // Act
-        var result = _messageRouter.GetRequestWithResponseHandler<TestQuery, string>();
+        var result = _messageRouter.GetRequestWithResponseHandler<TestRequestWithResponse, string>();
 
         // Assert
         Assert.Equal(registeredHandler, result);
@@ -139,7 +139,7 @@ public class MessageRouterTests
         var handlerToRegister = new TestMessageHandler();
 
         // Act
-        _messageRouter.RegisterEventHandler<TestEvent>(handlerToRegister);
+        _messageRouter.RegisterEventHandler(handlerToRegister);
 
         // Assert
         Assert.Single(_messageRouter.GetEventHandlers<TestEvent>(), handlerToRegister);
@@ -155,10 +155,10 @@ public class MessageRouterTests
             new OtherTestMessageHandler(),
             new YetAnotherTestMessageHandler()
         };
-        registeredHandlers.ForEach(_messageRouter.RegisterEventHandler<TestEvent>);
+        registeredHandlers.ForEach(_messageRouter.RegisterEventHandler);
 
         // Act
-        _messageRouter.RegisterEventHandler<TestEvent>(handlerToRegister);
+        _messageRouter.RegisterEventHandler(handlerToRegister);
 
         // Assert
         Assert.Equal(registeredHandlers.Append(handlerToRegister), _messageRouter.GetEventHandlers<TestEvent>());
@@ -166,84 +166,84 @@ public class MessageRouterTests
     }
 
     [Fact]
-    public void RegisterCommandHandler_NullHandlerProvided_ThrowsArgumentException()
+    public void RegisterRequestHandler_NullHandlerProvided_ThrowsArgumentException()
     {
         // Arrange
         // - no arrangement required
 
         // Act
-        Assert.Throws<ArgumentException>(() => _messageRouter.RegisterRequestHandler<TestCommand>(null!));
+        Assert.Throws<ArgumentException>(() => _messageRouter.RegisterRequestHandler<TestRequest>(null!));
 
         // Assert
-        Assert.Throws<KeyNotFoundException>(_messageRouter.GetRequestHandler<TestCommand>);
+        Assert.Throws<KeyNotFoundException>(_messageRouter.GetRequestHandler<TestRequest>);
     }
 
     [Fact]
-    public void RegisterCommandHandler_NoHandler_RegistersTheHandler()
+    public void RegisterRequestHandler_NoHandler_RegistersTheHandler()
     {
         // Arrange
         var handlerToRegister = new TestMessageHandler();
 
         // Act
-        _messageRouter.RegisterRequestHandler<TestCommand>(handlerToRegister);
+        _messageRouter.RegisterRequestHandler(handlerToRegister);
 
         // Assert
-        Assert.Equal(handlerToRegister, _messageRouter.GetRequestHandler<TestCommand>());
+        Assert.Equal(handlerToRegister, _messageRouter.GetRequestHandler<TestRequest>());
     }
 
     [Fact]
-    public void RegisterCommandHandler_AHandlerAlreadyRegistered_ThrowsArgumentException()
+    public void RegisterRequestHandler_AHandlerAlreadyRegistered_ThrowsArgumentException()
     {
         // Arrange
         var handlerToRegister = new TestMessageHandler();
         var registeredHandler = new OtherTestMessageHandler();
-        _messageRouter.RegisterRequestHandler<TestCommand>(registeredHandler);
+        _messageRouter.RegisterRequestHandler(registeredHandler);
 
         // Act
-        Assert.Throws<ArgumentException>(() => _messageRouter.RegisterRequestHandler<TestCommand>(handlerToRegister));
+        Assert.Throws<ArgumentException>(() => _messageRouter.RegisterRequestHandler(handlerToRegister));
 
         // Assert
-        Assert.Equal(registeredHandler, _messageRouter.GetRequestHandler<TestCommand>());
+        Assert.Equal(registeredHandler, _messageRouter.GetRequestHandler<TestRequest>());
     }
 
     [Fact]
-    public void RegisterQueryHandler_NullHandlerProvided_ThrowsArgumentException()
+    public void RegisterRequestWithResponseHandler_NullHandlerProvided_ThrowsArgumentException()
     {
         // Arrange
         // - no arrangement required
 
         // Act
-        Assert.Throws<ArgumentException>(() => _messageRouter.RegisterRequestWithResponseHandler<TestQuery, string>(null!));
+        Assert.Throws<ArgumentException>(() => _messageRouter.RegisterRequestWithResponseHandler<TestRequestWithResponse, string>(null!));
 
         // Assert
-        Assert.Throws<KeyNotFoundException>(_messageRouter.GetRequestWithResponseHandler<TestQuery, string>);
+        Assert.Throws<KeyNotFoundException>(_messageRouter.GetRequestWithResponseHandler<TestRequestWithResponse, string>);
     }
 
     [Fact]
-    public void RegisterQueryHandler_NoHandler_RegistersTheHandler()
+    public void RegisterRequestWithResponseHandler_NoHandler_RegistersTheHandler()
     {
         // Arrange
         var handlerToRegister = new TestMessageHandler();
 
         // Act
-        _messageRouter.RegisterRequestWithResponseHandler<TestQuery, string>(handlerToRegister);
+        _messageRouter.RegisterRequestWithResponseHandler(handlerToRegister);
 
         // Assert
-        Assert.Equal(handlerToRegister, _messageRouter.GetRequestWithResponseHandler<TestQuery, string>());
+        Assert.Equal(handlerToRegister, _messageRouter.GetRequestWithResponseHandler<TestRequestWithResponse, string>());
     }
 
     [Fact]
-    public void RegisterQueryHandler_AHandlerAlreadyRegistered_ThrowsArgumentException()
+    public void RegisterRequestWithResponseHandler_AHandlerAlreadyRegistered_ThrowsArgumentException()
     {
         // Arrange
         var handlerToRegister = new TestMessageHandler();
         var registeredHandler = new OtherTestMessageHandler();
-        _messageRouter.RegisterRequestWithResponseHandler<TestQuery, string>(registeredHandler);
+        _messageRouter.RegisterRequestWithResponseHandler(registeredHandler);
 
         // Act
-        Assert.Throws<ArgumentException>(() => _messageRouter.RegisterRequestWithResponseHandler<TestQuery, string>(handlerToRegister));
+        Assert.Throws<ArgumentException>(() => _messageRouter.RegisterRequestWithResponseHandler(handlerToRegister));
 
         // Assert
-        Assert.Equal(registeredHandler, _messageRouter.GetRequestWithResponseHandler<TestQuery, string>());
+        Assert.Equal(registeredHandler, _messageRouter.GetRequestWithResponseHandler<TestRequestWithResponse, string>());
     }
 }

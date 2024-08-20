@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using UnitTests.Utils;
 using Tycho.Messaging.Handlers;
+using UnitTests.Utils;
 
 namespace UnitTests.Messaging.Handlers;
 
@@ -68,133 +68,133 @@ public class LambdaWrappingHandlerTests
     }
 
     [Fact]
-    public async Task LambdaWrappingCommandHandler_WrapsAction()
+    public async Task LambdaWrappingRequestHandler_WrapsAction()
     {
         // Arrange
-        TestCommand? passedCommand = null;
-        var lambda = (TestCommand commandData) => { passedCommand = commandData; };
-        var handler = new LambdaWrappingRequestHandler<TestCommand>(lambda);
+        TestRequest? passedRequest = null;
+        var lambda = (TestRequest requestData) => { passedRequest = requestData; };
+        var handler = new LambdaWrappingRequestHandler<TestRequest>(lambda);
 
         // Act
-        var commandToExecute = new TestCommand("test-command");
-        await handler.Handle(commandToExecute, CancellationToken.None);
+        var requestToExecute = new TestRequest("test-request");
+        await handler.Handle(requestToExecute, CancellationToken.None);
 
         // Assert
-        Assert.Equal(commandToExecute, passedCommand);
+        Assert.Equal(requestToExecute, passedRequest);
     }
 
     [Fact]
-    public async Task LambdaWrappingCommandHandler_WrapsAsyncAction()
+    public async Task LambdaWrappingRequestHandler_WrapsAsyncAction()
     {
         // Arrange
-        TestCommand? passedCommand = null;
-        var lambda = async (TestCommand commandData) =>
+        TestRequest? passedRequest = null;
+        var lambda = async (TestRequest requestData) =>
         {
             await Task.Delay(100);
-            passedCommand = commandData;
+            passedRequest = requestData;
         };
-        var handler = new LambdaWrappingRequestHandler<TestCommand>(lambda);
+        var handler = new LambdaWrappingRequestHandler<TestRequest>(lambda);
 
         // Act
-        var commandToExecute = new TestCommand("test-command");
-        await handler.Handle(commandToExecute, CancellationToken.None);
+        var requestToExecute = new TestRequest("test-request");
+        await handler.Handle(requestToExecute, CancellationToken.None);
 
         // Assert
-        Assert.Equal(commandToExecute, passedCommand);
+        Assert.Equal(requestToExecute, passedRequest);
     }
 
     [Fact]
-    public async Task LambdaWrappingCommandHandler_WrapsAsyncActionWithToken()
+    public async Task LambdaWrappingRequestHandler_WrapsAsyncActionWithToken()
     {
         // Arrange
-        TestCommand? passedCommand = null;
+        TestRequest? passedRequest = null;
         CancellationToken? passedToken = null;
-        var lambda = async (TestCommand commandData, CancellationToken token) =>
+        var lambda = async (TestRequest requestData, CancellationToken token) =>
         {
             await Task.Delay(100, token);
-            passedCommand = commandData;
+            passedRequest = requestData;
             passedToken = token;
         };
-        var handler = new LambdaWrappingRequestHandler<TestCommand>(lambda);
+        var handler = new LambdaWrappingRequestHandler<TestRequest>(lambda);
 
         // Act
-        var commandToExecute = new TestCommand("test-command");
+        var requestToExecute = new TestRequest("test-request");
         var tokenToPass = new CancellationToken();
-        await handler.Handle(commandToExecute, tokenToPass);
+        await handler.Handle(requestToExecute, tokenToPass);
 
         // Assert
-        Assert.Equal(commandToExecute, passedCommand);
+        Assert.Equal(requestToExecute, passedRequest);
         Assert.Equal(tokenToPass, passedToken);
     }
 
     [Fact]
-    public async Task LambdaWrappingQueryHandler_WrapsFunc()
+    public async Task LambdaWrappingRequestWithResponseHandler_WrapsFunc()
     {
         // Arrange
         var expectedResult = "result";
-        TestQuery? passedQuery = null;
-        var lambda = (TestQuery queryData) => 
+        TestRequestWithResponse? passedRequest = null;
+        var lambda = (TestRequestWithResponse requestData) => 
         { 
-            passedQuery = queryData;
+            passedRequest = requestData;
             return expectedResult;
         };
-        var handler = new LambdaWrappingRequestHandler<TestQuery, string>(lambda);
+        var handler = new LambdaWrappingRequestHandler<TestRequestWithResponse, string>(lambda);
 
         // Act
-        var queryToExecute = new TestQuery("test-query");
-        var result = await handler.Handle(queryToExecute, CancellationToken.None);
+        var requestToExecute = new TestRequestWithResponse("test-request");
+        var result = await handler.Handle(requestToExecute, CancellationToken.None);
 
         // Assert
-        Assert.Equal(queryToExecute, passedQuery);
+        Assert.Equal(requestToExecute, passedRequest);
         Assert.Equal(expectedResult, result);
     }
 
     [Fact]
-    public async Task LambdaWrappingQueryHandler_WrapsAsyncFunc()
+    public async Task LambdaWrappingRequestWithResponseHandler_WrapsAsyncFunc()
     {
         // Arrange
         var expectedResult = "result";
-        TestQuery? passedQuery = null;
-        var lambda = async (TestQuery queryData) =>
+        TestRequestWithResponse? passedRequest = null;
+        var lambda = async (TestRequestWithResponse requestData) =>
         {
             await Task.Delay(100);
-            passedQuery = queryData;
+            passedRequest = requestData;
             return expectedResult;
         };
-        var handler = new LambdaWrappingRequestHandler<TestQuery, string>(lambda);
+        var handler = new LambdaWrappingRequestHandler<TestRequestWithResponse, string>(lambda);
 
         // Act
-        var queryToExecute = new TestQuery("test-query");
-        var result = await handler.Handle(queryToExecute, CancellationToken.None);
+        var requestToExecute = new TestRequestWithResponse("test-request");
+        var result = await handler.Handle(requestToExecute, CancellationToken.None);
 
         // Assert
-        Assert.Equal(queryToExecute, passedQuery);
+        Assert.Equal(requestToExecute, passedRequest);
         Assert.Equal(expectedResult, result);
     }
 
     [Fact]
-    public async Task LambdaWrappingQueryHandler_WrapsAsyncFuncWithToken()
+    public async Task LambdaWrappingRequestWithResponseHandler_WrapsAsyncFuncWithToken()
     {
         // Arrange
         var expectedResult = "result";
-        TestQuery? passedQuery = null;
+        TestRequestWithResponse? passedRequest = null;
         CancellationToken? passedToken = null;
-        var lambda = async (TestQuery queryData, CancellationToken token) =>
+        var lambda = async (TestRequestWithResponse requestData, CancellationToken token) =>
         {
             await Task.Delay(100, token);
-            passedQuery = queryData;
+            passedRequest = requestData;
             passedToken = token;
             return expectedResult;
         };
-        var handler = new LambdaWrappingRequestHandler<TestQuery, string>(lambda);
+        var handler = new LambdaWrappingRequestHandler<TestRequestWithResponse, string>(lambda);
 
         // Act
-        var queryToExecute = new TestQuery("test-query");
+        var requestToExecute = new TestRequestWithResponse("test-request");
         var tokenToPass = new CancellationToken();
-        var result = await handler.Handle(queryToExecute, tokenToPass);
+        var result = await handler.Handle(requestToExecute, tokenToPass);
 
         // Assert
-        Assert.Equal(queryToExecute, passedQuery);
+        Assert.Equal(requestToExecute, passedRequest);
         Assert.Equal(tokenToPass, passedToken);
         Assert.Equal(expectedResult, result);
     }

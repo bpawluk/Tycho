@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using UnitTests.Utils;
 using Tycho.Messaging.Handlers;
+using UnitTests.Utils;
 
 namespace UnitTests.Messaging.Handlers;
 
@@ -30,30 +30,30 @@ public class TransientHandlerTests
     }
 
     [Fact]
-    public async Task TransientCommandHandler_CreatesNewHandlerEachTime()
+    public async Task TransientRequestHandler_CreatesNewHandlerEachTime()
     {
         // Arrange
-        var handler = new TransientRequestHandler<TestCommand>(TestHandlerCreator<TestMessageHandler>);
+        var handler = new TransientRequestHandler<TestRequest>(TestHandlerCreator<TestMessageHandler>);
 
         // Act & Assert
-        await handler.Handle(new TestCommand("test-command"), CancellationToken.None);
+        await handler.Handle(new TestRequest("test-request"), CancellationToken.None);
         Assert.Equal(1, _testHandlerCreatorInvocationCount);
 
-        await handler.Handle(new TestCommand("test-command"), CancellationToken.None);
+        await handler.Handle(new TestRequest("test-request"), CancellationToken.None);
         Assert.Equal(2, _testHandlerCreatorInvocationCount);
     }
 
     [Fact]
-    public async Task TransientQueryHandler_CreatesNewHandlerEachTime()
+    public async Task TransientRequestWithResponseHandler_CreatesNewHandlerEachTime()
     {
         // Arrange
-        var handler = new TransientRequestHandler<TestQuery, string>(TestHandlerCreator<TestMessageHandler>);
+        var handler = new TransientRequestHandler<TestRequestWithResponse, string>(TestHandlerCreator<TestMessageHandler>);
 
         // Act & Assert
-        await handler.Handle(new TestQuery("test-query"), CancellationToken.None);
+        await handler.Handle(new TestRequestWithResponse("test-request"), CancellationToken.None);
         Assert.Equal(1, _testHandlerCreatorInvocationCount);
 
-        await handler.Handle(new TestQuery("test-query"), CancellationToken.None);
+        await handler.Handle(new TestRequestWithResponse("test-request"), CancellationToken.None);
         Assert.Equal(2, _testHandlerCreatorInvocationCount);
     }
 

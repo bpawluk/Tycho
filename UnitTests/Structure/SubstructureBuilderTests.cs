@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using UnitTests.Utils;
-using Tycho.Structure.Builders;
 using Tycho.Contract.Outbox;
+using Tycho.Structure.Builders;
+using UnitTests.Utils;
 
 namespace UnitTests.Structure;
 

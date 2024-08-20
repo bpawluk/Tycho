@@ -1,7 +1,7 @@
 ﻿using System;
-using UnitTests.Utils;
 using Tycho;
 using Tycho.Structure.Modules;
+using UnitTests.Utils;
 
 namespace UnitTests.Structure;
 

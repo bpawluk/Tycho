@@ -1,17 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using UnitTests.Utils;
+using Tycho.Contract.Outbox;
+using Tycho.Contract.Outbox.Builder;
 using Tycho.DependencyInjection;
 using Tycho.Messaging;
 using Tycho.Messaging.Handlers;
-using Tycho.Contract.Outbox.Builder;
+using UnitTests.Utils;
 
 namespace UnitTests.Contract;
 
 public class OutboxBuilderTests
 {
     private readonly OutboxBuilder _outboxBuilder;
+
+    private IOutboxConsumer OutboxConsumer => _outboxBuilder;
+
+    private IOutboxDefinition OutboxDefinition => _outboxBuilder;
 
     public OutboxBuilderTests()
     {
@@ -21,184 +26,180 @@ public class OutboxBuilderTests
     }
 
     [Fact]
-    public void PublishesEvent_EventAlreadyDefined_ThrowsArgumentException()
+    public void EventsDeclare_EventAlreadyDefined_ThrowsArgumentException()
     {
         // Arrange
-        _outboxBuilder.Publishes<TestEvent>();
+        OutboxDefinition.Events.Declare<TestEvent>();
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(_outboxBuilder.Publishes<TestEvent>);
+        Assert.Throws<ArgumentException>(OutboxDefinition.Events.Declare<TestEvent>);
     }
 
     [Fact]
-    public void SendsCommand_CommandAlreadyDefined_ThrowsArgumentException()
+    public void RequestsDeclare_RequestAlreadyDefined_ThrowsArgumentException()
     {
         // Arrange
-        _outboxBuilder.Sends<TestCommand>();
+        OutboxDefinition.Requests.Declare<TestRequest>();
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(_outboxBuilder.Sends<TestCommand>);
+        Assert.Throws<ArgumentException>(OutboxDefinition.Requests.Declare<TestRequest>);
     }
 
     [Fact]
-    public void SendsQuery_QueryAlreadyDefined_ThrowsArgumentException()
+    public void RequestsDeclareWithResponse_RequestAlreadyDefined_ThrowsArgumentException()
     {
         // Arrange
-        _outboxBuilder.Sends<TestQuery, string>();
+        OutboxDefinition.Requests.Declare<TestRequestWithResponse, string>();
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(_outboxBuilder.Sends<TestQuery, string>);
+        Assert.Throws<ArgumentException>(OutboxDefinition.Requests.Declare<TestRequestWithResponse, string>);
     }
 
     [Fact]
-    public void PassOn_EventNotDefined_ThrowsInvalidOperationException()
+    public void EventsForward_EventNotDefined_ThrowsInvalidOperationException()
     {
         // Arrange
         // - no arrangement required
 
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(_outboxBuilder.ForwardEvent<TestEvent, TestModule>);
+        Assert.Throws<InvalidOperationException>(OutboxConsumer.Events.Forward<TestEvent, TestModule>);
+        Assert.Throws<InvalidOperationException>(() => OutboxConsumer.Events.Forward<TestEvent, OtherEvent, TestModule>(eventData => new(int.MinValue)));
+    }
+
+    [Fact]
+    public void EventsExpose_EventNotDefined_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        // - no arrangement required
+
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(OutboxConsumer.Events.Expose<TestEvent>);
+        Assert.Throws<InvalidOperationException>(() => OutboxConsumer.Events.Expose<TestEvent, OtherEvent>(eventData => new(int.MinValue)));
+    }
+
+    [Fact]
+    public void EventsHandle_EventNotDefined_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        // - no arrangement required
+
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(() => OutboxConsumer.Events.Handle<TestEvent>(_ => { }));
+    }
+
+    [Fact]
+    public void RequestsForward_RequestNotDefined_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        // - no arrangement required
+
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(OutboxConsumer.Requests.Forward<TestRequest, TestModule>);
+        Assert.Throws<InvalidOperationException>(() => OutboxConsumer.Requests.Forward<TestRequest, OtherRequest, TestModule>(requestData => new(int.MinValue)));
+    }
+
+    [Fact]
+    public void RequestsExpose_RequestNotDefined_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        // - no arrangement required
+
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(OutboxConsumer.Requests.Expose<TestRequest>);
+        Assert.Throws<InvalidOperationException>(() => OutboxConsumer.Requests.Expose<TestRequest, OtherRequest>(requestData => new(int.MinValue)));
+    }
+
+    [Fact]
+    public void RequestsHandle_RequestNotDefined_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        // - no arrangement required
+
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(() => OutboxConsumer.Requests.Handle<TestRequest>(_ => Task.CompletedTask));
+    }
+
+    [Fact]
+    public void RequestsForwardWithResponse_RequestNotDefined_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        // - no arrangement required
+
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(OutboxConsumer.Requests.Forward<TestRequestWithResponse, string, TestModule>);
         Assert.Throws<InvalidOperationException>(
-            () => _outboxBuilder.ForwardEvent<TestEvent, OtherEvent, TestModule>(eventData => new(int.MinValue)));
-    }
-
-    [Fact]
-    public void ExposeEvent_EventNotDefined_ThrowsInvalidOperationException()
-    {
-        // Arrange
-        // - no arrangement required
-
-        // Act & Assert
-        Assert.Throws<InvalidOperationException>(_outboxBuilder.ExposeEvent<TestEvent>);
+            () => OutboxConsumer.Requests.Forward<TestRequestWithResponse, string, OtherTestRequestWithResponse, string, TestModule>(
+                requestData => new(requestData.Name), response => response));
         Assert.Throws<InvalidOperationException>(
-            () => _outboxBuilder.ExposeEvent<TestEvent, OtherEvent>(eventData => new(int.MinValue)));
+            () => OutboxConsumer.Requests.Forward<TestRequestWithResponse, string, OtherRequestWithResponse, object, TestModule>(
+                requestData => new(int.MinValue), response => response.ToString()!));
     }
 
     [Fact]
-    public void HandleEvent_EventNotDefined_ThrowsInvalidOperationException()
+    public void RequestsExposeWithResponse_RequestNotDefined_ThrowsInvalidOperationException()
     {
         // Arrange
         // - no arrangement required
 
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => _outboxBuilder.HandleEvent<TestEvent>(_ => { }));
-    }
-
-    [Fact]
-    public void Forward_CommandNotDefined_ThrowsInvalidOperationException()
-    {
-        // Arrange
-        // - no arrangement required
-
-        // Act & Assert
-        Assert.Throws<InvalidOperationException>(_outboxBuilder.ForwardCommand<TestCommand, TestModule>);
+        Assert.Throws<InvalidOperationException>(OutboxConsumer.Requests.Expose<TestRequestWithResponse, string>);
         Assert.Throws<InvalidOperationException>(
-            () => _outboxBuilder.ForwardCommand<TestCommand, OtherCommand, TestModule>(commandData => new(int.MinValue)));
+            () => OutboxConsumer.Requests.Expose<TestRequestWithResponse, string, OtherTestRequestWithResponse, string>(
+                requestData => new(requestData.Name), response => response));
+        Assert.Throws<InvalidOperationException>(
+            () => OutboxConsumer.Requests.Expose<TestRequestWithResponse, string, OtherRequestWithResponse, object>(
+                requestData => new(int.MinValue), response => response.ToString()!));
     }
 
     [Fact]
-    public void ExposeCommand_CommandNotDefined_ThrowsInvalidOperationException()
+    public void RequestsHandleWithResponse_RequestNotDefined_ThrowsInvalidOperationException()
     {
         // Arrange
         // - no arrangement required
 
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(_outboxBuilder.ExposeCommand<TestCommand>);
-        Assert.Throws<InvalidOperationException>(
-            () => _outboxBuilder.ExposeCommand<TestCommand, OtherCommand>(commandData => new(int.MinValue)));
-    }
-
-    [Fact]
-    public void HandleCommand_CommandNotDefined_ThrowsInvalidOperationException()
-    {
-        // Arrange
-        // - no arrangement required
-
-        // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => _outboxBuilder.HandleCommand<TestCommand>(_ => Task.CompletedTask));
-    }
-
-    [Fact]
-    public void Forward_QueryNotDefined_ThrowsInvalidOperationException()
-    {
-        // Arrange
-        // - no arrangement required
-
-        // Act & Assert
-        Assert.Throws<InvalidOperationException>(_outboxBuilder.ForwardQuery<TestQuery, string, TestModule>);
-        Assert.Throws<InvalidOperationException>(
-            () => _outboxBuilder.ForwardQuery<TestQuery, string, OtherTestQuery, string, TestModule>(
-                queryData => new(queryData.Name), response => response));
-        Assert.Throws<InvalidOperationException>(
-            () => _outboxBuilder.ForwardQuery<TestQuery, string, OtherQuery, object, TestModule>(
-                commandData => new(int.MinValue), response => response.ToString()!));
-    }
-
-    [Fact]
-    public void ExposeQuery_QueryNotDefined_ThrowsInvalidOperationException()
-    {
-        // Arrange
-        // - no arrangement required
-
-        // Act & Assert
-        Assert.Throws<InvalidOperationException>(_outboxBuilder.ExposeQuery<TestQuery, string>);
-        Assert.Throws<InvalidOperationException>(
-            () => _outboxBuilder.ExposeQuery<TestQuery, string, OtherTestQuery, string>(
-                queryData => new(queryData.Name), response => response));
-        Assert.Throws<InvalidOperationException>(
-            () => _outboxBuilder.ExposeQuery<TestQuery, string, OtherQuery, object>(
-                commandData => new(int.MinValue), response => response.ToString()!));
-    }
-
-    [Fact]
-    public void HandleQuery_QueryNotDefined_ThrowsInvalidOperationException()
-    {
-        // Arrange
-        // - no arrangement required
-
-        // Act & Assert
-        Assert.Throws<InvalidOperationException>(_outboxBuilder.HandleQuery<TestQuery, string, TestMessageHandler>);
+        Assert.Throws<InvalidOperationException>(OutboxConsumer.Requests.Handle<TestRequestWithResponse, string, TestMessageHandler>);
     }
 
     [Fact]
     public void Build_AllHandlersMissing_ThrowsInvalidOperationException()
     {
         // Arrange
-        _outboxBuilder.Publishes<TestEvent>();
-        _outboxBuilder.Sends<TestCommand>();
-        _outboxBuilder.Sends<TestQuery, string>();
+        OutboxDefinition.Events.Declare<TestEvent>();
+        OutboxDefinition.Requests.Declare<TestRequest>();
+        OutboxDefinition.Requests.Declare<TestRequestWithResponse, string>();
 
         // Act & Assert
         Assert.Throws<InvalidOperationException>(_outboxBuilder.Build);
     }
 
     [Fact]
-    public void Build_QueryHandlerMissing_ThrowsInvalidOperationException()
+    public void Build_RequestWithResponseHandlerMissing_ThrowsInvalidOperationException()
     {
         // Arrange
-        _outboxBuilder.Publishes<TestEvent>();
-        _outboxBuilder.HandleEvent<TestEvent>(_ => { });
+        OutboxDefinition.Events.Declare<TestEvent>();
+        OutboxConsumer.Events.Handle<TestEvent>(_ => { });
 
-        _outboxBuilder.Sends<TestCommand>();
-        _outboxBuilder.HandleCommand<TestCommand, TestMessageHandler>();
+        OutboxDefinition.Requests.Declare<TestRequest>();
+        OutboxConsumer.Requests.Handle<TestRequest, TestMessageHandler>();
 
-        _outboxBuilder.Sends<TestQuery, string>();
+        OutboxDefinition.Requests.Declare<TestRequestWithResponse, string>();
 
         // Act & Assert
         Assert.Throws<InvalidOperationException>(_outboxBuilder.Build);
     }
 
     [Fact]
-    public void Build_CommandHandlerMissing_ThrowsInvalidOperationException()
+    public void Build_RequestsHandlerMissing_ThrowsInvalidOperationException()
     {
         // Arrange
-        _outboxBuilder.Publishes<TestEvent>();
-        _outboxBuilder.HandleEvent<TestEvent>((_, _) => Task.CompletedTask);
+        OutboxDefinition.Events.Declare<TestEvent>();
+        OutboxConsumer.Events.Handle<TestEvent>((_, _) => Task.CompletedTask);
 
-        _outboxBuilder.Sends<TestCommand>();
+        OutboxDefinition.Requests.Declare<TestRequest>();
 
-        _outboxBuilder.Sends<TestQuery, string>();
-        _outboxBuilder.HandleQuery<TestQuery, string>(_ => Task.FromResult("test-response"));
+        OutboxDefinition.Requests.Declare<TestRequestWithResponse, string>();
+        OutboxConsumer.Requests.Handle<TestRequestWithResponse, string>(_ => Task.FromResult("test-response"));
 
         // Act & Assert
         Assert.Throws<InvalidOperationException>(_outboxBuilder.Build);
@@ -208,26 +209,26 @@ public class OutboxBuilderTests
     public async Task Build_EventHandlerMissing_ReturnsCorrectMessageBroker()
     {
         // Arrange
-        _outboxBuilder.Publishes<TestEvent>();
+        OutboxDefinition.Events.Declare<TestEvent>();
 
-        var commandHandler = new TestMessageHandler();
-        _outboxBuilder.Sends<TestCommand>();
-        _outboxBuilder.HandleCommand(commandHandler);
+        var requestHandler = new TestMessageHandler();
+        OutboxDefinition.Requests.Declare<TestRequest>();
+        OutboxConsumer.Requests.Handle<TestRequest>(requestHandler);
 
-        var queryHandler = new TestMessageHandler();
-        _outboxBuilder.Sends<TestQuery, string>();
-        _outboxBuilder.HandleQuery(queryHandler);
+        var requestWithResponseHandler = new TestMessageHandler();
+        OutboxDefinition.Requests.Declare<TestRequestWithResponse, string>();
+        OutboxConsumer.Requests.Handle<TestRequestWithResponse, string>(requestWithResponseHandler);
 
         // Act
         var broker = _outboxBuilder.Build();
         broker.Publish(new TestEvent("test-event"));
-        await broker.Execute(new TestCommand("test-command"));
-        var queryResponse = await broker.Execute<TestQuery, string>(new TestQuery("test-query"));
+        await broker.Execute(new TestRequest("test-request"));
+        var requestResponse = await broker.Execute<TestRequestWithResponse, string>(new TestRequestWithResponse("test-request"));
 
         // Assert
-        Assert.True(commandHandler.HandlerCalled);
-        Assert.True(queryHandler.HandlerCalled);
-        Assert.Equal(queryHandler.QueryResponse, queryResponse);
+        Assert.True(requestHandler.HandlerCalled);
+        Assert.True(requestWithResponseHandler.HandlerCalled);
+        Assert.Equal(requestWithResponseHandler.RequestResponse, requestResponse);
     }
 
     [Fact]
@@ -235,28 +236,28 @@ public class OutboxBuilderTests
     {
         // Arrange
         var eventHandler = new TestMessageHandler();
-        _outboxBuilder.Publishes<TestEvent>();
-        _outboxBuilder.HandleEvent(eventHandler);
+        OutboxDefinition.Events.Declare<TestEvent>();
+        OutboxConsumer.Events.Handle(eventHandler);
 
-        var commandHandler = new TestMessageHandler();
-        _outboxBuilder.Sends<TestCommand>();
-        _outboxBuilder.HandleCommand(commandHandler);
+        var requestHandler = new TestMessageHandler();
+        OutboxDefinition.Requests.Declare<TestRequest>();
+        OutboxConsumer.Requests.Handle<TestRequest>(requestHandler);
 
-        var queryHandler = new TestMessageHandler();
-        _outboxBuilder.Sends<TestQuery, string>();
-        _outboxBuilder.HandleQuery(queryHandler);
+        var requestWithResponseHandler = new TestMessageHandler();
+        OutboxDefinition.Requests.Declare<TestRequestWithResponse, string>();
+        OutboxConsumer.Requests.Handle<TestRequestWithResponse, string>(requestWithResponseHandler);
 
         // Act
         var broker = _outboxBuilder.Build();
         broker.Publish(new TestEvent("test-event"));
-        await broker.Execute(new TestCommand("test-command"));
-        var queryResponse = await broker.Execute<TestQuery, string>(new TestQuery("test-query"));
+        await broker.Execute(new TestRequest("test-request"));
+        var requestResponse = await broker.Execute<TestRequestWithResponse, string>(new TestRequestWithResponse("test-request"));
 
         // Assert
         Assert.True(eventHandler.HandlerCalled);
-        Assert.True(commandHandler.HandlerCalled);
-        Assert.True(queryHandler.HandlerCalled);
-        Assert.Equal(queryHandler.QueryResponse, queryResponse);
+        Assert.True(requestHandler.HandlerCalled);
+        Assert.True(requestWithResponseHandler.HandlerCalled);
+        Assert.Equal(requestWithResponseHandler.RequestResponse, requestResponse);
     }
 
     [Fact]
@@ -285,19 +286,19 @@ public class OutboxBuilderTests
             return Array.Empty<IEventHandler<Event>>();
         }
 
-        IRequestHandler<Command> IMessageRouter.GetRequestHandler<Command>() =>
-            (_handlers[typeof(Command)] as IRequestHandler<Command>)!;
+        IRequestHandler<Request> IMessageRouter.GetRequestHandler<Request>() =>
+            (_handlers[typeof(Request)] as IRequestHandler<Request>)!;
 
-        IRequestHandler<Query, Response> IMessageRouter.GetRequestWithResponseHandler<Query, Response>() =>
-            (_handlers[typeof(Query)] as IRequestHandler<Query, Response>)!;
+        IRequestHandler<Request, Response> IMessageRouter.GetRequestWithResponseHandler<Request, Response>() =>
+            (_handlers[typeof(Request)] as IRequestHandler<Request, Response>)!;
 
         void IMessageRouter.RegisterEventHandler<Event>(IEventHandler<Event> eventHandler) =>
             _handlers[typeof(Event)] = eventHandler;
 
-        void IMessageRouter.RegisterRequestHandler<Command>(IRequestHandler<Command> commandHandler) =>
-            _handlers[typeof(Command)] = commandHandler;
+        void IMessageRouter.RegisterRequestHandler<Request>(IRequestHandler<Request> requestHandler) =>
+            _handlers[typeof(Request)] = requestHandler;
 
-        void IMessageRouter.RegisterRequestWithResponseHandler<Query, Response>(IRequestHandler<Query, Response> queryHandler) =>
-            _handlers[typeof(Query)] = queryHandler;
+        void IMessageRouter.RegisterRequestWithResponseHandler<Request, Response>(IRequestHandler<Request, Response> requestHandler) =>
+            _handlers[typeof(Request)] = requestHandler;
     }
 }

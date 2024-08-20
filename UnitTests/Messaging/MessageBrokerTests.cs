@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using UnitTests.Utils;
 using Tycho.Messaging;
 using Tycho.Messaging.Handlers;
+using UnitTests.Utils;
 
 namespace UnitTests.Messaging;
 
@@ -12,8 +12,8 @@ public class MessageBrokerTests
 {
     private readonly Mock<IEventHandler<TestEvent>> _eventHandlerMock;
     private readonly Mock<IEventHandler<TestEvent>> _otherEventHandlerMock;
-    private readonly Mock<IRequestHandler<TestCommand>> _commandHandlerMock;
-    private readonly Mock<IRequestHandler<TestQuery, string>> _queryHandlerMock;
+    private readonly Mock<IRequestHandler<TestRequest>> _requestHandlerMock;
+    private readonly Mock<IRequestHandler<TestRequestWithResponse, string>> _requestWithResponseHandlerMock;
     private readonly Mock<IMessageRouter> _messageRouterMock;
     private readonly MessageBroker _messageBroker;
 
@@ -21,8 +21,8 @@ public class MessageBrokerTests
     {
         _eventHandlerMock = new Mock<IEventHandler<TestEvent>>();
         _otherEventHandlerMock = new Mock<IEventHandler<TestEvent>>();
-        _commandHandlerMock = new Mock<IRequestHandler<TestCommand>>();
-        _queryHandlerMock = new Mock<IRequestHandler<TestQuery, string>>();
+        _requestHandlerMock = new Mock<IRequestHandler<TestRequest>>();
+        _requestWithResponseHandlerMock = new Mock<IRequestHandler<TestRequestWithResponse, string>>();
         _messageRouterMock = new Mock<IMessageRouter>();
         _messageBroker = new MessageBroker(_messageRouterMock.Object);
     }
@@ -123,51 +123,51 @@ public class MessageBrokerTests
     }
 
     [Fact]
-    public async Task ExecuteCommand_NullCommandData_ThrowsArgumentException()
+    public async Task ExecuteRequest_NullRequestData_ThrowsArgumentException()
     {
         // Arrange
-        _messageRouterMock.Setup(router => router.GetRequestHandler<TestCommand>())
-                          .Returns(_commandHandlerMock.Object);
+        _messageRouterMock.Setup(router => router.GetRequestHandler<TestRequest>())
+                          .Returns(_requestHandlerMock.Object);
 
         // Act
-        await Assert.ThrowsAsync<ArgumentException>(() => _messageBroker.Execute<TestCommand>(null!, CancellationToken.None));
+        await Assert.ThrowsAsync<ArgumentException>(() => _messageBroker.Execute<TestRequest>(null!, CancellationToken.None));
 
         // Assert
-        _commandHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        _requestHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
-    public async Task ExecuteCommand_NoHandler_ThrowsNullReferenceException()
+    public async Task ExecuteRequest_NoHandler_ThrowsNullReferenceException()
     {
         // Arrange
         // - no arrangement required
 
         // Act
-        await Assert.ThrowsAsync<NullReferenceException>(() => _messageBroker.Execute<TestCommand>(new TestCommand("test-command"), CancellationToken.None));
+        await Assert.ThrowsAsync<NullReferenceException>(() => _messageBroker.Execute<TestRequest>(new TestRequest("test-request"), CancellationToken.None));
 
         // Assert
-        _commandHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        _requestHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
-    public async Task ExecuteCommand_HandlerPresent_CallsTheHandler()
+    public async Task ExecuteRequest_HandlerPresent_CallsTheHandler()
     {
         // Arrange
-        _messageRouterMock.Setup(router => router.GetRequestHandler<TestCommand>())
-                          .Returns(_commandHandlerMock.Object);
+        _messageRouterMock.Setup(router => router.GetRequestHandler<TestRequest>())
+                          .Returns(_requestHandlerMock.Object);
 
-        var commandToExecute = new TestCommand("test-command");
+        var requestToExecute = new TestRequest("test-request");
         var tokenToPass = new CancellationToken();
 
         // Act
-        await _messageBroker.Execute(commandToExecute, tokenToPass);
+        await _messageBroker.Execute(requestToExecute, tokenToPass);
 
         // Assert
-        _commandHandlerMock.Verify(handler => handler.Handle(commandToExecute, tokenToPass), Times.Once());
+        _requestHandlerMock.Verify(handler => handler.Handle(requestToExecute, tokenToPass), Times.Once());
     }
 
     [Fact]
-    public async Task ExecuteCommand_WithLongRunningHandler_CompletesWithTheHandler()
+    public async Task ExecuteRequest_WithLongRunningHandler_CompletesWithTheHandler()
     {
         // Arrange
         var handlerFinished = false;
@@ -177,75 +177,75 @@ public class MessageBrokerTests
             handlerFinished = true;
         };
 
-        _commandHandlerMock.Setup(handler => handler.Handle(It.IsAny<TestCommand>(), default))
+        _requestHandlerMock.Setup(handler => handler.Handle(It.IsAny<TestRequest>(), default))
                            .Returns(handlerWorkload);
 
-        _messageRouterMock.Setup(router => router.GetRequestHandler<TestCommand>())
-                          .Returns(_commandHandlerMock.Object);
+        _messageRouterMock.Setup(router => router.GetRequestHandler<TestRequest>())
+                          .Returns(_requestHandlerMock.Object);
 
-        var commandToExecute = new TestCommand("test-command");
+        var requestToExecute = new TestRequest("test-request");
         var tokenToPass = new CancellationToken();
 
         // Act
-        await _messageBroker.Execute(commandToExecute, tokenToPass);
+        await _messageBroker.Execute(requestToExecute, tokenToPass);
 
         // Assert
         Assert.True(handlerFinished);
-        _commandHandlerMock.Verify(handler => handler.Handle(commandToExecute, tokenToPass), Times.Once());
+        _requestHandlerMock.Verify(handler => handler.Handle(requestToExecute, tokenToPass), Times.Once());
     }
 
     [Fact]
-    public async Task ExecuteQuery_NullQueryData_ThrowsArgumentException()
+    public async Task ExecuteRequestWithResponse_NullRequestData_ThrowsArgumentException()
     {
         // Arrange
-        _messageRouterMock.Setup(router => router.GetRequestWithResponseHandler<TestQuery, string>())
-                          .Returns(_queryHandlerMock.Object);
+        _messageRouterMock.Setup(router => router.GetRequestWithResponseHandler<TestRequestWithResponse, string>())
+                          .Returns(_requestWithResponseHandlerMock.Object);
 
         // Act
-        await Assert.ThrowsAsync<ArgumentException>(() => _messageBroker.Execute<TestQuery, string>(null!, CancellationToken.None));
+        await Assert.ThrowsAsync<ArgumentException>(() => _messageBroker.Execute<TestRequestWithResponse, string>(null!, CancellationToken.None));
 
         // Assert
-        _queryHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestQuery>(), It.IsAny<CancellationToken>()), Times.Never());
+        _requestWithResponseHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestRequestWithResponse>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
-    public async Task ExecuteQuery_NoHandler_ThrowsNullReferenceException()
+    public async Task ExecuteRequestWithResponse_NoHandler_ThrowsNullReferenceException()
     {
         // Arrange
         // - no arrangement required
 
         // Act
-        await Assert.ThrowsAsync<NullReferenceException>(() => _messageBroker.Execute<TestQuery, string>(new TestQuery("test-query"), CancellationToken.None));
+        await Assert.ThrowsAsync<NullReferenceException>(() => _messageBroker.Execute<TestRequestWithResponse, string>(new TestRequestWithResponse("test-request"), CancellationToken.None));
 
         // Assert
-        _queryHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestQuery>(), It.IsAny<CancellationToken>()), Times.Never());
+        _requestWithResponseHandlerMock.Verify(handler => handler.Handle(It.IsAny<TestRequestWithResponse>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
-    public async Task ExecuteQuery_HandlerPresent_ReturnsTheResult()
+    public async Task ExecuteRequestWithResponse_HandlerPresent_ReturnsTheResult()
     {
         // Arrange
         var expectedResult = "result";
 
-        _queryHandlerMock.Setup(handler => handler.Handle(It.IsAny<TestQuery>(), default))
+        _requestWithResponseHandlerMock.Setup(handler => handler.Handle(It.IsAny<TestRequestWithResponse>(), default))
                          .ReturnsAsync(expectedResult);
 
-        _messageRouterMock.Setup(router => router.GetRequestWithResponseHandler<TestQuery, string>())
-                          .Returns(_queryHandlerMock.Object);
+        _messageRouterMock.Setup(router => router.GetRequestWithResponseHandler<TestRequestWithResponse, string>())
+                          .Returns(_requestWithResponseHandlerMock.Object);
 
-        var queryToExecute = new TestQuery("test-query");
+        var requestToExecute = new TestRequestWithResponse("test-request");
         var tokenToPass = new CancellationToken();
 
         // Act
-        var result = await _messageBroker.Execute<TestQuery, string>(queryToExecute, tokenToPass);
+        var result = await _messageBroker.Execute<TestRequestWithResponse, string>(requestToExecute, tokenToPass);
 
         // Assert
         Assert.Equal(expectedResult, result);
-        _queryHandlerMock.Verify(handler => handler.Handle(queryToExecute, tokenToPass), Times.Once());
+        _requestWithResponseHandlerMock.Verify(handler => handler.Handle(requestToExecute, tokenToPass), Times.Once());
     }
 
     [Fact]
-    public async Task ExecuteQuery_WithLongRunningHandler_CompletesWithTheHandler()
+    public async Task ExecuteRequestWithResponse_WithLongRunningHandler_CompletesWithTheHandler()
     {
         // Arrange
         var expectedResult = "result";
@@ -258,21 +258,21 @@ public class MessageBrokerTests
             return expectedResult;
         };
 
-        _queryHandlerMock.Setup(handler => handler.Handle(It.IsAny<TestQuery>(), default))
+        _requestWithResponseHandlerMock.Setup(handler => handler.Handle(It.IsAny<TestRequestWithResponse>(), default))
                          .Returns(handlerWorkload);
 
-        _messageRouterMock.Setup(router => router.GetRequestWithResponseHandler<TestQuery, string>())
-                          .Returns(_queryHandlerMock.Object);
+        _messageRouterMock.Setup(router => router.GetRequestWithResponseHandler<TestRequestWithResponse, string>())
+                          .Returns(_requestWithResponseHandlerMock.Object);
 
-        var queryToExecute = new TestQuery("test-query");
+        var requestToExecute = new TestRequestWithResponse("test-request");
         var tokenToPass = new CancellationToken();
 
         // Act
-        var result = await _messageBroker.Execute<TestQuery, string>(queryToExecute, tokenToPass);
+        var result = await _messageBroker.Execute<TestRequestWithResponse, string>(requestToExecute, tokenToPass);
 
         // Assert
         Assert.True(handlerFinished);
         Assert.Equal(expectedResult, result);
-        _queryHandlerMock.Verify(handler => handler.Handle(queryToExecute, tokenToPass), Times.Once());
+        _requestWithResponseHandlerMock.Verify(handler => handler.Handle(requestToExecute, tokenToPass), Times.Once());
     }
 }

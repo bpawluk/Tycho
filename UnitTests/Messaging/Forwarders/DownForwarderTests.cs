@@ -29,47 +29,47 @@ public class DownForwarderTests
     }
 
     [Fact]
-    public async Task CommandDownForwarder_ForwardsCommandToAnotherModule()
+    public async Task RequestDownForwarder_ForwardsRequestToAnotherModule()
     {
         // Arrange
         var moduleMock = new Mock<IModule<TestModule>>();
-        var interceptorMock = new Mock<IRequestInterceptor<OtherCommand>>();
-        var expectedCommand = new OtherCommand(int.MinValue);
+        var interceptorMock = new Mock<IRequestInterceptor<OtherRequest>>();
+        var expectedRequest = new OtherRequest(int.MinValue);
         var expectedToken = new CancellationToken();
-        var handler = new RequestDownForwarder<TestCommand, OtherCommand, TestModule>(moduleMock.Object, _ => expectedCommand, interceptorMock.Object);
+        var handler = new RequestDownForwarder<TestRequest, OtherRequest, TestModule>(moduleMock.Object, _ => expectedRequest, interceptorMock.Object);
 
         // Act
-        await handler.Handle(new TestCommand("command-name"), expectedToken);
+        await handler.Handle(new TestRequest("request-name"), expectedToken);
 
         // Assert
-        moduleMock.Verify(module => module.Execute(expectedCommand, expectedToken), Times.Once);
-        interceptorMock.Verify(module => module.ExecuteBefore(expectedCommand, expectedToken), Times.Once);
-        interceptorMock.Verify(module => module.ExecuteAfter(expectedCommand, expectedToken), Times.Once);
+        moduleMock.Verify(module => module.Execute(expectedRequest, expectedToken), Times.Once);
+        interceptorMock.Verify(module => module.ExecuteBefore(expectedRequest, expectedToken), Times.Once);
+        interceptorMock.Verify(module => module.ExecuteAfter(expectedRequest, expectedToken), Times.Once);
     }
 
     [Fact]
-    public async Task QueryDownForwarder_ForwardsQueryToAnotherModule()
+    public async Task RequestWithResponseDownForwarder_ForwardsRequestToAnotherModule()
     {
         // Arrange
         var moduleResponse = new object();
         var moduleMock = new Mock<IModule<TestModule>>();
-        moduleMock.Setup(module => module.Execute<OtherQuery, object>(It.IsAny<OtherQuery>(), It.IsAny<CancellationToken>()))
+        moduleMock.Setup(module => module.Execute<OtherRequestWithResponse, object>(It.IsAny<OtherRequestWithResponse>(), It.IsAny<CancellationToken>()))
                   .ReturnsAsync(moduleResponse);
-        var interceptorMock = new Mock<IRequestInterceptor<OtherQuery, object>>();
-        interceptorMock.Setup(interceptor => interceptor.ExecuteAfter(It.IsAny<OtherQuery>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
-                       .ReturnsAsync((OtherQuery  query, object result, CancellationToken token) => result);
+        var interceptorMock = new Mock<IRequestInterceptor<OtherRequestWithResponse, object>>();
+        interceptorMock.Setup(interceptor => interceptor.ExecuteAfter(It.IsAny<OtherRequestWithResponse>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
+                       .ReturnsAsync((OtherRequestWithResponse  request, object result, CancellationToken token) => result);
 
-        var expectedQuery = new OtherQuery(int.MinValue);
+        var expectedRequest = new OtherRequestWithResponse(int.MinValue);
         var expectedToken = new CancellationToken();
-        var handler = new RequestDownForwarder<TestQuery, string, OtherQuery, object, TestModule>(moduleMock.Object, _ => expectedQuery, response => response.ToString()!, interceptorMock.Object);
+        var handler = new RequestDownForwarder<TestRequestWithResponse, string, OtherRequestWithResponse, object, TestModule>(moduleMock.Object, _ => expectedRequest, response => response.ToString()!, interceptorMock.Object);
 
         // Act
-        var result = await handler.Handle(new TestQuery("query-name"), expectedToken);
+        var result = await handler.Handle(new TestRequestWithResponse("request-with-response-name"), expectedToken);
 
         // Assert
-        moduleMock.Verify(module => module.Execute<OtherQuery, object>(expectedQuery, expectedToken), Times.Once);
-        interceptorMock.Verify(module => module.ExecuteBefore(expectedQuery, expectedToken), Times.Once);
-        interceptorMock.Verify(module => module.ExecuteAfter(expectedQuery, moduleResponse, expectedToken), Times.Once);
+        moduleMock.Verify(module => module.Execute<OtherRequestWithResponse, object>(expectedRequest, expectedToken), Times.Once);
+        interceptorMock.Verify(module => module.ExecuteBefore(expectedRequest, expectedToken), Times.Once);
+        interceptorMock.Verify(module => module.ExecuteAfter(expectedRequest, moduleResponse, expectedToken), Times.Once);
         Assert.Equal(moduleResponse.ToString(), result);
     }
 }
