@@ -8,8 +8,8 @@ namespace IntegrationTests.PassingMessagesBetweenSubmodules.SUT.Handlers;
 
 internal class AlphaBetaProxyHandler
     : IEventHandler<AlphaEvent>
-    , IRequestHandler<AlphaCommand>
-    , IRequestHandler<AlphaQuery, string>
+    , IRequestHandler<AlphaRequest>
+    , IRequestHandler<AlphaRequestWithResponse, string>
 {
     private readonly IModule _betaModule;
 
@@ -24,13 +24,13 @@ internal class AlphaBetaProxyHandler
         return Task.CompletedTask;
     }
 
-    public Task Handle(AlphaCommand commandData, CancellationToken cancellationToken)
+    public Task Handle(AlphaRequest requestData, CancellationToken cancellationToken)
     {
-        return _betaModule.Execute<FromAlphaCommand>(new(commandData.Id), cancellationToken);
+        return _betaModule.Execute<FromAlphaRequest>(new(requestData.Id), cancellationToken);
     }
 
-    public Task<string> Handle(AlphaQuery queryData, CancellationToken cancellationToken)
+    public Task<string> Handle(AlphaRequestWithResponse requestData, CancellationToken cancellationToken)
     {
-        return _betaModule.Execute<FromAlphaQuery, string>(new(queryData.Id), cancellationToken);
+        return _betaModule.Execute<FromAlphaRequestWithResponse, string>(new(requestData.Id), cancellationToken);
     }
 }

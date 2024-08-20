@@ -11,13 +11,13 @@ namespace IntegrationTests.PassingMessagesBetweenSubmodules.SUT.Submodules;
 
 // Incoming
 internal record FromBetaEvent(string Id) : IEvent;
-internal record FromBetaCommand(string Id) : IRequest;
-internal record FromBetaQuery(string Id) : IRequest<string>;
+internal record FromBetaRequest(string Id) : IRequest;
+internal record FromBetaRequestWithResponse(string Id) : IRequest<string>;
 
 // Outgoing
 internal record GammaEvent(string Id) : IEvent;
-internal record GammaCommand(string Id) : IRequest;
-internal record GammaQuery(string Id) : IRequest<string>;
+internal record GammaRequest(string Id) : IRequest;
+internal record GammaRequestWithResponse(string Id) : IRequest<string>;
 
 internal class GammaModule : TychoModule
 {
@@ -30,22 +30,22 @@ internal class GammaModule : TychoModule
             thisModule.Publish<GammaEvent>(new(eventData.Id));
         });
 
-        module.Requests.Handle<FromBetaCommand>(commandData =>
+        module.Requests.Handle<FromBetaRequest>(requestData =>
         {
-            thisModule.Execute<GammaCommand>(new(commandData.Id));
+            thisModule.Execute<GammaRequest>(new(requestData.Id));
         });
 
-        module.Requests.Handle<FromBetaQuery, string>(queryData =>
+        module.Requests.Handle<FromBetaRequestWithResponse, string>(requestData =>
         {
-            return thisModule.Execute<GammaQuery, string>(new(queryData.Id));
+            return thisModule.Execute<GammaRequestWithResponse, string>(new(requestData.Id));
         });
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services)
     {
         module.Events.Declare<GammaEvent>()
-              .Requests.Declare<GammaCommand>()
-              .Requests.Declare<GammaQuery, string>();
+              .Requests.Declare<GammaRequest>()
+              .Requests.Declare<GammaRequestWithResponse, string>();
     }
 
     protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services) { }

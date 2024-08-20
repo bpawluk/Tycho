@@ -10,14 +10,14 @@ using Tycho.Structure;
 namespace IntegrationTests.PassingMessagesBetweenSubmodules.SUT.Submodules;
 
 // Incoming
-internal record BeginEventWorkflowCommand(string Id) : IRequest;
-internal record BeginCommandWorkflowCommand(string Id) : IRequest;
-internal record BeginQueryWorkflowCommand(string Id) : IRequest;
+internal record BeginEventWorkflowRequest(string Id) : IRequest;
+internal record BeginRequestWorkflowRequest(string Id) : IRequest;
+internal record BeginRequestWithResponseWorkflowRequest(string Id) : IRequest;
 
 // Outgoing
 internal record AlphaEvent(string Id) : IEvent;
-internal record AlphaCommand(string Id) : IRequest;
-internal record AlphaQuery(string Id) : IRequest<string>;
+internal record AlphaRequest(string Id) : IRequest;
+internal record AlphaRequestWithResponse(string Id) : IRequest<string>;
 
 internal class AlphaModule : TychoModule
 {
@@ -25,27 +25,27 @@ internal class AlphaModule : TychoModule
     {
         var thisModule = services.GetRequiredService<IModule>();
 
-        module.Requests.Handle<BeginEventWorkflowCommand>(commandData =>
+        module.Requests.Handle<BeginEventWorkflowRequest>(requestData =>
         {
-            thisModule.Publish<AlphaEvent>(new(commandData.Id));
+            thisModule.Publish<AlphaEvent>(new(requestData.Id));
         });
 
-        module.Requests.Handle<BeginCommandWorkflowCommand>(commandData =>
+        module.Requests.Handle<BeginRequestWorkflowRequest>(requestData =>
         {
-            thisModule.Execute<AlphaCommand>(new(commandData.Id));
+            thisModule.Execute<AlphaRequest>(new(requestData.Id));
         });
 
-        module.Requests.Handle<BeginQueryWorkflowCommand>(commandData =>
+        module.Requests.Handle<BeginRequestWithResponseWorkflowRequest>(requestData =>
         {
-            thisModule.Execute<AlphaQuery, string>(new(commandData.Id));
+            thisModule.Execute<AlphaRequestWithResponse, string>(new(requestData.Id));
         });
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services)
     {
         module.Events.Declare<AlphaEvent>()
-              .Requests.Declare<AlphaCommand>()
-              .Requests.Declare<AlphaQuery, string>();
+              .Requests.Declare<AlphaRequest>()
+              .Requests.Declare<AlphaRequestWithResponse, string>();
     }
 
     protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services) { }

@@ -20,8 +20,8 @@ public class SendingMessagesDownTheHierarchyTests : IAsyncLifetime
             .FulfillContract(consumer =>
             {
                 consumer.Events.Handle<EventWorkflowCompletedEvent>(eventData => _testWorkflowTcs.SetResult(eventData.Id));
-                consumer.Events.Handle<CommandWorkflowCompletedEvent>(commandData => _testWorkflowTcs.SetResult(commandData.Id));
-                consumer.Events.Handle<QueryWorkflowCompletedEvent>(queryData => _testWorkflowTcs.SetResult(queryData.Id));
+                consumer.Events.Handle<RequestWorkflowCompletedEvent>(requestData => _testWorkflowTcs.SetResult(requestData.Id));
+                consumer.Events.Handle<RequestWithResponseWorkflowCompletedEvent>(requestData => _testWorkflowTcs.SetResult(requestData.Id));
             })
             .Build();
     }
@@ -33,7 +33,7 @@ public class SendingMessagesDownTheHierarchyTests : IAsyncLifetime
         var workflowId = "event-workflow";
 
         // Act
-        await _sut!.Execute<BeginEventWorkflowCommand>(new(workflowId));
+        await _sut!.Execute<BeginEventWorkflowRequest>(new(workflowId));
         var returnedId = await _testWorkflowTcs.Task;
 
         // Assert
@@ -41,13 +41,13 @@ public class SendingMessagesDownTheHierarchyTests : IAsyncLifetime
     }
 
     [Fact(Timeout = 1000)]
-    public async Task Tycho_Enables_PassingCommandsDownTheHierarchy()
+    public async Task Tycho_Enables_PassingRequestsDownTheHierarchy()
     {
         // Arrange
-        var workflowId = "command-workflow";
+        var workflowId = "request-workflow";
 
         // Act
-        await _sut!.Execute<BeginCommandWorkflowCommand>(new(workflowId));
+        await _sut!.Execute<BeginRequestWorkflowRequest>(new(workflowId));
         var returnedId = await _testWorkflowTcs.Task;
 
         // Assert
@@ -58,10 +58,10 @@ public class SendingMessagesDownTheHierarchyTests : IAsyncLifetime
     public async Task Tycho_Enables_PassingQueriesDownTheHierarchy()
     {
         // Arrange
-        var workflowId = "query-workflow";
+        var workflowId = "request-workflow";
 
         // Act
-        await _sut!.Execute<BeginQueryWorkflowCommand>(new(workflowId));
+        await _sut!.Execute<BeginRequestWithResponseWorkflowRequest>(new(workflowId));
         var returnedId = await _testWorkflowTcs.Task;
 
         // Assert

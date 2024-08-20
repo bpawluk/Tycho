@@ -24,7 +24,7 @@ public class DefiningGenericModulesTests
         var module = await GetGenericModule(typeParameter);
 
         // Act
-        var result = await ExecuteGenericQuery(module, typeParameter, expectedResult);
+        var result = await ExecuteGenericRequestWithResponse(module, typeParameter, expectedResult);
 
         // Assert
         Assert.Equal(expectedResult, result);
@@ -40,22 +40,22 @@ public class DefiningGenericModulesTests
         // Act & Assert
         await Assert.ThrowsAsync<KeyNotFoundException>(() =>
         {
-            return module.Execute<GenericQuery<DerivedClass>, DerivedClass>(new(expectedResult));
+            return module.Execute<GenericRequestWithResponse<DerivedClass>, DerivedClass>(new(expectedResult));
         });
     }
 
-    private static async Task<object> ExecuteGenericQuery(IModule module, Type queryParameterType, object queryParameter)
+    private static async Task<object> ExecuteGenericRequestWithResponse(IModule module, Type requestParameterType, object requestParameter)
     {
-        Type genericQueryType = typeof(GenericQuery<>).MakeGenericType(queryParameterType);
-        var query = Activator.CreateInstance(genericQueryType, queryParameter)!;
+        Type genericRequestWithResponseType = typeof(GenericRequestWithResponse<>).MakeGenericType(requestParameterType);
+        var request = Activator.CreateInstance(genericRequestWithResponseType, requestParameter)!;
 
         MethodInfo executor = typeof(IMessageBroker)
             .GetMethods()
             .Where(method => method.Name == "Execute")
             .First(method => method.GetGenericArguments().Length == 2)
-            .MakeGenericMethod(genericQueryType, queryParameterType);
+            .MakeGenericMethod(genericRequestWithResponseType, requestParameterType);
 
-        dynamic resultTask = executor.Invoke(module, new object[] { query, CancellationToken.None })!;
+        dynamic resultTask = executor.Invoke(module, new object[] { request, CancellationToken.None })!;
         return await resultTask;
     }
 

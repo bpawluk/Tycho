@@ -13,27 +13,27 @@ using Tycho.Structure;
 namespace IntegrationTests.ServiceRegistrationAndResolving.SUT;
 
 // Incoming
-internal record SingletonServiceWorkflowQuery : IRequest<int>;
-internal record TransientServiceWorkflowQuery : IRequest<int>;
-internal record SubmoduleResolvingWorkflowQuery : IRequest<string>;
-internal record ModuleResolvingWorkflowQuery : IRequest<string>;
+internal record SingletonServiceWorkflowRequest : IRequest<int>;
+internal record TransientServiceWorkflowRequest : IRequest<int>;
+internal record SubmoduleResolvingWorkflowRequest : IRequest<string>;
+internal record ModuleResolvingWorkflowRequest : IRequest<string>;
 
 // Outgoing
-internal record GetDataFromThisModulesClientQuery() : IRequest<string>;
+internal record GetDataFromThisModulesClientRequestWithResponse() : IRequest<string>;
 
 internal class AppModule : TychoModule
 {
     protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
-        module.Requests.Handle<SingletonServiceWorkflowQuery, int, SingletonServiceWorkflowQueryHandler>()
-              .Requests.Handle<TransientServiceWorkflowQuery, int, TransientServiceWorkflowQueryHandler>()
-              .Requests.Handle<SubmoduleResolvingWorkflowQuery, string, SubmoduleResolvingWorkflowQueryHandler>()
-              .Requests.Handle<ModuleResolvingWorkflowQuery, string, ModuleResolvingWorkflowQueryHandler>();
+        module.Requests.Handle<SingletonServiceWorkflowRequest, int, SingletonServiceWorkflowRequestHandler>()
+              .Requests.Handle<TransientServiceWorkflowRequest, int, TransientServiceWorkflowRequestHandler>()
+              .Requests.Handle<SubmoduleResolvingWorkflowRequest, string, SubmoduleResolvingWorkflowRequestHandler>()
+              .Requests.Handle<ModuleResolvingWorkflowRequest, string, ModuleResolvingWorkflowRequestHandler>();
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services) 
     {
-        module.Requests.Declare<GetDataFromThisModulesClientQuery, string>();
+        module.Requests.Declare<GetDataFromThisModulesClientRequestWithResponse, string>();
     }
 
     protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services)

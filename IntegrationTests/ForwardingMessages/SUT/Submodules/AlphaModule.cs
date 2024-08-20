@@ -17,13 +17,13 @@ internal record MappedAlphaEvent(string Id, int preInterceptions, int postInterc
     public int PostInterceptions { get; set; } = postInterceptions;
 };
 
-internal record MappedAlphaCommand(string Id, int preInterceptions, int postInterceptions) : IRequest
+internal record MappedAlphaRequest(string Id, int preInterceptions, int postInterceptions) : IRequest
 {
     public int PreInterceptions { get; set; } = preInterceptions;
     public int PostInterceptions { get; set; } = postInterceptions;
 };
 
-internal record MappedAlphaQuery(string Id, int preInterceptions, int postInterceptions) : IRequest<AlphaResponse>
+internal record MappedAlphaRequestWithResponse(string Id, int preInterceptions, int postInterceptions) : IRequest<AlphaResponse>
 {
     public int PreInterceptions { get; set; } = preInterceptions;
     public int PostInterceptions { get; set; } = postInterceptions;
@@ -41,12 +41,12 @@ internal class AlphaModule : TychoModule
         module.Events.ForwardWithInterception<EventToForward, EventInterceptor, BetaModule>()
               .Events.ForwardWithInterception<MappedAlphaEvent, MappedBetaEvent, EventInterceptor, BetaModule>(
                   eventData => new(eventData.Id, eventData.PreInterceptions, eventData.PostInterceptions))
-              .Requests.ForwardWithInterception<CommandToForward, CommandInterceptor, BetaModule>()
-              .Requests.ForwardWithInterception<MappedAlphaCommand, MappedBetaCommand, CommandInterceptor, BetaModule>(
-                  commandData => new(commandData.Id, commandData.PreInterceptions, commandData.PostInterceptions))
-              .Requests.ForwardWithInterception<QueryToForward, string, QueryInterceptor, BetaModule>()
-              .Requests.ForwardWithInterception<MappedAlphaQuery, AlphaResponse, MappedBetaQuery, BetaResponse, QueryInterceptor, BetaModule>(
-                  queryData => new(queryData.Id, queryData.PreInterceptions, queryData.PostInterceptions), 
+              .Requests.ForwardWithInterception<RequestToForward, RequestInterceptor, BetaModule>()
+              .Requests.ForwardWithInterception<MappedAlphaRequest, MappedBetaRequest, RequestInterceptor, BetaModule>(
+                  requestData => new(requestData.Id, requestData.PreInterceptions, requestData.PostInterceptions))
+              .Requests.ForwardWithInterception<RequestWithResponseToForward, string, RequestWithResponseInterceptor, BetaModule>()
+              .Requests.ForwardWithInterception<MappedAlphaRequestWithResponse, AlphaResponse, MappedBetaRequestWithResponse, BetaResponse, RequestWithResponseInterceptor, BetaModule>(
+                  requestData => new(requestData.Id, requestData.PreInterceptions, requestData.PostInterceptions), 
                   result => new(result.Content));
     }
 
@@ -54,10 +54,10 @@ internal class AlphaModule : TychoModule
     {
         module.Events.Declare<EventToForward>()
               .Events.Declare<MappedAlphaEvent>()
-              .Requests.Declare<CommandToForward>()
-              .Requests.Declare<MappedAlphaCommand>()
-              .Requests.Declare<QueryToForward, string>()
-              .Requests.Declare<MappedAlphaQuery, AlphaResponse>();
+              .Requests.Declare<RequestToForward>()
+              .Requests.Declare<MappedAlphaRequest>()
+              .Requests.Declare<RequestWithResponseToForward, string>()
+              .Requests.Declare<MappedAlphaRequestWithResponse, AlphaResponse>();
     }
 
     protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services) 
@@ -67,12 +67,12 @@ internal class AlphaModule : TychoModule
             consumer.Events.ExposeWithInterception<EventToForward, EventInterceptor>()
                     .Events.ExposeWithInterception<MappedBetaEvent, MappedAlphaEvent, EventInterceptor>(
                         eventData => new(eventData.Id, eventData.PreInterceptions, eventData.PostInterceptions))
-                    .Requests.ExposeWithInterception<CommandToForward, CommandInterceptor>()
-                    .Requests.ExposeWithInterception<MappedBetaCommand, MappedAlphaCommand, CommandInterceptor>(
-                        commandData => new(commandData.Id, commandData.PreInterceptions, commandData.PostInterceptions))
-                    .Requests.ExposeWithInterception<QueryToForward, string, QueryInterceptor>()
-                    .Requests.ExposeWithInterception<MappedBetaQuery, BetaResponse, MappedAlphaQuery, AlphaResponse, QueryInterceptor>(
-                        queryData => new(queryData.Id, queryData.PreInterceptions, queryData.PostInterceptions), 
+                    .Requests.ExposeWithInterception<RequestToForward, RequestInterceptor>()
+                    .Requests.ExposeWithInterception<MappedBetaRequest, MappedAlphaRequest, RequestInterceptor>(
+                        requestData => new(requestData.Id, requestData.PreInterceptions, requestData.PostInterceptions))
+                    .Requests.ExposeWithInterception<RequestWithResponseToForward, string, RequestWithResponseInterceptor>()
+                    .Requests.ExposeWithInterception<MappedBetaRequestWithResponse, BetaResponse, MappedAlphaRequestWithResponse, AlphaResponse, RequestWithResponseInterceptor>(
+                        requestData => new(requestData.Id, requestData.PreInterceptions, requestData.PostInterceptions), 
                         result => new(result.Content));
         });
     }

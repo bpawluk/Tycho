@@ -17,17 +17,17 @@ public record HandledByAsyncLambdaEvent() : IEvent;
 public record HandledByHandlerInstanceEvent() : IEvent;
 public record HandledByHandlerTypeEvent() : IEvent;
 
-// Commands
-public record HandledByLambdaCommand() : IRequest;
-public record HandledByAsyncLambdaCommand() : IRequest;
-public record HandledByHandlerInstanceCommand() : IRequest;
-public record HandledByHandlerTypeCommand() : IRequest;
+// Requests
+public record HandledByLambdaRequest() : IRequest;
+public record HandledByAsyncLambdaRequest() : IRequest;
+public record HandledByHandlerInstanceRequest() : IRequest;
+public record HandledByHandlerTypeRequest() : IRequest;
 
 // Queries
-public record HandledByLambdaQuery() : IRequest<string>;
-public record HandledByAsyncLambdaQuery() : IRequest<string>;
-public record HandledByHandlerInstanceQuery() : IRequest<string>;
-public record HandledByHandlerTypeQuery() : IRequest<string>;
+public record HandledByLambdaRequestWithResponse() : IRequest<string>;
+public record HandledByAsyncLambdaRequestWithResponse() : IRequest<string>;
+public record HandledByHandlerInstanceRequestWithResponse() : IRequest<string>;
+public record HandledByHandlerTypeRequestWithResponse() : IRequest<string>;
 
 
 internal class AppModule : TychoModule
@@ -44,15 +44,15 @@ internal class AppModule : TychoModule
               .Events.Handle(new HandledByHandlerInstanceEventHandler(thisModule))
               .Events.Handle<HandledByHandlerTypeEvent, HandledByHandlerTypeEventHandler>();
 
-        module.Requests.Handle<HandledByLambdaCommand>(c => { thisModule.Execute(c); })
-              .Requests.Handle<HandledByAsyncLambdaCommand>((c, t) => thisModule.Execute(c, t))
-              .Requests.Handle(new HandledByHandlerInstanceCommandHandler(thisModule))
-              .Requests.Handle<HandledByHandlerTypeCommand, HandledByHandlerTypeCommandHandler>();
+        module.Requests.Handle<HandledByLambdaRequest>(c => { thisModule.Execute(c); })
+              .Requests.Handle<HandledByAsyncLambdaRequest>((c, t) => thisModule.Execute(c, t))
+              .Requests.Handle(new HandledByHandlerInstanceRequestHandler(thisModule))
+              .Requests.Handle<HandledByHandlerTypeRequest, HandledByHandlerTypeRequestHandler>();
 
-        module.Requests.Handle<HandledByLambdaQuery, string>(q => thisModule.Execute<HandledByLambdaQuery, string>(q).Result)
-              .Requests.Handle<HandledByAsyncLambdaQuery, string>(thisModule.Execute<HandledByAsyncLambdaQuery, string>)
-              .Requests.Handle(new HandledByHandlerInstanceQueryHandler(thisModule))
-              .Requests.Handle<HandledByHandlerTypeQuery, string, HandledByHandlerTypeQueryHandler>();
+        module.Requests.Handle<HandledByLambdaRequestWithResponse, string>(q => thisModule.Execute<HandledByLambdaRequestWithResponse, string>(q).Result)
+              .Requests.Handle<HandledByAsyncLambdaRequestWithResponse, string>(thisModule.Execute<HandledByAsyncLambdaRequestWithResponse, string>)
+              .Requests.Handle(new HandledByHandlerInstanceRequestWithResponseHandler(thisModule))
+              .Requests.Handle<HandledByHandlerTypeRequestWithResponse, string, HandledByHandlerTypeRequestWithResponseHandler>();
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services)
@@ -62,15 +62,15 @@ internal class AppModule : TychoModule
               .Events.Declare<HandledByHandlerInstanceEvent>()
               .Events.Declare<HandledByHandlerTypeEvent>();
 
-        module.Requests.Declare<HandledByLambdaCommand>()
-              .Requests.Declare<HandledByAsyncLambdaCommand>()
-              .Requests.Declare<HandledByHandlerInstanceCommand>()
-              .Requests.Declare<HandledByHandlerTypeCommand>();
+        module.Requests.Declare<HandledByLambdaRequest>()
+              .Requests.Declare<HandledByAsyncLambdaRequest>()
+              .Requests.Declare<HandledByHandlerInstanceRequest>()
+              .Requests.Declare<HandledByHandlerTypeRequest>();
 
-        module.Requests.Declare<HandledByLambdaQuery, string>()
-              .Requests.Declare<HandledByAsyncLambdaQuery, string>()
-              .Requests.Declare<HandledByHandlerInstanceQuery, string>()
-              .Requests.Declare<HandledByHandlerTypeQuery, string>();
+        module.Requests.Declare<HandledByLambdaRequestWithResponse, string>()
+              .Requests.Declare<HandledByAsyncLambdaRequestWithResponse, string>()
+              .Requests.Declare<HandledByHandlerInstanceRequestWithResponse, string>()
+              .Requests.Declare<HandledByHandlerTypeRequestWithResponse, string>();
     }
 
     protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services) { }

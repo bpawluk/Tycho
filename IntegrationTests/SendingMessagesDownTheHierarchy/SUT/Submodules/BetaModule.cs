@@ -11,13 +11,13 @@ namespace IntegrationTests.SendingMessagesDownTheHierarchy.SUT.Submodules;
 
 // Incoming
 internal record BetaDownstreamEvent(string Id) : IEvent;
-internal record BetaDownstreamCommand(string Id) : IRequest;
-internal record BetaDownstreamQuery(string Id) : IRequest<string>;
+internal record BetaDownstreamRequest(string Id) : IRequest;
+internal record BetaDownstreamRequestWithResponse(string Id) : IRequest<string>;
 
 // Outgoing
 internal record BetaUpstreamEvent(string Id) : IEvent;
-internal record BetaUpstreamCommand(string Id) : IRequest;
-internal record BetaUpstreamQuery(string Id) : IRequest<string>;
+internal record BetaUpstreamRequest(string Id) : IRequest;
+internal record BetaUpstreamRequestWithResponse(string Id) : IRequest<string>;
 
 internal class BetaModule : TychoModule
 {
@@ -30,22 +30,22 @@ internal class BetaModule : TychoModule
             gammaModule.Publish<GammaDownstreamEvent>(new(eventData.Id));
         });
 
-        module.Requests.Handle<BetaDownstreamCommand>(commandData =>
+        module.Requests.Handle<BetaDownstreamRequest>(requestData =>
         {
-            gammaModule.Execute<GammaDownstreamCommand>(new(commandData.Id));
+            gammaModule.Execute<GammaDownstreamRequest>(new(requestData.Id));
         });
 
-        module.Requests.Handle<BetaDownstreamQuery, string>(queryData =>
+        module.Requests.Handle<BetaDownstreamRequestWithResponse, string>(requestData =>
         {
-            return gammaModule.Execute<GammaDownstreamQuery, string>(new(queryData.Id));
+            return gammaModule.Execute<GammaDownstreamRequestWithResponse, string>(new(requestData.Id));
         });
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services)
     {
         module.Events.Declare<BetaUpstreamEvent>()
-              .Requests.Declare<BetaUpstreamCommand>()
-              .Requests.Declare<BetaUpstreamQuery, string>();
+              .Requests.Declare<BetaUpstreamRequest>()
+              .Requests.Declare<BetaUpstreamRequestWithResponse, string>();
     }
 
     protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services)
@@ -59,14 +59,14 @@ internal class BetaModule : TychoModule
                 thisModule.Publish<BetaUpstreamEvent>(new(eventData.Id));
             });
 
-            consumer.Requests.Handle<GammaUpstreamCommand>(commandData =>
+            consumer.Requests.Handle<GammaUpstreamRequest>(requestData =>
             {
-                thisModule.Execute<BetaUpstreamCommand>(new(commandData.Id));
+                thisModule.Execute<BetaUpstreamRequest>(new(requestData.Id));
             });
 
-            consumer.Requests.Handle<GammaUpstreamQuery, string>(queryData =>
+            consumer.Requests.Handle<GammaUpstreamRequestWithResponse, string>(requestData =>
             {
-                return thisModule.Execute<BetaUpstreamQuery, string>(new(queryData.Id));
+                return thisModule.Execute<BetaUpstreamRequestWithResponse, string>(new(requestData.Id));
             });
         });
     }

@@ -11,13 +11,13 @@ namespace IntegrationTests.PassingMessagesBetweenSubmodules.SUT.Submodules;
 
 // Incoming
 internal record FromAlphaEvent(string Id) : IEvent;
-internal record FromAlphaCommand(string Id) : IRequest;
-internal record FromAlphaQuery(string Id) : IRequest<string>;
+internal record FromAlphaRequest(string Id) : IRequest;
+internal record FromAlphaRequestWithResponse(string Id) : IRequest<string>;
 
 // Outgoing
 internal record BetaEvent(string Id) : IEvent;
-internal record BetaCommand(string Id) : IRequest;
-internal record BetaQuery(string Id) : IRequest<string>;
+internal record BetaRequest(string Id) : IRequest;
+internal record BetaRequestWithResponse(string Id) : IRequest<string>;
 
 internal class BetaModule : TychoModule
 {
@@ -30,22 +30,22 @@ internal class BetaModule : TychoModule
             thisModule.Publish<BetaEvent>(new(eventData.Id));
         });
 
-        module.Requests.Handle<FromAlphaCommand>(commandData =>
+        module.Requests.Handle<FromAlphaRequest>(requestData =>
         {
-            thisModule.Execute<BetaCommand>(new(commandData.Id));
+            thisModule.Execute<BetaRequest>(new(requestData.Id));
         });
 
-        module.Requests.Handle<FromAlphaQuery, string>(queryData =>
+        module.Requests.Handle<FromAlphaRequestWithResponse, string>(requestData =>
         {
-            return thisModule.Execute<BetaQuery, string>(new(queryData.Id));
+            return thisModule.Execute<BetaRequestWithResponse, string>(new(requestData.Id));
         });
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services)
     {
         module.Events.Declare<BetaEvent>()
-              .Requests.Declare<BetaCommand>()
-              .Requests.Declare<BetaQuery, string>();
+              .Requests.Declare<BetaRequest>()
+              .Requests.Declare<BetaRequestWithResponse, string>();
     }
 
     protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services) { }

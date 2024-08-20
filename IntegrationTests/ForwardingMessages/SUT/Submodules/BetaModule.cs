@@ -16,13 +16,13 @@ internal record MappedBetaEvent(string Id, int preInterceptions, int postInterce
     public int PostInterceptions { get; set; } = postInterceptions;
 };
 
-internal record MappedBetaCommand(string Id, int preInterceptions, int postInterceptions) : IRequest
+internal record MappedBetaRequest(string Id, int preInterceptions, int postInterceptions) : IRequest
 {
     public int PreInterceptions { get; set; } = preInterceptions;
     public int PostInterceptions { get; set; } = postInterceptions;
 };
 
-internal record MappedBetaQuery(string Id, int preInterceptions, int postInterceptions) : IRequest<BetaResponse>
+internal record MappedBetaRequestWithResponse(string Id, int preInterceptions, int postInterceptions) : IRequest<BetaResponse>
 {
     public int PreInterceptions { get; set; } = preInterceptions;
     public int PostInterceptions { get; set; } = postInterceptions;
@@ -37,20 +37,20 @@ internal class BetaModule : TychoModule
         var thisModule = services.GetRequiredService<IModule>();
         module.Events.Handle<EventToForward>(eventData => thisModule.Publish(eventData))
               .Events.Handle<MappedBetaEvent>(eventData => thisModule.Publish(eventData))
-              .Requests.Handle<CommandToForward>(commandData => thisModule.Execute(commandData))
-              .Requests.Handle<MappedBetaCommand>(commandData => thisModule.Execute(commandData))
-              .Requests.Handle<QueryToForward, string>(queryData => thisModule.Execute<QueryToForward, string>(queryData))
-              .Requests.Handle<MappedBetaQuery, BetaResponse>(queryData => thisModule.Execute<MappedBetaQuery, BetaResponse>(queryData));
+              .Requests.Handle<RequestToForward>(requestData => thisModule.Execute(requestData))
+              .Requests.Handle<MappedBetaRequest>(requestData => thisModule.Execute(requestData))
+              .Requests.Handle<RequestWithResponseToForward, string>(requestData => thisModule.Execute<RequestWithResponseToForward, string>(requestData))
+              .Requests.Handle<MappedBetaRequestWithResponse, BetaResponse>(requestData => thisModule.Execute<MappedBetaRequestWithResponse, BetaResponse>(requestData));
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services)
     {
         module.Events.Declare<EventToForward>()
               .Events.Declare<MappedBetaEvent>()
-              .Requests.Declare<CommandToForward>()
-              .Requests.Declare<MappedBetaCommand>()
-              .Requests.Declare<QueryToForward, string>()
-              .Requests.Declare<MappedBetaQuery, BetaResponse>();
+              .Requests.Declare<RequestToForward>()
+              .Requests.Declare<MappedBetaRequest>()
+              .Requests.Declare<RequestWithResponseToForward, string>()
+              .Requests.Declare<MappedBetaRequestWithResponse, BetaResponse>();
     }
 
     protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services) { }

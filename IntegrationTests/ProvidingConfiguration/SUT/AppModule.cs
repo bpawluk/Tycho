@@ -12,8 +12,8 @@ using Tycho.Structure;
 namespace IntegrationTests.ProvidingConfiguration.SUT;
 
 // Incoming
-internal record GetConfiguredValueViaBindingQuery() : IRequest<int>;
-internal record GetConfiguredValueViaIConfigurationQuery() : IRequest<DateTime>;
+internal record GetConfiguredValueViaBindingRequest() : IRequest<int>;
+internal record GetConfiguredValueViaIConfigurationRequest() : IRequest<DateTime>;
 
 // Outgoing
 // - no incoming messages specific to this module
@@ -22,8 +22,8 @@ internal class AppModule : TychoModule
 {
     protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
-        module.Requests.Handle<GetConfiguredValueViaBindingQuery, int, GetConfiguredValueViaBindingQueryHandler>()
-              .Requests.Handle<GetConfiguredValueViaIConfigurationQuery, DateTime, GetConfiguredValueViaIConfigurationQueryHandler>();
+        module.Requests.Handle<GetConfiguredValueViaBindingRequest, int, GetConfiguredValueViaBindingRequestHandler>()
+              .Requests.Handle<GetConfiguredValueViaIConfigurationRequest, DateTime, GetConfiguredValueViaIConfigurationRequestHandler>();
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services) { }

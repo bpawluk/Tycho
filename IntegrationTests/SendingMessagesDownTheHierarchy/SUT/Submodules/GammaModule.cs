@@ -11,13 +11,13 @@ namespace IntegrationTests.SendingMessagesDownTheHierarchy.SUT.Submodules;
 
 // Incoming
 internal record GammaDownstreamEvent(string Id) : IEvent;
-internal record GammaDownstreamCommand(string Id) : IRequest;
-internal record GammaDownstreamQuery(string Id) : IRequest<string>;
+internal record GammaDownstreamRequest(string Id) : IRequest;
+internal record GammaDownstreamRequestWithResponse(string Id) : IRequest<string>;
 
 // Outgoing
 internal record GammaUpstreamEvent(string Id) : IEvent;
-internal record GammaUpstreamCommand(string Id) : IRequest;
-internal record GammaUpstreamQuery(string Id) : IRequest<string>;
+internal record GammaUpstreamRequest(string Id) : IRequest;
+internal record GammaUpstreamRequestWithResponse(string Id) : IRequest<string>;
 
 internal class GammaModule : TychoModule
 {
@@ -30,22 +30,22 @@ internal class GammaModule : TychoModule
             thisModule.Publish<GammaUpstreamEvent>(new(eventData.Id));
         });
 
-        module.Requests.Handle<GammaDownstreamCommand>(commandData =>
+        module.Requests.Handle<GammaDownstreamRequest>(requestData =>
         {
-            thisModule.Execute<GammaUpstreamCommand>(new(commandData.Id));
+            thisModule.Execute<GammaUpstreamRequest>(new(requestData.Id));
         });
 
-        module.Requests.Handle<GammaDownstreamQuery, string>(queryData =>
+        module.Requests.Handle<GammaDownstreamRequestWithResponse, string>(requestData =>
         {
-            return thisModule.Execute<GammaUpstreamQuery, string>(new(queryData.Id));
+            return thisModule.Execute<GammaUpstreamRequestWithResponse, string>(new(requestData.Id));
         });
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services)
     {
         module.Events.Declare<GammaUpstreamEvent>()
-              .Requests.Declare<GammaUpstreamCommand>()
-              .Requests.Declare<GammaUpstreamQuery, string>();
+              .Requests.Declare<GammaUpstreamRequest>()
+              .Requests.Declare<GammaUpstreamRequestWithResponse, string>();
     }
 
     protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services) { }

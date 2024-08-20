@@ -10,7 +10,7 @@ using Tycho.Structure;
 namespace IntegrationTests.DefiningGenericModules.SUT;
 
 // Incoming
-internal record GenericQuery<T>(T Data) : IRequest<T>;
+internal record GenericRequestWithResponse<T>(T Data) : IRequest<T>;
 
 // Outgoing
 // - no incoming messages specific to this module
@@ -19,7 +19,7 @@ internal class GenericModule<T> : TychoModule
 {
     protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
-        module.Requests.Handle<GenericQuery<T>, T>((query) => query.Data);
+        module.Requests.Handle<GenericRequestWithResponse<T>, T>((request) => request.Data);
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services) { }

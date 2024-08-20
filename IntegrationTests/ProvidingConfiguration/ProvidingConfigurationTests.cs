@@ -38,8 +38,8 @@ public class ProvidingConfigurationTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var configuredNumber = await _sut!.Execute<GetConfiguredValueViaBindingQuery, int>(new());
-        var configuredDate = await _sut.Execute<GetConfiguredValueViaIConfigurationQuery, DateTime>(new());
+        var configuredNumber = await _sut!.Execute<GetConfiguredValueViaBindingRequest, int>(new());
+        var configuredDate = await _sut.Execute<GetConfiguredValueViaIConfigurationRequest, DateTime>(new());
 
         // Assert
         Assert.Equal(_config["SomeNumber"], configuredNumber.ToString());

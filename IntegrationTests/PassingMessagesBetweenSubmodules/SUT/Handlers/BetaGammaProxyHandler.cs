@@ -8,8 +8,8 @@ namespace IntegrationTests.PassingMessagesBetweenSubmodules.SUT.Handlers;
 
 internal class BetaGammaProxyHandler
     : IEventHandler<BetaEvent>
-    , IRequestHandler<BetaCommand>
-    , IRequestHandler<BetaQuery, string>
+    , IRequestHandler<BetaRequest>
+    , IRequestHandler<BetaRequestWithResponse, string>
 {
     private readonly IModule _gammaModule;
 
@@ -24,13 +24,13 @@ internal class BetaGammaProxyHandler
         return Task.CompletedTask;
     }
 
-    public Task Handle(BetaCommand commandData, CancellationToken cancellationToken)
+    public Task Handle(BetaRequest requestData, CancellationToken cancellationToken)
     {
-        return _gammaModule.Execute<FromBetaCommand>(new(commandData.Id), cancellationToken);
+        return _gammaModule.Execute<FromBetaRequest>(new(requestData.Id), cancellationToken);
     }
 
-    public Task<string> Handle(BetaQuery queryData, CancellationToken cancellationToken)
+    public Task<string> Handle(BetaRequestWithResponse requestData, CancellationToken cancellationToken)
     {
-        return _gammaModule.Execute<FromBetaQuery, string>(new(queryData.Id), cancellationToken);
+        return _gammaModule.Execute<FromBetaRequestWithResponse, string>(new(requestData.Id), cancellationToken);
     }
 }
