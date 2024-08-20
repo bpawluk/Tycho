@@ -56,7 +56,7 @@ public class PassingMessagesBetweenSubmodulesTests : IAsyncLifetime
     }
 
     [Fact(Timeout = 1000)]
-    public async Task Tycho_Enables_PassingQueriesBetweenSubmodules()
+    public async Task Tycho_Enables_PassingRequestsWithResponsesBetweenSubmodules()
     {
         // Arrange
         var workflowId = "request-workflow";

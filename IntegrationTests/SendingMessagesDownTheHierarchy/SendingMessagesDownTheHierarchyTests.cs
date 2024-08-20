@@ -55,7 +55,7 @@ public class SendingMessagesDownTheHierarchyTests : IAsyncLifetime
     }
 
     [Fact(Timeout = 1000)]
-    public async Task Tycho_Enables_PassingQueriesDownTheHierarchy()
+    public async Task Tycho_Enables_PassingRequestsWithResponsesDownTheHierarchy()
     {
         // Arrange
         var workflowId = "request-workflow";

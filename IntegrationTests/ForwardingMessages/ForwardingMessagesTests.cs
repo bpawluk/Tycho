@@ -110,7 +110,7 @@ public class ForwardingMessagesTests : IAsyncLifetime
     }
 
     [Fact(Timeout = 1000)]
-    public async Task Tycho_Enables_ForwardingQueries()
+    public async Task Tycho_Enables_ForwardingRequestsWithResponses()
     {
         // Arrange
         var workflowId = "request-workflow";
@@ -128,7 +128,7 @@ public class ForwardingMessagesTests : IAsyncLifetime
     }
 
     [Fact(Timeout = 1000)]
-    public async Task Tycho_Enables_ForwardingQueriesWithMapping()
+    public async Task Tycho_Enables_ForwardingRequestsWithResponsesWithMapping()
     {
         // Arrange
         var workflowId = "request-mapping-workflow";

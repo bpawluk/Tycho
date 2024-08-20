@@ -23,7 +23,7 @@ public record HandledByAsyncLambdaRequest() : IRequest;
 public record HandledByHandlerInstanceRequest() : IRequest;
 public record HandledByHandlerTypeRequest() : IRequest;
 
-// Queries
+// Requests with responses
 public record HandledByLambdaRequestWithResponse() : IRequest<string>;
 public record HandledByAsyncLambdaRequestWithResponse() : IRequest<string>;
 public record HandledByHandlerInstanceRequestWithResponse() : IRequest<string>;
