@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Tycho.Contract.Inbox.Builder;
 using Tycho.DependencyInjection;
 using Tycho.Messaging;
@@ -41,14 +40,11 @@ public class InboxBuilderTests
         // - no arrangement required
 
         // Act
-        _inboxBuilder.Events.Handle((TestEvent _) => { });
-        _inboxBuilder.Events.Handle((TestEvent _) => Task.CompletedTask);
-        _inboxBuilder.Events.Handle((TestEvent _, CancellationToken _) => Task.CompletedTask);
         _inboxBuilder.Events.Handle(new TestMessageHandler());
         _inboxBuilder.Events.Handle<TestEvent, TestMessageHandler>();
 
         // Assert
-        _messageRouterMock.Verify(router => router.RegisterEventHandler(It.IsAny<IEventHandler<TestEvent>>()), Times.Exactly(5));
+        _messageRouterMock.Verify(router => router.RegisterEventHandler(It.IsAny<IEventHandler<TestEvent>>()), Times.Exactly(2));
     }
 
     [Fact]
@@ -74,14 +70,11 @@ public class InboxBuilderTests
         // - no arrangement required
 
         // Act
-        _inboxBuilder.Requests.Handle((TestRequest _) => { });
-        _inboxBuilder.Requests.Handle((TestRequest _) => Task.CompletedTask);
-        _inboxBuilder.Requests.Handle((TestRequest _, CancellationToken _) => Task.CompletedTask);
         _inboxBuilder.Requests.Handle<TestRequest>(new TestMessageHandler());
         _inboxBuilder.Requests.Handle<TestRequest, TestMessageHandler>();
 
         // Assert
-        _messageRouterMock.Verify(router => router.RegisterRequestHandler(It.IsAny<IRequestHandler<TestRequest>>()), Times.Exactly(5));
+        _messageRouterMock.Verify(router => router.RegisterRequestHandler(It.IsAny<IRequestHandler<TestRequest>>()), Times.Exactly(2));
     }
 
     [Fact]
@@ -106,17 +99,14 @@ public class InboxBuilderTests
     public void RequestsHandleWithResponse_RegistersRequestHandler()
     {
         // Arrange
-        var response = "test-response";
+        // - no arrangement required
 
         // Act
-        _inboxBuilder.Requests.Handle((TestRequestWithResponse _) => response);
-        _inboxBuilder.Requests.Handle((TestRequestWithResponse _) => Task.FromResult(response));
-        _inboxBuilder.Requests.Handle((TestRequestWithResponse _, CancellationToken _) => Task.FromResult(response));
         _inboxBuilder.Requests.Handle<TestRequestWithResponse, string>(new TestMessageHandler());
         _inboxBuilder.Requests.Handle<TestRequestWithResponse, string, TestMessageHandler>();
 
         // Assert
-        _messageRouterMock.Verify(router => router.RegisterRequestWithResponseHandler(It.IsAny<IRequestHandler<TestRequestWithResponse, string>>()), Times.Exactly(5));
+        _messageRouterMock.Verify(router => router.RegisterRequestWithResponseHandler(It.IsAny<IRequestHandler<TestRequestWithResponse, string>>()), Times.Exactly(2));
     }
 
     [Fact]
@@ -125,7 +115,7 @@ public class InboxBuilderTests
         // Arrange
         var eventHandler = new TestMessageHandler();
         _messageRouterMock.Setup(router => router.GetEventHandlers<TestEvent>())
-                          .Returns(new[] { eventHandler });
+                          .Returns([eventHandler]);
 
         var requestHandler = new TestMessageHandler();
         _messageRouterMock.Setup(router => router.GetRequestHandler<TestRequest>())

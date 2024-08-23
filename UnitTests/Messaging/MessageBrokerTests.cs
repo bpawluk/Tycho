@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Messaging;
@@ -32,7 +31,7 @@ public class MessageBrokerTests
     {
         // Arrange
         _messageRouterMock.Setup(router => router.GetEventHandlers<TestEvent>())
-                          .Returns(new[] { _eventHandlerMock.Object, _otherEventHandlerMock.Object });
+                          .Returns([_eventHandlerMock.Object, _otherEventHandlerMock.Object]);
 
         // Act
         Assert.Throws<ArgumentException>(() => _messageBroker.Publish<TestEvent>(null!, CancellationToken.None));
@@ -47,7 +46,7 @@ public class MessageBrokerTests
     {
         // Arrange
         _messageRouterMock.Setup(router => router.GetEventHandlers<TestEvent>())
-                          .Returns(Enumerable.Empty<IEventHandler<TestEvent>>());
+                          .Returns([]);
 
         // Act
         _messageBroker.Publish(new TestEvent("test-event"), CancellationToken.None);
@@ -62,7 +61,7 @@ public class MessageBrokerTests
     {
         // Arrange
         _messageRouterMock.Setup(router => router.GetEventHandlers<TestEvent>())
-                          .Returns(new[] { _eventHandlerMock.Object });
+                          .Returns([_eventHandlerMock.Object]);
 
         var eventToPublish = new TestEvent("test-event");
         var tokenToPass = new CancellationToken();
@@ -80,7 +79,7 @@ public class MessageBrokerTests
     {
         // Arrange
         _messageRouterMock.Setup(router => router.GetEventHandlers<TestEvent>())
-                          .Returns(new[] { _eventHandlerMock.Object, _otherEventHandlerMock.Object });
+                          .Returns([_eventHandlerMock.Object, _otherEventHandlerMock.Object]);
 
         var eventToPublish = new TestEvent("test-event");
         var tokenToPass = new CancellationToken();
@@ -108,7 +107,7 @@ public class MessageBrokerTests
                          .Returns(handlerWorkload);
 
         _messageRouterMock.Setup(router => router.GetEventHandlers<TestEvent>())
-                          .Returns(new[] { _eventHandlerMock.Object });
+                          .Returns([_eventHandlerMock.Object]);
 
         var eventToPublish = new TestEvent("test-event");
         var tokenToPass = new CancellationToken();
@@ -228,7 +227,7 @@ public class MessageBrokerTests
         var expectedResult = "result";
 
         _requestWithResponseHandlerMock.Setup(handler => handler.Handle(It.IsAny<TestRequestWithResponse>(), default))
-                         .ReturnsAsync(expectedResult);
+                                       .ReturnsAsync(expectedResult);
 
         _messageRouterMock.Setup(router => router.GetRequestWithResponseHandler<TestRequestWithResponse, string>())
                           .Returns(_requestWithResponseHandlerMock.Object);
@@ -259,7 +258,7 @@ public class MessageBrokerTests
         };
 
         _requestWithResponseHandlerMock.Setup(handler => handler.Handle(It.IsAny<TestRequestWithResponse>(), default))
-                         .Returns(handlerWorkload);
+                                       .Returns(handlerWorkload);
 
         _messageRouterMock.Setup(router => router.GetRequestWithResponseHandler<TestRequestWithResponse, string>())
                           .Returns(_requestWithResponseHandlerMock.Object);

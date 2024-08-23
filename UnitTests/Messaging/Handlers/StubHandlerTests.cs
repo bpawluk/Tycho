@@ -7,20 +7,6 @@ namespace UnitTests.Messaging.Handlers;
 public class StubHandlerTests
 {
     [Fact]
-    public void StubEventHandler_ReturnsCompletedTask()
-    {
-        // Arrange
-        var handler = new StubEventHandler<TestEvent>();
-
-        // Act
-        var result = handler.Handle(new TestEvent("test-event"), CancellationToken.None);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.True(result.IsCompleted);
-    }
-
-    [Fact]
     public void StubRequestHandler_ReturnsCompletedTask()
     {
         // Arrange

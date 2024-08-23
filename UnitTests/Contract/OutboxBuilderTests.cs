@@ -84,7 +84,7 @@ public class OutboxBuilderTests
         // - no arrangement required
 
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => OutboxConsumer.Events.Handle<TestEvent>(_ => { }));
+        Assert.Throws<InvalidOperationException>(OutboxConsumer.Events.Handle<TestEvent, TestMessageHandler>);
     }
 
     [Fact]
@@ -116,7 +116,7 @@ public class OutboxBuilderTests
         // - no arrangement required
 
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => OutboxConsumer.Requests.Handle<TestRequest>(_ => Task.CompletedTask));
+        Assert.Throws<InvalidOperationException>(OutboxConsumer.Requests.Handle<TestRequest, TestMessageHandler>);
     }
 
     [Fact]
@@ -178,7 +178,7 @@ public class OutboxBuilderTests
     {
         // Arrange
         OutboxDefinition.Events.Declare<TestEvent>();
-        OutboxConsumer.Events.Handle<TestEvent>(_ => { });
+        OutboxConsumer.Events.Handle<TestEvent, TestMessageHandler>();
 
         OutboxDefinition.Requests.Declare<TestRequest>();
         OutboxConsumer.Requests.Handle<TestRequest, TestMessageHandler>();
@@ -194,12 +194,12 @@ public class OutboxBuilderTests
     {
         // Arrange
         OutboxDefinition.Events.Declare<TestEvent>();
-        OutboxConsumer.Events.Handle<TestEvent>((_, _) => Task.CompletedTask);
+        OutboxConsumer.Events.Handle<TestEvent, TestMessageHandler>();
 
         OutboxDefinition.Requests.Declare<TestRequest>();
 
         OutboxDefinition.Requests.Declare<TestRequestWithResponse, string>();
-        OutboxConsumer.Requests.Handle<TestRequestWithResponse, string>(_ => Task.FromResult("test-response"));
+        OutboxConsumer.Requests.Handle<TestRequestWithResponse, string, TestMessageHandler>();
 
         // Act & Assert
         Assert.Throws<InvalidOperationException>(_outboxBuilder.Build);
