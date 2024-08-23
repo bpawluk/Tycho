@@ -15,21 +15,25 @@ internal class GammaRequestHandler(IModule module) :
 
     public async Task Handle(RequestToSend requestData, CancellationToken cancellationToken)
     {
+        requestData.Result.HandlingCount++;
         await _module.Execute(requestData, cancellationToken);
     }
 
     public async Task Handle(GammaInRequest requestData, CancellationToken cancellationToken)
     {
+        requestData.Result.HandlingCount++;
         await _module.Execute<GammaOutRequest>(new(requestData.Result), cancellationToken);
     }
 
     public async Task<string> Handle(RequestWithResponseToSend requestData, CancellationToken cancellationToken)
     {
+        requestData.Result.HandlingCount++;
         return await _module.Execute<RequestWithResponseToSend, string>(requestData, cancellationToken);
     }
 
     public async Task<GammaInRequestWithResponse.Response> Handle(GammaInRequestWithResponse requestData, CancellationToken cancellationToken)
     {
+        requestData.Result.HandlingCount++;
         var result = await _module.Execute<GammaOutRequestWithResponse, GammaOutRequestWithResponse.Response>(
             new(requestData.Result), 
             cancellationToken);

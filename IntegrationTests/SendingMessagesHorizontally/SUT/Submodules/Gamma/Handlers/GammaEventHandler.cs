@@ -13,12 +13,14 @@ internal class GammaEventHandler(IModule module) :
 
     public Task Handle(EventToSend eventData, CancellationToken cancellationToken)
     {
+        eventData.Result.HandlingCount++;
         _module.Publish(eventData, cancellationToken);
         return Task.CompletedTask;
     }
 
     public Task Handle(GammaInEvent eventData, CancellationToken cancellationToken)
     {
+        eventData.Result.HandlingCount++;
         _module.Publish<GammaOutEvent>(new(eventData.Result), cancellationToken);
         return Task.CompletedTask;
     }

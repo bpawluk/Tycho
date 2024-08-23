@@ -6,7 +6,7 @@ namespace IntegrationTests.SendingMessagesHorizontally;
 
 public class SendingMessagesHorizontallyTests : IAsyncLifetime
 {
-    private const int _expectedHandlingCount = 4;
+    private const int _expectedHandlingCount = 7;
 
     private readonly TestResultHandler _testResultHandler = new();
     private IModule? _sut;

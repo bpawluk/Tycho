@@ -15,21 +15,25 @@ internal class BetaRequestHandler(IModule module) :
 
     public async Task Handle(RequestToSend requestData, CancellationToken cancellationToken)
     {
+        requestData.Result.HandlingCount++;
         await _module.Execute(requestData, cancellationToken);
     }
 
     public async Task Handle(BetaInRequest requestData, CancellationToken cancellationToken)
     {
+        requestData.Result.HandlingCount++;
         await _module.Execute<BetaOutRequest>(new(requestData.Result), cancellationToken);
     }
 
     public async Task<string> Handle(RequestWithResponseToSend requestData, CancellationToken cancellationToken)
     {
+        requestData.Result.HandlingCount++;
         return await _module.Execute<RequestWithResponseToSend, string>(requestData, cancellationToken);
     }
 
     public async Task<BetaInRequestWithResponse.Response> Handle(BetaInRequestWithResponse requestData, CancellationToken cancellationToken)
     {
+        requestData.Result.HandlingCount++;
         var result = await _module.Execute<BetaOutRequestWithResponse, BetaOutRequestWithResponse.Response>(
             new(requestData.Result), 
             cancellationToken);

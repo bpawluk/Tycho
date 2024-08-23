@@ -13,12 +13,14 @@ internal class AlphaEventHandler(IModule module) :
 
     public Task Handle(EventToSend eventData, CancellationToken cancellationToken)
     {
+        eventData.Result.HandlingCount++;
         _module.Publish(eventData, cancellationToken);
         return Task.CompletedTask;
     }
 
     public Task Handle(AlphaInEvent eventData, CancellationToken cancellationToken)
     {
+        eventData.Result.HandlingCount++;
         _module.Publish<AlphaOutEvent>(new(eventData.Result), cancellationToken);
         return Task.CompletedTask;
     }

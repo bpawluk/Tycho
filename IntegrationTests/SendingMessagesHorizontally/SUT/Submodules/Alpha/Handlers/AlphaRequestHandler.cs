@@ -15,21 +15,25 @@ internal class AlphaRequestHandler(IModule module) :
 
     public async Task Handle(RequestToSend requestData, CancellationToken cancellationToken)
     {
+        requestData.Result.HandlingCount++;
         await _module.Execute(requestData, cancellationToken);
     }
 
     public async Task Handle(AlphaInRequest requestData, CancellationToken cancellationToken)
     {
+        requestData.Result.HandlingCount++;
         await _module.Execute<AlphaOutRequest>(new(requestData.Result), cancellationToken);
     }
 
     public async Task<string> Handle(RequestWithResponseToSend requestData, CancellationToken cancellationToken)
     {
+        requestData.Result.HandlingCount++;
         return await _module.Execute<RequestWithResponseToSend, string>(requestData, cancellationToken);
     }
 
     public async Task<AlphaInRequestWithResponse.Response> Handle(AlphaInRequestWithResponse requestData, CancellationToken cancellationToken)
     {
+        requestData.Result.HandlingCount++;
         var result = await _module.Execute<AlphaOutRequestWithResponse, AlphaOutRequestWithResponse.Response>(
             new(requestData.Result), 
             cancellationToken);
