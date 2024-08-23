@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Tycho.Messaging.Handlers;
 using Tycho.Messaging.Interceptors;
 using Tycho.Messaging.Payload;
@@ -12,36 +10,6 @@ namespace Tycho.Contract.Outbox
     /// </summary>
     public interface IEventOutboxConsumer
     {
-        /// <summary>
-        /// Defines logic for handling the specified <b>event</b>
-        /// </summary>
-        /// <typeparam name="Event">The type of the event being handled</typeparam>
-        /// <param name="action">A method to be invoked when the event is published</param>
-        /// <exception cref="ArgumentException"/>
-        /// <exception cref="InvalidOperationException"/>
-        IOutboxConsumer Handle<Event>(Action<Event> action)
-            where Event : class, IEvent;
-
-        /// <summary>
-        /// Defines logic for handling the specified <b>event</b>
-        /// </summary>
-        /// <typeparam name="Event">The type of the event being handled</typeparam>
-        /// <param name="function">A method to be invoked when the event is published</param>
-        /// <exception cref="ArgumentException"/>
-        /// <exception cref="InvalidOperationException"/>
-        IOutboxConsumer Handle<Event>(Func<Event, Task> function)
-            where Event : class, IEvent;
-
-        /// <summary>
-        /// Defines logic for handling the specified <b>event</b>
-        /// </summary>
-        /// <typeparam name="Event">The type of the event being handled</typeparam>
-        /// <param name="function">A method to be invoked when the event is published</param>
-        /// <exception cref="ArgumentException"/>
-        /// <exception cref="InvalidOperationException"/>
-        IOutboxConsumer Handle<Event>(Func<Event, CancellationToken, Task> function)
-            where Event : class, IEvent;
-
         /// <summary>
         /// Defines logic for handling the specified <b>event</b>
         /// </summary>

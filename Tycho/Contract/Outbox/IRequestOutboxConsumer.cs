@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Tycho.Messaging.Handlers;
 using Tycho.Messaging.Interceptors;
 using Tycho.Messaging.Payload;
@@ -12,69 +10,6 @@ namespace Tycho.Contract.Outbox
     /// </summary>
     public interface IRequestOutboxConsumer
     {
-        /// <summary>
-        /// Defines logic for handling the specified <b>request</b>
-        /// </summary>
-        /// <typeparam name="Request">The type of the request being handled</typeparam>
-        /// <param name="action">A method to be invoked when the request is received</param>
-        /// <exception cref="ArgumentException"/>
-        /// <exception cref="InvalidOperationException"/>
-        IOutboxConsumer Handle<Request>(Action<Request> action)
-            where Request : class, IRequest;
-
-        /// <summary>
-        /// Defines logic for handling the specified <b>request</b>
-        /// </summary>
-        /// <typeparam name="Request">The type of the request being handled</typeparam>
-        /// <typeparam name="Response">The type of the request response</typeparam>
-        /// <param name="function">A method to be invoked when the request is received</param>
-        /// <exception cref="ArgumentException"/>
-        /// <exception cref="InvalidOperationException"/>
-        IOutboxConsumer Handle<Request, Response>(Func<Request, Response> function)
-            where Request : class, IRequest<Response>;
-
-        /// <summary>
-        /// Defines logic for handling the specified <b>request</b>
-        /// </summary>
-        /// <typeparam name="Request">The type of the request being handled</typeparam>
-        /// <param name="function">A method to be invoked when the request is received</param>
-        /// <exception cref="ArgumentException"/>
-        /// <exception cref="InvalidOperationException"/>
-        IOutboxConsumer Handle<Request>(Func<Request, Task> function)
-            where Request : class, IRequest;
-
-        /// <summary>
-        /// Defines logic for handling the specified <b>request</b>
-        /// </summary>
-        /// <typeparam name="Request">The type of the request being handled</typeparam>
-        /// <typeparam name="Response">The type of the request response</typeparam>
-        /// <param name="function">A method to be invoked when the request is received</param>
-        /// <exception cref="ArgumentException"/>
-        /// <exception cref="InvalidOperationException"/>
-        IOutboxConsumer Handle<Request, Response>(Func<Request, Task<Response>> function)
-            where Request : class, IRequest<Response>;
-
-        /// <summary>
-        /// Defines logic for handling the specified <b>request</b>
-        /// </summary>
-        /// <typeparam name="Request">The type of the request being handled</typeparam>
-        /// <param name="function">A method to be invoked when the request is received</param>
-        /// <exception cref="ArgumentException"/>
-        /// <exception cref="InvalidOperationException"/>
-        IOutboxConsumer Handle<Request>(Func<Request, CancellationToken, Task> function)
-            where Request : class, IRequest;
-
-        /// <summary>
-        /// Defines logic for handling the specified <b>request</b>
-        /// </summary>
-        /// <typeparam name="Request">The type of the request being handled</typeparam>
-        /// <typeparam name="Response">The type of the request response</typeparam>
-        /// <param name="function">A method to be invoked when the request is received</param>
-        /// <exception cref="ArgumentException"/>
-        /// <exception cref="InvalidOperationException"/>
-        IOutboxConsumer Handle<Request, Response>(Func<Request, CancellationToken, Task<Response>> function)
-            where Request : class, IRequest<Response>;
-
         /// <summary>
         /// Defines logic for handling the specified <b>request</b>
         /// </summary>

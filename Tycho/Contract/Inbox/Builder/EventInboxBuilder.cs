@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Tycho.Messaging.Forwarders;
 using Tycho.Messaging.Handlers;
 
@@ -8,27 +6,6 @@ namespace Tycho.Contract.Inbox.Builder
 {
     internal partial class InboxBuilder : IInboxDefinition, IRequestInboxDefinition, IEventInboxDefinition
     {
-        IInboxDefinition IEventInboxDefinition.Handle<Event>(Action<Event> action)
-        {
-            var handler = new LambdaWrappingEventHandler<Event>(action);
-            _moduleInbox.RegisterEventHandler(handler);
-            return this;
-        }
-
-        IInboxDefinition IEventInboxDefinition.Handle<Event>(Func<Event, Task> function)
-        {
-            var handler = new LambdaWrappingEventHandler<Event>(function);
-            _moduleInbox.RegisterEventHandler(handler);
-            return this;
-        }
-
-        IInboxDefinition IEventInboxDefinition.Handle<Event>(Func<Event, CancellationToken, Task> function)
-        {
-            var handler = new LambdaWrappingEventHandler<Event>(function);
-            _moduleInbox.RegisterEventHandler(handler);
-            return this;
-        }
-
         IInboxDefinition IEventInboxDefinition.Handle<Event>(IEventHandler<Event> handler)
         {
             _moduleInbox.RegisterEventHandler(handler);

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Tycho.Messaging.Forwarders;
 using Tycho.Messaging.Handlers;
 using Tycho.Messaging.Payload;
@@ -12,27 +10,6 @@ namespace Tycho.Contract.Outbox.Builder
         IOutboxDefinition IEventOutboxDefinition.Declare<Event>()
         {
             AddMessageDefinition(typeof(Event), nameof(Event));
-            return this;
-        }
-
-        IOutboxConsumer IEventOutboxConsumer.Handle<Event>(Action<Event> action)
-        {
-            var handler = new LambdaWrappingEventHandler<Event>(action);
-            RegisterEventHandler(handler);
-            return this;
-        }
-
-        IOutboxConsumer IEventOutboxConsumer.Handle<Event>(Func<Event, Task> function)
-        {
-            var handler = new LambdaWrappingEventHandler<Event>(function);
-            RegisterEventHandler(handler);
-            return this;
-        }
-
-        IOutboxConsumer IEventOutboxConsumer.Handle<Event>(Func<Event, CancellationToken, Task> function)
-        {
-            var handler = new LambdaWrappingEventHandler<Event>(function);
-            RegisterEventHandler(handler);
             return this;
         }
 

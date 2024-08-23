@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Tycho.Messaging.Handlers;
 using Tycho.Messaging.Interceptors;
 using Tycho.Messaging.Payload;
@@ -12,36 +10,6 @@ namespace Tycho.Contract.Inbox
     /// </summary>
     public interface IEventInboxDefinition
     {
-        /// <summary>
-        /// Declares that the specified <b>event</b> is handled by your module 
-        /// and defines logic for doing so
-        /// </summary>
-        /// <typeparam name="Event">The type of the event being handled</typeparam>
-        /// <param name="action">A method to be invoked when the event is published</param>
-        /// <exception cref="ArgumentException"/>
-        IInboxDefinition Handle<Event>(Action<Event> action)
-            where Event : class, IEvent;
-
-        /// <summary>
-        /// Declares that the specified <b>event</b> is handled by your module 
-        /// and defines logic for doing so
-        /// </summary>
-        /// <typeparam name="Event">The type of the event being handled</typeparam>
-        /// <param name="function">A method to be invoked when the event is published</param>
-        /// <exception cref="ArgumentException"/>
-        IInboxDefinition Handle<Event>(Func<Event, Task> function)
-            where Event : class, IEvent;
-
-        /// <summary>
-        /// Declares that the specified <b>event</b> is handled by your module 
-        /// and defines logic for doing so
-        /// </summary>
-        /// <typeparam name="Event">The type of the event being handled</typeparam>
-        /// <param name="function">A method to be invoked when the event is published</param>
-        /// <exception cref="ArgumentException"/>
-        IInboxDefinition Handle<Event>(Func<Event, CancellationToken, Task> function)
-            where Event : class, IEvent;
-
         /// <summary>
         /// Declares that the specified <b>event</b> is handled by your module 
         /// and defines logic for doing so

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Tycho.Messaging.Forwarders;
 using Tycho.Messaging.Handlers;
 using Tycho.Messaging.Payload;
@@ -18,48 +16,6 @@ namespace Tycho.Contract.Outbox.Builder
         IOutboxDefinition IRequestOutboxDefinition.Declare<Request, Response>()
         {
             AddMessageDefinition(typeof(Request), nameof(Request));
-            return this;
-        }
-
-        IOutboxConsumer IRequestOutboxConsumer.Handle<Request>(Action<Request> action)
-        {
-            var handler = new LambdaWrappingRequestHandler<Request>(action);
-            RegisterRequestHandler(handler);
-            return this;
-        }
-
-        IOutboxConsumer IRequestOutboxConsumer.Handle<Request, Response>(Func<Request, Response> function)
-        {
-            var handler = new LambdaWrappingRequestHandler<Request, Response>(function);
-            RegisterRequestHandler(handler);
-            return this;
-        }
-
-        IOutboxConsumer IRequestOutboxConsumer.Handle<Request>(Func<Request, Task> function)
-        {
-            var handler = new LambdaWrappingRequestHandler<Request>(function);
-            RegisterRequestHandler(handler);
-            return this;
-        }
-
-        IOutboxConsumer IRequestOutboxConsumer.Handle<Request, Response>(Func<Request, Task<Response>> function)
-        {
-            var handler = new LambdaWrappingRequestHandler<Request, Response>(function);
-            RegisterRequestHandler(handler);
-            return this;
-        }
-
-        IOutboxConsumer IRequestOutboxConsumer.Handle<Request>(Func<Request, CancellationToken, Task> function)
-        {
-            var handler = new LambdaWrappingRequestHandler<Request>(function);
-            RegisterRequestHandler(handler);
-            return this;
-        }
-
-        IOutboxConsumer IRequestOutboxConsumer.Handle<Request, Response>(Func<Request, CancellationToken, Task<Response>> function)
-        {
-            var handler = new LambdaWrappingRequestHandler<Request, Response>(function);
-            RegisterRequestHandler(handler);
             return this;
         }
 

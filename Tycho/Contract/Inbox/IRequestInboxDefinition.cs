@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Tycho.Messaging.Handlers;
 using Tycho.Messaging.Interceptors;
 using Tycho.Messaging.Payload;
@@ -12,69 +10,6 @@ namespace Tycho.Contract.Inbox
     /// </summary>
     public interface IRequestInboxDefinition
     {
-        /// <summary>
-        /// Declares that the specified <b>request</b> is handled by your module 
-        /// and defines logic for doing so
-        /// </summary>
-        /// <typeparam name="Request">The type of the request being handled</typeparam>
-        /// <param name="action">A method to be invoked when the request is received</param>
-        /// <exception cref="ArgumentException"/>
-        IInboxDefinition Handle<Request>(Action<Request> action)
-            where Request : class, IRequest;
-
-        /// <summary>
-        /// Declares that the specified <b>request</b> is handled by your module 
-        /// and defines logic for doing so
-        /// </summary>
-        /// <typeparam name="Request">The type of the request being handled</typeparam>
-        /// <typeparam name="Response">The type of the response expected by the request</typeparam>
-        /// <param name="function">A method to be invoked when the request is received</param>
-        /// <exception cref="ArgumentException"/>
-        IInboxDefinition Handle<Request, Response>(Func<Request, Response> function)
-            where Request : class, IRequest<Response>;
-
-        /// <summary>
-        /// Declares that the specified <b>request</b> is handled by your module 
-        /// and defines logic for doing so
-        /// </summary>
-        /// <typeparam name="Request">The type of the request being handled</typeparam>
-        /// <param name="function">A method to be invoked when the request is received</param>
-        /// <exception cref="ArgumentException"/>
-        IInboxDefinition Handle<Request>(Func<Request, Task> function)
-            where Request : class, IRequest;
-
-        /// <summary>
-        /// Declares that the specified <b>request</b> is handled by your module 
-        /// and defines logic for doing so
-        /// </summary>
-        /// <typeparam name="Request">The type of the request being handled</typeparam>
-        /// <typeparam name="Response">The type of the response expected by the request</typeparam>
-        /// <param name="function">A method to be invoked when the request is received</param>
-        /// <exception cref="ArgumentException"/>
-        IInboxDefinition Handle<Request, Response>(Func<Request, Task<Response>> function)
-            where Request : class, IRequest<Response>;
-
-        /// <summary>
-        /// Declares that the specified <b>request</b> is handled by your module 
-        /// and defines logic for doing so
-        /// </summary>
-        /// <typeparam name="Request">The type of the request being handled</typeparam>
-        /// <param name="function">A method to be invoked when the request is received</param>
-        /// <exception cref="ArgumentException"/>
-        IInboxDefinition Handle<Request>(Func<Request, CancellationToken, Task> function)
-            where Request : class, IRequest;
-
-        /// <summary>
-        /// Declares that the specified <b>request</b> is handled by your module 
-        /// and defines logic for doing so
-        /// </summary>
-        /// <typeparam name="Request">The type of the request being handled</typeparam>
-        /// <typeparam name="Response">The type of the response expected by the request</typeparam>
-        /// <param name="function">A method to be invoked when the request is received</param>
-        /// <exception cref="ArgumentException"/>
-        IInboxDefinition Handle<Request, Response>(Func<Request, CancellationToken, Task<Response>> function)
-            where Request : class, IRequest<Response>;
-
         /// <summary>
         /// Declares that the specified <b>request</b> is handled by your module 
         /// and defines logic for doing so

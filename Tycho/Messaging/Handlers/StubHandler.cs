@@ -4,12 +4,6 @@ using Tycho.Messaging.Payload;
 
 namespace Tycho.Messaging.Handlers
 {
-    internal class StubEventHandler<Event> : IEventHandler<Event>
-        where Event : class, IEvent
-    {
-        public Task Handle(Event eventData, CancellationToken cancellationToken) => Task.CompletedTask;
-    }
-
     internal class StubRequestHandler<Request> : IRequestHandler<Request>
         where Request : class, IRequest
     {

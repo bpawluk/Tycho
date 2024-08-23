@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Tycho.Messaging.Forwarders;
 using Tycho.Messaging.Handlers;
 
@@ -8,48 +6,6 @@ namespace Tycho.Contract.Inbox.Builder
 {
     internal partial class InboxBuilder : IInboxDefinition, IRequestInboxDefinition, IEventInboxDefinition
     {
-        IInboxDefinition IRequestInboxDefinition.Handle<Request>(Action<Request> action)
-        {
-            var handler = new LambdaWrappingRequestHandler<Request>(action);
-            _moduleInbox.RegisterRequestHandler(handler);
-            return this;
-        }
-
-        IInboxDefinition IRequestInboxDefinition.Handle<Request, Response>(Func<Request, Response> function)
-        {
-            var handler = new LambdaWrappingRequestHandler<Request, Response>(function);
-            _moduleInbox.RegisterRequestWithResponseHandler(handler);
-            return this;
-        }
-
-        IInboxDefinition IRequestInboxDefinition.Handle<Request>(Func<Request, Task> function)
-        {
-            var handler = new LambdaWrappingRequestHandler<Request>(function);
-            _moduleInbox.RegisterRequestHandler(handler);
-            return this;
-        }
-
-        IInboxDefinition IRequestInboxDefinition.Handle<Request, Response>(Func<Request, Task<Response>> function)
-        {
-            var handler = new LambdaWrappingRequestHandler<Request, Response>(function);
-            _moduleInbox.RegisterRequestWithResponseHandler(handler);
-            return this;
-        }
-
-        IInboxDefinition IRequestInboxDefinition.Handle<Request>(Func<Request, CancellationToken, Task> function)
-        {
-            var handler = new LambdaWrappingRequestHandler<Request>(function);
-            _moduleInbox.RegisterRequestHandler(handler);
-            return this;
-        }
-
-        IInboxDefinition IRequestInboxDefinition.Handle<Request, Response>(Func<Request, CancellationToken, Task<Response>> function)
-        {
-            var handler = new LambdaWrappingRequestHandler<Request, Response>(function);
-            _moduleInbox.RegisterRequestWithResponseHandler(handler);
-            return this;
-        }
-
         IInboxDefinition IRequestInboxDefinition.Handle<Request>(IRequestHandler<Request> handler)
         {
             _moduleInbox.RegisterRequestHandler(handler);

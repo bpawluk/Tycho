@@ -21,9 +21,9 @@ namespace Tycho.Messaging.Interceptors
         /// <summary>
         /// A method to be executed after the specified request is forwarded
         /// </summary>
-        /// <param name="requestata">An object that represents the request being intercepted</param>
+        /// <param name="requestData">An object that represents the request being intercepted</param>
         /// <param name="cancellationToken">A token that notifies when the operation should be canceled</param>
         /// <returns>A task that represents the asynchronous operation</returns>
-        Task ExecuteAfter(Request requestata, CancellationToken cancellationToken = default);
+        Task ExecuteAfter(Request requestData, CancellationToken cancellationToken = default);
     }
 }
