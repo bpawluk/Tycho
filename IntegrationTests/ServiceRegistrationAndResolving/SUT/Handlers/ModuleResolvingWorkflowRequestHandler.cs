@@ -5,14 +5,10 @@ using Tycho.Messaging.Handlers;
 
 namespace IntegrationTests.ServiceRegistrationAndResolving.SUT.Handlers;
 
-internal class ModuleResolvingWorkflowRequestHandler : IRequestHandler<ModuleResolvingWorkflowRequest, string>
+internal class ModuleResolvingWorkflowRequestHandler(IModule module) : 
+    IRequestHandler<ModuleResolvingWorkflowRequest, string>
 {
-    private readonly IModule _module;
-
-    public ModuleResolvingWorkflowRequestHandler(IModule module)
-    {
-        _module = module;
-    }
+    private readonly IModule _module = module;
 
     public Task<string> Handle(ModuleResolvingWorkflowRequest request, CancellationToken cancellationToken)
     {

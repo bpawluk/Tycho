@@ -5,16 +5,12 @@ using Tycho.Messaging.Handlers;
 
 namespace IntegrationTests.ContractDefinitionAndMessageHandling.SUT.InternalHandlers;
 
-internal class HandledByHandlerInstanceRequestWithResponseHandler : IRequestHandler<HandledByHandlerInstanceRequestWithResponse, string>
+internal class HandledByHandlerInstanceRequestWithResponseHandler(IModule thisModule) : 
+    IRequestHandler<HandledByHandlerInstanceRequestWithResponse, string>
 {
-    private readonly IModule _thisModule;
+    private readonly IModule _thisModule = thisModule;
 
-    public HandledByHandlerInstanceRequestWithResponseHandler(IModule thisModule)
-    {
-        _thisModule = thisModule;
-    }
-
-    public Task<string> Handle(HandledByHandlerInstanceRequestWithResponse requestData, CancellationToken cancellationToken = default)
+    public Task<string> Handle(HandledByHandlerInstanceRequestWithResponse requestData, CancellationToken cancellationToken)
     {
         return _thisModule.Execute<HandledByHandlerInstanceRequestWithResponse, string>(requestData);
     }

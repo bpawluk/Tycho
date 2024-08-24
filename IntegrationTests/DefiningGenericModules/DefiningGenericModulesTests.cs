@@ -55,7 +55,7 @@ public class DefiningGenericModulesTests
             .First(method => method.GetGenericArguments().Length == 2)
             .MakeGenericMethod(genericRequestWithResponseType, requestParameterType);
 
-        dynamic resultTask = executor.Invoke(module, new object[] { request, CancellationToken.None })!;
+        dynamic resultTask = executor.Invoke(module, [request, CancellationToken.None])!;
         return await resultTask;
     }
 

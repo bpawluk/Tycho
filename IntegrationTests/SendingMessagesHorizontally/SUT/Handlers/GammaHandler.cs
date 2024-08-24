@@ -6,7 +6,7 @@ using Tycho.Messaging.Handlers;
 
 namespace IntegrationTests.SendingMessagesHorizontally.SUT.Handlers;
 
-internal class GammaHandler(IModule appModule) :
+internal class GammaHandler(IModule module) :
     IEventHandler<EventToSend>,
     IEventHandler<GammaOutEvent>,
     IRequestHandler<RequestToSend>,
@@ -14,43 +14,43 @@ internal class GammaHandler(IModule appModule) :
     IRequestHandler<RequestWithResponseToSend, string>,
     IRequestHandler<GammaOutRequestWithResponse, GammaOutRequestWithResponse.Response>
 {
-    private readonly IModule _appModule = appModule;
+    private readonly IModule _module = module;
 
     public Task Handle(EventToSend eventData, CancellationToken cancellationToken)
     {
         eventData.Result.HandlingCount++;
-        _appModule.Publish(eventData);
+        _module.Publish(eventData);
         return Task.CompletedTask;
     }
 
     public Task Handle(GammaOutEvent eventData, CancellationToken cancellationToken)
     {
         eventData.Result.HandlingCount++;
-        _appModule.Publish<MappedEvent>(new(eventData.Result));
+        _module.Publish<MappedEvent>(new(eventData.Result));
         return Task.CompletedTask;
     }
 
     public async Task Handle(RequestToSend requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        await _appModule.Execute(requestData);
+        await _module.Execute(requestData);
     }
 
     public async Task Handle(GammaOutRequest requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        await _appModule.Execute<MappedRequest>(new(requestData.Result));
+        await _module.Execute<MappedRequest>(new(requestData.Result));
     }
 
     public async Task<string> Handle(RequestWithResponseToSend requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        return await _appModule.Execute<RequestWithResponseToSend, string>(requestData);
+        return await _module.Execute<RequestWithResponseToSend, string>(requestData);
     }
 
     public async Task<GammaOutRequestWithResponse.Response> Handle(GammaOutRequestWithResponse requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        return new(await _appModule.Execute<MappedRequestWithResponse, string>(new(requestData.Result)));
+        return new(await _module.Execute<MappedRequestWithResponse, string>(new(requestData.Result)));
     }
 }

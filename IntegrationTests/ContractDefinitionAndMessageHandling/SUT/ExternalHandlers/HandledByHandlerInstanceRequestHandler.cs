@@ -4,14 +4,10 @@ using Tycho.Messaging.Handlers;
 
 namespace IntegrationTests.ContractDefinitionAndMessageHandling.SUT.ExternalHandlers;
 
-internal class HandledByHandlerInstanceRequestHandler : IRequestHandler<HandledByHandlerInstanceRequest>
+internal class HandledByHandlerInstanceRequestHandler(ContractDefinitionAndMessageHandlingTests tests) : 
+    IRequestHandler<HandledByHandlerInstanceRequest>
 {
-    private readonly ContractDefinitionAndMessageHandlingTests _tests;
-
-    public HandledByHandlerInstanceRequestHandler(ContractDefinitionAndMessageHandlingTests tests)
-    {
-        _tests = tests;
-    }
+    private readonly ContractDefinitionAndMessageHandlingTests _tests = tests;
 
     public Task Handle(HandledByHandlerInstanceRequest requestData, CancellationToken cancellationToken)
     {

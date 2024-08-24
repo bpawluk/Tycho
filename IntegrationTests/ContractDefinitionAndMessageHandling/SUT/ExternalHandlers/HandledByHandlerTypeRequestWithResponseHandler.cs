@@ -6,15 +6,8 @@ namespace IntegrationTests.ContractDefinitionAndMessageHandling.SUT.ExternalHand
 
 internal class HandledByHandlerTypeRequestWithResponseHandler : IRequestHandler<HandledByHandlerTypeRequestWithResponse, string>
 {
-    private readonly ContractDefinitionAndMessageHandlingTests _tests;
-
-    public HandledByHandlerTypeRequestWithResponseHandler(ContractDefinitionAndMessageHandlingTests tests)
-    {
-        _tests = tests;
-    }
-
     public Task<string> Handle(HandledByHandlerTypeRequestWithResponse requestData, CancellationToken cancellationToken)
     {
-        return Task.FromResult(_tests.RequestWithResponseResponse);
+        return Task.FromResult(ContractDefinitionAndMessageHandlingTests.ReturnedResponse);
     }
 }

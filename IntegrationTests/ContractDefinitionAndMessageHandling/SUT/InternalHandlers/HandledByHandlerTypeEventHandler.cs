@@ -5,14 +5,10 @@ using Tycho.Messaging.Handlers;
 
 namespace IntegrationTests.ContractDefinitionAndMessageHandling.SUT.InternalHandlers;
 
-internal class HandledByHandlerTypeEventHandler : IEventHandler<HandledByHandlerTypeEvent>
+internal class HandledByHandlerTypeEventHandler(IModule thisModule) : 
+    IEventHandler<HandledByHandlerTypeEvent>
 {
-    private readonly IModule _thisModule;
-
-    public HandledByHandlerTypeEventHandler(IModule thisModule)
-    {
-        _thisModule = thisModule;
-    }
+    private readonly IModule _thisModule = thisModule;
 
     public Task Handle(HandledByHandlerTypeEvent eventData, CancellationToken cancellationToken)
     {

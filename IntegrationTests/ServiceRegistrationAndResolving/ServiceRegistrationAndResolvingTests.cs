@@ -1,6 +1,6 @@
-﻿using System.Threading.Tasks;
-using IntegrationTests.ServiceRegistrationAndResolving.SUT;
+﻿using IntegrationTests.ServiceRegistrationAndResolving.SUT;
 using IntegrationTests.ServiceRegistrationAndResolving.SUT.Submodules;
+using System.Threading.Tasks;
 using Tycho;
 
 namespace IntegrationTests.ServiceRegistrationAndResolving;

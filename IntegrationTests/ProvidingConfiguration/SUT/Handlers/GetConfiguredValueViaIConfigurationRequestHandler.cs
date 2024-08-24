@@ -6,14 +6,10 @@ using Tycho.Messaging.Handlers;
 
 namespace IntegrationTests.ProvidingConfiguration.SUT.Handlers;
 
-internal class GetConfiguredValueViaIConfigurationRequestHandler : IRequestHandler<GetConfiguredValueViaIConfigurationRequest, DateTime>
+internal class GetConfiguredValueViaIConfigurationRequestHandler(IConfiguration config) : 
+    IRequestHandler<GetConfiguredValueViaIConfigurationRequest, DateTime>
 {
-    private readonly IConfiguration _config;
-
-    public GetConfiguredValueViaIConfigurationRequestHandler(IConfiguration config)
-    {
-        _config = config;
-    }
+    private readonly IConfiguration _config = config;
 
     public Task<DateTime> Handle(GetConfiguredValueViaIConfigurationRequest requestData, CancellationToken cancellationToken)
     {

@@ -6,17 +6,13 @@ using Tycho.Messaging.Handlers;
 
 namespace IntegrationTests.ServiceRegistrationAndResolving.SUT.Handlers;
 
-internal class SubmoduleResolvingWorkflowRequestHandler : IRequestHandler<SubmoduleResolvingWorkflowRequest, string>
+internal class SubmoduleResolvingWorkflowRequestHandler(IModule<AppSubmodule> submodule) : 
+    IRequestHandler<SubmoduleResolvingWorkflowRequest, string>
 {
-    private readonly IModule _submodule;
+    private readonly IModule _submodule = submodule;
 
-    public SubmoduleResolvingWorkflowRequestHandler(IModule<AppSubmodule> submodule)
+    public Task<string> Handle(SubmoduleResolvingWorkflowRequest request, CancellationToken cancellationToken)
     {
-        _submodule = submodule;
-    }
-
-    public Task<string> Handle(SubmoduleResolvingWorkflowRequest request, CancellationToken cancellationToken = default)
-    {
-        return _submodule.Execute<GetDataFromSubmoduleRequestWithResponse, string>(new());
+        return _submodule.Execute<GetDataFromSubmoduleRequest, string>(new());
     }
 }

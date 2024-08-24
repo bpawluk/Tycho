@@ -5,14 +5,10 @@ using Tycho.Messaging.Handlers;
 
 namespace IntegrationTests.ServiceRegistrationAndResolving.SUT.Handlers;
 
-internal class SingletonServiceWorkflowRequestHandler : IRequestHandler<SingletonServiceWorkflowRequest, int>
+internal class SingletonServiceWorkflowRequestHandler(ISingletonService service) : 
+    IRequestHandler<SingletonServiceWorkflowRequest, int>
 {
-    private readonly ISingletonService _service;
-
-    public SingletonServiceWorkflowRequestHandler(ISingletonService service)
-    {
-        _service = service;
-    }
+    private readonly ISingletonService _service = service;
 
     public Task<int> Handle(SingletonServiceWorkflowRequest request, CancellationToken cancellationToken)
     {

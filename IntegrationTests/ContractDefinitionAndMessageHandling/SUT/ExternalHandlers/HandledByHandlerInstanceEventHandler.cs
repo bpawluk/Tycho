@@ -4,14 +4,10 @@ using Tycho.Messaging.Handlers;
 
 namespace IntegrationTests.ContractDefinitionAndMessageHandling.SUT.ExternalHandlers;
 
-internal class HandledByHandlerInstanceEventHandler : IEventHandler<HandledByHandlerInstanceEvent>
+internal class HandledByHandlerInstanceEventHandler(ContractDefinitionAndMessageHandlingTests tests) : 
+    IEventHandler<HandledByHandlerInstanceEvent>
 {
-    private readonly ContractDefinitionAndMessageHandlingTests _tests;
-
-    public HandledByHandlerInstanceEventHandler(ContractDefinitionAndMessageHandlingTests tests)
-    {
-        _tests = tests;
-    }
+    private readonly ContractDefinitionAndMessageHandlingTests _tests = tests;
 
     public Task Handle(HandledByHandlerInstanceEvent eventData, CancellationToken cancellationToken)
     {

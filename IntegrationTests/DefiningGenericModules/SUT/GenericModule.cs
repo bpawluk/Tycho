@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using IntegrationTests.DefiningGenericModules.SUT.Handlers;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using Tycho;
@@ -19,7 +20,7 @@ internal class GenericModule<T> : TychoModule
 {
     protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
-        module.Requests.Handle<GenericRequestWithResponse<T>, T>((request) => request.Data);
+        module.Requests.Handle<GenericRequestWithResponse<T>, T, GenericRequestWithResponseHandler<T>>();
     }
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services) { }

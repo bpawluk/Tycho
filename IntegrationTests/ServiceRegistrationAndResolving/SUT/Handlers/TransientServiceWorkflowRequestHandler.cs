@@ -5,14 +5,10 @@ using Tycho.Messaging.Handlers;
 
 namespace IntegrationTests.ServiceRegistrationAndResolving.SUT.Handlers;
 
-internal class TransientServiceWorkflowRequestHandler : IRequestHandler<TransientServiceWorkflowRequest, int>
+internal class TransientServiceWorkflowRequestHandler(ITransientService service) : 
+    IRequestHandler<TransientServiceWorkflowRequest, int>
 {
-    private readonly ITransientService _service;
-
-    public TransientServiceWorkflowRequestHandler(ITransientService service)
-    {
-        _service = service;
-    }
+    private readonly ITransientService _service = service;
 
     public Task<int> Handle(TransientServiceWorkflowRequest request, CancellationToken cancellationToken)
     {

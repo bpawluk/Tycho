@@ -5,14 +5,10 @@ using Tycho.Messaging.Handlers;
 
 namespace IntegrationTests.ProvidingConfiguration.SUT.Handlers;
 
-internal class GetConfiguredValueViaBindingRequestHandler : IRequestHandler<GetConfiguredValueViaBindingRequest, int>
+internal class GetConfiguredValueViaBindingRequestHandler(TestConfig config) : 
+    IRequestHandler<GetConfiguredValueViaBindingRequest, int>
 {
-    private readonly TestConfig _config;
-
-    public GetConfiguredValueViaBindingRequestHandler(TestConfig config)
-    {
-        _config = config;
-    }
+    private readonly TestConfig _config = config;
 
     public Task<int> Handle(GetConfiguredValueViaBindingRequest requestData, CancellationToken cancellationToken)
     {
