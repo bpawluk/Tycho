@@ -12,6 +12,6 @@ internal class ModuleResolvingWorkflowRequestHandler(IModule module) :
 
     public Task<string> Handle(ModuleResolvingWorkflowRequest request, CancellationToken cancellationToken)
     {
-        return _module.Execute<GetDataFromThisModulesClientRequestWithResponse, string>(new(), cancellationToken);
+        return _module.Execute<GetDataFromThisModulesClientRequest, string>(new(), cancellationToken);
     }
 }

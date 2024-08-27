@@ -14,18 +14,20 @@ namespace IntegrationTests.ServiceRegistrationAndResolving.SUT;
 
 // Incoming
 internal record SingletonServiceWorkflowRequest : IRequest<int>;
+internal record ScopedServiceWorkflowRequest : IRequest<int>;
 internal record TransientServiceWorkflowRequest : IRequest<int>;
 internal record SubmoduleResolvingWorkflowRequest : IRequest<string>;
 internal record ModuleResolvingWorkflowRequest : IRequest<string>;
 
 // Outgoing
-internal record GetDataFromThisModulesClientRequestWithResponse() : IRequest<string>;
+internal record GetDataFromThisModulesClientRequest() : IRequest<string>;
 
 internal class AppModule : TychoModule
 {
     protected override void HandleIncomingMessages(IInboxDefinition module, IServiceProvider services)
     {
         module.Requests.Handle<SingletonServiceWorkflowRequest, int, SingletonServiceWorkflowRequestHandler>()
+              .Requests.Handle<ScopedServiceWorkflowRequest, int, ScopedServiceWorkflowRequestHandler>()
               .Requests.Handle<TransientServiceWorkflowRequest, int, TransientServiceWorkflowRequestHandler>()
               .Requests.Handle<SubmoduleResolvingWorkflowRequest, string, SubmoduleResolvingWorkflowRequestHandler>()
               .Requests.Handle<ModuleResolvingWorkflowRequest, string, ModuleResolvingWorkflowRequestHandler>();
@@ -33,7 +35,7 @@ internal class AppModule : TychoModule
 
     protected override void DeclareOutgoingMessages(IOutboxDefinition module, IServiceProvider services) 
     {
-        module.Requests.Declare<GetDataFromThisModulesClientRequestWithResponse, string>();
+        module.Requests.Declare<GetDataFromThisModulesClientRequest, string>();
     }
 
     protected override void IncludeSubmodules(ISubstructureDefinition module, IServiceProvider services)
@@ -44,6 +46,7 @@ internal class AppModule : TychoModule
     protected override void RegisterServices(IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<ISingletonService, SingletonService>()
+                .AddScoped<IScopedService, ScopedService>()
                 .AddTransient<ITransientService, TransientService>();
     }
 }

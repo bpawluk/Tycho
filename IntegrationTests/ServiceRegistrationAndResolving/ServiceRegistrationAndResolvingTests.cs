@@ -14,7 +14,7 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         _sut = await new AppModule()
             .FulfillContract(consumer =>
             {
-                consumer.Requests.Ignore<GetDataFromThisModulesClientRequestWithResponse, string>(
+                consumer.Requests.Ignore<GetDataFromThisModulesClientRequest, string>(
                     $"Response from {typeof(ServiceRegistrationAndResolvingTests).Name}");
             })
             .Build();
@@ -32,6 +32,22 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
 
         // Assert
         Assert.Equal(1, firstResult);
+        Assert.Equal(2, secondResult);
+    }
+
+    [Fact]
+    public async Task Tycho_Enables_ResolvingScopedServices()
+    {
+        // Arrange
+        // - no arrangement required
+
+        // Act
+        var firstResult = await _sut!.Execute<ScopedServiceWorkflowRequest, int>(new());
+        var secondResult = await _sut.Execute<ScopedServiceWorkflowRequest, int>(new());
+
+        // Assert
+        Assert.Equal(1, firstResult);
+        // TODO: Introduce Message handling scope and expect 1 below
         Assert.Equal(2, secondResult);
     }
 
