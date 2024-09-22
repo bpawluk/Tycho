@@ -14,7 +14,13 @@ namespace TychoV2.Requests.Setup
             _internals = internals;
         }
 
-        public void RegisterRequestHandler<TRequest, THandler>()
+        // string ServiceKey
+
+        // Handle
+        // Forward
+        // Expose
+
+        private void RegisterRequestHandler<TRequest, THandler>()
             where TRequest : class, IRequest
             where THandler : class, IHandle<TRequest>
         {
@@ -24,7 +30,7 @@ namespace TychoV2.Requests.Setup
             }
         }
 
-        public void RegisterRequestHandler<TRequest, TResponse, THandler>()
+        private void RegisterRequestHandler<TRequest, TResponse, THandler>()
             where TRequest : class, IRequest<TResponse>
             where THandler : class, IHandle<TRequest, TResponse>
         {
