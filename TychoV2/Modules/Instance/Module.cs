@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using TychoV2.Requests;
 using TychoV2.Structure;
 
-namespace TychoV2.Modules
+namespace TychoV2.Modules.Instance
 {
     internal class Module<TModuleDefinition> : IModule<TModuleDefinition>
         where TModuleDefinition : TychoModule

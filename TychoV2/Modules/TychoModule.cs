@@ -6,6 +6,9 @@ using TychoV2.Modules.Setup;
 
 namespace TychoV2.Modules
 {
+    /// <summary>
+    /// TODO
+    /// </summary>
     public abstract class TychoModule
     {
         private readonly object _runLock = new object();
@@ -13,6 +16,9 @@ namespace TychoV2.Modules
 
         private readonly ModuleBuilder _builder;
 
+        /// <summary>
+        /// TODO
+        /// </summary>
         protected IConfiguration Configuration => _builder.Configuration ?? throw new InvalidOperationException("Configuration not yet available");
 
         public TychoModule()
@@ -20,14 +26,29 @@ namespace TychoV2.Modules
             _builder = new ModuleBuilder(GetType());
         }
 
+        /// <summary>
+        /// TODO
+        /// </summary>
         protected abstract void DefineContract(IModuleContract module);
 
+        /// <summary>
+        /// TODO
+        /// </summary>
         protected abstract void IncludeModules(IModuleStructure module);
 
+        /// <summary>
+        /// TODO
+        /// </summary>
         protected abstract void MapEvents(IModuleEvents module);
 
+        /// <summary>
+        /// TODO
+        /// </summary>
         protected abstract void RegisterServices(IServiceCollection module);
 
+        /// <summary>
+        /// TODO
+        /// </summary>
         protected virtual Task Startup(IServiceProvider module) { return Task.CompletedTask; }
 
         internal TychoModule Configure(Action<IConfigurationBuilder> configurationDefinition)

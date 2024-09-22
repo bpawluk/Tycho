@@ -3,7 +3,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NewTycho.Requests.Execution
+namespace NewTycho.Requests
 {
     internal class RequestBroker : IExecute
     {

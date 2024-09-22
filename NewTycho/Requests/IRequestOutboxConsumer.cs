@@ -1,6 +1,6 @@
 ﻿using NewTycho.Modules;
 
-namespace NewTycho.Requests.Outbox
+namespace NewTycho.Requests
 {
     /// <summary>
     /// Lets you define logic for handling <b>requests</b> sent out by a module that you want to use

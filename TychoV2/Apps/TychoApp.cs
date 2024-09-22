@@ -6,6 +6,9 @@ using TychoV2.Apps.Setup;
 
 namespace TychoV2.Apps
 {
+    /// <summary>
+    /// TODO
+    /// </summary>
     public abstract class TychoApp
     {
         private readonly object _runLock = new object();
@@ -13,18 +16,39 @@ namespace TychoV2.Apps
 
         private readonly AppBuilder _builder = new AppBuilder();
 
+        /// <summary>
+        /// TODO
+        /// </summary>
         protected IConfiguration Configuration => _builder.Configuration ?? throw new InvalidOperationException("Configuration not yet available");
 
+        /// <summary>
+        /// TODO
+        /// </summary>
         protected abstract void DefineContract(IAppContract app);
 
+        /// <summary>
+        /// TODO
+        /// </summary>
         protected abstract void IncludeModules(IAppStructure app);
 
+        /// <summary>
+        /// TODO
+        /// </summary>
         protected abstract void MapEvents(IAppEvents app);
 
+        /// <summary>
+        /// TODO
+        /// </summary>
         protected abstract void RegisterServices(IServiceCollection app);
 
+        /// <summary>
+        /// TODO
+        /// </summary>
         protected virtual Task Startup(IServiceProvider app) { return Task.CompletedTask; }
 
+        /// <summary>
+        /// TODO
+        /// </summary>
         public async Task<IApp> Run()
         {
             EnsureItIsRunOnlyOnce();

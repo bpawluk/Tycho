@@ -1,6 +1,9 @@
 ﻿namespace TychoV2.Modules
 {
-    internal interface IContractFulfillment
+    /// <summary>
+    /// TODO
+    /// </summary>
+    public interface IContractFulfillment
     {
     }
 }

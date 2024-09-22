@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using TychoV2.Modules.Instance;
 using TychoV2.Structure;
 
 namespace TychoV2.Modules.Setup
