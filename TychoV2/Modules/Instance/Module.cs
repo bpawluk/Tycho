@@ -22,6 +22,7 @@ namespace TychoV2.Modules.Instance
         public Task Execute<TRequest>(TRequest requestData, CancellationToken cancellationToken)
              where TRequest : class, IRequest
         {
+            // TODO: Use broker instead
             var handler = _internals.GetService<IHandle<TRequest>>() ?? throw new InvalidOperationException($"Request handler for {typeof(TRequest).Name} was not registered");
             return handler.Handle(requestData, cancellationToken);
         }
@@ -29,6 +30,7 @@ namespace TychoV2.Modules.Instance
         public Task<TResponse> Execute<TRequest, TResponse>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest<TResponse>
         {
+            // TODO: Use broker instead
             var handler = _internals.GetService<IHandle<TRequest, TResponse>>() ?? throw new InvalidOperationException($"Request handler for {typeof(TRequest).Name} was not registered");
             return handler.Handle(requestData, cancellationToken);
         }
