@@ -55,7 +55,7 @@ namespace TychoV2.Modules
         /// <summary>
         /// TODO
         /// </summary>
-        IModuleContract Ignore<TRequest, TResponse>(TResponse response)
+        IModuleContract Ignore<TRequest, TResponse>()
             where TRequest : class, IRequest<TResponse>;
     }
 }
