@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Threading.Tasks;
 using TychoV2.Modules.Instance;
+using TychoV2.Requests.Broker;
 using TychoV2.Structure;
 
 namespace TychoV2.Modules.Setup
@@ -12,8 +14,6 @@ namespace TychoV2.Modules.Setup
         private readonly Internals _internals;
 
         private Action<IConfigurationBuilder>? _configurationDefinition;
-        private Action<IContractFulfillment>? _contractFullfilment;
-        private IServiceProvider? _contractFullfilmentServices;
 
         public IConfiguration? Configuration { get; private set; }
 
@@ -39,10 +39,9 @@ namespace TychoV2.Modules.Setup
             _configurationDefinition = configurationDefinition;
         }
 
-        public void WithContractFulfillment(Action<IContractFulfillment> contractFulfillment, IServiceProvider contractFulfillmentServices)
+        public void WithContractFulfillment(IRequestBroker contractFulfillingBroker)
         {
-            _contractFullfilment = contractFulfillment;
-            _contractFullfilmentServices = contractFulfillmentServices;
+            Contract.WithContractFulfillment(contractFulfillingBroker);
         }
 
         public void Init()
@@ -52,15 +51,16 @@ namespace TychoV2.Modules.Setup
             Configuration = configurationBuilder.Build();
         }
 
-        public IModule Build()
+        public async Task<IModule> Build()
         {
             var services = _internals.GetServiceCollection();
             var module = (IModule)Activator.CreateInstance(_moduleType, _internals);
-            services.AddSingleton(module);
 
-            Contract.Build();
             Events.Build();
-            Structure.Build();
+            await Structure.Build();
+
+            services.AddSingleton(Configuration!);
+            services.AddTransient<IModule, ParentProxy>();
             _internals.Build();
 
             return module;

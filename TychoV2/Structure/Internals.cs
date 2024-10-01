@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Linq;
 
 namespace TychoV2.Structure
 {
@@ -21,6 +22,18 @@ namespace TychoV2.Structure
         {
             _serviceProvider ??= _serviceCollection!.BuildServiceProvider();
             _serviceCollection = null;
+        }
+
+        public bool HasService<TServiceInterface>()
+        {
+            var serviceType = typeof(TServiceInterface);
+
+            if (_serviceCollection != null)
+            {
+                return _serviceCollection.Any(descriptor => descriptor.ServiceType == serviceType);
+            }
+
+            return GetService(serviceType) != null;
         }
 
         public object GetService(Type serviceType)

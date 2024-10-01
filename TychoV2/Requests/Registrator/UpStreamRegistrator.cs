@@ -41,8 +41,8 @@ namespace TychoV2.Requests.Registrator
             where THandler : class, IHandle<TRequest>
         {
             if (TryAddRegistration<
-                IUpStreamHandlerRegistration<TRequest>, 
-                UpStreamHandlerRegistration<TRequest, THandler>>())
+                    IUpStreamHandlerRegistration<TRequest>,
+                    UpStreamHandlerRegistration<TRequest, THandler>>())
             {
                 Services.TryAddTransient<THandler>();
             }
@@ -57,8 +57,8 @@ namespace TychoV2.Requests.Registrator
             where THandler : class, IHandle<TRequest, TResponse>
         {
             if (TryAddRegistration<
-                IUpStreamHandlerRegistration<TRequest, TResponse>, 
-                UpStreamHandlerRegistration<TRequest, TResponse, THandler>>())
+                    IUpStreamHandlerRegistration<TRequest, TResponse>,
+                    UpStreamHandlerRegistration<TRequest, TResponse, THandler>>())
             {
                 Services.TryAddTransient<THandler>();
             }

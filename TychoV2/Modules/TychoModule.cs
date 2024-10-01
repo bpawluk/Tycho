@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 using TychoV2.Modules.Setup;
+using TychoV2.Requests.Broker;
 
 namespace TychoV2.Modules
 {
@@ -57,9 +58,9 @@ namespace TychoV2.Modules
             return this;
         }
 
-        internal TychoModule FulfillContract(Action<IContractFulfillment> contractFulfillment, IServiceProvider contractFulfillmentServices)
+        internal TychoModule FulfillContract(IRequestBroker contractFulfillingBroker)
         {
-            _builder.WithContractFulfillment(contractFulfillment, contractFulfillmentServices);
+            _builder.WithContractFulfillment(contractFulfillingBroker);
             return this;
         }
 
@@ -73,7 +74,7 @@ namespace TychoV2.Modules
             MapEvents(_builder.Events);
             IncludeModules(_builder.Structure);
 
-            var module = _builder.Build();
+            var module = await _builder.Build();
             await Startup(module.Internals).ConfigureAwait(false);
 
             return module;

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System.Linq;
 using TychoV2.Requests.Registrations;
 using TychoV2.Structure;
 
@@ -20,13 +19,13 @@ namespace TychoV2.Requests.Registrator
             where THandlerRegistrationInterface : class, IHandlerRegistration
             where THandlerRegistration : class, THandlerRegistrationInterface
         {
-            if (Services.Any(service => service.ServiceType == typeof(THandlerRegistrationInterface)))
+            if (_internals.HasService<THandlerRegistrationInterface>())
             {
-                Services.AddTransient<THandlerRegistrationInterface, THandlerRegistration>();
-                return true;
+                return false;
             }
 
-            return false;
+            Services.AddTransient<THandlerRegistrationInterface, THandlerRegistration>();
+            return true;
         }
     }
 }
