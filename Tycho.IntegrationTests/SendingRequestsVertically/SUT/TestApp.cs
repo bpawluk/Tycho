@@ -1,13 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tycho.IntegrationTests._Utils;
-using Tycho.IntegrationTests.SendingRequestsHorizontally.SUT.Handlers;
-using Tycho.IntegrationTests.SendingRequestsHorizontally.SUT.Modules.Alpha;
-using Tycho.IntegrationTests.SendingRequestsHorizontally.SUT.Modules.Beta;
-using Tycho.IntegrationTests.SendingRequestsHorizontally.SUT.Modules.Gamma;
+using Tycho.IntegrationTests.SendingRequestsVertically.SUT.Handlers;
+using Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Alpha;
 using TychoV2.Apps;
 using TychoV2.Requests;
 
-namespace Tycho.IntegrationTests.SendingRequestsHorizontally.SUT;
+namespace Tycho.IntegrationTests.SendingRequestsVertically.SUT;
 
 // Handles
 public record Request(TestResult Result) : IRequest;
@@ -29,18 +27,6 @@ public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
         {
             contract.Handle<AlphaOutRequest, AlphaOutRequestHandler>()
                     .Handle<AlphaOutRequestWithResponse, string, AlphaOutRequestHandler>();
-        });
-
-        app.AddModule<BetaModule>(contract =>
-        {
-            contract.Handle<BetaOutRequest, BetaOutRequestHandler>()
-                    .Handle<BetaOutRequestWithResponse, string, BetaOutRequestHandler>();
-        });
-
-        app.AddModule<GammaModule>(contract =>
-        {
-            contract.Handle<GammaOutRequest, GammaOutRequestHandler>()
-                    .Handle<GammaOutRequestWithResponse, string, GammaOutRequestHandler>();
         });
     }
 

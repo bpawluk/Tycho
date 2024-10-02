@@ -1,10 +1,10 @@
 ﻿using Tycho.IntegrationTests._Utils;
-using Tycho.IntegrationTests.SendingRequestsHorizontally.SUT;
+using Tycho.IntegrationTests.SendingRequestsVertically.SUT;
 using TychoV2.Apps;
 
-namespace Tycho.IntegrationTests.SendingRequestsHorizontally;
+namespace Tycho.IntegrationTests.SendingRequestsVertically;
 
-public class SendingRequestsHorizontallyTests : IAsyncLifetime
+public class SendingRequestsVerticallyTests : IAsyncLifetime
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = new();
     private IApp _sut = null!;
@@ -15,7 +15,7 @@ public class SendingRequestsHorizontallyTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task TychoEnables_SendingRequests_WithinHorizontalHierarchy()
+    public async Task TychoEnables_SendingRequests_WithinVerticalHierarchy()
     {
         // Arrange
         var workflowId = "request-workflow";
@@ -31,7 +31,7 @@ public class SendingRequestsHorizontallyTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task TychoEnables_SendingRequestsForResponses_WithinHorizontalHierarchy()
+    public async Task TychoEnables_SendingRequestsForResponses_WithinVerticalHierarchy()
     {
         // Arrange
         var workflowId = "request-with-response-workflow";

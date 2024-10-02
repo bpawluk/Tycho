@@ -1,4 +1,4 @@
-﻿namespace Tycho.IntegrationTests.TestUtils;
+﻿namespace Tycho.IntegrationTests._Utils;
 
 public class TestWorkflow<TResult>
 {
