@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules.TestModule.Handlers;
 using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Services;
-using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Submodules.TestModule.Handlers;
 using TychoV2.Modules;
 using TychoV2.Requests;
 
-namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Submodules.TestModule;
+namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules.TestModule;
 
 // Handles
 public record GetModuleSingletonServiceUsageRequest : IRequest<int>;

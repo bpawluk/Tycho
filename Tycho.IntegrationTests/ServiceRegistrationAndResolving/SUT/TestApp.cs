@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Handlers;
+using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules.TestModule;
 using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Services;
-using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Submodules.TestModule;
 using TychoV2.Apps;
 using TychoV2.Requests;
 

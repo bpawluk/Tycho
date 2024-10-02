@@ -1,7 +1,7 @@
 ﻿using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Services;
 using TychoV2.Requests;
 
-namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Submodules.TestModule.Handlers;
+namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules.TestModule.Handlers;
 
 internal class GetModuleTransientServiceUsageRequestHandler(ITransientService service) : IHandle<GetModuleTransientServiceUsageRequest, int>
 {
