@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using TychoV2.Requests.Registrations;
@@ -30,6 +31,11 @@ namespace TychoV2.Requests.Broker
         public Task Execute<TRequest>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest
         {
+            if (requestData is null)
+            {
+                throw new ArgumentException($"{nameof(requestData)} cannot be null", nameof(requestData));
+            }
+
             var handlerRegistration = _internals.GetRequiredService<IUpStreamHandlerRegistration<TRequest>>();
             return handlerRegistration.Handler.Handle(requestData, cancellationToken);
         }
@@ -37,6 +43,11 @@ namespace TychoV2.Requests.Broker
         public Task<TResponse> Execute<TRequest, TResponse>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest<TResponse>
         {
+            if (requestData is null)
+            {
+                throw new ArgumentException($"{nameof(requestData)} cannot be null", nameof(requestData));
+            }
+
             var handlerRegistration = _internals.GetRequiredService<IUpStreamHandlerRegistration<TRequest, TResponse>>();
             return handlerRegistration.Handler.Handle(requestData, cancellationToken);
         }

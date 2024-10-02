@@ -11,7 +11,7 @@ namespace TychoV2.Modules
         /// <summary>
         /// TODO
         /// </summary>
-        IModuleContract Handles<TEvent, THandler>()
+        IModuleEvents Handles<TEvent, THandler>()
             where TEvent : class, IEvent
             where THandler : class, IHandle<TEvent>;
 
