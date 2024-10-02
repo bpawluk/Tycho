@@ -1,17 +1,13 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using TychoV2.Requests;
 using TychoV2.Requests.Broker;
-using TychoV2.Structure;
 
-namespace TychoV2.Modules.Instance
+namespace TychoV2.Structure
 {
-    internal class ParentProxy : IModule
+    internal class ParentProxy : IParent
     {
         private readonly IRequestBroker _contractFulfillingBroker;
-
-        Internals IModule.Internals => throw new InvalidOperationException();
 
         public ParentProxy(IRequestBroker contractFulfillingBroker)
         {

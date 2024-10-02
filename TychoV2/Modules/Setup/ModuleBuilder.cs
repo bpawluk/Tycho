@@ -46,9 +46,11 @@ namespace TychoV2.Modules.Setup
 
         public void Init()
         {
+            var services = _internals.GetServiceCollection();
             var configurationBuilder = new ConfigurationBuilder();
             _configurationDefinition?.Invoke(configurationBuilder);
             Configuration = configurationBuilder.Build();
+            services.AddSingleton(Configuration);
         }
 
         public async Task<IModule> Build()
@@ -59,8 +61,7 @@ namespace TychoV2.Modules.Setup
             Events.Build();
             await Structure.Build();
 
-            services.AddSingleton(Configuration!);
-            services.AddTransient<IModule, ParentProxy>();
+            services.AddTransient<IParent, ParentProxy>();
             _internals.Build();
 
             return module;

@@ -18,6 +18,7 @@ namespace TychoV2.Modules
         /// </summary>
         IContractFulfillment Expose<TRequest, TResponse>()
             where TRequest : class, IRequest<TResponse>;
+
         /// <summary>
         /// TODO
         /// </summary>

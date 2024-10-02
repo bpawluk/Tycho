@@ -11,9 +11,9 @@ namespace TychoV2.Modules
         /// <summary>
         /// TODO
         /// </summary>
-        IModuleStructure AddSubmodule<Module>(
+        IModuleStructure AddSubmodule<TModule>(
             Action<IContractFulfillment>? contractFulfillment = null,
             Action<IConfigurationBuilder>? configurationDefinition = null)
-            where Module : TychoModule, new();
+            where TModule : TychoModule, new();
     }
 }

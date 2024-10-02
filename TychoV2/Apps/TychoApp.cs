@@ -14,12 +14,17 @@ namespace TychoV2.Apps
         private readonly object _runLock = new object();
         private bool _wasAlreadyRun = false;
 
-        private readonly AppBuilder _builder = new AppBuilder();
+        private readonly AppBuilder _builder;
 
         /// <summary>
         /// TODO
         /// </summary>
         protected IConfiguration Configuration => _builder.Configuration ?? throw new InvalidOperationException("Configuration not yet available");
+
+        public TychoApp()
+        {
+            _builder = new AppBuilder(GetType());
+        }
 
         /// <summary>
         /// TODO
@@ -53,13 +58,14 @@ namespace TychoV2.Apps
         {
             EnsureItIsRunOnlyOnce();
 
+            _builder.Init();
             RegisterServices(_builder.Services);
             DefineContract(_builder.Contract);
             MapEvents(_builder.Events);
             IncludeModules(_builder.Structure);
 
-            var app = _builder.Build();
-            await Startup(app.Services).ConfigureAwait(false);
+            var app = await _builder.Build();
+            await Startup(app.Internals).ConfigureAwait(false);
 
             return app;
         }

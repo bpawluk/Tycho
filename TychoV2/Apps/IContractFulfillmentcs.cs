@@ -6,34 +6,46 @@ namespace TychoV2.Apps
     /// <summary>
     /// TODO
     /// </summary>
-    public interface IAppContract
+    public interface IContractFulfillment
     {
         /// <summary>
         /// TODO
         /// </summary>
-        IAppContract Forwards<TRequest, TModule>()
+        IContractFulfillment Forward<TRequest, TModule>()
             where TRequest : class, IRequest
             where TModule : TychoModule;
 
         /// <summary>
         /// TODO
         /// </summary>
-        IAppContract Forwards<TRequest, TResponse, TModule>()
+        IContractFulfillment Forward<TRequest, TResponse, TModule>()
             where TRequest : class, IRequest<TResponse>
             where TModule : TychoModule;
 
         /// <summary>
         /// TODO
         /// </summary>
-        IAppContract Handles<TRequest, THandler>()
+        IContractFulfillment Handle<TRequest, THandler>()
             where TRequest : class, IRequest
             where THandler : class, IHandle<TRequest>;
 
         /// <summary>
         /// TODO
         /// </summary>
-        IAppContract Handles<TRequest, TResponse, THandler>()
+        IContractFulfillment Handle<TRequest, TResponse, THandler>()
             where TRequest : class, IRequest<TResponse>
             where THandler : class, IHandle<TRequest, TResponse>;
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        IContractFulfillment Ignore<TRequest>()
+            where TRequest : class, IRequest;
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        IContractFulfillment Ignore<TRequest, TResponse>()
+            where TRequest : class, IRequest<TResponse>;
     }
 }
