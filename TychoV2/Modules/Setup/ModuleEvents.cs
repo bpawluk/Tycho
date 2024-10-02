@@ -13,7 +13,7 @@ namespace TychoV2.Modules.Setup
             _internals = internals;
         }
 
-        public IModuleContract Handles<TEvent, THandler>()
+        public IModuleEvents Handles<TEvent, THandler>()
             where TEvent : class, IEvent
             where THandler : class, IHandle<TEvent>
         {

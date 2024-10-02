@@ -13,7 +13,7 @@ namespace TychoV2.Apps.Setup
             _internals = internals;
         }
 
-        public IAppContract Handles<TEvent, THandler>()
+        public IAppEvents Handles<TEvent, THandler>()
             where TEvent : class, IEvent
             where THandler : class, IHandle<TEvent>
         {
