@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Handlers;
-using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules.TestModule;
+using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules;
 using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Services;
 using TychoV2.Apps;
 using TychoV2.Requests;
@@ -16,9 +16,9 @@ public class TestApp : TychoApp
 {
     protected override void DefineContract(IAppContract app)
     {
-        app.Handles<GetAppSingletonServiceUsageRequest, int, GetAppSingletonServiceUsageRequestHandler>()
-           .Handles<GetAppScopedServiceUsageRequest, int, GetAppScopedServiceUsageRequestHandler>()
-           .Handles<GetAppTransientServiceUsageRequest, int, GetAppTransientServiceUsageRequestHandler>();
+        app.Handles<GetAppSingletonServiceUsageRequest, int, GetSingletonServiceUsageRequestHandler>()
+           .Handles<GetAppScopedServiceUsageRequest, int, GetScopedServiceUsageRequestHandler>()
+           .Handles<GetAppTransientServiceUsageRequest, int, GetTransientServiceUsageRequestHandler>();
 
         app.Forwards<GetModuleSingletonServiceUsageRequest, int, TestModule>()
            .Forwards<GetModuleScopedServiceUsageRequest, int, TestModule>()

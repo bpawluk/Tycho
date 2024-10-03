@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules.TestModule.Handlers;
+using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Handlers;
 using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Services;
 using TychoV2.Modules;
 using TychoV2.Requests;
 
-namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules.TestModule;
+namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules;
 
 // Handles
 public record GetModuleSingletonServiceUsageRequest : IRequest<int>;
@@ -15,9 +15,9 @@ internal class TestModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<GetModuleSingletonServiceUsageRequest, int, GetModuleSingletonServiceUsageRequestHandler>()
-              .Handles<GetModuleScopedServiceUsageRequest, int, GetModuleScopedServiceUsageRequestHandler>()
-              .Handles<GetModuleTransientServiceUsageRequest, int, GetModuleTransientServiceUsageRequestHandler>();
+        module.Handles<GetModuleSingletonServiceUsageRequest, int, GetSingletonServiceUsageRequestHandler>()
+              .Handles<GetModuleScopedServiceUsageRequest, int, GetScopedServiceUsageRequestHandler>()
+              .Handles<GetModuleTransientServiceUsageRequest, int, GetTransientServiceUsageRequestHandler>();
     }
 
     protected override void IncludeModules(IModuleStructure module) { }
