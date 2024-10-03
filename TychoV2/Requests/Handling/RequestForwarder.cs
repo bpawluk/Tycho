@@ -15,7 +15,8 @@ namespace TychoV2.Requests.Handling
             _childModule = childModule;
         }
 
-        public Task Handle(TRequest requestData, CancellationToken cancellationToken) => _childModule.Execute(requestData, cancellationToken);
+        public Task Handle(TRequest requestData, CancellationToken cancellationToken) => 
+            _childModule.Execute(requestData, cancellationToken);
     }
 
     internal class RequestForwarder<TRequest, TResponse, TModule> : IHandle<TRequest, TResponse>
@@ -29,6 +30,7 @@ namespace TychoV2.Requests.Handling
             _childModule = childModule;
         }
 
-        public Task<TResponse> Handle(TRequest requestData, CancellationToken cancellationToken) => _childModule.Execute<TRequest, TResponse>(requestData, cancellationToken);
+        public Task<TResponse> Handle(TRequest requestData, CancellationToken cancellationToken) =>
+            _childModule.Execute<TRequest, TResponse>(requestData, cancellationToken);
     }
 }
