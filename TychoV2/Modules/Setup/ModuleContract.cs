@@ -2,7 +2,7 @@
 using System;
 using TychoV2.Requests;
 using TychoV2.Requests.Broker;
-using TychoV2.Requests.Registrator;
+using TychoV2.Requests.Registrating;
 using TychoV2.Structure;
 
 namespace TychoV2.Modules.Setup

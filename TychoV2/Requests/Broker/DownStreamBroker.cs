@@ -3,7 +3,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using TychoV2.Modules;
-using TychoV2.Requests.Registrations;
+using TychoV2.Requests.Registrating.Registrations;
 using TychoV2.Structure;
 
 namespace TychoV2.Requests.Broker

@@ -1,4 +1,4 @@
-﻿namespace TychoV2.Requests.Registrations
+﻿namespace TychoV2.Requests.Registrating.Registrations
 {
     internal class UpStreamHandlerRegistration<TRequest, THandler> : IUpStreamHandlerRegistration<TRequest>
         where TRequest : class, IRequest

@@ -1,6 +1,6 @@
 ﻿using TychoV2.Modules;
 
-namespace TychoV2.Requests.Registrations
+namespace TychoV2.Requests.Registrating.Registrations
 {
     internal class DownStreamHandlerRegistration<TRequest, THandler, TModule> : IDownStreamHandlerRegistration<TRequest, TModule>
         where TRequest : class, IRequest

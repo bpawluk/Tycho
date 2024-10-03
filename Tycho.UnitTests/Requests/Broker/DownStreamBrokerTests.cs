@@ -4,7 +4,7 @@ using Tycho.UnitTests._Data.Modules;
 using Tycho.UnitTests._Data.Requests;
 using TychoV2.Requests;
 using TychoV2.Requests.Broker;
-using TychoV2.Requests.Registrations;
+using TychoV2.Requests.Registrating.Registrations;
 using TychoV2.Structure;
 
 namespace Tycho.UnitTests.Requests.Broker;

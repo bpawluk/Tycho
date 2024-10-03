@@ -2,9 +2,9 @@
 using System;
 using TychoV2.Modules;
 using TychoV2.Requests.Handling;
-using TychoV2.Requests.Registrations;
+using TychoV2.Requests.Registrating.Registrations;
 
-namespace TychoV2.Requests.Registrator
+namespace TychoV2.Requests.Registrating
 {
     internal partial class Registrator
     {

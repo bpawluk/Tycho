@@ -1,4 +1,4 @@
-﻿namespace TychoV2.Requests.Registrations
+﻿namespace TychoV2.Requests.Registrating.Registrations
 {
     internal interface IHandlerRegistration
     {

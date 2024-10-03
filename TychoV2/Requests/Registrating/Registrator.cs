@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using TychoV2.Requests.Registrations;
+using TychoV2.Requests.Registrating.Registrations;
 using TychoV2.Structure;
 
-namespace TychoV2.Requests.Registrator
+namespace TychoV2.Requests.Registrating
 {
     internal partial class Registrator
     {

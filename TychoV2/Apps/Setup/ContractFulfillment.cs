@@ -1,7 +1,7 @@
 ﻿using TychoV2.Modules;
 using TychoV2.Requests;
 using TychoV2.Requests.Handling;
-using TychoV2.Requests.Registrator;
+using TychoV2.Requests.Registrating;
 using TychoV2.Structure;
 
 namespace TychoV2.Apps.Setup
