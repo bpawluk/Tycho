@@ -1,5 +1,6 @@
 ﻿namespace Tycho.IntegrationTests.ForwardingRequestsHorizontally;
 
-public class TBD
+public record TestResult
 {
+    public string Id { get; init; } = default!;
 }
