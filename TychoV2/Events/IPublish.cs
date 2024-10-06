@@ -6,9 +6,9 @@ namespace TychoV2.Events
     /// <summary>
     /// TODO
     /// </summary>
-    public interface IPublish<TEvent> 
-        where TEvent : class, IEvent 
+    public interface IPublish
     {
-        Task Publish(TEvent eventData, CancellationToken cancellationToken = default);
+        Task Publish<TEvent>(TEvent eventData, CancellationToken cancellationToken = default)
+            where TEvent : class, IEvent;
     }
 }

@@ -1,13 +1,13 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using TychoV2.Events.Outbox;
 using TychoV2.Events.Router;
+using TychoV2.Persistence;
 
 namespace TychoV2.Events.Broker
 {
-    internal class EventBroker<TEvent> : IPublish<TEvent>, IProcess<TEvent>
-        where TEvent : class, IEvent
+    internal class EventBroker : IPublish, IEventProcessor
     {
         private readonly EventRouter _router;
         private readonly IOutbox _outbox;
@@ -18,7 +18,10 @@ namespace TychoV2.Events.Broker
             _outbox = persistentOutbox;
         }
 
-        public async Task Publish(TEvent eventData, CancellationToken cancellationToken)
+        public async Task Publish<TEvent>(
+            TEvent eventData, 
+            CancellationToken cancellationToken)
+            where TEvent : class, IEvent
         {
             if (eventData is null)
             {
@@ -29,14 +32,16 @@ namespace TychoV2.Events.Broker
 
             if (eventHandlerIds.Count > 0)
             {
-                await _outbox.Enqueue(eventHandlerIds, eventData, cancellationToken).ConfigureAwait(false);
+                var outboxEntries = eventHandlerIds.Select(handlerId => new Entry(handlerId, eventData));
+                await _outbox.Add(outboxEntries.ToArray(), cancellationToken).ConfigureAwait(false);
             }
         }
 
-        public async Task<bool> Process(
-            string handlerId,
-            TEvent eventData,
+        public async Task<bool> Process<TEvent>(
+            string handlerId, 
+            TEvent eventData, 
             CancellationToken cancellationToken)
+            where TEvent : class, IEvent
         {
             if (eventData is null)
             {
@@ -50,9 +55,9 @@ namespace TychoV2.Events.Broker
                 await eventHandler.Handle(eventData, cancellationToken).ConfigureAwait(false);
                 return true;
             }
-            catch (Exception)
+            catch
             {
-                // TODO: log
+                // TODO: Log the Exception
                 return false;
             }
         }
