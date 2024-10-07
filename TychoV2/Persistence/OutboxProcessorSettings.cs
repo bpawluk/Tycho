@@ -4,6 +4,8 @@ namespace TychoV2.Persistence
 {
     internal class OutboxProcessorSettings
     {
+        public int ConcurrencyLimit { get; set; } = 10;
+
         public int BatchSize { get; set; } = 5;
 
         public TimeSpan InitialPollingInterval { get; set; } = TimeSpan.FromSeconds(0.5);

@@ -14,58 +14,79 @@ namespace TychoV2.Persistence
         private readonly OutboxProcessorSettings _settings;
 
         private readonly Timer _timer;
-        private readonly SemaphoreSlim _semaphore;
 
+        private readonly object _timerChangeLock;
+        private readonly SemaphoreSlim _processingSemaphore;
+
+        private List<Task> _entriesInProcessing = new List<Task>();
         private TimeSpan _currentPollingInterval = Timeout.InfiniteTimeSpan;
 
         public OutboxProcessor(
-            IOutbox eventOutbox, 
-            IEventProcessor eventProcessor, 
+            IOutbox eventOutbox,
+            IEventProcessor eventProcessor,
             OutboxProcessorSettings settings)
         {
             _settings = settings;
             _eventProcessor = eventProcessor;
             _eventOutbox = eventOutbox;
 
-            _semaphore = new SemaphoreSlim(1, 1);
             _timer = new Timer(TimerCallback, null, Timeout.Infinite, Timeout.Infinite);
+
+            _timerChangeLock = new object();
+            _processingSemaphore = new SemaphoreSlim(1, 1);
         }
 
-        public async Task StartPolling()
-        {
-            await _semaphore.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                SetIntervalUnsafe(_settings.InitialPollingInterval);
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
-        }
+        public void StartPolling() => ResetInterval();
 
         private async void TimerCallback(object? _)
         {
-            try
+            // Prevent overlapping processing
+            if (await _processingSemaphore.WaitAsync(0).ConfigureAwait(false))
             {
-                await ProcessOutbox().ConfigureAwait(false);
-            }
-            catch
-            {
-                // TODO: Log the Exception
+                try
+                {
+                    await ProcessOutbox().ConfigureAwait(false);
+                }
+                catch
+                {
+                    // TODO: Log the Exception
+                }
+                finally
+                {
+                    _processingSemaphore.Release();
+                }
             }
         }
 
         private async Task ProcessOutbox()
         {
-            var nextEntries = await GetNextEntries().ConfigureAwait(false);
-            var processEntryTasks = nextEntries.Select(async entry =>
-            {
-                var succesfullyProcessed = await _eventProcessor
-                    .Process(entry.HandlerId, entry.Payload)
-                    .ConfigureAwait(false);
+            _entriesInProcessing.RemoveAll(t => t.IsCompleted);
 
-                if (succesfullyProcessed)
+            var newEntriesCount = 0;
+            var entriesInProcessingCount = _entriesInProcessing.Count;
+
+            var entriesToFetch = Math.Min(_settings.ConcurrencyLimit - entriesInProcessingCount, _settings.BatchSize);
+            if (entriesToFetch > 0)
+            {
+                var newEntries = await _eventOutbox.Read(entriesToFetch).ConfigureAwait(false);
+                newEntriesCount = newEntries.Count;
+
+                var newEntriesInProcessing = newEntries.Select(ProcessEntry);
+                _entriesInProcessing.AddRange(newEntriesInProcessing);
+            }
+
+            if (newEntriesCount == 0 && entriesInProcessingCount == 0)
+            {
+                IncreaseInterval(); // When processor is idle
+            }
+        }
+
+        private async Task ProcessEntry(Entry entry)
+        {
+            try
+            {
+                var isProcessed = await _eventProcessor.Process(entry.HandlerId, entry.Payload).ConfigureAwait(false);
+                if (isProcessed)
                 {
                     await _eventOutbox.MarkAsProcessed(entry).ConfigureAwait(false);
                 }
@@ -73,51 +94,46 @@ namespace TychoV2.Persistence
                 {
                     await _eventOutbox.MarkAsFailed(entry).ConfigureAwait(false);
                 }
-            });
-            await Task.WhenAll(processEntryTasks).ConfigureAwait(false);
+            }
+            catch 
+            {
+                // TODO: Log the Exception
+            }
+
         }
 
-        private async Task<IReadOnlyCollection<Entry>> GetNextEntries()
-        {
-            await _semaphore.WaitAsync().ConfigureAwait(false);
-            try
+        private void ResetInterval() 
+        { 
+            lock (_timerChangeLock)
             {
-                var nextEntries = await _eventOutbox.Read(_settings.BatchSize).ConfigureAwait(false);
-
-                if (nextEntries.Count == 0)
+                if (_currentPollingInterval != _settings.InitialPollingInterval)
                 {
-                    // Increase polling
-                    SetIntervalUnsafe(_currentPollingInterval * _settings.PollingIntervalMultiplier);
+                    _currentPollingInterval = _settings.InitialPollingInterval;
+                    _timer.Change(TimeSpan.Zero, _currentPollingInterval);
+                }
+            }
+        }
+
+        private void IncreaseInterval()
+        {
+            lock (_timerChangeLock)
+            {
+                var newInterval = _currentPollingInterval * _settings.PollingIntervalMultiplier;
+
+                if (newInterval > _settings.MaxPollingInterval)
+                {
+                    // Stop polling
+                    newInterval = Timeout.InfiniteTimeSpan;
                 }
 
-                return nextEntries;
+                _currentPollingInterval = newInterval;
+                _timer.Change(_currentPollingInterval, _currentPollingInterval);
             }
-            finally
-            {
-                _semaphore.Release();
-            }
-        }
-
-        private void SetIntervalUnsafe(TimeSpan interval)
-        {
-            if (interval == _currentPollingInterval)
-            {
-                return;
-            }
-
-            if (interval > _settings.MaxPollingInterval)
-            {
-                // Stop polling
-                interval = Timeout.InfiniteTimeSpan;
-            }
-
-            _currentPollingInterval = interval;
-            _timer.Change(_currentPollingInterval, _currentPollingInterval);
         }
 
         public void Dispose()
         {
-            _semaphore.Dispose();
+            _processingSemaphore.Dispose();
             _timer.Dispose();
         }
     }
