@@ -25,9 +25,5 @@ namespace TychoV2.Apps.Setup
         {
             throw new System.NotImplementedException();
         }
-
-        public void Build()
-        {
-        }
     }
 }

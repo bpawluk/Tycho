@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
+using TychoV2.Events.Routing;
 using TychoV2.Modules.Setup;
 using TychoV2.Requests.Broker;
 
@@ -61,6 +62,12 @@ namespace TychoV2.Modules
         internal TychoModule FulfillContract(IRequestBroker contractFulfillingBroker)
         {
             _builder.WithContractFulfillment(contractFulfillingBroker);
+            return this;
+        }
+
+        internal TychoModule PassEventRouter(IEventRouter parentEventRouter)
+        {
+            _builder.WithParentEventRouter(parentEventRouter);
             return this;
         }
 

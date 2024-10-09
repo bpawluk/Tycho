@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using TychoV2.Requests;
 using TychoV2.Requests.Broker;
 using TychoV2.Requests.Registrating;
@@ -14,6 +13,10 @@ namespace TychoV2.Modules.Setup
 
         private IRequestBroker? _contractFulfillingBroker;
 
+        public IRequestBroker ContractFulfillingBroker => 
+            _contractFulfillingBroker ?? 
+            throw new InvalidOperationException("Contract fulfilling broker has not been defined yet.");
+
         public ModuleContract(Internals internals)
         {
             _internals = internals;
@@ -23,7 +26,6 @@ namespace TychoV2.Modules.Setup
         public void WithContractFulfillment(IRequestBroker contractFulfillingBroker)
         {
             _contractFulfillingBroker = contractFulfillingBroker;
-            _internals.GetServiceCollection().AddSingleton(_contractFulfillingBroker!);
         }
 
         public IModuleContract Forwards<TRequest, TModule>()
@@ -61,7 +63,7 @@ namespace TychoV2.Modules.Setup
         public IModuleContract Requires<TRequest>()
             where TRequest : class, IRequest
         {
-            if (!_contractFulfillingBroker!.CanExecute<TRequest>())
+            if (!ContractFulfillingBroker.CanExecute<TRequest>())
             {
                 throw new InvalidOperationException($"Parent module does not handle the required {typeof(TRequest).Name} request");
             }
@@ -71,7 +73,7 @@ namespace TychoV2.Modules.Setup
         public IModuleContract Requires<TRequest, TResponse>()
             where TRequest : class, IRequest<TResponse>
         {
-            if (!_contractFulfillingBroker!.CanExecute<TRequest, TResponse>())
+            if (!ContractFulfillingBroker.CanExecute<TRequest, TResponse>())
             {
                 throw new InvalidOperationException($"Parent module does not handle the required {typeof(TRequest).Name} request");
             }

@@ -85,7 +85,7 @@ namespace TychoV2.Persistence
         {
             try
             {
-                var isProcessed = await _eventProcessor.Process(entry.HandlerId, entry.Payload).ConfigureAwait(false);
+                var isProcessed = await _eventProcessor.Process(entry.HandlerIdentity, entry.Payload).ConfigureAwait(false);
                 if (isProcessed)
                 {
                     await _eventOutbox.MarkAsProcessed(entry).ConfigureAwait(false);

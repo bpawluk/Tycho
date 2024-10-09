@@ -1,16 +1,17 @@
 ﻿using TychoV2.Events;
+using TychoV2.Events.Routing;
 
 namespace TychoV2.Persistence
 {
-    public class Entry
+    internal class Entry
     {
-        public string HandlerId { get; }
+        public HandlerIdentity HandlerIdentity { get; }
 
         public IEvent Payload { get; }
 
-        public Entry(string handlerId, IEvent payload)
+        public Entry(HandlerIdentity handlerIdentity, IEvent payload)
         {
-            HandlerId = handlerId;
+            HandlerIdentity = handlerIdentity;
             Payload = payload;
         }
     }

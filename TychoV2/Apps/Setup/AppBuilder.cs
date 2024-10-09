@@ -27,7 +27,7 @@ namespace TychoV2.Apps.Setup
         public AppBuilder(Type appDefinitionType)
         {
             _appType = typeof(App<>).MakeGenericType(new Type[] { appDefinitionType });
-            _internals = new Internals();
+            _internals = new Internals(appDefinitionType.FullName);
             Contract = new AppContract(_internals);
             Events = new AppEvents(_internals);
             Structure = new AppStructure(_internals);
@@ -52,7 +52,6 @@ namespace TychoV2.Apps.Setup
             var services = _internals.GetServiceCollection();
             var app = (IApp)Activator.CreateInstance(_appType, _internals);
 
-            Events.Build();
             await Structure.Build();
 
             services.AddSingleton(Configuration!);

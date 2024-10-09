@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using TychoV2.Events.Router;
+using TychoV2.Events.Routing;
 using TychoV2.Persistence;
 
 namespace TychoV2.Events.Broker
@@ -28,7 +28,7 @@ namespace TychoV2.Events.Broker
                 throw new ArgumentException($"{nameof(eventData)} cannot be null", nameof(eventData));
             }
 
-            var eventHandlerIds = _router.IdentifyEventHandlers<TEvent>();
+            var eventHandlerIds = _router.IdentifyHandlers<TEvent>();
 
             if (eventHandlerIds.Count > 0)
             {
@@ -38,7 +38,7 @@ namespace TychoV2.Events.Broker
         }
 
         public async Task<bool> Process<TEvent>(
-            string handlerId, 
+            HandlerIdentity handlerIdentity,
             TEvent eventData, 
             CancellationToken cancellationToken)
             where TEvent : class, IEvent
@@ -48,7 +48,7 @@ namespace TychoV2.Events.Broker
                 throw new ArgumentException($"{nameof(eventData)} cannot be null", nameof(eventData));
             }
 
-            var eventHandler = _router.GetEventHandler<TEvent>(handlerId);
+            var eventHandler = _router.GetHandler<TEvent>(handlerIdentity);
 
             try
             {

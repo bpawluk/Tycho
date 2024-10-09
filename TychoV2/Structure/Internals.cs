@@ -9,6 +9,13 @@ namespace TychoV2.Structure
         private IServiceCollection? _serviceCollection = new ServiceCollection();
         private IServiceProvider? _serviceProvider = null;
 
+        public string Identifier { get; }
+
+        public Internals(string identifier)
+        {
+            Identifier = identifier;
+        }
+
         public IServiceCollection GetServiceCollection()
         {
             if (_serviceCollection == null)

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TychoV2.Events.Routing;
 using TychoV2.Requests.Broker;
 using TychoV2.Structure;
 
@@ -33,6 +34,9 @@ namespace TychoV2.Modules.Setup
             var downStreamBroker = new DownStreamBroker<TModule>(_internals);
             submodule.FulfillContract(downStreamBroker);
 
+            var parentEventRouter = new EventRouter(_internals);
+            submodule.PassEventRouter(parentEventRouter);
+
             if (configurationDefinition != null)
             {
                 submodule.Configure(configurationDefinition);
@@ -48,7 +52,7 @@ namespace TychoV2.Modules.Setup
             var services = _internals.GetServiceCollection();
             await Task.WhenAll(_submodules.Values.Select(async module =>
             {
-                var runningModule = await module.Run();
+                var runningModule = await module.Run().ConfigureAwait(false);
                 var interfaceType = typeof(IModule<>).MakeGenericType(module.GetType());
                 services.AddSingleton(interfaceType, runningModule);
 

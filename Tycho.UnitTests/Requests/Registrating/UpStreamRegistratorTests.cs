@@ -18,7 +18,7 @@ public class UpStreamRegistratorTests
 
     public UpStreamRegistratorTests()
     {
-        _internals = new Internals();
+        _internals = new Internals(string.Empty);
         _sut = new Registrator(_internals);
     }
 

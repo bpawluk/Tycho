@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
-using System.Threading;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using TychoV2.Requests;
 using TychoV2.Requests.Broker;
 using TychoV2.Structure;
-using TychoV2.Requests;
 
 namespace TychoV2.Apps.Instance
 {
@@ -10,26 +10,26 @@ namespace TychoV2.Apps.Instance
         where TAppDefinition : TychoApp
     {
         private readonly Internals _internals;
+        private readonly UpStreamBroker _requestBroker;
 
         Internals IApp.Internals => _internals;
 
         public App(Internals internals)
         {
             _internals = internals;
+            _requestBroker = new UpStreamBroker(_internals);
         }
 
         public Task Execute<TRequest>(TRequest requestData, CancellationToken cancellationToken)
              where TRequest : class, IRequest
         {
-            var broker = new UpStreamBroker(_internals);
-            return broker.Execute(requestData, cancellationToken);
+            return _requestBroker.Execute(requestData, cancellationToken);
         }
 
         public Task<TResponse> Execute<TRequest, TResponse>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest<TResponse>
         {
-            var broker = new UpStreamBroker(_internals);
-            return broker.Execute<TRequest, TResponse>(requestData, cancellationToken);
+            return _requestBroker.Execute<TRequest, TResponse>(requestData, cancellationToken);
         }
     }
 }

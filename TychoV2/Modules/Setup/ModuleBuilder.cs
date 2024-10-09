@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
+using TychoV2.Events.Routing;
 using TychoV2.Modules.Instance;
 using TychoV2.Requests.Broker;
 using TychoV2.Structure;
@@ -28,7 +29,7 @@ namespace TychoV2.Modules.Setup
         public ModuleBuilder(Type moduleDefinitionType)
         {
             _moduleType = typeof(Module<>).MakeGenericType(new Type[] { moduleDefinitionType });
-            _internals = new Internals();
+            _internals = new Internals(moduleDefinitionType.FullName);
             Contract = new ModuleContract(_internals);
             Events = new ModuleEvents(_internals);
             Structure = new ModuleStructure(_internals);
@@ -42,6 +43,11 @@ namespace TychoV2.Modules.Setup
         public void WithContractFulfillment(IRequestBroker contractFulfillingBroker)
         {
             Contract.WithContractFulfillment(contractFulfillingBroker);
+        }
+
+        public void WithParentEventRouter(IEventRouter parentEventRouter)
+        {
+            Events.WithParentEventRouter(parentEventRouter);
         }
 
         public void Init()
@@ -58,10 +64,10 @@ namespace TychoV2.Modules.Setup
             var services = _internals.GetServiceCollection();
             var module = (IModule)Activator.CreateInstance(_moduleType, _internals);
 
-            Events.Build();
             await Structure.Build();
 
-            services.AddTransient<IParent, ParentProxy>();
+            var parentProxy = new ParentProxy(Contract.ContractFulfillingBroker, Events.ParentEventRouter);
+            services.AddSingleton<IParent>(parentProxy);
             _internals.Build();
 
             return module;

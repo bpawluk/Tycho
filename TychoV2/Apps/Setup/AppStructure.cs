@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TychoV2.Events.Routing;
 using TychoV2.Modules;
 using TychoV2.Requests.Broker;
 using TychoV2.Structure;
@@ -33,6 +34,9 @@ namespace TychoV2.Apps.Setup
 
             var downStreamBroker = new DownStreamBroker<TModule>(_internals);
             submodule.FulfillContract(downStreamBroker);
+
+            var parentEventRouter = new EventRouter(_internals);
+            submodule.PassEventRouter(parentEventRouter);
 
             if (configurationDefinition != null)
             {

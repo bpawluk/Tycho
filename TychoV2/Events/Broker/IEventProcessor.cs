@@ -1,15 +1,13 @@
 ﻿using System.Threading.Tasks;
 using System.Threading;
+using TychoV2.Events.Routing;
 
 namespace TychoV2.Events.Broker
 {
-    /// <summary>
-    /// TODO
-    /// </summary>
-    public interface IEventProcessor
+    internal interface IEventProcessor
     {
         Task<bool> Process<TEvent>(
-            string handlerId,
+            HandlerIdentity handlerIdentity,
             TEvent eventData,
             CancellationToken cancellationToken = default)
             where TEvent : class, IEvent;

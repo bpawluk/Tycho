@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace TychoV2.Persistence
 {
-    public interface IOutbox
+    internal interface IOutbox
     {
         Task Add(IReadOnlyCollection<Entry> entries, CancellationToken cancellationToken = default);
 
