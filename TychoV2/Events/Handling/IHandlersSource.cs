@@ -6,8 +6,8 @@ namespace TychoV2.Events.Handling
     internal interface IHandlersSource<TEvent>
         where TEvent : class, IEvent
     {
-        IReadOnlyList<HandlerIdentity> IdentifyHandlers();
+        IReadOnlyCollection<HandlerIdentity> IdentifyHandlers();
 
-        IHandle<TEvent> GetHandler(HandlerIdentity handlerIdentity);
+        IHandle<TEvent>? FindHandler(HandlerIdentity handlerIdentity);
     }
 }

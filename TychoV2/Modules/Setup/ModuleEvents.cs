@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using TychoV2.Events;
+using TychoV2.Events.Broker;
 using TychoV2.Events.Routing;
 using TychoV2.Modules.Routing;
+using TychoV2.Persistence;
 using TychoV2.Structure;
 
 namespace TychoV2.Modules.Setup
@@ -19,6 +22,10 @@ namespace TychoV2.Modules.Setup
         public ModuleEvents(Internals internals)
         {
             _internals = internals;
+            _internals.GetServiceCollection()
+                .AddSingleton(sp => new EventBroker(_internals, sp.GetRequiredService<IOutbox>()))
+                .AddSingleton<IPublish>(sp => sp.GetRequiredService<EventBroker>())
+                .AddSingleton<IEventProcessor>(sp => sp.GetRequiredService<EventBroker>());
         }
 
         public void WithParentEventRouter(IEventRouter parentEventRouter)

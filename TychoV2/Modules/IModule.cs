@@ -11,7 +11,7 @@ namespace TychoV2.Modules
     {
         internal Internals Internals { get; }
 
-        internal EventRouter EventRouter { get; }
+        internal IEventRouter EventRouter { get; }
     }
 
     /// <summary>

@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using TychoV2.Events.Handling;
 using TychoV2.Structure;
 
 namespace TychoV2.Events.Routing
@@ -16,13 +19,23 @@ namespace TychoV2.Events.Routing
         public IReadOnlyCollection<HandlerIdentity> IdentifyHandlers<TEvent>()
             where TEvent : class, IEvent
         {
-            throw new NotImplementedException();
+            var sources = _internals.GetServices<IHandlersSource<TEvent>>();
+            return sources.SelectMany(source => source.IdentifyHandlers()).ToArray();
         }
 
-        public IHandle<TEvent> GetHandler<TEvent>(HandlerIdentity handlerIdentity)
+        public IHandle<TEvent>? FindHandler<TEvent>(HandlerIdentity handlerIdentity)
             where TEvent : class, IEvent
         {
-            throw new NotImplementedException();
+            var sources = _internals.GetServices<IHandlersSource<TEvent>>();
+            foreach (var source in sources)
+            {
+                var handler = source.FindHandler(handlerIdentity);
+                if (handler != null)
+                {
+                    return handler;
+                }
+            }
+            return null;
         }
     }
 }

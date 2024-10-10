@@ -12,11 +12,11 @@ namespace TychoV2.Modules.Instance
     {
         private readonly Internals _internals;
         private readonly UpStreamBroker _requestBroker;
-        private readonly EventRouter _eventRouter;
+        private readonly IEventRouter _eventRouter;
 
         Internals IModule.Internals => _internals;
 
-        EventRouter IModule.EventRouter => _eventRouter;
+        IEventRouter IModule.EventRouter => _eventRouter;
 
         public Module(Internals internals)
         {
