@@ -2,6 +2,7 @@
 using System;
 using TychoV2.Events;
 using TychoV2.Events.Broker;
+using TychoV2.Events.Registrating;
 using TychoV2.Events.Routing;
 using TychoV2.Modules.Routing;
 using TychoV2.Persistence;
@@ -11,7 +12,7 @@ namespace TychoV2.Modules.Setup
 {
     internal class ModuleEvents : IModuleEvents
     {
-        private readonly Internals _internals;
+        private readonly Registrator _registrator;
 
         private IEventRouter? _parentEventRouter;
 
@@ -21,9 +22,10 @@ namespace TychoV2.Modules.Setup
 
         public ModuleEvents(Internals internals)
         {
-            _internals = internals;
-            _internals.GetServiceCollection()
-                .AddSingleton(sp => new EventBroker(_internals, sp.GetRequiredService<IOutbox>()))
+            _registrator = new Registrator(internals);
+
+            internals.GetServiceCollection()
+                .AddSingleton(sp => new EventBroker(internals, sp.GetRequiredService<IOutbox>()))
                 .AddSingleton<IPublish>(sp => sp.GetRequiredService<EventBroker>())
                 .AddSingleton<IEventProcessor>(sp => sp.GetRequiredService<EventBroker>());
         }
@@ -37,13 +39,14 @@ namespace TychoV2.Modules.Setup
             where TEvent : class, IEvent
             where THandler : class, IHandle<TEvent>
         {
-            throw new System.NotImplementedException();
+            _registrator.HandleEvent<TEvent, THandler>();
+            return this;
         }
 
         public IEventRouting Routes<TEvent>()
             where TEvent : class, IEvent
         {
-            throw new System.NotImplementedException();
+            return new EventRouting<TEvent>(_registrator);
         }
     }
 }

@@ -5,7 +5,7 @@
         /// <summary>
         /// TODO
         /// </summary>
-        void Expose();
+        IEventRouting Expose();
 
         /// <summary>
         /// TODO
