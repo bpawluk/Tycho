@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,6 +7,8 @@ namespace TychoV2.Persistence
 {
     internal interface IOutbox
     {
+        event EventHandler NewEntriesAdded;
+
         Task Add(IReadOnlyCollection<Entry> entries, CancellationToken cancellationToken = default);
 
         Task<IReadOnlyCollection<Entry>> Read(int count, CancellationToken cancellationToken = default);

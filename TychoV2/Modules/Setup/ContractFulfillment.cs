@@ -47,7 +47,7 @@ namespace TychoV2.Modules.Setup
 
         public IContractFulfillment Handle<TRequest, THandler>()
             where TRequest : class, IRequest
-            where THandler : class, IHandle<TRequest>
+            where THandler : class, IRequestHandler<TRequest>
         {
             _registrator.HandleDownStreamRequest<TSourceModule, TRequest, THandler>();
             return this;
@@ -55,7 +55,7 @@ namespace TychoV2.Modules.Setup
 
         public IContractFulfillment Handle<TRequest, TResponse, THandler>()
             where TRequest : class, IRequest<TResponse>
-            where THandler : class, IHandle<TRequest, TResponse>
+            where THandler : class, IRequestHandler<TRequest, TResponse>
         {
             _registrator.HandleDownStreamRequest<TSourceModule, TRequest, TResponse, THandler>();
             return this;

@@ -23,7 +23,7 @@ public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
 
     protected override void IncludeModules(IAppStructure app)
     {
-        app.AddModule<AlphaModule>(contract =>
+        app.Uses<AlphaModule>(contract =>
         {
             contract.Handle<AlphaOutRequest, AlphaOutRequestHandler>()
                     .Handle<AlphaOutRequestWithResponse, string, AlphaOutRequestHandler>();

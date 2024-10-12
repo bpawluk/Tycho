@@ -1,4 +1,5 @@
-﻿using TychoV2.Modules;
+﻿using System.Threading.Tasks;
+using TychoV2.Modules;
 using TychoV2.Requests;
 using TychoV2.Requests.Registrating;
 using TychoV2.Structure;
@@ -32,7 +33,7 @@ namespace TychoV2.Apps.Setup
 
         public IAppContract Handles<TRequest, THandler>()
             where TRequest : class, IRequest
-            where THandler : class, IHandle<TRequest>
+            where THandler : class, IRequestHandler<TRequest>
         {
             _registrator.HandleUpStreamRequest<TRequest, THandler>();
             return this;
@@ -40,10 +41,12 @@ namespace TychoV2.Apps.Setup
 
         public IAppContract Handles<TRequest, TResponse, THandler>()
             where TRequest : class, IRequest<TResponse>
-            where THandler : class, IHandle<TRequest, TResponse>
+            where THandler : class, IRequestHandler<TRequest, TResponse>
         {
             _registrator.HandleUpStreamRequest<TRequest, TResponse, THandler>();
             return this;
         }
+
+        public Task Build() => Task.CompletedTask;
     }
 }

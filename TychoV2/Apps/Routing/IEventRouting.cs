@@ -7,7 +7,7 @@ namespace TychoV2.Apps.Routing
         /// <summary>
         /// TODO
         /// </summary>
-        IEventRouting Forward<Module>()
+        IEventRouting Forwards<Module>()
             where Module : TychoModule;
     }
 }

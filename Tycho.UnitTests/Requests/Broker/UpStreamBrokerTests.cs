@@ -145,7 +145,7 @@ public class UpStreamBrokerTests
     {
         // Arrange
         var request = new TestRequest();
-        var handlerMock = new Mock<IHandle<TestRequest>>();
+        var handlerMock = new Mock<IRequestHandler<TestRequest>>();
 
         var registrationMock = new Mock<IUpStreamHandlerRegistration<TestRequest>>();
         registrationMock.Setup(x => x.Handler).Returns(handlerMock.Object);
@@ -193,7 +193,7 @@ public class UpStreamBrokerTests
         var request = new TestRequestWithResponse();
         var response = "success";
 
-        var handlerMock = new Mock<IHandle<TestRequestWithResponse, string>>();
+        var handlerMock = new Mock<IRequestHandler<TestRequestWithResponse, string>>();
         handlerMock.Setup(h => h.Handle(request, CancellationToken.None))
                    .ReturnsAsync(response);
 

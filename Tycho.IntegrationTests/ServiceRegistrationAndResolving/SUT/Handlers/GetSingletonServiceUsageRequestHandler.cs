@@ -5,8 +5,8 @@ using TychoV2.Requests;
 namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Handlers;
 
 internal class GetSingletonServiceUsageRequestHandler(ISingletonService service)
-    : IHandle<GetAppSingletonServiceUsageRequest, int>
-    , IHandle<GetModuleSingletonServiceUsageRequest, int>
+    : IRequestHandler<GetAppSingletonServiceUsageRequest, int>
+    , IRequestHandler<GetModuleSingletonServiceUsageRequest, int>
 {
     private readonly ISingletonService _service = service;
 

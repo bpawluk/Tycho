@@ -22,7 +22,7 @@ namespace TychoV2.Apps.Setup
             _submodules = new Dictionary<Type, TychoModule>();
         }
 
-        public IAppStructure AddModule<TModule>(
+        public IAppStructure Uses<TModule>(
             Action<IContractFulfillment>? contractFulfillment = null,
             Action<IConfigurationBuilder>? configurationDefinition = null)
             where TModule : TychoModule, new()

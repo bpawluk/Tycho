@@ -4,8 +4,8 @@ using TychoV2.Requests;
 namespace Tycho.UnitTests._Data.Handlers;
 
 internal class TestRequestHandler
-    : IHandle<TestRequest>
-    , IHandle<TestRequestWithResponse, string>
+    : IRequestHandler<TestRequest>
+    , IRequestHandler<TestRequestWithResponse, string>
 {
     public Task Handle(TestRequest requestData, CancellationToken cancellationToken) =>
         Task.CompletedTask;

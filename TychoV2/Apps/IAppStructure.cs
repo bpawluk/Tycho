@@ -12,7 +12,7 @@ namespace TychoV2.Apps
         /// <summary>
         /// TODO
         /// </summary>
-        IAppStructure AddModule<TModule>(
+        IAppStructure Uses<TModule>(
             Action<IContractFulfillment>? contractFulfillment = null,
             Action<IConfigurationBuilder>? configurationDefinition = null)
             where TModule : TychoModule, new();

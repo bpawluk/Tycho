@@ -3,7 +3,7 @@ using TychoV2.Requests;
 
 namespace TychoV2.Structure
 {
-    public interface IParent : IExecute
+    public interface IParent : IRequestExecutor
     {
         internal IEventRouter EventRouter { get; }
     }

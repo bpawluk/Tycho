@@ -1,6 +1,6 @@
 ﻿namespace TychoV2.Requests.Broker
 {
-    internal interface IRequestBroker : IExecute
+    internal interface IRequestBroker : IRequestExecutor
     {
         public bool CanExecute<TRequest>()
             where TRequest : class, IRequest;

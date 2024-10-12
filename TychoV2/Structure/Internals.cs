@@ -11,6 +11,8 @@ namespace TychoV2.Structure
 
         public string Identifier { get; }
 
+        public event EventHandler? InternalsBuilt;
+
         public Internals(string identifier)
         {
             Identifier = identifier;
@@ -29,6 +31,7 @@ namespace TychoV2.Structure
         {
             _serviceProvider ??= _serviceCollection!.BuildServiceProvider();
             _serviceCollection = null;
+            InternalsBuilt?.Invoke(this, EventArgs.Empty);
         }
 
         public bool HasService<TServiceInterface>()

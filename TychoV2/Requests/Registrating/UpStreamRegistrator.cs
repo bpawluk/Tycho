@@ -24,21 +24,21 @@ namespace TychoV2.Requests.Registrating
 
         public void HandleUpStreamRequest<TRequest, THandler>()
             where TRequest : class, IRequest
-            where THandler : class, IHandle<TRequest>
+            where THandler : class, IRequestHandler<TRequest>
         {
             RegisterUpStreamRequestHandler<TRequest, THandler>();
         }
 
         public void HandleUpStreamRequest<TRequest, TResponse, THandler>()
             where TRequest : class, IRequest<TResponse>
-            where THandler : class, IHandle<TRequest, TResponse>
+            where THandler : class, IRequestHandler<TRequest, TResponse>
         {
             RegisterUpStreamRequestHandler<TRequest, TResponse, THandler>();
         }
 
         private void RegisterUpStreamRequestHandler<TRequest, THandler>()
             where TRequest : class, IRequest
-            where THandler : class, IHandle<TRequest>
+            where THandler : class, IRequestHandler<TRequest>
         {
             if (TryAddRegistration<
                     IUpStreamHandlerRegistration<TRequest>,
@@ -54,7 +54,7 @@ namespace TychoV2.Requests.Registrating
 
         private void RegisterUpStreamRequestHandler<TRequest, TResponse, THandler>()
             where TRequest : class, IRequest<TResponse>
-            where THandler : class, IHandle<TRequest, TResponse>
+            where THandler : class, IRequestHandler<TRequest, TResponse>
         {
             if (TryAddRegistration<
                     IUpStreamHandlerRegistration<TRequest, TResponse>,

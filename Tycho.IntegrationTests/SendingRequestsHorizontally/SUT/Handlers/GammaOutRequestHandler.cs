@@ -5,8 +5,8 @@ using TychoV2.Requests;
 namespace Tycho.IntegrationTests.SendingRequestsHorizontally.SUT.Handlers;
 
 internal class GammaOutRequestHandler(TestWorkflow<TestResult> testWorkflow) 
-    : IHandle<GammaOutRequest>
-    , IHandle<GammaOutRequestWithResponse, string>
+    : IRequestHandler<GammaOutRequest>
+    , IRequestHandler<GammaOutRequestWithResponse, string>
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;
 

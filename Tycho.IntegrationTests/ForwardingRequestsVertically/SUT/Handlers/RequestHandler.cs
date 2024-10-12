@@ -4,8 +4,8 @@ using TychoV2.Requests;
 namespace Tycho.IntegrationTests.ForwardingRequestsVertically.SUT.Handlers;
 
 internal class RequestHandler(TestWorkflow<TestResult> testWorkflow) 
-    : IHandle<Request>
-    , IHandle<RequestWithResponse, string>
+    : IRequestHandler<Request>
+    , IRequestHandler<RequestWithResponse, string>
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;
 

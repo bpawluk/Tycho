@@ -5,8 +5,8 @@ using TychoV2.Requests;
 namespace Tycho.IntegrationTests.SendingRequestsVertically.SUT.Handlers;
 
 internal class RequestHandler(IModule<AlphaModule> alphaModule)
-    : IHandle<Request>
-    , IHandle<RequestWithResponse, string>
+    : IRequestHandler<Request>
+    , IRequestHandler<RequestWithResponse, string>
 {
     private readonly IModule<AlphaModule> _alphaModule = alphaModule;
 

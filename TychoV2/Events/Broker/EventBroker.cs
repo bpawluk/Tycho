@@ -8,7 +8,7 @@ using TychoV2.Structure;
 
 namespace TychoV2.Events.Broker
 {
-    internal class EventBroker : IPublish, IEventProcessor
+    internal class EventBroker : IEventPublisher, IEventProcessor
     {
         private readonly IEventRouter _router;
         private readonly IOutbox _outbox;

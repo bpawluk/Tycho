@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TychoV2.Persistence
+namespace TychoV2.Persistence.Processor
 {
     internal class OutboxProcessorSettings
     {
@@ -8,9 +8,9 @@ namespace TychoV2.Persistence
 
         public int BatchSize { get; set; } = 5;
 
-        public TimeSpan InitialPollingInterval { get; set; } = TimeSpan.FromSeconds(0.5);
+        public TimeSpan InitialPollingInterval { get; set; } = TimeSpan.FromSeconds(0.2);
 
-        public TimeSpan MaxPollingInterval { get; set; } = TimeSpan.FromSeconds(5.0);
+        public TimeSpan MaxPollingInterval { get; set; } = TimeSpan.FromSeconds(2.0);
 
         public double PollingIntervalMultiplier { get; set; } = 2.0;
     }

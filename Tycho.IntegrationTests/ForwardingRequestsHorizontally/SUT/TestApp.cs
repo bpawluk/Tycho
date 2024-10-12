@@ -23,19 +23,19 @@ public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
 
     protected override void IncludeModules(IAppStructure app)
     {
-        app.AddModule<AlphaModule>(contract =>
+        app.Uses<AlphaModule>(contract =>
         {
             contract.Forward<Request, BetaModule>()
                     .Forward<RequestWithResponse, string, BetaModule>();
         });
 
-        app.AddModule<BetaModule>(contract =>
+        app.Uses<BetaModule>(contract =>
         {
             contract.Forward<Request, GammaModule>()
                     .Forward<RequestWithResponse, string, GammaModule>();
         });
 
-        app.AddModule<GammaModule>(contract =>
+        app.Uses<GammaModule>(contract =>
         {
             contract.Handle<Request, RequestHandler>()
                     .Handle<RequestWithResponse, string, RequestHandler>();

@@ -1,4 +1,11 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Threading.Tasks;
+using TychoV2.Events.Broker;
+using TychoV2.Events;
+using TychoV2.Persistence.InMemory;
+using TychoV2.Persistence.Processor;
+using TychoV2.Persistence;
 using TychoV2.Requests;
 using TychoV2.Requests.Broker;
 using TychoV2.Requests.Registrating;
@@ -46,7 +53,7 @@ namespace TychoV2.Modules.Setup
 
         public IModuleContract Handles<TRequest, THandler>()
             where TRequest : class, IRequest
-            where THandler : class, IHandle<TRequest>
+            where THandler : class, IRequestHandler<TRequest>
         {
             _registrator.HandleUpStreamRequest<TRequest, THandler>();
             return this;
@@ -54,7 +61,7 @@ namespace TychoV2.Modules.Setup
 
         public IModuleContract Handles<TRequest, TResponse, THandler>()
             where TRequest : class, IRequest<TResponse>
-            where THandler : class, IHandle<TRequest, TResponse>
+            where THandler : class, IRequestHandler<TRequest, TResponse>
         {
             _registrator.HandleUpStreamRequest<TRequest, TResponse, THandler>();
             return this;
@@ -79,5 +86,7 @@ namespace TychoV2.Modules.Setup
             }
             return this;
         }
+
+        public Task Build() => Task.CompletedTask;
     }
 }

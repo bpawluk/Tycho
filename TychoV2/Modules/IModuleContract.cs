@@ -26,14 +26,14 @@ namespace TychoV2.Modules
         /// </summary>
         IModuleContract Handles<TRequest, THandler>()
             where TRequest : class, IRequest
-            where THandler : class, IHandle<TRequest>;
+            where THandler : class, IRequestHandler<TRequest>;
 
         /// <summary>
         /// TODO
         /// </summary>
         IModuleContract Handles<TRequest, TResponse, THandler>()
             where TRequest : class, IRequest<TResponse>
-            where THandler : class, IHandle<TRequest, TResponse>;
+            where THandler : class, IRequestHandler<TRequest, TResponse>;
 
         /// <summary>
         /// TODO

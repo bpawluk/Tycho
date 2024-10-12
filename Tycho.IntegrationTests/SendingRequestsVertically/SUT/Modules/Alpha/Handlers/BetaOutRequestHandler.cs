@@ -5,8 +5,8 @@ using TychoV2.Structure;
 namespace Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Alpha.Handlers;
 
 internal class GammaOutRequestHandler(IParent parent)
-    : IHandle<BetaOutRequest>
-    , IHandle<BetaOutRequestWithResponse, string>
+    : IRequestHandler<BetaOutRequest>
+    , IRequestHandler<BetaOutRequestWithResponse, string>
 {
     private readonly IParent _parent = parent;
 

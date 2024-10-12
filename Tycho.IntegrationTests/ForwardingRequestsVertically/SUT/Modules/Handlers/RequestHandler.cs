@@ -4,8 +4,8 @@ using TychoV2.Structure;
 namespace Tycho.IntegrationTests.ForwardingRequestsVertically.SUT.Modules.Handlers;
 
 internal class RequestHandler(IParent parent)
-    : IHandle<Request>
-    , IHandle<RequestWithResponse, string>
+    : IRequestHandler<Request>
+    , IRequestHandler<RequestWithResponse, string>
 {
     private readonly IParent _parent = parent;
 

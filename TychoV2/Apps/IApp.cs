@@ -6,7 +6,7 @@ namespace TychoV2.Apps
     /// <summary>
     /// TODO
     /// </summary>
-    public interface IApp : IExecute
+    public interface IApp : IRequestExecutor
     {
         internal Internals Internals { get; }
     }

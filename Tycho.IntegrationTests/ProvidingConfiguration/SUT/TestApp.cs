@@ -17,12 +17,12 @@ public class TestApp(IConfiguration appConfig) : TychoApp
 
     protected override void IncludeModules(IAppStructure app)
     {
-        app.AddModule<AlphaModule>(configurationDefinition: moduleConfig =>
+        app.Uses<AlphaModule>(configurationDefinition: moduleConfig =>
         {
             moduleConfig.AddConfiguration(_appConfig.GetSection("Alpha"));
         });
 
-        app.AddModule<BetaModule>(configurationDefinition: moduleConfig =>
+        app.Uses<BetaModule>(configurationDefinition: moduleConfig =>
         {
             moduleConfig.AddConfiguration(_appConfig.GetSection("Beta"));
         });

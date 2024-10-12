@@ -5,8 +5,8 @@ using TychoV2.Requests;
 namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Handlers;
 
 internal class GetTransientServiceUsageRequestHandler(ITransientService service)
-    : IHandle<GetAppTransientServiceUsageRequest, int>
-    , IHandle<GetModuleTransientServiceUsageRequest, int>
+    : IRequestHandler<GetAppTransientServiceUsageRequest, int>
+    , IRequestHandler<GetModuleTransientServiceUsageRequest, int>
 {
     private readonly ITransientService _service = service;
 

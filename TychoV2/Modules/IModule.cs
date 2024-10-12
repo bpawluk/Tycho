@@ -7,7 +7,7 @@ namespace TychoV2.Modules
     /// <summary>
     /// TODO
     /// </summary>
-    public interface IModule : IExecute
+    public interface IModule : IRequestExecutor
     {
         internal Internals Internals { get; }
 

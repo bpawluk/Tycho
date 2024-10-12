@@ -41,7 +41,7 @@ namespace TychoV2.Requests.Registrating
         public void HandleDownStreamRequest<TSourceModule, TRequest, THandler>()
             where TSourceModule : TychoModule
             where TRequest : class, IRequest
-            where THandler : class, IHandle<TRequest>
+            where THandler : class, IRequestHandler<TRequest>
         {
             RegisterDownStreamRequestHandler<TSourceModule, TRequest, THandler>();
         }
@@ -49,7 +49,7 @@ namespace TychoV2.Requests.Registrating
         public void HandleDownStreamRequest<TSourceModule, TRequest, TResponse, THandler>()
             where TSourceModule : TychoModule
             where TRequest : class, IRequest<TResponse>
-            where THandler : class, IHandle<TRequest, TResponse>
+            where THandler : class, IRequestHandler<TRequest, TResponse>
         {
             RegisterDownStreamRequestHandler<TSourceModule, TRequest, TResponse, THandler>();
         }
@@ -71,7 +71,7 @@ namespace TychoV2.Requests.Registrating
         private void RegisterDownStreamRequestHandler<TSourceModule, TRequest, THandler>()
             where TSourceModule : TychoModule
             where TRequest : class, IRequest
-            where THandler : class, IHandle<TRequest>
+            where THandler : class, IRequestHandler<TRequest>
         {
             if (TryAddRegistration<
                     IDownStreamHandlerRegistration<TRequest, TSourceModule>,
@@ -88,7 +88,7 @@ namespace TychoV2.Requests.Registrating
         private void RegisterDownStreamRequestHandler<TSourceModule, TRequest, TResponse, THandler>()
             where TSourceModule : TychoModule
             where TRequest : class, IRequest<TResponse>
-            where THandler : class, IHandle<TRequest, TResponse>
+            where THandler : class, IRequestHandler<TRequest, TResponse>
         {
             if (TryAddRegistration<
                     IDownStreamHandlerRegistration<TRequest, TResponse, TSourceModule>,

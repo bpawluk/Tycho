@@ -4,8 +4,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using TychoV2.Events.Broker;
+using static System.Net.Mime.MediaTypeNames;
 
-namespace TychoV2.Persistence
+namespace TychoV2.Persistence.Processor
 {
     internal class OutboxProcessor : IDisposable
     {
@@ -36,11 +37,16 @@ namespace TychoV2.Persistence
             _processingSemaphore = new SemaphoreSlim(1, 1);
         }
 
-        public void StartPolling() => ResetInterval();
+        public void Initialize()
+        {
+            _eventOutbox.NewEntriesAdded += OnEntriesAdded;
+        }
+
+        private void OnEntriesAdded(object _, EventArgs __) => ResetInterval();
 
         private async void TimerCallback(object? _)
         {
-            // Prevent overlapping processing
+            // Prevents overlapping processing
             if (await _processingSemaphore.WaitAsync(0).ConfigureAwait(false))
             {
                 try
@@ -95,15 +101,15 @@ namespace TychoV2.Persistence
                     await _eventOutbox.MarkAsFailed(entry).ConfigureAwait(false);
                 }
             }
-            catch 
+            catch
             {
                 // TODO: Log the Exception
             }
 
         }
 
-        private void ResetInterval() 
-        { 
+        private void ResetInterval()
+        {
             lock (_timerChangeLock)
             {
                 if (_currentPollingInterval != _settings.InitialPollingInterval)
@@ -133,6 +139,7 @@ namespace TychoV2.Persistence
 
         public void Dispose()
         {
+            _eventOutbox.NewEntriesAdded -= OnEntriesAdded;
             _processingSemaphore.Dispose();
             _timer.Dispose();
         }

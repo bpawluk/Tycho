@@ -4,7 +4,7 @@ using TychoV2.Modules;
 
 namespace TychoV2.Requests.Handling
 {
-    internal class RequestForwarder<TRequest, TModule> : IHandle<TRequest>
+    internal class RequestForwarder<TRequest, TModule> : IRequestHandler<TRequest>
         where TRequest : class, IRequest
         where TModule : TychoModule
     {
@@ -19,7 +19,7 @@ namespace TychoV2.Requests.Handling
             _childModule.Execute(requestData, cancellationToken);
     }
 
-    internal class RequestForwarder<TRequest, TResponse, TModule> : IHandle<TRequest, TResponse>
+    internal class RequestForwarder<TRequest, TResponse, TModule> : IRequestHandler<TRequest, TResponse>
         where TRequest : class, IRequest<TResponse>
         where TModule : TychoModule
     {

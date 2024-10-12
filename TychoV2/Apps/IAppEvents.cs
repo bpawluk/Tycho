@@ -13,7 +13,7 @@ namespace TychoV2.Apps
         /// </summary>
         IAppEvents Handles<TEvent, THandler>()
             where TEvent : class, IEvent
-            where THandler : class, IHandle<TEvent>;
+            where THandler : class, IEventHandler<TEvent>;
 
         /// <summary>
         /// TODO

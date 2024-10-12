@@ -5,8 +5,8 @@ using TychoV2.Requests;
 namespace Tycho.IntegrationTests.ProvidingConfiguration.SUT.Handlers;
 
 internal class GetValueRequestHandler(IConfiguration config)
-    : IHandle<GetAlphaValueRequest, string>
-    , IHandle<GetBetaValueRequest, string>
+    : IRequestHandler<GetAlphaValueRequest, string>
+    , IRequestHandler<GetBetaValueRequest, string>
 {
     private readonly IConfiguration _config = config;
 

@@ -5,12 +5,12 @@
         /// <summary>
         /// TODO
         /// </summary>
-        IEventRouting Expose();
+        IEventRouting Exposes();
 
         /// <summary>
         /// TODO
         /// </summary>
-        IEventRouting Forward<Module>()
+        IEventRouting Forwards<Module>()
             where Module : TychoModule;
     }
 }

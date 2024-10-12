@@ -13,13 +13,13 @@ namespace TychoV2.Modules.Routing
             _registrator = registrator;
         }
 
-        public IEventRouting Expose()
+        public IEventRouting Exposes()
         {
             _registrator.ExposeEvent<TEvent>();
             return this;
         }
 
-        public IEventRouting Forward<Module>() 
+        public IEventRouting Forwards<Module>() 
             where Module : TychoModule
         {
             _registrator.ForwardEvent<TEvent, Module>();

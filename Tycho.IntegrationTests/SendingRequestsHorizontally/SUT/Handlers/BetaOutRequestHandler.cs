@@ -6,8 +6,8 @@ using TychoV2.Requests;
 namespace Tycho.IntegrationTests.SendingRequestsHorizontally.SUT.Handlers;
 
 internal class BetaOutRequestHandler(IModule<GammaModule> gammaModule) 
-    : IHandle<BetaOutRequest>
-    , IHandle<BetaOutRequestWithResponse, string>
+    : IRequestHandler<BetaOutRequest>
+    , IRequestHandler<BetaOutRequestWithResponse, string>
 {
     private readonly IModule<GammaModule> _gammaModule = gammaModule;
 

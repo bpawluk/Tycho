@@ -20,7 +20,7 @@ public class TestApp : TychoApp
 
     protected override void IncludeModules(IAppStructure app)
     {
-        app.AddModule<TestModule>();
+        app.Uses<TestModule>();
     }
 
     protected override void MapEvents(IAppEvents app) { }

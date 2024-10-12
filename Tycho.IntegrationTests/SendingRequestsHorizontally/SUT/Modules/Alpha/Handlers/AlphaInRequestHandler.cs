@@ -4,8 +4,8 @@ using TychoV2.Structure;
 namespace Tycho.IntegrationTests.SendingRequestsHorizontally.SUT.Modules.Alpha.Handlers;
 
 internal class AlphaInRequestHandler(IParent parent)
-    : IHandle<AlphaInRequest>
-    , IHandle<AlphaInRequestWithResponse, string>
+    : IRequestHandler<AlphaInRequest>
+    , IRequestHandler<AlphaInRequestWithResponse, string>
 {
     private readonly IParent _parent = parent;
 

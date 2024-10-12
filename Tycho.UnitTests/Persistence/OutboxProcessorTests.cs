@@ -3,6 +3,7 @@ using TychoV2.Events;
 using TychoV2.Events.Broker;
 using TychoV2.Events.Routing;
 using TychoV2.Persistence;
+using TychoV2.Persistence.Processor;
 using CTK = System.Threading.CancellationToken;
 
 namespace Tycho.UnitTests.Persistence;
@@ -69,7 +70,8 @@ public sealed class OutboxProcessorTests : IDisposable
         _settings.BatchSize = batchSize;
 
         // Act
-        _sut.StartPolling();
+        _sut.Initialize();
+        _mockOutbox.Raise(o => o.NewEntriesAdded += null, EventArgs.Empty);
         await WaitForCompletion();
 
         // Assert
@@ -97,7 +99,8 @@ public sealed class OutboxProcessorTests : IDisposable
         _settings.PollingIntervalMultiplier = multiplier;
 
         // Act
-        _sut.StartPolling();
+        _sut.Initialize();
+        _mockOutbox.Raise(o => o.NewEntriesAdded += null, EventArgs.Empty);
         await WaitForCompletion();
 
         // Assert
@@ -122,7 +125,8 @@ public sealed class OutboxProcessorTests : IDisposable
                            .Returns(tcs.Task);
 
         // Act
-        _sut.StartPolling();
+        _sut.Initialize();
+        _mockOutbox.Raise(o => o.NewEntriesAdded += null, EventArgs.Empty);
         await WaitForCompletion();
 
         // Assert
@@ -147,7 +151,8 @@ public sealed class OutboxProcessorTests : IDisposable
                            .Returns(tcs.Task);
 
         // Act
-        _sut.StartPolling();
+        _sut.Initialize();
+        _mockOutbox.Raise(o => o.NewEntriesAdded += null, EventArgs.Empty);
         await WaitNumberOfIterations(1);
 
         // Assert
@@ -173,7 +178,8 @@ public sealed class OutboxProcessorTests : IDisposable
         _settings.MaxPollingInterval = _settings.InitialPollingInterval;
 
         // Act
-        _sut.StartPolling();
+        _sut.Initialize();
+        _mockOutbox.Raise(o => o.NewEntriesAdded += null, EventArgs.Empty);
         await WaitForCompletion();
 
         // Assert
@@ -198,10 +204,11 @@ public sealed class OutboxProcessorTests : IDisposable
                 It.IsAny<IEvent>(),
                 It.IsAny<CTK>()))
             .ThrowsAsync(new InvalidOperationException());
-        _settings.MaxPollingInterval = _settings.InitialPollingInterval;                         
+        _settings.MaxPollingInterval = _settings.InitialPollingInterval;
 
         // Act
-        _sut.StartPolling();
+        _sut.Initialize();
+        _mockOutbox.Raise(o => o.NewEntriesAdded += null, EventArgs.Empty);
         await WaitForCompletion();
 
         // Assert
@@ -226,7 +233,8 @@ public sealed class OutboxProcessorTests : IDisposable
                    .ThrowsAsync(new InvalidOperationException());
 
         // Act
-        _sut.StartPolling();
+        _sut.Initialize();
+        _mockOutbox.Raise(o => o.NewEntriesAdded += null, EventArgs.Empty);
         await WaitForCompletion();
 
         // Assert

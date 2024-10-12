@@ -18,7 +18,7 @@ namespace TychoV2.Events.Handling
         public IReadOnlyCollection<HandlerIdentity> IdentifyHandlers() =>
             _submoduleEventRouter.IdentifyHandlers<TEvent>();
 
-        public IHandle<TEvent>? FindHandler(HandlerIdentity handlerIdentity) =>
+        public IEventHandler<TEvent>? FindHandler(HandlerIdentity handlerIdentity) =>
             _submoduleEventRouter.FindHandler<TEvent>(handlerIdentity);
     }
 }

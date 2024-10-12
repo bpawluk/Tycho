@@ -5,8 +5,8 @@ using TychoV2.Requests;
 namespace Tycho.IntegrationTests.RunningStartupLogic.SUT.Handlers;
 
 internal class GetValueRequestHandler(TestService testService)
-    : IHandle<GetAppValueRequest, string>
-    , IHandle<GetModuleValueRequest, string>
+    : IRequestHandler<GetAppValueRequest, string>
+    , IRequestHandler<GetModuleValueRequest, string>
 {
     private readonly TestService _testService = testService;
 

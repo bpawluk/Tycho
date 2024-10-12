@@ -23,7 +23,7 @@ namespace TychoV2.Events.Routing
             return sources.SelectMany(source => source.IdentifyHandlers()).ToArray();
         }
 
-        public IHandle<TEvent>? FindHandler<TEvent>(HandlerIdentity handlerIdentity)
+        public IEventHandler<TEvent>? FindHandler<TEvent>(HandlerIdentity handlerIdentity)
             where TEvent : class, IEvent
         {
             var sources = _internals.GetServices<IHandlersSource<TEvent>>();

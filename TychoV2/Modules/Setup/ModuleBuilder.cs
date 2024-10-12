@@ -64,10 +64,13 @@ namespace TychoV2.Modules.Setup
             var services = _internals.GetServiceCollection();
             var module = (IModule)Activator.CreateInstance(_moduleType, _internals);
 
+            await Contract.Build();
+            await Events.Build();
             await Structure.Build();
 
             var parentProxy = new ParentProxy(Contract.ContractFulfillingBroker, Events.ParentEventRouter);
             services.AddSingleton<IParent>(parentProxy);
+
             _internals.Build();
 
             return module;

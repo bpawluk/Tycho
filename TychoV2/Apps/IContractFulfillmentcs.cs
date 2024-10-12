@@ -27,14 +27,14 @@ namespace TychoV2.Apps
         /// </summary>
         IContractFulfillment Handle<TRequest, THandler>()
             where TRequest : class, IRequest
-            where THandler : class, IHandle<TRequest>;
+            where THandler : class, IRequestHandler<TRequest>;
 
         /// <summary>
         /// TODO
         /// </summary>
         IContractFulfillment Handle<TRequest, TResponse, THandler>()
             where TRequest : class, IRequest<TResponse>
-            where THandler : class, IHandle<TRequest, TResponse>;
+            where THandler : class, IRequestHandler<TRequest, TResponse>;
 
         /// <summary>
         /// TODO

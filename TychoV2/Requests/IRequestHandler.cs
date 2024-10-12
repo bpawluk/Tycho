@@ -6,12 +6,12 @@ namespace TychoV2.Requests
     /// <summary>
     /// TODO
     /// </summary>
-    public interface IHandle { }
+    public interface IRequestHandler { }
 
     /// <summary>
     /// TODO
     /// </summary>
-    public interface IHandle<TRequest> : IHandle
+    public interface IRequestHandler<TRequest> : IRequestHandler
         where TRequest : class, IRequest 
     {
         Task Handle(TRequest requestData, CancellationToken cancellationToken = default);
@@ -20,7 +20,7 @@ namespace TychoV2.Requests
     /// <summary>
     /// TODO
     /// </summary>
-    public interface IHandle<TRequest, TResponse> : IHandle
+    public interface IRequestHandler<TRequest, TResponse> : IRequestHandler
         where TRequest : class, IRequest<TResponse> 
     {
         Task<TResponse> Handle(TRequest requestData, CancellationToken cancellationToken = default);

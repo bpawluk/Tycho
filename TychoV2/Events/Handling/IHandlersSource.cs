@@ -8,6 +8,6 @@ namespace TychoV2.Events.Handling
     {
         IReadOnlyCollection<HandlerIdentity> IdentifyHandlers();
 
-        IHandle<TEvent>? FindHandler(HandlerIdentity handlerIdentity);
+        IEventHandler<TEvent>? FindHandler(HandlerIdentity handlerIdentity);
     }
 }

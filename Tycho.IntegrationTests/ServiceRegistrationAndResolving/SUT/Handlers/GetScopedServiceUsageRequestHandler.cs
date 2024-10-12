@@ -5,8 +5,8 @@ using TychoV2.Requests;
 namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Handlers;
 
 internal class GetScopedServiceUsageRequestHandler(IScopedService service) 
-    : IHandle<GetAppScopedServiceUsageRequest, int>
-    , IHandle<GetModuleScopedServiceUsageRequest, int>
+    : IRequestHandler<GetAppScopedServiceUsageRequest, int>
+    , IRequestHandler<GetModuleScopedServiceUsageRequest, int>
 {
     private readonly IScopedService _service = service;
 

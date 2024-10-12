@@ -4,8 +4,8 @@ using TychoV2.Structure;
 namespace Tycho.IntegrationTests.SendingRequestsHorizontally.SUT.Modules.Beta.Handlers;
 
 internal class BetaInRequestHandler(IParent parent)
-    : IHandle<BetaInRequest>
-    , IHandle<BetaInRequestWithResponse, string>
+    : IRequestHandler<BetaInRequest>
+    , IRequestHandler<BetaInRequestWithResponse, string>
 {
     private readonly IParent _parent = parent;
 

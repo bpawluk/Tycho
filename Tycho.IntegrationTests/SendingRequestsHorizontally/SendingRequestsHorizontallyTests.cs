@@ -14,7 +14,7 @@ public class SendingRequestsHorizontallyTests : IAsyncLifetime
         _sut = await new TestApp(_testWorkflow).Run();
     }
 
-    [Fact]
+    [Fact(Timeout = 500)]
     public async Task TychoEnables_SendingRequests_WithinHorizontalHierarchy()
     {
         // Arrange
@@ -30,7 +30,7 @@ public class SendingRequestsHorizontallyTests : IAsyncLifetime
         Assert.Equal(7, testResult.HandlingCount);
     }
 
-    [Fact]
+    [Fact(Timeout = 500)]
     public async Task TychoEnables_SendingRequestsForResponses_WithinHorizontalHierarchy()
     {
         // Arrange

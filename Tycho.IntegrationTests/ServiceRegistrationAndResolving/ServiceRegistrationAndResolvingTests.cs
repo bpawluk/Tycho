@@ -13,7 +13,7 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         _sut = await new TestApp().Run();
     }
 
-    [Fact]
+    [Fact(Timeout = 500)]
     public async Task TychoEnables_ResolvingSingletonServices_InApps()
     {
         // Arrange
@@ -28,7 +28,7 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         Assert.Equal(2, secondResult);
     }
 
-    [Fact]
+    [Fact(Timeout = 500)]
     public async Task TychoEnables_ResolvingSingletonServices_InModules()
     {
         // Arrange
@@ -43,7 +43,7 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         Assert.Equal(2, secondResult);
     }
 
-    [Fact]
+    [Fact(Timeout = 500)]
     public async Task TychoEnables_ResolvingScopedServices_InApps()
     {
         // Arrange
@@ -58,7 +58,7 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         Assert.Equal(2, secondResult);
     }
 
-    [Fact]
+    [Fact(Timeout = 500)]
     public async Task TychoEnables_ResolvingScopedServices_InModules()
     {
         // Arrange
@@ -73,7 +73,7 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         Assert.Equal(2, secondResult);
     }
 
-    [Fact]
+    [Fact(Timeout = 500)]
     public async Task TychoEnables_ResolvingTransientServices_InApps()
     {
         // Arrange
@@ -88,7 +88,7 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         Assert.Equal(1, secondResult);
     }
 
-    [Fact]
+    [Fact(Timeout = 500)]
     public async Task TychoEnables_ResolvingTransientServices_InModules()
     {
         // Arrange

@@ -4,7 +4,7 @@ using TychoV2.Structure;
 
 namespace TychoV2.Requests.Handling
 {
-    internal class RequestExposer<TRequest> : IHandle<TRequest>
+    internal class RequestExposer<TRequest> : IRequestHandler<TRequest>
         where TRequest : class, IRequest
     {
         private readonly IParent _parent;
@@ -18,7 +18,7 @@ namespace TychoV2.Requests.Handling
             _parent.Execute(requestData, cancellationToken);
     }
 
-    internal class RequestExposer<TRequest, TResponse> : IHandle<TRequest, TResponse>
+    internal class RequestExposer<TRequest, TResponse> : IRequestHandler<TRequest, TResponse>
         where TRequest : class, IRequest<TResponse>
     {
         private readonly IParent _parent;

@@ -18,18 +18,18 @@ namespace TychoV2.Events.Handling
         }
 
         public IReadOnlyCollection<HandlerIdentity> IdentifyHandlers() => _internals
-            .GetServices<IHandle<TEvent>>()
+            .GetServices<IEventHandler<TEvent>>()
             .Select(handler => new HandlerIdentity(
                 _internals.Identifier,
                 handler.GetType().FullName))
             .ToArray();
 
-        public IHandle<TEvent>? FindHandler(HandlerIdentity handlerIdentity)
+        public IEventHandler<TEvent>? FindHandler(HandlerIdentity handlerIdentity)
         {
             if (handlerIdentity.SourceId == _internals.Identifier)
             {
                 var handler = _internals
-                    .GetServices<IHandle<TEvent>>()
+                    .GetServices<IEventHandler<TEvent>>()
                     .FirstOrDefault(handler => handlerIdentity.HandlerId == handler.GetType().FullName);
                 return handler ?? throw new InvalidOperationException($"Missing {handlerIdentity} event handler");
             }

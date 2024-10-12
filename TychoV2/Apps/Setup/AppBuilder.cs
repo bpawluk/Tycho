@@ -52,9 +52,9 @@ namespace TychoV2.Apps.Setup
             var services = _internals.GetServiceCollection();
             var app = (IApp)Activator.CreateInstance(_appType, _internals);
 
+            await Contract.Build();
+            await Events.Build();
             await Structure.Build();
-
-            services.AddSingleton(Configuration!);
             _internals.Build();
 
             return app;

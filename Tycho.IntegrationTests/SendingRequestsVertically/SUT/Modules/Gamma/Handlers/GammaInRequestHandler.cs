@@ -4,8 +4,8 @@ using TychoV2.Structure;
 namespace Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Gamma.Handlers;
 
 internal class GammaInRequestHandler(IParent parent)
-    : IHandle<GammaInRequest>
-    , IHandle<GammaInRequestWithResponse, string>
+    : IRequestHandler<GammaInRequest>
+    , IRequestHandler<GammaInRequestWithResponse, string>
 {
     private readonly IParent _parent = parent;
 

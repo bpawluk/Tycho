@@ -41,27 +41,27 @@ namespace TychoV2.Events.Registrating
 
         public void HandleEvent<TEvent, THandler>()
             where TEvent : class, IEvent
-            where THandler : class, IHandle<TEvent>
+            where THandler : class, IEventHandler<TEvent>
         {
             if (IsHandlerAlreadyRegistered<TEvent, THandler>())
             {
                 throw new ArgumentException($"Event handler for {typeof(TEvent).Name} already registered", nameof(THandler));
             }
 
-            Services.AddTransient<IHandle<TEvent>, THandler>();
+            Services.AddTransient<IEventHandler<TEvent>, THandler>();
 
             if (!IsSourceAlreadyRegistered<TEvent, LocalHandlersSource<TEvent>>())
             {
-                Services.AddTransient<IHandlersSource<TEvent>, LocalHandlersSource<TEvent>>();
+                Services.AddSingleton<IHandlersSource<TEvent>>(new LocalHandlersSource<TEvent>(_internals));
             }
         }
 
         private bool IsHandlerAlreadyRegistered<TEvent, THandler>()
             where TEvent : class, IEvent
-            where THandler : class, IHandle<TEvent>
+            where THandler : class, IEventHandler<TEvent>
         {
             return Services.Any(descriptor =>
-                descriptor.ServiceType == typeof(IHandle<TEvent>) &&
+                descriptor.ServiceType == typeof(IEventHandler<TEvent>) &&
                 descriptor.ImplementationType == typeof(THandler));
         }
 

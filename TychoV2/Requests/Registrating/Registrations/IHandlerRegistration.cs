@@ -7,12 +7,12 @@
     internal interface IHandlerRegistration<TRequest> : IHandlerRegistration
         where TRequest : class, IRequest
     {
-        IHandle<TRequest> Handler { get; }
+        IRequestHandler<TRequest> Handler { get; }
     }
 
     internal interface IHandlerRegistration<TRequest, TResponse> : IHandlerRegistration
         where TRequest : class, IRequest<TResponse>
     {
-        IHandle<TRequest, TResponse> Handler { get; }
+        IRequestHandler<TRequest, TResponse> Handler { get; }
     }
 }

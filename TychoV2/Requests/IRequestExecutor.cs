@@ -6,7 +6,7 @@ namespace TychoV2.Requests
     /// <summary>
     /// TODO
     /// </summary>
-    public interface IExecute
+    public interface IRequestExecutor
     {
         Task Execute<TRequest>(TRequest requestData, CancellationToken cancellationToken = default)
             where TRequest : class, IRequest;
