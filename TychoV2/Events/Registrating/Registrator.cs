@@ -25,7 +25,7 @@ namespace TychoV2.Events.Registrating
             {
                 throw new ArgumentException($"{typeof(TEvent).Name} is already exposed", nameof(TEvent));
             }
-            Services.AddTransient<IHandlersSource<TEvent>, UpStreamHandlersSource<TEvent>>();
+            Services.AddTransient<IHandlersSource, UpStreamHandlersSource<TEvent>>();
         }
 
         public void ForwardEvent<TEvent, TModule>()
@@ -36,7 +36,7 @@ namespace TychoV2.Events.Registrating
             {
                 throw new ArgumentException($"{typeof(TEvent).Name} is already exposed", nameof(TEvent));
             }
-            Services.AddTransient<IHandlersSource<TEvent>, DownStreamHandlersSource<TEvent, TModule>>();
+            Services.AddTransient<IHandlersSource, DownStreamHandlersSource<TEvent, TModule>>();
         }
 
         public void HandleEvent<TEvent, THandler>()
@@ -52,7 +52,7 @@ namespace TychoV2.Events.Registrating
 
             if (!IsSourceAlreadyRegistered<TEvent, LocalHandlersSource<TEvent>>())
             {
-                Services.AddSingleton<IHandlersSource<TEvent>>(new LocalHandlersSource<TEvent>(_internals));
+                Services.AddSingleton<IHandlersSource>(new LocalHandlersSource<TEvent>(_internals));
             }
         }
 
@@ -67,10 +67,10 @@ namespace TychoV2.Events.Registrating
 
         private bool IsSourceAlreadyRegistered<TEvent, THandlersSource>()
             where TEvent : class, IEvent
-            where THandlersSource : class, IHandlersSource<TEvent>
+            where THandlersSource : class, IHandlersSource
         {
             return Services.Any(descriptor =>
-                descriptor.ServiceType == typeof(IHandlersSource<TEvent>) &&
+                descriptor.ServiceType == typeof(IHandlersSource) &&
                 descriptor.ImplementationType == typeof(THandlersSource));
         }
     }

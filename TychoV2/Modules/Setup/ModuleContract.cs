@@ -1,11 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Threading.Tasks;
-using TychoV2.Events.Broker;
-using TychoV2.Events;
-using TychoV2.Persistence.InMemory;
-using TychoV2.Persistence.Processor;
-using TychoV2.Persistence;
 using TychoV2.Requests;
 using TychoV2.Requests.Broker;
 using TychoV2.Requests.Registrating;

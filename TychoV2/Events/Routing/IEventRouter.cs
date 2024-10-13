@@ -7,7 +7,6 @@ namespace TychoV2.Events.Routing
         IReadOnlyCollection<HandlerIdentity> IdentifyHandlers<TEvent>()
             where TEvent : class, IEvent;
 
-        public IEventHandler<TEvent>? FindHandler<TEvent>(HandlerIdentity handlerIdentity)
-            where TEvent : class, IEvent;
+        public IEventHandler? FindHandler(HandlerIdentity handlerIdentity);
     }
 }

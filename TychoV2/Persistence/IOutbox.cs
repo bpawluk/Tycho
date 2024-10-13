@@ -9,12 +9,12 @@ namespace TychoV2.Persistence
     {
         event EventHandler NewEntriesAdded;
 
-        Task Add(IReadOnlyCollection<Entry> entries, CancellationToken cancellationToken = default);
+        Task Add(IReadOnlyCollection<OutboxEntry> entries, CancellationToken cancellationToken = default);
 
-        Task<IReadOnlyCollection<Entry>> Read(int count, CancellationToken cancellationToken = default);
+        Task<IReadOnlyCollection<OutboxEntry>> Read(int count, CancellationToken cancellationToken = default);
 
-        Task MarkAsProcessed(Entry entry, CancellationToken cancellationToken = default);
+        Task MarkAsProcessed(OutboxEntry entry, CancellationToken cancellationToken = default);
 
-        Task MarkAsFailed(Entry entry, CancellationToken cancellationToken = default);
+        Task MarkAsFailed(OutboxEntry entry, CancellationToken cancellationToken = default);
     }
 }

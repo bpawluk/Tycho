@@ -1,8 +1,10 @@
 ﻿using Moq;
+using Tycho.UnitTests._Data.Events;
 using TychoV2.Events;
 using TychoV2.Events.Broker;
 using TychoV2.Events.Routing;
 using TychoV2.Persistence;
+using TychoV2.Persistence.Processing;
 using TychoV2.Persistence.Processor;
 using CTK = System.Threading.CancellationToken;
 
@@ -16,7 +18,7 @@ public sealed class OutboxProcessorTests : IDisposable
     private Mock<IEventProcessor> _mockEventProcessor;
     private OutboxProcessorSettings _settings;
 
-    private List<Entry> _entries = [];
+    private List<OutboxEntry> _entries = [];
     private int _iterations = 0;
 
     private int ExpectedIterations => ExpectedProcessingIterations + ExpectedIdleIterations;
@@ -41,7 +43,7 @@ public sealed class OutboxProcessorTests : IDisposable
                    });
 
         _mockEventProcessor = new Mock<IEventProcessor>();
-        _mockEventProcessor.Setup(ep => ep.Process(It.IsAny<HandlerIdentity>(), It.IsAny<IEvent>(), It.IsAny<CTK>()))
+        _mockEventProcessor.Setup(ep => ep.Process(It.IsAny<HandlerIdentity>(), It.IsAny<IEvent>()))
                            .ReturnsAsync(true);
 
         _settings = new OutboxProcessorSettings
@@ -66,7 +68,7 @@ public sealed class OutboxProcessorTests : IDisposable
     public async Task Process_WithDifferentOutboxContents_CompletesAll(int count, int batchSize)
     {
         // Arrange
-        _entries = Enumerable.Range(0, count).Select(_ => new Entry(new(string.Empty, string.Empty), default!)).ToList();
+        _entries = Enumerable.Range(0, count).Select(_ => new OutboxEntry(new(string.Empty, string.Empty), new TestEvent())).ToList();
         _settings.BatchSize = batchSize;
 
         // Act
@@ -76,7 +78,7 @@ public sealed class OutboxProcessorTests : IDisposable
 
         // Assert
         Assert.Equal(ExpectedIterations, _iterations);
-        _mockOutbox.Verify(o => o.MarkAsProcessed(It.IsAny<Entry>(), It.IsAny<CTK>()), Times.Exactly(_entries.Count));
+        _mockOutbox.Verify(o => o.MarkAsProcessed(It.IsAny<OutboxEntry>(), It.IsAny<CTK>()), Times.Exactly(_entries.Count));
     }
 
     [Theory(Timeout = 500)]
@@ -91,8 +93,8 @@ public sealed class OutboxProcessorTests : IDisposable
         // Arrange
         _entries =
         [
-            new Entry(new(string.Empty, string.Empty), default!),
-            new Entry(new(string.Empty, string.Empty), default!)
+            new OutboxEntry(new(string.Empty, string.Empty), new TestEvent()),
+            new OutboxEntry(new(string.Empty, string.Empty), new TestEvent())
         ];
         _settings.InitialPollingInterval = TimeSpan.FromMilliseconds(initial);
         _settings.MaxPollingInterval = TimeSpan.FromMilliseconds(max);
@@ -105,7 +107,7 @@ public sealed class OutboxProcessorTests : IDisposable
 
         // Assert
         Assert.Equal(ExpectedIterations, _iterations);
-        _mockOutbox.Verify(o => o.MarkAsProcessed(It.IsAny<Entry>(), It.IsAny<CTK>()), Times.Exactly(_entries.Count));
+        _mockOutbox.Verify(o => o.MarkAsProcessed(It.IsAny<OutboxEntry>(), It.IsAny<CTK>()), Times.Exactly(_entries.Count));
     }
 
     [Fact(Timeout = 500)]
@@ -114,14 +116,14 @@ public sealed class OutboxProcessorTests : IDisposable
         // Arrange
         _entries =
         [
-            new Entry(new(string.Empty, string.Empty), default!),
-            new Entry(new(string.Empty, string.Empty), default!)
+            new OutboxEntry(new(string.Empty, string.Empty), new TestEvent()),
+            new OutboxEntry(new(string.Empty, string.Empty), new TestEvent())
         ];
         _settings.ConcurrencyLimit = _entries.Count + 1;
         _settings.MaxPollingInterval = _settings.InitialPollingInterval;
 
         var tcs = new TaskCompletionSource<bool>();
-        _mockEventProcessor.Setup(ep => ep.Process(It.IsAny<HandlerIdentity>(), It.IsAny<IEvent>(), It.IsAny<CTK>()))
+        _mockEventProcessor.Setup(ep => ep.Process(It.IsAny<HandlerIdentity>(), It.IsAny<IEvent>()))
                            .Returns(tcs.Task);
 
         // Act
@@ -140,14 +142,14 @@ public sealed class OutboxProcessorTests : IDisposable
         // Arrange
         _entries =
         [
-            new Entry(new(string.Empty, string.Empty), default!),
-            new Entry(new(string.Empty, string.Empty), default!)
+            new OutboxEntry(new(string.Empty, string.Empty), new TestEvent()),
+            new OutboxEntry(new(string.Empty, string.Empty), new TestEvent())
         ];
         _settings.ConcurrencyLimit = _entries.Count;
         _settings.MaxPollingInterval = _settings.InitialPollingInterval;
 
         var tcs = new TaskCompletionSource<bool>();
-        _mockEventProcessor.Setup(ep => ep.Process(It.IsAny<HandlerIdentity>(), It.IsAny<IEvent>(), It.IsAny<CTK>()))
+        _mockEventProcessor.Setup(ep => ep.Process(It.IsAny<HandlerIdentity>(), It.IsAny<IEvent>()))
                            .Returns(tcs.Task);
 
         // Act
@@ -165,15 +167,14 @@ public sealed class OutboxProcessorTests : IDisposable
         // Arrange
         _entries =
         [
-            new Entry(new(string.Empty, string.Empty), default!),
-            new Entry(new("fail", string.Empty), default!),
-            new Entry(new(string.Empty, string.Empty), default!)
+            new OutboxEntry(new(string.Empty, string.Empty), new TestEvent()),
+            new OutboxEntry(new("fail", string.Empty), new TestEvent()),
+            new OutboxEntry(new(string.Empty, string.Empty), new TestEvent())
         ];
         _mockEventProcessor
             .Setup(ep => ep.Process(
-                It.Is<HandlerIdentity>(x => x.SourceId == "fail"), 
-                It.IsAny<IEvent>(), 
-                It.IsAny<CTK>()))
+                It.Is<HandlerIdentity>(x => x.ModuleId == "fail"), 
+                It.IsAny<IEvent>()))
             .ReturnsAsync(false);
         _settings.MaxPollingInterval = _settings.InitialPollingInterval;
 
@@ -184,8 +185,8 @@ public sealed class OutboxProcessorTests : IDisposable
 
         // Assert
         Assert.Equal(ExpectedIterations, _iterations);
-        _mockOutbox.Verify(o => o.MarkAsProcessed(It.IsAny<Entry>(), It.IsAny<CTK>()), Times.Exactly(2));
-        _mockOutbox.Verify(o => o.MarkAsFailed(It.IsAny<Entry>(), It.IsAny<CTK>()), Times.Once);
+        _mockOutbox.Verify(o => o.MarkAsProcessed(It.IsAny<OutboxEntry>(), It.IsAny<CTK>()), Times.Exactly(2));
+        _mockOutbox.Verify(o => o.MarkAsFailed(It.IsAny<OutboxEntry>(), It.IsAny<CTK>()), Times.Once);
     }
 
     [Fact(Timeout = 500)]
@@ -194,15 +195,14 @@ public sealed class OutboxProcessorTests : IDisposable
         // Arrange
         _entries =
         [
-            new Entry(new(string.Empty, string.Empty), default!),
-            new Entry(new("throw", string.Empty), default!),
-            new Entry(new(string.Empty, string.Empty), default!)
+            new OutboxEntry(new(string.Empty, string.Empty), new TestEvent()),
+            new OutboxEntry(new("throw", string.Empty), new TestEvent()),
+            new OutboxEntry(new(string.Empty, string.Empty), new TestEvent())
         ];
         _mockEventProcessor
             .Setup(ep => ep.Process(
-                It.Is<HandlerIdentity>(x => x.SourceId == "throw"),
-                It.IsAny<IEvent>(),
-                It.IsAny<CTK>()))
+                It.Is<HandlerIdentity>(x => x.ModuleId == "throw"),
+                It.IsAny<IEvent>()))
             .ThrowsAsync(new InvalidOperationException());
         _settings.MaxPollingInterval = _settings.InitialPollingInterval;
 
@@ -213,8 +213,8 @@ public sealed class OutboxProcessorTests : IDisposable
 
         // Assert
         Assert.Equal(ExpectedIterations, _iterations);
-        _mockOutbox.Verify(o => o.MarkAsProcessed(It.IsAny<Entry>(), It.IsAny<CTK>()), Times.Exactly(2));
-        _mockOutbox.Verify(o => o.MarkAsFailed(It.IsAny<Entry>(), It.IsAny<CTK>()), Times.Never);
+        _mockOutbox.Verify(o => o.MarkAsProcessed(It.IsAny<OutboxEntry>(), It.IsAny<CTK>()), Times.Exactly(2));
+        _mockOutbox.Verify(o => o.MarkAsFailed(It.IsAny<OutboxEntry>(), It.IsAny<CTK>()), Times.Never);
         // TODO: assert that the exception is logged
     }
 
@@ -224,8 +224,8 @@ public sealed class OutboxProcessorTests : IDisposable
         // Arrange
         _entries =
         [
-            new Entry(new(string.Empty, string.Empty), default!),
-            new Entry(new(string.Empty, string.Empty), default!)
+            new OutboxEntry(new(string.Empty, string.Empty), new TestEvent()),
+            new OutboxEntry(new(string.Empty, string.Empty), new TestEvent())
         ];
         _settings.MaxPollingInterval = _settings.InitialPollingInterval;
         _mockOutbox.Setup(o => o.Read(It.IsAny<int>(), It.IsAny<CTK>()))
@@ -238,8 +238,8 @@ public sealed class OutboxProcessorTests : IDisposable
         await WaitForCompletion();
 
         // Assert
-        _mockOutbox.Verify(o => o.MarkAsProcessed(It.IsAny<Entry>(), It.IsAny<CTK>()), Times.Never);
-        _mockOutbox.Verify(o => o.MarkAsFailed(It.IsAny<Entry>(), It.IsAny<CTK>()), Times.Never);
+        _mockOutbox.Verify(o => o.MarkAsProcessed(It.IsAny<OutboxEntry>(), It.IsAny<CTK>()), Times.Never);
+        _mockOutbox.Verify(o => o.MarkAsFailed(It.IsAny<OutboxEntry>(), It.IsAny<CTK>()), Times.Never);
         // TODO: assert that the exception is logged
     }
 

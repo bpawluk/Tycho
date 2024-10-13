@@ -13,6 +13,9 @@ internal class AlphaModule : TychoModule
     protected override void MapEvents(IModuleEvents module)
     {
         module.Handles<WorkflowStartedEvent, TestEventHandler>();
+
+        module.Routes<WorkflowFinishedEvent>()
+              .Exposes();
     }
 
     protected override void RegisterServices(IServiceCollection module) { }

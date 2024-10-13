@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TychoV2.Persistence.Processor
+namespace TychoV2.Persistence.Processing
 {
     internal class OutboxProcessorSettings
     {

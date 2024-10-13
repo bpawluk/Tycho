@@ -9,13 +9,13 @@ namespace TychoV2.Structure
         private IServiceCollection? _serviceCollection = new ServiceCollection();
         private IServiceProvider? _serviceProvider = null;
 
-        public string Identifier { get; }
+        public Type Owner { get; }
 
         public event EventHandler? InternalsBuilt;
 
-        public Internals(string identifier)
+        public Internals(Type owner)
         {
-            Identifier = identifier;
+            Owner = owner;
         }
 
         public IServiceCollection GetServiceCollection()

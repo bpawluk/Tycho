@@ -29,7 +29,7 @@ namespace TychoV2.Modules.Setup
         public ModuleBuilder(Type moduleDefinitionType)
         {
             _moduleType = typeof(Module<>).MakeGenericType(new Type[] { moduleDefinitionType });
-            _internals = new Internals(moduleDefinitionType.FullName);
+            _internals = new Internals(moduleDefinitionType);
             Contract = new ModuleContract(_internals);
             Events = new ModuleEvents(_internals);
             Structure = new ModuleStructure(_internals);
@@ -53,24 +53,25 @@ namespace TychoV2.Modules.Setup
         public void Init()
         {
             var services = _internals.GetServiceCollection();
+
             var configurationBuilder = new ConfigurationBuilder();
             _configurationDefinition?.Invoke(configurationBuilder);
             Configuration = configurationBuilder.Build();
+
+            var parentProxy = new ParentProxy(Contract.ContractFulfillingBroker, Events.ParentEventRouter);
+
             services.AddSingleton(Configuration);
+            services.AddSingleton<IParent>(parentProxy);
+            services.AddSingleton(_internals);
         }
 
         public async Task<IModule> Build()
         {
-            var services = _internals.GetServiceCollection();
             var module = (IModule)Activator.CreateInstance(_moduleType, _internals);
 
             await Contract.Build();
             await Events.Build();
             await Structure.Build();
-
-            var parentProxy = new ParentProxy(Contract.ContractFulfillingBroker, Events.ParentEventRouter);
-            services.AddSingleton<IParent>(parentProxy);
-
             _internals.Build();
 
             return module;

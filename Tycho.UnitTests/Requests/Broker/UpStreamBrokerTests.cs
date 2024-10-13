@@ -16,7 +16,7 @@ public class UpStreamBrokerTests
 
     public UpStreamBrokerTests()
     {
-        _internals = new Internals(string.Empty);
+        _internals = new Internals(typeof(object));
         _sut = new UpStreamBroker(_internals);
     }
 

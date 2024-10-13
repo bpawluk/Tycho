@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using TychoV2.Events.Broker;
-using static System.Net.Mime.MediaTypeNames;
+using TychoV2.Events.Routing;
 
-namespace TychoV2.Persistence.Processor
+namespace TychoV2.Persistence.Processing
 {
     internal class OutboxProcessor : IDisposable
     {
-        private readonly IEventProcessor _eventProcessor;
         private readonly IOutbox _eventOutbox;
         private readonly OutboxProcessorSettings _settings;
+        private readonly EntryProcessor _entryProcessor;
 
         private readonly Timer _timer;
 
@@ -24,12 +23,13 @@ namespace TychoV2.Persistence.Processor
 
         public OutboxProcessor(
             IOutbox eventOutbox,
-            IEventProcessor eventProcessor,
+            IEventRouter eventRouter,
+            IPayloadSerializer payloadSerializer,
             OutboxProcessorSettings settings)
         {
-            _settings = settings;
-            _eventProcessor = eventProcessor;
             _eventOutbox = eventOutbox;
+            _settings = settings;
+            _entryProcessor = new EntryProcessor(eventRouter, payloadSerializer);
 
             _timer = new Timer(TimerCallback, null, Timeout.Infinite, Timeout.Infinite);
 
@@ -87,11 +87,11 @@ namespace TychoV2.Persistence.Processor
             }
         }
 
-        private async Task ProcessEntry(Entry entry)
+        private async Task ProcessEntry(OutboxEntry entry)
         {
             try
             {
-                var isProcessed = await _eventProcessor.Process(entry.HandlerIdentity, entry.Payload).ConfigureAwait(false);
+                var isProcessed = await _entryProcessor.Process(entry).ConfigureAwait(false);
                 if (isProcessed)
                 {
                     await _eventOutbox.MarkAsProcessed(entry).ConfigureAwait(false);

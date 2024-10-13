@@ -5,9 +5,10 @@ using TychoV2.Apps.Routing;
 using TychoV2.Events;
 using TychoV2.Events.Broker;
 using TychoV2.Events.Registrating;
+using TychoV2.Events.Routing;
 using TychoV2.Persistence;
 using TychoV2.Persistence.InMemory;
-using TychoV2.Persistence.Processor;
+using TychoV2.Persistence.Processing;
 using TychoV2.Structure;
 
 namespace TychoV2.Apps.Setup
@@ -43,9 +44,9 @@ namespace TychoV2.Apps.Setup
                 .AddSingleton<OutboxProcessor>()
                 .AddSingleton<OutboxProcessorSettings>()
                 .AddSingleton<IOutbox, InMemoryOutbox>()
-                .AddSingleton(sp => new EventBroker(_internals, sp.GetRequiredService<IOutbox>()))
-                .AddSingleton<IEventPublisher>(sp => sp.GetRequiredService<EventBroker>())
-                .AddSingleton<IEventProcessor>(sp => sp.GetRequiredService<EventBroker>());
+                .AddTransient<IPayloadSerializer, InMemoryPayloadSerializer>()
+                .AddTransient<IEventRouter, EventRouter>()
+                .AddTransient<IEventPublisher, EventPublisher>();
             _internals.InternalsBuilt += OnInternalsBuilt;
             return Task.CompletedTask;
         }
@@ -53,6 +54,7 @@ namespace TychoV2.Apps.Setup
         private void OnInternalsBuilt(object _, EventArgs __)
         {
             _internals.GetRequiredService<OutboxProcessor>().Initialize();
+            _internals.InternalsBuilt -= OnInternalsBuilt;
         }
     }
 }

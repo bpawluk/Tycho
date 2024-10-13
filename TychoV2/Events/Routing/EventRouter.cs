@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using TychoV2.Events.Handling;
@@ -19,14 +18,13 @@ namespace TychoV2.Events.Routing
         public IReadOnlyCollection<HandlerIdentity> IdentifyHandlers<TEvent>()
             where TEvent : class, IEvent
         {
-            var sources = _internals.GetServices<IHandlersSource<TEvent>>();
-            return sources.SelectMany(source => source.IdentifyHandlers()).ToArray();
+            var sources = _internals.GetServices<IHandlersSource>();
+            return sources.SelectMany(source => source.IdentifyHandlers<TEvent>()).ToArray();
         }
 
-        public IEventHandler<TEvent>? FindHandler<TEvent>(HandlerIdentity handlerIdentity)
-            where TEvent : class, IEvent
+        public IEventHandler? FindHandler(HandlerIdentity handlerIdentity)
         {
-            var sources = _internals.GetServices<IHandlersSource<TEvent>>();
+            var sources = _internals.GetServices<IHandlersSource>();
             foreach (var source in sources)
             {
                 var handler = source.FindHandler(handlerIdentity);

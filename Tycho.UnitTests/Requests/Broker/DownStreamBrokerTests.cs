@@ -16,7 +16,7 @@ public class DownStreamBrokerTests
 
     public DownStreamBrokerTests()
     {
-        _internals = new Internals(string.Empty);
+        _internals = new Internals(typeof(object));
         _sut = new DownStreamBroker<TestModule>(_internals);
     }
 

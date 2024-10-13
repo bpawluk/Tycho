@@ -1,15 +1,14 @@
-﻿using TychoV2.Events;
-using TychoV2.Events.Routing;
+﻿using TychoV2.Events.Routing;
 
 namespace TychoV2.Persistence
 {
-    internal class Entry
+    internal class OutboxEntry
     {
         public HandlerIdentity HandlerIdentity { get; }
 
-        public IEvent Payload { get; }
+        public object Payload { get; }
 
-        public Entry(HandlerIdentity handlerIdentity, IEvent payload)
+        public OutboxEntry(HandlerIdentity handlerIdentity, object payload)
         {
             HandlerIdentity = handlerIdentity;
             Payload = payload;

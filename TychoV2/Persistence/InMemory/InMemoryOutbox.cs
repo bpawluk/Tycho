@@ -7,11 +7,11 @@ namespace TychoV2.Persistence.InMemory
 {
     internal class InMemoryOutbox : IOutbox
     {
-        private readonly Queue<Entry> _entries = new Queue<Entry>();
+        private readonly Queue<OutboxEntry> _entries = new Queue<OutboxEntry>();
 
         public event EventHandler? NewEntriesAdded;
 
-        public Task Add(IReadOnlyCollection<Entry> entries, CancellationToken cancellationToken)
+        public Task Add(IReadOnlyCollection<OutboxEntry> entries, CancellationToken cancellationToken)
         {
             foreach (var entry in entries)
             {
@@ -21,9 +21,9 @@ namespace TychoV2.Persistence.InMemory
             return Task.CompletedTask;
         }
 
-        public Task<IReadOnlyCollection<Entry>> Read(int count, CancellationToken cancellationToken)
+        public Task<IReadOnlyCollection<OutboxEntry>> Read(int count, CancellationToken cancellationToken)
         {
-            List<Entry> entries = new List<Entry>();
+            List<OutboxEntry> entries = new List<OutboxEntry>();
 
             count = Math.Min(count, _entries.Count);
             for (int i = 0; i < count; i++)
@@ -32,11 +32,11 @@ namespace TychoV2.Persistence.InMemory
                 entries.Add(entry);
             }
 
-            return Task.FromResult<IReadOnlyCollection<Entry>>(entries);
+            return Task.FromResult<IReadOnlyCollection<OutboxEntry>>(entries);
         }
 
-        public Task MarkAsFailed(Entry entry, CancellationToken cancellationToken) => Task.CompletedTask;
+        public Task MarkAsFailed(OutboxEntry entry, CancellationToken cancellationToken) => Task.CompletedTask;
 
-        public Task MarkAsProcessed(Entry entry, CancellationToken cancellationToken) => Task.CompletedTask;
+        public Task MarkAsProcessed(OutboxEntry entry, CancellationToken cancellationToken) => Task.CompletedTask;
     }
 }
