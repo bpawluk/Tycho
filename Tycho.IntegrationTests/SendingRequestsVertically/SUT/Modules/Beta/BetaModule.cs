@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Beta.Handlers;
 using Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Gamma;
-using TychoV2.Modules;
-using TychoV2.Requests;
+using Tycho.Modules;
+using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Beta;
 

@@ -2,10 +2,10 @@
 using Moq;
 using Tycho.UnitTests._Data.Modules;
 using Tycho.UnitTests._Data.Requests;
-using TychoV2.Requests;
-using TychoV2.Requests.Broker;
-using TychoV2.Requests.Registrating.Registrations;
-using TychoV2.Structure;
+using Tycho.Requests;
+using Tycho.Requests.Broker;
+using Tycho.Requests.Registrating.Registrations;
+using Tycho.Structure;
 
 namespace Tycho.UnitTests.Requests.Broker;
 

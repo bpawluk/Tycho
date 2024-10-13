@@ -1,50 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Major>3</Major>
-    <Minor>0</Minor>
-    <Patch>0</Patch>
-    <VersionPrefix>$(Major).$(Minor).$(Patch)</VersionPrefix>
-    <AssemblyVersion>$(Major).0.0.0</AssemblyVersion>
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Authors>Bartosz Pawluk</Authors>
-    <Title>$(AssemblyName)</Title>
-    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <IncludeSymbols>True</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Copyright>Copyright Bartosz Pawluk</Copyright>
-    <PackageProjectUrl>https://github.com/bpawluk/Tycho</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/bpawluk/Tycho</RepositoryUrl>
-    <PackageTags>tycho; module; modular; architecture; framework</PackageTags>
-    <Description>Lightweight framework for writing modular .NET apps</Description>
-    <PackageIcon>logo-128x128.png</PackageIcon>
-    <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\Tycho.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageReference Include="System.IO.Hashing" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-      <_Parameter1>UnitTests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100c93fea40f2534618e4ff61e0b471f2e286b28ed8f297345971529ef2c715b485e472aa36606687ceb5b351a5e56cbeee289ed43588aaa72a0135c0ba09d9f370892d7eebc6897f5a79f74730f2cbe5f927c5c97b11bada096f2873371d72b6a15d0d453c07e31df5246762901eb572b74171be8d4bf8cc513be4eca5b32cadab</_Parameter1>
+      <_Parameter1>Tycho.UnitTests</_Parameter1>
     </AssemblyAttribute>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-      <_Parameter1>DynamicProxyGenAssembly2, PublicKey=0024000004800000940000000602000000240000525341310004000001000100c547cac37abd99c8db225ef2f6c8a3602f3b3606cc9891605d02baa56104f4cfc0734aa39b93bf7852f7d9266654753cc297e7d2edfe0bac1cdcf9f717241550e0a7b191195b7667bb4f64bcb8e2121380fd1d9d46ad2d92d2d15605093924cceaf74c4861eff62abf69b9291ed0a340e113be11e6a7d3113e92484cf7045cc7</_Parameter1>
+      <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
     </AssemblyAttribute>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\Assets\logo-128x128.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
   </ItemGroup>
 
 </Project>

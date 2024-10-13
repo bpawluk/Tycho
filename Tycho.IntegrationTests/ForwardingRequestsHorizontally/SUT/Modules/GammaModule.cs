@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Modules.Handlers;
-using TychoV2.Modules;
+using Tycho.Modules;
 
 namespace Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Modules;
 

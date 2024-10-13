@@ -3,13 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33103.184
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tycho", "Tycho\Tycho.csproj", "{8774D167-57E3-4598-8B9F-CB5A376E656A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{D4C75946-56C2-44B0-9C62-F620F40BB18E}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationTests", "IntegrationTests\IntegrationTests.csproj", "{97BC4F27-09B7-4720-ABA4-BB9A93C70B11}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TychoV2", "TychoV2\TychoV2.csproj", "{1363AA50-91F4-4A6E-BD05-8E0280F6E4FB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tycho", "Tycho\Tycho.csproj", "{1363AA50-91F4-4A6E-BD05-8E0280F6E4FB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tycho.IntegrationTests", "Tycho.IntegrationTests\Tycho.IntegrationTests.csproj", "{281F5B93-2FFC-4BB9-9D23-DBDA70ECA910}"
 EndProject
@@ -21,18 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8774D167-57E3-4598-8B9F-CB5A376E656A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8774D167-57E3-4598-8B9F-CB5A376E656A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8774D167-57E3-4598-8B9F-CB5A376E656A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8774D167-57E3-4598-8B9F-CB5A376E656A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D4C75946-56C2-44B0-9C62-F620F40BB18E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D4C75946-56C2-44B0-9C62-F620F40BB18E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D4C75946-56C2-44B0-9C62-F620F40BB18E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D4C75946-56C2-44B0-9C62-F620F40BB18E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{97BC4F27-09B7-4720-ABA4-BB9A93C70B11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{97BC4F27-09B7-4720-ABA4-BB9A93C70B11}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{97BC4F27-09B7-4720-ABA4-BB9A93C70B11}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{97BC4F27-09B7-4720-ABA4-BB9A93C70B11}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1363AA50-91F4-4A6E-BD05-8E0280F6E4FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1363AA50-91F4-4A6E-BD05-8E0280F6E4FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1363AA50-91F4-4A6E-BD05-8E0280F6E4FB}.Release|Any CPU.ActiveCfg = Release|Any CPU

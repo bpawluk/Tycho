@@ -3,11 +3,11 @@ using Moq;
 using Tycho.UnitTests._Data.Handlers;
 using Tycho.UnitTests._Data.Modules;
 using Tycho.UnitTests._Data.Requests;
-using TychoV2.Modules;
-using TychoV2.Requests.Handling;
-using TychoV2.Requests.Registrating;
-using TychoV2.Requests.Registrating.Registrations;
-using TychoV2.Structure;
+using Tycho.Modules;
+using Tycho.Requests.Handling;
+using Tycho.Requests.Registrating;
+using Tycho.Requests.Registrating.Registrations;
+using Tycho.Structure;
 
 namespace Tycho.UnitTests.Requests.Registrating;
 

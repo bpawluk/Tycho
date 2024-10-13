@@ -1,6 +1,6 @@
 ﻿using Tycho.IntegrationTests.RunningStartupLogic.SUT;
 using Tycho.IntegrationTests.RunningStartupLogic.SUT.Modules;
-using TychoV2.Apps;
+using Tycho.Apps;
 
 namespace Tycho.IntegrationTests.RunningStartupLogic;
 

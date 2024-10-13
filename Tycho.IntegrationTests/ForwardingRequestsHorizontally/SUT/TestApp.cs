@@ -2,8 +2,8 @@
 using Tycho.IntegrationTests._Utils;
 using Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Handlers;
 using Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Modules;
-using TychoV2.Apps;
-using TychoV2.Requests;
+using Tycho.Apps;
+using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT;
 

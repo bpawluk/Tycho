@@ -1,5 +1,5 @@
-﻿using TychoV2.Requests;
-using TychoV2.Structure;
+﻿using Tycho.Requests;
+using Tycho.Structure;
 
 namespace Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Modules.Handlers;
 

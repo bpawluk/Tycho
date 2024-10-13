@@ -4,9 +4,9 @@ using Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Handlers;
 using Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Alpha;
 using Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Beta;
 using Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Gamma;
-using TychoV2.Apps;
-using TychoV2.Events;
-using TychoV2.Requests;
+using Tycho.Apps;
+using Tycho.Events;
+using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT;
 

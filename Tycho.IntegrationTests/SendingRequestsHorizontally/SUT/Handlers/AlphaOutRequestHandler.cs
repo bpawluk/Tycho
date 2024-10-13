@@ -1,7 +1,7 @@
 ﻿using Tycho.IntegrationTests.SendingRequestsHorizontally.SUT.Modules.Alpha;
 using Tycho.IntegrationTests.SendingRequestsHorizontally.SUT.Modules.Beta;
-using TychoV2.Modules;
-using TychoV2.Requests;
+using Tycho.Modules;
+using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.SendingRequestsHorizontally.SUT.Handlers;
 

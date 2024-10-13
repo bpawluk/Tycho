@@ -1,8 +1,8 @@
 ﻿using Moq;
 using Tycho.UnitTests._Data.Modules;
 using Tycho.UnitTests._Data.Requests;
-using TychoV2.Modules;
-using TychoV2.Requests.Handling;
+using Tycho.Modules;
+using Tycho.Requests.Handling;
 
 namespace Tycho.UnitTests.Requests.Handling;
 

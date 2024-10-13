@@ -2,9 +2,9 @@
 using Tycho.IntegrationTests._Utils;
 using Tycho.IntegrationTests.ForwardingEventsVertically.SUT.Handlers;
 using Tycho.IntegrationTests.ForwardingEventsVertically.SUT.Modules;
-using TychoV2.Apps;
-using TychoV2.Events;
-using TychoV2.Requests;
+using Tycho.Apps;
+using Tycho.Events;
+using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.ForwardingEventsVertically.SUT;
 

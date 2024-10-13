@@ -2,8 +2,8 @@
 using Tycho.IntegrationTests.RunningStartupLogic.SUT.Handlers;
 using Tycho.IntegrationTests.RunningStartupLogic.SUT.Modules;
 using Tycho.IntegrationTests.RunningStartupLogic.SUT.Services;
-using TychoV2.Apps;
-using TychoV2.Requests;
+using Tycho.Apps;
+using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.RunningStartupLogic.SUT;
 

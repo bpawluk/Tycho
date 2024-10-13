@@ -1,6 +1,6 @@
 ﻿using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules;
 using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Services;
-using TychoV2.Requests;
+using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Handlers;
 

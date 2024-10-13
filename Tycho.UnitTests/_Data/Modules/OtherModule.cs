@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using TychoV2.Modules;
+using Tycho.Modules;
 
 namespace Tycho.UnitTests._Data.Modules;
 

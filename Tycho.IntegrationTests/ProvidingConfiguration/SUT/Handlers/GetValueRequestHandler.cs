@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Tycho.IntegrationTests.ProvidingConfiguration.SUT.Modules;
-using TychoV2.Requests;
+using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.ProvidingConfiguration.SUT.Handlers;
 

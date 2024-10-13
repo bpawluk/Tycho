@@ -1,5 +1,5 @@
 ﻿using Tycho.IntegrationTests._Utils;
-using TychoV2.Requests;
+using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.ForwardingRequestsVertically.SUT.Handlers;
 

@@ -1,4 +1,4 @@
-﻿using TychoV2.Events;
+﻿using Tycho.Events;
 
 namespace Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Gamma.Handlers;
 

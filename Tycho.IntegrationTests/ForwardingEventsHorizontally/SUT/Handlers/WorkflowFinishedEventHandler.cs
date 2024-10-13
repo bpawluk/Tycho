@@ -1,5 +1,5 @@
 ﻿using Tycho.IntegrationTests._Utils;
-using TychoV2.Events;
+using Tycho.Events;
 
 namespace Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Handlers;
 

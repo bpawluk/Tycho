@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tycho.IntegrationTests.ProvidingConfiguration.SUT.Handlers;
-using TychoV2.Modules;
-using TychoV2.Requests;
+using Tycho.Modules;
+using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.ProvidingConfiguration.SUT.Modules;
 

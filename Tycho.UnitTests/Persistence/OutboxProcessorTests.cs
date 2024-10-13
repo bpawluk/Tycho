@@ -1,9 +1,9 @@
 ﻿using Moq;
 using Tycho.UnitTests._Data.Events;
-using TychoV2.Events;
-using TychoV2.Events.Routing;
-using TychoV2.Persistence;
-using TychoV2.Persistence.Processing;
+using Tycho.Events;
+using Tycho.Events.Routing;
+using Tycho.Persistence;
+using Tycho.Persistence.Processing;
 using CTK = System.Threading.CancellationToken;
 
 namespace Tycho.UnitTests.Persistence;

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Gamma.Handlers;
-using TychoV2.Modules;
+using Tycho.Modules;
 
 namespace Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Gamma;
 

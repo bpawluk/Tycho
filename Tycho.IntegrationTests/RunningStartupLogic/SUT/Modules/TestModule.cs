@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tycho.IntegrationTests.RunningStartupLogic.SUT.Handlers;
 using Tycho.IntegrationTests.RunningStartupLogic.SUT.Services;
-using TychoV2.Modules;
-using TychoV2.Requests;
+using Tycho.Modules;
+using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.RunningStartupLogic.SUT.Modules;
 
