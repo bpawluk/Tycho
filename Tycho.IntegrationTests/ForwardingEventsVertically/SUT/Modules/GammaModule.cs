@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Gamma.Handlers;
+using Tycho.IntegrationTests.ForwardingEventsVertically.SUT.Modules.Handlers;
 using TychoV2.Modules;
 
-namespace Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Gamma;
+namespace Tycho.IntegrationTests.ForwardingEventsVertically.SUT.Modules;
 
 internal class GammaModule : TychoModule
 {

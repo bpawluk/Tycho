@@ -12,7 +12,7 @@ internal class BetaModule : TychoModule
 
     protected override void MapEvents(IModuleEvents module)
     {
-        module.Handles<WorkflowStartedEvent, TestEventHandler>();
+        module.Handles<WorkflowStartedEvent, WorkflowStartedEventHandler>();
 
         module.Routes<WorkflowFinishedEvent>()
               .Exposes();

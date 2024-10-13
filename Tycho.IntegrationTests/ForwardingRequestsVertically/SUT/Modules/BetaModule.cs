@@ -16,7 +16,7 @@ internal class BetaModule : TychoModule
 
     protected override void IncludeModules(IModuleStructure module)
     {
-        module.AddSubmodule<GammaModule>(contract =>
+        module.Uses<GammaModule>(contract =>
         {
             contract.Expose<Request>()
                     .Expose<RequestWithResponse, string>();

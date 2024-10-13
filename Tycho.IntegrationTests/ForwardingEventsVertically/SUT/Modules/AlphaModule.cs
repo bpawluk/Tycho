@@ -1,18 +1,21 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Gamma.Handlers;
 using TychoV2.Modules;
 
-namespace Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Gamma;
+namespace Tycho.IntegrationTests.ForwardingEventsVertically.SUT.Modules;
 
-internal class GammaModule : TychoModule
+internal class AlphaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module) { }
 
-    protected override void IncludeModules(IModuleStructure module) { }
+    protected override void IncludeModules(IModuleStructure module)
+    {
+        module.Uses<BetaModule>();
+    }
 
     protected override void MapEvents(IModuleEvents module)
     {
-        module.Handles<WorkflowStartedEvent, WorkflowStartedEventHandler>();
+        module.Routes<WorkflowStartedEvent>()
+              .Forwards<BetaModule>();
 
         module.Routes<WorkflowFinishedEvent>()
               .Exposes();

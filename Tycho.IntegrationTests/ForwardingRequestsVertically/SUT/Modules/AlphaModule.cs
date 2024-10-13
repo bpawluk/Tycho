@@ -16,7 +16,7 @@ internal class AlphaModule : TychoModule
 
     protected override void IncludeModules(IModuleStructure module)
     {
-        module.AddSubmodule<BetaModule>(contract =>
+        module.Uses<BetaModule>(contract =>
         {
             contract.Expose<Request>()
                     .Expose<RequestWithResponse, string>();
