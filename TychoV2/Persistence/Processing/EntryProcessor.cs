@@ -6,7 +6,12 @@ using TychoV2.Events.Routing;
 
 namespace TychoV2.Persistence.Processing
 {
-    internal class EntryProcessor
+    internal interface IEntryProcessor
+    {
+        Task<bool> Process(OutboxEntry entry);
+    }
+
+    internal class EntryProcessor : IEntryProcessor
     {
         private readonly IEventRouter _eventRouter;
         private readonly IPayloadSerializer _payloadSerializer;

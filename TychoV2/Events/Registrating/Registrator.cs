@@ -34,7 +34,7 @@ namespace TychoV2.Events.Registrating
         {
             if (IsSourceAlreadyRegistered<TEvent, DownStreamHandlersSource<TEvent, TModule>>())
             {
-                throw new ArgumentException($"{typeof(TEvent).Name} is already exposed", nameof(TEvent));
+                throw new ArgumentException($"{typeof(TEvent).Name} is already forwarded to {typeof(TModule).Name}", nameof(TEvent));
             }
             Services.AddTransient<IHandlersSource, DownStreamHandlersSource<TEvent, TModule>>();
         }

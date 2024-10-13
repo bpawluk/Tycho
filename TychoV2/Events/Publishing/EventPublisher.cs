@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using TychoV2.Events.Routing;
 using TychoV2.Persistence;
 
-namespace TychoV2.Events.Broker
+namespace TychoV2.Events.Publishing
 {
     internal class EventPublisher : IEventPublisher
     {
@@ -22,7 +22,7 @@ namespace TychoV2.Events.Broker
         }
 
         public async Task Publish<TEvent>(
-            TEvent eventData, 
+            TEvent eventData,
             CancellationToken cancellationToken)
             where TEvent : class, IEvent
         {

@@ -43,8 +43,9 @@ namespace TychoV2.Events.Routing
         {
             if (ReferenceEquals(left, right)) return true;
             if (left is null || right is null) return false;
-            return string.Equals(left.ModuleId, right.ModuleId, StringComparison.InvariantCulture) &&
-                   string.Equals(left.HandlerId, right.HandlerId, StringComparison.InvariantCulture);
+            return string.Equals(left.EventId, right.EventId, StringComparison.InvariantCulture) &&
+                   string.Equals(left.HandlerId, right.HandlerId, StringComparison.InvariantCulture) &&
+                   string.Equals(left.ModuleId, right.ModuleId, StringComparison.InvariantCulture);
         }
 
         public override string ToString() => $"{EventId}-{HandlerId}-{ModuleId}";

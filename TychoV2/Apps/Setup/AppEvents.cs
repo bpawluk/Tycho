@@ -3,7 +3,7 @@ using System;
 using System.Threading.Tasks;
 using TychoV2.Apps.Routing;
 using TychoV2.Events;
-using TychoV2.Events.Broker;
+using TychoV2.Events.Publishing;
 using TychoV2.Events.Registrating;
 using TychoV2.Events.Routing;
 using TychoV2.Persistence;
@@ -44,6 +44,7 @@ namespace TychoV2.Apps.Setup
                 .AddSingleton<OutboxProcessor>()
                 .AddSingleton<OutboxProcessorSettings>()
                 .AddSingleton<IOutbox, InMemoryOutbox>()
+                .AddTransient<IEntryProcessor, EntryProcessor>()
                 .AddTransient<IPayloadSerializer, InMemoryPayloadSerializer>()
                 .AddTransient<IEventRouter, EventRouter>()
                 .AddTransient<IEventPublisher, EventPublisher>();

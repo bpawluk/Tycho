@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using TychoV2.Events.Routing;
 
 namespace TychoV2.Persistence.Processing
 {
     internal class OutboxProcessor : IDisposable
     {
         private readonly IOutbox _eventOutbox;
+        private readonly IEntryProcessor _entryProcessor;
         private readonly OutboxProcessorSettings _settings;
-        private readonly EntryProcessor _entryProcessor;
 
         private readonly Timer _timer;
 
@@ -23,13 +22,12 @@ namespace TychoV2.Persistence.Processing
 
         public OutboxProcessor(
             IOutbox eventOutbox,
-            IEventRouter eventRouter,
-            IPayloadSerializer payloadSerializer,
+            IEntryProcessor entryProcessor,
             OutboxProcessorSettings settings)
         {
             _eventOutbox = eventOutbox;
             _settings = settings;
-            _entryProcessor = new EntryProcessor(eventRouter, payloadSerializer);
+            _entryProcessor = entryProcessor;
 
             _timer = new Timer(TimerCallback, null, Timeout.Infinite, Timeout.Infinite);
 
