@@ -2,11 +2,11 @@
 
 namespace Tycho.Events.Routing
 {
-    internal interface IEventRouter
+    internal interface IHandlersSource
     {
         IReadOnlyCollection<HandlerIdentity> IdentifyHandlers<TEvent>()
             where TEvent : class, IEvent;
 
-        public IEventHandler? FindHandler(HandlerIdentity handlerIdentity);
+        IEventHandler? FindHandler(HandlerIdentity handlerIdentity);
     }
 }

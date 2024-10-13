@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using Tycho.Events.Routing;
-using Tycho.Modules;
+using Tycho.Structure;
 
-namespace Tycho.Events.Handling
+namespace Tycho.Events.Routing.Sources
 {
-    internal class DownStreamHandlersSource<TEvent, TModule> : IHandlersSource
+    internal class UpStreamHandlersSource<TEvent> : IHandlersSource
         where TEvent : class, IEvent
-        where TModule : TychoModule
     {
-        private readonly IEventRouter _submoduleEventRouter;
+        private readonly IEventRouter _parentEventRouter;
 
-        public DownStreamHandlersSource(IModule<TModule> submodule)
+        public UpStreamHandlersSource(IParent parent)
         {
-            _submoduleEventRouter = submodule.EventRouter;
+            _parentEventRouter = parent.EventRouter;
         }
 
         public IReadOnlyCollection<HandlerIdentity> IdentifyHandlers<TRequestedEvent>()
@@ -21,7 +19,7 @@ namespace Tycho.Events.Handling
         {
             if (typeof(TRequestedEvent) == typeof(TEvent))
             {
-               return _submoduleEventRouter.IdentifyHandlers<TEvent>();
+                return _parentEventRouter.IdentifyHandlers<TEvent>();
             }
             return Array.Empty<HandlerIdentity>();
         }
@@ -30,7 +28,7 @@ namespace Tycho.Events.Handling
         {
             if (handlerIdentity.MatchesEvent(typeof(TEvent)))
             {
-                return _submoduleEventRouter.FindHandler(handlerIdentity);
+                return _parentEventRouter.FindHandler(handlerIdentity);
             }
             return null;
         }

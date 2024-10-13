@@ -1,11 +1,18 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Linq;
-using Tycho.Events.Handling;
 using Tycho.Structure;
 
 namespace Tycho.Events.Routing
 {
+    internal interface IEventRouter
+    {
+        IReadOnlyCollection<HandlerIdentity> IdentifyHandlers<TEvent>()
+            where TEvent : class, IEvent;
+
+        public IEventHandler? FindHandler(HandlerIdentity handlerIdentity);
+    }
+
     internal class EventRouter : IEventRouter
     {
         private readonly Internals _internals;

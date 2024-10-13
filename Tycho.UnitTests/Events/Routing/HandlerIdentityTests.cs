@@ -1,10 +1,10 @@
 ﻿using Tycho.Events.Routing;
 
-namespace Tycho.UnitTests.Events;
+namespace Tycho.UnitTests.Events.Routing;
 
 public class HandlerIdentityTests
 {
-    private readonly static HandlerIdentity _handlerIdentity = new("EventOne", "HandlerOne", "ModuleOne");  
+    private readonly static HandlerIdentity _handlerIdentity = new("EventOne", "HandlerOne", "ModuleOne");
 
     public readonly static IEnumerable<object[]> EqualsTestData =
     [

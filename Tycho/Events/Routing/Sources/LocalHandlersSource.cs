@@ -2,10 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Tycho.Events.Routing;
 using Tycho.Structure;
 
-namespace Tycho.Events.Handling
+namespace Tycho.Events.Routing.Sources
 {
     internal class LocalHandlersSource<TEvent> : IHandlersSource
         where TEvent : class, IEvent
