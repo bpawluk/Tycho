@@ -101,9 +101,9 @@ public class LocalHandlersSourceTests
         var identity = new HandlerIdentity(typeof(TestEvent), typeof(TestEventAnotherHandler), typeof(TestModule));
 
         // Act
-        var getResult = () => _sut.FindHandler(identity);
+        IEventHandler? Act() => _sut.FindHandler(identity);
 
         // Assert
-        Assert.Throws<InvalidOperationException>(getResult);
+        Assert.Throws<InvalidOperationException>(Act);
     }
 }

@@ -85,10 +85,10 @@ public class EventPublisherTests
         var cancellationToken = CancellationToken.None;
 
         // Act
-        var publish = async () => await _sut.Publish(eventData, cancellationToken);
+        async Task Act() => await _sut.Publish(eventData, cancellationToken);
 
         // Assert
-        await Assert.ThrowsAsync<ArgumentException>(publish);
+        await Assert.ThrowsAsync<ArgumentException>(Act);
     }
 
     private static string SerializeMock(IEvent eventData) => eventData.GetType().Name;
