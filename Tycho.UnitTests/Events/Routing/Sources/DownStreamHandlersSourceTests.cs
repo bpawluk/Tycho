@@ -39,7 +39,7 @@ public class DownStreamHandlersSourceTests
     public void IdentifyHandlers_ForTestEvent_ReturnsHandlersFromSubmodule()
     {
         // Arrange
-        // - no arrangements required
+        // - no arrangement required
 
         // Act
         var result = _sut.IdentifyHandlers<TestEvent>();
@@ -52,7 +52,7 @@ public class DownStreamHandlersSourceTests
     public void IdentifyHandlers_ForOtherEvent_ReturnsEmptyCollection()
     {
         // Arrange
-        // - no arrangements required
+        // - no arrangement required
 
         // Act
         var result = _sut.IdentifyHandlers<OtherEvent>();

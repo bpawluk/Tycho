@@ -38,7 +38,7 @@ public class UpStreamHandlersSourceTests
     public void IdentifyHandlers_ForTestEvent_ReturnsHandlersFromParent()
     {
         // Arrange
-        // - no arrangements required
+        // - no arrangement required
 
         // Act
         var result = _sut.IdentifyHandlers<TestEvent>();
@@ -51,7 +51,7 @@ public class UpStreamHandlersSourceTests
     public void IdentifyHandlers_ForOtherEvent_ReturnsEmptyCollection()
     {
         // Arrange
-        // - no arrangements required
+        // - no arrangement required
 
         // Act
         var result = _sut.IdentifyHandlers<OtherEvent>();
