@@ -1,6 +1,6 @@
-﻿using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT;
+﻿using Tycho.Apps;
+using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT;
 using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules;
-using Tycho.Apps;
 
 namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving;
 
@@ -20,8 +20,10 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var firstResult = await _sut.Execute<GetAppSingletonServiceUsageRequest, int>(new());
-        var secondResult = await _sut.Execute<GetAppSingletonServiceUsageRequest, int>(new());
+        var firstResult = await _sut.Execute<GetAppSingletonServiceUsageRequest, int>(
+            new GetAppSingletonServiceUsageRequest());
+        var secondResult =  await _sut.Execute<GetAppSingletonServiceUsageRequest, int>(
+            new GetAppSingletonServiceUsageRequest());
 
         // Assert
         Assert.Equal(1, firstResult);
@@ -35,8 +37,10 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var firstResult = await _sut.Execute<GetModuleSingletonServiceUsageRequest, int>(new());
-        var secondResult = await _sut.Execute<GetModuleSingletonServiceUsageRequest, int>(new());
+        var firstResult = await _sut.Execute<GetModuleSingletonServiceUsageRequest, int>(
+            new GetModuleSingletonServiceUsageRequest());
+        var secondResult = await _sut.Execute<GetModuleSingletonServiceUsageRequest, int>(
+            new GetModuleSingletonServiceUsageRequest());
 
         // Assert
         Assert.Equal(1, firstResult);
@@ -50,8 +54,10 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var firstResult = await _sut.Execute<GetAppScopedServiceUsageRequest, int>(new());
-        var secondResult = await _sut.Execute<GetAppScopedServiceUsageRequest, int>(new());
+        var firstResult = await _sut.Execute<GetAppScopedServiceUsageRequest, int>(
+            new GetAppScopedServiceUsageRequest());
+        var secondResult = await _sut.Execute<GetAppScopedServiceUsageRequest, int>(
+            new GetAppScopedServiceUsageRequest());
 
         // Assert
         Assert.Equal(1, firstResult);
@@ -65,8 +71,10 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var firstResult = await _sut.Execute<GetModuleScopedServiceUsageRequest, int>(new());
-        var secondResult = await _sut.Execute<GetModuleScopedServiceUsageRequest, int>(new());
+        var firstResult = await _sut.Execute<GetModuleScopedServiceUsageRequest, int>(
+            new GetModuleScopedServiceUsageRequest());
+        var secondResult = await _sut.Execute<GetModuleScopedServiceUsageRequest, int>(
+            new GetModuleScopedServiceUsageRequest());
 
         // Assert
         Assert.Equal(1, firstResult);
@@ -80,8 +88,10 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var firstResult = await _sut.Execute<GetAppTransientServiceUsageRequest, int>(new());
-        var secondResult = await _sut.Execute<GetAppTransientServiceUsageRequest, int>(new());
+        var firstResult = await _sut.Execute<GetAppTransientServiceUsageRequest, int>(
+            new GetAppTransientServiceUsageRequest());
+        var secondResult = await _sut.Execute<GetAppTransientServiceUsageRequest, int>(
+            new GetAppTransientServiceUsageRequest());
 
         // Assert
         Assert.Equal(1, firstResult);
@@ -95,13 +105,18 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var firstResult = await _sut.Execute<GetModuleTransientServiceUsageRequest, int>(new());
-        var secondResult = await _sut.Execute<GetModuleTransientServiceUsageRequest, int>(new());
+        var firstResult = await _sut.Execute<GetModuleTransientServiceUsageRequest, int>(
+            new GetModuleTransientServiceUsageRequest());
+        var secondResult = await _sut.Execute<GetModuleTransientServiceUsageRequest, int>(
+            new GetModuleTransientServiceUsageRequest());
 
         // Assert
         Assert.Equal(1, firstResult);
         Assert.Equal(1, secondResult);
     }
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
+    }
 }

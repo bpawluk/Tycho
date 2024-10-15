@@ -7,6 +7,7 @@ internal interface ITransientService
 
 internal class TransientService : ITransientService
 {
-    private int _numberOfCalls = 0;
+    private int _numberOfCalls;
+
     public int NumberOfCalls => ++_numberOfCalls;
 }

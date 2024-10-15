@@ -5,7 +5,7 @@ using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.SendingRequestsHorizontally.SUT.Handlers;
 
-internal class BetaOutRequestHandler(IModule<GammaModule> gammaModule) 
+internal class BetaOutRequestHandler(IModule<GammaModule> gammaModule)
     : IRequestHandler<BetaOutRequest>
     , IRequestHandler<BetaOutRequestWithResponse, string>
 {
@@ -21,7 +21,7 @@ internal class BetaOutRequestHandler(IModule<GammaModule> gammaModule)
     {
         requestData.Result.HandlingCount++;
         return _gammaModule.Execute<GammaInRequestWithResponse, string>(
-            new GammaInRequestWithResponse(requestData.Result), 
+            new GammaInRequestWithResponse(requestData.Result),
             cancellationToken);
     }
 }

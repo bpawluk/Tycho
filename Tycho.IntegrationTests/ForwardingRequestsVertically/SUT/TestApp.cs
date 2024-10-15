@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Tycho.Apps;
 using Tycho.IntegrationTests._Utils;
 using Tycho.IntegrationTests.ForwardingRequestsVertically.SUT.Handlers;
 using Tycho.IntegrationTests.ForwardingRequestsVertically.SUT.Modules;
-using Tycho.Apps;
 using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.ForwardingRequestsVertically.SUT;

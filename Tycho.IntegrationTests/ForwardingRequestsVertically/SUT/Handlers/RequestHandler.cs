@@ -3,7 +3,7 @@ using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.ForwardingRequestsVertically.SUT.Handlers;
 
-internal class RequestHandler(TestWorkflow<TestResult> testWorkflow) 
+internal class RequestHandler(TestWorkflow<TestResult> testWorkflow)
     : IRequestHandler<Request>
     , IRequestHandler<RequestWithResponse, string>
 {

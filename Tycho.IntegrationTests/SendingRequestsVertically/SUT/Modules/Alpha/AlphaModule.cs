@@ -25,7 +25,7 @@ internal class AlphaModule : TychoModule
               .Requires<AlphaOutRequestWithResponse, string>();
     }
 
-    protected override void IncludeModules(IModuleStructure module) 
+    protected override void IncludeModules(IModuleStructure module)
     {
         module.Uses<BetaModule>(contract =>
         {

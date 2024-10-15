@@ -4,7 +4,7 @@ using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.SendingRequestsVertically.SUT.Handlers;
 
-internal class AlphaOutRequestHandler(TestWorkflow<TestResult> testWorkflow) 
+internal class AlphaOutRequestHandler(TestWorkflow<TestResult> testWorkflow)
     : IRequestHandler<AlphaOutRequest>
     , IRequestHandler<AlphaOutRequestWithResponse, string>
 {

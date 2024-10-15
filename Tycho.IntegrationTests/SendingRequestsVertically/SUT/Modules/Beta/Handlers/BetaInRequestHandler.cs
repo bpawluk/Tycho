@@ -20,7 +20,7 @@ internal class AlphaInRequestHandler(IModule<GammaModule> gammaModule)
     {
         requestData.Result.HandlingCount++;
         return _gammaModule.Execute<GammaInRequestWithResponse, string>(
-            new GammaInRequestWithResponse(requestData.Result), 
+            new GammaInRequestWithResponse(requestData.Result),
             cancellationToken);
     }
 }

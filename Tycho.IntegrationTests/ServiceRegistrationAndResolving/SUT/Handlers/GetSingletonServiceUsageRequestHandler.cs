@@ -10,9 +10,13 @@ internal class GetSingletonServiceUsageRequestHandler(ISingletonService service)
 {
     private readonly ISingletonService _service = service;
 
-    public Task<int> Handle(GetAppSingletonServiceUsageRequest requestData, CancellationToken cancellationToken) =>
-        Task.FromResult(_service.NumberOfCalls);
+    public Task<int> Handle(GetAppSingletonServiceUsageRequest requestData, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(_service.NumberOfCalls);
+    }
 
-    public Task<int> Handle(GetModuleSingletonServiceUsageRequest requestData, CancellationToken cancellationToken) =>
-        Task.FromResult(_service.NumberOfCalls);
+    public Task<int> Handle(GetModuleSingletonServiceUsageRequest requestData, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(_service.NumberOfCalls);
+    }
 }

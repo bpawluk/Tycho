@@ -20,7 +20,7 @@ internal class AlphaInRequestHandler(IModule<BetaModule> betaModule)
     {
         requestData.Result.HandlingCount++;
         return _betaModule.Execute<BetaInRequestWithResponse, string>(
-            new BetaInRequestWithResponse(requestData.Result), 
+            new BetaInRequestWithResponse(requestData.Result),
             cancellationToken);
     }
 }

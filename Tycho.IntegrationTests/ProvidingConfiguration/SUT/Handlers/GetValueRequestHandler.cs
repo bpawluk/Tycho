@@ -12,10 +12,13 @@ internal class GetValueRequestHandler(IConfiguration config)
 
     private string Value => _config["Value"]!;
 
-    public Task<string> Handle(GetAlphaValueRequest requestData, CancellationToken cancellationToken) =>
-        Task.FromResult(Value);
+    public Task<string> Handle(GetAlphaValueRequest requestData, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(Value);
+    }
 
-    public Task<string> Handle(GetBetaValueRequest requestData, CancellationToken cancellationToken) =>
-        Task.FromResult(Value);
-
+    public Task<string> Handle(GetBetaValueRequest requestData, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(Value);
+    }
 }

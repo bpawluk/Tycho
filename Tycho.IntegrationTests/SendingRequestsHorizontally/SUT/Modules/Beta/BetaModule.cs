@@ -21,7 +21,7 @@ internal class BetaModule : TychoModule
               .Handles<BetaInRequestWithResponse, string, BetaInRequestHandler>();
 
         module.Requires<BetaOutRequest>()
-              .Requires<BetaOutRequestWithResponse,string>();
+              .Requires<BetaOutRequestWithResponse, string>();
     }
 
     protected override void IncludeModules(IModuleStructure module) { }

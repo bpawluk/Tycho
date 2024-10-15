@@ -19,7 +19,7 @@ internal class AlphaInRequestHandler(IParent parent)
     {
         requestData.Result.HandlingCount++;
         return _parent.Execute<AlphaOutRequestWithResponse, string>(
-            new AlphaOutRequestWithResponse(requestData.Result), 
+            new AlphaOutRequestWithResponse(requestData.Result),
             cancellationToken);
     }
 }

@@ -7,6 +7,7 @@ internal interface ISingletonService
 
 internal class SingletonService : ISingletonService
 {
-    private int _numberOfCalls = 0;
+    private int _numberOfCalls;
+
     public int NumberOfCalls => ++_numberOfCalls;
 }

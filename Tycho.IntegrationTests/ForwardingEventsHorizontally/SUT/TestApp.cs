@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Tycho.Apps;
+using Tycho.Events;
 using Tycho.IntegrationTests._Utils;
 using Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Handlers;
 using Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Alpha;
 using Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Beta;
 using Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Gamma;
-using Tycho.Apps;
-using Tycho.Events;
 using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT;
@@ -45,7 +45,7 @@ internal class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
 
     protected override void RegisterServices(IServiceCollection app)
     {
-        app.AddSingleton(_testWorkflow);
-        app.AddSingleton(new CompoundResult<Type>([typeof(AlphaModule), typeof(BetaModule), typeof(GammaModule)]));
+        app.AddSingleton(_testWorkflow)
+           .AddSingleton(new CompoundResult<Type>([typeof(AlphaModule), typeof(BetaModule), typeof(GammaModule)]));
     }
 }

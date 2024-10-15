@@ -7,6 +7,7 @@ internal interface IScopedService
 
 internal class ScopedService : IScopedService
 {
-    private int _numberOfCalls = 0;
+    private int _numberOfCalls;
+
     public int NumberOfCalls => ++_numberOfCalls;
 }

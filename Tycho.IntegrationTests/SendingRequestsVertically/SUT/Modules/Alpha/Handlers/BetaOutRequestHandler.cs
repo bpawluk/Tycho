@@ -20,7 +20,7 @@ internal class GammaOutRequestHandler(IParent parent)
     {
         requestData.Result.HandlingCount++;
         return _parent.Execute<AlphaOutRequestWithResponse, string>(
-            new AlphaOutRequestWithResponse(requestData.Result), 
+            new AlphaOutRequestWithResponse(requestData.Result),
             cancellationToken);
     }
 }

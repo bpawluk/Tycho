@@ -1,6 +1,6 @@
-﻿using Tycho.IntegrationTests._Utils;
+﻿using Tycho.Apps;
+using Tycho.IntegrationTests._Utils;
 using Tycho.IntegrationTests.SendingRequestsHorizontally.SUT;
-using Tycho.Apps;
 
 namespace Tycho.IntegrationTests.SendingRequestsHorizontally;
 
@@ -19,7 +19,7 @@ public class SendingRequestsHorizontallyTests : IAsyncLifetime
     {
         // Arrange
         var workflowId = "request-workflow";
-        var request = new Request(new() { Id = workflowId });
+        var request = new Request(new TestResult { Id = workflowId });
 
         // Act
         await _sut!.Execute(request);
@@ -35,7 +35,7 @@ public class SendingRequestsHorizontallyTests : IAsyncLifetime
     {
         // Arrange
         var workflowId = "request-with-response-workflow";
-        var message = new RequestWithResponse(new() { Id = workflowId });
+        var message = new RequestWithResponse(new TestResult { Id = workflowId });
 
         // Act
         var response = await _sut!.Execute<RequestWithResponse, string>(message);
@@ -47,5 +47,8 @@ public class SendingRequestsHorizontallyTests : IAsyncLifetime
         Assert.Equal(7, testResult.HandlingCount);
     }
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
+    }
 }

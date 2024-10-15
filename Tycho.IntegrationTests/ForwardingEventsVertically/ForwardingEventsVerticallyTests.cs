@@ -1,6 +1,6 @@
-﻿using Tycho.IntegrationTests._Utils;
+﻿using Tycho.Apps;
+using Tycho.IntegrationTests._Utils;
 using Tycho.IntegrationTests.ForwardingEventsVertically.SUT;
-using Tycho.Apps;
 
 namespace Tycho.IntegrationTests.ForwardingEventsVertically;
 
@@ -19,7 +19,7 @@ public class ForwardingEventsVerticallyTests : IAsyncLifetime
     {
         // Arrange
         var workflowId = "event-workflow";
-        var request = new BeginTestWorkflowRequest(new() { Id = workflowId });
+        var request = new BeginTestWorkflowRequest(new TestResult { Id = workflowId });
 
         // Act
         await _sut!.Execute(request);
@@ -29,5 +29,8 @@ public class ForwardingEventsVerticallyTests : IAsyncLifetime
         Assert.Equal(workflowId, testResult.Id);
     }
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
+    }
 }

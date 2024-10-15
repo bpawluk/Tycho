@@ -10,9 +10,13 @@ internal class GetTransientServiceUsageRequestHandler(ITransientService service)
 {
     private readonly ITransientService _service = service;
 
-    public Task<int> Handle(GetAppTransientServiceUsageRequest requestData, CancellationToken cancellationToken) =>
-        Task.FromResult(_service.NumberOfCalls);
+    public Task<int> Handle(GetAppTransientServiceUsageRequest requestData, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(_service.NumberOfCalls);
+    }
 
-    public Task<int> Handle(GetModuleTransientServiceUsageRequest requestData, CancellationToken cancellationToken) =>
-        Task.FromResult(_service.NumberOfCalls);
+    public Task<int> Handle(GetModuleTransientServiceUsageRequest requestData, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(_service.NumberOfCalls);
+    }
 }

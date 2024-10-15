@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Tycho.IntegrationTests.ProvidingConfiguration.SUT.Modules;
 using Tycho.Apps;
+using Tycho.IntegrationTests.ProvidingConfiguration.SUT.Modules;
 
 namespace Tycho.IntegrationTests.ProvidingConfiguration.SUT;
 
@@ -29,7 +29,6 @@ public class TestApp(IConfiguration appConfig) : TychoApp
     }
 
     protected override void MapEvents(IAppEvents app) { }
-
 
     protected override void RegisterServices(IServiceCollection app) { }
 }

@@ -22,10 +22,10 @@ internal class BetaModule : TychoModule
               .Handles<BetaInRequestWithResponse, string, AlphaInRequestHandler>();
 
         module.Requires<BetaOutRequest>()
-              .Requires<BetaOutRequestWithResponse,string>();
+              .Requires<BetaOutRequestWithResponse, string>();
     }
 
-    protected override void IncludeModules(IModuleStructure module) 
+    protected override void IncludeModules(IModuleStructure module)
     {
         module.Uses<GammaModule>(contract =>
         {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Tycho.Apps;
 using Tycho.IntegrationTests.ProvidingConfiguration.SUT;
 using Tycho.IntegrationTests.ProvidingConfiguration.SUT.Modules;
-using Tycho.Apps;
 
 namespace Tycho.IntegrationTests.ProvidingConfiguration;
 
@@ -33,13 +33,16 @@ public class ProvidingConfigurationTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var alphaValue = await _sut.Execute<GetAlphaValueRequest, string>(new());
-        var betaValue = await _sut.Execute<GetBetaValueRequest, string>(new());
+        var alphaValue = await _sut.Execute<GetAlphaValueRequest, string>(new GetAlphaValueRequest());
+        var betaValue = await _sut.Execute<GetBetaValueRequest, string>(new GetBetaValueRequest());
 
         // Assert
         Assert.Equal(_alphaValue, alphaValue);
         Assert.Equal(_betaValue, betaValue);
     }
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
+    }
 }

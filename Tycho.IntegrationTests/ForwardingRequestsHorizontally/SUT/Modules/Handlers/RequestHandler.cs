@@ -9,9 +9,13 @@ internal class RequestHandler(IParent parent)
 {
     private readonly IParent _parent = parent;
 
-    public Task Handle(Request requestData, CancellationToken cancellationToken) =>
-        _parent.Execute(requestData, cancellationToken);
+    public Task Handle(Request requestData, CancellationToken cancellationToken)
+    {
+        return _parent.Execute(requestData, cancellationToken);
+    }
 
-    public Task<string> Handle(RequestWithResponse requestData, CancellationToken cancellationToken) =>
-        _parent.Execute<RequestWithResponse, string>(requestData, cancellationToken);
+    public Task<string> Handle(RequestWithResponse requestData, CancellationToken cancellationToken)
+    {
+        return _parent.Execute<RequestWithResponse, string>(requestData, cancellationToken);
+    }
 }

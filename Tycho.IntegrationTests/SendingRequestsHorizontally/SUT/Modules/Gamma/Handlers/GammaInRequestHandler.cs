@@ -19,7 +19,7 @@ internal class GammaInRequestHandler(IParent parent)
     {
         requestData.Result.HandlingCount++;
         return _parent.Execute<GammaOutRequestWithResponse, string>(
-            new GammaOutRequestWithResponse(requestData.Result), 
+            new GammaOutRequestWithResponse(requestData.Result),
             cancellationToken);
     }
 }
