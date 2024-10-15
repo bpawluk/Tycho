@@ -11,13 +11,14 @@ namespace Tycho.UnitTests.Events.Publishing;
 
 public class EventPublisherTests
 {
-    private readonly HandlerIdentity[] _testIdentities = 
+    private readonly Mock<IOutbox> _outboxMock;
+
+    private readonly HandlerIdentity[] _testIdentities =
     [
-        new HandlerIdentity(typeof(TestEvent), typeof(TestEventHandler), typeof(TestModule)), 
-        new HandlerIdentity(typeof(TestEvent), typeof(TestEventOtherHandler), typeof(TestModule))
+        new(typeof(TestEvent), typeof(TestEventHandler), typeof(TestModule)),
+        new(typeof(TestEvent), typeof(TestEventOtherHandler), typeof(TestModule))
     ];
 
-    private readonly Mock<IOutbox> _outboxMock;
     private readonly EventPublisher _sut;
 
     public EventPublisherTests()
@@ -54,8 +55,8 @@ public class EventPublisherTests
                     entries.Length == _testIdentities.Length &&
                     entries[0].HandlerIdentity == _testIdentities[0] &&
                     entries[1].HandlerIdentity == _testIdentities[1] &&
-                    entries.All(entry => entry.Payload as string == SerializeMock(eventData))), 
-                cancellationToken), 
+                    entries.All(entry => entry.Payload as string == SerializeMock(eventData))),
+                cancellationToken),
             Times.Once);
     }
 
@@ -72,7 +73,7 @@ public class EventPublisherTests
         // Assert
         _outboxMock.Verify(
             o => o.Add(
-                It.IsAny<IReadOnlyCollection<OutboxEntry>>(), 
+                It.IsAny<IReadOnlyCollection<OutboxEntry>>(),
                 It.IsAny<CancellationToken>()),
             Times.Never);
     }
@@ -85,11 +86,17 @@ public class EventPublisherTests
         var cancellationToken = CancellationToken.None;
 
         // Act
-        async Task Act() => await _sut.Publish(eventData, cancellationToken);
+        async Task Act()
+        {
+            await _sut.Publish(eventData, cancellationToken);
+        }
 
         // Assert
         await Assert.ThrowsAsync<ArgumentException>(Act);
     }
 
-    private static string SerializeMock(IEvent eventData) => eventData.GetType().Name;
+    private static string SerializeMock(IEvent eventData)
+    {
+        return eventData.GetType().Name;
+    }
 }

@@ -16,10 +16,10 @@ public class LocalHandlersSourceTests
     public LocalHandlersSourceTests()
     {
         var internals = new Internals(typeof(TestModule));
-        var services = internals.GetServiceCollection();
-        services.AddTransient<IEventHandler<OtherEvent>, OtherEventHandler>();
-        services.AddTransient<IEventHandler<TestEvent>, TestEventOtherHandler>();
-        services.AddTransient<IEventHandler<TestEvent>, TestEventHandler>();
+        var services = internals.GetServiceCollection()
+            .AddTransient<IEventHandler<OtherEvent>, OtherEventHandler>()
+            .AddTransient<IEventHandler<TestEvent>, TestEventOtherHandler>()
+            .AddTransient<IEventHandler<TestEvent>, TestEventHandler>();
         internals.Build();
         _sut = new LocalHandlersSource<TestEvent>(internals);
     }
@@ -101,7 +101,10 @@ public class LocalHandlersSourceTests
         var identity = new HandlerIdentity(typeof(TestEvent), typeof(TestEventAnotherHandler), typeof(TestModule));
 
         // Act
-        IEventHandler? Act() => _sut.FindHandler(identity);
+        IEventHandler? Act()
+        {
+            return _sut.FindHandler(identity);
+        }
 
         // Assert
         Assert.Throws<InvalidOperationException>(Act);

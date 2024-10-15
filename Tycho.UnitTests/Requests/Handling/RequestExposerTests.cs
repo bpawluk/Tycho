@@ -1,7 +1,7 @@
 ﻿using Moq;
-using Tycho.UnitTests._Data.Requests;
 using Tycho.Requests.Handling;
 using Tycho.Structure;
+using Tycho.UnitTests._Data.Requests;
 
 namespace Tycho.UnitTests.Requests.Handling;
 

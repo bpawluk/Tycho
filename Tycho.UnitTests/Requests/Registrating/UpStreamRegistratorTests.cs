@@ -1,20 +1,20 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Tycho.UnitTests._Data.Handlers;
-using Tycho.UnitTests._Data.Modules;
-using Tycho.UnitTests._Data.Requests;
 using Tycho.Modules;
 using Tycho.Requests.Handling;
 using Tycho.Requests.Registrating;
 using Tycho.Requests.Registrating.Registrations;
 using Tycho.Structure;
+using Tycho.UnitTests._Data.Handlers;
+using Tycho.UnitTests._Data.Modules;
+using Tycho.UnitTests._Data.Requests;
 
 namespace Tycho.UnitTests.Requests.Registrating;
 
 public class UpStreamRegistratorTests
 {
-    private readonly Registrator _sut;
     private readonly Internals _internals;
+    private readonly Registrator _sut;
 
     public UpStreamRegistratorTests()
     {
@@ -47,7 +47,10 @@ public class UpStreamRegistratorTests
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
-        void Act() => _sut.ForwardUpStreamRequest<TestRequest, TestModule>();
+        void Act()
+        {
+            _sut.ForwardUpStreamRequest<TestRequest, TestModule>();
+        }
 
         // Assert
         Assert.Throws<ArgumentException>(Act);
@@ -78,7 +81,10 @@ public class UpStreamRegistratorTests
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
-        void Act() => _sut.ForwardUpStreamRequest<TestRequestWithResponse, string, TestModule>();
+        void Act()
+        {
+            _sut.ForwardUpStreamRequest<TestRequestWithResponse, string, TestModule>();
+        }
 
         // Assert
         Assert.Throws<ArgumentException>(Act);
@@ -108,7 +114,10 @@ public class UpStreamRegistratorTests
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
-        void Act() => _sut.HandleUpStreamRequest<TestRequest, TestRequestHandler>();
+        void Act()
+        {
+            _sut.HandleUpStreamRequest<TestRequest, TestRequestHandler>();
+        }
 
         // Assert
         Assert.Throws<ArgumentException>(Act);
@@ -139,7 +148,10 @@ public class UpStreamRegistratorTests
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
-        void Act() => _sut.HandleUpStreamRequest<TestRequestWithResponse, string, TestRequestHandler>();
+        void Act()
+        {
+            _sut.HandleUpStreamRequest<TestRequestWithResponse, string, TestRequestHandler>();
+        }
 
         // Assert
         Assert.Throws<ArgumentException>(Act);

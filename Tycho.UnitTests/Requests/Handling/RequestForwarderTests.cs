@@ -1,8 +1,8 @@
 ﻿using Moq;
-using Tycho.UnitTests._Data.Modules;
-using Tycho.UnitTests._Data.Requests;
 using Tycho.Modules;
 using Tycho.Requests.Handling;
+using Tycho.UnitTests._Data.Modules;
+using Tycho.UnitTests._Data.Requests;
 
 namespace Tycho.UnitTests.Requests.Handling;
 
@@ -42,6 +42,10 @@ public class RequestForwarderTests
 
         // Assert
         Assert.Equal(response, result);
-        targetModuleMock.Verify(m => m.Execute<TestRequestWithResponse, string>(request, CancellationToken.None), Times.Once);
+        targetModuleMock.Verify(
+            m => m.Execute<TestRequestWithResponse, string>(
+                request, 
+                CancellationToken.None),
+            Times.Once);
     }
 }

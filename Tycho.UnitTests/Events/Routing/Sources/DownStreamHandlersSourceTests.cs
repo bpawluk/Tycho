@@ -12,10 +12,11 @@ namespace Tycho.UnitTests.Events.Routing.Sources;
 public class DownStreamHandlersSourceTests
 {
     private readonly IEventHandler<TestEvent> _expectedHandler = new TestEventHandler();
+
     private readonly HandlerIdentity[] _expectedIdentities =
     [
-        new HandlerIdentity("some-event", "some-handler", "some-module"),
-        new HandlerIdentity("other-event", "other-handler", "other-module")
+        new("some-event", "some-handler", "some-module"),
+        new("other-event", "other-handler", "other-module")
     ];
 
     private readonly DownStreamHandlersSource<TestEvent, TestModule> _sut;
@@ -30,7 +31,7 @@ public class DownStreamHandlersSourceTests
 
         var submoduleMock = new Mock<IModule<TestModule>>();
         submoduleMock.SetupGet(m => m.EventRouter)
-                      .Returns(eventRouterMock.Object);
+                     .Returns(eventRouterMock.Object);
 
         _sut = new DownStreamHandlersSource<TestEvent, TestModule>(submoduleMock.Object);
     }

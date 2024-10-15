@@ -13,7 +13,7 @@ public class EventRouterTests
 {
     private readonly HandlerIdentity[] _firstSourceHandlers =
     [
-        new HandlerIdentity(
+        new(
             typeof(TestEvent),
             typeof(TestEventHandler),
             typeof(TestModule))
@@ -21,31 +21,28 @@ public class EventRouterTests
 
     private readonly HandlerIdentity[] _secondSourceHandlers =
     [
-        new HandlerIdentity(
+        new(
             typeof(TestEvent),
             typeof(TestEventOtherHandler),
             typeof(TestModule)),
-        new HandlerIdentity(
+        new(
             typeof(TestEvent),
             typeof(TestEventAnotherHandler),
             typeof(TestModule))
     ];
 
+    private readonly EventRouter _sut;
+
     private readonly HandlerIdentity[] _thirdSourceHandlers =
     [
-        new HandlerIdentity(
+        new(
             typeof(OtherEvent),
             typeof(OtherEventHandler),
             typeof(TestModule))
     ];
 
-    private readonly EventRouter _sut;
-
     public EventRouterTests()
     {
-        var internals = new Internals(typeof(TestModule));
-        var services = internals.GetServiceCollection();
-
         var firstHandlersSourceMock = new Mock<IHandlersSource>();
         firstHandlersSourceMock.Setup(source => source.IdentifyHandlers<TestEvent>())
                                .Returns(_firstSourceHandlers);
@@ -55,8 +52,8 @@ public class EventRouterTests
                                .Returns([]);
         firstHandlersSourceMock.Setup(source => source.FindHandler(It.IsAny<HandlerIdentity>()))
                                .Returns((HandlerIdentity identity) => FindHandlerMock(
-                                   _firstSourceHandlers,
-                                   identity));
+                                    _firstSourceHandlers,
+                                    identity));
 
         var secondHandlersSourceMock = new Mock<IHandlersSource>();
         secondHandlersSourceMock.Setup(source => source.IdentifyHandlers<TestEvent>())
@@ -64,11 +61,11 @@ public class EventRouterTests
         secondHandlersSourceMock.Setup(source => source.IdentifyHandlers<OtherEvent>())
                                 .Returns([]);
         secondHandlersSourceMock.Setup(source => source.IdentifyHandlers<AnotherEvent>())
-                               .Returns([]);
+                                .Returns([]);
         secondHandlersSourceMock.Setup(source => source.FindHandler(It.IsAny<HandlerIdentity>()))
-                               .Returns((HandlerIdentity identity) => FindHandlerMock(
-                                   _secondSourceHandlers,
-                                   identity));
+                                .Returns((HandlerIdentity identity) => FindHandlerMock(
+                                    _secondSourceHandlers,
+                                    identity));
 
         var thirdHandlersSourceMock = new Mock<IHandlersSource>();
         thirdHandlersSourceMock.Setup(source => source.IdentifyHandlers<TestEvent>())
@@ -82,10 +79,13 @@ public class EventRouterTests
                                    _thirdSourceHandlers,
                                    identity));
 
-        services.AddTransient(_ => firstHandlersSourceMock.Object);
-        services.AddTransient(_ => secondHandlersSourceMock.Object);
-        services.AddTransient(_ => thirdHandlersSourceMock.Object);
+        var internals = new Internals(typeof(TestModule));
+        internals.GetServiceCollection()
+            .AddTransient(_ => firstHandlersSourceMock.Object)
+            .AddTransient(_ => secondHandlersSourceMock.Object)
+            .AddTransient(_ => thirdHandlersSourceMock.Object);
         internals.Build();
+
         _sut = new EventRouter(internals);
     }
 
@@ -151,7 +151,7 @@ public class EventRouterTests
     {
         if (allIds.Contains(searchedId))
         {
-            Type handlerType = typeof(object);
+            var handlerType = typeof(object);
 
             if (searchedId.MatchesHandler(typeof(TestEventHandler)))
             {
@@ -170,6 +170,7 @@ public class EventRouterTests
 
             return Activator.CreateInstance(handlerType) as IEventHandler;
         }
+
         return null;
     }
 }

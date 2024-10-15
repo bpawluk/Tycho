@@ -14,8 +14,8 @@ namespace Tycho.UnitTests.Events.Registrating;
 
 public class RegistratorTests
 {
-    private readonly Registrator _sut;
     private readonly Internals _internals;
+    private readonly Registrator _sut;
 
     public RegistratorTests()
     {
@@ -45,10 +45,13 @@ public class RegistratorTests
     {
         // Arrange
         _internals.GetServiceCollection()
-                  .AddTransient<IHandlersSource, UpStreamHandlersSource<TestEvent>>();
+            .AddTransient<IHandlersSource, UpStreamHandlersSource<TestEvent>>();
 
         // Act
-        void Act() => _sut.ExposeEvent<TestEvent>();
+        void Act()
+        {
+            _sut.ExposeEvent<TestEvent>();
+        }
 
         // Assert
         Assert.Throws<ArgumentException>(Act);
@@ -76,10 +79,13 @@ public class RegistratorTests
     {
         // Arrange
         _internals.GetServiceCollection()
-                  .AddTransient<IHandlersSource, DownStreamHandlersSource<TestEvent, TestModule>>();
+            .AddTransient<IHandlersSource, DownStreamHandlersSource<TestEvent, TestModule>>();
 
         // Act
-        void Act() => _sut.ForwardEvent<TestEvent, TestModule>();
+        void Act()
+        {
+            _sut.ForwardEvent<TestEvent, TestModule>();
+        }
 
         // Assert
         Assert.Throws<ArgumentException>(Act);
@@ -110,9 +116,9 @@ public class RegistratorTests
     {
         // Arrange
         _internals.GetServiceCollection()
-                  .AddSingleton(_internals)
-                  .AddTransient<IHandlersSource, LocalHandlersSource<TestEvent>>()
-                  .AddTransient<IEventHandler<TestEvent>, TestEventHandler>();
+            .AddSingleton(_internals)
+            .AddTransient<IHandlersSource, LocalHandlersSource<TestEvent>>()
+            .AddTransient<IEventHandler<TestEvent>, TestEventHandler>();
 
         // Act
         _sut.HandleEvent<TestEvent, TestEventOtherHandler>();
@@ -129,12 +135,15 @@ public class RegistratorTests
     {
         // Arrange
         _internals.GetServiceCollection()
-                  .AddSingleton(_internals)
-                  .AddTransient<IHandlersSource, LocalHandlersSource<TestEvent>>()
-                  .AddTransient<IEventHandler<TestEvent>, TestEventHandler>();
+            .AddSingleton(_internals)
+            .AddTransient<IHandlersSource, LocalHandlersSource<TestEvent>>()
+            .AddTransient<IEventHandler<TestEvent>, TestEventHandler>();
 
         // Act
-        void Act() => _sut.HandleEvent<TestEvent, TestEventHandler>();
+        void Act()
+        {
+            _sut.HandleEvent<TestEvent, TestEventHandler>();
+        }
 
         // Assert
         Assert.Throws<ArgumentException>(Act);

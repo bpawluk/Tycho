@@ -1,5 +1,5 @@
-﻿using Tycho.UnitTests._Data.Requests;
-using Tycho.Requests.Handling;
+﻿using Tycho.Requests.Handling;
+using Tycho.UnitTests._Data.Requests;
 
 namespace Tycho.UnitTests.Requests.Handling;
 
@@ -12,7 +12,7 @@ public class RequestIgnorerTests
         var sut = new RequestIgnorer<TestRequest>();
 
         // Act
-        await sut.Handle(new(), CancellationToken.None);
+        await sut.Handle(new TestRequest(), CancellationToken.None);
 
         // Assert
         // - no assertion required
@@ -25,7 +25,7 @@ public class RequestIgnorerTests
         var sut = new RequestIgnorer<TestRequestWithResponse, string>();
 
         // Act
-        var result = await sut.Handle(new(), CancellationToken.None);
+        var result = await sut.Handle(new TestRequestWithResponse(), CancellationToken.None);
 
         // Assert
         Assert.Equal(default, result);

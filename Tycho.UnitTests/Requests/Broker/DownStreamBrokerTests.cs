@@ -1,18 +1,18 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Tycho.UnitTests._Data.Modules;
-using Tycho.UnitTests._Data.Requests;
 using Tycho.Requests;
 using Tycho.Requests.Broker;
 using Tycho.Requests.Registrating.Registrations;
 using Tycho.Structure;
+using Tycho.UnitTests._Data.Modules;
+using Tycho.UnitTests._Data.Requests;
 
 namespace Tycho.UnitTests.Requests.Broker;
 
 public class DownStreamBrokerTests
 {
-    private readonly DownStreamBroker<TestModule> _sut;
     private readonly Internals _internals;
+    private readonly DownStreamBroker<TestModule> _sut;
 
     public DownStreamBrokerTests()
     {
@@ -35,7 +35,7 @@ public class DownStreamBrokerTests
         }
 
         // Act
-        bool canExecute = _sut.CanExecute<TestRequest>();
+        var canExecute = _sut.CanExecute<TestRequest>();
 
         // Assert
         Assert.True(canExecute);
@@ -56,7 +56,7 @@ public class DownStreamBrokerTests
         }
 
         // Act
-        bool canExecute = _sut.CanExecute<TestRequest>();
+        var canExecute = _sut.CanExecute<TestRequest>();
 
         // Assert
         Assert.False(canExecute);
@@ -77,7 +77,7 @@ public class DownStreamBrokerTests
         }
 
         // Act
-        bool canExecute = _sut.CanExecute<TestRequest>();
+        var canExecute = _sut.CanExecute<TestRequest>();
 
         // Assert
         Assert.False(canExecute);
@@ -95,7 +95,7 @@ public class DownStreamBrokerTests
         }
 
         // Act
-        bool canExecute = _sut.CanExecute<TestRequest>();
+        var canExecute = _sut.CanExecute<TestRequest>();
 
         // Assert
         Assert.False(canExecute);
@@ -116,7 +116,7 @@ public class DownStreamBrokerTests
         }
 
         // Act
-        bool canExecute = _sut.CanExecute<TestRequestWithResponse, string>();
+        var canExecute = _sut.CanExecute<TestRequestWithResponse, string>();
 
         // Assert
         Assert.True(canExecute);
@@ -137,7 +137,7 @@ public class DownStreamBrokerTests
         }
 
         // Act
-        bool canExecute = _sut.CanExecute<TestRequestWithResponse, string>();
+        var canExecute = _sut.CanExecute<TestRequestWithResponse, string>();
 
         // Assert
         Assert.False(canExecute);
@@ -158,7 +158,7 @@ public class DownStreamBrokerTests
         }
 
         // Act
-        bool canExecute = _sut.CanExecute<TestRequestWithResponse, string>();
+        var canExecute = _sut.CanExecute<TestRequestWithResponse, string>();
 
         // Assert
         Assert.False(canExecute);
@@ -176,7 +176,7 @@ public class DownStreamBrokerTests
         }
 
         // Act
-        bool canExecute = _sut.CanExecute<TestRequestWithResponse, string>();
+        var canExecute = _sut.CanExecute<TestRequestWithResponse, string>();
 
         // Assert
         Assert.False(canExecute);
@@ -209,7 +209,10 @@ public class DownStreamBrokerTests
         _internals.Build();
 
         // Act
-        async Task Act() => await _sut.Execute<TestRequest>(new(), CancellationToken.None);
+        async Task Act()
+        {
+            await _sut.Execute<TestRequest>(new TestRequest(), CancellationToken.None);
+        }
 
         // Assert
         await Assert.ThrowsAsync<InvalidOperationException>(Act);
@@ -222,7 +225,10 @@ public class DownStreamBrokerTests
         TestRequest requestData = null!;
 
         // Act
-        async Task Act() => await _sut.Execute(requestData, CancellationToken.None);
+        async Task Act()
+        {
+            await _sut.Execute(requestData, CancellationToken.None);
+        }
 
         // Assert
         await Assert.ThrowsAsync<ArgumentException>(Act);
@@ -240,7 +246,8 @@ public class DownStreamBrokerTests
                    .ReturnsAsync(response);
 
         var registrationMock = new Mock<IDownStreamHandlerRegistration<TestRequestWithResponse, string, TestModule>>();
-        registrationMock.Setup(x => x.Handler).Returns(handlerMock.Object);
+        registrationMock.Setup(x => x.Handler)
+                        .Returns(handlerMock.Object);
 
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
         _internals.Build();
@@ -260,7 +267,10 @@ public class DownStreamBrokerTests
         _internals.Build();
 
         // Act
-        async Task Act() => await _sut.Execute<TestRequestWithResponse, string>(new(), CancellationToken.None);
+        async Task Act()
+        {
+            await _sut.Execute<TestRequestWithResponse, string>(new TestRequestWithResponse(), CancellationToken.None);
+        }
 
         // Assert
         await Assert.ThrowsAsync<InvalidOperationException>(Act);
@@ -273,7 +283,10 @@ public class DownStreamBrokerTests
         TestRequestWithResponse requestData = null!;
 
         // Act
-        async Task Act() => await _sut.Execute<TestRequestWithResponse, string>(requestData, CancellationToken.None);
+        async Task Act()
+        {
+            await _sut.Execute<TestRequestWithResponse, string>(requestData, CancellationToken.None);
+        }
 
         // Assert
         await Assert.ThrowsAsync<ArgumentException>(Act);

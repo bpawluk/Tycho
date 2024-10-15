@@ -2,4 +2,6 @@
 
 namespace Tycho.UnitTests._Data.Events;
 
-public class TestEvent : IEvent { }
+public class TestEvent : IEvent
+{
+}

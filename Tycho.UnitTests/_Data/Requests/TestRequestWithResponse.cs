@@ -2,4 +2,6 @@
 
 namespace Tycho.UnitTests._Data.Requests;
 
-public class TestRequestWithResponse : IRequest<string> { }
+public class TestRequestWithResponse : IRequest<string>
+{
+}
