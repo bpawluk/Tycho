@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Structure;
 
 namespace Tycho.Events.Routing.Sources
@@ -29,6 +29,7 @@ namespace Tycho.Events.Routing.Sources
                         _internals.Owner))
                     .ToArray();
             }
+
             return Array.Empty<HandlerIdentity>();
         }
 
@@ -39,8 +40,15 @@ namespace Tycho.Events.Routing.Sources
                 var handler = _internals
                     .GetServices<IEventHandler<TEvent>>()
                     .FirstOrDefault(handler => handlerIdentity.MatchesHandler(handler.GetType()));
-                return handler ?? throw new InvalidOperationException($"Missing event handler with ID {handlerIdentity}");
+
+                if (handler is null)
+                {
+                    throw new InvalidOperationException($"Missing event handler with ID {handlerIdentity}");
+                }
+
+                return handler; 
             }
+
             return null;
         }
     }

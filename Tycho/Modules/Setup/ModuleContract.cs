@@ -14,8 +14,7 @@ namespace Tycho.Modules.Setup
 
         private IRequestBroker? _contractFulfillingBroker;
 
-        public IRequestBroker ContractFulfillingBroker => 
-            _contractFulfillingBroker ?? 
+        public IRequestBroker ContractFulfillingBroker => _contractFulfillingBroker ??
             throw new InvalidOperationException("Contract fulfilling broker has not been defined yet.");
 
         public ModuleContract(Internals internals)
@@ -66,8 +65,11 @@ namespace Tycho.Modules.Setup
         {
             if (!ContractFulfillingBroker.CanExecute<TRequest>())
             {
-                throw new InvalidOperationException($"Parent module does not handle the required {typeof(TRequest).Name} request");
+                throw new InvalidOperationException(
+                    $"Parent module does not handle " +
+                    $"the required {typeof(TRequest).Name} request");
             }
+
             return this;
         }
 
@@ -76,11 +78,17 @@ namespace Tycho.Modules.Setup
         {
             if (!ContractFulfillingBroker.CanExecute<TRequest, TResponse>())
             {
-                throw new InvalidOperationException($"Parent module does not handle the required {typeof(TRequest).Name} request");
+                throw new InvalidOperationException(
+                    $"Parent module does not handle " +
+                    $"the required {typeof(TRequest).Name} request");
             }
+
             return this;
         }
 
-        public Task Build() => Task.CompletedTask;
+        public Task Build()
+        {
+            return Task.CompletedTask;
+        }
     }
 }

@@ -1,15 +1,15 @@
-﻿using Microsoft.Extensions.Configuration;
-using System;
+﻿using System;
+using Microsoft.Extensions.Configuration;
 
 namespace Tycho.Modules
 {
     /// <summary>
-    /// TODO
+    ///     TODO
     /// </summary>
     public interface IModuleStructure
     {
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         IModuleStructure Uses<TModule>(
             Action<IContractFulfillment>? contractFulfillment = null,

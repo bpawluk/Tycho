@@ -1,58 +1,63 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Apps.Setup;
 
 namespace Tycho.Apps
 {
     /// <summary>
-    /// TODO
+    ///     TODO
     /// </summary>
     public abstract class TychoApp
     {
-        private readonly object _runLock = new object();
-        private bool _wasAlreadyRun = false;
-
+        private readonly object _runLock;
         private readonly AppBuilder _builder;
 
+        private bool _wasAlreadyRun = false;
+
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
-        protected IConfiguration Configuration => _builder.Configuration ?? throw new InvalidOperationException("Configuration not yet available");
+        protected IConfiguration Configuration => _builder.Configuration ??
+            throw new InvalidOperationException("Configuration not yet available");
 
         public TychoApp()
         {
+            _runLock = new object();
             _builder = new AppBuilder(GetType());
         }
 
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         protected abstract void DefineContract(IAppContract app);
 
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         protected abstract void IncludeModules(IAppStructure app);
 
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         protected abstract void MapEvents(IAppEvents app);
 
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         protected abstract void RegisterServices(IServiceCollection app);
 
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
-        protected virtual Task Startup(IServiceProvider app) { return Task.CompletedTask; }
+        protected virtual Task Startup(IServiceProvider app)
+        {
+            return Task.CompletedTask;
+        }
 
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         public async Task<IApp> Run()
         {
@@ -74,7 +79,10 @@ namespace Tycho.Apps
         {
             lock (_runLock)
             {
-                if (_wasAlreadyRun) throw new InvalidOperationException("This app has already been run");
+                if (_wasAlreadyRun)
+                {
+                    throw new InvalidOperationException("This app has already been run");
+                }
                 _wasAlreadyRun = true;
             }
         }

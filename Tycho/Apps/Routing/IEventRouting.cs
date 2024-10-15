@@ -5,7 +5,7 @@ namespace Tycho.Apps.Routing
     public interface IEventRouting
     {
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         IEventRouting Forwards<Module>()
             where Module : TychoModule;

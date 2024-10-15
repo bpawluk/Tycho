@@ -2,10 +2,10 @@
 {
     internal interface IRequestBroker : IRequestExecutor
     {
-        public bool CanExecute<TRequest>()
+        bool CanExecute<TRequest>()
             where TRequest : class, IRequest;
 
-        public bool CanExecute<TRequest, TResponse>()
+        bool CanExecute<TRequest, TResponse>()
             where TRequest : class, IRequest<TResponse>;
     }
 }

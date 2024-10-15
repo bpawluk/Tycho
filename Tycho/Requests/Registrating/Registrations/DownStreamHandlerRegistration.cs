@@ -2,7 +2,8 @@
 
 namespace Tycho.Requests.Registrating.Registrations
 {
-    internal class DownStreamHandlerRegistration<TRequest, THandler, TModule> : IDownStreamHandlerRegistration<TRequest, TModule>
+    internal class DownStreamHandlerRegistration<TRequest, THandler, TModule> 
+        : IDownStreamHandlerRegistration<TRequest, TModule>
         where TRequest : class, IRequest
         where THandler : class, IRequestHandler<TRequest>
         where TModule : TychoModule
@@ -15,7 +16,8 @@ namespace Tycho.Requests.Registrating.Registrations
         }
     }
 
-    internal class DownStreamHandlerRegistration<TRequest, TResponse, THandler, TModule> : IDownStreamHandlerRegistration<TRequest, TResponse, TModule>
+    internal class DownStreamHandlerRegistration<TRequest, TResponse, THandler, TModule> 
+        : IDownStreamHandlerRegistration<TRequest, TResponse, TModule>
         where TRequest : class, IRequest<TResponse>
         where THandler : class, IRequestHandler<TRequest, TResponse>
         where TModule : TychoModule

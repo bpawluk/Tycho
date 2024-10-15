@@ -21,7 +21,7 @@ namespace Tycho.Apps.Instance
         }
 
         public Task Execute<TRequest>(TRequest requestData, CancellationToken cancellationToken)
-             where TRequest : class, IRequest
+            where TRequest : class, IRequest
         {
             return _requestBroker.Execute(requestData, cancellationToken);
         }

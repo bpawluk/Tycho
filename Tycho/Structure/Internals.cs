@@ -1,13 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Tycho.Structure
 {
     internal class Internals : IServiceProvider
     {
         private IServiceCollection? _serviceCollection = new ServiceCollection();
-        private IServiceProvider? _serviceProvider = null;
+        private IServiceProvider? _serviceProvider;
 
         public Type Owner { get; }
 
@@ -18,12 +18,23 @@ namespace Tycho.Structure
             Owner = owner;
         }
 
+        public object GetService(Type serviceType)
+        {
+            if (_serviceProvider == null)
+            {
+                throw new InvalidOperationException("Service provider has not been built yet.");
+            }
+
+            return _serviceProvider!.GetService(serviceType)!;
+        }
+
         public IServiceCollection GetServiceCollection()
         {
             if (_serviceCollection == null)
             {
                 throw new InvalidOperationException("Service provider has already been built.");
             }
+
             return _serviceCollection;
         }
 
@@ -44,15 +55,6 @@ namespace Tycho.Structure
             }
 
             return GetService(serviceType) != null;
-        }
-
-        public object GetService(Type serviceType)
-        {
-            if (_serviceProvider == null)
-            {
-                throw new InvalidOperationException("Service provider has not been built yet.");
-            }
-            return _serviceProvider!.GetService(serviceType)!;
         }
     }
 }

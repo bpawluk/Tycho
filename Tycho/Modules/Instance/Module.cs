@@ -10,9 +10,9 @@ namespace Tycho.Modules.Instance
     internal class Module<TModuleDefinition> : IModule<TModuleDefinition>
         where TModuleDefinition : TychoModule
     {
+        private readonly IEventRouter _eventRouter;
         private readonly Internals _internals;
         private readonly UpStreamBroker _requestBroker;
-        private readonly IEventRouter _eventRouter;
 
         Internals IModule.Internals => _internals;
 
@@ -26,7 +26,7 @@ namespace Tycho.Modules.Instance
         }
 
         public Task Execute<TRequest>(TRequest requestData, CancellationToken cancellationToken)
-             where TRequest : class, IRequest
+            where TRequest : class, IRequest
         {
             return _requestBroker.Execute(requestData, cancellationToken);
         }

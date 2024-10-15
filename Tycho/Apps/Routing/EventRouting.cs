@@ -14,7 +14,7 @@ namespace Tycho.Apps.Routing
             _registrator = registrator;
         }
 
-        public IEventRouting Forwards<Module>() 
+        public IEventRouting Forwards<Module>()
             where Module : TychoModule
         {
             _registrator.ForwardEvent<TEvent, Module>();

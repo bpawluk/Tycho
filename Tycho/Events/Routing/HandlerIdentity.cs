@@ -18,36 +18,68 @@ namespace Tycho.Events.Routing
             ModuleId = moduleId;
         }
 
-        public HandlerIdentity(Type eventType, Type handlerType, Type moduleType) 
+        public HandlerIdentity(Type eventType, Type handlerType, Type moduleType)
         {
             EventId = TypeIdentifier.GetId(eventType);
             HandlerId = TypeIdentifier.GetId(handlerType);
             ModuleId = TypeIdentifier.GetId(moduleType);
         }
 
-        public bool MatchesEvent(Type eventType) => EventId == TypeIdentifier.GetId(eventType);
+        public bool Equals(HandlerIdentity? other)
+        {
+            return this == other;
+        }
 
-        public bool MatchesHandler(Type handlerType) => HandlerId == TypeIdentifier.GetId(handlerType);
+        public bool MatchesEvent(Type eventType)
+        {
+            return EventId == TypeIdentifier.GetId(eventType);
+        }
 
-        public bool MatchesModule(Type moduleType) => ModuleId == TypeIdentifier.GetId(moduleType);
+        public bool MatchesHandler(Type handlerType)
+        {
+            return HandlerId == TypeIdentifier.GetId(handlerType);
+        }
 
-        public bool Equals(HandlerIdentity? other) => this == other;
+        public bool MatchesModule(Type moduleType)
+        {
+            return ModuleId == TypeIdentifier.GetId(moduleType);
+        }
 
-        public override bool Equals(object? obj) => this == obj as HandlerIdentity;
+        public override bool Equals(object? obj)
+        {
+            return this == obj as HandlerIdentity;
+        }
 
-        public override int GetHashCode() => HashCode.Combine(ModuleId, HandlerId);
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(ModuleId, HandlerId);
+        }
 
-        public static bool operator !=(HandlerIdentity? left, HandlerIdentity? right) => !(left == right);
+        public static bool operator !=(HandlerIdentity? left, HandlerIdentity? right)
+        {
+            return !(left == right);
+        }
 
         public static bool operator ==(HandlerIdentity? left, HandlerIdentity? right)
         {
-            if (ReferenceEquals(left, right)) return true;
-            if (left is null || right is null) return false;
+            if (ReferenceEquals(left, right))
+            {
+                return true;
+            }
+
+            if (left is null || right is null)
+            {
+                return false;
+            }
+
             return string.Equals(left.EventId, right.EventId, StringComparison.InvariantCulture) &&
                    string.Equals(left.HandlerId, right.HandlerId, StringComparison.InvariantCulture) &&
                    string.Equals(left.ModuleId, right.ModuleId, StringComparison.InvariantCulture);
         }
 
-        public override string ToString() => $"{EventId}-{HandlerId}-{ModuleId}";
+        public override string ToString()
+        {
+            return $"{EventId}-{HandlerId}-{ModuleId}";
+        }
     }
 }

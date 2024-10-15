@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Routing;
 using Tycho.Modules.Setup;
 using Tycho.Requests.Broker;
@@ -9,49 +9,54 @@ using Tycho.Requests.Broker;
 namespace Tycho.Modules
 {
     /// <summary>
-    /// TODO
+    ///     TODO
     /// </summary>
     public abstract class TychoModule
     {
-        private readonly object _runLock = new object();
-        private bool _wasAlreadyRun = false;
-
+        private readonly object _runLock;
         private readonly ModuleBuilder _builder;
 
+        private bool _wasAlreadyRun = false;
+
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
-        protected IConfiguration Configuration => _builder.Configuration ?? throw new InvalidOperationException("Configuration not yet available");
+        protected IConfiguration Configuration => _builder.Configuration ??
+            throw new InvalidOperationException("Configuration not yet available");
 
         public TychoModule()
         {
+            _runLock = new object();
             _builder = new ModuleBuilder(GetType());
         }
 
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         protected abstract void DefineContract(IModuleContract module);
 
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         protected abstract void IncludeModules(IModuleStructure module);
 
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         protected abstract void MapEvents(IModuleEvents module);
 
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         protected abstract void RegisterServices(IServiceCollection module);
 
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
-        protected virtual Task Startup(IServiceProvider module) { return Task.CompletedTask; }
+        protected virtual Task Startup(IServiceProvider module)
+        {
+            return Task.CompletedTask;
+        }
 
         internal TychoModule Configure(Action<IConfigurationBuilder> configurationDefinition)
         {
@@ -91,7 +96,10 @@ namespace Tycho.Modules
         {
             lock (_runLock)
             {
-                if (_wasAlreadyRun) throw new InvalidOperationException("This module has already been run");
+                if (_wasAlreadyRun)
+                {
+                    throw new InvalidOperationException("This module has already been run");
+                }
                 _wasAlreadyRun = true;
             }
         }

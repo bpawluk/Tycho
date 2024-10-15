@@ -17,16 +17,17 @@ namespace Tycho.Persistence.InMemory
             {
                 _entries.Enqueue(entry);
             }
+
             NewEntriesAdded?.Invoke(this, EventArgs.Empty);
             return Task.CompletedTask;
         }
 
         public Task<IReadOnlyCollection<OutboxEntry>> Read(int count, CancellationToken cancellationToken)
         {
-            List<OutboxEntry> entries = new List<OutboxEntry>();
+            var entries = new List<OutboxEntry>();
 
             count = Math.Min(count, _entries.Count);
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 var entry = _entries.Dequeue();
                 entries.Add(entry);
@@ -35,8 +36,14 @@ namespace Tycho.Persistence.InMemory
             return Task.FromResult<IReadOnlyCollection<OutboxEntry>>(entries);
         }
 
-        public Task MarkAsFailed(OutboxEntry entry, CancellationToken cancellationToken) => Task.CompletedTask;
+        public Task MarkAsFailed(OutboxEntry entry, CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
 
-        public Task MarkAsProcessed(OutboxEntry entry, CancellationToken cancellationToken) => Task.CompletedTask;
+        public Task MarkAsProcessed(OutboxEntry entry, CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
     }
 }

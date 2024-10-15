@@ -12,12 +12,12 @@ namespace Tycho.Persistence.Processing
         private readonly IEntryProcessor _entryProcessor;
         private readonly OutboxProcessorSettings _settings;
 
+        private readonly SemaphoreSlim _processingSemaphore;
+        private readonly object _timerChangeLock;
         private readonly Timer _timer;
 
-        private readonly object _timerChangeLock;
-        private readonly SemaphoreSlim _processingSemaphore;
+        private readonly List<Task> _entriesInProcessing = new List<Task>();
 
-        private List<Task> _entriesInProcessing = new List<Task>();
         private TimeSpan _currentPollingInterval = Timeout.InfiniteTimeSpan;
 
         public OutboxProcessor(
@@ -40,7 +40,17 @@ namespace Tycho.Persistence.Processing
             _eventOutbox.NewEntriesAdded += OnEntriesAdded;
         }
 
-        private void OnEntriesAdded(object _, EventArgs __) => ResetInterval();
+        public void Dispose()
+        {
+            _eventOutbox.NewEntriesAdded -= OnEntriesAdded;
+            _processingSemaphore.Dispose();
+            _timer.Dispose();
+        }
+
+        private void OnEntriesAdded(object _, EventArgs __)
+        {
+            ResetInterval();
+        }
 
         private async void TimerCallback(object? _)
         {
@@ -103,7 +113,6 @@ namespace Tycho.Persistence.Processing
             {
                 // TODO: Log the Exception
             }
-
         }
 
         private void ResetInterval()
@@ -133,13 +142,6 @@ namespace Tycho.Persistence.Processing
                 _currentPollingInterval = newInterval;
                 _timer.Change(_currentPollingInterval, _currentPollingInterval);
             }
-        }
-
-        public void Dispose()
-        {
-            _eventOutbox.NewEntriesAdded -= OnEntriesAdded;
-            _processingSemaphore.Dispose();
-            _timer.Dispose();
         }
     }
 }

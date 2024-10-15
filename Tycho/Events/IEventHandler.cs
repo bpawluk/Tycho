@@ -5,18 +5,18 @@ using System.Threading.Tasks;
 namespace Tycho.Events
 {
     /// <summary>
-    /// TODO
+    ///     TODO
     /// </summary>
-    public interface IEventHandler 
+    public interface IEventHandler
     {
         Type EventType { get; }
     }
 
     /// <summary>
-    /// TODO
+    ///     TODO
     /// </summary>
     public interface IEventHandler<TEvent> : IEventHandler
-        where TEvent : class, IEvent 
+        where TEvent : class, IEvent
     {
         Type IEventHandler.EventType => typeof(TEvent);
 

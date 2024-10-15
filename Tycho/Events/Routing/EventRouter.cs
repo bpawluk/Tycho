@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Structure;
 
 namespace Tycho.Events.Routing
@@ -10,7 +10,7 @@ namespace Tycho.Events.Routing
         IReadOnlyCollection<HandlerIdentity> IdentifyHandlers<TEvent>()
             where TEvent : class, IEvent;
 
-        public IEventHandler? FindHandler(HandlerIdentity handlerIdentity);
+        IEventHandler? FindHandler(HandlerIdentity handlerIdentity);
     }
 
     internal class EventRouter : IEventRouter
@@ -31,8 +31,7 @@ namespace Tycho.Events.Routing
 
         public IEventHandler? FindHandler(HandlerIdentity handlerIdentity)
         {
-            var sources = _internals.GetServices<IHandlersSource>();
-            foreach (var source in sources)
+            foreach (var source in _internals.GetServices<IHandlersSource>())
             {
                 var handler = source.FindHandler(handlerIdentity);
                 if (handler != null)
@@ -40,6 +39,7 @@ namespace Tycho.Events.Routing
                     return handler;
                 }
             }
+
             return null;
         }
     }

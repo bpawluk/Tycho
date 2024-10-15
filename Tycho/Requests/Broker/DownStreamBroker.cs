@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
 using Tycho.Requests.Registrating.Registrations;
 using Tycho.Structure;
@@ -31,15 +31,15 @@ namespace Tycho.Requests.Broker
         }
 
         public Task Execute<TRequest>(TRequest requestData, CancellationToken cancellationToken)
-           where TRequest : class, IRequest
+            where TRequest : class, IRequest
         {
             if (requestData is null)
             {
                 throw new ArgumentException($"{nameof(requestData)} cannot be null", nameof(requestData));
             }
 
-            var handlerRegistration = _internals.GetRequiredService<IDownStreamHandlerRegistration<TRequest, TModule>>();
-            return handlerRegistration.Handler.Handle(requestData, cancellationToken);
+            var registration = _internals.GetRequiredService<IDownStreamHandlerRegistration<TRequest, TModule>>();
+            return registration.Handler.Handle(requestData, cancellationToken);
         }
 
         public Task<TResponse> Execute<TRequest, TResponse>(TRequest requestData, CancellationToken cancellationToken)
@@ -50,8 +50,8 @@ namespace Tycho.Requests.Broker
                 throw new ArgumentException($"{nameof(requestData)} cannot be null", nameof(requestData));
             }
 
-            var handlerRegistration = _internals.GetRequiredService<IDownStreamHandlerRegistration<TRequest, TResponse, TModule>>();
-            return handlerRegistration.Handler.Handle(requestData, cancellationToken);
+            var registration = _internals.GetRequiredService<IDownStreamHandlerRegistration<TRequest, TResponse, TModule>>();
+            return registration.Handler.Handle(requestData, cancellationToken);
         }
     }
 }

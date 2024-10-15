@@ -10,8 +10,8 @@ namespace Tycho.Events.Publishing
 {
     internal class EventPublisher : IEventPublisher
     {
-        private readonly IEventRouter _router;
         private readonly IOutbox _outbox;
+        private readonly IEventRouter _router;
         private readonly IPayloadSerializer _serializer;
 
         public EventPublisher(IEventRouter router, IOutbox persistentOutbox, IPayloadSerializer serializer)
@@ -39,7 +39,8 @@ namespace Tycho.Events.Publishing
             }
         }
 
-        private async Task AddOutboxEntries(IReadOnlyCollection<HandlerIdentity> handlerIdentities, IEvent eventData, CancellationToken cancellationToken)
+        private async Task AddOutboxEntries(IReadOnlyCollection<HandlerIdentity> handlerIdentities, IEvent eventData,
+            CancellationToken cancellationToken)
         {
             var serializedPayload = _serializer.Serialize(eventData);
             var outboxEntries = handlerIdentities.Select(identity => new OutboxEntry(identity, serializedPayload));

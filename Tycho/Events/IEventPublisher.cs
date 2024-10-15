@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Tycho.Events
 {
     /// <summary>
-    /// TODO
+    ///     TODO
     /// </summary>
     public interface IEventPublisher
     {

@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection.Extensions;
-using System;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Tycho.Modules;
 using Tycho.Requests.Handling;
 using Tycho.Requests.Registrating.Registrations;
@@ -35,7 +35,8 @@ namespace Tycho.Requests.Registrating
             where TRequest : class, IRequest<TResponse>
             where TTargetModule : TychoModule
         {
-            RegisterDownStreamRequestHandler<TSourceModule, TRequest, TResponse, RequestForwarder<TRequest, TResponse, TTargetModule>>();
+            RegisterDownStreamRequestHandler<TSourceModule, TRequest, TResponse,
+                RequestForwarder<TRequest, TResponse, TTargetModule>>();
         }
 
         public void HandleDownStreamRequest<TSourceModule, TRequest, THandler>()
@@ -81,7 +82,9 @@ namespace Tycho.Requests.Registrating
             }
             else
             {
-                throw new ArgumentException($"Request handler for {typeof(TRequest).Name} already registered", nameof(THandler));
+                throw new ArgumentException(
+                    $"Request handler for {typeof(TRequest).Name} already registered",
+                    nameof(THandler));
             }
         }
 
@@ -98,7 +101,9 @@ namespace Tycho.Requests.Registrating
             }
             else
             {
-                throw new ArgumentException($"Request handler for {typeof(TRequest).Name} already registered", nameof(THandler));
+                throw new ArgumentException(
+                    $"Request handler for {typeof(TRequest).Name} already registered",
+                    nameof(THandler));
             }
         }
     }

@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events;
 using Tycho.Events.Publishing;
 using Tycho.Events.Registrating;
@@ -20,8 +20,7 @@ namespace Tycho.Modules.Setup
 
         private IEventRouter? _parentEventRouter;
 
-        public IEventRouter ParentEventRouter =>
-            _parentEventRouter ??
+        public IEventRouter ParentEventRouter => _parentEventRouter ??
             throw new InvalidOperationException("Parent event router has not been defined yet.");
 
         public ModuleEvents(Internals internals)

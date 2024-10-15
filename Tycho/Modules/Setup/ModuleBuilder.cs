@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Routing;
 using Tycho.Modules.Instance;
 using Tycho.Requests.Broker;
@@ -11,8 +11,8 @@ namespace Tycho.Modules.Setup
 {
     internal class ModuleBuilder
     {
-        private readonly Type _moduleType;
         private readonly Internals _internals;
+        private readonly Type _moduleType;
 
         private Action<IConfigurationBuilder>? _configurationDefinition;
 
@@ -22,13 +22,13 @@ namespace Tycho.Modules.Setup
 
         public ModuleContract Contract { get; }
 
-        public ModuleEvents Events { get; } = null!;
+        public ModuleEvents Events { get; }
 
-        public ModuleStructure Structure { get; } = null!;
+        public ModuleStructure Structure { get; }
 
         public ModuleBuilder(Type moduleDefinitionType)
         {
-            _moduleType = typeof(Module<>).MakeGenericType(new Type[] { moduleDefinitionType });
+            _moduleType = typeof(Module<>).MakeGenericType(moduleDefinitionType);
             _internals = new Internals(moduleDefinitionType);
             Contract = new ModuleContract(_internals);
             Events = new ModuleEvents(_internals);
@@ -52,17 +52,16 @@ namespace Tycho.Modules.Setup
 
         public void Init()
         {
-            var services = _internals.GetServiceCollection();
-
             var configurationBuilder = new ConfigurationBuilder();
             _configurationDefinition?.Invoke(configurationBuilder);
             Configuration = configurationBuilder.Build();
 
             var parentProxy = new ParentProxy(Contract.ContractFulfillingBroker, Events.ParentEventRouter);
 
-            services.AddSingleton(Configuration);
-            services.AddSingleton<IParent>(parentProxy);
-            services.AddSingleton(_internals);
+            _internals.GetServiceCollection()
+                .AddSingleton(Configuration)
+                .AddSingleton<IParent>(parentProxy)
+                .AddSingleton(_internals);
         }
 
         public async Task<IModule> Build()

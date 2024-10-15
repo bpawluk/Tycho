@@ -14,8 +14,10 @@ namespace Tycho.Requests.Handling
             _parent = parent;
         }
 
-        public Task Handle(TRequest requestData, CancellationToken cancellationToken) => 
-            _parent.Execute(requestData, cancellationToken);
+        public Task Handle(TRequest requestData, CancellationToken cancellationToken)
+        {
+            return _parent.Execute(requestData, cancellationToken);
+        }
     }
 
     internal class RequestExposer<TRequest, TResponse> : IRequestHandler<TRequest, TResponse>
@@ -28,7 +30,9 @@ namespace Tycho.Requests.Handling
             _parent = parent;
         }
 
-        public Task<TResponse> Handle(TRequest requestData, CancellationToken cancellationToken) =>
-            _parent.Execute<TRequest, TResponse>(requestData, cancellationToken);
+        public Task<TResponse> Handle(TRequest requestData, CancellationToken cancellationToken)
+        {
+            return _parent.Execute<TRequest, TResponse>(requestData, cancellationToken);
+        }
     }
 }

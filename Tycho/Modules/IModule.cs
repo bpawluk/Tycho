@@ -5,7 +5,7 @@ using Tycho.Structure;
 namespace Tycho.Modules
 {
     /// <summary>
-    /// TODO
+    ///     TODO
     /// </summary>
     public interface IModule : IRequestExecutor
     {
@@ -15,7 +15,7 @@ namespace Tycho.Modules
     }
 
     /// <summary>
-    /// TODO
+    ///     TODO
     /// </summary>
     public interface IModule<TModuleDefinition> : IModule
         where TModuleDefinition : TychoModule

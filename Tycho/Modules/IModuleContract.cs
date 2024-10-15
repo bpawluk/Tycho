@@ -3,46 +3,46 @@
 namespace Tycho.Modules
 {
     /// <summary>
-    /// TODO
+    ///     TODO
     /// </summary>
     public interface IModuleContract
     {
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         IModuleContract Forwards<TRequest, TModule>()
             where TRequest : class, IRequest
             where TModule : TychoModule;
 
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         IModuleContract Forwards<TRequest, TResponse, TModule>()
             where TRequest : class, IRequest<TResponse>
             where TModule : TychoModule;
 
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         IModuleContract Handles<TRequest, THandler>()
             where TRequest : class, IRequest
             where THandler : class, IRequestHandler<TRequest>;
 
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         IModuleContract Handles<TRequest, TResponse, THandler>()
             where TRequest : class, IRequest<TResponse>
             where THandler : class, IRequestHandler<TRequest, TResponse>;
 
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         IModuleContract Requires<TRequest>()
             where TRequest : class, IRequest;
 
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         IModuleContract Requires<TRequest, TResponse>()
             where TRequest : class, IRequest<TResponse>;

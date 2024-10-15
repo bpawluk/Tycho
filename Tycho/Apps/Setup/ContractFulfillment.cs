@@ -58,7 +58,9 @@ namespace Tycho.Apps.Setup
         public IContractFulfillment Ignore<TRequest, TResponse>()
             where TRequest : class, IRequest<TResponse>
         {
-            _registrator.HandleDownStreamRequest<TSourceModule, TRequest, TResponse, RequestIgnorer<TRequest, TResponse>>();
+            _registrator.HandleDownStreamRequest<
+                TSourceModule, TRequest, TResponse, 
+                RequestIgnorer<TRequest, TResponse>>();
             return this;
         }
     }

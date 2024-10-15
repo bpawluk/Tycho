@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection.Extensions;
-using System;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Tycho.Modules;
 using Tycho.Requests.Handling;
 using Tycho.Requests.Registrating.Registrations;
@@ -48,7 +48,9 @@ namespace Tycho.Requests.Registrating
             }
             else
             {
-                throw new ArgumentException($"Request handler for {typeof(TRequest).Name} already registered", nameof(THandler));
+                throw new ArgumentException(
+                    $"Request handler for {typeof(TRequest).Name} already registered",
+                    nameof(THandler));
             }
         }
 
@@ -64,7 +66,9 @@ namespace Tycho.Requests.Registrating
             }
             else
             {
-                throw new ArgumentException($"Request handler for {typeof(TRequest).Name} already registered", nameof(THandler));
+                throw new ArgumentException(
+                    $"Request handler for {typeof(TRequest).Name} already registered",
+                    nameof(THandler));
             }
         }
     }

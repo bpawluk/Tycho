@@ -47,6 +47,9 @@ namespace Tycho.Apps.Setup
             return this;
         }
 
-        public Task Build() => Task.CompletedTask;
+        public Task Build()
+        {
+            return Task.CompletedTask;
+        }
     }
 }

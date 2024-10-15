@@ -3,12 +3,12 @@
     public interface IEventRouting
     {
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         IEventRouting Exposes();
 
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         IEventRouting Forwards<Module>()
             where Module : TychoModule;

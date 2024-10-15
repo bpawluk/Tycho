@@ -21,6 +21,7 @@ namespace Tycho.Events.Routing.Sources
             {
                 return _parentEventRouter.IdentifyHandlers<TEvent>();
             }
+
             return Array.Empty<HandlerIdentity>();
         }
 
@@ -30,6 +31,7 @@ namespace Tycho.Events.Routing.Sources
             {
                 return _parentEventRouter.FindHandler(handlerIdentity);
             }
+
             return null;
         }
     }

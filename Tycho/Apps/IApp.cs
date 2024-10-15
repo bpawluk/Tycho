@@ -4,7 +4,7 @@ using Tycho.Structure;
 namespace Tycho.Apps
 {
     /// <summary>
-    /// TODO
+    ///     TODO
     /// </summary>
     public interface IApp : IRequestExecutor
     {
@@ -12,7 +12,7 @@ namespace Tycho.Apps
     }
 
     /// <summary>
-    /// TODO
+    ///     TODO
     /// </summary>
     public interface IApp<TAppDefinition> : IApp
         where TAppDefinition : TychoApp

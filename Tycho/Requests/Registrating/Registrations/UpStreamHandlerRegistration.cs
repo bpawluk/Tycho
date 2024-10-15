@@ -1,6 +1,7 @@
 ﻿namespace Tycho.Requests.Registrating.Registrations
 {
-    internal class UpStreamHandlerRegistration<TRequest, THandler> : IUpStreamHandlerRegistration<TRequest>
+    internal class UpStreamHandlerRegistration<TRequest, THandler> 
+        : IUpStreamHandlerRegistration<TRequest>
         where TRequest : class, IRequest
         where THandler : class, IRequestHandler<TRequest>
     {
@@ -12,7 +13,8 @@
         }
     }
 
-    internal class UpStreamHandlerRegistration<TRequest, TResponse, THandler> : IUpStreamHandlerRegistration<TRequest, TResponse>
+    internal class UpStreamHandlerRegistration<TRequest, TResponse, THandler> 
+        : IUpStreamHandlerRegistration<TRequest, TResponse>
         where TRequest : class, IRequest<TResponse>
         where THandler : class, IRequestHandler<TRequest, TResponse>
     {

@@ -4,46 +4,46 @@ using Tycho.Requests;
 namespace Tycho.Apps
 {
     /// <summary>
-    /// TODO
+    ///     TODO
     /// </summary>
     public interface IContractFulfillment
     {
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         IContractFulfillment Forward<TRequest, TModule>()
             where TRequest : class, IRequest
             where TModule : TychoModule;
 
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         IContractFulfillment Forward<TRequest, TResponse, TModule>()
             where TRequest : class, IRequest<TResponse>
             where TModule : TychoModule;
 
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         IContractFulfillment Handle<TRequest, THandler>()
             where TRequest : class, IRequest
             where THandler : class, IRequestHandler<TRequest>;
 
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         IContractFulfillment Handle<TRequest, TResponse, THandler>()
             where TRequest : class, IRequest<TResponse>
             where THandler : class, IRequestHandler<TRequest, TResponse>;
 
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         IContractFulfillment Ignore<TRequest>()
             where TRequest : class, IRequest;
 
         /// <summary>
-        /// TODO
+        ///     TODO
         /// </summary>
         IContractFulfillment Ignore<TRequest, TResponse>()
             where TRequest : class, IRequest<TResponse>;

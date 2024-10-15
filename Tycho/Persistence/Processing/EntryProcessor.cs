@@ -26,10 +26,15 @@ namespace Tycho.Persistence.Processing
         {
             try
             {
-                var eventHandler = _eventRouter.FindHandler(entry.HandlerIdentity) 
-                                ?? throw new InvalidOperationException($"Missing event handler with ID {entry.HandlerIdentity}");
+                var eventHandler = _eventRouter.FindHandler(entry.HandlerIdentity);
+                if (eventHandler is null)
+                {
+                    throw new InvalidOperationException($"Missing event handler with ID {entry.HandlerIdentity}");
+                }
+
                 var eventData = _payloadSerializer.Deserialize(eventHandler.EventType, entry.Payload);
                 await HandleWithReflection(eventData, eventHandler).ConfigureAwait(false);
+
                 return true;
             }
             catch
@@ -42,8 +47,20 @@ namespace Tycho.Persistence.Processing
         private Task HandleWithReflection(IEvent eventData, IEventHandler eventHandler)
         {
             var handleMethod = eventHandler.GetType().GetMethod(nameof(IEventHandler<IEvent>.Handle));
-            var handleResult = handleMethod.Invoke(eventHandler, new object[] { eventData, CancellationToken.None }) as Task;
-            return handleResult ?? throw new InvalidOperationException($"Failure invoking {eventHandler.GetType().Name} Handle method");
+
+            var handleResult = handleMethod.Invoke(
+                eventHandler,
+                new object[] {
+                    eventData,
+                    CancellationToken.None })
+                as Task;
+
+            if (handleResult is null)
+            {
+                throw new InvalidOperationException($"Failure invoking {eventHandler.GetType().Name} Handle method");
+            }
+
+            return handleResult;
         }
     }
 }

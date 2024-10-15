@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Apps.Instance;
 using Tycho.Structure;
 
@@ -20,13 +20,13 @@ namespace Tycho.Apps.Setup
 
         public AppContract Contract { get; }
 
-        public AppEvents Events { get; } = null!;
+        public AppEvents Events { get; }
 
-        public AppStructure Structure { get; } = null!;
+        public AppStructure Structure { get; }
 
         public AppBuilder(Type appDefinitionType)
         {
-            _appType = typeof(App<>).MakeGenericType(new Type[] { appDefinitionType });
+            _appType = typeof(App<>).MakeGenericType(appDefinitionType);
             _internals = new Internals(appDefinitionType);
             Contract = new AppContract(_internals);
             Events = new AppEvents(_internals);
@@ -40,14 +40,13 @@ namespace Tycho.Apps.Setup
 
         public void Init()
         {
-            var services = _internals.GetServiceCollection();
-
             var configurationBuilder = new ConfigurationBuilder();
             _configurationDefinition?.Invoke(configurationBuilder);
             Configuration = configurationBuilder.Build();
 
-            services.AddSingleton(Configuration);
-            services.AddSingleton(_internals);
+            _internals.GetServiceCollection()
+                .AddSingleton(Configuration)
+                .AddSingleton(_internals);
         }
 
         public async Task<IApp> Build()

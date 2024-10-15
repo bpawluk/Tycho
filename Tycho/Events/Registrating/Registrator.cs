@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Routing;
 using Tycho.Events.Routing.Sources;
 using Tycho.Modules;
@@ -20,23 +20,26 @@ namespace Tycho.Events.Registrating
         }
 
         public void ExposeEvent<TEvent>()
-           where TEvent : class, IEvent
+            where TEvent : class, IEvent
         {
             if (IsSourceAlreadyRegistered<TEvent, UpStreamHandlersSource<TEvent>>())
             {
                 throw new ArgumentException($"{typeof(TEvent).Name} is already exposed", nameof(TEvent));
             }
+
             Services.AddTransient<IHandlersSource, UpStreamHandlersSource<TEvent>>();
         }
 
         public void ForwardEvent<TEvent, TModule>()
-           where TEvent : class, IEvent
-           where TModule : TychoModule
+            where TEvent : class, IEvent
+            where TModule : TychoModule
         {
             if (IsSourceAlreadyRegistered<TEvent, DownStreamHandlersSource<TEvent, TModule>>())
             {
-                throw new ArgumentException($"{typeof(TEvent).Name} is already forwarded to {typeof(TModule).Name}", nameof(TEvent));
+                throw new ArgumentException($"{typeof(TEvent).Name} is already forwarded to {typeof(TModule).Name}",
+                    nameof(TEvent));
             }
+
             Services.AddTransient<IHandlersSource, DownStreamHandlersSource<TEvent, TModule>>();
         }
 
@@ -46,7 +49,8 @@ namespace Tycho.Events.Registrating
         {
             if (IsHandlerAlreadyRegistered<TEvent, THandler>())
             {
-                throw new ArgumentException($"Event handler for {typeof(TEvent).Name} already registered", nameof(THandler));
+                throw new ArgumentException($"Event handler for {typeof(TEvent).Name} already registered",
+                    nameof(THandler));
             }
 
             Services.AddTransient<IEventHandler<TEvent>, THandler>();

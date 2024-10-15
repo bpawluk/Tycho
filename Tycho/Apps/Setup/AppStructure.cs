@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Routing;
 using Tycho.Modules;
 using Tycho.Requests.Broker;
@@ -56,7 +56,6 @@ namespace Tycho.Apps.Setup
                 var runningModule = await module.Run();
                 var interfaceType = typeof(IModule<>).MakeGenericType(module.GetType());
                 services.AddSingleton(interfaceType, runningModule);
-
             })).ConfigureAwait(false);
         }
 
@@ -64,8 +63,9 @@ namespace Tycho.Apps.Setup
         {
             if (!_submodules.TryAdd(submodule.GetType(), submodule))
             {
-                throw new InvalidOperationException(submodule.GetType().Name +
-                    " is already defined as a submodule for this module");
+                throw new InvalidOperationException(
+                    $"{submodule.GetType().Name} is already defined " +
+                    $"as a submodule for this module");
             }
         }
     }

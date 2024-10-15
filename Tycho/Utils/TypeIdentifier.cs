@@ -6,14 +6,20 @@ namespace Tycho.Utils
 {
     internal static class TypeIdentifier
     {
-        public static string GetId<T>() => GetId(typeof(T));
+        public static string GetId<T>()
+        {
+            return GetId(typeof(T));
+        }
 
-        public static string GetId(Type type) => $"{GetShortName(type)}+{GetShortId(type)}";
+        public static string GetId(Type type)
+        {
+            return $"{GetShortName(type)}+{GetShortId(type)}";
+        }
 
         private static string GetShortName(Type type)
         {
             var typeName = type.Name;
-            int genericPartIndex = typeName.IndexOf('`');
+            var genericPartIndex = typeName.IndexOf('`');
             return genericPartIndex == -1 ? typeName : typeName[..genericPartIndex];
         }
 
