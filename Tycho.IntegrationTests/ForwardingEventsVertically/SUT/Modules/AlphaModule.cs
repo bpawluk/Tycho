@@ -1,7 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Tycho.Events;
 using Tycho.Modules;
 
 namespace Tycho.IntegrationTests.ForwardingEventsVertically.SUT.Modules;
+
+// Events
+public record AlphaWorkflowStartedEvent(TestResult Result) : IEvent;
+public record AlphaWorkflowFinishedEvent(TestResult Result) : IEvent;
 
 internal class AlphaModule : TychoModule
 {
@@ -19,6 +24,14 @@ internal class AlphaModule : TychoModule
 
         module.Routes<WorkflowFinishedEvent>()
               .Exposes();
+
+        module.Routes<AlphaWorkflowStartedEvent>()
+              .ForwardsAs<BetaWorkflowStartedEvent, BetaModule>(
+                  eventData => new(eventData.Result));
+
+        module.Routes<AlphaWorkflowFinishedEvent>()
+              .ExposesAs<WorkflowWithMappingFinishedEvent>(
+                  eventData => new(eventData.Result));
     }
 
     protected override void RegisterServices(IServiceCollection module) { }

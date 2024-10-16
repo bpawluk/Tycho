@@ -2,7 +2,8 @@
 
 namespace Tycho.IntegrationTests.ForwardingEventsVertically.SUT.Modules.Handlers;
 
-internal class WorkflowStartedEventHandler(IEventPublisher publisher) : IEventHandler<WorkflowStartedEvent>
+internal class WorkflowStartedEventHandler(IEventPublisher publisher) 
+    : IEventHandler<WorkflowStartedEvent>
 {
     private readonly IEventPublisher _publisher = publisher;
 

@@ -14,6 +14,8 @@ public record BeginTestWorkflowRequest(TestResult Result) : IRequest;
 // Events
 public record WorkflowStartedEvent(TestResult Result) : IEvent;
 public record WorkflowFinishedEvent(TestResult Result) : IEvent;
+public record WorkflowWithMappingStartedEvent(TestResult Result) : IEvent;
+public record WorkflowWithMappingFinishedEvent(TestResult Result) : IEvent;
 
 internal class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
 {
@@ -35,6 +37,12 @@ internal class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
            .Forwards<AlphaModule>();
 
         app.Handles<WorkflowFinishedEvent, WorkflowFinishedEventHandler>();
+
+        app.Routes<WorkflowWithMappingStartedEvent>()
+           .ForwardsAs<AlphaWorkflowStartedEvent, AlphaModule>(
+               eventData => new(eventData.Result));
+
+        app.Handles<WorkflowWithMappingFinishedEvent, Handlers.WorkflowWithMappingFinishedEventHandler>();
     }
 
     protected override void RegisterServices(IServiceCollection app)
