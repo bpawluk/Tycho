@@ -1,39 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
 using Tycho.Modules;
 
 namespace Tycho.Events.Routing.Sources
 {
-    internal class DownStreamHandlersSource<TEvent, TModule> : IHandlersSource
+    internal class DownStreamHandlersSource<TEvent, TModule>
+        : ExternalHandlersSource<TEvent>
         where TEvent : class, IEvent
         where TModule : TychoModule
     {
-        private readonly IEventRouter _submoduleEventRouter;
-
         public DownStreamHandlersSource(IModule<TModule> submodule)
+            : base(submodule.EventRouter)
         {
-            _submoduleEventRouter = submodule.EventRouter;
         }
+    }
 
-        public IReadOnlyCollection<HandlerIdentity> IdentifyHandlers<TRequestedEvent>()
-            where TRequestedEvent : class, IEvent
+    internal class DownStreamMappedHandlersSource<TEvent, TTargetEvent, TModule>
+        : MappedExternalHandlersSource<TEvent, TTargetEvent>
+        where TEvent : class, IEvent
+        where TTargetEvent : class, IEvent
+        where TModule : TychoModule
+    {
+        public DownStreamMappedHandlersSource(IModule<TModule> submodule, Func<TEvent, TTargetEvent> map)
+            : base(submodule.EventRouter, map)
         {
-            if (typeof(TRequestedEvent) == typeof(TEvent))
-            {
-                return _submoduleEventRouter.IdentifyHandlers<TEvent>();
-            }
-
-            return Array.Empty<HandlerIdentity>();
-        }
-
-        public IEventHandler? FindHandler(HandlerIdentity handlerIdentity)
-        {
-            if (handlerIdentity.MatchesEvent(typeof(TEvent)))
-            {
-                return _submoduleEventRouter.FindHandler(handlerIdentity);
-            }
-
-            return null;
         }
     }
 }

@@ -1,38 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
 using Tycho.Structure;
 
 namespace Tycho.Events.Routing.Sources
 {
-    internal class UpStreamHandlersSource<TEvent> : IHandlersSource
+    internal class UpStreamHandlersSource<TEvent>
+        : ExternalHandlersSource<TEvent>
         where TEvent : class, IEvent
     {
-        private readonly IEventRouter _parentEventRouter;
-
         public UpStreamHandlersSource(IParent parent)
+            : base(parent.EventRouter)
         {
-            _parentEventRouter = parent.EventRouter;
         }
+    }
 
-        public IReadOnlyCollection<HandlerIdentity> IdentifyHandlers<TRequestedEvent>()
-            where TRequestedEvent : class, IEvent
+    internal class UpStreamMappedHandlersSource<TEvent, TTargetEvent>
+        : MappedExternalHandlersSource<TEvent, TTargetEvent>
+        where TEvent : class, IEvent
+        where TTargetEvent : class, IEvent
+    {
+        public UpStreamMappedHandlersSource(IParent parent, Func<TEvent, TTargetEvent> map)
+            : base(parent.EventRouter, map)
         {
-            if (typeof(TRequestedEvent) == typeof(TEvent))
-            {
-                return _parentEventRouter.IdentifyHandlers<TEvent>();
-            }
-
-            return Array.Empty<HandlerIdentity>();
-        }
-
-        public IEventHandler? FindHandler(HandlerIdentity handlerIdentity)
-        {
-            if (handlerIdentity.MatchesEvent(typeof(TEvent)))
-            {
-                return _parentEventRouter.FindHandler(handlerIdentity);
-            }
-
-            return null;
         }
     }
 }

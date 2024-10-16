@@ -1,8 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Tycho.Events;
 using Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Gamma.Handlers;
 using Tycho.Modules;
 
 namespace Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Gamma;
+
+// Events
+public record GammaWorkflowStartedEvent(TestResult Result) : IEvent;
+public record GammaWorkflowFinishedEvent(TestResult Result) : IEvent;
 
 internal class GammaModule : TychoModule
 {
@@ -15,6 +20,11 @@ internal class GammaModule : TychoModule
         module.Handles<WorkflowStartedEvent, WorkflowStartedEventHandler>();
 
         module.Routes<WorkflowFinishedEvent>()
+              .Exposes();
+
+        module.Handles<GammaWorkflowStartedEvent, GammaWorkflowStartedEventHandler>();
+
+        module.Routes<GammaWorkflowFinishedEvent>()
               .Exposes();
     }
 

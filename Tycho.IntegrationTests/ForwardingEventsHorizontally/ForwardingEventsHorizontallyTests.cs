@@ -29,6 +29,21 @@ public class ForwardingEventsHorizontallyTests : IAsyncLifetime
         Assert.Equal(workflowId, testResult.Id);
     }
 
+    [Fact(Timeout = 500)]
+    public async Task TychoEnables_ForwardingMappedEvents_WithinHorizontalHierarchy()
+    {
+        // Arrange
+        var workflowId = "mapped-event-workflow";
+        var request = new BeginTestWorkflowRequest(new TestResult { Id = workflowId });
+
+        // Act
+        await _sut!.Execute(request);
+        var testResult = await _testWorkflow.GetResult();
+
+        // Assert
+        Assert.Equal(workflowId, testResult.Id);
+    }
+
     public Task DisposeAsync()
     {
         return Task.CompletedTask;

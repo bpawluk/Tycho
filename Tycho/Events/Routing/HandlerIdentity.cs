@@ -25,6 +25,11 @@ namespace Tycho.Events.Routing
             ModuleId = TypeIdentifier.GetId(moduleType);
         }
 
+        public HandlerIdentity ForEvent(Type eventType)
+        {
+            return new HandlerIdentity(TypeIdentifier.GetId(eventType), HandlerId, ModuleId);
+        }
+
         public bool Equals(HandlerIdentity? other)
         {
             return this == other;

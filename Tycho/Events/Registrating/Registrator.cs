@@ -24,10 +24,29 @@ namespace Tycho.Events.Registrating
         {
             if (IsSourceAlreadyRegistered<TEvent, UpStreamHandlersSource<TEvent>>())
             {
-                throw new ArgumentException($"{typeof(TEvent).Name} is already exposed", nameof(TEvent));
+                throw new ArgumentException(
+                    $"{typeof(TEvent).Name} is already exposed", 
+                    nameof(TEvent));
             }
 
             Services.AddTransient<IHandlersSource, UpStreamHandlersSource<TEvent>>();
+        }
+
+        public void ExposeEvent<TEvent, TTargetEvent>(Func<TEvent, TTargetEvent> map)
+            where TEvent : class, IEvent
+            where TTargetEvent : class, IEvent
+        {
+            if (IsSourceAlreadyRegistered<TEvent, UpStreamMappedHandlersSource<TEvent, TTargetEvent>>())
+            {
+                throw new ArgumentException(
+                    $"{typeof(TEvent).Name} is already exposed",
+                    nameof(TEvent));
+            }
+
+            Services.AddTransient<IHandlersSource>(
+                sp => new UpStreamMappedHandlersSource<TEvent, TTargetEvent>(
+                    sp.GetRequiredService<IParent>(),
+                    map));
         }
 
         public void ForwardEvent<TEvent, TModule>()
@@ -36,11 +55,30 @@ namespace Tycho.Events.Registrating
         {
             if (IsSourceAlreadyRegistered<TEvent, DownStreamHandlersSource<TEvent, TModule>>())
             {
-                throw new ArgumentException($"{typeof(TEvent).Name} is already forwarded to {typeof(TModule).Name}",
+                throw new ArgumentException(
+                    $"{typeof(TEvent).Name} is already forwarded to {typeof(TModule).Name}",
                     nameof(TEvent));
             }
 
             Services.AddTransient<IHandlersSource, DownStreamHandlersSource<TEvent, TModule>>();
+        }
+
+        public void ForwardEvent<TEvent, TTargetEvent, TModule>(Func<TEvent, TTargetEvent> map)
+            where TEvent : class, IEvent
+            where TTargetEvent : class, IEvent
+            where TModule : TychoModule
+        {
+            if (IsSourceAlreadyRegistered<TEvent, DownStreamMappedHandlersSource<TEvent, TTargetEvent, TModule>>())
+            {
+                throw new ArgumentException(
+                    $"{typeof(TEvent).Name} is already forwarded to {typeof(TModule).Name}",
+                    nameof(TEvent));
+            }
+
+            Services.AddTransient<IHandlersSource>(
+                sp => new DownStreamMappedHandlersSource<TEvent, TTargetEvent, TModule>(
+                    sp.GetRequiredService<IModule<TModule>>(),
+                    map));
         }
 
         public void HandleEvent<TEvent, THandler>()
@@ -49,7 +87,8 @@ namespace Tycho.Events.Registrating
         {
             if (IsHandlerAlreadyRegistered<TEvent, THandler>())
             {
-                throw new ArgumentException($"Event handler for {typeof(TEvent).Name} already registered",
+                throw new ArgumentException(
+                    $"Event handler for {typeof(TEvent).Name} already registered",
                     nameof(THandler));
             }
 

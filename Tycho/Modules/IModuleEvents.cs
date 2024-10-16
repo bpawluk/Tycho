@@ -18,7 +18,7 @@ namespace Tycho.Modules
         /// <summary>
         ///     TODO
         /// </summary>
-        IEventRouting Routes<TEvent>()
+        IEventRouting<TEvent> Routes<TEvent>()
             where TEvent : class, IEvent;
     }
 }

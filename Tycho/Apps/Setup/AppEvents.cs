@@ -32,7 +32,7 @@ namespace Tycho.Apps.Setup
             return this;
         }
 
-        public IEventRouting Routes<TEvent>()
+        public IEventRouting<TEvent> Routes<TEvent>()
             where TEvent : class, IEvent
         {
             return new EventRouting<TEvent>(_registrator);
