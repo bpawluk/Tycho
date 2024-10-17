@@ -29,7 +29,7 @@ public class UpStreamHandlersSourceTests
                        .Returns(_expectedHandler);
 
         var parentMock = new Mock<IParent>();
-        parentMock.SetupGet(m => m.EventRouter)
+        parentMock.SetupGet(p => p.EventRouter)
                   .Returns(eventRouterMock.Object);
 
         _sut = new UpStreamHandlersSource<TestEvent>(parentMock.Object);

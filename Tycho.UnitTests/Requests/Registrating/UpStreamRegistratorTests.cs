@@ -47,10 +47,7 @@ public class UpStreamRegistratorTests
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
-        void Act()
-        {
-            _sut.ForwardUpStreamRequest<TestRequest, TestModule>();
-        }
+        void Act() => _sut.ForwardUpStreamRequest<TestRequest, TestModule>();
 
         // Assert
         Assert.Throws<ArgumentException>(Act);
@@ -81,10 +78,7 @@ public class UpStreamRegistratorTests
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
-        void Act()
-        {
-            _sut.ForwardUpStreamRequest<TestRequestWithResponse, string, TestModule>();
-        }
+        void Act() => _sut.ForwardUpStreamRequest<TestRequestWithResponse, string, TestModule>();
 
         // Assert
         Assert.Throws<ArgumentException>(Act);
@@ -114,10 +108,7 @@ public class UpStreamRegistratorTests
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
-        void Act()
-        {
-            _sut.HandleUpStreamRequest<TestRequest, TestRequestHandler>();
-        }
+        void Act() => _sut.HandleUpStreamRequest<TestRequest, TestRequestHandler>();
 
         // Assert
         Assert.Throws<ArgumentException>(Act);
@@ -148,10 +139,7 @@ public class UpStreamRegistratorTests
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
-        void Act()
-        {
-            _sut.HandleUpStreamRequest<TestRequestWithResponse, string, TestRequestHandler>();
-        }
+        void Act() => _sut.HandleUpStreamRequest<TestRequestWithResponse, string, TestRequestHandler>();
 
         // Assert
         Assert.Throws<ArgumentException>(Act);

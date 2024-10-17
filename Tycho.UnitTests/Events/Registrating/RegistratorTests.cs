@@ -48,10 +48,38 @@ public class RegistratorTests
             .AddTransient<IHandlersSource, UpStreamHandlersSource<TestEvent>>();
 
         // Act
-        void Act()
-        {
-            _sut.ExposeEvent<TestEvent>();
-        }
+        void Act() => _sut.ExposeEvent<TestEvent>();
+
+        // Assert
+        Assert.Throws<ArgumentException>(Act);
+    }
+
+    [Fact]
+    public void Expose_NewEventWithMapping_RegistersHandlersSource()
+    {
+        // Arrange
+        var targetModuleMock = new Mock<IParent>();
+        _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
+
+        // Act
+        _sut.ExposeEvent<TestEvent, OtherEvent>(eventData => new());
+        _internals.Build();
+
+        // Assert
+        var source = _internals.GetService<IHandlersSource>();
+        Assert.NotNull(source);
+        Assert.IsType<UpStreamMappedHandlersSource<TestEvent, OtherEvent>>(source);
+    }
+
+    [Fact]
+    public void Expose_ExistingEventWithMapping_ThrowsArgumentException()
+    {
+        // Arrange
+        _internals.GetServiceCollection()
+            .AddTransient<IHandlersSource, UpStreamMappedHandlersSource<TestEvent, OtherEvent>>();
+
+        // Act
+        void Act() => _sut.ExposeEvent<TestEvent, OtherEvent>(eventData => new());
 
         // Assert
         Assert.Throws<ArgumentException>(Act);
@@ -82,10 +110,38 @@ public class RegistratorTests
             .AddTransient<IHandlersSource, DownStreamHandlersSource<TestEvent, TestModule>>();
 
         // Act
-        void Act()
-        {
-            _sut.ForwardEvent<TestEvent, TestModule>();
-        }
+        void Act() => _sut.ForwardEvent<TestEvent, TestModule>();
+
+        // Assert
+        Assert.Throws<ArgumentException>(Act);
+    }
+
+    [Fact]
+    public void Forward_NewEventWithMapping_RegistersHandlersSource()
+    {
+        // Arrange
+        var targetModuleMock = new Mock<IModule<TestModule>>();
+        _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
+
+        // Act
+        _sut.ForwardEvent<TestEvent, OtherEvent, TestModule>(eventData => new());
+        _internals.Build();
+
+        // Assert
+        var source = _internals.GetService<IHandlersSource>();
+        Assert.NotNull(source);
+        Assert.IsType<DownStreamMappedHandlersSource<TestEvent, OtherEvent, TestModule>>(source);
+    }
+
+    [Fact]
+    public void Forward_ExistingEventWithMapping_ThrowsArgumentException()
+    {
+        // Arrange
+        _internals.GetServiceCollection()
+            .AddTransient<IHandlersSource, DownStreamMappedHandlersSource<TestEvent, OtherEvent, TestModule>>();
+
+        // Act
+        void Act() => _sut.ForwardEvent<TestEvent, OtherEvent, TestModule>(eventData => new());
 
         // Assert
         Assert.Throws<ArgumentException>(Act);
@@ -140,10 +196,7 @@ public class RegistratorTests
             .AddTransient<IEventHandler<TestEvent>, TestEventHandler>();
 
         // Act
-        void Act()
-        {
-            _sut.HandleEvent<TestEvent, TestEventHandler>();
-        }
+        void Act() => _sut.HandleEvent<TestEvent, TestEventHandler>();
 
         // Assert
         Assert.Throws<ArgumentException>(Act);

@@ -46,10 +46,7 @@ public class DownStreamRegistratorTests
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
-        void Act()
-        {
-            _sut.ExposeDownStreamRequest<OtherModule, TestRequest>();
-        }
+        void Act() => _sut.ExposeDownStreamRequest<OtherModule, TestRequest>();
 
         // Assert
         Assert.Throws<ArgumentException>(Act);
@@ -80,10 +77,7 @@ public class DownStreamRegistratorTests
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
-        void Act()
-        {
-            _sut.ExposeDownStreamRequest<OtherModule, TestRequestWithResponse, string>();
-        }
+        void Act() => _sut.ExposeDownStreamRequest<OtherModule, TestRequestWithResponse, string>();
 
         // Assert
         Assert.Throws<ArgumentException>(Act);
@@ -114,10 +108,7 @@ public class DownStreamRegistratorTests
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
-        void Act()
-        {
-            _sut.ForwardDownStreamRequest<OtherModule, TestRequest, TestModule>();
-        }
+        void Act() => _sut.ForwardDownStreamRequest<OtherModule, TestRequest, TestModule>();
 
         // Assert
         Assert.Throws<ArgumentException>(Act);
@@ -149,10 +140,7 @@ public class DownStreamRegistratorTests
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
-        void Act()
-        {
-            _sut.ForwardDownStreamRequest<OtherModule, TestRequestWithResponse, string, TestModule>();
-        }
+        void Act() => _sut.ForwardDownStreamRequest<OtherModule, TestRequestWithResponse, string, TestModule>();
 
         // Assert
         Assert.Throws<ArgumentException>(Act);
@@ -182,10 +170,7 @@ public class DownStreamRegistratorTests
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
-        void Act()
-        {
-            _sut.HandleDownStreamRequest<OtherModule, TestRequest, TestRequestHandler>();
-        }
+        void Act() => _sut.HandleDownStreamRequest<OtherModule, TestRequest, TestRequestHandler>();
 
         // Assert
         Assert.Throws<ArgumentException>(Act);
@@ -217,10 +202,7 @@ public class DownStreamRegistratorTests
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
-        void Act()
-        {
-            _sut.HandleDownStreamRequest<OtherModule, TestRequestWithResponse, string, TestRequestHandler>();
-        }
+        void Act() => _sut.HandleDownStreamRequest<OtherModule, TestRequestWithResponse, string, TestRequestHandler>();
 
         // Assert
         Assert.Throws<ArgumentException>(Act);
@@ -250,10 +232,7 @@ public class DownStreamRegistratorTests
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
-        void Act()
-        {
-            _sut.IgnoreDownStreamRequest<OtherModule, TestRequest>();
-        }
+        void Act() => _sut.IgnoreDownStreamRequest<OtherModule, TestRequest>();
 
         // Assert
         Assert.Throws<ArgumentException>(Act);
@@ -284,10 +263,7 @@ public class DownStreamRegistratorTests
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
-        void Act()
-        {
-            _sut.IgnoreDownStreamRequest<OtherModule, TestRequestWithResponse, string>();
-        }
+        void Act() => _sut.IgnoreDownStreamRequest<OtherModule, TestRequestWithResponse, string>();
 
         // Assert
         Assert.Throws<ArgumentException>(Act);
