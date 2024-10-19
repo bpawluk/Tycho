@@ -85,6 +85,89 @@ public class UpStreamRegistratorTests
     }
 
     [Fact]
+    public void Forward_NewMappedRequest_RegistersForwarder()
+    {
+        // Arrange
+        var mapMock = new Mock<Func<TestRequest, OtherRequest>>();
+        var targetModuleMock = new Mock<IModule<TestModule>>();
+        _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
+
+        // Act
+        _sut.ForwardMappedUpStreamRequest<TestRequest, OtherRequest, TestModule>(mapMock.Object);
+        _internals.Build();
+
+        // Assert
+        var registration = _internals.GetService<IUpStreamHandlerRegistration<TestRequest>>();
+        Assert.NotNull(registration);
+        Assert.IsType<MappedRequestForwarder<TestRequest, OtherRequest, TestModule>>(registration.Handler);
+    }
+
+    [Fact]
+    public void Forward_ExistingMappedRequest_ThrowsArgumentException()
+    {
+        // Arrange
+        var mapMock = new Mock<Func<TestRequest, OtherRequest>>();
+        var registrationMock = new Mock<IUpStreamHandlerRegistration<TestRequest>>();
+        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+
+        // Act
+        void Act() => _sut.ForwardMappedUpStreamRequest<
+            TestRequest, OtherRequest, TestModule>(
+                mapMock.Object);
+
+        // Assert
+        Assert.Throws<ArgumentException>(Act);
+    }
+
+    [Fact]
+    public void Forward_NewMappedRequestWithResponse_RegistersForwarder()
+    {
+        // Arrange
+        var mapRequestMock = new Mock<Func<TestRequestWithResponse, OtherRequestWithResponse>>();
+        var mapResponseMock = new Mock<Func<string, string>>();
+        var targetModuleMock = new Mock<IModule<TestModule>>();
+        _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
+
+        // Act
+        _sut.ForwardMappedUpStreamRequest<
+            TestRequestWithResponse, string,
+            OtherRequestWithResponse, string,
+            TestModule>(
+                mapRequestMock.Object, mapResponseMock.Object);
+        _internals.Build();
+
+        // Assert
+        var registration = _internals
+            .GetService<IUpStreamHandlerRegistration<TestRequestWithResponse, string>>();
+        Assert.NotNull(registration);
+        Assert.IsType<MappedRequestForwarder<
+            TestRequestWithResponse, string,
+            OtherRequestWithResponse, string,
+            TestModule>>(
+                registration.Handler);
+    }
+
+    [Fact]
+    public void Forward_ExistingMappedRequestWithResponse_ThrowsArgumentException()
+    {
+        // Arrange
+        var mapRequestMock = new Mock<Func<TestRequestWithResponse, OtherRequestWithResponse>>();
+        var mapResponseMock = new Mock<Func<string, string>>();
+        var registrationMock = new Mock<IUpStreamHandlerRegistration<TestRequestWithResponse, string>>();
+        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+
+        // Act
+        void Act() => _sut.ForwardMappedUpStreamRequest<
+            TestRequestWithResponse, string,
+            OtherRequestWithResponse, string,
+            TestModule>(
+                mapRequestMock.Object, mapResponseMock.Object);
+
+        // Assert
+        Assert.Throws<ArgumentException>(Act);
+    }
+
+    [Fact]
     public void Handle_NewRequest_RegistersHandler()
     {
         // Arrange
