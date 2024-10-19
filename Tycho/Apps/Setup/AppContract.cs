@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Tycho.Modules;
 using Tycho.Requests;
 using Tycho.Requests.Registrating;
@@ -28,6 +29,30 @@ namespace Tycho.Apps.Setup
             where TModule : TychoModule
         {
             _registrator.ForwardUpStreamRequest<TRequest, TResponse, TModule>();
+            return this;
+        }
+
+        public IAppContract ForwardsAs<TRequest, TTargetRequest, TModule>(
+            Func<TRequest, TTargetRequest> map)
+            where TRequest : class, IRequest
+            where TTargetRequest : class, IRequest
+            where TModule : TychoModule
+        {
+            _registrator.ForwardMappedUpStreamRequest<TRequest, TTargetRequest, TModule>(map);
+            return this;
+        }
+
+        public IAppContract ForwardsAs<TRequest, TResponse, TTargetRequest, TTargetResponse, TModule>(
+            Func<TRequest, TTargetRequest> mapRequest,
+            Func<TTargetResponse, TResponse> mapResponse)
+            where TRequest : class, IRequest<TResponse>
+            where TTargetRequest : class, IRequest<TTargetResponse>
+            where TModule : TychoModule
+        {
+            _registrator.ForwardMappedUpStreamRequest<
+                TRequest, TResponse, 
+                TTargetRequest, TTargetResponse, 
+                TModule>(mapRequest, mapResponse);
             return this;
         }
 

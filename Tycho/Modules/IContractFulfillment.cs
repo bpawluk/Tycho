@@ -1,4 +1,5 @@
-﻿using Tycho.Requests;
+﻿using System;
+using Tycho.Requests;
 
 namespace Tycho.Modules
 {
@@ -22,6 +23,23 @@ namespace Tycho.Modules
         /// <summary>
         ///     TODO
         /// </summary>
+        IContractFulfillment ExposeAs<TRequest, TTargetRequest>(
+            Func<TRequest, TTargetRequest> map)
+            where TRequest : class, IRequest
+            where TTargetRequest : class, IRequest;
+
+        /// <summary>
+        ///     TODO
+        /// </summary>
+        IContractFulfillment ExposeAs<TRequest, TResponse, TTargetRequest, TTargetResponse>(
+            Func<TRequest, TTargetRequest> mapRequest,
+            Func<TTargetResponse, TResponse> mapResponse)
+            where TRequest : class, IRequest<TResponse>
+            where TTargetRequest : class, IRequest<TTargetResponse>;
+
+        /// <summary>
+        ///     TODO
+        /// </summary>
         IContractFulfillment Forward<TRequest, TModule>()
             where TRequest : class, IRequest
             where TModule : TychoModule;
@@ -32,6 +50,25 @@ namespace Tycho.Modules
         IContractFulfillment Forward<TRequest, TResponse, TModule>()
             where TRequest : class, IRequest<TResponse>
             where TModule : TychoModule;
+
+        /// <summary>
+        ///     TODO
+        /// </summary>
+        IContractFulfillment ForwardAs<TRequest, TTargetRequest, TTargetModule>(
+            Func<TRequest, TTargetRequest> map)
+            where TRequest : class, IRequest
+            where TTargetRequest : class, IRequest
+            where TTargetModule : TychoModule;
+
+        /// <summary>
+        ///     TODO
+        /// </summary>
+        IContractFulfillment ForwardAs<TRequest, TResponse, TTargetRequest, TTargetResponse, TTargetModule>(
+            Func<TRequest, TTargetRequest> mapRequest,
+            Func<TTargetResponse, TResponse> mapResponse)
+            where TRequest : class, IRequest<TResponse>
+            where TTargetRequest : class, IRequest<TTargetResponse>
+            where TTargetModule : TychoModule;
 
         /// <summary>
         ///     TODO

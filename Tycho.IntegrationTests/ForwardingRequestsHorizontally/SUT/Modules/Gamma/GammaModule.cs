@@ -1,8 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Modules.Handlers;
+using Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Modules.Gamma.Handlers;
 using Tycho.Modules;
+using Tycho.Requests;
 
-namespace Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Modules;
+namespace Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Modules.Gamma;
+
+// Handles
+public record GammaRequest(TestResult Result) : IRequest;
+public record GammaRequestWithResponse(TestResult Result) : IRequest<string>;
 
 internal class GammaModule : TychoModule
 {
@@ -13,6 +18,12 @@ internal class GammaModule : TychoModule
 
         module.Requires<Request>()
               .Requires<RequestWithResponse, string>();
+
+        module.Handles<GammaRequest, GammaRequestHandler>()
+              .Handles<GammaRequestWithResponse, string, GammaRequestHandler>();
+
+        module.Requires<GammaRequest>()
+              .Requires<GammaRequestWithResponse, string>();
     }
 
     protected override void IncludeModules(IModuleStructure module) { }

@@ -1,7 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
+using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.ForwardingRequestsVertically.SUT.Modules;
+
+// Handles
+public record BetaRequest(TestResult Result) : IRequest;
+public record BetaRequestWithResponse(TestResult Result) : IRequest<string>;
 
 internal class BetaModule : TychoModule
 {
@@ -12,6 +17,15 @@ internal class BetaModule : TychoModule
 
         module.Requires<Request>()
               .Requires<RequestWithResponse, string>();
+
+        module.ForwardsAs<BetaRequest, GammaRequest, GammaModule>(
+                  requestData => new(requestData.Result))
+              .ForwardsAs<BetaRequestWithResponse, string, GammaRequestWithResponse, string, GammaModule>(
+                  requestData => new(requestData.Result),
+                  response => response);
+
+        module.Requires<BetaRequest>()
+              .Requires<BetaRequestWithResponse, string>();
     }
 
     protected override void IncludeModules(IModuleStructure module)
@@ -20,6 +34,12 @@ internal class BetaModule : TychoModule
         {
             contract.Expose<Request>()
                     .Expose<RequestWithResponse, string>();
+
+            contract.ExposeAs<GammaRequest, BetaRequest>(
+                        requestData => new(requestData.Result))
+                    .ExposeAs<GammaRequestWithResponse, string, BetaRequestWithResponse, string>(
+                        requestData => new(requestData.Result),
+                        response => response);
         });
     }
 

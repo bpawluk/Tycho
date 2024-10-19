@@ -1,4 +1,5 @@
-﻿using Tycho.Modules;
+﻿using System;
+using Tycho.Modules;
 using Tycho.Requests;
 using Tycho.Requests.Handling;
 using Tycho.Requests.Registrating;
@@ -29,6 +30,31 @@ namespace Tycho.Apps.Setup
             where TTargetModule : TychoModule
         {
             _registrator.ForwardDownStreamRequest<TSourceModule, TRequest, TResponse, TTargetModule>();
+            return this;
+        }
+
+        public IContractFulfillment ForwardAs<TRequest, TTargetRequest, TTargetModule>(
+            Func<TRequest, TTargetRequest> map)
+            where TRequest : class, IRequest
+            where TTargetRequest : class, IRequest
+            where TTargetModule : TychoModule
+        {
+            _registrator.ForwardMappedDownStreamRequest<TSourceModule, TRequest, TTargetRequest, TTargetModule>(map);
+            return this;
+        }
+
+        public IContractFulfillment ForwardAs<TRequest, TResponse, TTargetRequest, TTargetResponse, TTargetModule>(
+            Func<TRequest, TTargetRequest> mapRequest,
+            Func<TTargetResponse, TResponse> mapResponse)
+            where TRequest : class, IRequest<TResponse>
+            where TTargetRequest : class, IRequest<TTargetResponse>
+            where TTargetModule : TychoModule
+        {
+            _registrator.ForwardMappedDownStreamRequest<
+                TSourceModule,
+                TRequest, TResponse,
+                TTargetRequest, TTargetResponse,
+                TTargetModule>(mapRequest, mapResponse);
             return this;
         }
 

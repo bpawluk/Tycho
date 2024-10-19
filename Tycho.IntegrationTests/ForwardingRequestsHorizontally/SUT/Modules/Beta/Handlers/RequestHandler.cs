@@ -1,7 +1,7 @@
 ﻿using Tycho.Requests;
 using Tycho.Structure;
 
-namespace Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Modules.Handlers;
+namespace Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Modules.Beta.Handlers;
 
 internal class RequestHandler(IParent parent)
     : IRequestHandler<Request>

@@ -44,6 +44,30 @@ namespace Tycho.Modules.Setup
             return this;
         }
 
+        public IModuleContract ForwardsAs<TRequest, TTargetRequest, TModule>(
+            Func<TRequest, TTargetRequest> map)
+            where TRequest : class, IRequest
+            where TTargetRequest : class, IRequest
+            where TModule : TychoModule
+        {
+            _registrator.ForwardMappedUpStreamRequest<TRequest, TTargetRequest, TModule>(map);
+            return this;
+        }
+
+        public IModuleContract ForwardsAs<TRequest, TResponse, TTargetRequest, TTargetResponse, TModule>(
+            Func<TRequest, TTargetRequest> mapRequest,
+            Func<TTargetResponse, TResponse> mapResponse)
+            where TRequest : class, IRequest<TResponse>
+            where TTargetRequest : class, IRequest<TTargetResponse>
+            where TModule : TychoModule
+        {
+            _registrator.ForwardMappedUpStreamRequest<
+                TRequest, TResponse,
+                TTargetRequest, TTargetResponse,
+                TModule>(mapRequest, mapResponse);
+            return this;
+        }
+
         public IModuleContract Handles<TRequest, THandler>()
             where TRequest : class, IRequest
             where THandler : class, IRequestHandler<TRequest>

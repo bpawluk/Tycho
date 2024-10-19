@@ -1,6 +1,7 @@
 ﻿using Tycho.Apps;
 using Tycho.IntegrationTests._Utils;
 using Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT;
+using static Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.RequestToMapWithResponse;
 
 namespace Tycho.IntegrationTests.ForwardingRequestsHorizontally;
 
@@ -42,6 +43,38 @@ public class ForwardingRequestsHorizontallyTests : IAsyncLifetime
 
         // Assert
         Assert.Equal("Test = Passed", response);
+        Assert.Equal(workflowId, testResult.Id);
+    }
+
+    [Fact(Timeout = 500)]
+    public async Task TychoEnables_ForwardingMappedRequests_WithinHorizontalHierarchy()
+    {
+        // Arrange
+        var workflowId = "mapped-request-workflow";
+        var request = new RequestToMap(new TestResult { Id = workflowId });
+
+        // Act
+        await _sut!.Execute(request);
+        var testResult = await _testWorkflow.GetResult();
+
+        // Assert
+        Assert.Equal(workflowId, testResult.Id);
+    }
+
+    [Fact(Timeout = 500)]
+    public async Task TychoEnables_ForwardingMappedRequestsForResponses_WithinHorizontalHierarchy()
+    {
+        // Arrange
+        var workflowId = "mapped-request-with-response-workflow";
+        var message = new RequestToMapWithResponse(new TestResult { Id = workflowId });
+
+        // Act
+        var response = await _sut!.Execute<RequestToMapWithResponse, Response>(message);
+        var testResult = await _testWorkflow.GetResult();
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal("Test = Passed", response.Value);
         Assert.Equal(workflowId, testResult.Id);
     }
 

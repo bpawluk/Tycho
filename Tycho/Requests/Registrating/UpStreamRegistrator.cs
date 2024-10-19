@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Tycho.Modules;
 using Tycho.Requests.Handling;
@@ -12,41 +13,75 @@ namespace Tycho.Requests.Registrating
             where TRequest : class, IRequest
             where TTargetModule : TychoModule
         {
-            RegisterUpStreamRequestHandler<TRequest, RequestForwarder<TRequest, TTargetModule>>();
+            AddUpStreamRegistration<TRequest, 
+                RequestForwarder<TRequest, TTargetModule>>();
+            Services.TryAddTransient<
+                RequestForwarder<TRequest, TTargetModule>>();
         }
 
         public void ForwardUpStreamRequest<TRequest, TResponse, TTargetModule>()
             where TRequest : class, IRequest<TResponse>
             where TTargetModule : TychoModule
         {
-            RegisterUpStreamRequestHandler<TRequest, TResponse, RequestForwarder<TRequest, TResponse, TTargetModule>>();
+            AddUpStreamRegistration<TRequest, TResponse, 
+                RequestForwarder<TRequest, TResponse, TTargetModule>>();
+            Services.TryAddTransient<
+                RequestForwarder<TRequest, TResponse, TTargetModule>>();
+        }
+
+        public void ForwardMappedUpStreamRequest<TRequest, TTargetRequest, TTargetModule>(
+            Func<TRequest, TTargetRequest> map)
+            where TRequest : class, IRequest
+            where TTargetRequest : class, IRequest
+            where TTargetModule : TychoModule
+        {
+            AddUpStreamRegistration<TRequest, 
+                MappedRequestForwarder<TRequest, TTargetRequest, TTargetModule>>();
+            Services.TryAddTransient(sp =>
+                new MappedRequestForwarder<TRequest, TTargetRequest, TTargetModule>(
+                    sp.GetRequiredService<IModule<TTargetModule>>(), 
+                    map));
+        }
+
+        public void ForwardMappedUpStreamRequest<TRequest, TResponse, TTargetRequest, TTargetResponse, TTargetModule>(
+            Func<TRequest, TTargetRequest> mapRequest,
+            Func<TTargetResponse, TResponse> mapResponse)
+            where TRequest : class, IRequest<TResponse>
+            where TTargetRequest : class, IRequest<TTargetResponse>
+            where TTargetModule : TychoModule
+        {
+            AddUpStreamRegistration<TRequest, TResponse, 
+                MappedRequestForwarder<TRequest, TResponse, TTargetRequest, TTargetResponse, TTargetModule>>();
+            Services.TryAddTransient(sp =>
+                new MappedRequestForwarder<TRequest, TResponse, TTargetRequest, TTargetResponse, TTargetModule>(
+                    sp.GetRequiredService<IModule<TTargetModule>>(),
+                    mapRequest,
+                    mapResponse));
         }
 
         public void HandleUpStreamRequest<TRequest, THandler>()
             where TRequest : class, IRequest
             where THandler : class, IRequestHandler<TRequest>
         {
-            RegisterUpStreamRequestHandler<TRequest, THandler>();
+            AddUpStreamRegistration<TRequest, THandler>();
+            Services.TryAddTransient<THandler>();
         }
 
         public void HandleUpStreamRequest<TRequest, TResponse, THandler>()
             where TRequest : class, IRequest<TResponse>
             where THandler : class, IRequestHandler<TRequest, TResponse>
         {
-            RegisterUpStreamRequestHandler<TRequest, TResponse, THandler>();
+            AddUpStreamRegistration<TRequest, TResponse, THandler>();
+            Services.TryAddTransient<THandler>();
         }
 
-        private void RegisterUpStreamRequestHandler<TRequest, THandler>()
+        private void AddUpStreamRegistration<TRequest, THandler>()
             where TRequest : class, IRequest
             where THandler : class, IRequestHandler<TRequest>
         {
-            if (TryAddRegistration<
+            if (!TryAddRegistration<
                     IUpStreamHandlerRegistration<TRequest>,
                     UpStreamHandlerRegistration<TRequest, THandler>>())
-            {
-                Services.TryAddTransient<THandler>();
-            }
-            else
             {
                 throw new ArgumentException(
                     $"Request handler for {typeof(TRequest).Name} already registered",
@@ -54,17 +89,13 @@ namespace Tycho.Requests.Registrating
             }
         }
 
-        private void RegisterUpStreamRequestHandler<TRequest, TResponse, THandler>()
+        private void AddUpStreamRegistration<TRequest, TResponse, THandler>()
             where TRequest : class, IRequest<TResponse>
             where THandler : class, IRequestHandler<TRequest, TResponse>
         {
-            if (TryAddRegistration<
+            if (!TryAddRegistration<
                     IUpStreamHandlerRegistration<TRequest, TResponse>,
                     UpStreamHandlerRegistration<TRequest, TResponse, THandler>>())
-            {
-                Services.TryAddTransient<THandler>();
-            }
-            else
             {
                 throw new ArgumentException(
                     $"Request handler for {typeof(TRequest).Name} already registered",

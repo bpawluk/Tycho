@@ -1,4 +1,5 @@
-﻿using Tycho.Requests;
+﻿using System;
+using Tycho.Requests;
 
 namespace Tycho.Modules
 {
@@ -19,6 +20,25 @@ namespace Tycho.Modules
         /// </summary>
         IModuleContract Forwards<TRequest, TResponse, TModule>()
             where TRequest : class, IRequest<TResponse>
+            where TModule : TychoModule;
+
+        /// <summary>
+        ///     TODO
+        /// </summary>
+        IModuleContract ForwardsAs<TRequest, TTargetRequest, TModule>(
+            Func<TRequest, TTargetRequest> map)
+            where TRequest : class, IRequest
+            where TTargetRequest : class, IRequest
+            where TModule : TychoModule;
+
+        /// <summary>
+        ///     TODO
+        /// </summary>
+        IModuleContract ForwardsAs<TRequest, TResponse, TTargetRequest, TTargetResponse, TModule>(
+            Func<TRequest, TTargetRequest> mapRequest,
+            Func<TTargetResponse, TResponse> mapResponse)
+            where TRequest : class, IRequest<TResponse>
+            where TTargetRequest : class, IRequest<TTargetResponse>
             where TModule : TychoModule;
 
         /// <summary>
