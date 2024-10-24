@@ -83,7 +83,7 @@ public class UpStreamMappedHandlersSourceTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.IsType<WrappingHandler<TestEvent, OtherEvent>>(result);
+        Assert.IsType<WrappingEventHandler<TestEvent, OtherEvent>>(result);
     }
 
     [Fact]

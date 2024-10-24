@@ -4,14 +4,14 @@ using System.Threading.Tasks;
 
 namespace Tycho.Events.Handling
 {
-    internal class WrappingHandler<TEvent, TTargetEvent> : IEventHandler<TEvent>
+    internal class WrappingEventHandler<TEvent, TTargetEvent> : IEventHandler<TEvent>
         where TEvent : class, IEvent
         where TTargetEvent : class, IEvent
     {
         private readonly IEventHandler<TTargetEvent> _wrappedHandler;
         private readonly Func<TEvent, TTargetEvent> _map;
 
-        public WrappingHandler(IEventHandler<TTargetEvent> wrappedHandler, Func<TEvent, TTargetEvent> map)
+        public WrappingEventHandler(IEventHandler<TTargetEvent> wrappedHandler, Func<TEvent, TTargetEvent> map)
         {
             _wrappedHandler = wrappedHandler;
             _map = map;

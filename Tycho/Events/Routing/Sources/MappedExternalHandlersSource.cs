@@ -37,11 +37,9 @@ namespace Tycho.Events.Routing.Sources
             {
                 var mappedIdentity = handlerIdentity.ForEvent(typeof(TTargetEvent));
                 var foundHandler = _externalEventRouter.FindHandler(mappedIdentity);
-                if (foundHandler != null)
+                if (foundHandler is IEventHandler<TTargetEvent> targetEventHandler)
                 {
-                    return new WrappingHandler<TEvent, TTargetEvent>(
-                        (foundHandler as IEventHandler<TTargetEvent>)!,
-                        _map);
+                    return new WrappingEventHandler<TEvent, TTargetEvent>(targetEventHandler, _map);
                 }
             }
 

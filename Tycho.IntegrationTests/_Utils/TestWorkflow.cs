@@ -2,7 +2,7 @@
 
 public class TestWorkflow<TResult>
 {
-    private readonly TaskCompletionSource<TResult> _resultCompletionSource = new();
+    private TaskCompletionSource<TResult> _resultCompletionSource = new();
 
     public Task<TResult> GetResult()
     {
@@ -12,5 +12,10 @@ public class TestWorkflow<TResult>
     public void SetResult(TResult result)
     {
         _resultCompletionSource.SetResult(result);
+    }
+
+    public void Reset()
+    {
+        _resultCompletionSource = new();
     }
 }

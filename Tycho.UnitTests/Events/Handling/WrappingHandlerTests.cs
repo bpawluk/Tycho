@@ -18,7 +18,7 @@ public class WrappingHandlerTests
         var map = new Mock<Func<TestEvent, OtherEvent>>();
         map.Setup(m => m(eventData)).Returns(mappedEventData);
 
-        var sut = new WrappingHandler<TestEvent, OtherEvent>(wrappedHandler.Object, map.Object);
+        var sut = new WrappingEventHandler<TestEvent, OtherEvent>(wrappedHandler.Object, map.Object);
 
         // Act
         await sut.Handle(eventData, CancellationToken.None);

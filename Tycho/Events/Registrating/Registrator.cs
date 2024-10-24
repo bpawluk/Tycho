@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Tycho.Events.Handling;
 using Tycho.Events.Routing;
 using Tycho.Events.Routing.Sources;
 using Tycho.Modules;
@@ -85,14 +86,15 @@ namespace Tycho.Events.Registrating
             where TEvent : class, IEvent
             where THandler : class, IEventHandler<TEvent>
         {
-            if (IsHandlerAlreadyRegistered<TEvent, THandler>())
+            if (IsHandlerAlreadyRegistered<TEvent, ScopedEventHandler<TEvent, THandler>>())
             {
                 throw new ArgumentException(
                     $"Event handler for {typeof(TEvent).Name} already registered",
                     nameof(THandler));
             }
 
-            Services.AddTransient<IEventHandler<TEvent>, THandler>();
+            Services.AddTransient<IEventHandler<TEvent>, ScopedEventHandler<TEvent, THandler>>();
+            Services.AddScoped<THandler>();
 
             if (!IsSourceAlreadyRegistered<TEvent, LocalHandlersSource<TEvent>>())
             {

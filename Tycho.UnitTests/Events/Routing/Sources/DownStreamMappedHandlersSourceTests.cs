@@ -83,7 +83,7 @@ public class DownStreamMappedHandlersSourceTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.IsType<WrappingHandler<TestEvent, OtherEvent>>(result);
+        Assert.IsType<WrappingEventHandler<TestEvent, OtherEvent>>(result);
     }
 
     [Fact]
