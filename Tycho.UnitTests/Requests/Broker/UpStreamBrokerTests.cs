@@ -178,7 +178,7 @@ public class UpStreamBrokerTests
     }
 
     [Fact]
-    public async Task Execute_NullRequest_ThrowsArgumentException()
+    public async Task Execute_NullRequest_ThrowsArgumentNullException()
     {
         // Arrange
         TestRequest requestData = null!;
@@ -190,7 +190,7 @@ public class UpStreamBrokerTests
         }
 
         // Assert
-        await Assert.ThrowsAsync<ArgumentException>(Act);
+        await Assert.ThrowsAsync<ArgumentNullException>(Act);
     }
 
     [Fact]
@@ -236,7 +236,7 @@ public class UpStreamBrokerTests
     }
 
     [Fact]
-    public async Task Execute_NullRequestWithResponse_ThrowsArgumentException()
+    public async Task Execute_NullRequestWithResponse_ThrowsArgumentNullException()
     {
         // Arrange
         TestRequestWithResponse requestData = null!;
@@ -248,6 +248,6 @@ public class UpStreamBrokerTests
         }
 
         // Assert
-        await Assert.ThrowsAsync<ArgumentException>(Act);
+        await Assert.ThrowsAsync<ArgumentNullException>(Act);
     }
 }

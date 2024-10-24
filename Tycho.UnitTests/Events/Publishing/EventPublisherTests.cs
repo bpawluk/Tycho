@@ -79,7 +79,7 @@ public class EventPublisherTests
     }
 
     [Fact]
-    public async Task Publish_WithNullEventData_ThrowsArgumentException()
+    public async Task Publish_WithNullEventData_ThrowsArgumentNullException()
     {
         // Arrange
         IEvent eventData = null!;
@@ -92,7 +92,7 @@ public class EventPublisherTests
         }
 
         // Assert
-        await Assert.ThrowsAsync<ArgumentException>(Act);
+        await Assert.ThrowsAsync<ArgumentNullException>(Act);
     }
 
     private static string SerializeMock(IEvent eventData)

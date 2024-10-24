@@ -219,7 +219,7 @@ public class DownStreamBrokerTests
     }
 
     [Fact]
-    public async Task Execute_NullRequest_ThrowsArgumentException()
+    public async Task Execute_NullRequest_ThrowsArgumentNullException()
     {
         // Arrange
         TestRequest requestData = null!;
@@ -231,7 +231,7 @@ public class DownStreamBrokerTests
         }
 
         // Assert
-        await Assert.ThrowsAsync<ArgumentException>(Act);
+        await Assert.ThrowsAsync<ArgumentNullException>(Act);
     }
 
     [Fact]
@@ -277,7 +277,7 @@ public class DownStreamBrokerTests
     }
 
     [Fact]
-    public async Task Execute_NullRequestWithResponse_ThrowsArgumentException()
+    public async Task Execute_NullRequestWithResponse_ThrowsArgumentNullException()
     {
         // Arrange
         TestRequestWithResponse requestData = null!;
@@ -289,6 +289,6 @@ public class DownStreamBrokerTests
         }
 
         // Assert
-        await Assert.ThrowsAsync<ArgumentException>(Act);
+        await Assert.ThrowsAsync<ArgumentNullException>(Act);
     }
 }
