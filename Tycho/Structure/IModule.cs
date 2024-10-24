@@ -1,8 +1,8 @@
 ﻿using Tycho.Events.Routing;
+using Tycho.Modules;
 using Tycho.Requests;
-using Tycho.Structure;
 
-namespace Tycho.Modules
+namespace Tycho.Structure
 {
     /// <summary>
     ///     TODO

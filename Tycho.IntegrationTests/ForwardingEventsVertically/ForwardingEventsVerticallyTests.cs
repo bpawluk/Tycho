@@ -1,6 +1,6 @@
-﻿using Tycho.Apps;
-using Tycho.IntegrationTests._Utils;
+﻿using Tycho.IntegrationTests._Utils;
 using Tycho.IntegrationTests.ForwardingEventsVertically.SUT;
+using Tycho.Structure;
 
 namespace Tycho.IntegrationTests.ForwardingEventsVertically;
 

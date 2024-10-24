@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Apps.Setup;
+using Tycho.Structure;
 
 namespace Tycho.Apps
 {

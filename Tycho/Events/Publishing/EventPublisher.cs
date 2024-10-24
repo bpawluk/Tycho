@@ -28,7 +28,7 @@ namespace Tycho.Events.Publishing
         {
             if (eventData is null)
             {
-                throw new ArgumentException($"{nameof(eventData)} cannot be null", nameof(eventData));
+                throw new ArgumentNullException(nameof(eventData), $"{nameof(eventData)} cannot be null");
             }
 
             var handlerIdentities = _router.IdentifyHandlers<TEvent>();

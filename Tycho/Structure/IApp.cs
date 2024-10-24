@@ -1,7 +1,7 @@
-﻿using Tycho.Requests;
-using Tycho.Structure;
+﻿using Tycho.Apps;
+using Tycho.Requests;
 
-namespace Tycho.Apps
+namespace Tycho.Structure
 {
     /// <summary>
     ///     TODO

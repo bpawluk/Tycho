@@ -1,6 +1,6 @@
-﻿using Tycho.Apps;
-using Tycho.IntegrationTests._Utils;
+﻿using Tycho.IntegrationTests._Utils;
 using Tycho.IntegrationTests.SendingRequestsHorizontally.SUT;
+using Tycho.Structure;
 
 namespace Tycho.IntegrationTests.SendingRequestsHorizontally;
 

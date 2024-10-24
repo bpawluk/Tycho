@@ -1,4 +1,5 @@
 ﻿using Tycho.Modules;
+using Tycho.Structure;
 
 namespace Tycho.Requests.Handling
 {

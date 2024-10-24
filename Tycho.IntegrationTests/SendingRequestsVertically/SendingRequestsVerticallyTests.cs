@@ -1,6 +1,6 @@
-﻿using Tycho.Apps;
-using Tycho.IntegrationTests._Utils;
+﻿using Tycho.IntegrationTests._Utils;
 using Tycho.IntegrationTests.SendingRequestsVertically.SUT;
+using Tycho.Structure;
 
 namespace Tycho.IntegrationTests.SendingRequestsVertically;
 

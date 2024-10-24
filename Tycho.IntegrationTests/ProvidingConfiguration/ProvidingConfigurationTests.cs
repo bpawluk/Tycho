@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Tycho.Apps;
 using Tycho.IntegrationTests.ProvidingConfiguration.SUT;
 using Tycho.IntegrationTests.ProvidingConfiguration.SUT.Modules;
+using Tycho.Structure;
 
 namespace Tycho.IntegrationTests.ProvidingConfiguration;
 

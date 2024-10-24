@@ -33,7 +33,7 @@ namespace Tycho.Requests.Broker
         {
             if (requestData is null)
             {
-                throw new ArgumentException($"{nameof(requestData)} cannot be null", nameof(requestData));
+                throw new ArgumentNullException(nameof(requestData), $"{nameof(requestData)} cannot be null");
             }
 
             var registration = _internals.GetRequiredService<IUpStreamHandlerRegistration<TRequest>>();
@@ -45,7 +45,7 @@ namespace Tycho.Requests.Broker
         {
             if (requestData is null)
             {
-                throw new ArgumentException($"{nameof(requestData)} cannot be null", nameof(requestData));
+                throw new ArgumentNullException(nameof(requestData), $"{nameof(requestData)} cannot be null");
             }
 
             var registration = _internals.GetRequiredService<IUpStreamHandlerRegistration<TRequest, TResponse>>();

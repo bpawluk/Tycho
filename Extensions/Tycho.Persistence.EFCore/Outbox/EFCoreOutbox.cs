@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Tycho.Persistence.EFCore;
+namespace Tycho.Persistence.EFCore.Outbox;
 
-internal class Outbox : IOutbox
+internal class EFCoreOutbox : IOutbox
 {
     public event EventHandler? NewEntriesAdded;
 

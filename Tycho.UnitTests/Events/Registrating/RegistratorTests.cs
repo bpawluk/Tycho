@@ -4,7 +4,6 @@ using Tycho.Events;
 using Tycho.Events.Registrating;
 using Tycho.Events.Routing;
 using Tycho.Events.Routing.Sources;
-using Tycho.Modules;
 using Tycho.Structure;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;

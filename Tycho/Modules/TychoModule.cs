@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Routing;
 using Tycho.Modules.Setup;
 using Tycho.Requests.Broker;
+using Tycho.Structure;
 
 namespace Tycho.Modules
 {

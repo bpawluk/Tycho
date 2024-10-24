@@ -1,6 +1,6 @@
-﻿using Tycho.Apps;
-using Tycho.IntegrationTests._Utils;
+﻿using Tycho.IntegrationTests._Utils;
 using Tycho.IntegrationTests.ForwardingRequestsVertically.SUT;
+using Tycho.Structure;
 using static Tycho.IntegrationTests.ForwardingRequestsVertically.SUT.RequestToMapWithResponse;
 
 namespace Tycho.IntegrationTests.ForwardingRequestsVertically;

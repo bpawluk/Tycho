@@ -57,7 +57,24 @@ namespace Tycho.Events.Routing
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(ModuleId, HandlerId);
+            return HashCode.Combine(EventId, HandlerId, ModuleId);
+        }
+
+        public override string ToString()
+        {
+            return $"{EventId}-{HandlerId}-{ModuleId}";
+        }
+
+        public static HandlerIdentity FromString(string identity)
+        {
+            var parts = identity.Split('-');
+            if (parts.Length != 3)
+            {
+                throw new ArgumentException(
+                    $"Invalid format of identity string {identity}",
+                    nameof(identity));
+            }
+            return new HandlerIdentity(parts[0], parts[1], parts[2]);
         }
 
         public static bool operator !=(HandlerIdentity? left, HandlerIdentity? right)
@@ -80,11 +97,6 @@ namespace Tycho.Events.Routing
             return string.Equals(left.EventId, right.EventId, StringComparison.InvariantCulture) &&
                    string.Equals(left.HandlerId, right.HandlerId, StringComparison.InvariantCulture) &&
                    string.Equals(left.ModuleId, right.ModuleId, StringComparison.InvariantCulture);
-        }
-
-        public override string ToString()
-        {
-            return $"{EventId}-{HandlerId}-{ModuleId}";
         }
     }
 }

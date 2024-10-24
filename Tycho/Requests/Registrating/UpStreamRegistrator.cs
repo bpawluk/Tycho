@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Tycho.Modules;
 using Tycho.Requests.Handling;
 using Tycho.Requests.Registrating.Registrations;
+using Tycho.Structure;
 
 namespace Tycho.Requests.Registrating
 {
