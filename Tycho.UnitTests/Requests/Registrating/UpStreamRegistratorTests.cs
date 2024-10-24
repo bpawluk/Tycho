@@ -18,6 +18,8 @@ public class UpStreamRegistratorTests
     public UpStreamRegistratorTests()
     {
         _internals = new Internals(typeof(object));
+        _internals.GetServiceCollection()
+                  .AddSingleton(_internals);
         _sut = new Registrator(_internals);
     }
 
@@ -179,7 +181,7 @@ public class UpStreamRegistratorTests
         // Assert
         var registration = _internals.GetService<IUpStreamHandlerRegistration<TestRequest>>();
         Assert.NotNull(registration);
-        Assert.IsType<TestRequestHandler>(registration.Handler);
+        Assert.IsType<ScopedRequestHandler<TestRequest, TestRequestHandler>>(registration.Handler);
     }
 
     [Fact]
@@ -210,7 +212,7 @@ public class UpStreamRegistratorTests
         // Assert
         var registration = _internals.GetService<IUpStreamHandlerRegistration<TestRequestWithResponse, string>>();
         Assert.NotNull(registration);
-        Assert.IsType<TestRequestHandler>(registration.Handler);
+        Assert.IsType<ScopedRequestHandler<TestRequestWithResponse, string, TestRequestHandler>>(registration.Handler);
     }
 
     [Fact]

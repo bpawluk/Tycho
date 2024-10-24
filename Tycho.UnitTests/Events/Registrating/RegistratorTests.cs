@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Tycho.Events;
+using Tycho.Events.Handling;
 using Tycho.Events.Registrating;
 using Tycho.Events.Routing;
 using Tycho.Events.Routing.Sources;
@@ -161,9 +162,12 @@ public class RegistratorTests
         Assert.NotNull(source);
         Assert.IsType<LocalHandlersSource<TestEvent>>(source);
 
-        var handler = _internals.GetService<IEventHandler<TestEvent>>();
-        Assert.NotNull(handler);
-        Assert.IsType<TestEventHandler>(handler);
+        var scopedHandler = _internals.GetService<IEventHandler<TestEvent>>();
+        Assert.NotNull(scopedHandler);
+        Assert.IsType<ScopedEventHandler<TestEvent, TestEventHandler>>(scopedHandler);
+
+        var actualHandler = _internals.GetServices<TestEventHandler>();
+        Assert.NotNull(actualHandler);
     }
 
     [Fact]
@@ -173,7 +177,8 @@ public class RegistratorTests
         _internals.GetServiceCollection()
             .AddSingleton(_internals)
             .AddTransient<IHandlersSource, LocalHandlersSource<TestEvent>>()
-            .AddTransient<IEventHandler<TestEvent>, TestEventHandler>();
+            .AddTransient<IEventHandler<TestEvent>, ScopedEventHandler<TestEvent, TestEventHandler>>()
+            .AddScoped<TestEventHandler>();
 
         // Act
         _sut.HandleEvent<TestEvent, TestEventOtherHandler>();
@@ -182,7 +187,7 @@ public class RegistratorTests
         // Assert
         var handlers = _internals.GetServices<IEventHandler<TestEvent>>();
         Assert.Equal(2, handlers.Count());
-        Assert.Contains(handlers, handler => handler is TestEventOtherHandler);
+        Assert.Contains(handlers, handler => handler is ScopedEventHandler<TestEvent, TestEventOtherHandler>);
     }
 
     [Fact]
@@ -192,7 +197,8 @@ public class RegistratorTests
         _internals.GetServiceCollection()
             .AddSingleton(_internals)
             .AddTransient<IHandlersSource, LocalHandlersSource<TestEvent>>()
-            .AddTransient<IEventHandler<TestEvent>, TestEventHandler>();
+            .AddTransient<IEventHandler<TestEvent>, ScopedEventHandler<TestEvent, TestEventHandler>>()
+            .AddScoped<TestEventHandler>();
 
         // Act
         void Act() => _sut.HandleEvent<TestEvent, TestEventHandler>();

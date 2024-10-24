@@ -18,6 +18,8 @@ public class DownStreamRegistratorTests
     public DownStreamRegistratorTests()
     {
         _internals = new Internals(typeof(object));
+        _internals.GetServiceCollection()
+                  .AddSingleton(_internals);
         _sut = new Registrator(_internals);
     }
 
@@ -321,7 +323,7 @@ public class DownStreamRegistratorTests
         // Assert
         var registration = _internals.GetService<IDownStreamHandlerRegistration<TestRequest, OtherModule>>();
         Assert.NotNull(registration);
-        Assert.IsType<TestRequestHandler>(registration.Handler);
+        Assert.IsType<ScopedRequestHandler<TestRequest, TestRequestHandler>>(registration.Handler);
     }
 
     [Fact]
@@ -353,7 +355,7 @@ public class DownStreamRegistratorTests
         var registration = _internals.GetService<
             IDownStreamHandlerRegistration<TestRequestWithResponse, string, OtherModule>>();
         Assert.NotNull(registration);
-        Assert.IsType<TestRequestHandler>(registration.Handler);
+        Assert.IsType<ScopedRequestHandler<TestRequestWithResponse, string, TestRequestHandler>>(registration.Handler);
     }
 
     [Fact]
