@@ -9,8 +9,9 @@ namespace Tycho.UnitTests.Persistence;
 
 public sealed class OutboxProcessorTests : IDisposable
 {
+    private readonly Mock<IOutboxConsumer> _mockOutbox;
+    private readonly OutboxActivity _outboxActivity;
     private readonly Mock<IEntryProcessor> _mockEntryProcessor;
-    private readonly Mock<IOutbox> _mockOutbox;
     private readonly OutboxProcessorSettings _settings;
 
     private List<OutboxEntry> _entries = [];
@@ -22,7 +23,7 @@ public sealed class OutboxProcessorTests : IDisposable
     {
         var processedEntries = 0;
 
-        _mockOutbox = new Mock<IOutbox>();
+        _mockOutbox = new Mock<IOutboxConsumer>();
         _mockOutbox.Setup(o => o.Read(It.IsAny<int>(), It.IsAny<CTK>()))
                    .Callback(() => _iterations++)
                    .ReturnsAsync((int count, CTK _) =>
@@ -31,6 +32,8 @@ public sealed class OutboxProcessorTests : IDisposable
                        processedEntries += nextEntries.Length;
                        return nextEntries;
                    });
+
+        _outboxActivity = new OutboxActivity();
 
         _mockEntryProcessor = new Mock<IEntryProcessor>();
         _mockEntryProcessor.Setup(ep => ep.Process(It.IsAny<OutboxEntry>()))
@@ -45,7 +48,7 @@ public sealed class OutboxProcessorTests : IDisposable
             PollingIntervalMultiplier = 2
         };
 
-        _sut = new OutboxProcessor(_mockOutbox.Object, _mockEntryProcessor.Object, _settings);
+        _sut = new OutboxProcessor(_mockOutbox.Object, _outboxActivity, _mockEntryProcessor.Object, _settings);
     }
 
     private int ExpectedIterations => ExpectedProcessingIterations + ExpectedIdleIterations;
@@ -75,7 +78,7 @@ public sealed class OutboxProcessorTests : IDisposable
 
         // Act
         _sut.Initialize();
-        _mockOutbox.Raise(o => o.NewEntriesAdded += null, EventArgs.Empty);
+        _outboxActivity.NotifyNewEntriesAdded();
         await WaitForCompletion();
 
         // Assert
@@ -105,7 +108,7 @@ public sealed class OutboxProcessorTests : IDisposable
 
         // Act
         _sut.Initialize();
-        _mockOutbox.Raise(o => o.NewEntriesAdded += null, EventArgs.Empty);
+        _outboxActivity.NotifyNewEntriesAdded();
         await WaitForCompletion();
 
         // Assert
@@ -132,7 +135,7 @@ public sealed class OutboxProcessorTests : IDisposable
 
         // Act
         _sut.Initialize();
-        _mockOutbox.Raise(o => o.NewEntriesAdded += null, EventArgs.Empty);
+        _outboxActivity.NotifyNewEntriesAdded();
         await WaitForCompletion();
 
         // Assert
@@ -158,7 +161,7 @@ public sealed class OutboxProcessorTests : IDisposable
 
         // Act
         _sut.Initialize();
-        _mockOutbox.Raise(o => o.NewEntriesAdded += null, EventArgs.Empty);
+        _outboxActivity.NotifyNewEntriesAdded();
         await WaitNumberOfIterations(1);
 
         // Assert
@@ -181,7 +184,7 @@ public sealed class OutboxProcessorTests : IDisposable
 
         // Act
         _sut.Initialize();
-        _mockOutbox.Raise(o => o.NewEntriesAdded += null, EventArgs.Empty);
+        _outboxActivity.NotifyNewEntriesAdded();
         await WaitForCompletion();
 
         // Assert
@@ -206,7 +209,7 @@ public sealed class OutboxProcessorTests : IDisposable
 
         // Act
         _sut.Initialize();
-        _mockOutbox.Raise(o => o.NewEntriesAdded += null, EventArgs.Empty);
+        _outboxActivity.NotifyNewEntriesAdded();
         await WaitForCompletion();
 
         // Assert
@@ -232,7 +235,7 @@ public sealed class OutboxProcessorTests : IDisposable
 
         // Act
         _sut.Initialize();
-        _mockOutbox.Raise(o => o.NewEntriesAdded += null, EventArgs.Empty);
+        _outboxActivity.NotifyNewEntriesAdded();
         await WaitForCompletion();
 
         // Assert

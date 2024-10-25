@@ -36,5 +36,10 @@ namespace Tycho.Modules.Instance
         {
             return _requestBroker.Execute<TRequest, TResponse>(requestData, cancellationToken);
         }
+
+        public void Dispose()
+        {
+            _internals.Dispose();
+        }
     }
 }

@@ -8,7 +8,8 @@ namespace Tycho.Persistence.Processing
 {
     internal class OutboxProcessor : IDisposable
     {
-        private readonly IOutbox _eventOutbox;
+        private readonly IOutboxConsumer _eventOutbox;
+        private readonly OutboxActivity _outboxActivity;
         private readonly IEntryProcessor _entryProcessor;
         private readonly OutboxProcessorSettings _settings;
 
@@ -21,11 +22,13 @@ namespace Tycho.Persistence.Processing
         private TimeSpan _currentPollingInterval = Timeout.InfiniteTimeSpan;
 
         public OutboxProcessor(
-            IOutbox eventOutbox,
+            IOutboxConsumer eventOutbox,
+            OutboxActivity outboxActivity,
             IEntryProcessor entryProcessor,
             OutboxProcessorSettings settings)
         {
             _eventOutbox = eventOutbox;
+            _outboxActivity = outboxActivity;
             _settings = settings;
             _entryProcessor = entryProcessor;
 
@@ -37,12 +40,12 @@ namespace Tycho.Persistence.Processing
 
         public void Initialize()
         {
-            _eventOutbox.NewEntriesAdded += OnEntriesAdded;
+            _outboxActivity.NewEntriesAdded += OnEntriesAdded;
         }
 
         public void Dispose()
         {
-            _eventOutbox.NewEntriesAdded -= OnEntriesAdded;
+            _outboxActivity.NewEntriesAdded -= OnEntriesAdded;
             _processingSemaphore.Dispose();
             _timer.Dispose();
         }

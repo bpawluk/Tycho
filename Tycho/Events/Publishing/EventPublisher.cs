@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,21 +7,34 @@ using Tycho.Persistence;
 
 namespace Tycho.Events.Publishing
 {
-    internal class EventPublisher : IEventPublisher
+    internal class EventPublisher : IEventPublisher, IUncommittedEventPublisher
     {
-        private readonly IOutbox _outbox;
+        private readonly IOutboxWriter _outbox;
         private readonly IEventRouter _router;
         private readonly IPayloadSerializer _serializer;
 
-        public EventPublisher(IEventRouter router, IOutbox persistentOutbox, IPayloadSerializer serializer)
+        public EventPublisher(IEventRouter router, IOutboxWriter persistentOutbox, IPayloadSerializer serializer)
         {
             _router = router;
             _outbox = persistentOutbox;
             _serializer = serializer;
         }
 
-        public async Task Publish<TEvent>(
+        public Task Publish<TEvent>(TEvent eventData, CancellationToken cancellationToken)
+            where TEvent : class, IEvent
+        {
+            return Publish(eventData, true, cancellationToken);
+        }
+
+        public Task PublishWithoutCommitting<TEvent>(TEvent eventData, CancellationToken cancellationToken)
+            where TEvent : class, IEvent
+        {
+            return Publish(eventData, false, cancellationToken);
+        }
+
+        private async Task Publish<TEvent>(
             TEvent eventData,
+            bool shouldCommit,
             CancellationToken cancellationToken)
             where TEvent : class, IEvent
         {
@@ -35,16 +47,10 @@ namespace Tycho.Events.Publishing
 
             if (handlerIdentities.Count > 0)
             {
-                await AddOutboxEntries(handlerIdentities, eventData, cancellationToken).ConfigureAwait(false);
+                var serializedPayload = _serializer.Serialize(eventData);
+                var outboxEntries = handlerIdentities.Select(identity => new OutboxEntry(identity, serializedPayload));
+                await _outbox.Write(outboxEntries.ToArray(), shouldCommit, cancellationToken).ConfigureAwait(false);
             }
-        }
-
-        private async Task AddOutboxEntries(IReadOnlyCollection<HandlerIdentity> handlerIdentities, IEvent eventData,
-            CancellationToken cancellationToken)
-        {
-            var serializedPayload = _serializer.Serialize(eventData);
-            var outboxEntries = handlerIdentities.Select(identity => new OutboxEntry(identity, serializedPayload));
-            await _outbox.Add(outboxEntries.ToArray(), cancellationToken).ConfigureAwait(false);
         }
     }
 }

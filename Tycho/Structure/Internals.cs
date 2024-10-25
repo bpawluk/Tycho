@@ -4,10 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Tycho.Structure
 {
-    internal class Internals : IServiceProvider
+    internal class Internals : IServiceProvider, IDisposable
     {
-        private IServiceCollection? _serviceCollection = new ServiceCollection();
-        private IServiceProvider? _serviceProvider;
+        private ServiceCollection? _serviceCollection = new ServiceCollection();
+        private ServiceProvider? _serviceProvider;
 
         public Type Owner { get; }
 
@@ -55,6 +55,11 @@ namespace Tycho.Structure
             }
 
             return GetService(serviceType) != null;
+        }
+
+        public void Dispose()
+        {
+            _serviceProvider?.Dispose();
         }
     }
 }

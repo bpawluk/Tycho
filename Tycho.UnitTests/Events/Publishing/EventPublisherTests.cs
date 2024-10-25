@@ -11,7 +11,7 @@ namespace Tycho.UnitTests.Events.Publishing;
 
 public class EventPublisherTests
 {
-    private readonly Mock<IOutbox> _outboxMock;
+    private readonly Mock<IOutboxWriter> _outboxMock;
 
     private readonly HandlerIdentity[] _testIdentities =
     [
@@ -29,7 +29,7 @@ public class EventPublisherTests
         routerMock.Setup(r => r.IdentifyHandlers<OtherEvent>())
                   .Returns([]);
 
-        _outboxMock = new Mock<IOutbox>();
+        _outboxMock = new Mock<IOutboxWriter>();
 
         var serializerMock = new Mock<IPayloadSerializer>();
         serializerMock.Setup(s => s.Serialize(It.IsAny<IEvent>()))
@@ -50,12 +50,36 @@ public class EventPublisherTests
 
         // Assert
         _outboxMock.Verify(
-            o => o.Add(
+            o => o.Write(
                 It.Is<OutboxEntry[]>(entries =>
                     entries.Length == _testIdentities.Length &&
                     entries[0].HandlerIdentity == _testIdentities[0] &&
                     entries[1].HandlerIdentity == _testIdentities[1] &&
                     entries.All(entry => entry.Payload as string == SerializeMock(eventData))),
+                true,
+                cancellationToken),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task PublishWithoutCommitting_ForEventWithRegisteredHandlers_AddsOutboxEntries()
+    {
+        // Arrange
+        var eventData = new TestEvent();
+        var cancellationToken = CancellationToken.None;
+
+        // Act
+        await _sut.PublishWithoutCommitting(eventData, cancellationToken);
+
+        // Assert
+        _outboxMock.Verify(
+            o => o.Write(
+                It.Is<OutboxEntry[]>(entries =>
+                    entries.Length == _testIdentities.Length &&
+                    entries[0].HandlerIdentity == _testIdentities[0] &&
+                    entries[1].HandlerIdentity == _testIdentities[1] &&
+                    entries.All(entry => entry.Payload as string == SerializeMock(eventData))),
+                false,
                 cancellationToken),
             Times.Once);
     }
@@ -72,9 +96,29 @@ public class EventPublisherTests
 
         // Assert
         _outboxMock.Verify(
-            o => o.Add(
+            o => o.Write(
                 It.IsAny<IReadOnlyCollection<OutboxEntry>>(),
-                It.IsAny<CancellationToken>()),
+                true,
+                cancellationToken),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task PublishWithoutCommitting_ForEventWithNoHandlers_DoesNotAddAnyEntries()
+    {
+        // Arrange
+        var eventData = new OtherEvent();
+        var cancellationToken = CancellationToken.None;
+
+        // Act
+        await _sut.PublishWithoutCommitting(eventData, cancellationToken);
+
+        // Assert
+        _outboxMock.Verify(
+            o => o.Write(
+                It.IsAny<IReadOnlyCollection<OutboxEntry>>(),
+                false,
+                cancellationToken),
             Times.Never);
     }
 
@@ -89,6 +133,23 @@ public class EventPublisherTests
         async Task Act()
         {
             await _sut.Publish(eventData, cancellationToken);
+        }
+
+        // Assert
+        await Assert.ThrowsAsync<ArgumentNullException>(Act);
+    }
+
+    [Fact]
+    public async Task PublishWithoutCommitting_WithNullEventData_ThrowsArgumentNullException()
+    {
+        // Arrange
+        IEvent eventData = null!;
+        var cancellationToken = CancellationToken.None;
+
+        // Act
+        async Task Act()
+        {
+            await _sut.PublishWithoutCommitting(eventData, cancellationToken);
         }
 
         // Assert

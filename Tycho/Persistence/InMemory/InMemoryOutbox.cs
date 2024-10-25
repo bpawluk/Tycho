@@ -5,20 +5,25 @@ using System.Threading.Tasks;
 
 namespace Tycho.Persistence.InMemory
 {
-    internal class InMemoryOutbox : IOutbox
+    internal class InMemoryOutbox : IOutboxWriter, IOutboxConsumer
     {
-        private readonly Queue<OutboxEntry> _entries = new Queue<OutboxEntry>();
+        private readonly OutboxActivity _outboxActivity;
+        private readonly Queue<OutboxEntry> _entries;
 
-        public event EventHandler? NewEntriesAdded;
+        public InMemoryOutbox(OutboxActivity outboxActivity)
+        {
+            _outboxActivity = outboxActivity;
+            _entries = new Queue<OutboxEntry>();
+        }
 
-        public Task Add(IReadOnlyCollection<OutboxEntry> entries, CancellationToken cancellationToken)
+        public Task Write(IReadOnlyCollection<OutboxEntry> entries, bool _, CancellationToken cancellationToken)
         {
             foreach (var entry in entries)
             {
                 _entries.Enqueue(entry);
             }
 
-            NewEntriesAdded?.Invoke(this, EventArgs.Empty);
+            _outboxActivity.NotifyNewEntriesAdded();
             return Task.CompletedTask;
         }
 

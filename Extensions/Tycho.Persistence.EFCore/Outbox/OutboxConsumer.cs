@@ -5,14 +5,9 @@ using System.Threading.Tasks;
 
 namespace Tycho.Persistence.EFCore.Outbox;
 
-internal class EFCoreOutbox : IOutbox
+internal class OutboxConsumer(TychoDbContext dbContext) : IOutboxConsumer
 {
-    public event EventHandler? NewEntriesAdded;
-
-    public Task Add(IReadOnlyCollection<OutboxEntry> entries, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
+    private readonly TychoDbContext _dbContext = dbContext;
 
     public Task<IReadOnlyCollection<OutboxEntry>> Read(int count, CancellationToken cancellationToken)
     {

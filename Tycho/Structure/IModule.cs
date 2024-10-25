@@ -1,4 +1,5 @@
-﻿using Tycho.Events.Routing;
+﻿using System;
+using Tycho.Events.Routing;
 using Tycho.Modules;
 using Tycho.Requests;
 
@@ -7,7 +8,7 @@ namespace Tycho.Structure
     /// <summary>
     ///     TODO
     /// </summary>
-    public interface IModule : IRequestExecutor
+    public interface IModule : IRequestExecutor, IDisposable
     {
         internal Internals Internals { get; }
 
