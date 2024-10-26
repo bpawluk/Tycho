@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Tycho.Persistence.Processing
+namespace Tycho.Persistence
 {
-    internal class OutboxProcessorSettings
+    public class OutboxProcessorSettings
     {
         public int ConcurrencyLimit { get; set; } = 10;
 

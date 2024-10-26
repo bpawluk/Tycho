@@ -43,13 +43,6 @@ namespace Tycho.Persistence.Processing
             _outboxActivity.NewEntriesAdded += OnEntriesAdded;
         }
 
-        public void Dispose()
-        {
-            _outboxActivity.NewEntriesAdded -= OnEntriesAdded;
-            _processingSemaphore.Dispose();
-            _timer.Dispose();
-        }
-
         private void OnEntriesAdded(object _, EventArgs __)
         {
             ResetInterval();
@@ -145,6 +138,13 @@ namespace Tycho.Persistence.Processing
                 _currentPollingInterval = newInterval;
                 _timer.Change(_currentPollingInterval, _currentPollingInterval);
             }
+        }
+
+        public void Dispose()
+        {
+            _outboxActivity.NewEntriesAdded -= OnEntriesAdded;
+            _processingSemaphore.Dispose();
+            _timer.Dispose();
         }
     }
 }

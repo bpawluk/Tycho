@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Tycho.Apps.Routing;
 using Tycho.Events;
 using Tycho.Events.Publishing;
@@ -40,17 +41,17 @@ namespace Tycho.Apps.Setup
 
         public Task Build()
         {
-            _internals.GetServiceCollection()
-                .AddSingleton<OutboxProcessor>()
-                .AddSingleton<OutboxProcessorSettings>()
-                .AddSingleton<OutboxActivity>()
-                .AddSingleton<InMemoryOutbox>()
-                .AddTransient<IOutboxWriter>(sp => sp.GetRequiredService<InMemoryOutbox>())
-                .AddTransient<IOutboxConsumer>(sp => sp.GetRequiredService<InMemoryOutbox>())
-                .AddTransient<IEntryProcessor, EntryProcessor>()
-                .AddTransient<IPayloadSerializer, InMemoryPayloadSerializer>()
-                .AddTransient<IEventRouter, EventRouter>()
-                .AddTransient<IEventPublisher, EventPublisher>();
+            var services = _internals.GetServiceCollection();
+            services.TryAddSingleton<OutboxProcessorSettings>();
+            services.AddSingleton<OutboxProcessor>()
+                    .AddSingleton<OutboxActivity>()
+                    .AddSingleton<InMemoryOutbox>()
+                    .AddTransient<IOutboxWriter>(sp => sp.GetRequiredService<InMemoryOutbox>())
+                    .AddTransient<IOutboxConsumer>(sp => sp.GetRequiredService<InMemoryOutbox>())
+                    .AddTransient<IEntryProcessor, EntryProcessor>()
+                    .AddTransient<IPayloadSerializer, InMemoryPayloadSerializer>()
+                    .AddTransient<IEventRouter, EventRouter>()
+                    .AddTransient<IEventPublisher, EventPublisher>();
             _internals.InternalsBuilt += OnInternalsBuilt;
             return Task.CompletedTask;
         }

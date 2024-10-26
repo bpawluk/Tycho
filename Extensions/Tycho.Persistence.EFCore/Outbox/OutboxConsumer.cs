@@ -1,26 +1,72 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Tycho.Events.Routing;
 
 namespace Tycho.Persistence.EFCore.Outbox;
 
-internal class OutboxConsumer(TychoDbContext dbContext) : IOutboxConsumer
+internal class OutboxConsumer(OutboxConsumerSettings settings, TychoDbContext dbContext) : IOutboxConsumer
 {
+    private readonly OutboxConsumerSettings _settings = settings;
     private readonly TychoDbContext _dbContext = dbContext;
 
-    public Task<IReadOnlyCollection<OutboxEntry>> Read(int count, CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<OutboxEntry>> Read(int count, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var currentTime = DateTime.UtcNow;
+        var validProcessingThreshold = currentTime - _settings.ProcessingStateExpiration;
+        var outboxMessages = _dbContext.Set<OutboxMessage>();
+
+        var messagesToProcess = await outboxMessages
+            .Where(message =>
+                (message.State == MessageState.New) ||
+                (message.State == MessageState.Failed &&
+                 message.DeliveryCount < _settings.MaxDeliveryCount) ||
+                (message.State == MessageState.Processing &&
+                 message.DeliveryCount < _settings.MaxDeliveryCount &&
+                 message.Updated < validProcessingThreshold))
+            .OrderBy(message => message.Created)
+            .Take(count)
+            .ToArrayAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        foreach (var message in messagesToProcess)
+        {
+            message.State = MessageState.Processing;
+            message.Updated = currentTime;
+            message.DeliveryCount++;
+        }
+        await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        return messagesToProcess
+            .Select(message => new OutboxEntry(
+                HandlerIdentity.FromString(message.Handler), 
+                message.Payload))
+            .ToArray();
     }
 
-    public Task MarkAsProcessed(OutboxEntry entry, CancellationToken cancellationToken)
+    public async Task MarkAsProcessed(OutboxEntry entry, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var outboxMessages = _dbContext.Set<OutboxMessage>();
+        var message = await outboxMessages.FindAsync([entry.Id], cancellationToken).ConfigureAwait(false);
+        if (message != null)
+        {
+            outboxMessages.Remove(message);
+            await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        }
     }
 
-    public Task MarkAsFailed(OutboxEntry entry, CancellationToken cancellationToken)
+    public async Task MarkAsFailed(OutboxEntry entry, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var outboxMessages = _dbContext.Set<OutboxMessage>();
+        var message = await outboxMessages.FindAsync([entry.Id], cancellationToken).ConfigureAwait(false);
+        if (message != null)
+        {
+            message.State = MessageState.Failed;
+            message.Updated = DateTime.UtcNow;
+            await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        }
     }
 }

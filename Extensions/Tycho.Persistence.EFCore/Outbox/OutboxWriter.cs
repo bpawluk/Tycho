@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,8 +9,26 @@ internal class OutboxWriter(TychoDbContext dbContext, OutboxActivity outboxActiv
     private readonly TychoDbContext _dbContext = dbContext;
     private readonly OutboxActivity _outboxActivity = outboxActivity;
 
-    public Task Write(IReadOnlyCollection<OutboxEntry> entries, bool shouldCommit, CancellationToken cancellationToken)
+    public async Task Write(IReadOnlyCollection<OutboxEntry> entries, bool shouldCommit, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var outboxMessages = _dbContext.Set<OutboxMessage>();
+
+        foreach (var entry in entries)
+        {
+            var outboxMessage = new OutboxMessage
+            {
+                Id = entry.Id,
+                Handler = entry.HandlerIdentity.ToString(),
+                Payload = (entry.Payload as string)!,
+            };
+            await outboxMessages.AddAsync(outboxMessage, cancellationToken).ConfigureAwait(false);
+        }
+
+        if (shouldCommit)
+        {
+            await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        _outboxActivity.NotifyNewEntriesAdded();
     }
 }
