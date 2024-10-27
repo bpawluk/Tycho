@@ -42,6 +42,7 @@ internal class OutboxConsumer(OutboxConsumerSettings settings, TychoDbContext db
 
         return messagesToProcess
             .Select(message => new OutboxEntry(
+                message.Id,
                 HandlerIdentity.FromString(message.Handler), 
                 message.Payload))
             .ToArray();

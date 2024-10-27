@@ -143,8 +143,8 @@ namespace Tycho.Persistence.Processing
         public void Dispose()
         {
             _outboxActivity.NewEntriesAdded -= OnEntriesAdded;
-            _processingSemaphore.Dispose();
             _timer.Dispose();
+            _processingSemaphore.Dispose();
         }
     }
 }

@@ -59,6 +59,8 @@ namespace Tycho.Modules
             return Task.CompletedTask;
         }
 
+        // TODO: Cleanup
+
         internal TychoModule Configure(Action<IConfigurationBuilder> configurationDefinition)
         {
             _builder.WithConfiguration(configurationDefinition);

@@ -52,16 +52,22 @@ namespace Tycho.Modules.Setup
         public Task Build()
         {
             var services = _internals.GetServiceCollection();
+
+            if (!_internals.HasService<IOutboxWriter>() || !_internals.HasService<IOutboxConsumer>())
+            {
+                services.AddSingleton<InMemoryOutbox>()
+                        .AddTransient<IOutboxWriter>(sp => sp.GetRequiredService<InMemoryOutbox>())
+                        .AddTransient<IOutboxConsumer>(sp => sp.GetRequiredService<InMemoryOutbox>())
+                        .AddTransient<IPayloadSerializer, InMemoryPayloadSerializer>();
+            }
+
             services.TryAddSingleton<OutboxProcessorSettings>();
             services.AddSingleton<OutboxProcessor>()
                     .AddSingleton<OutboxActivity>()
-                    .AddSingleton<InMemoryOutbox>()
-                    .AddTransient<IOutboxWriter>(sp => sp.GetRequiredService<InMemoryOutbox>())
-                    .AddTransient<IOutboxConsumer>(sp => sp.GetRequiredService<InMemoryOutbox>())
                     .AddTransient<IEntryProcessor, EntryProcessor>()
-                    .AddTransient<IPayloadSerializer, InMemoryPayloadSerializer>()
                     .AddTransient<IEventRouter, EventRouter>()
                     .AddTransient<IEventPublisher, EventPublisher>();
+
             _internals.InternalsBuilt += OnInternalsBuilt;
             return Task.CompletedTask;
         }
