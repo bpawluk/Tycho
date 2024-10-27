@@ -15,7 +15,7 @@ public class SomeTests : IAsyncLifetime
     }
 
     [Fact(Timeout = 500)]
-    public async Task TychoEnables_ForwardingEvents_WithinHorizontalHierarchy()
+    public async Task TychoEnables_Something()
     {
         // Arrange
         var workflowId = "event-workflow";
