@@ -13,9 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tycho.Persistence.EFCore", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{F7B45DD8-65CA-4257-AA1F-187A33736F63}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tycho.Persistence.EFCore.UnitTests", "Extensions\Tycho.Persistence.EFCore.UnitTests\Tycho.Persistence.EFCore.UnitTests.csproj", "{ED0FBBCF-601A-4FC1-B6AF-F8609218479F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tycho.Persistence.EFCore.UnitTests", "Extensions\Tycho.Persistence.EFCore.UnitTests\Tycho.Persistence.EFCore.UnitTests.csproj", "{ED0FBBCF-601A-4FC1-B6AF-F8609218479F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tycho.Persistence.EFCore.IntegrationTests", "Extensions\Tycho.Persistence.EFCore.IntegrationTests\Tycho.Persistence.EFCore.IntegrationTests.csproj", "{7C0E4119-3D60-467F-A53B-A6B277551B07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tycho.Persistence.EFCore.IntegrationTests", "Extensions\Tycho.Persistence.EFCore.IntegrationTests\Tycho.Persistence.EFCore.IntegrationTests.csproj", "{7C0E4119-3D60-467F-A53B-A6B277551B07}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tycho.UseCaseTests", "Tycho.UseCaseTests\Tycho.UseCaseTests.csproj", "{243C36A4-7024-4412-97C6-C2F8EECB4C12}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,10 @@ Global
 		{7C0E4119-3D60-467F-A53B-A6B277551B07}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C0E4119-3D60-467F-A53B-A6B277551B07}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C0E4119-3D60-467F-A53B-A6B277551B07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{243C36A4-7024-4412-97C6-C2F8EECB4C12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{243C36A4-7024-4412-97C6-C2F8EECB4C12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{243C36A4-7024-4412-97C6-C2F8EECB4C12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{243C36A4-7024-4412-97C6-C2F8EECB4C12}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

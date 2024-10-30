@@ -4,6 +4,8 @@ using Tycho.Structure;
 
 namespace Tycho.Persistence.EFCore.IntegrationTests;
 
+// TODO: Remove the whole project
+
 public class SomeTests : IAsyncLifetime
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = new();

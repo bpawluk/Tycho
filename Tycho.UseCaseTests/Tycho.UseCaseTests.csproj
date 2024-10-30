@@ -13,8 +13,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.10" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
-    <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
       <PrivateAssets>all</PrivateAssets>
@@ -23,7 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Tycho.Persistence.EFCore\Tycho.Persistence.EFCore.csproj" />
+    <ProjectReference Include="..\Extensions\Tycho.Persistence.EFCore\Tycho.Persistence.EFCore.csproj" />
+    <ProjectReference Include="..\Tycho\Tycho.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,9 +32,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="UoW\" />
-    <Folder Include="Serialization\" />
-    <Folder Include="Outbox\" />
+    <Folder Include="OnlineStore\SUT\Modules\Basket\Domain\" />
+    <Folder Include="OnlineStore\SUT\Modules\Basket\Persistence\" />
+    <Folder Include="OnlineStore\SUT\Modules\Catalog\Domain\" />
+    <Folder Include="OnlineStore\SUT\Modules\Catalog\Persistence\" />
+    <Folder Include="OnlineStore\SUT\Modules\Inventory\Domain\" />
+    <Folder Include="OnlineStore\SUT\Modules\Inventory\Persistence\" />
+    <Folder Include="OnlineStore\SUT\Modules\Ordering\Domain\" />
+    <Folder Include="OnlineStore\SUT\Modules\Ordering\Persistence\" />
+    <Folder Include="_Utils\" />
   </ItemGroup>
 
 </Project>
