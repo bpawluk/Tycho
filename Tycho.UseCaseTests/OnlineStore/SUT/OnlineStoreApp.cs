@@ -1,7 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tycho.Apps;
-using Tycho.UseCaseTests.OnlineStore.SUT.Messaging;
+using Tycho.UseCaseTests.OnlineStore.SUT.Messaging.Forwarders;
+using Tycho.UseCaseTests.OnlineStore.SUT.Messaging.Handlers;
+using Tycho.UseCaseTests.OnlineStore.SUT.Messaging.Routers;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Events;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering;
@@ -30,6 +33,8 @@ public class OnlineStoreApp : TychoApp
     {
         app.RoutesInventoryEvents()
            .RoutesBasketEvents();
+
+        app.Handles<BasketItemAddedEvent, BasketItemAddedEventHandler>();
     }
 
     protected override void RegisterServices(IServiceCollection app) { }

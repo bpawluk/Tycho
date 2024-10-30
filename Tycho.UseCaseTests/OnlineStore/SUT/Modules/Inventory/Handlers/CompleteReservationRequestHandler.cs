@@ -1,5 +1,12 @@
-﻿namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Handlers;
+﻿using Tycho.Requests;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract;
 
-internal class CompleteReservationRequestHandler
+namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Handlers;
+
+internal class CompleteReservationRequestHandler : IRequestHandler<CompleteReservationRequest>
 {
+    public Task Handle(CompleteReservationRequest requestData, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
 }

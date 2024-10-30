@@ -1,5 +1,12 @@
-﻿namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Handlers;
+﻿using Tycho.Requests;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Requests;
 
-internal class ConfirmBasketItemRequestHandler
+namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Handlers;
+
+internal class ConfirmBasketItemRequestHandler : IRequestHandler<ConfirmBasketItemRequest>
 {
+    public Task Handle(ConfirmBasketItemRequest requestData, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
 }
