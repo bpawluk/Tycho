@@ -2,10 +2,14 @@
 
 public class OnlineStoreTests
 {
-    // Add Items To Catalog
-    // Stock Items
-    // Add Items To Basket
+    // Timse X:
+    // - CreateProductRequest
+    // - StockItemRequest
+    // Confirm with GetProductsRequest
+    // Times Y:
+    // - AddBasketItemRequest
+    // Confirm with GetProductsRequest
     // Checkout
     // Get Orders
-    // Get Items From Catalog
+    // Confirm with GetProductsRequest
 }

@@ -9,8 +9,6 @@ internal static class BasketRequestsForwarder
     public static IAppContract ForwardsBasketRequests(this IAppContract app)
     {
         app.Forwards<AddBasketItemRequest, BasketModule>()
-           .Forwards<ConfirmBasketItemRequest, BasketModule>()
-           .Forwards<DeclineBasketItemRequest, BasketModule>()
            .Forwards<CheckoutRequest, BasketModule>();
 
         return app;

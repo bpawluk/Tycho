@@ -8,9 +8,7 @@ internal static class InventoryRequestsForwarder
 {
     public static IAppContract ForwardsInventoryRequests(this IAppContract app)
     {
-        app.Forwards<StockItemRequest, InventoryModule>()
-           .Forwards<ReserveItemRequest, ReserveItemRequest.Response, InventoryModule>()
-           .Forwards<CompleteReservationRequest, InventoryModule>();
+        app.Forwards<StockItemRequest, InventoryModule>();
 
         return app;
     }
