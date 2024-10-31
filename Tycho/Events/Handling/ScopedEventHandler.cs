@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Structure;
@@ -10,6 +11,8 @@ namespace Tycho.Events.Handling
         where TEventHandler : IEventHandler<TEvent>
     {
         private readonly Internals _internals;
+
+        Type IEventHandler.HandlerType => typeof(TEventHandler);
 
         public ScopedEventHandler(Internals internals)
         {

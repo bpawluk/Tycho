@@ -17,6 +17,6 @@ internal static class InventoryEventsRouter
 
     private static ProductAvailabilityChangedEvent Map(StockLevelChangedEvent eventData)
     {
-        return new();
+        return new(eventData.ItemId, eventData.NewQuantity, eventData.Version);
     }
 }

@@ -46,6 +46,7 @@ public class ForwardingEventsVerticallyTests : IAsyncLifetime
 
     public Task DisposeAsync()
     {
+        _sut?.Dispose();
         return Task.CompletedTask;
     }
 }

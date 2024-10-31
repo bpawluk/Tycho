@@ -2,4 +2,9 @@
 
 namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Requests;
 
-public record AddBasketItemRequest() : IRequest;
+public record AddBasketItemRequest(
+    int CustomerId, 
+    int ProductId, 
+    uint Quantity, 
+    decimal Price) 
+    : IRequest;

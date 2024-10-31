@@ -2,7 +2,7 @@
 
 namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract;
 
-public record CreateProductRequest() : IRequest<CreateProductRequest.Response>
+public record CreateProductRequest(string Name, decimal Price) : IRequest<CreateProductRequest.Response>
 {
-    public record Response();
+    public record Response(int CreatedProductId);
 }

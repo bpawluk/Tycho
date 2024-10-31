@@ -25,7 +25,7 @@ namespace Tycho.Events.Routing.Sources
                     .GetServices<IEventHandler<TEvent>>()
                     .Select(handler => new HandlerIdentity(
                         typeof(TEvent),
-                        handler.GetType(),
+                        handler.HandlerType,
                         _internals.Owner))
                     .ToArray();
             }
@@ -39,7 +39,7 @@ namespace Tycho.Events.Routing.Sources
             {
                 var handler = _internals
                     .GetServices<IEventHandler<TEvent>>()
-                    .FirstOrDefault(handler => handlerIdentity.MatchesHandler(handler.GetType()));
+                    .FirstOrDefault(handler => handlerIdentity.MatchesHandler(handler.HandlerType));
 
                 if (handler is null)
                 {

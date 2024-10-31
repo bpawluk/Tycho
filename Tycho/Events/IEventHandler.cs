@@ -10,6 +10,8 @@ namespace Tycho.Events
     public interface IEventHandler
     {
         Type EventType { get; }
+
+        Type HandlerType { get; }
     }
 
     /// <summary>
@@ -19,6 +21,8 @@ namespace Tycho.Events
         where TEvent : class, IEvent
     {
         Type IEventHandler.EventType => typeof(TEvent);
+
+        Type IEventHandler.HandlerType => GetType();
 
         Task Handle(TEvent eventData, CancellationToken cancellationToken = default);
     }

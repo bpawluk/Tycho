@@ -2,4 +2,4 @@
 
 namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract;
 
-public record StockLevelChangedEvent() : IEvent;
+public record StockLevelChangedEvent(int ItemId, uint NewQuantity, uint Version) : IEvent;

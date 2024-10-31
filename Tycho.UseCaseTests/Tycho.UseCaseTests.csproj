@@ -32,15 +32,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="OnlineStore\SUT\Modules\Basket\Domain\" />
-    <Folder Include="OnlineStore\SUT\Modules\Basket\Persistence\" />
-    <Folder Include="OnlineStore\SUT\Modules\Catalog\Domain\" />
-    <Folder Include="OnlineStore\SUT\Modules\Catalog\Persistence\" />
-    <Folder Include="OnlineStore\SUT\Modules\Inventory\Domain\" />
-    <Folder Include="OnlineStore\SUT\Modules\Inventory\Persistence\" />
     <Folder Include="OnlineStore\SUT\Modules\Ordering\Domain\" />
     <Folder Include="OnlineStore\SUT\Modules\Ordering\Persistence\" />
-    <Folder Include="_Utils\" />
   </ItemGroup>
 
 </Project>

@@ -2,4 +2,8 @@
 
 namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Events;
 
-public record BasketItemAddedEvent() : IEvent;
+public record BasketItemAddedEvent(
+    int CustomerId,
+    int ProductId,
+    uint Quantity) 
+    : IEvent;

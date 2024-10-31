@@ -2,4 +2,4 @@
 
 namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract;
 
-public record StockItemRequest() : IRequest;
+public record StockItemRequest(int ItemId, uint Quantity) : IRequest;
