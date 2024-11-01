@@ -1,4 +1,5 @@
 ﻿using Tycho.Structure;
+using Tycho.UseCaseTests._Utils;
 using Tycho.UseCaseTests.OnlineStore.SUT;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract;
@@ -7,6 +8,7 @@ namespace Tycho.UseCaseTests.OnlineStore;
 
 public class OnlineStoreTests : IAsyncLifetime
 {
+    private readonly TestData _testData = new();
     private IApp _sut = null!;
 
     public async Task InitializeAsync()
@@ -14,46 +16,44 @@ public class OnlineStoreTests : IAsyncLifetime
        _sut = await new OnlineStoreApp().Run();
     }
 
-    // Times X:
-    // - CreateProductRequest
-    // - StockItemRequest
-    // Confirm with GetProductsRequest
-    // Times Y:
-    // - AddBasketItemRequest
-    // Confirm with GetProductsRequest
-    // Checkout
-    // Get Orders
-    // Confirm with GetProductsRequest
-
     [Fact(Timeout = 2500)]
     public async Task TychoUseCase_OnlineStoreApp_WorksCorrectly()
     {
-        await DefineStoreProducts();
-        await Task.Delay(1500);
+        await SetupProductCatalog();
+        await AssertEventually.True(async () => 
+        {
+            var getProductsRequest = new GetProductsRequest();
+            var response = await _sut.Execute<GetProductsRequest, GetProductsRequest.Response>(getProductsRequest);
+            return _testData.InitialProducts.Match(response);
+        });
+
+        await AddProductsToBasket();
+        // Confirm with GetProductsRequest
+
+        await Checkout();
+        // Confirm with Get Orders
+        // Confirm with GetProductsRequest
     }
 
-    private async Task DefineStoreProducts()
+    private async Task SetupProductCatalog()
     {
-        var createFirstProductRequest = new CreateProductRequest("A4 Printing Paper (500 Sheets)", 24.99M);
-        var firstResponse = await _sut.Execute<CreateProductRequest, CreateProductRequest.Response>(createFirstProductRequest);
+        foreach (var product in _testData.InitialProducts)
+        {
+            var createProductRequest = new CreateProductRequest(product.Name, product.Price);
+            var response = await _sut.Execute<CreateProductRequest, CreateProductRequest.Response>(createProductRequest);
+            product.Id = response.CreatedProductId;
 
-        var stockFirstProductRequest = new StockItemRequest(firstResponse.CreatedProductId, 100);
-        await _sut.Execute(stockFirstProductRequest);
-
-        var createSecondProductRequest = new CreateProductRequest("Legal Size Paper (500 Sheets)", 19.99M);
-        var secondResponse = await _sut.Execute<CreateProductRequest, CreateProductRequest.Response>(createSecondProductRequest);
-
-        var stockSecondProductRequest = new StockItemRequest(secondResponse.CreatedProductId, 75);
-        await _sut.Execute(stockSecondProductRequest);
-
-        var createThirdProductRequest = new CreateProductRequest("Heavyweight Cardstock (100 Sheets)", 29.99M);
-        var thirdResponse = await _sut.Execute<CreateProductRequest, CreateProductRequest.Response>(createThirdProductRequest);
-
-        var stockThirdProductRequest = new StockItemRequest(thirdResponse.CreatedProductId, 50);
-        await _sut.Execute(stockThirdProductRequest);
+            var stockProductRequest = new StockItemRequest(product.Id.Value, product.Quantity);
+            await _sut.Execute(stockProductRequest);
+        }
     }
 
-    private async Task AddBasketItems()
+    private async Task AddProductsToBasket()
+    {
+
+    }
+
+    private async Task Checkout()
     {
 
     }

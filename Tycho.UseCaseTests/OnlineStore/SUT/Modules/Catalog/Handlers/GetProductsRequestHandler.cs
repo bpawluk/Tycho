@@ -1,13 +1,22 @@
-﻿using Tycho.Requests;
+﻿using Microsoft.EntityFrameworkCore;
+using Tycho.Persistence.EFCore;
+using Tycho.Requests;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Domain;
 using static Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.GetProductsRequest;
 
 namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Handlers;
 
-internal class GetProductsRequestHandler : IRequestHandler<GetProductsRequest, Response>
+internal class GetProductsRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetProductsRequest, Response>
 {
-    public Task<Response> Handle(GetProductsRequest requestData, CancellationToken cancellationToken)
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
+    public async Task<Response> Handle(GetProductsRequest requestData, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var products = _unitOfWork.Set<Product>();
+        var responseProducts = await products
+            .Select(p => new Response.Product(p.Id, p.Name, p.Price, p.Availability.Quantity))
+            .ToListAsync(cancellationToken);
+        return new Response(responseProducts);
     }
 }
