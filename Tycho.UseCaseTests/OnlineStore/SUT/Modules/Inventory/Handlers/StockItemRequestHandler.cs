@@ -24,8 +24,8 @@ internal class StockItemRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler
             item.Stock(requestData.Quantity);
         }
 
-        var stockLevelChanged = new StockLevelChangedEvent(item.Id, item.StockLevel.Quantity, item.StockLevel.Version);
-        await _unitOfWork.Publish(stockLevelChanged, cancellationToken);
+        var itemAvailabilityChanged = new ItemAvailabilityChangedEvent(item.Id, item.Availability.Quantity, item.Availability.Version);
+        await _unitOfWork.Publish(itemAvailabilityChanged, cancellationToken);
 
         await _unitOfWork.SaveChanges(cancellationToken);
     }

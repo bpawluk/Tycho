@@ -13,16 +13,15 @@ internal class BasketDbContext : TychoDbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<BasketEntity>()
-            .OwnsMany(
-                basket => basket.Items, 
-                basketItem =>
-                {
-                    basketItem.ToTable($"{typeof(BasketItem).Name}s");
-                    basketItem.WithOwner()
-                              .HasForeignKey(BasketItemShadowProperties.BasketId);
-                    basketItem.HasKey(BasketItemShadowProperties.BasketId, nameof(BasketItem.ProductId));
-                });
+        modelBuilder.Entity<BasketEntity>().OwnsMany(
+            basket => basket.Items, 
+            basketItem =>
+            {
+                basketItem.ToTable($"{typeof(BasketItem).Name}s");
+                basketItem.WithOwner()
+                            .HasForeignKey(BasketItemShadowProperties.BasketId);
+                basketItem.HasKey(BasketItemShadowProperties.BasketId, nameof(BasketItem.ProductId));
+            });
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

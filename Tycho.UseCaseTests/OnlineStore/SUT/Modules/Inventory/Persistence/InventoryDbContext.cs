@@ -12,7 +12,17 @@ internal class InventoryDbContext : TychoDbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<Item>().OwnsOne(product => product.StockLevel);
+        modelBuilder.Entity<Item>().OwnsOne(item => item.Availability);
+
+        modelBuilder.Entity<Item>().OwnsMany(
+            item => item.Reservations,
+            reservation =>
+            {
+                reservation.ToTable($"{typeof(Reservation).Name}s");
+                reservation.WithOwner()
+                           .HasForeignKey(ReservationShadowProperties.ItemId);
+                reservation.HasKey(r => r.Code);
+            });
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -21,5 +31,10 @@ internal class InventoryDbContext : TychoDbContext
 
         var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "OnlineStore.Inventory.db");
         optionsBuilder.UseSqlite($"Data Source={dbPath}");
+    }
+
+    private static class ReservationShadowProperties
+    {
+        public const string ItemId = "ItemId";
     }
 }

@@ -2,7 +2,6 @@
 using Tycho.Persistence.EFCore;
 using Tycho.Requests;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Domain;
 using static Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.GetProductsRequest;
 
 namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Handlers;
@@ -13,9 +12,9 @@ internal class GetProductsRequestHandler(IUnitOfWork unitOfWork) : IRequestHandl
 
     public async Task<Response> Handle(GetProductsRequest requestData, CancellationToken cancellationToken)
     {
-        var products = _unitOfWork.Set<Product>();
+        var products = _unitOfWork.Set<Domain.Product>();
         var responseProducts = await products
-            .Select(p => new Response.Product(p.Id, p.Name, p.Price, p.Availability.Quantity))
+            .Select(p => new Product(p.Id, p.Name, p.Price, p.Availability.Quantity))
             .ToListAsync(cancellationToken);
         return new Response(responseProducts);
     }

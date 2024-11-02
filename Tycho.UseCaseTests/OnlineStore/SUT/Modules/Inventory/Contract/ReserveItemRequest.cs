@@ -2,7 +2,7 @@
 
 namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract;
 
-public record ReserveItemRequest() : IRequest<ReserveItemRequest.Response>
+public record ReserveItemRequest(string ReservationCode, int ItemId, uint Quantity) : IRequest<ReserveItemRequest.Response>
 {
-    public record Response();
+    public record Response(bool ReservationCreated);
 }

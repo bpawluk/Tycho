@@ -31,9 +31,4 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="OnlineStore\SUT\Modules\Ordering\Domain\" />
-    <Folder Include="OnlineStore\SUT\Modules\Ordering\Persistence\" />
-  </ItemGroup>
-
 </Project>

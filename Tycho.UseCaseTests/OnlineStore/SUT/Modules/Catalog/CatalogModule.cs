@@ -12,7 +12,10 @@ internal class CatalogModule : TychoModule
     protected override void DefineContract(IModuleContract module)
     {
         module.Handles<CreateProductRequest, CreateProductRequest.Response, CreateProductRequestHandler>()
-              .Handles<GetProductsRequest, GetProductsRequest.Response, GetProductsRequestHandler>();
+              .Handles<GetProductsRequest, GetProductsRequest.Response, GetProductsRequestHandler>()
+              .Handles<BuyProductRequest, BuyProductRequestHandler>();
+
+        module.Requires<AddProductToBasketRequest>();
     }
 
     protected override void IncludeModules(IModuleStructure module) { }

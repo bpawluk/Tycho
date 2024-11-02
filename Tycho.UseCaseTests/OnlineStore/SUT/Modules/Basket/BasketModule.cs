@@ -15,6 +15,7 @@ internal class BasketModule : TychoModule
         module.Handles<AddBasketItemRequest, AddBasketItemRequestHandler>()
               .Handles<ConfirmBasketItemRequest, ConfirmBasketItemRequestHandler>()
               .Handles<DeclineBasketItemRequest, DeclineBasketItemRequestHandler>()
+              .Handles<GetBasketRequest, GetBasketRequest.Response, GetBasketRequestHandler>()
               .Handles<CheckoutRequest, CheckoutRequestHandler>();
     }
 

@@ -29,4 +29,34 @@ internal class Basket(int customerId)
 
         TotalAmount += item.Price * item.Quantity;
     }
+
+    public void ConfirmItem(int productId)
+    {
+        var item = _items.FirstOrDefault(i => i.ProductId == productId);
+        if (item != null)
+        {
+            item.Confirm();
+        }
+    }
+
+    public void DeclineItem(int productId)
+    {
+        var item = _items.FirstOrDefault(i => i.ProductId == productId);
+        if (item != null)
+        {
+            item.Decline();
+        }
+    }
+
+    public void Checkout()
+    {
+        if (Items.All(item => item.Status == BasketItem.ItemStatus.Confirmed))
+        {
+            CheckedOut = true;
+        }
+        else
+        {
+            throw new InvalidOperationException("Tried checking out a basket with unconfirmed items");
+        }
+    }
 }

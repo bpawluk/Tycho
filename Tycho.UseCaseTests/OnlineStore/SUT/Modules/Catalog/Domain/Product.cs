@@ -17,4 +17,9 @@ internal class Product(string name, decimal price)
             Availability = availability;
         }
     }
+
+    public bool IsEnoughAvailable(uint requestedQuantity)
+    {
+        return Availability.Quantity >= requestedQuantity;
+    }
 }
