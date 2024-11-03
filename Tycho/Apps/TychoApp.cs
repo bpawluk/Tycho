@@ -72,7 +72,7 @@ namespace Tycho.Apps
             MapEvents(_builder.Events);
             IncludeModules(_builder.Structure);
 
-            var app = await _builder.Build();
+            var app = await _builder.Build().ConfigureAwait(false);
             await Startup(app.Internals).ConfigureAwait(false);
 
             return app;

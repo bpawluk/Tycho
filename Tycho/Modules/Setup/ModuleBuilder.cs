@@ -68,9 +68,9 @@ namespace Tycho.Modules.Setup
         {
             var module = (IModule)Activator.CreateInstance(_moduleType, _internals);
 
-            await Contract.Build();
-            await Events.Build();
-            await Structure.Build();
+            await Contract.Build().ConfigureAwait(false);
+            await Events.Build().ConfigureAwait(false);
+            await Structure.Build().ConfigureAwait(false);
             _internals.Build();
 
             return module;

@@ -48,7 +48,7 @@ namespace Tycho.Requests.Handling
         {
             var targetRequestData = _mapRequest(requestData);
             var targetRequestResponse = await _targetExecutor.Execute<TTargetRequest, TTargetResponse>(
-                targetRequestData, cancellationToken);
+                targetRequestData, cancellationToken).ConfigureAwait(false);
             return _mapResponse(targetRequestResponse);
         }
     }

@@ -89,7 +89,7 @@ namespace Tycho.Modules
             MapEvents(_builder.Events);
             IncludeModules(_builder.Structure);
 
-            var module = await _builder.Build();
+            var module = await _builder.Build().ConfigureAwait(false);
             await Startup(module.Internals).ConfigureAwait(false);
 
             return module;

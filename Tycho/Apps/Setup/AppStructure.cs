@@ -53,7 +53,7 @@ namespace Tycho.Apps.Setup
             var services = _internals.GetServiceCollection();
             await Task.WhenAll(_submodules.Values.Select(async module =>
             {
-                var runningModule = await module.Run();
+                var runningModule = await module.Run().ConfigureAwait(false);
                 var interfaceType = typeof(IModule<>).MakeGenericType(module.GetType());
                 services.AddSingleton(interfaceType, runningModule);
             })).ConfigureAwait(false);
