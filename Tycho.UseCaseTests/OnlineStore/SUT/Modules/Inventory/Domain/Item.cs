@@ -1,25 +1,16 @@
 ﻿namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Domain;
 
-internal class Item
+internal class Item(int id, uint stockLevel)
 {
     public List<Reservation> _reservations = [];
 
-    public int Id { get; private set; }
+    public int Id { get; private set; } = id;
 
-    public uint StockLevel { get; private set; }
+    public uint StockLevel { get; private set; } = stockLevel;
+
+    public Availability Availability { get; private set; } = new(stockLevel, 1);
 
     public IReadOnlyList<Reservation> Reservations => _reservations;
-
-    public Availability Availability { get; private set; } = default!;
-
-    private Item() { }
-
-    public Item(int id, uint initialQuantity)
-    {
-        Id = id;
-        StockLevel = initialQuantity;
-        Availability = new(initialQuantity, 1);
-    }
 
     public void Stock(uint quantity)
     {
@@ -27,16 +18,16 @@ internal class Item
         RecalculateAvailability();
     }
 
-    public bool Reserve(string reservationCode, uint quantity)
+    public bool Reserve(string reservationCode, uint requestedQuantity)
     {
         if (Reservations.Any(reservation => reservation.Code == reservationCode))
         {
             return true;
         }
 
-        if (Availability.Quantity >= quantity)
+        if (Availability.Quantity >= requestedQuantity)
         {
-            var newReservation = new Reservation(reservationCode, Id, quantity);
+            var newReservation = new Reservation(reservationCode, Id, requestedQuantity);
             _reservations.Add(newReservation);
             RecalculateAvailability();
             return true;

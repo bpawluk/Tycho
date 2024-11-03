@@ -1,8 +1,9 @@
 ﻿using Tycho.Persistence.EFCore;
 using Tycho.Requests;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Incoming;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Outgoing;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Domain;
-using static Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.ReserveItemRequest;
+using static Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Incoming.ReserveItemRequest;
 
 namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Handlers;
 

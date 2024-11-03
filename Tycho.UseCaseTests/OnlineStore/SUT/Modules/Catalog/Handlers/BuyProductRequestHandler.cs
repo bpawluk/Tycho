@@ -1,7 +1,8 @@
 ﻿using Tycho.Persistence.EFCore;
 using Tycho.Requests;
 using Tycho.Structure;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Outgoing;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Domain;
 
 namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Handlers;

@@ -1,7 +1,7 @@
 ﻿using Tycho.Persistence.EFCore;
 using Tycho.Requests;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Events;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Requests;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Outgoing;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Domain;
 
 namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Handlers;
@@ -16,11 +16,7 @@ internal class CheckoutRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<
         var customerBasket = await basketProvider.GetBasket(requestData.CustomerId, cancellationToken);
         customerBasket.Checkout();
 
-        var basketCheckedOutEvent = new BasketCheckedOutEvent(
-            requestData.CustomerId, 
-            customerBasket.Items
-                .Select(item => new BasketCheckedOutEvent.BasketItem(item.ProductId, item.Quantity, item.Price))
-                .ToArray());
+        var basketCheckedOutEvent = new BasketCheckedOutEvent(customerBasket.CustomerId, customerBasket.TotalAmount);
         await _unitOfWork.Publish(basketCheckedOutEvent, cancellationToken);
 
         await _unitOfWork.SaveChanges(cancellationToken);

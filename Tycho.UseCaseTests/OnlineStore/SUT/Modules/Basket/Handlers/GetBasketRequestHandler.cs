@@ -1,8 +1,8 @@
 ﻿using Tycho.Persistence.EFCore;
 using Tycho.Requests;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Requests;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Domain;
-using static Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Requests.GetBasketRequest;
+using static Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming.GetBasketRequest;
 
 namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Handlers;
 

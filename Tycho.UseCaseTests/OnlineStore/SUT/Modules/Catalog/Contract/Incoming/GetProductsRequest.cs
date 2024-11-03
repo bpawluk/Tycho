@@ -1,6 +1,6 @@
 ﻿using Tycho.Requests;
 
-namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract;
+namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming;
 
 public record GetProductsRequest() : IRequest<GetProductsRequest.Response>
 {

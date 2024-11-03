@@ -15,7 +15,7 @@ internal class GetOrdersRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler
         var orders = _unitOfWork.Set<Domain.Order>();
         var result = await orders
             .Select(order => new Order(order.Id, order.CustomerId, order.Total))
-            .ToListAsync(cancellationToken);
+            .ToArrayAsync(cancellationToken);
         return new Response(result);
     }
 }

@@ -12,12 +12,8 @@ internal class OrderPlacedEventHandler(IUnitOfWork unitOfWork) : IEventHandler<O
     public async Task Handle(OrderPlacedEvent eventData, CancellationToken cancellationToken)
     {
         var orders = _unitOfWork.Set<Order>();
-
-        var newOrder = new Order(
-            eventData.CustomerId, 
-            eventData.Items.Sum(item => item.Price * item.Quantity));
+        var newOrder = new Order(eventData.CustomerId, eventData.Total);
         orders.Add(newOrder);
-
         await _unitOfWork.SaveChanges(cancellationToken);
     }
 }

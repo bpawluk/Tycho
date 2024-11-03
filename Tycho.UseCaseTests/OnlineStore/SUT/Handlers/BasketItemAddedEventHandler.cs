@@ -1,10 +1,10 @@
 ﻿using Tycho.Events;
 using Tycho.Structure;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Events;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Requests;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Outgoing;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Incoming;
 
 namespace Tycho.UseCaseTests.OnlineStore.SUT.Handlers;
 

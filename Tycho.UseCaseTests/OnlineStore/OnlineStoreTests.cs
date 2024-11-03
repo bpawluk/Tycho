@@ -1,9 +1,9 @@
 ﻿using Tycho.Structure;
 using Tycho.UseCaseTests._Utils;
 using Tycho.UseCaseTests.OnlineStore.SUT;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Requests;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Incoming;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract;
 
 namespace Tycho.UseCaseTests.OnlineStore;

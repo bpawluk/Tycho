@@ -1,25 +1,23 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Tycho.Persistence.EFCore;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Domain;
-using BasketEntity = Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Domain.Basket;
 
 namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Persistence;
 
 internal class BasketDbContext : TychoDbContext
 {
-    public DbSet<BasketEntity> Baskets { get; set; }
+    public DbSet<Domain.Basket> Baskets { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<BasketEntity>().OwnsMany(
+        modelBuilder.Entity<Domain.Basket>().OwnsMany(
             basket => basket.Items, 
             basketItem =>
             {
                 basketItem.ToTable($"{typeof(BasketItem).Name}s");
-                basketItem.WithOwner()
-                            .HasForeignKey(BasketItemShadowProperties.BasketId);
+                basketItem.WithOwner().HasForeignKey(BasketItemShadowProperties.BasketId);
                 basketItem.HasKey(BasketItemShadowProperties.BasketId, nameof(BasketItem.ProductId));
             });
     }

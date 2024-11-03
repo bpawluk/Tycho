@@ -19,8 +19,7 @@ internal class InventoryDbContext : TychoDbContext
             reservation =>
             {
                 reservation.ToTable($"{typeof(Reservation).Name}s");
-                reservation.WithOwner()
-                           .HasForeignKey(ReservationShadowProperties.ItemId);
+                reservation.WithOwner().HasForeignKey(ReservationShadowProperties.ItemId);
                 reservation.HasKey(r => r.Code);
             });
     }

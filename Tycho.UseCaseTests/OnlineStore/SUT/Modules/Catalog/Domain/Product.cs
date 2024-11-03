@@ -10,11 +10,11 @@ internal class Product(string name, decimal price)
 
     public ProductAvailability Availability { get; private set; } = new(0, 0);
 
-    public void UpdateAvailability(ProductAvailability availability)
+    public void UpdateAvailability(ProductAvailability newAvailability)
     {
-        if (availability.Version > Availability.Version)
+        if (newAvailability.Version > Availability.Version)
         {
-            Availability = availability;
+            Availability = newAvailability;
         }
     }
 

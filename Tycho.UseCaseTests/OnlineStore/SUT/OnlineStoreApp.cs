@@ -3,12 +3,14 @@ using Tycho.Apps;
 using Tycho.UseCaseTests.OnlineStore.SUT.Handlers;
 using Tycho.UseCaseTests.OnlineStore.SUT.Mappers;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Events;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Requests;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Outgoing;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Outgoing;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Incoming;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Outgoing;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract;
 
