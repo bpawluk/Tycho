@@ -2,6 +2,4 @@
 
 namespace Tycho.UnitTests._Data.Requests;
 
-public class TestRequest : IRequest
-{
-}
+public record TestRequest : IRequest;

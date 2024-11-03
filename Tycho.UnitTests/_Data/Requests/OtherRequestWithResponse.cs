@@ -2,6 +2,4 @@
 
 namespace Tycho.UnitTests._Data.Requests;
 
-public class OtherRequestWithResponse : IRequest<string>
-{
-}
+public record OtherRequestWithResponse : IRequest<string>;
