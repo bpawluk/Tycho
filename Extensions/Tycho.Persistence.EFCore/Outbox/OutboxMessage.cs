@@ -28,7 +28,7 @@ internal class OutboxMessage
     public DateTime Updated { get; set; } = DateTime.UtcNow;
 
     [Required]
-    public int DeliveryCount { get; set; } = 0;
+    public uint DeliveryCount { get; set; } = 0;
 }
 
 internal enum MessageState
