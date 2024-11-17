@@ -3,6 +3,9 @@ using Tycho.Persistence.EFCore.Outbox;
 
 namespace Tycho.Persistence.EFCore;
 
+/// <summary>
+///     TODO
+/// </summary>
 public class TychoDbContext : DbContext
 {
     public TychoDbContext() : base() { }

@@ -4,6 +4,9 @@ using Tycho.Modules;
 
 namespace Tycho.Apps.Routing
 {
+    /// <summary>
+    ///     TODO
+    /// </summary>
     public interface IEventRouting<TEvent>
         where TEvent : class, IEvent
     {

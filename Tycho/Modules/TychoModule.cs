@@ -10,7 +10,7 @@ using Tycho.Structure;
 namespace Tycho.Modules
 {
     /// <summary>
-    ///     TODO
+    /// Base class for defining a Tycho module
     /// </summary>
     public abstract class TychoModule
     {
@@ -20,7 +20,7 @@ namespace Tycho.Modules
         private bool _wasAlreadyRun = false;
 
         /// <summary>
-        ///     TODO
+        /// Configuration defined for the module
         /// </summary>
         protected IConfiguration Configuration => _builder.Configuration ??
             throw new InvalidOperationException("Configuration not yet available");
@@ -32,34 +32,40 @@ namespace Tycho.Modules
         }
 
         /// <summary>
-        ///     TODO
+        /// Use this method to define requests handled and required by the module
         /// </summary>
+        /// <param name="module">An interface to define the requests</param>
         protected abstract void DefineContract(IModuleContract module);
 
         /// <summary>
-        ///     TODO
+        /// Use this method to define submodules used by the module
         /// </summary>
+        /// <param name="module">An interface to define the submodules</param>
         protected abstract void IncludeModules(IModuleStructure module);
 
         /// <summary>
-        ///     TODO
+        /// Use this method to define events handled and routed by the module
         /// </summary>
+        /// <param name="module">An interface to define the events</param>
         protected abstract void MapEvents(IModuleEvents module);
 
         /// <summary>
-        ///     TODO
+        /// Use this method to define services required by the module
         /// </summary>
+        /// <param name="module">An interface to define the services</param>
         protected abstract void RegisterServices(IServiceCollection module);
 
         /// <summary>
-        ///     TODO
+        /// Override this method if you need to execute code before the module runs
         /// </summary>
+        /// <param name="module">A provider of the services configured for the module</param>
         protected virtual Task Startup(IServiceProvider module)
         {
             return Task.CompletedTask;
         }
 
-        // TODO: Cleanup
+        // TODO:
+        // protected virtual Task Cleanup(IServiceProvider module) { }
 
         internal TychoModule Configure(Action<IConfigurationBuilder> configurationDefinition)
         {

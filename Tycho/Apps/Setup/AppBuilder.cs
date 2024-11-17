@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Apps.Instance;
 using Tycho.Structure;
@@ -11,10 +10,6 @@ namespace Tycho.Apps.Setup
     {
         private readonly Type _appType;
         private readonly Internals _internals;
-
-        private Action<IConfigurationBuilder>? _configurationDefinition;
-
-        public IConfiguration? Configuration { get; private set; }
 
         public IServiceCollection Services => _internals.GetServiceCollection();
 
@@ -33,19 +28,9 @@ namespace Tycho.Apps.Setup
             Structure = new AppStructure(_internals);
         }
 
-        public void WithConfiguration(Action<IConfigurationBuilder> configurationDefinition)
-        {
-            _configurationDefinition = configurationDefinition;
-        }
-
         public void Init()
         {
-            var configurationBuilder = new ConfigurationBuilder();
-            _configurationDefinition?.Invoke(configurationBuilder);
-            Configuration = configurationBuilder.Build();
-
             _internals.GetServiceCollection()
-                .AddSingleton(Configuration)
                 .AddSingleton(_internals);
         }
 

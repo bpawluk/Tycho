@@ -2,6 +2,9 @@
 
 namespace Tycho.Persistence
 {
+    /// <summary>
+    ///     TODO
+    /// </summary>
     public class OutboxProcessorSettings
     {
         public int ConcurrencyLimit { get; set; } = 10;

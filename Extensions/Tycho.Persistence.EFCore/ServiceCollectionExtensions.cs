@@ -7,6 +7,9 @@ using Tycho.Persistence.EFCore.UoW;
 
 namespace Tycho.Persistence.EFCore;
 
+/// <summary>
+///     TODO
+/// </summary>
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddTychoPersistence<TDbContext>(this IServiceCollection services)
