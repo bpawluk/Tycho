@@ -12,13 +12,13 @@ internal class GetCommentsRequestHandler(IUnitOfWork unitOfWork) : IRequestHandl
 
     public async Task<Response> Handle(GetCommentsRequest requestData, CancellationToken cancellationToken)
     {
-        var articles = _unitOfWork.Set<Domain.Comment>();
-        var responseComments = await articles
-            .Where(article => requestData.CommentIds.Contains(article.Id))
-            .Select(article => new Comment(
-                article.Id,
-                article.Author,
-                article.Content))
+        var posts = _unitOfWork.Set<Domain.Comment>();
+        var responseComments = await posts
+            .Where(post => requestData.CommentIds.Contains(post.Id))
+            .Select(post => new Comment(
+                post.Id,
+                post.Author,
+                post.Content))
             .ToArrayAsync(cancellationToken);
         return new Response(responseComments);
     }

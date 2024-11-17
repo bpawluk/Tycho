@@ -12,9 +12,9 @@ internal class AddPostRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<A
 
     public async Task<Response> Handle(AddPostRequest requestData, CancellationToken cancellationToken)
     {
-        var articles = _unitOfWork.Set<Post>();
+        var posts = _unitOfWork.Set<Post>();
         var newPost = new Post(requestData.Author, requestData.Content);
-        articles.Add(newPost);
+        posts.Add(newPost);
         await _unitOfWork.SaveChanges(cancellationToken);
         return new Response(newPost.Id);
     }

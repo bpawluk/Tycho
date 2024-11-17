@@ -21,7 +21,7 @@ internal class OutboxWriter(TychoDbContext dbContext, OutboxActivity outboxActiv
                 Handler = entry.HandlerIdentity.ToString(),
                 Payload = (entry.Payload as string)!,
             };
-            await outboxMessages.AddAsync(outboxMessage, cancellationToken).ConfigureAwait(false);
+            outboxMessages.Add(outboxMessage);
         }
 
         if (shouldCommit)

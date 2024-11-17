@@ -12,13 +12,13 @@ internal class GetPostsRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<
 
     public async Task<Response> Handle(GetPostsRequest requestData, CancellationToken cancellationToken)
     {
-        var articles = _unitOfWork.Set<Domain.Post>();
-        var responsePosts = await articles
-            .Where(article => requestData.PostIds.Contains(article.Id))
-            .Select(article => new Post(
-                article.Id,
-                article.Author,
-                article.Content))
+        var posts = _unitOfWork.Set<Domain.Post>();
+        var responsePosts = await posts
+            .Where(post => requestData.PostIds.Contains(post.Id))
+            .Select(post => new Post(
+                post.Id,
+                post.Author,
+                post.Content))
             .ToArrayAsync(cancellationToken);
         return new Response(responsePosts);
     }

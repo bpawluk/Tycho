@@ -12,9 +12,9 @@ internal class AddCommentRequestHandler(IUnitOfWork unitOfWork) : IRequestHandle
 
     public async Task<Response> Handle(AddCommentRequest requestData, CancellationToken cancellationToken)
     {
-        var articles = _unitOfWork.Set<Comment>();
+        var comments = _unitOfWork.Set<Comment>();
         var newComment = new Comment(requestData.Author, requestData.Content);
-        articles.Add(newComment);
+        comments.Add(newComment);
         await _unitOfWork.SaveChanges(cancellationToken);
         return new Response(newComment.Id);
     }

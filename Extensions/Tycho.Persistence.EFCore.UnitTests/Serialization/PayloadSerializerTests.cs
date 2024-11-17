@@ -86,8 +86,7 @@ public class PayloadSerializerTests
         // Act
         void Act()
         {
-            var result = _sut.Deserialize(typeof(TestEvent), payload);
-            var i = 0;
+            _sut.Deserialize(typeof(TestEvent), payload);
         }
 
         // Assert

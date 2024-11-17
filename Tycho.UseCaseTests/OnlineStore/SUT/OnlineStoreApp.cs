@@ -34,11 +34,11 @@ public class OnlineStoreApp : TychoApp
 
     protected override void IncludeModules(IAppStructure app)
     {
-        app.Uses<CatalogModule>(contract => 
+        app.Uses<CatalogModule>(outgoingRequests => 
         {
-            contract.ForwardAs<
-                AddProductToBasketRequest, 
-                AddBasketItemRequest, 
+            outgoingRequests.ForwardAs<
+                AddProductToBasketRequest,
+                AddBasketItemRequest,
                 BasketModule>(RequestMapper.Map);
         });
 

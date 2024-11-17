@@ -48,13 +48,13 @@ public class OutboxWriterTests
         await _sut.Write(entries, shouldCommit, cancellationToken);
 
         // Assert
-        _dbSetMock.Verify(db => db.AddAsync(It.IsAny<OutboxMessage>(), cancellationToken), Times.Exactly(entries.Count));
+        _dbSetMock.Verify(db => db.Add(It.IsAny<OutboxMessage>()), Times.Exactly(entries.Count));
         foreach (var entry in entries)
         {
-            _dbSetMock.Verify(db => db.AddAsync(It.Is<OutboxMessage>(m =>
+            _dbSetMock.Verify(db => db.Add(It.Is<OutboxMessage>(m =>
                 m.Id == entry.Id &&
                 m.Handler == entry.HandlerIdentity.ToString() &&
-                m.Payload == (entry.Payload as string)!), cancellationToken), Times.Once);
+                m.Payload == (entry.Payload as string)!)), Times.Once);
         }
         _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), shouldCommit ? Times.Once : Times.Never);
         Assert.Equal(1, _outboxActivityNotiicationCount);
