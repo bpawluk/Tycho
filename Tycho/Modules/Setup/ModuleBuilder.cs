@@ -11,10 +11,11 @@ namespace Tycho.Modules.Setup
 {
     internal class ModuleBuilder
     {
-        private readonly Internals _internals;
         private readonly Type _moduleType;
+        private readonly Internals _internals;
 
         private Action<IConfigurationBuilder>? _configurationDefinition;
+        private Func<IServiceProvider, Task>? _cleanup;
 
         public IConfiguration? Configuration { get; private set; }
 
@@ -38,6 +39,11 @@ namespace Tycho.Modules.Setup
         public void WithConfiguration(Action<IConfigurationBuilder> configurationDefinition)
         {
             _configurationDefinition = configurationDefinition;
+        }
+
+        public void WithCleanup(Func<IServiceProvider, Task> cleanup)
+        {
+            _cleanup = cleanup;
         }
 
         public void WithContractFulfillment(IRequestBroker contractFulfillingBroker)
@@ -66,7 +72,7 @@ namespace Tycho.Modules.Setup
 
         public async Task<IModule> Build()
         {
-            var module = (IModule)Activator.CreateInstance(_moduleType, _internals);
+            var module = (IModule)Activator.CreateInstance(_moduleType, _internals, _cleanup);
 
             await Contract.Build().ConfigureAwait(false);
             await Events.Build().ConfigureAwait(false);

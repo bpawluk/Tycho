@@ -11,6 +11,8 @@ namespace Tycho.Apps.Setup
         private readonly Type _appType;
         private readonly Internals _internals;
 
+        private Func<IServiceProvider, Task>? _cleanup;
+
         public IServiceCollection Services => _internals.GetServiceCollection();
 
         public AppContract Contract { get; }
@@ -28,15 +30,19 @@ namespace Tycho.Apps.Setup
             Structure = new AppStructure(_internals);
         }
 
+        public void WithCleanup(Func<IServiceProvider, Task> cleanup)
+        {
+            _cleanup = cleanup;
+        }
+
         public void Init()
         {
-            _internals.GetServiceCollection()
-                .AddSingleton(_internals);
+            _internals.GetServiceCollection().AddSingleton(_internals);
         }
 
         public async Task<IApp> Build()
         {
-            var app = (IApp)Activator.CreateInstance(_appType, _internals);
+            var app = (IApp)Activator.CreateInstance(_appType, _internals, _cleanup);
 
             await Contract.Build().ConfigureAwait(false);
             await Events.Build().ConfigureAwait(false);

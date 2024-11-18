@@ -55,8 +55,14 @@ namespace Tycho.Apps
             return Task.CompletedTask;
         }
 
-        // TODO:
-        // protected virtual Task Cleanup(IServiceProvider app) { }
+        /// <summary>
+        /// Override this method if you need to execute code before the application is disposed
+        /// </summary>
+        /// <param name="app">A provider of the services configured for the application</param>
+        protected virtual Task Cleanup(IServiceProvider app) 
+        {
+            return Task.CompletedTask;
+        }
 
         /// <summary>
         /// Builds the application according to the definition and runs it
@@ -72,6 +78,7 @@ namespace Tycho.Apps
             DefineContract(_builder.Contract);
             MapEvents(_builder.Events);
             IncludeModules(_builder.Structure);
+            _builder.WithCleanup(Cleanup);
 
             var app = await _builder.Build().ConfigureAwait(false);
             await Startup(app.Internals).ConfigureAwait(false);

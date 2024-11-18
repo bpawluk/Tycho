@@ -1,5 +1,7 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Routing;
 using Tycho.Requests;
 using Tycho.Requests.Broker;
@@ -10,17 +12,20 @@ namespace Tycho.Modules.Instance
     internal class Module<TModuleDefinition> : IModule<TModuleDefinition>
         where TModuleDefinition : TychoModule
     {
-        private readonly IEventRouter _eventRouter;
         private readonly Internals _internals;
+        private readonly Func<IServiceProvider, Task> _cleanup;
+
         private readonly UpStreamBroker _requestBroker;
+        private readonly IEventRouter _eventRouter;
 
         Internals IModule.Internals => _internals;
 
         IEventRouter IModule.EventRouter => _eventRouter;
 
-        public Module(Internals internals)
+        public Module(Internals internals, Func<IServiceProvider, Task> cleanup)
         {
             _internals = internals;
+            _cleanup = cleanup;
             _requestBroker = new UpStreamBroker(_internals);
             _eventRouter = new EventRouter(_internals);
         }
@@ -39,6 +44,11 @@ namespace Tycho.Modules.Instance
 
         public void Dispose()
         {
+            _cleanup(_internals);
+            foreach (var module in _internals.GetServices<IModule>())
+            {
+                module.Dispose();
+            }
             _internals.Dispose();
         }
     }

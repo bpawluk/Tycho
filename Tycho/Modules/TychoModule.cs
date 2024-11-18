@@ -64,8 +64,14 @@ namespace Tycho.Modules
             return Task.CompletedTask;
         }
 
-        // TODO:
-        // protected virtual Task Cleanup(IServiceProvider module) { }
+        /// <summary>
+        /// Override this method if you need to execute code before the module is disposed
+        /// </summary>
+        /// <param name="app">A provider of the services configured for the module</param>
+        protected virtual Task Cleanup(IServiceProvider app)
+        {
+            return Task.CompletedTask;
+        }
 
         internal TychoModule Configure(Action<IConfigurationBuilder> configurationDefinition)
         {
@@ -94,6 +100,7 @@ namespace Tycho.Modules
             DefineContract(_builder.Contract);
             MapEvents(_builder.Events);
             IncludeModules(_builder.Structure);
+            _builder.WithCleanup(Cleanup);
 
             var module = await _builder.Build().ConfigureAwait(false);
             await Startup(module.Internals).ConfigureAwait(false);
