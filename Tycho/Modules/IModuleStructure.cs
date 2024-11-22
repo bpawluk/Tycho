@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.Extensions.Configuration;
 
 namespace Tycho.Modules
 {
@@ -8,12 +7,18 @@ namespace Tycho.Modules
     /// </summary>
     public interface IModuleStructure
     {
-        /// <summary>
-        ///     TODO
-        /// </summary>
-        IModuleStructure Uses<TModule>(
-            Action<IContractFulfillment>? contractFulfillment = null,
-            Action<IConfigurationBuilder>? configurationDefinition = null)
+        public IModuleStructure Uses<TModule>()
+            where TModule : TychoModule, new();
+
+        public IModuleStructure Uses<TModule>(Action<IContractFulfillment> contractFulfillment)
+            where TModule : TychoModule, new();
+
+        public IModuleStructure Uses<TModule>(IModuleSettings settings)
+            where TModule : TychoModule, new();
+
+        public IModuleStructure Uses<TModule>(
+            Action<IContractFulfillment> contractFulfillment,
+            IModuleSettings settings)
             where TModule : TychoModule, new();
     }
 }

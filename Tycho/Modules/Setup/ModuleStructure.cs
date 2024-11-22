@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Routing;
 using Tycho.Requests.Broker;
@@ -13,20 +12,58 @@ namespace Tycho.Modules.Setup
     internal class ModuleStructure : IModuleStructure
     {
         private readonly Internals _internals;
+        private readonly Globals _globals;
+
         private readonly Dictionary<Type, TychoModule> _submodules;
 
-        public ModuleStructure(Internals internals)
+        public ModuleStructure(Internals internals, Globals globals)
         {
             _internals = internals;
+            _globals = globals;
             _submodules = new Dictionary<Type, TychoModule>();
         }
 
-        public IModuleStructure Uses<TModule>(
-            Action<IContractFulfillment>? contractFulfillment = null,
-            Action<IConfigurationBuilder>? configurationDefinition = null)
+        public IModuleStructure Uses<TModule>()
             where TModule : TychoModule, new()
         {
-            var submodule = new TModule();
+            Use<TModule>(null, null);
+            return this;
+        }
+
+        public IModuleStructure Uses<TModule>(Action<IContractFulfillment> contractFulfillment)
+            where TModule : TychoModule, new()
+        {
+            Use<TModule>(contractFulfillment, null);
+            return this;
+        }
+
+        public IModuleStructure Uses<TModule>(IModuleSettings settings)
+            where TModule : TychoModule, new()
+        {
+            Use<TModule>(null, settings);
+            return this;
+        }
+
+        public IModuleStructure Uses<TModule>(
+            Action<IContractFulfillment> contractFulfillment,
+            IModuleSettings settings)
+            where TModule : TychoModule, new()
+        {
+            Use<TModule>(contractFulfillment, settings);
+            return this;
+        }
+
+        private void Use<TModule>(
+            Action<IContractFulfillment>? contractFulfillment,
+            IModuleSettings? settings)
+            where TModule : TychoModule, new()
+        {
+            var submodule = new TModule().WithGlobals(_globals);
+
+            if (settings != null)
+            {
+                submodule.WithSettings(settings);
+            }
 
             var fulfiller = new ContractFulfillment<TModule>(_internals);
             contractFulfillment?.Invoke(fulfiller);
@@ -37,14 +74,7 @@ namespace Tycho.Modules.Setup
             var parentEventRouter = new EventRouter(_internals);
             submodule.PassEventRouter(parentEventRouter);
 
-            if (configurationDefinition != null)
-            {
-                submodule.Configure(configurationDefinition);
-            }
-
             AddSubmodule(submodule);
-
-            return this;
         }
 
         public async Task Build()

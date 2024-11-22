@@ -19,16 +19,22 @@ namespace Tycho.Modules
 
         private bool _wasAlreadyRun = false;
 
-        /// <summary>
-        /// Configuration defined for the module
-        /// </summary>
-        protected IConfiguration Configuration => _builder.Configuration ??
-            throw new InvalidOperationException("Configuration not yet available");
+        protected IConfiguration Configuration => _builder.Globals.Configuration;
 
         public TychoModule()
         {
             _runLock = new object();
             _builder = new ModuleBuilder(GetType());
+        }
+
+        /// <summary>
+        /// Retrieves the settings provided to the module by its parent
+        /// </summary>
+        /// <typeparam name="TSettings">The type of settings to retrieve</typeparam>
+        /// <returns>Matching settings or a new instance of the requested settings type</returns>
+        protected TSettings GetSettings<TSettings>() where TSettings : class, IModuleSettings, new()
+        {
+            return _builder.Settings as TSettings ?? new TSettings();
         }
 
         /// <summary>
@@ -73,9 +79,15 @@ namespace Tycho.Modules
             return Task.CompletedTask;
         }
 
-        internal TychoModule Configure(Action<IConfigurationBuilder> configurationDefinition)
+        internal TychoModule WithGlobals(Globals globals)
         {
-            _builder.WithConfiguration(configurationDefinition);
+            _builder.WithGlobals(globals);
+            return this;
+        }
+
+        internal TychoModule WithSettings(IModuleSettings settings)
+        {
+            _builder.WithSettings(settings);
             return this;
         }
 
@@ -95,12 +107,11 @@ namespace Tycho.Modules
         {
             EnsureItIsRunOnlyOnce();
 
-            _builder.Init();
+            _builder.WithCleanup(Cleanup).Init();
             RegisterServices(_builder.Services);
             DefineContract(_builder.Contract);
             MapEvents(_builder.Events);
             IncludeModules(_builder.Structure);
-            _builder.WithCleanup(Cleanup);
 
             var module = await _builder.Build().ConfigureAwait(false);
             await Startup(module.Internals).ConfigureAwait(false);

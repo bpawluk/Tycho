@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Tycho.Apps.Instance;
 using Tycho.Structure;
 
@@ -13,7 +15,7 @@ namespace Tycho.Apps.Setup
 
         private Func<IServiceProvider, Task>? _cleanup;
 
-        public IServiceCollection Services => _internals.GetServiceCollection();
+        public Globals Globals { get; }
 
         public AppContract Contract { get; }
 
@@ -21,23 +23,47 @@ namespace Tycho.Apps.Setup
 
         public AppStructure Structure { get; }
 
+        public IServiceCollection Services => _internals.GetServiceCollection();
+
         public AppBuilder(Type appDefinitionType)
         {
             _appType = typeof(App<>).MakeGenericType(appDefinitionType);
             _internals = new Internals(appDefinitionType);
+            Globals = new Globals();
             Contract = new AppContract(_internals);
             Events = new AppEvents(_internals);
-            Structure = new AppStructure(_internals);
+            Structure = new AppStructure(_internals, Globals);
         }
 
-        public void WithCleanup(Func<IServiceProvider, Task> cleanup)
+        public AppBuilder WithConfiguration(IConfiguration globalConfiguration)
+        {
+            Globals.Configuration = globalConfiguration;
+            return this;
+        }
+
+        public AppBuilder WithLogging(Action<ILoggingBuilder> loggingSetup)
+        {
+            Globals.LoggingSetup = loggingSetup;
+            return this;
+        }
+
+        public AppBuilder WithCleanup(Func<IServiceProvider, Task> cleanup)
         {
             _cleanup = cleanup;
+            return this;
         }
 
-        public void Init()
+        public AppBuilder Init()
         {
-            _internals.GetServiceCollection().AddSingleton(_internals);
+            var services = _internals.GetServiceCollection();
+
+            if (Globals.LoggingSetup != null)
+            {
+                services.AddLogging(Globals.LoggingSetup);
+            }
+            services.AddSingleton(_internals);
+
+            return this;
         }
 
         public async Task<IApp> Build()

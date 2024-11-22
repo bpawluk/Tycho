@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Tycho.IntegrationTests.ProvidingConfiguration.SUT.Handlers;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Tycho.IntegrationTests.ProvidingSettings.SUT.Handlers;
+using Tycho.IntegrationTests.ProvidingSettings.SUT.Settings;
 using Tycho.Modules;
 using Tycho.Requests;
 
-namespace Tycho.IntegrationTests.ProvidingConfiguration.SUT.Modules;
+namespace Tycho.IntegrationTests.ProvidingSettings.SUT.Modules;
 
 // Handles
 public record GetBetaValueRequest : IRequest<string>;
@@ -22,6 +22,10 @@ internal class BetaModule : TychoModule
 
     protected override void RegisterServices(IServiceCollection module)
     {
-        module.AddSingleton<IConfiguration>(Configuration.GetSection("Beta"));
+        var moduleSettings = GetSettings<ModuleSettings>();
+        module.AddSingleton(moduleSettings);
+
+        var otherSettings = GetSettings<OtherSettings>();
+        module.AddSingleton(otherSettings);
     }
 }

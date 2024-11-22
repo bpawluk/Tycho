@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Tycho.Apps.Setup;
 using Tycho.Structure;
 
@@ -16,8 +18,10 @@ namespace Tycho.Apps
 
         private bool _wasAlreadyRun = false;
 
+        protected IConfiguration Configuration => _builder.Globals.Configuration;
+
         public TychoApp()
-        {
+        { 
             _runLock = new object();
             _builder = new AppBuilder(GetType());
         }
@@ -59,9 +63,29 @@ namespace Tycho.Apps
         /// Override this method if you need to execute code before the application is disposed
         /// </summary>
         /// <param name="app">A provider of the services configured for the application</param>
-        protected virtual Task Cleanup(IServiceProvider app) 
+        protected virtual Task Cleanup(IServiceProvider app)
         {
             return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Supplies global configuration for the application and its modules
+        /// </summary>
+        /// <param name="globalConfiguration">Configuration to be used</param>
+        public TychoApp WithConfiguration(IConfiguration globalConfiguration)
+        {
+            _builder.WithConfiguration(globalConfiguration);
+            return this;
+        }
+
+        /// <summary>
+        /// Configures logging for the application and its modules
+        /// </summary>
+        /// <param name="loggingSetup">Logging setup to be used</param>
+        public TychoApp WithLogging(Action<ILoggingBuilder> loggingSetup)
+        {
+            _builder.WithLogging(loggingSetup);
+            return this;
         }
 
         /// <summary>
@@ -73,12 +97,11 @@ namespace Tycho.Apps
         {
             EnsureItIsRunOnlyOnce();
 
-            _builder.Init();
+            _builder.WithCleanup(Cleanup).Init();
             RegisterServices(_builder.Services);
             DefineContract(_builder.Contract);
             MapEvents(_builder.Events);
             IncludeModules(_builder.Structure);
-            _builder.WithCleanup(Cleanup);
 
             var app = await _builder.Build().ConfigureAwait(false);
             await Startup(app.Internals).ConfigureAwait(false);

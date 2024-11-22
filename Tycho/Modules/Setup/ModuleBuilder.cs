@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Routing;
 using Tycho.Modules.Instance;
@@ -14,12 +13,11 @@ namespace Tycho.Modules.Setup
         private readonly Type _moduleType;
         private readonly Internals _internals;
 
-        private Action<IConfigurationBuilder>? _configurationDefinition;
         private Func<IServiceProvider, Task>? _cleanup;
 
-        public IConfiguration? Configuration { get; private set; }
+        public Globals Globals { get; private set; }
 
-        public IServiceCollection Services => _internals.GetServiceCollection();
+        public IModuleSettings? Settings { get; private set; }
 
         public ModuleContract Contract { get; }
 
@@ -27,47 +25,64 @@ namespace Tycho.Modules.Setup
 
         public ModuleStructure Structure { get; }
 
+        public IServiceCollection Services => _internals.GetServiceCollection();
+
         public ModuleBuilder(Type moduleDefinitionType)
         {
             _moduleType = typeof(Module<>).MakeGenericType(moduleDefinitionType);
             _internals = new Internals(moduleDefinitionType);
+            Globals = new Globals();
+            Settings = null!;
             Contract = new ModuleContract(_internals);
             Events = new ModuleEvents(_internals);
-            Structure = new ModuleStructure(_internals);
+            Structure = new ModuleStructure(_internals, Globals);
         }
 
-        public void WithConfiguration(Action<IConfigurationBuilder> configurationDefinition)
+        public ModuleBuilder WithGlobals(Globals globals)
         {
-            _configurationDefinition = configurationDefinition;
+            Globals.Configuration = globals.Configuration;
+            Globals.LoggingSetup = globals.LoggingSetup;
+            return this;
         }
 
-        public void WithCleanup(Func<IServiceProvider, Task> cleanup)
+        public ModuleBuilder WithSettings(IModuleSettings settings)
         {
-            _cleanup = cleanup;
+            Settings = settings;
+            return this;
         }
 
-        public void WithContractFulfillment(IRequestBroker contractFulfillingBroker)
+        public ModuleBuilder WithContractFulfillment(IRequestBroker contractFulfillingBroker)
         {
             Contract.WithContractFulfillment(contractFulfillingBroker);
+            return this;
         }
 
-        public void WithParentEventRouter(IEventRouter parentEventRouter)
+        public ModuleBuilder WithParentEventRouter(IEventRouter parentEventRouter)
         {
             Events.WithParentEventRouter(parentEventRouter);
+            return this;
         }
 
-        public void Init()
+        public ModuleBuilder WithCleanup(Func<IServiceProvider, Task> cleanup)
         {
-            var configurationBuilder = new ConfigurationBuilder();
-            _configurationDefinition?.Invoke(configurationBuilder);
-            Configuration = configurationBuilder.Build();
+            _cleanup = cleanup;
+            return this;
+        }
 
+        public ModuleBuilder Init()
+        {
             var parentProxy = new ParentProxy(Contract.ContractFulfillingBroker, Events.ParentEventRouter);
+            var services = _internals.GetServiceCollection();
 
-            _internals.GetServiceCollection()
-                .AddSingleton(Configuration)
-                .AddSingleton<IParent>(parentProxy)
-                .AddSingleton(_internals);
+            if (Globals.LoggingSetup != null)
+            {
+                services.AddLogging(Globals.LoggingSetup);
+            }
+
+            services.AddSingleton<IParent>(parentProxy)
+                    .AddSingleton(_internals);
+
+            return this;
         }
 
         public async Task<IModule> Build()

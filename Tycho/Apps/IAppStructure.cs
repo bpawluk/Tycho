@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.Extensions.Configuration;
 using Tycho.Modules;
 
 namespace Tycho.Apps
@@ -9,12 +8,18 @@ namespace Tycho.Apps
     /// </summary>
     public interface IAppStructure
     {
-        /// <summary>
-        ///     TODO
-        /// </summary>
-        IAppStructure Uses<TModule>(
-            Action<IContractFulfillment>? contractFulfillment = null,
-            Action<IConfigurationBuilder>? configurationDefinition = null)
+        public IAppStructure Uses<TModule>()
+            where TModule : TychoModule, new();
+
+        public IAppStructure Uses<TModule>(Action<IContractFulfillment> contractFulfillment)
+            where TModule : TychoModule, new();
+
+        public IAppStructure Uses<TModule>(IModuleSettings settings)
+            where TModule : TychoModule, new();
+
+        public IAppStructure Uses<TModule>(
+            Action<IContractFulfillment> contractFulfillment,
+            IModuleSettings settings)
             where TModule : TychoModule, new();
     }
 }
