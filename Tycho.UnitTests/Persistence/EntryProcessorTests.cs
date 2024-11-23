@@ -1,4 +1,6 @@
-﻿using Moq;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Testing;
+using Moq;
 using Tycho.Events;
 using Tycho.Events.Routing;
 using Tycho.Persistence;
@@ -14,6 +16,7 @@ public class EntryProcessorTests
     private readonly Mock<IEventHandler<TestEvent>> _eventHandlerMock;
     private readonly Mock<IEventRouter> _eventRouterMock;
     private readonly Mock<IPayloadSerializer> _payloadSerializerMock;
+    private readonly FakeLogger<EntryProcessor> _fakeLogger;
 
     private readonly EntryProcessor _sut;
 
@@ -29,7 +32,12 @@ public class EntryProcessorTests
         _payloadSerializerMock.Setup(x => x.Deserialize(It.IsAny<Type>(), It.IsAny<TestEvent>()))
                               .Returns((Type _, object payload) => (payload as TestEvent)!);
 
-        _sut = new EntryProcessor(_eventRouterMock.Object, _payloadSerializerMock.Object);
+        _fakeLogger = new FakeLogger<EntryProcessor>();
+
+        _sut = new EntryProcessor(
+            _eventRouterMock.Object, 
+            _payloadSerializerMock.Object,
+            _fakeLogger);
     }
 
     [Fact]
@@ -53,8 +61,9 @@ public class EntryProcessorTests
     public async Task Process_WhenHandlerFails_ReturnsFalse()
     {
         // Arrange
+        var expectedException = new InvalidOperationException("Error message");
         _eventHandlerMock.Setup(x => x.Handle(It.IsAny<TestEvent>(), It.IsAny<CancellationToken>()))
-                         .ThrowsAsync(new InvalidOperationException());
+                         .ThrowsAsync(expectedException);
 
         var eventData = new TestEvent();
         var entry = new OutboxEntry(
@@ -67,6 +76,15 @@ public class EntryProcessorTests
         // Assert
         _eventHandlerMock.Verify(x => x.Handle(eventData, It.IsAny<CancellationToken>()), Times.Once);
         Assert.False(result);
+
+        var logs = _fakeLogger.Collector.GetSnapshot();
+        Assert.Single(logs);
+
+        var log = logs.Single();
+        Assert.Equal(LogLevel.Error, log.Level);
+        Assert.Equal($"Failed to process entry {entry.Id}", log.Message);
+        Assert.NotNull(log.Exception);
+        Assert.Equal(expectedException.Message, log.Exception.Message);
     }
 
     [Fact]
@@ -82,5 +100,14 @@ public class EntryProcessorTests
 
         // Assert
         Assert.False(result);
+
+        var logs = _fakeLogger.Collector.GetSnapshot();
+        Assert.Single(logs);
+
+        var log = logs.Single();
+        Assert.Equal(LogLevel.Error, log.Level);
+        Assert.Equal($"Failed to process entry {entry.Id}", log.Message);
+        Assert.NotNull(log.Exception);
+        Assert.Equal($"Missing event handler with ID {entry.HandlerIdentity}", log.Exception.Message);
     }
 }

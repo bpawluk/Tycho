@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Tycho.Events;
 using Tycho.Events.Routing;
 
@@ -15,11 +17,16 @@ namespace Tycho.Persistence.Processing
     {
         private readonly IEventRouter _eventRouter;
         private readonly IPayloadSerializer _payloadSerializer;
+        private readonly ILogger<EntryProcessor> _logger;
 
-        public EntryProcessor(IEventRouter eventRouter, IPayloadSerializer payloadSerializer)
+        public EntryProcessor(
+            IEventRouter eventRouter, 
+            IPayloadSerializer payloadSerializer,
+            ILogger<EntryProcessor>? logger = null)
         {
             _eventRouter = eventRouter;
             _payloadSerializer = payloadSerializer;
+            _logger = logger ?? NullLogger<EntryProcessor>.Instance;
         }
 
         public async Task<bool> Process(OutboxEntry entry)
@@ -37,9 +44,9 @@ namespace Tycho.Persistence.Processing
 
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
-                // TODO: Log the Exception
+                _logger.LogError(ex, "Failed to process entry {entryId}", entry.Id);
                 return false;
             }
         }
