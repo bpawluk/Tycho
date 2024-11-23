@@ -37,12 +37,12 @@ namespace Tycho.Apps.Instance
             return _requestBroker.Execute<TRequest, TResponse>(requestData, cancellationToken);
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-            _cleanup(_internals);
+            await _cleanup(_internals).ConfigureAwait(false);
             foreach (var module in _internals.GetServices<IModule>())
             {
-                module.Dispose();
+                await module.DisposeAsync().ConfigureAwait(false);
             }
             _internals.Dispose();
         }

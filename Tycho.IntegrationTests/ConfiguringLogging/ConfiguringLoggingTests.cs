@@ -38,9 +38,8 @@ public class ConfiguringLoggingTests : IAsyncLifetime
         builder.AddProvider(new TestLoggerProvider());
     }
 
-    public Task DisposeAsync()
+    public async Task DisposeAsync()
     {
-        _sut?.Dispose();
-        return Task.CompletedTask;
+        await _sut!.DisposeAsync();
     }
 }

@@ -237,9 +237,8 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         Assert.Equal(1, secondResult);
     }
 
-    public Task DisposeAsync()
+    public async Task DisposeAsync()
     {
-        _sut?.Dispose();
-        return Task.CompletedTask;
+        await _sut!.DisposeAsync();
     }
 }

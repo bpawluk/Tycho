@@ -12,7 +12,7 @@ public class RunningCleanupLogicTests
         var testResult = TestResult.Instance;
 
         // Act
-        sut.Dispose();
+        await sut.DisposeAsync();
 
         // Assert
         Assert.True(testResult.AppCleanupPerformed);

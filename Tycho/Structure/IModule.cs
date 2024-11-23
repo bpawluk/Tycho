@@ -8,7 +8,7 @@ namespace Tycho.Structure
     /// <summary>
     ///     TODO
     /// </summary>
-    public interface IModule : IRequestExecutor, IDisposable
+    public interface IModule : IRequestExecutor, IAsyncDisposable
     {
         internal Internals Internals { get; }
 

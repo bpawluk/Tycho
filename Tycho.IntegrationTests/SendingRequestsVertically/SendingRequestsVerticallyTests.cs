@@ -47,9 +47,8 @@ public class SendingRequestsVerticallyTests : IAsyncLifetime
         Assert.Equal(7, testResult.HandlingCount);
     }
 
-    public Task DisposeAsync()
+    public async Task DisposeAsync()
     {
-        _sut?.Dispose();
-        return Task.CompletedTask;
+        await _sut!.DisposeAsync();
     }
 }

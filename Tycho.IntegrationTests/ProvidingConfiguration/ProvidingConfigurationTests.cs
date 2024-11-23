@@ -43,9 +43,8 @@ public class ProvidingConfigurationTests : IAsyncLifetime
         Assert.Equal(_betaValue, betaValue);
     }
 
-    public Task DisposeAsync()
+    public async Task DisposeAsync()
     {
-        _sut?.Dispose();
-        return Task.CompletedTask;
+        await _sut!.DisposeAsync();
     }
 }

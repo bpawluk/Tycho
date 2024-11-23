@@ -78,9 +78,8 @@ public class ForwardingRequestsHorizontallyTests : IAsyncLifetime
         Assert.Equal(workflowId, testResult.Id);
     }
 
-    public Task DisposeAsync()
+    public async Task DisposeAsync()
     {
-        _sut?.Dispose();
-        return Task.CompletedTask;
+        await _sut!.DisposeAsync();
     }
 }
