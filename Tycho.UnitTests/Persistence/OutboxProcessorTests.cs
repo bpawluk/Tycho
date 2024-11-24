@@ -1,4 +1,6 @@
-﻿using Moq;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Testing;
+using Moq;
 using Tycho.Events.Routing;
 using Tycho.Persistence;
 using Tycho.Persistence.Processing;
@@ -13,6 +15,8 @@ public sealed class OutboxProcessorTests : IDisposable
     private readonly OutboxActivity _outboxActivity;
     private readonly Mock<IEntryProcessor> _mockEntryProcessor;
     private readonly OutboxProcessorSettings _settings;
+    private readonly FakeLogger<OutboxProcessor> _fakeLogger;
+
 
     private List<OutboxEntry> _entries = [];
     private int _iterations;
@@ -48,7 +52,14 @@ public sealed class OutboxProcessorTests : IDisposable
             PollingIntervalMultiplier = 2
         };
 
-        _sut = new OutboxProcessor(_mockOutbox.Object, _outboxActivity, _mockEntryProcessor.Object, _settings);
+        _fakeLogger = new FakeLogger<OutboxProcessor>();
+
+        _sut = new OutboxProcessor(
+            _mockOutbox.Object, 
+            _outboxActivity, 
+            _mockEntryProcessor.Object, 
+            _settings,
+            _fakeLogger);
     }
 
     private int ExpectedIterations => ExpectedProcessingIterations + ExpectedIdleIterations;
@@ -197,14 +208,18 @@ public sealed class OutboxProcessorTests : IDisposable
     public async Task Process_WithExceptionWhileProcessingEntry_LogsTheExceptionAndCompletesOtherEntries()
     {
         // Arrange
+        var failingEntry = new OutboxEntry(new HandlerIdentity("throw", string.Empty, string.Empty), new TestEvent());
         _entries =
         [
             new OutboxEntry(new HandlerIdentity(string.Empty, string.Empty, string.Empty), new TestEvent()),
-            new OutboxEntry(new HandlerIdentity("throw", string.Empty, string.Empty), new TestEvent()),
+            failingEntry,
             new OutboxEntry(new HandlerIdentity(string.Empty, string.Empty, string.Empty), new TestEvent())
         ];
+
+        var expectedException = new InvalidOperationException("Error message");
         _mockEntryProcessor.Setup(ep => ep.Process(It.Is<OutboxEntry>(x => x.HandlerIdentity.EventId == "throw")))
-                           .ThrowsAsync(new InvalidOperationException());
+                           .ThrowsAsync(expectedException);
+
         _settings.MaxPollingInterval = _settings.InitialPollingInterval;
 
         // Act
@@ -214,9 +229,18 @@ public sealed class OutboxProcessorTests : IDisposable
 
         // Assert
         Assert.Equal(ExpectedIterations, _iterations);
+
         _mockOutbox.Verify(o => o.MarkAsProcessed(It.IsAny<OutboxEntry>(), It.IsAny<CTK>()), Times.Exactly(2));
         _mockOutbox.Verify(o => o.MarkAsFailed(It.IsAny<OutboxEntry>(), It.IsAny<CTK>()), Times.Never);
-        // TODO: assert that the exception is logged
+
+        var logs = _fakeLogger.Collector.GetSnapshot();
+        Assert.Single(logs);
+
+        var log = logs.Single();
+        Assert.Equal(LogLevel.Error, log.Level);
+        Assert.Equal($"Entry processing failed ({failingEntry.Id})", log.Message);
+        Assert.NotNull(log.Exception);
+        Assert.Equal(expectedException.Message, log.Exception.Message);
     }
 
     [Fact(Timeout = 500)]
@@ -228,10 +252,13 @@ public sealed class OutboxProcessorTests : IDisposable
             new OutboxEntry(new HandlerIdentity(string.Empty, string.Empty, string.Empty), new TestEvent()),
             new OutboxEntry(new HandlerIdentity(string.Empty, string.Empty, string.Empty), new TestEvent())
         ];
-        _settings.MaxPollingInterval = _settings.InitialPollingInterval;
+
+        var expectedException = new InvalidOperationException("Error message");
         _mockOutbox.Setup(o => o.Read(It.IsAny<int>(), It.IsAny<CTK>()))
                    .Callback(() => _iterations++)
-                   .ThrowsAsync(new InvalidOperationException());
+                   .ThrowsAsync(expectedException);
+
+        _settings.MaxPollingInterval = _settings.InitialPollingInterval;
 
         // Act
         _sut.Initialize();
@@ -241,7 +268,17 @@ public sealed class OutboxProcessorTests : IDisposable
         // Assert
         _mockOutbox.Verify(o => o.MarkAsProcessed(It.IsAny<OutboxEntry>(), It.IsAny<CTK>()), Times.Never);
         _mockOutbox.Verify(o => o.MarkAsFailed(It.IsAny<OutboxEntry>(), It.IsAny<CTK>()), Times.Never);
-        // TODO: assert that the exception is logged
+
+        var logs = _fakeLogger.Collector.GetSnapshot();
+        Assert.NotEmpty(logs);
+
+        foreach (var log in logs)
+        {
+            Assert.Equal(LogLevel.Error, log.Level);
+            Assert.Equal("Outbox processing failed", log.Message);
+            Assert.NotNull(log.Exception);
+            Assert.Equal(expectedException.Message, log.Exception.Message);
+        }
     }
 
     private async Task WaitForCompletion()

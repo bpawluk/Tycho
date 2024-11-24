@@ -46,7 +46,7 @@ namespace Tycho.Persistence.Processing
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to process entry {entryId}", entry.Id);
+                _logger.LogError(ex, "Failed to process entry with ID {entryId}", entry.Id);
                 return false;
             }
         }

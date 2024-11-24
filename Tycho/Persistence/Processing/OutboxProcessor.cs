@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Tycho.Persistence.Processing
 {
@@ -12,6 +14,7 @@ namespace Tycho.Persistence.Processing
         private readonly OutboxActivity _outboxActivity;
         private readonly IEntryProcessor _entryProcessor;
         private readonly OutboxProcessorSettings _settings;
+        private readonly ILogger<OutboxProcessor> _logger;
 
         private readonly SemaphoreSlim _processingSemaphore;
         private readonly object _timerChangeLock;
@@ -25,12 +28,14 @@ namespace Tycho.Persistence.Processing
             IOutboxConsumer eventOutbox,
             OutboxActivity outboxActivity,
             IEntryProcessor entryProcessor,
-            OutboxProcessorSettings settings)
+            OutboxProcessorSettings settings,
+            ILogger<OutboxProcessor>? logger = null)
         {
             _eventOutbox = eventOutbox;
             _outboxActivity = outboxActivity;
-            _settings = settings;
             _entryProcessor = entryProcessor;
+            _settings = settings;
+            _logger = logger ?? NullLogger<OutboxProcessor>.Instance;
 
             _timer = new Timer(TimerCallback, null, Timeout.Infinite, Timeout.Infinite);
 
@@ -57,9 +62,9 @@ namespace Tycho.Persistence.Processing
                 {
                     await ProcessOutbox().ConfigureAwait(false);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // TODO: Log the Exception
+                    _logger.LogError(ex, "Outbox processing failed");
                 }
                 finally
                 {
@@ -105,9 +110,9 @@ namespace Tycho.Persistence.Processing
                     await _eventOutbox.MarkAsFailed(entry).ConfigureAwait(false);
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // TODO: Log the Exception
+                _logger.LogError(ex, "Entry processing failed ({entryId})", entry.Id);
             }
         }
 

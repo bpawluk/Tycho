@@ -82,7 +82,7 @@ public class EntryProcessorTests
 
         var log = logs.Single();
         Assert.Equal(LogLevel.Error, log.Level);
-        Assert.Equal($"Failed to process entry {entry.Id}", log.Message);
+        Assert.Equal($"Failed to process entry with ID {entry.Id}", log.Message);
         Assert.NotNull(log.Exception);
         Assert.Equal(expectedException.Message, log.Exception.Message);
     }
@@ -106,7 +106,7 @@ public class EntryProcessorTests
 
         var log = logs.Single();
         Assert.Equal(LogLevel.Error, log.Level);
-        Assert.Equal($"Failed to process entry {entry.Id}", log.Message);
+        Assert.Equal($"Failed to process entry with ID {entry.Id}", log.Message);
         Assert.NotNull(log.Exception);
         Assert.Equal($"Missing event handler with ID {entry.HandlerIdentity}", log.Exception.Message);
     }
