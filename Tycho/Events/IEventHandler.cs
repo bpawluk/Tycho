@@ -9,15 +9,9 @@ namespace Tycho.Events
     /// </summary>
     public interface IEventHandler
     {
-        /// <summary>
-        /// Type of the event to handle
-        /// </summary>
-        Type EventType { get; }
+        internal Type EventType { get; }
 
-        /// <summary>
-        /// The type of the event handler
-        /// </summary>
-        Type HandlerType { get; }
+        internal Type HandlerType { get; }
     }
 
     /// <summary>
@@ -27,10 +21,8 @@ namespace Tycho.Events
     public interface IEventHandler<TEvent> : IEventHandler
         where TEvent : class, IEvent
     {
-        /// <inheritdoc />
         Type IEventHandler.EventType => typeof(TEvent);
 
-        /// <inheritdoc />
         Type IEventHandler.HandlerType => GetType();
 
         /// <summary>

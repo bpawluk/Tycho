@@ -7,7 +7,7 @@ using Tycho.Structure.Data;
 namespace Tycho.Structure
 {
     /// <summary>
-    ///     TODO
+    /// An interface for a Tycho module
     /// </summary>
     public interface IModule : IRequestExecutor, IAsyncDisposable
     {
@@ -17,8 +17,9 @@ namespace Tycho.Structure
     }
 
     /// <summary>
-    ///     TODO
+    /// An interface for a Tycho module defined by <typeparamref name="TModuleDefinition"/>
     /// </summary>
+    /// <typeparam name="TModuleDefinition">The definition of the module</typeparam>
     public interface IModule<TModuleDefinition> : IModule
         where TModuleDefinition : TychoModule
     {

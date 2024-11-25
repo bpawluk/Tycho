@@ -6,7 +6,7 @@ using Tycho.Structure.Data;
 namespace Tycho.Structure
 {
     /// <summary>
-    ///     TODO
+    /// An interface for a Tycho application
     /// </summary>
     public interface IApp : IRequestExecutor, IAsyncDisposable
     {
@@ -14,8 +14,9 @@ namespace Tycho.Structure
     }
 
     /// <summary>
-    ///     TODO
+    /// An interface for a Tycho application defined by <typeparamref name="TAppDefinition"/>
     /// </summary>
+    /// <typeparam name="TAppDefinition">The definition of the application</typeparam>
     public interface IApp<TAppDefinition> : IApp
         where TAppDefinition : TychoApp
     {
