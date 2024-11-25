@@ -1,6 +1,7 @@
 ﻿using System;
 using Tycho.Apps;
 using Tycho.Requests;
+using Tycho.Structure.Data;
 
 namespace Tycho.Structure
 {

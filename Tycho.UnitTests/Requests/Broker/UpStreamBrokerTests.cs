@@ -3,7 +3,7 @@ using Moq;
 using Tycho.Requests;
 using Tycho.Requests.Broker;
 using Tycho.Requests.Registrating.Registrations;
-using Tycho.Structure;
+using Tycho.Structure.Data;
 using Tycho.UnitTests._Data.Modules;
 using Tycho.UnitTests._Data.Requests;
 

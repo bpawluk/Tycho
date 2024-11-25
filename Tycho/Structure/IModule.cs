@@ -2,6 +2,7 @@
 using Tycho.Events.Routing;
 using Tycho.Modules;
 using Tycho.Requests;
+using Tycho.Structure.Data;
 
 namespace Tycho.Structure
 {

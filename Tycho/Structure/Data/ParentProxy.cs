@@ -4,7 +4,7 @@ using Tycho.Events.Routing;
 using Tycho.Requests;
 using Tycho.Requests.Broker;
 
-namespace Tycho.Structure
+namespace Tycho.Structure.Data
 {
     internal class ParentProxy : IParent
     {

@@ -3,7 +3,7 @@ using Tycho.Modules;
 using Tycho.Requests;
 using Tycho.Requests.Handling;
 using Tycho.Requests.Registrating;
-using Tycho.Structure;
+using Tycho.Structure.Data;
 
 namespace Tycho.Apps.Setup
 {

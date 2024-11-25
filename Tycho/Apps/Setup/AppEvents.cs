@@ -10,7 +10,7 @@ using Tycho.Events.Routing;
 using Tycho.Persistence;
 using Tycho.Persistence.InMemory;
 using Tycho.Persistence.Processing;
-using Tycho.Structure;
+using Tycho.Structure.Data;
 
 namespace Tycho.Apps.Setup
 {

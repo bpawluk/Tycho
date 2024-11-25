@@ -2,7 +2,7 @@
 using Moq;
 using Tycho.Events;
 using Tycho.Events.Routing;
-using Tycho.Structure;
+using Tycho.Structure.Data;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
 using Tycho.UnitTests._Data.Modules;

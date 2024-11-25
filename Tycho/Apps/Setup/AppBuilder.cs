@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Tycho.Apps.Instance;
 using Tycho.Structure;
+using Tycho.Structure.Data;
 
 namespace Tycho.Apps.Setup
 {
