@@ -6,14 +6,26 @@ using Tycho.Apps;
 
 namespace Tycho
 {
+    /// <summary>
+    /// Extension methods for setting up Tycho applications
+    /// </summary>
     public static class SetupExtensions
     {
+        /// <summary>
+        /// Sets up and runs the specified Tycho application and registers it in the Host Application Builder
+        /// </summary>
+        /// <typeparam name="TApp">The type of the application to run</typeparam>
         public static Task<IHostApplicationBuilder> AddTycho<TApp>(this IHostApplicationBuilder builder)
             where TApp : TychoApp, new()
         {
             return builder.AddTycho(new TApp());
         }
 
+        /// <summary>
+        /// Sets up and runs the specified Tycho application and registers it in the Host Application Builder
+        /// </summary>
+        /// <typeparam name="TApp">The type of the application to run</typeparam>
+        /// <param name="app">An instance of the application to run</param>
         public static async Task<IHostApplicationBuilder> AddTycho<TApp>(this IHostApplicationBuilder builder, TApp app)
             where TApp : TychoApp
         {
