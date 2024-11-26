@@ -51,7 +51,6 @@ namespace Tycho.Apps.Setup
                         .AddTransient<IPayloadSerializer, InMemoryPayloadSerializer>();
             }
 
-            services.TryAddSingleton<OutboxProcessorSettings>();
             services.AddSingleton<OutboxProcessor>()
                     .AddSingleton<OutboxActivity>()
                     .AddTransient<IEntryProcessor, EntryProcessor>() 

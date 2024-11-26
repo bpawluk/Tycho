@@ -8,6 +8,11 @@ namespace Tycho.Persistence.EFCore;
 public class OutboxConsumerSettings
 {
     /// <summary>
+    /// An instance of the default settings
+    /// </summary>
+    public static readonly OutboxConsumerSettings Default = new();
+
+    /// <summary>
     /// Gets or sets the maximum message delivery count for the outbox consumer
     /// </summary>
     /// <value>The number of times a single message can be consumed in case of redeliveries</value>

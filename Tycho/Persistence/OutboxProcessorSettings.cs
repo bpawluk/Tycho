@@ -8,6 +8,11 @@ namespace Tycho.Persistence
     public class OutboxProcessorSettings
     {
         /// <summary>
+        /// An instance of the default settings
+        /// </summary>
+        public static readonly OutboxProcessorSettings Default = new OutboxProcessorSettings();
+
+        /// <summary>
         /// Gets or sets the concurrency limit for the outbox processor
         /// </summary>
         /// <value>The maximum number of messages being processed in parallel</value>

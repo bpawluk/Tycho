@@ -8,10 +8,10 @@ using Tycho.Events.Routing;
 
 namespace Tycho.Persistence.EFCore.Outbox;
 
-internal class OutboxConsumer(OutboxConsumerSettings settings, TychoDbContext dbContext) : IOutboxConsumer
+internal class OutboxConsumer(TychoDbContext dbContext, OutboxConsumerSettings? settings = null) : IOutboxConsumer
 {
-    private readonly OutboxConsumerSettings _settings = settings;
     private readonly TychoDbContext _dbContext = dbContext;
+    private readonly OutboxConsumerSettings _settings = settings ?? OutboxConsumerSettings.Default;
 
     public async Task<IReadOnlyCollection<OutboxEntry>> Read(int count, CancellationToken cancellationToken)
     {

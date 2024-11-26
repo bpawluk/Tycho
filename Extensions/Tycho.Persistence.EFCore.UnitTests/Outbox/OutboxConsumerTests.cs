@@ -27,7 +27,7 @@ public class OutboxConsumerTests
         _dbContextMock.Setup(db => db.Set<OutboxMessage>())
                       .Returns(() => _dbSetMock.Object);
 
-        _sut = new OutboxConsumer(_settings, _dbContextMock.Object);
+        _sut = new OutboxConsumer(_dbContextMock.Object, _settings);
     }
 
     [Fact]

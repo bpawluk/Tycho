@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Tycho.Events.Publishing;
 using Tycho.Persistence.EFCore.Outbox;
 using Tycho.Persistence.EFCore.Serialization;
@@ -19,7 +18,6 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddTychoPersistence<TDbContext>(this IServiceCollection services)
         where TDbContext : TychoDbContext
     {
-        services.TryAddSingleton<OutboxConsumerSettings>();
         services.AddDbContext<TDbContext>()
                 .AddScoped<TychoDbContext, TDbContext>()
                 .AddScoped<IUnitOfWork, UnitOfWork>()

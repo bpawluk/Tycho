@@ -28,13 +28,13 @@ namespace Tycho.Persistence.Processing
             IOutboxConsumer eventOutbox,
             OutboxActivity outboxActivity,
             IEntryProcessor entryProcessor,
-            OutboxProcessorSettings settings,
+            OutboxProcessorSettings? settings = null,
             ILogger<OutboxProcessor>? logger = null)
         {
             _eventOutbox = eventOutbox;
             _outboxActivity = outboxActivity;
             _entryProcessor = entryProcessor;
-            _settings = settings;
+            _settings = settings ?? OutboxProcessorSettings.Default;
             _logger = logger ?? NullLogger<OutboxProcessor>.Instance;
 
             _timer = new Timer(TimerCallback, null, Timeout.Infinite, Timeout.Infinite);
