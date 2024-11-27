@@ -11,8 +11,6 @@ internal class OutboxWriter(TychoDbContext dbContext, OutboxActivity outboxActiv
 
     public async Task Write(IReadOnlyCollection<OutboxEntry> entries, bool shouldCommit, CancellationToken cancellationToken)
     {
-        var outboxMessages = _dbContext.Set<OutboxMessage>();
-
         foreach (var entry in entries)
         {
             var outboxMessage = new OutboxMessage
@@ -21,7 +19,7 @@ internal class OutboxWriter(TychoDbContext dbContext, OutboxActivity outboxActiv
                 Handler = entry.HandlerIdentity.ToString(),
                 Payload = (entry.Payload as string)!,
             };
-            outboxMessages.Add(outboxMessage);
+            _dbContext.Set<OutboxMessage>().Add(outboxMessage);
         }
 
         if (shouldCommit)

@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Tycho.Requests;
 using Tycho.Requests.Broker;
 using Tycho.Structure;
-using Tycho.Structure.Data;
+using Tycho.Structure.Internal;
 
 namespace Tycho.Apps.Instance
 {

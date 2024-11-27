@@ -14,20 +14,16 @@ namespace Tycho.Requests.Registrating
             where TRequest : class, IRequest
             where TTargetModule : TychoModule
         {
-            AddUpStreamRegistration<TRequest, 
-                RequestForwarder<TRequest, TTargetModule>>();
-            Services.TryAddTransient<
-                RequestForwarder<TRequest, TTargetModule>>();
+            AddUpStreamRegistration<TRequest, RequestForwarder<TRequest, TTargetModule>>();
+            Services.TryAddTransient<RequestForwarder<TRequest, TTargetModule>>();
         }
 
         public void ForwardUpStreamRequest<TRequest, TResponse, TTargetModule>()
             where TRequest : class, IRequest<TResponse>
             where TTargetModule : TychoModule
         {
-            AddUpStreamRegistration<TRequest, TResponse, 
-                RequestForwarder<TRequest, TResponse, TTargetModule>>();
-            Services.TryAddTransient<
-                RequestForwarder<TRequest, TResponse, TTargetModule>>();
+            AddUpStreamRegistration<TRequest, TResponse, RequestForwarder<TRequest, TResponse, TTargetModule>>();
+            Services.TryAddTransient<RequestForwarder<TRequest, TResponse, TTargetModule>>();
         }
 
         public void ForwardMappedUpStreamRequest<TRequest, TTargetRequest, TTargetModule>(
@@ -36,8 +32,7 @@ namespace Tycho.Requests.Registrating
             where TTargetRequest : class, IRequest
             where TTargetModule : TychoModule
         {
-            AddUpStreamRegistration<TRequest, 
-                MappedRequestForwarder<TRequest, TTargetRequest, TTargetModule>>();
+            AddUpStreamRegistration<TRequest, MappedRequestForwarder<TRequest, TTargetRequest, TTargetModule>>();
             Services.TryAddTransient(sp =>
                 new MappedRequestForwarder<TRequest, TTargetRequest, TTargetModule>(
                     sp.GetRequiredService<IModule<TTargetModule>>(), 
@@ -51,7 +46,8 @@ namespace Tycho.Requests.Registrating
             where TTargetRequest : class, IRequest<TTargetResponse>
             where TTargetModule : TychoModule
         {
-            AddUpStreamRegistration<TRequest, TResponse, 
+            AddUpStreamRegistration<
+                TRequest, TResponse, 
                 MappedRequestForwarder<TRequest, TResponse, TTargetRequest, TTargetResponse, TTargetModule>>();
             Services.TryAddTransient(sp =>
                 new MappedRequestForwarder<TRequest, TResponse, TTargetRequest, TTargetResponse, TTargetModule>(

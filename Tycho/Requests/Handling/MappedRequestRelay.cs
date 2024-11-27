@@ -47,8 +47,11 @@ namespace Tycho.Requests.Handling
         public async Task<TResponse> Handle(TRequest requestData, CancellationToken cancellationToken)
         {
             var targetRequestData = _mapRequest(requestData);
-            var targetRequestResponse = await _targetExecutor.Execute<TTargetRequest, TTargetResponse>(
-                targetRequestData, cancellationToken).ConfigureAwait(false);
+            var targetRequestResponse = await _targetExecutor
+                .Execute<TTargetRequest, TTargetResponse>(
+                    targetRequestData, 
+                    cancellationToken)
+                .ConfigureAwait(false);
             return _mapResponse(targetRequestResponse);
         }
     }

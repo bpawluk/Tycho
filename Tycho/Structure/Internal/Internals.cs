@@ -2,7 +2,7 @@
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Tycho.Structure.Data
+namespace Tycho.Structure.Internal
 {
     internal class Internals : IServiceProvider, IDisposable
     {
@@ -40,9 +40,12 @@ namespace Tycho.Structure.Data
 
         public void Build()
         {
-            _serviceProvider ??= _serviceCollection!.BuildServiceProvider();
-            _serviceCollection = null;
-            InternalsBuilt?.Invoke(this, EventArgs.Empty);
+            if (_serviceProvider == null)
+            {
+                _serviceProvider = _serviceCollection!.BuildServiceProvider();
+                _serviceCollection = null;
+                InternalsBuilt?.Invoke(this, EventArgs.Empty);
+            }
         }
 
         public bool HasService<TServiceInterface>()

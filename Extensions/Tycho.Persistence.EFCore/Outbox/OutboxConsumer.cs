@@ -17,9 +17,9 @@ internal class OutboxConsumer(TychoDbContext dbContext, OutboxConsumerSettings? 
     {
         var currentTime = DateTime.UtcNow;
         var validProcessingThreshold = currentTime - _settings.ProcessingStateExpiration;
-        var outboxMessages = _dbContext.Set<OutboxMessage>();
 
-        var messagesToProcess = await outboxMessages
+        var messagesToProcess = await _dbContext
+            .Set<OutboxMessage>()
             .Where(message =>
                 (message.State == MessageState.New) ||
                 (message.State == MessageState.Failed &&

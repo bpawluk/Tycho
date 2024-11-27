@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Tycho.Structure.Data;
+using Tycho.Structure.Internal;
 
 namespace Tycho.Events.Routing.Sources
 {

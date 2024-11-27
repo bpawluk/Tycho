@@ -6,7 +6,7 @@ using Tycho.Events.Routing;
 using Tycho.Events.Routing.Sources;
 using Tycho.Modules;
 using Tycho.Structure;
-using Tycho.Structure.Data;
+using Tycho.Structure.Internal;
 
 namespace Tycho.Events.Registrating
 {

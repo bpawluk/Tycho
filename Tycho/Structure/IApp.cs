@@ -1,7 +1,7 @@
 ﻿using System;
 using Tycho.Apps;
 using Tycho.Requests;
-using Tycho.Structure.Data;
+using Tycho.Structure.Internal;
 
 namespace Tycho.Structure
 {

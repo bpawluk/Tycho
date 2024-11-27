@@ -2,7 +2,7 @@
 using Tycho.Events;
 using Tycho.Events.Routing;
 using Tycho.Events.Routing.Sources;
-using Tycho.Structure.Data;
+using Tycho.Structure.Internal;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
 using Tycho.UnitTests._Data.Modules;
@@ -16,7 +16,7 @@ public class LocalHandlersSourceTests
     public LocalHandlersSourceTests()
     {
         var internals = new Internals(typeof(TestModule));
-        var services = internals.GetServiceCollection()
+        internals.GetServiceCollection()
             .AddTransient<IEventHandler<OtherEvent>, OtherEventHandler>()
             .AddTransient<IEventHandler<TestEvent>, TestEventOtherHandler>()
             .AddTransient<IEventHandler<TestEvent>, TestEventHandler>();

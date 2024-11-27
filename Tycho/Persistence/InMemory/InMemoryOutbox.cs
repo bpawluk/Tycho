@@ -22,7 +22,6 @@ namespace Tycho.Persistence.InMemory
             {
                 _entries.Enqueue(entry);
             }
-
             _outboxActivity.NotifyNewEntriesAdded();
             return Task.CompletedTask;
         }

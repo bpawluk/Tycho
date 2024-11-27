@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Requests.Registrating.Registrations;
-using Tycho.Structure.Data;
+using Tycho.Structure.Internal;
 
 namespace Tycho.Requests.Broker
 {
@@ -35,7 +35,6 @@ namespace Tycho.Requests.Broker
             {
                 throw new ArgumentNullException(nameof(requestData), $"{nameof(requestData)} cannot be null");
             }
-
             var registration = _internals.GetRequiredService<IUpStreamHandlerRegistration<TRequest>>();
             return registration.Handler.Handle(requestData, cancellationToken);
         }
@@ -47,7 +46,6 @@ namespace Tycho.Requests.Broker
             {
                 throw new ArgumentNullException(nameof(requestData), $"{nameof(requestData)} cannot be null");
             }
-
             var registration = _internals.GetRequiredService<IUpStreamHandlerRegistration<TRequest, TResponse>>();
             return registration.Handler.Handle(requestData, cancellationToken);
         }

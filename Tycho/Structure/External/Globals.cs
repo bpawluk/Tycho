@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace Tycho.Structure.Data
+namespace Tycho.Structure.External
 {
     internal class Globals
     {
