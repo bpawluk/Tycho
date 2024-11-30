@@ -29,6 +29,6 @@ namespace Tycho.Events
         /// Handles an event of type <typeparamref name="TEvent"/>
         /// </summary>
         /// <param name="eventData">The data of the event to handle</param>
-        Task Handle(TEvent eventData, CancellationToken cancellationToken = default);
+        Task Handle(TEvent eventData, CancellationToken cancellationToken);
     }
 }
