@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using Tycho.Persistence.EFCore.Outbox;
 
 namespace Tycho.Persistence.EFCore;
@@ -18,6 +19,21 @@ public class TychoDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.Entity<OutboxMessage>();
+
+        modelBuilder.Entity<OutboxMessage>()
+                    .ToTable(GetOutboxName());
+    }
+
+    private string GetOutboxName()
+    {
+        var dbContextName = GetType().Name;
+        var dbContextSuffix = "DbContext";
+
+        if (dbContextName.EndsWith(dbContextSuffix, StringComparison.OrdinalIgnoreCase))
+        {
+            dbContextName = dbContextName[..^dbContextSuffix.Length];
+        }
+
+        return dbContextName + "Outbox";
     }
 }
