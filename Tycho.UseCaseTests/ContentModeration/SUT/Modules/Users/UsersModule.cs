@@ -15,12 +15,12 @@ public class UsersModule : TychoModule
               .Handles<GetUsersRequest, GetUsersRequest.Response, GetUsersRequestHandler>();
     }
 
-    protected override void IncludeModules(IModuleStructure module) { }
-
-    protected override void MapEvents(IModuleEvents module)
+    protected override void DefineEvents(IModuleEvents module)
     {
         module.Handles<UserStatusChangedEvent, UserStatusChangedEventHandler>();
     }
+
+    protected override void IncludeModules(IModuleStructure module) { }
 
     protected override void RegisterServices(IServiceCollection module)
     {

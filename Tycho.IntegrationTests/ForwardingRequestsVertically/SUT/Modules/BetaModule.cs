@@ -28,6 +28,8 @@ internal class BetaModule : TychoModule
               .Requires<BetaRequestWithResponse, string>();
     }
 
+    protected override void DefineEvents(IModuleEvents module) { }
+
     protected override void IncludeModules(IModuleStructure module)
     {
         module.Uses<GammaModule>(contract =>
@@ -42,8 +44,6 @@ internal class BetaModule : TychoModule
                         response => response);
         });
     }
-
-    protected override void MapEvents(IModuleEvents module) { }
 
     protected override void RegisterServices(IServiceCollection module) { }
 }

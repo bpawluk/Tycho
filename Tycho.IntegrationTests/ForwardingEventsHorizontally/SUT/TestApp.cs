@@ -27,14 +27,7 @@ internal class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
         app.Handles<BeginTestWorkflowRequest, BeginTestWorkflowRequestHandler>();
     }
 
-    protected override void IncludeModules(IAppStructure app)
-    {
-        app.Uses<AlphaModule>()
-           .Uses<BetaModule>()
-           .Uses<GammaModule>();
-    }
-
-    protected override void MapEvents(IAppEvents app)
+    protected override void DefineEvents(IAppEvents app)
     {
         app.Routes<WorkflowStartedEvent>()
            .Forwards<AlphaModule>()
@@ -54,6 +47,13 @@ internal class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
         app.Handles<AlphaWorkflowFinishedEvent, AlphaWorkflowFinishedEventHandler>()
            .Handles<BetaWorkflowFinishedEvent, BetaWorkflowFinishedEventHandler>()
            .Handles<GammaWorkflowFinishedEvent, GammaWorkflowFinishedEventHandler>();
+    }
+
+    protected override void IncludeModules(IAppStructure app)
+    {
+        app.Uses<AlphaModule>()
+           .Uses<BetaModule>()
+           .Uses<GammaModule>();
     }
 
     protected override void RegisterServices(IServiceCollection app)

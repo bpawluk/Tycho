@@ -19,17 +19,17 @@ public class BloggingWebsiteApp : TychoApp
         app.Forwards<AddReactionRequest, ReactionsModule>();
     }
 
-    protected override void IncludeModules(IAppStructure app)
-    {
-        app.Uses<FeedsModule>()
-           .Uses<ReactionsModule>();
-    }
-
-    protected override void MapEvents(IAppEvents app)
+    protected override void DefineEvents(IAppEvents app)
     {
         app.Routes<Reactions.Contract.Outgoing.ScoreChangedEvent>()
            .ForwardsAs<Feeds.Contract.ScoreChangedEvent, FeedsModule>(
                eventData => new(eventData.TargetId, eventData.NewScore));
+    }
+
+    protected override void IncludeModules(IAppStructure app)
+    {
+        app.Uses<FeedsModule>()
+           .Uses<ReactionsModule>();
     }
 
     protected override void RegisterServices(IServiceCollection app) { }

@@ -13,9 +13,7 @@ internal class GammaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module) { }
 
-    protected override void IncludeModules(IModuleStructure module) { }
-
-    protected override void MapEvents(IModuleEvents module)
+    protected override void DefineEvents(IModuleEvents module)
     {
         module.Handles<WorkflowStartedEvent, WorkflowStartedEventHandler>();
 
@@ -28,6 +26,8 @@ internal class GammaModule : TychoModule
               .ExposesAs<BetaWorkflowFinishedEvent>(
                   eventData => new(eventData.Result));
     }
+
+    protected override void IncludeModules(IModuleStructure module) { }
 
     protected override void RegisterServices(IServiceCollection module) { }
 }

@@ -19,13 +19,13 @@ public class TestApp : TychoApp
            .Handles<GetAppValueRequest, string, GetValueRequestHandler>();
     }
 
+    protected override void DefineEvents(IAppEvents app) { }
+
     protected override void IncludeModules(IAppStructure app)
     {
         app.Uses<AlphaModule>()
            .Uses<BetaModule>();
     }
-
-    protected override void MapEvents(IAppEvents app) { }
 
     protected override void RegisterServices(IServiceCollection app)
     {

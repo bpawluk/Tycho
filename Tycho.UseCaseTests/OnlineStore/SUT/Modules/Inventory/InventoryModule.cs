@@ -16,13 +16,13 @@ internal class InventoryModule : TychoModule
               .Handles<ReserveItemRequest, ReserveItemRequest.Response, ReserveItemRequestHandler>();
     }
 
-    protected override void IncludeModules(IModuleStructure module) { }
-
-    protected override void MapEvents(IModuleEvents module)
+    protected override void DefineEvents(IModuleEvents module)
     {
         module.Routes<ItemAvailabilityChangedEvent>()
               .Exposes();
     }
+
+    protected override void IncludeModules(IModuleStructure module) { }
 
     protected override void RegisterServices(IServiceCollection module)
     {

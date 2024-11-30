@@ -19,16 +19,16 @@ public class FeedsModule : TychoModule
               .Handles<GetFeedEntriesRequest, GetFeedEntriesRequest.Response, GetFeedEntriesRequestHandler>();
     }
 
+    protected override void DefineEvents(IModuleEvents module)
+    {
+        module.Handles<ScoreChangedEvent, ScoreChangedEventHandler>();
+    }
+
     protected override void IncludeModules(IModuleStructure module) 
     {
         module.Uses<ArticlesModule>()
               .Uses<PostsModule>()
               .Uses<CommentsModule>();
-    }
-
-    protected override void MapEvents(IModuleEvents module)
-    {
-        module.Handles<ScoreChangedEvent, ScoreChangedEventHandler>();
     }
 
     protected override void RegisterServices(IServiceCollection module)

@@ -31,14 +31,14 @@ internal class TestModule : TychoModule
         module.Requires<EndTestWorkflowRequest>();
     }
 
-    protected override void IncludeModules(IModuleStructure module) { }
-
-    protected override void MapEvents(IModuleEvents module) 
+    protected override void DefineEvents(IModuleEvents module) 
     {
         module.Handles<GetModuleSingletonServiceUsageEvent, GetModuleSingletonServiceUsageEventHandler>()
               .Handles<GetModuleScopedServiceUsageEvent, GetModuleScopedServiceUsageEventHandler>()
               .Handles<GetModuleTransientServiceUsageEvent, GetModuleTransientServiceUsageEventHandler>();
     }
+
+    protected override void IncludeModules(IModuleStructure module) { }
 
     protected override void RegisterServices(IServiceCollection module)
     {

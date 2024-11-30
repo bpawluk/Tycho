@@ -35,6 +35,8 @@ public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
                 response => new(response));
     }
 
+    protected override void DefineEvents(IAppEvents app) { }
+
     protected override void IncludeModules(IAppStructure app)
     {
         app.Uses<AlphaModule>(contract =>
@@ -70,8 +72,6 @@ public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
                     .Handle<GammaRequestWithResponse, string, GammaRequestHandler>();
         });
     }
-
-    protected override void MapEvents(IAppEvents app) { }
 
     protected override void RegisterServices(IServiceCollection app)
     {

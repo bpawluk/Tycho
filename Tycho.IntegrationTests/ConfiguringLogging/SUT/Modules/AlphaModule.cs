@@ -16,12 +16,12 @@ internal class AlphaModule : TychoModule
               .Handles<LogAlphaRequest, LogAlphaRequestHandler>();
     }
 
+    protected override void DefineEvents(IModuleEvents module) { }
+
     protected override void IncludeModules(IModuleStructure module)
     {
         module.Uses<BetaModule>();
     }
-
-    protected override void MapEvents(IModuleEvents module) { }
 
     protected override void RegisterServices(IServiceCollection module) { }
 }

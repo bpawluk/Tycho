@@ -32,6 +32,17 @@ public class OnlineStoreApp : TychoApp
         app.Forwards<GetOrdersRequest, GetOrdersRequest.Response, OrderingModule>();
     }
 
+    protected override void DefineEvents(IAppEvents app)
+    {
+        app.Routes<ItemAvailabilityChangedEvent>()
+           .ForwardsAs<ProductAvailabilityChangedEvent, CatalogModule>(EventMapper.Map);
+
+        app.Routes<BasketCheckedOutEvent>()
+           .ForwardsAs<OrderPlacedEvent, OrderingModule>(EventMapper.Map);
+
+        app.Handles<BasketItemAddedEvent, BasketItemAddedEventHandler>();
+    }
+
     protected override void IncludeModules(IAppStructure app)
     {
         app.Uses<CatalogModule>(outgoingRequests => 
@@ -45,17 +56,6 @@ public class OnlineStoreApp : TychoApp
         app.Uses<InventoryModule>()
            .Uses<BasketModule>()
            .Uses<OrderingModule>();
-    }
-
-    protected override void MapEvents(IAppEvents app)
-    {
-        app.Routes<ItemAvailabilityChangedEvent>()
-           .ForwardsAs<ProductAvailabilityChangedEvent, CatalogModule>(EventMapper.Map);
-
-        app.Routes<BasketCheckedOutEvent>()
-           .ForwardsAs<OrderPlacedEvent, OrderingModule>(EventMapper.Map);
-
-        app.Handles<BasketItemAddedEvent, BasketItemAddedEventHandler>();
     }
 
     protected override void RegisterServices(IServiceCollection app) { }

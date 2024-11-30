@@ -45,21 +45,21 @@ namespace Tycho.Modules
         protected abstract void DefineContract(IModuleContract module);
 
         /// <summary>
-        /// Use this method to define submodules used by the module
-        /// </summary>
-        /// <param name="module">An interface to define the submodules</param>
-        protected abstract void IncludeModules(IModuleStructure module);
-
-        /// <summary>
         /// Use this method to define events handled and routed by the module
         /// </summary>
         /// <param name="module">An interface to define the events</param>
-        protected abstract void MapEvents(IModuleEvents module);
+        protected abstract void DefineEvents(IModuleEvents module);
+
+        /// <summary>
+        /// Use this method to define submodules used by the module
+        /// </summary>
+        /// <param name="module">An interface to include the submodules</param>
+        protected abstract void IncludeModules(IModuleStructure module);
 
         /// <summary>
         /// Use this method to define services required by the module
         /// </summary>
-        /// <param name="module">An interface to define the services</param>
+        /// <param name="module">An interface to register the services</param>
         protected abstract void RegisterServices(IServiceCollection module);
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace Tycho.Modules
             _builder.WithCleanup(Cleanup).Init();
             RegisterServices(_builder.Services);
             DefineContract(_builder.Contract);
-            MapEvents(_builder.Events);
+            DefineEvents(_builder.Events);
             IncludeModules(_builder.Structure);
 
             var module = await _builder.Build().ConfigureAwait(false);

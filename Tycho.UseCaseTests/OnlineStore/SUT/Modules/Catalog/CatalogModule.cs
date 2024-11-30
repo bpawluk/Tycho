@@ -19,12 +19,12 @@ internal class CatalogModule : TychoModule
         module.Requires<AddProductToBasketRequest>();
     }
 
-    protected override void IncludeModules(IModuleStructure module) { }
-
-    protected override void MapEvents(IModuleEvents module)
+    protected override void DefineEvents(IModuleEvents module)
     {
         module.Handles<ProductAvailabilityChangedEvent, ProductAvailabilityChangedEventHandler>();
     }
+
+    protected override void IncludeModules(IModuleStructure module) { }
 
     protected override void RegisterServices(IServiceCollection module)
     {

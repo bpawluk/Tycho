@@ -18,12 +18,12 @@ internal class TestApp : TychoApp
            .Handles<LogAppRequest, LogAppRequestHandler>();
     }
 
+    protected override void DefineEvents(IAppEvents app) { }
+
     protected override void IncludeModules(IAppStructure app)
     {
         app.Uses<AlphaModule>();
     }
-
-    protected override void MapEvents(IAppEvents app) { }
 
     protected override void RegisterServices(IServiceCollection app) { }
 }

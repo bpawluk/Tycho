@@ -21,6 +21,8 @@ public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
            .Handles<RequestWithResponse, string, RequestHandler>();
     }
 
+    protected override void DefineEvents(IAppEvents app) { }
+
     protected override void IncludeModules(IAppStructure app)
     {
         app.Uses<AlphaModule>(contract =>
@@ -29,8 +31,6 @@ public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
                     .Handle<AlphaOutRequestWithResponse, string, AlphaOutRequestHandler>();
         });
     }
-
-    protected override void MapEvents(IAppEvents app) { }
 
     protected override void RegisterServices(IServiceCollection app)
     {

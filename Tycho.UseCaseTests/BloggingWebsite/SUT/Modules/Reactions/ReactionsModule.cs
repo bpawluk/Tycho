@@ -15,13 +15,13 @@ public class ReactionsModule : TychoModule
         module.Handles<AddReactionRequest, AddReactionRequestHandler>();
     }
 
-    protected override void IncludeModules(IModuleStructure module) { }
-
-    protected override void MapEvents(IModuleEvents module)
+    protected override void DefineEvents(IModuleEvents module)
     {
         module.Routes<ScoreChangedEvent>()
               .Exposes();
     }
+
+    protected override void IncludeModules(IModuleStructure module) { }
 
     protected override void RegisterServices(IServiceCollection module)
     {
