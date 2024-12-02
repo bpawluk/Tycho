@@ -19,11 +19,11 @@ namespace Tycho.Events.Handling
             _internals = internals;
         }
 
-        public Task Handle(TEvent eventData, CancellationToken cancellationToken)
+        public async Task Handle(TEvent eventData, CancellationToken cancellationToken)
         {
             using var scope = _internals.CreateScope();
             var handler = scope.ServiceProvider.GetRequiredService<TEventHandler>();
-            return handler.Handle(eventData, cancellationToken);
+            await handler.Handle(eventData, cancellationToken);
         }
     }
 }

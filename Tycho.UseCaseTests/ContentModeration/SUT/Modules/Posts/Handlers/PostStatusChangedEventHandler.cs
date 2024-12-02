@@ -11,6 +11,7 @@ internal class PostStatusChangedEventHandler(IUnitOfWork unitOfWork) : IEventHan
 
     public async Task Handle(PostStatusChangedEvent eventData, CancellationToken cancellationToken)
     {
+        await Task.Delay(10, cancellationToken); // Simulate async work
         var posts = _unitOfWork.Set<Post>();
 
         var post = await posts.FindAsync([eventData.PostId], cancellationToken);

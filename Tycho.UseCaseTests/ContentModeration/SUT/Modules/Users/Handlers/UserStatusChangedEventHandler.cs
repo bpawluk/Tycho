@@ -11,6 +11,7 @@ internal class UserStatusChangedEventHandler(IUnitOfWork unitOfWork) : IEventHan
 
     public async Task Handle(UserStatusChangedEvent eventData, CancellationToken cancellationToken)
     {
+        await Task.Delay(10, cancellationToken); // Simulate async work
         var users = _unitOfWork.Set<User>();
 
         var user = await users.FindAsync([eventData.UserId], cancellationToken);

@@ -11,6 +11,7 @@ internal class AddPostRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<A
 
     public async Task<AddPostRequest.Response> Handle(AddPostRequest requestData, CancellationToken cancellationToken)
     {
+        await Task.Delay(10, cancellationToken); // Simulate async work
         var posts = _unitOfWork.Set<Post>();
         var newPost = new Post(requestData.AuthorId, requestData.Content);
         posts.Add(newPost);
