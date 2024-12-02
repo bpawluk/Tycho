@@ -86,7 +86,10 @@ namespace Tycho.Persistence.Processing
                 var newEntries = await _eventOutbox.Read(entriesToFetch).ConfigureAwait(false);
                 newEntriesCount = newEntries.Count;
 
-                var newEntriesInProcessing = newEntries.Select(ProcessEntry);
+                var newEntriesInProcessing = newEntries.Select(entry =>
+                {
+                    return Task.Run(async () => await ProcessEntry(entry).ConfigureAwait(false));
+                });
                 _entriesInProcessing.AddRange(newEntriesInProcessing);
             }
 

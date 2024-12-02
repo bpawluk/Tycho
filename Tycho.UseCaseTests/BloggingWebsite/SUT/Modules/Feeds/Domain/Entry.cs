@@ -4,6 +4,8 @@ internal class Entry(int contentId, string feedPath, EntryType type)
 {
     public int Id { get; private set; }
 
+    public int Version { get; private set; }
+
     public int ContentId { get; private set; } = contentId;
 
     public string FeedPath { get; private set; } = feedPath;
@@ -23,6 +25,7 @@ internal class Entry(int contentId, string feedPath, EntryType type)
         if (newScore > Score)
         {
             Score = newScore;
+            Version++;
         }
     }
 }

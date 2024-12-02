@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Moq.EntityFrameworkCore;
 using Tycho.Events.Routing;
 using Tycho.Persistence.EFCore.Outbox;
+using Tycho.Structure.Internal;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Outbox;
 
@@ -27,7 +29,12 @@ public class OutboxConsumerTests
         _dbContextMock.Setup(db => db.Set<OutboxMessage>())
                       .Returns(() => _dbSetMock.Object);
 
-        _sut = new OutboxConsumer(_dbContextMock.Object, _settings);
+        var internals = new Internals(GetType());
+        internals.GetServiceCollection()
+                 .AddSingleton(_dbContextMock.Object);
+        internals.Build();
+
+        _sut = new OutboxConsumer(internals, _settings);
     }
 
     [Fact]

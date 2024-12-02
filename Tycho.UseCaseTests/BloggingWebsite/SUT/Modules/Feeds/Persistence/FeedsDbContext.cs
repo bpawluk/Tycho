@@ -8,6 +8,15 @@ internal class FeedsDbContext : TychoDbContext
 {
     public DbSet<Entry> Entries { get; set; } = null!;
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Entry>()
+                    .Property(entry => entry.Version)
+                    .IsConcurrencyToken();
+    }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);
