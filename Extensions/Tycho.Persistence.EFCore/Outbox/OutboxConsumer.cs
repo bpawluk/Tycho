@@ -4,21 +4,26 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Routing;
+using Tycho.Structure.Internal;
 
 namespace Tycho.Persistence.EFCore.Outbox;
 
-internal class OutboxConsumer(TychoDbContext dbContext, OutboxConsumerSettings? settings = null) : IOutboxConsumer
+internal class OutboxConsumer(Internals internals, OutboxConsumerSettings? settings = null) : IOutboxConsumer
 {
-    private readonly TychoDbContext _dbContext = dbContext;
+    private readonly Internals _internals = internals;
     private readonly OutboxConsumerSettings _settings = settings ?? OutboxConsumerSettings.Default;
 
     public async Task<IReadOnlyCollection<OutboxEntry>> Read(int count, CancellationToken cancellationToken)
     {
+        using var scope = _internals.CreateScope();
+        using var dbContext = scope.ServiceProvider.GetRequiredService<TychoDbContext>();
+
         var currentTime = DateTime.UtcNow;
         var validProcessingThreshold = currentTime - _settings.ProcessingStateExpiration;
 
-        var messagesToProcess = await _dbContext
+        var messagesToProcess = await dbContext
             .Set<OutboxMessage>()
             .Where(message =>
                 (message.State == MessageState.New) ||
@@ -38,7 +43,7 @@ internal class OutboxConsumer(TychoDbContext dbContext, OutboxConsumerSettings? 
             message.Updated = currentTime;
             message.DeliveryCount++;
         }
-        await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return messagesToProcess
             .Select(message => new OutboxEntry(
@@ -50,24 +55,32 @@ internal class OutboxConsumer(TychoDbContext dbContext, OutboxConsumerSettings? 
 
     public async Task MarkAsProcessed(OutboxEntry entry, CancellationToken cancellationToken)
     {
-        var outboxMessages = _dbContext.Set<OutboxMessage>();
+        using var scope = _internals.CreateScope();
+        using var dbContext = scope.ServiceProvider.GetRequiredService<TychoDbContext>();
+
+        var outboxMessages = dbContext.Set<OutboxMessage>();
         var message = await outboxMessages.FindAsync([entry.Id], cancellationToken).ConfigureAwait(false);
+
         if (message != null)
         {
             outboxMessages.Remove(message);
-            await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 
     public async Task MarkAsFailed(OutboxEntry entry, CancellationToken cancellationToken)
     {
-        var outboxMessages = _dbContext.Set<OutboxMessage>();
+        using var scope = _internals.CreateScope();
+        using var dbContext = scope.ServiceProvider.GetRequiredService<TychoDbContext>();
+
+        var outboxMessages = dbContext.Set<OutboxMessage>();
         var message = await outboxMessages.FindAsync([entry.Id], cancellationToken).ConfigureAwait(false);
+
         if (message != null)
         {
             message.State = MessageState.Failed;
             message.Updated = DateTime.UtcNow;
-            await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 }

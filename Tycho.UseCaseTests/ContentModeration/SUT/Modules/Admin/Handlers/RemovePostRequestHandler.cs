@@ -14,6 +14,8 @@ internal class RemovePostRequestHandler(IUnitOfWork unitOfWork, IParent parent) 
 
     public async Task Handle(RemovePostRequest requestData, CancellationToken cancellationToken)
     {
+        await Task.Delay(10, cancellationToken); // Simulate async work
+
         var adminActions = _unitOfWork.Set<AdminAction>();
 
         AdminAction newAdminAction;

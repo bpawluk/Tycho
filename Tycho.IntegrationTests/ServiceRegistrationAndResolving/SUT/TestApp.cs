@@ -37,15 +37,7 @@ public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
         app.Handles<BeginTestWorkflowRequest, BeginTestWorkflowRequestHandler>();
     }
 
-    protected override void IncludeModules(IAppStructure app)
-    {
-        app.Uses<TestModule>(contract =>
-        {
-            contract.Handle<EndTestWorkflowRequest, EndTestWorkflowRequestHandler>();
-        });
-    }
-
-    protected override void MapEvents(IAppEvents app)
+    protected override void DefineEvents(IAppEvents app)
     {
         app.Handles<GetAppSingletonServiceUsageEvent, GetAppSingletonServiceUsageEventHandler>()
            .Handles<GetAppScopedServiceUsageEvent, GetAppScopedServiceUsageEventHandler>()
@@ -59,6 +51,14 @@ public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
 
         app.Routes<GetModuleTransientServiceUsageEvent>()
            .Forwards<TestModule>();
+    }
+
+    protected override void IncludeModules(IAppStructure app)
+    {
+        app.Uses<TestModule>(contract =>
+        {
+            contract.Handle<EndTestWorkflowRequest, EndTestWorkflowRequestHandler>();
+        });
     }
 
     protected override void RegisterServices(IServiceCollection app)

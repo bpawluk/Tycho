@@ -29,6 +29,7 @@ internal class Feed(string path, EntryType entriesType, IUnitOfWork unitOfWork)
             .FromSqlRaw(@"
                 SELECT 
                     entry.Id,
+                    entry.Version,
                     entry.ContentId,
                     entry.FeedPath,
                     entry.Type,
@@ -53,6 +54,7 @@ internal class Feed(string path, EntryType entriesType, IUnitOfWork unitOfWork)
             .FromSqlRaw(@"
                 SELECT 
                     entry.Id,
+                    entry.Version,
                     entry.ContentId,
                     entry.FeedPath,
                     entry.Type,
@@ -77,6 +79,7 @@ internal class Feed(string path, EntryType entriesType, IUnitOfWork unitOfWork)
             .FromSqlRaw(@"
                 SELECT 
                     entry.Id,
+                    entry.Version,
                     entry.ContentId,
                     entry.FeedPath,
                     entry.Type,

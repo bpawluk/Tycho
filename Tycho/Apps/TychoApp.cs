@@ -33,21 +33,21 @@ namespace Tycho.Apps
         protected abstract void DefineContract(IAppContract app);
 
         /// <summary>
-        /// Use this method to define modules used by the application
-        /// </summary>
-        /// <param name="app">An interface to define the modules</param>
-        protected abstract void IncludeModules(IAppStructure app);
-
-        /// <summary>
         /// Use this method to define events handled and routed by the application
         /// </summary>
         /// <param name="app">An interface to define the events</param>
-        protected abstract void MapEvents(IAppEvents app);
+        protected abstract void DefineEvents(IAppEvents app);
+
+        /// <summary>
+        /// Use this method to define modules used by the application
+        /// </summary>
+        /// <param name="app">An interface to include the modules</param>
+        protected abstract void IncludeModules(IAppStructure app);
 
         /// <summary>
         /// Use this method to define services required by the application
         /// </summary>
-        /// <param name="app">An interface to define the services</param>
+        /// <param name="app">An interface to register the services</param>
         protected abstract void RegisterServices(IServiceCollection app);
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace Tycho.Apps
             _builder.WithCleanup(Cleanup).Init();
             RegisterServices(_builder.Services);
             DefineContract(_builder.Contract);
-            MapEvents(_builder.Events);
+            DefineEvents(_builder.Events);
             IncludeModules(_builder.Structure);
 
             var app = await _builder.Build().ConfigureAwait(false);

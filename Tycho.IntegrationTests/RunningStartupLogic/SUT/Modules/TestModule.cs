@@ -16,9 +16,9 @@ internal class TestModule : TychoModule
         module.Handles<GetModuleValueRequest, string, GetValueRequestHandler>();
     }
 
-    protected override void IncludeModules(IModuleStructure module) { }
+    protected override void DefineEvents(IModuleEvents module) { }
 
-    protected override void MapEvents(IModuleEvents module) { }
+    protected override void IncludeModules(IModuleStructure module) { }
 
     protected override void RegisterServices(IServiceCollection app)
     {

@@ -25,6 +25,15 @@ public class ContentModerationApp : TychoApp
         app.Forwards<RemovePostRequest, AdminModule>();
     }
 
+    protected override void DefineEvents(IAppEvents app)
+    {
+        app.Routes<UserBannedEvent>()
+           .ForwardsAs<UserStatusChangedEvent, UsersModule>(EventMapper.Map);
+
+        app.Routes<PostRemovedEvent>()
+           .ForwardsAs<PostStatusChangedEvent, PostsModule>(EventMapper.Map);
+    }
+
     protected override void IncludeModules(IAppStructure app)
     {
         app.Uses<UsersModule>()
@@ -37,15 +46,6 @@ public class ContentModerationApp : TychoApp
                 GetPostRequest, GetPostRequest.Response, 
                 PostsModule>(RequestMapper.Map, RequestMapper.Map);
         });
-    }
-
-    protected override void MapEvents(IAppEvents app)
-    {
-        app.Routes<UserBannedEvent>()
-           .ForwardsAs<UserStatusChangedEvent, UsersModule>(EventMapper.Map);
-
-        app.Routes<PostRemovedEvent>()
-           .ForwardsAs<PostStatusChangedEvent, PostsModule>(EventMapper.Map);
     }
 
     protected override void RegisterServices(IServiceCollection app) { }

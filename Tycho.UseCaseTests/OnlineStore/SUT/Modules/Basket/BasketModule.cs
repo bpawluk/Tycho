@@ -19,9 +19,7 @@ internal class BasketModule : TychoModule
               .Handles<CheckoutRequest, CheckoutRequestHandler>();
     }
 
-    protected override void IncludeModules(IModuleStructure module) { }
-
-    protected override void MapEvents(IModuleEvents module)
+    protected override void DefineEvents(IModuleEvents module)
     {
         module.Routes<BasketItemAddedEvent>()
               .Exposes();
@@ -29,6 +27,8 @@ internal class BasketModule : TychoModule
         module.Routes<BasketCheckedOutEvent>()
               .Exposes();
     }
+
+    protected override void IncludeModules(IModuleStructure module) { }
 
     protected override void RegisterServices(IServiceCollection module)
     {

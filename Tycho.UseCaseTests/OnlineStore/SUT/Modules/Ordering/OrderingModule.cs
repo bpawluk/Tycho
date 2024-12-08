@@ -14,12 +14,12 @@ internal class OrderingModule : TychoModule
         module.Handles<GetOrdersRequest, GetOrdersRequest.Response, GetOrdersRequestHandler>();
     }
 
-    protected override void IncludeModules(IModuleStructure module) { }
-
-    protected override void MapEvents(IModuleEvents module)
+    protected override void DefineEvents(IModuleEvents module)
     {
         module.Handles<OrderPlacedEvent, OrderPlacedEventHandler>();
     }
+
+    protected override void IncludeModules(IModuleStructure module) { }
 
     protected override void RegisterServices(IServiceCollection module)
     {

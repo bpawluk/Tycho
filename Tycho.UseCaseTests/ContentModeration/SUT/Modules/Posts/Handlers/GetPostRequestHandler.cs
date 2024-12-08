@@ -11,6 +11,7 @@ internal class GetPostRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<G
 
     public async Task<GetPostRequest.Response> Handle(GetPostRequest requestData, CancellationToken cancellationToken)
     {
+        await Task.Delay(10, cancellationToken); // Simulate async work
         var posts = _unitOfWork.Set<Post>();
 
         var post = await posts.FindAsync([requestData.PostId], cancellationToken);

@@ -11,6 +11,7 @@ internal class AddUserRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<A
 
     public async Task<AddUserRequest.Response> Handle(AddUserRequest requestData, CancellationToken cancellationToken)
     {
+        await Task.Delay(10, cancellationToken); // Simulate async work
         var users = _unitOfWork.Set<User>();
         var newUser = new User(requestData.Name);
         users.Add(newUser);

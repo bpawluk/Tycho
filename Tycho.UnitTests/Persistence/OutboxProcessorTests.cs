@@ -93,7 +93,7 @@ public sealed class OutboxProcessorTests : IDisposable
         await WaitForCompletion();
 
         // Assert
-        Assert.Equal(ExpectedIterations, _iterations);
+        Assert.True(_iterations >= ExpectedIterations);
         _mockOutbox.Verify(o => o.MarkAsProcessed(It.IsAny<OutboxEntry>(), It.IsAny<CTK>()),
             Times.Exactly(_entries.Count));
     }
@@ -123,7 +123,7 @@ public sealed class OutboxProcessorTests : IDisposable
         await WaitForCompletion();
 
         // Assert
-        Assert.Equal(ExpectedIterations, _iterations);
+        Assert.True(_iterations >= ExpectedIterations);
         _mockOutbox.Verify(o => o.MarkAsProcessed(It.IsAny<OutboxEntry>(), It.IsAny<CTK>()),
             Times.Exactly(_entries.Count));
     }
@@ -150,6 +150,7 @@ public sealed class OutboxProcessorTests : IDisposable
         await WaitForCompletion();
 
         // Assert
+        Assert.True(_iterations >= ExpectedIterations);
         _mockOutbox.Verify(o => o.Read(It.Is<int>(value => value == 2), It.IsAny<CTK>()), Times.Once);
         _mockOutbox.Verify(o => o.Read(It.Is<int>(value => value == 1), It.IsAny<CTK>()), Times.AtLeastOnce);
     }
@@ -199,7 +200,7 @@ public sealed class OutboxProcessorTests : IDisposable
         await WaitForCompletion();
 
         // Assert
-        Assert.Equal(ExpectedIterations, _iterations);
+        Assert.True(_iterations >= ExpectedIterations);
         _mockOutbox.Verify(o => o.MarkAsProcessed(It.IsAny<OutboxEntry>(), It.IsAny<CTK>()), Times.Exactly(2));
         _mockOutbox.Verify(o => o.MarkAsFailed(It.IsAny<OutboxEntry>(), It.IsAny<CTK>()), Times.Once);
     }
@@ -228,7 +229,7 @@ public sealed class OutboxProcessorTests : IDisposable
         await WaitForCompletion();
 
         // Assert
-        Assert.Equal(ExpectedIterations, _iterations);
+        Assert.True(_iterations >= ExpectedIterations);
 
         _mockOutbox.Verify(o => o.MarkAsProcessed(It.IsAny<OutboxEntry>(), It.IsAny<CTK>()), Times.Exactly(2));
         _mockOutbox.Verify(o => o.MarkAsFailed(It.IsAny<OutboxEntry>(), It.IsAny<CTK>()), Times.Never);

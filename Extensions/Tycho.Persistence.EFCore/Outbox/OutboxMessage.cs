@@ -1,11 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace Tycho.Persistence.EFCore.Outbox;
 
-[Table("Outbox")]
 [Index(nameof(Created))]
 internal class OutboxMessage
 {

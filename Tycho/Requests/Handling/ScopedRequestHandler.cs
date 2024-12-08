@@ -16,11 +16,11 @@ namespace Tycho.Requests.Handling
             _internals = internals;
         }
 
-        public Task Handle(TRequest requestData, CancellationToken cancellationToken)
+        public async Task Handle(TRequest requestData, CancellationToken cancellationToken)
         {
             using var scope = _internals.CreateScope();
             var handler = scope.ServiceProvider.GetRequiredService<TRequestHandler>();
-            return handler.Handle(requestData, cancellationToken);
+            await handler.Handle(requestData, cancellationToken);
         }
     }
 
@@ -35,11 +35,11 @@ namespace Tycho.Requests.Handling
             _internals = internals;
         }
 
-        public Task<TResponse> Handle(TRequest requestData, CancellationToken cancellationToken)
+        public async Task<TResponse> Handle(TRequest requestData, CancellationToken cancellationToken)
         {
             using var scope = _internals.CreateScope();
             var handler = scope.ServiceProvider.GetRequiredService<TRequestHandler>();
-            return handler.Handle(requestData, cancellationToken);
+            return await handler.Handle(requestData, cancellationToken);
         }
     }
 }

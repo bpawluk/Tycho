@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Major>4</Major>
+    <Major>5</Major>
     <Minor>0</Minor>
     <Patch>0</Patch>
     <VersionPrefix>$(Major).$(Minor).$(Patch)</VersionPrefix>
@@ -28,6 +28,7 @@
   
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>

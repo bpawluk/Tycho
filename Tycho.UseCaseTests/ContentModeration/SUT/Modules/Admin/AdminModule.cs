@@ -15,9 +15,7 @@ public class AdminModule : TychoModule
         module.Handles<RemovePostRequest, RemovePostRequestHandler>();
     }
 
-    protected override void IncludeModules(IModuleStructure module) { }
-
-    protected override void MapEvents(IModuleEvents module)
+    protected override void DefineEvents(IModuleEvents module)
     {
         module.Routes<PostRemovedEvent>()
               .Exposes();
@@ -25,6 +23,8 @@ public class AdminModule : TychoModule
         module.Routes<UserBannedEvent>()
               .Exposes();
     }
+
+    protected override void IncludeModules(IModuleStructure module) { }
 
     protected override void RegisterServices(IServiceCollection module)
     {

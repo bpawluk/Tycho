@@ -18,12 +18,12 @@ public class TestApp : TychoApp
            .Forwards<GetModuleValueRequest, string, TestModule>();
     }
 
+    protected override void DefineEvents(IAppEvents app) { }
+
     protected override void IncludeModules(IAppStructure app)
     {
         app.Uses<TestModule>();
     }
-
-    protected override void MapEvents(IAppEvents app) { }
 
     protected override void RegisterServices(IServiceCollection app)
     {

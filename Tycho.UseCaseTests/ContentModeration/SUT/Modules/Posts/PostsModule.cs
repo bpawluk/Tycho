@@ -16,12 +16,12 @@ public class PostsModule : TychoModule
               .Handles<GetPostsRequest, GetPostsRequest.Response, GetPostsRequestHandler>();
     }
 
-    protected override void IncludeModules(IModuleStructure module) { }
-
-    protected override void MapEvents(IModuleEvents module)
+    protected override void DefineEvents(IModuleEvents module)
     {
         module.Handles<PostStatusChangedEvent, PostStatusChangedEventHandler>();
     }
+
+    protected override void IncludeModules(IModuleStructure module) { }
 
     protected override void RegisterServices(IServiceCollection module)
     {

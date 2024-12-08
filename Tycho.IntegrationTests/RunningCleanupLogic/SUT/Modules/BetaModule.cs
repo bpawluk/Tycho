@@ -7,12 +7,12 @@ internal class BetaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module) { }
 
+    protected override void DefineEvents(IModuleEvents module) { }
+
     protected override void IncludeModules(IModuleStructure module) 
     {
         module.Uses<GammaModule>();
     }
-
-    protected override void MapEvents(IModuleEvents module) { }
 
     protected override void RegisterServices(IServiceCollection module)
     {

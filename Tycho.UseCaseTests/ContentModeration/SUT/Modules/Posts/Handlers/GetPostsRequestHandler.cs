@@ -12,6 +12,7 @@ internal class GetPostsRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<
 
     public async Task<GetPostsRequest.Response> Handle(GetPostsRequest requestData, CancellationToken cancellationToken)
     {
+        await Task.Delay(10, cancellationToken); // Simulate async work
         var posts = _unitOfWork.Set<Post>();
         var responsePosts = await posts
             .Where(post => post.Status == Post.PostStatus.Published)

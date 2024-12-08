@@ -14,6 +14,8 @@ public class TestApp : TychoApp
            .Forwards<GetGammaValueRequest, string, GammaModule>();     
     }
 
+    protected override void DefineEvents(IAppEvents app) { }
+
     protected override void IncludeModules(IAppStructure app)
     {
         var moduleSettings = new ModuleSettings()
@@ -24,8 +26,6 @@ public class TestApp : TychoApp
         app.Uses<AlphaModule>(moduleSettings)
            .Uses<GammaModule>(moduleSettings);
     }
-
-    protected override void MapEvents(IAppEvents app) { }
 
     protected override void RegisterServices(IServiceCollection app) { }
 }

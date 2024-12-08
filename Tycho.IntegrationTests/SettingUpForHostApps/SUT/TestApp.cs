@@ -15,9 +15,9 @@ public class TestApp : TychoApp
         app.Handles<TestRequest, string, TestRequestHandler>();
     }
 
-    protected override void IncludeModules(IAppStructure app) { }
+    protected override void DefineEvents(IAppEvents app) { }
 
-    protected override void MapEvents(IAppEvents app) { }
+    protected override void IncludeModules(IAppStructure app) { }
 
     protected override void RegisterServices(IServiceCollection app) 
     {

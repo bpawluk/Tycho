@@ -12,6 +12,7 @@ internal class GetUsersRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<
 
     public async Task<GetUsersRequest.Response> Handle(GetUsersRequest requestData, CancellationToken cancellationToken)
     {
+        await Task.Delay(10, cancellationToken); // Simulate async work
         var users = _unitOfWork.Set<User>();
         var responseUsers = await users
             .Where(user => user.Status == User.UserStatus.Active)
