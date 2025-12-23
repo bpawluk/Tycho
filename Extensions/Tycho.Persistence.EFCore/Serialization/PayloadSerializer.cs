@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.Json;
 using Tycho.Events;
+using Tycho.Events.Serialization;
 
 namespace Tycho.Persistence.EFCore.Serialization;
 

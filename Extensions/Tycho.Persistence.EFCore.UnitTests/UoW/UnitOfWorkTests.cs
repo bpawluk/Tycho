@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moq;
-using Tycho.Events.Publishing;
+using Tycho.OLD.Events.Publishing;
 using Tycho.Persistence.EFCore.UnitTests._Data.Entities;
 using Tycho.Persistence.EFCore.UnitTests._Data.Events;
 using Tycho.Persistence.EFCore.UoW;

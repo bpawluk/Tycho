@@ -43,7 +43,7 @@ public class EventRouterTests
 
     public EventRouterTests()
     {
-        var firstHandlersSourceMock = new Mock<IHandlersSource>();
+        var firstHandlersSourceMock = new Mock<IRouteSource>();
         firstHandlersSourceMock.Setup(source => source.IdentifyHandlers<TestEvent>())
                                .Returns(_firstSourceHandlers);
         firstHandlersSourceMock.Setup(source => source.IdentifyHandlers<OtherEvent>())
@@ -55,7 +55,7 @@ public class EventRouterTests
                                     _firstSourceHandlers,
                                     identity));
 
-        var secondHandlersSourceMock = new Mock<IHandlersSource>();
+        var secondHandlersSourceMock = new Mock<IRouteSource>();
         secondHandlersSourceMock.Setup(source => source.IdentifyHandlers<TestEvent>())
                                 .Returns(_secondSourceHandlers);
         secondHandlersSourceMock.Setup(source => source.IdentifyHandlers<OtherEvent>())
@@ -67,7 +67,7 @@ public class EventRouterTests
                                     _secondSourceHandlers,
                                     identity));
 
-        var thirdHandlersSourceMock = new Mock<IHandlersSource>();
+        var thirdHandlersSourceMock = new Mock<IRouteSource>();
         thirdHandlersSourceMock.Setup(source => source.IdentifyHandlers<TestEvent>())
                                .Returns([]);
         thirdHandlersSourceMock.Setup(source => source.IdentifyHandlers<OtherEvent>())

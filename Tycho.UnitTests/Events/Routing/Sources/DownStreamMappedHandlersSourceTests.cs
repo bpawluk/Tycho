@@ -1,8 +1,8 @@
 ﻿using Moq;
 using Tycho.Events;
-using Tycho.Events.Handling;
 using Tycho.Events.Routing;
 using Tycho.Events.Routing.Sources;
+using Tycho.OLD.Events.Handling;
 using Tycho.Structure;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
@@ -20,7 +20,7 @@ public class DownStreamMappedHandlersSourceTests
         new(typeof(OtherEvent), typeof(OtherEventHandler), typeof(OtherModule))
     ];
 
-    private readonly DownStreamMappedHandlersSource<TestEvent, OtherEvent, TestModule> _sut;
+    private readonly DownStreamMappedRouteSource<TestEvent, OtherEvent, TestModule> _sut;
 
     public DownStreamMappedHandlersSourceTests()
     {

@@ -2,54 +2,66 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Tycho.Events.Outbox;
 using Tycho.Events.Routing;
-using Tycho.Persistence;
+using Tycho.Events.Serialization;
 
 namespace Tycho.Events.Publishing
 {
     internal class EventPublisher : IEventPublisher, IUncommittedEventPublisher
     {
-        private readonly IOutboxWriter _outbox;
         private readonly IEventRouter _router;
         private readonly IPayloadSerializer _serializer;
+        private readonly IOutboxWriter _outbox;
 
-        public EventPublisher(IEventRouter router, IOutboxWriter persistentOutbox, IPayloadSerializer serializer)
+        public EventPublisher(IEventRouter router, IPayloadSerializer serializer, IOutboxWriter outbox)
         {
             _router = router;
-            _outbox = persistentOutbox;
             _serializer = serializer;
+            _outbox = outbox;
         }
 
-        public Task Publish<TEvent>(TEvent eventData, CancellationToken cancellationToken)
+        public Task Publish<TEvent>(TEvent eventPayload, CancellationToken cancellationToken)
             where TEvent : class, IEvent
         {
-            return Publish(eventData, true, cancellationToken);
+            return Publish(eventPayload, true, cancellationToken);
         }
 
-        public Task PublishWithoutCommitting<TEvent>(TEvent eventData, CancellationToken cancellationToken)
+        public Task PublishWithoutCommitting<TEvent>(TEvent eventPayload, CancellationToken cancellationToken)
             where TEvent : class, IEvent
         {
-            return Publish(eventData, false, cancellationToken);
+            return Publish(eventPayload, false, cancellationToken);
         }
 
         private async Task Publish<TEvent>(
-            TEvent eventData,
+            TEvent eventPayload,
             bool shouldCommit,
             CancellationToken cancellationToken)
             where TEvent : class, IEvent
         {
-            if (eventData is null)
+            if (eventPayload is null)
             {
-                throw new ArgumentNullException(nameof(eventData), $"{nameof(eventData)} cannot be null");
+                throw new ArgumentNullException(nameof(eventPayload), $"{nameof(eventPayload)} cannot be null");
             }
 
-            var handlerIdentities = _router.IdentifyHandlers<TEvent>();
+            var eventId = Guid.NewGuid();
+            var routedEvents = _router.FindRoutes(eventId, eventPayload);
 
-            if (handlerIdentities.Count > 0)
+            var outboxEntries = routedEvents
+                .Select(routedEvent => 
+                    new OutboxEntry(
+                        routedEvent.Id, 
+                        _serializer.Serialize(routedEvent.Payload), 
+                        routedEvent.Route))
+                .ToList();
+
+            if (shouldCommit)
             {
-                var serializedPayload = _serializer.Serialize(eventData);
-                var outboxEntries = handlerIdentities.Select(identity => new OutboxEntry(identity, serializedPayload));
-                await _outbox.Write(outboxEntries.ToArray(), shouldCommit, cancellationToken).ConfigureAwait(false);
+                await _outbox.WriteAndCommit(outboxEntries, cancellationToken).ConfigureAwait(false);
+            }
+            else
+            {
+                await _outbox.WriteUncommitted(outboxEntries, cancellationToken).ConfigureAwait(false);
             }
         }
     }

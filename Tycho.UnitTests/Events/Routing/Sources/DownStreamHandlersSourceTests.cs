@@ -19,7 +19,7 @@ public class DownStreamHandlersSourceTests
         new("other-event", "other-handler", "other-module")
     ];
 
-    private readonly DownStreamHandlersSource<TestEvent, TestModule> _sut;
+    private readonly DownStreamRouteSource<TestEvent, TestModule> _sut;
 
     public DownStreamHandlersSourceTests()
     {
@@ -33,7 +33,7 @@ public class DownStreamHandlersSourceTests
         submoduleMock.SetupGet(m => m.EventRouter)
                      .Returns(eventRouterMock.Object);
 
-        _sut = new DownStreamHandlersSource<TestEvent, TestModule>(submoduleMock.Object);
+        _sut = new DownStreamRouteSource<TestEvent, TestModule>(submoduleMock.Object);
     }
 
     [Fact]

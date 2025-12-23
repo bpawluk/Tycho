@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Tycho.Apps.Routing;
 using Tycho.Events;
+using Tycho.Events.Outbox;
 using Tycho.Events.Publishing;
 using Tycho.Events.Registrating;
 using Tycho.Events.Routing;
-using Tycho.Persistence;
-using Tycho.Persistence.InMemory;
-using Tycho.Persistence.Processing;
 using Tycho.Structure.Internal;
 
 namespace Tycho.Apps.Setup
@@ -43,17 +40,16 @@ namespace Tycho.Apps.Setup
         {
             var services = _internals.GetServiceCollection();
 
-            if (!_internals.HasService<IOutboxWriter>() || !_internals.HasService<IOutboxConsumer>())
-            {
-                services.AddSingleton<InMemoryOutbox>()
-                        .AddTransient<IOutboxWriter>(sp => sp.GetRequiredService<InMemoryOutbox>())
-                        .AddTransient<IOutboxConsumer>(sp => sp.GetRequiredService<InMemoryOutbox>())
-                        .AddTransient<IPayloadSerializer, InMemoryPayloadSerializer>();
-            }
+            //if (!_internals.HasService<IOutboxWriter>() || !_internals.HasService<IOutboxConsumer>())
+            //{
+            //    services.AddSingleton<InMemoryOutbox>()
+            //            .AddTransient<IOutboxWriter>(sp => sp.GetRequiredService<InMemoryOutbox>())
+            //            .AddTransient<IOutboxConsumer>(sp => sp.GetRequiredService<InMemoryOutbox>())
+            //            .AddTransient<IPayloadSerializer, InMemoryPayloadSerializer>();
+            //}
 
             services.AddSingleton<OutboxProcessor>()
                     .AddSingleton<OutboxActivity>()
-                    .AddTransient<IEntryProcessor, EntryProcessor>() 
                     .AddTransient<IEventRouter, EventRouter>()
                     .AddTransient<IEventPublisher, EventPublisher>();
 

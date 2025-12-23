@@ -1,0 +1,29 @@
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Tycho.Events.Routing.Payload;
+using Tycho.Events.Routing.Routes;
+using Tycho.Structure;
+
+namespace Tycho.Events.Routing.Delivery
+{
+    internal class UpStreamRouteDelivery : IDeliveryStrategy
+    {
+        private readonly IParent _parent;
+
+        public UpStreamRouteDelivery(IParent parent)
+        {
+            _parent = parent;
+        }
+
+        public async Task DeliverAsync(IRoutedEvent routedEvent, CancellationToken cancellationToken)
+        {
+            if (!routedEvent.Route.TryPop(out var routeStep) || !(routeStep is UpStreamRouteStep))
+            {
+                throw new InvalidOperationException($"Invalid route in {GetType().Name}");
+            }
+
+            await _parent.EventRouter.DeliverAsync(routedEvent, cancellationToken);
+        }
+    }
+}

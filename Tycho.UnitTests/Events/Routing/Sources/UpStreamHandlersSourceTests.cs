@@ -18,7 +18,7 @@ public class UpStreamHandlersSourceTests
         new("other-event", "other-handler", "other-module")
     ];
 
-    private readonly UpStreamHandlersSource<TestEvent> _sut;
+    private readonly UpStreamRouteSource<TestEvent> _sut;
 
     public UpStreamHandlersSourceTests()
     {
@@ -32,7 +32,7 @@ public class UpStreamHandlersSourceTests
         parentMock.SetupGet(p => p.EventRouter)
                   .Returns(eventRouterMock.Object);
 
-        _sut = new UpStreamHandlersSource<TestEvent>(parentMock.Object);
+        _sut = new UpStreamRouteSource<TestEvent>(parentMock.Object);
     }
 
     [Fact]

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging.Testing;
 using Moq;
 using Tycho.Events;
 using Tycho.Events.Routing;
+using Tycho.Events.Serialization;
 using Tycho.Persistence;
 using Tycho.Persistence.Processing;
 using Tycho.UnitTests._Data.Events;

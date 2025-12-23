@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Tycho.Events;
-using Tycho.Events.Publishing;
+using Tycho.OLD.Events.Publishing;
 
 namespace Tycho.Persistence.EFCore.UoW;
 

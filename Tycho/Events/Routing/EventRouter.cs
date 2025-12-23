@@ -1,18 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Tycho.Events.Routing.Delivery;
+using Tycho.Events.Routing.Payload;
+using Tycho.Events.Routing.Sources;
 using Tycho.Structure.Internal;
 
 namespace Tycho.Events.Routing
 {
-    internal interface IEventRouter
-    {
-        IReadOnlyCollection<HandlerIdentity> IdentifyHandlers<TEvent>()
-            where TEvent : class, IEvent;
-
-        IEventHandler? FindHandler(HandlerIdentity handlerIdentity);
-    }
-
     internal class EventRouter : IEventRouter
     {
         private readonly Internals _internals;
@@ -22,25 +20,24 @@ namespace Tycho.Events.Routing
             _internals = internals;
         }
 
-        public IReadOnlyCollection<HandlerIdentity> IdentifyHandlers<TEvent>()
+        public IReadOnlyCollection<IRoutedEvent<IEvent>> FindRoutes<TEvent>(Guid eventId, TEvent eventPayload) 
             where TEvent : class, IEvent
         {
-            var sources = _internals.GetServices<IHandlersSource>();
-            return sources.SelectMany(source => source.IdentifyHandlers<TEvent>()).ToArray();
+            var sources = _internals.GetServices<IRouteSource<TEvent>>();
+            return sources.SelectMany(source => source.GetRoutes(eventId, eventPayload)).ToArray();
         }
 
-        public IEventHandler? FindHandler(HandlerIdentity handlerIdentity)
+        public async Task DeliverAsync(IRoutedEvent routedEvent, CancellationToken cancellationToken)
         {
-            foreach (var source in _internals.GetServices<IHandlersSource>())
+            if (!routedEvent.Route.TryPeek(out var nextRouteStep))
             {
-                var handler = source.FindHandler(handlerIdentity);
-                if (handler != null)
-                {
-                    return handler;
-                }
+                throw new InvalidOperationException("No route steps available in the routed event.");
             }
 
-            return null;
+            var deliveryStrategyProvider = _internals.GetRequiredService<IDeliveryStrategyProvider>();
+            var deliveryStrategy = deliveryStrategyProvider.GetDeliveryStrategy(nextRouteStep);
+
+            await deliveryStrategy.DeliverAsync(routedEvent, cancellationToken);
         }
     }
 }

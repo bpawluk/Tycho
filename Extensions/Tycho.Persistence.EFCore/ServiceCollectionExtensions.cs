@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Tycho.Events.Publishing;
+using Tycho.Events.Serialization;
+using Tycho.OLD.Events.Publishing;
 using Tycho.Persistence.EFCore.Outbox;
 using Tycho.Persistence.EFCore.Serialization;
 using Tycho.Persistence.EFCore.UoW;

@@ -11,7 +11,7 @@ namespace Tycho.UnitTests.Events.Routing.Sources;
 
 public class LocalHandlersSourceTests
 {
-    private readonly LocalHandlersSource<TestEvent> _sut;
+    private readonly LocalRouteSource<TestEvent> _sut;
 
     public LocalHandlersSourceTests()
     {
@@ -21,7 +21,7 @@ public class LocalHandlersSourceTests
             .AddTransient<IEventHandler<TestEvent>, TestEventOtherHandler>()
             .AddTransient<IEventHandler<TestEvent>, TestEventHandler>();
         internals.Build();
-        _sut = new LocalHandlersSource<TestEvent>(internals);
+        _sut = new LocalRouteSource<TestEvent>(internals);
     }
 
     [Fact]
