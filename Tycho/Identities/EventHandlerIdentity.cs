@@ -1,5 +1,4 @@
 ﻿using System;
-using Tycho.Utils;
 
 namespace Tycho.Identities
 {
@@ -9,20 +8,16 @@ namespace Tycho.Identities
 
         public string HandlerId { get; set; } = string.Empty;
 
-        public string ModuleId { get; set; } = string.Empty;
-
-        public EventHandlerIdentity(string eventId, string handlerId, string moduleId)
+        public EventHandlerIdentity(string eventId, string handlerId)
         {
             EventId = eventId;
             HandlerId = handlerId;
-            ModuleId = moduleId;
         }
 
-        public EventHandlerIdentity(Type eventType, Type handlerType, Type moduleType)
+        public EventHandlerIdentity(Type eventType, Type handlerType)
         {
             EventId = TypeIdentifier.GetId(eventType);
             HandlerId = TypeIdentifier.GetId(handlerType);
-            ModuleId = TypeIdentifier.GetId(moduleType);
         }
 
         public bool MatchesEvent(Type eventType)
@@ -45,16 +40,6 @@ namespace Tycho.Identities
             return HandlerId == TypeIdentifier.GetId<THandler>();
         }
 
-        public bool MatchesModule(Type moduleType)
-        {
-            return ModuleId == TypeIdentifier.GetId(moduleType);
-        }
-
-        public bool MatchesModule<TModule>()
-        {
-            return ModuleId == TypeIdentifier.GetId<TModule>();
-        }
-
         public bool Equals(EventHandlerIdentity? other)
         {
             return this == other;
@@ -67,24 +52,24 @@ namespace Tycho.Identities
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(EventId, HandlerId, ModuleId);
+            return HashCode.Combine(EventId, HandlerId);
         }
 
         public override string ToString()
         {
-            return $"{EventId}-{HandlerId}-{ModuleId}";
+            return $"{EventId}-{HandlerId}";
         }
 
         public static EventHandlerIdentity FromString(string identity)
         {
             var parts = identity.Split('-');
-            if (parts.Length != 3)
+            if (parts.Length != 2)
             {
                 throw new ArgumentException(
                     $"Invalid format of identity string {identity}",
                     nameof(identity));
             }
-            return new EventHandlerIdentity(parts[0], parts[1], parts[2]);
+            return new EventHandlerIdentity(parts[0], parts[1]);
         }
 
         public static bool operator !=(EventHandlerIdentity? left, EventHandlerIdentity? right)
@@ -105,8 +90,7 @@ namespace Tycho.Identities
             }
 
             return string.Equals(left.EventId, right.EventId, StringComparison.InvariantCulture) &&
-                   string.Equals(left.HandlerId, right.HandlerId, StringComparison.InvariantCulture) &&
-                   string.Equals(left.ModuleId, right.ModuleId, StringComparison.InvariantCulture);
+                   string.Equals(left.HandlerId, right.HandlerId, StringComparison.InvariantCulture);
         }
     }
 }

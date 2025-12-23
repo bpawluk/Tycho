@@ -1,5 +1,4 @@
 ﻿using System;
-using Tycho.Utils;
 
 namespace Tycho.Identities
 {
@@ -7,19 +6,19 @@ namespace Tycho.Identities
     {
         public string ModuleId { get; set; } = string.Empty;
 
-        public ModuleIdentity(string eventId)
+        public ModuleIdentity(string moduleId)
         {
-            ModuleId = eventId;
+            ModuleId = moduleId;
         }
 
-        public ModuleIdentity(Type eventType)
+        public ModuleIdentity(Type moduleType)
         {
-            ModuleId = TypeIdentifier.GetId(eventType);
+            ModuleId = TypeIdentifier.GetId(moduleType);
         }
 
-        public bool MatchesModule(Type eventType)
+        public bool MatchesModule(Type moduleType)
         {
-            return ModuleId == TypeIdentifier.GetId(eventType);
+            return ModuleId == TypeIdentifier.GetId(moduleType);
         }
 
         public bool MatchesModule<TModule>()

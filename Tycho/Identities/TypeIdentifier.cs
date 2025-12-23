@@ -2,7 +2,7 @@
 using System.IO.Hashing;
 using System.Text;
 
-namespace Tycho.Utils
+namespace Tycho.Identities
 {
     internal static class TypeIdentifier
     {

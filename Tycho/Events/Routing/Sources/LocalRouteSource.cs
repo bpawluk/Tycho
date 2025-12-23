@@ -33,7 +33,6 @@ namespace Tycho.Events.Routing.Sources
         private EventHandlerIdentity GetHandlerIdentity(IEventHandler<TEvent> handler) =>
             new EventHandlerIdentity(
                 handler.EventType,
-                handler.HandlerType,
-                _internals.Owner);
+                handler.HandlerType);
     }
 }
