@@ -37,8 +37,8 @@ namespace Tycho.Processor
                 try
                 {
                     using var cancellationTokenSource = new CancellationTokenSource(_settings.ProcessingTimeout);
-                    var processed = await _job.ExecuteAsync(cancellationTokenSource.Token).ConfigureAwait(false);
 
+                    var processed = await _job.ExecuteAsync(cancellationTokenSource.Token).ConfigureAwait(false);
                     if (processed)
                     {
                         ResetInterval();

@@ -50,12 +50,12 @@ namespace Tycho.Events.Outbox
             {
                 var routedEvent = new RoutedEvent(entry.Id, entry.Payload, entry.Route);
                 await _eventRouter.DeliverAsync(routedEvent, cancellationToken).ConfigureAwait(false);
-                await _outboxConsumer.MarkAsDelivered(entry, cancellationToken).ConfigureAwait(false);
+                await _outboxConsumer.MarkAsDelivered(entry.Id, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex) 
             {
                 _logger.LogError(ex, "Failed to deliver outbox entry with ID {entryId}", entry.Id);
-                await _outboxConsumer.MarkAsFailed(entry, cancellationToken).ConfigureAwait(false);
+                await _outboxConsumer.MarkAsFailed(entry.Id, cancellationToken).ConfigureAwait(false);
             }
         }
     }

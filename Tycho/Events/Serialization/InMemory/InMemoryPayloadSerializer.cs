@@ -1,7 +1,6 @@
 ﻿using System;
-using Tycho.Events.Serialization;
 
-namespace Tycho.Events.Outbox.InMemory
+namespace Tycho.Events.Serialization.InMemory
 {
     internal class InMemoryPayloadSerializer : IPayloadSerializer
     {

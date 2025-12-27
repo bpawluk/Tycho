@@ -1,53 +1,54 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.Threading;
-//using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
-//namespace Tycho.Events.Outbox.InMemory
-//{
-//    internal class InMemoryOutbox : IOutboxWriter, IOutboxConsumer
-//    {
-//        private readonly OutboxActivity _outboxActivity;
-//        private readonly Queue<OutboxEntry> _entries;
+namespace Tycho.Events.Outbox.InMemory
+{
+    internal class InMemoryOutbox : IOutboxWriter, IOutboxConsumer
+    {
+        private readonly OutboxActivity _outboxActivity;
+        private readonly Queue<OutboxEntry> _entries;
 
-//        public InMemoryOutbox(OutboxActivity outboxActivity)
-//        {
-//            _outboxActivity = outboxActivity;
-//            _entries = new Queue<OutboxEntry>();
-//        }
+        public InMemoryOutbox(OutboxActivity outboxActivity)
+        {
+            _outboxActivity = outboxActivity;
+            _entries = new Queue<OutboxEntry>();
+        }
 
-//        public Task Write(IReadOnlyCollection<OutboxEntry> entries, bool _, CancellationToken cancellationToken)
-//        {
-//            foreach (var entry in entries)
-//            {
-//                _entries.Enqueue(entry);
-//            }
-//            _outboxActivity.NotifyNewEntriesAdded();
-//            return Task.CompletedTask;
-//        }
+        public Task Write(IReadOnlyCollection<OutboxEntry> entries, CancellationToken cancellationToken)
+        {
+            foreach (var entry in entries)
+            {
+                _entries.Enqueue(entry);
+            }
+            _outboxActivity.NotifyNewEntriesAdded();
 
-//        public Task<IReadOnlyCollection<OutboxEntry>> Read(int count, CancellationToken cancellationToken)
-//        {
-//            var entries = new List<OutboxEntry>();
+            return Task.CompletedTask;
+        }
 
-//            count = Math.Min(count, _entries.Count);
-//            for (var i = 0; i < count; i++)
-//            {
-//                var entry = _entries.Dequeue();
-//                entries.Add(entry);
-//            }
+        public Task<IReadOnlyCollection<OutboxEntry>> Read(int count, CancellationToken cancellationToken)
+        {
+            var entries = new List<OutboxEntry>();
 
-//            return Task.FromResult<IReadOnlyCollection<OutboxEntry>>(entries);
-//        }
+            count = Math.Min(count, _entries.Count);
+            for (var i = 0; i < count; i++)
+            {
+                var entry = _entries.Dequeue();
+                entries.Add(entry);
+            }
 
-//        public Task MarkAsFailed(OutboxEntry entry, CancellationToken cancellationToken)
-//        {
-//            return Task.CompletedTask;
-//        }
+            return Task.FromResult<IReadOnlyCollection<OutboxEntry>>(entries);
+        }
 
-//        public Task MarkAsProcessed(OutboxEntry entry, CancellationToken cancellationToken)
-//        {
-//            return Task.CompletedTask;
-//        }
-//    }
-//}
+        public Task MarkAsDelivered(Guid entryId, CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task MarkAsFailed(Guid entryId, CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+    }
+}

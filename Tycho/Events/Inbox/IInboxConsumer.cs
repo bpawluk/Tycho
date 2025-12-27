@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,8 +9,8 @@ namespace Tycho.Events.Inbox
     {
         Task<IReadOnlyCollection<InboxEntry>> Read(int count, CancellationToken cancellationToken = default);
 
-        Task MarkAsHandled(InboxEntry entry, CancellationToken cancellationToken = default);
+        Task MarkAsHandled(Guid entryId, CancellationToken cancellationToken = default);
 
-        Task MarkAsFailed(InboxEntry entry, CancellationToken cancellationToken = default);
+        Task MarkAsFailed(Guid entryId, CancellationToken cancellationToken = default);
     }
 }

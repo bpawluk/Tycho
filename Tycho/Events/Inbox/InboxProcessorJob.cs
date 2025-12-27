@@ -1,6 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Tycho.Processor;
 
 namespace Tycho.Events.Inbox
@@ -9,45 +13,54 @@ namespace Tycho.Events.Inbox
     {
         private readonly IInboxConsumer _inboxConsumer;
         private readonly IInboxEntryHandler _entryHandler;
+        private readonly ILogger<InboxProcessorJob> _logger;
         private readonly InboxProcessorSettings _settings;
+
+        private readonly List<Task> _entriesInProcessing = new List<Task>();
 
         public InboxProcessorJob(
             IInboxConsumer inboxConsumer,
             IInboxEntryHandler entryHandler,
+            ILogger<InboxProcessorJob>? logger = null,
             InboxProcessorSettings? settings = null)
         {
             _inboxConsumer = inboxConsumer;
             _entryHandler = entryHandler;
+            _logger = logger ?? NullLogger<InboxProcessorJob>.Instance;
             _settings = settings ?? InboxProcessorSettings.Default;
         }
 
-        // TODO: OLD OUTBOX PROCESSING LOGIC
-
         public async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
         {
-            var entriesRead = await _inboxConsumer.Read(_settings.BatchSize, cancellationToken).ConfigureAwait(false);
-            if (entriesRead.Any())
+            _entriesInProcessing.RemoveAll(t => t.IsCompleted);
+
+            var newEntriesCount = 0;
+            var entriesInProcessingCount = _entriesInProcessing.Count;
+
+            var entriesToFetch = Math.Min(_settings.ConcurrencyLimit - entriesInProcessingCount, _settings.BatchSize);
+            if (entriesToFetch > 0)
             {
-                var deliveryTasks = entriesRead.Select(entry => HandleEntryAsync(entry, cancellationToken));
-                await Task.WhenAll(deliveryTasks).ConfigureAwait(false);
-                return true;
+                var newEntries = await _inboxConsumer.Read(entriesToFetch, cancellationToken).ConfigureAwait(false);
+                newEntriesCount = newEntries.Count;
+
+                var newEntriesInProcessing = newEntries.Select(entry => HandleEntryAsync(entry, cancellationToken));
+                _entriesInProcessing.AddRange(newEntriesInProcessing);
             }
-            else
-            {
-                return false;
-            }
+
+            return newEntriesCount > 0 || entriesInProcessingCount > 0;
         }
 
         private async Task HandleEntryAsync(InboxEntry entry, CancellationToken cancellationToken)
         {
-            var handledSuccessfully = await _entryHandler.TryHandlingEntryAsync(entry, cancellationToken).ConfigureAwait(false);
-            if (handledSuccessfully)
+            try
             {
-                await _inboxConsumer.MarkAsHandled(entry, cancellationToken).ConfigureAwait(false);
+                // TODO: Handler timeout support
+                await _entryHandler.HandleEntryAsync(entry, CancellationToken.None).ConfigureAwait(false);
             }
-            else
+            catch (Exception ex)
             {
-                await _inboxConsumer.MarkAsFailed(entry, cancellationToken).ConfigureAwait(false);
+                _logger.LogError(ex, "Failed to process inbox entry with ID {entryId}", entry.Id);
+                await _inboxConsumer.MarkAsFailed(entry.Id, cancellationToken).ConfigureAwait(false);
             }
         }
     }

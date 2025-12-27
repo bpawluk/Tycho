@@ -1,7 +1,7 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Tycho.Events.Inbox;
 using Tycho.Structure.Internal;
 
 namespace Tycho.Events.Handling
@@ -12,18 +12,42 @@ namespace Tycho.Events.Handling
     {
         private readonly Internals _internals;
 
-        Type IEventHandler.HandlerType => typeof(TEventHandler);
-
         public ScopedEventHandler(Internals internals)
         {
             _internals = internals;
         }
 
-        public async Task Handle(TEvent eventData, CancellationToken cancellationToken)
+        public async Task Handle(EventContext<TEvent> context, CancellationToken cancellationToken)
         {
-            using var scope = _internals.CreateScope();
+            await using var scope = _internals.CreateAsyncScope();
+
+            var inbox = scope.ServiceProvider.GetRequiredService<IInboxConsumer>();
             var handler = scope.ServiceProvider.GetRequiredService<TEventHandler>();
-            await handler.Handle(eventData, cancellationToken);
+
+            var transactionalHandler = handler as ITransactionalEventHandler;
+            if (transactionalHandler != null)
+            {
+                await transactionalHandler.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
+            }
+
+            try
+            {
+                await handler.Handle(context, cancellationToken).ConfigureAwait(false);
+                await inbox.MarkAsHandled(context.Id, cancellationToken).ConfigureAwait(false);
+
+                if (transactionalHandler != null)
+                {
+                    await transactionalHandler.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
+                }
+            }
+            catch
+            {
+                if (transactionalHandler != null)
+                {
+                    await transactionalHandler.RollbackTransactionAsync(cancellationToken).ConfigureAwait(false);
+                }
+                throw;
+            }
         }
     }
 }

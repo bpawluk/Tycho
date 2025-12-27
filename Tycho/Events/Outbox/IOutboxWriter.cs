@@ -6,8 +6,6 @@ namespace Tycho.Events.Outbox
 {
     internal interface IOutboxWriter
     {
-        Task WriteUncommitted(IReadOnlyList<OutboxEntry> entries, CancellationToken cancellationToken = default);
-
-        Task WriteAndCommit(IReadOnlyList<OutboxEntry> entries, CancellationToken cancellationToken = default);
+        Task Write(IReadOnlyCollection<OutboxEntry> entries, CancellationToken cancellationToken = default);
     }
 }

@@ -18,9 +18,32 @@ namespace Tycho.Requests.Handling
 
         public async Task Handle(TRequest requestData, CancellationToken cancellationToken)
         {
-            using var scope = _internals.CreateScope();
+            await using var scope = _internals.CreateAsyncScope();
             var handler = scope.ServiceProvider.GetRequiredService<TRequestHandler>();
-            await handler.Handle(requestData, cancellationToken);
+
+            var transactionalHandler = handler as ITransactionalRequestHandler;
+            if (transactionalHandler != null)
+            {
+                await transactionalHandler.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
+            }
+
+            try
+            {
+                await handler.Handle(requestData, cancellationToken).ConfigureAwait(false);
+                if (transactionalHandler != null)
+                {
+                    await transactionalHandler.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
+                }
+            }
+            catch
+            {
+                if (transactionalHandler != null)
+                {
+                    await transactionalHandler.RollbackTransactionAsync(cancellationToken).ConfigureAwait(false);
+                }
+                throw;
+            }
+
         }
     }
 
@@ -37,9 +60,32 @@ namespace Tycho.Requests.Handling
 
         public async Task<TResponse> Handle(TRequest requestData, CancellationToken cancellationToken)
         {
-            using var scope = _internals.CreateScope();
+            await using var scope = _internals.CreateAsyncScope();
             var handler = scope.ServiceProvider.GetRequiredService<TRequestHandler>();
-            return await handler.Handle(requestData, cancellationToken);
+
+            var transactionalHandler = handler as ITransactionalRequestHandler;
+            if (transactionalHandler != null)
+            {
+                await transactionalHandler.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
+            }
+
+            try
+            {
+                var result = await handler.Handle(requestData, cancellationToken).ConfigureAwait(false);
+                if (transactionalHandler != null)
+                {
+                    await transactionalHandler.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
+                }
+                return result;
+            }
+            catch
+            {
+                if (transactionalHandler != null)
+                {
+                    await transactionalHandler.RollbackTransactionAsync(cancellationToken).ConfigureAwait(false);
+                }
+                throw;
+            }
         }
     }
 }

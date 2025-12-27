@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using Tycho.Events.Handling;
 using Tycho.Events.Serialization;
 
@@ -10,48 +8,31 @@ namespace Tycho.Events.Inbox
 {
     internal class InboxEntryHandler : IInboxEntryHandler
     {
-        private readonly IPayloadSerializer _payloadSerializer;
         private readonly IEventHandlerProvider _handlerProvider;
-        private readonly ILogger<InboxEntryHandler> _logger;
+        private readonly IPayloadSerializer _payloadSerializer;
 
         public InboxEntryHandler(
-            IInboxConsumer outboxConsumer,
-            IPayloadSerializer payloadSerializer,
             IEventHandlerProvider handlerProvider,
-            InboxProcessorSettings? settings = null,
-            ILogger<InboxEntryHandler>? logger = null)
+            IPayloadSerializer payloadSerializer)
         {
-            _payloadSerializer = payloadSerializer;
             _handlerProvider = handlerProvider;
-            _logger = logger ?? NullLogger<InboxEntryHandler>.Instance;
+            _payloadSerializer = payloadSerializer;
         }
 
-        public async Task<bool> TryHandlingEntryAsync(InboxEntry entry, CancellationToken cancellationToken)
+        public async Task HandleEntryAsync(InboxEntry entry, CancellationToken cancellationToken)
         {
-            try
-            {
-                var eventHandler = _handlerProvider.GetHandler(entry.HandlerId);
-                var eventData = _payloadSerializer.Deserialize(eventHandler.EventType, entry.Payload);
-                await HandleWithReflection(eventData, eventHandler).ConfigureAwait(false);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to handle inbox entry with ID {entryId}", entry.Id);
-                return false;
-            }
+            var handler = _handlerProvider.GetHandler(entry.HandlerId);
+            var payload = _payloadSerializer.Deserialize(handler.EventType, entry.Payload);
+            await HandleWithReflection(entry.Id, payload, handler, cancellationToken).ConfigureAwait(false);
         }
 
-        private Task HandleWithReflection(IEvent eventData, IEventHandler eventHandler)
+        private Task HandleWithReflection(Guid eventId, IEvent eventData, IEventHandler eventHandler, CancellationToken cancellationToken)
         {
+            var eventContextType = typeof(EventContext<>).MakeGenericType(eventHandler.EventType);
+            var eventContext = Activator.CreateInstance(eventContextType, eventId, eventData);
+
             var handleMethod = eventHandler.GetType().GetMethod(nameof(IEventHandler<IEvent>.Handle));
-
-            var handleResult = handleMethod.Invoke(
-                eventHandler,
-                new object[] {
-                    eventData,
-                    CancellationToken.None })
-                as Task;
+            var handleResult = handleMethod.Invoke(eventHandler, new object[] { eventContext, cancellationToken }) as Task;
 
             if (handleResult is null)
             {

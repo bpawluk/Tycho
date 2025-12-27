@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events;
 using Tycho.Events.Outbox;
 using Tycho.Events.Publishing;
-using Tycho.Events.Registrating;
+using Tycho.Events.Registration;
 using Tycho.Events.Routing;
 using Tycho.Modules.Routing;
 using Tycho.Structure.Internal;

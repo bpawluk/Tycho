@@ -8,7 +8,7 @@ using Tycho.Events.Serialization;
 
 namespace Tycho.Events.Publishing
 {
-    internal class EventPublisher : IEventPublisher, IUncommittedEventPublisher
+    internal class EventPublisher : IEventPublisher
     {
         private readonly IEventRouter _router;
         private readonly IPayloadSerializer _serializer;
@@ -21,22 +21,7 @@ namespace Tycho.Events.Publishing
             _outbox = outbox;
         }
 
-        public Task Publish<TEvent>(TEvent eventPayload, CancellationToken cancellationToken)
-            where TEvent : class, IEvent
-        {
-            return Publish(eventPayload, true, cancellationToken);
-        }
-
-        public Task PublishWithoutCommitting<TEvent>(TEvent eventPayload, CancellationToken cancellationToken)
-            where TEvent : class, IEvent
-        {
-            return Publish(eventPayload, false, cancellationToken);
-        }
-
-        private async Task Publish<TEvent>(
-            TEvent eventPayload,
-            bool shouldCommit,
-            CancellationToken cancellationToken)
+        public async Task Publish<TEvent>(TEvent eventPayload, CancellationToken cancellationToken)
             where TEvent : class, IEvent
         {
             if (eventPayload is null)
@@ -48,21 +33,14 @@ namespace Tycho.Events.Publishing
             var routedEvents = _router.FindRoutes(eventId, eventPayload);
 
             var outboxEntries = routedEvents
-                .Select(routedEvent => 
+                .Select(routedEvent =>
                     new OutboxEntry(
-                        routedEvent.Id, 
-                        _serializer.Serialize(routedEvent.Payload), 
+                        routedEvent.Id,
+                        _serializer.Serialize(routedEvent.Payload),
                         routedEvent.Route))
                 .ToList();
 
-            if (shouldCommit)
-            {
-                await _outbox.WriteAndCommit(outboxEntries, cancellationToken).ConfigureAwait(false);
-            }
-            else
-            {
-                await _outbox.WriteUncommitted(outboxEntries, cancellationToken).ConfigureAwait(false);
-            }
+            await _outbox.Write(outboxEntries, cancellationToken).ConfigureAwait(false);
         }
     }
 }
