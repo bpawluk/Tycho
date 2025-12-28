@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Tycho.Events.Handling;
 using Tycho.Events.Routing.Payload;
 using Tycho.Identities;
 using Tycho.Structure.Internal;
@@ -33,6 +34,8 @@ namespace Tycho.Events.Routing.Sources
         private EventHandlerIdentity GetHandlerIdentity(IEventHandler<TEvent> handler) =>
             new EventHandlerIdentity(
                 handler.EventType,
-                handler.HandlerType);
+                handler is IEventHandlerWrapper eventHandlerWrapper 
+                    ? eventHandlerWrapper.InnerHandlerType 
+                    : handler.HandlerType);
     }
 }

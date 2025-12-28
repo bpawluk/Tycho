@@ -22,10 +22,6 @@ namespace Tycho.Events
     public interface ITransactionalEventHandler<TEvent> : ITransactionalEventHandler
         where TEvent : class, IEvent
     {
-        Type IEventHandler.EventType => typeof(TEvent);
-
-        Type IEventHandler.HandlerType => GetType();
-
         /// <summary>
         /// Handles an event of type <typeparamref name="TEvent"/>
         /// </summary>

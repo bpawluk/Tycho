@@ -1,6 +1,6 @@
 ﻿using System;
 using Tycho.Events;
-using Tycho.Events.Registration;
+using Tycho.Events.Registrating;
 using Tycho.Modules;
 
 namespace Tycho.Apps.Routing

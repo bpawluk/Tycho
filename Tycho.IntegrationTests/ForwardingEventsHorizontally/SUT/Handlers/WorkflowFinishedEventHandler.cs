@@ -9,13 +9,13 @@ internal class WorkflowFinishedEventHandler(TestWorkflow<TestResult> testWorkflo
     private readonly CompoundResult<Type> _compoundResult = result;
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;
 
-    public Task Handle(WorkflowFinishedEvent eventData, CancellationToken cancellationToken = default)
+    public Task Handle(EventContext<WorkflowFinishedEvent> context, CancellationToken cancellationToken)
     {
-        _compoundResult.AddSubResult(eventData.FinalModule);
+        _compoundResult.AddSubResult(context.Payload.FinalModule);
 
         if (_compoundResult.IsComplete)
         {
-            _testWorkflow.SetResult(eventData.Result);
+            _testWorkflow.SetResult(context.Payload.Result);
         }
 
         return Task.CompletedTask;

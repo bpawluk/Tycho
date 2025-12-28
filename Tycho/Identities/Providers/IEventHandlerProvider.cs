@@ -1,6 +1,6 @@
-﻿using Tycho.Identities;
+﻿using Tycho.Events;
 
-namespace Tycho.Events.Handling
+namespace Tycho.Identities.Providers
 {
     internal interface IEventHandlerProvider
     {

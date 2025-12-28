@@ -7,8 +7,8 @@ internal class GammaWorkflowStartedEventHandler(IEventPublisher publisher)
 {
     private readonly IEventPublisher _publisher = publisher;
 
-    public async Task Handle(GammaWorkflowStartedEvent eventData, CancellationToken cancellationToken)
+    public async Task Handle(EventContext<GammaWorkflowStartedEvent> context, CancellationToken cancellationToken)
     {
-        await _publisher.Publish(new GammaWorkflowFinishedEvent(eventData.Result), cancellationToken);
+        await _publisher.Publish(new GammaWorkflowFinishedEvent(context.Payload.Result), cancellationToken);
     }
 }

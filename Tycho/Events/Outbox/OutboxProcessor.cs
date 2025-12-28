@@ -11,8 +11,10 @@ namespace Tycho.Events.Outbox
         public OutboxProcessor(
             OutboxActivity outboxActivity,
             OutboxProcessorJob outboxProcessorJob, 
-            OutboxProcessorSettings settings)
+            OutboxProcessorSettings? settings = null)
         {
+            settings ??= OutboxProcessorSettings.Default;
+
             var jobProcessorSettings = new JobProcessorSettings(
                 settings.InitialPollingInterval,
                 settings.PollingIntervalMultiplier,

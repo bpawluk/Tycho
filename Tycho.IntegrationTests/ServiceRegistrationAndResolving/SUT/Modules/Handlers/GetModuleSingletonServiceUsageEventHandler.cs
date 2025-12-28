@@ -11,14 +11,14 @@ internal class GetModuleSingletonServiceUsageEventHandler(IParent parent, IServi
     private readonly IParent _parent = parent;
     private readonly IServiceProvider _serviceProvider = serviceProvider;
 
-    public Task Handle(GetModuleSingletonServiceUsageEvent eventData, CancellationToken cancellationToken)
+    public Task Handle(EventContext<GetModuleSingletonServiceUsageEvent> context, CancellationToken cancellationToken)
     {
         var firstServiceInstance = _serviceProvider.GetRequiredService<ISingletonService>();
         _ = firstServiceInstance.NumberOfCalls;
 
         var secondServiceInstance = _serviceProvider.GetRequiredService<ISingletonService>();
-        eventData.Result.NumberOfCalls = secondServiceInstance.NumberOfCalls;
+        context.Payload.Result.NumberOfCalls = secondServiceInstance.NumberOfCalls;
 
-        return _parent.Execute(new EndTestWorkflowRequest(eventData.Result), cancellationToken);
+        return _parent.Execute(new EndTestWorkflowRequest(context.Payload.Result), cancellationToken);
     }
 }

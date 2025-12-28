@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Tycho.Events.Handling;
 using Tycho.Events.Routing.Sources;
+using Tycho.Identities;
 using Tycho.Modules;
 using Tycho.Structure;
 using Tycho.Structure.Internal;
 
-namespace Tycho.Events.Registration
+namespace Tycho.Events.Registrating
 {
     internal class Registrator
     {
@@ -93,7 +96,8 @@ namespace Tycho.Events.Registration
             }
 
             Services.AddScoped<THandler>();
-            Services.AddTransient<IEventHandler<TEvent>, THandler>();
+            Services.AddTransient<IEventHandler, ScopedEventHandler<TEvent, THandler>>();
+            Services.AddTransient<IEventHandler<TEvent>, ScopedEventHandler<TEvent, THandler>>();
 
             if (!IsSourceAlreadyRegistered<TEvent, LocalRouteSource<TEvent>>())
             {
@@ -107,7 +111,7 @@ namespace Tycho.Events.Registration
         {
             return Services.Any(descriptor =>
                 descriptor.ServiceType == typeof(IEventHandler<TEvent>) &&
-                descriptor.ImplementationType == typeof(THandler));
+                descriptor.ImplementationType == typeof(ScopedEventHandler<TEvent, THandler>));
         }
 
         private bool IsSourceAlreadyRegistered<TEvent, TRouteSource>()

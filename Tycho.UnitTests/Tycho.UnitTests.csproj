@@ -33,4 +33,8 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Events\Handling\" />
+  </ItemGroup>
+
 </Project>

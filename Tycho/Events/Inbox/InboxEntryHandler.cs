@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Tycho.Events.Handling;
 using Tycho.Events.Serialization;
+using Tycho.Identities.Providers;
 
 namespace Tycho.Events.Inbox
 {

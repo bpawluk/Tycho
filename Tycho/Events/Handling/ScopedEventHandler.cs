@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Inbox;
@@ -6,11 +7,13 @@ using Tycho.Structure.Internal;
 
 namespace Tycho.Events.Handling
 {
-    internal class ScopedEventHandler<TEvent, TEventHandler> : IEventHandler<TEvent>
+    internal class ScopedEventHandler<TEvent, TEventHandler> : IEventHandlerWrapper, IEventHandler<TEvent>
         where TEvent : class, IEvent
-        where TEventHandler : IEventHandler<TEvent>
+        where TEventHandler : IEventHandler<TEvent> 
     {
         private readonly Internals _internals;
+
+        public Type InnerHandlerType => typeof(TEventHandler);
 
         public ScopedEventHandler(Internals internals)
         {

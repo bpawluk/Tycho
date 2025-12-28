@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Tycho.Events.Outbox;
 using Tycho.Events.Serialization;
-using Tycho.OLD.Events.Publishing;
 using Tycho.Persistence.EFCore.Outbox;
 using Tycho.Persistence.EFCore.Serialization;
-using Tycho.Persistence.EFCore.UoW;
 
 namespace Tycho.Persistence.EFCore;
 
@@ -21,11 +20,9 @@ public static class ServiceCollectionExtensions
     {
         services.AddDbContext<TDbContext>()
                 .AddScoped<TychoDbContext, TDbContext>()
-                .AddScoped<IUnitOfWork, UnitOfWork>()
                 .AddTransient<IOutboxWriter, OutboxWriter>()
                 .AddTransient<IOutboxConsumer, OutboxConsumer>()
-                .AddTransient<IPayloadSerializer, PayloadSerializer>()
-                .AddTransient<IUncommittedEventPublisher, EventPublisher>();
+                .AddTransient<IPayloadSerializer, PayloadSerializer>();
         return services;
     }
 }

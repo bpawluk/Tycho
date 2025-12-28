@@ -11,15 +11,15 @@ internal class GetAppSingletonServiceUsageEventHandler(IServiceProvider serviceP
     private readonly IServiceProvider _serviceProvider = serviceProvider;
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;
 
-    public Task Handle(GetAppSingletonServiceUsageEvent eventData, CancellationToken cancellationToken)
+    public Task Handle(EventContext<GetAppSingletonServiceUsageEvent> context, CancellationToken cancellationToken)
     {
         var firstServiceInstance = _serviceProvider.GetRequiredService<ISingletonService>();
         _ = firstServiceInstance.NumberOfCalls;
 
         var secondServiceInstance = _serviceProvider.GetRequiredService<ISingletonService>();
-        eventData.Result.NumberOfCalls = secondServiceInstance.NumberOfCalls;
+        context.Payload.Result.NumberOfCalls = secondServiceInstance.NumberOfCalls;
 
-        _testWorkflow.SetResult(eventData.Result);
+        _testWorkflow.SetResult(context.Payload.Result);
         return Task.CompletedTask;
     }
 }

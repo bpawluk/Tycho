@@ -6,8 +6,8 @@ internal class AlphaWorkflowStartedEventHandler(IEventPublisher publisher) : IEv
 {
     private readonly IEventPublisher _publisher = publisher;
 
-    public async Task Handle(AlphaWorkflowStartedEvent eventData, CancellationToken cancellationToken)
+    public async Task Handle(EventContext<AlphaWorkflowStartedEvent> context, CancellationToken cancellationToken)
     {
-        await _publisher.Publish(new AlphaWorkflowFinishedEvent(eventData.Result), cancellationToken);
+        await _publisher.Publish(new AlphaWorkflowFinishedEvent(context.Payload.Result), cancellationToken);
     }
 }

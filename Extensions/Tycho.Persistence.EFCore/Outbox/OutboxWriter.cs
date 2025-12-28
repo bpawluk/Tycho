@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Tycho.Events.Outbox;
 
 namespace Tycho.Persistence.EFCore.Outbox;
 
@@ -13,10 +14,9 @@ internal class OutboxWriter(TychoDbContext dbContext, OutboxActivity outboxActiv
     {
         foreach (var entry in entries)
         {
-            var outboxMessage = new OutboxMessage
+            var outboxMessage = new OutboxMessage // TODO
             {
                 Id = entry.Id,
-                Handler = entry.HandlerIdentity.ToString(),
                 Payload = (entry.Payload as string)!,
             };
             _dbContext.Set<OutboxMessage>().Add(outboxMessage);
@@ -28,5 +28,10 @@ internal class OutboxWriter(TychoDbContext dbContext, OutboxActivity outboxActiv
         }
 
         _outboxActivity.NotifyNewEntriesAdded();
+    }
+
+    public Task Write(IReadOnlyCollection<OutboxEntry> entries, CancellationToken cancellationToken = default)
+    {
+        throw new System.NotImplementedException();
     }
 }

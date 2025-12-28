@@ -11,14 +11,14 @@ internal class GetModuleTransientServiceUsageEventHandler(IParent parent, IServi
     private readonly IParent _parent = parent;
     private readonly IServiceProvider _serviceProvider = serviceProvider;
 
-    public Task Handle(GetModuleTransientServiceUsageEvent eventData, CancellationToken cancellationToken)
+    public Task Handle(EventContext<GetModuleTransientServiceUsageEvent> context, CancellationToken cancellationToken)
     {
         var firstServiceInstance = _serviceProvider.GetRequiredService<ITransientService>();
         _ = firstServiceInstance.NumberOfCalls;
 
         var secondServiceInstance = _serviceProvider.GetRequiredService<ITransientService>();
-        eventData.Result.NumberOfCalls = secondServiceInstance.NumberOfCalls;
+        context.Payload.Result.NumberOfCalls = secondServiceInstance.NumberOfCalls;
 
-        return _parent.Execute(new EndTestWorkflowRequest(eventData.Result), cancellationToken);
+        return _parent.Execute(new EndTestWorkflowRequest(context.Payload.Result), cancellationToken);
     }
 }

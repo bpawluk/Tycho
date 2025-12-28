@@ -2,7 +2,7 @@
 using Moq;
 using Tycho.Events;
 using Tycho.Events.Handling;
-using Tycho.Events.Registration;
+using Tycho.Events.Registrating;
 using Tycho.Events.Routing.Sources;
 using Tycho.Structure;
 using Tycho.Structure.Internal;

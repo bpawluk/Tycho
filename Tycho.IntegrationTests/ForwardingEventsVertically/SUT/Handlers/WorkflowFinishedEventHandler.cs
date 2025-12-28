@@ -8,9 +8,9 @@ internal class WorkflowFinishedEventHandler(TestWorkflow<TestResult> testWorkflo
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;
 
-    public Task Handle(WorkflowFinishedEvent eventData, CancellationToken cancellationToken)
+    public Task Handle(EventContext<WorkflowFinishedEvent> context, CancellationToken cancellationToken)
     {
-        _testWorkflow.SetResult(eventData.Result);
+        _testWorkflow.SetResult(context.Payload.Result);
         return Task.CompletedTask;
     }
 }

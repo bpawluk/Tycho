@@ -5,14 +5,16 @@ namespace Tycho.Events.Inbox
 {
     internal sealed class InboxProcessor : IDisposable
     {
-        private readonly InboxActivity _outboxActivity;
+        private readonly InboxActivity _inboxActivity;
         private readonly JobProcessor _jobProcessor;
 
         public InboxProcessor(
-            InboxActivity outboxActivity,
+            InboxActivity inboxActivity,
             InboxProcessorJob outboxProcessorJob, 
-            InboxProcessorSettings settings)
+            InboxProcessorSettings? settings = null)
         {
+            settings ??= InboxProcessorSettings.Default;
+
             var jobProcessorSettings = new JobProcessorSettings(
                 settings.InitialPollingInterval,
                 settings.PollingIntervalMultiplier,
@@ -20,16 +22,16 @@ namespace Tycho.Events.Inbox
                 settings.ProcessingTimeout);
 
             _jobProcessor = new JobProcessor(outboxProcessorJob, jobProcessorSettings);
-            _outboxActivity = outboxActivity;
+            _inboxActivity = inboxActivity;
         }
 
-        public void Initialize() => _outboxActivity.NewEntriesAdded += OnEntriesAdded;
+        public void Initialize() => _inboxActivity.NewEntriesAdded += OnEntriesAdded;
 
         private void OnEntriesAdded(object _, EventArgs __) => _jobProcessor.Activate();
 
         public void Dispose()
         {
-            _outboxActivity.NewEntriesAdded -= OnEntriesAdded;
+            _inboxActivity.NewEntriesAdded -= OnEntriesAdded;
             _jobProcessor.Dispose();
         }
     }

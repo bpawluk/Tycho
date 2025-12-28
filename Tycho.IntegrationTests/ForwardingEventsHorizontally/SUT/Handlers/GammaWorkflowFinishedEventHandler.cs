@@ -10,13 +10,13 @@ internal class GammaWorkflowFinishedEventHandler(TestWorkflow<TestResult> testWo
     private readonly CompoundResult<Type> _compoundResult = result;
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;
 
-    public Task Handle(GammaWorkflowFinishedEvent eventData, CancellationToken cancellationToken = default)
+    public Task Handle(EventContext<GammaWorkflowFinishedEvent> context, CancellationToken cancellationToken)
     {
         _compoundResult.AddSubResult(typeof(GammaModule));
 
         if (_compoundResult.IsComplete)
         {
-            _testWorkflow.SetResult(eventData.Result);
+            _testWorkflow.SetResult(context.Payload.Result);
         }
 
         return Task.CompletedTask;

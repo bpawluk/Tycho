@@ -6,12 +6,12 @@ namespace Tycho.Events
     {
         public Guid Id { get; set; }
 
-        public TEvent Event { get; set; }
+        public TEvent Payload { get; set; }
 
-        public EventContext(Guid id, TEvent @event)
+        public EventContext(Guid id, TEvent payload)
         {
             Id = id;
-            Event = @event;
+            Payload = payload;
         }
     }
 }

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Routing;
+using Tycho.Identities;
+using Tycho.Identities.Providers;
 using Tycho.Modules;
 using Tycho.Requests.Broker;
 using Tycho.Structure;
@@ -83,13 +85,13 @@ namespace Tycho.Apps.Setup
         public async Task Build()
         {
             var services = _internals.GetServiceCollection();
+            services.AddTransient<ISubmoduleProvider, SubmoduleProvider>();
             await Task.WhenAll(_submodules.Values.Select(async module =>
             {
-                var moduleInterface = typeof(IModule);
-                var genericModuleInterface = typeof(IModule<>).MakeGenericType(module.GetType());
                 var runningModule = await module.Run().ConfigureAwait(false);
-                services.AddSingleton(moduleInterface, runningModule);
-                services.AddSingleton(genericModuleInterface, runningModule);
+                services.AddSingleton(runningModule);
+                var genericIface = typeof(IModule<>).MakeGenericType(module.GetType());
+                services.AddSingleton(genericIface, runningModule);
             })).ConfigureAwait(false);
         }
 

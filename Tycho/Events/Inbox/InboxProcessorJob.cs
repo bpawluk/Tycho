@@ -13,21 +13,21 @@ namespace Tycho.Events.Inbox
     {
         private readonly IInboxConsumer _inboxConsumer;
         private readonly IInboxEntryHandler _entryHandler;
-        private readonly ILogger<InboxProcessorJob> _logger;
         private readonly InboxProcessorSettings _settings;
+        private readonly ILogger<InboxProcessorJob> _logger;
 
         private readonly List<Task> _entriesInProcessing = new List<Task>();
 
         public InboxProcessorJob(
             IInboxConsumer inboxConsumer,
             IInboxEntryHandler entryHandler,
-            ILogger<InboxProcessorJob>? logger = null,
-            InboxProcessorSettings? settings = null)
+            InboxProcessorSettings? settings = null,
+            ILogger<InboxProcessorJob>? logger = null)
         {
             _inboxConsumer = inboxConsumer;
             _entryHandler = entryHandler;
-            _logger = logger ?? NullLogger<InboxProcessorJob>.Instance;
             _settings = settings ?? InboxProcessorSettings.Default;
+            _logger = logger ?? NullLogger<InboxProcessorJob>.Instance;
         }
 
         public async Task<bool> ExecuteAsync(CancellationToken cancellationToken)

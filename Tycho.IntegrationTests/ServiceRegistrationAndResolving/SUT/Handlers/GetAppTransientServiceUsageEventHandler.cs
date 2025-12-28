@@ -11,15 +11,15 @@ internal class GetAppTransientServiceUsageEventHandler(IServiceProvider serviceP
     private readonly IServiceProvider _serviceProvider = serviceProvider;
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;
 
-    public Task Handle(GetAppTransientServiceUsageEvent eventData, CancellationToken cancellationToken)
+    public Task Handle(EventContext<GetAppTransientServiceUsageEvent> context, CancellationToken cancellationToken)
     {
         var firstServiceInstance = _serviceProvider.GetRequiredService<ITransientService>();
         _ = firstServiceInstance.NumberOfCalls;
 
         var secondServiceInstance = _serviceProvider.GetRequiredService<ITransientService>();
-        eventData.Result.NumberOfCalls = secondServiceInstance.NumberOfCalls;
+        context.Payload.Result.NumberOfCalls = secondServiceInstance.NumberOfCalls;
 
-        _testWorkflow.SetResult(eventData.Result);
+        _testWorkflow.SetResult(context.Payload.Result);
         return Task.CompletedTask;
     }
 }

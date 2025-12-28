@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Tycho.Events.Routing;
+using Tycho.Events.Outbox;
 using Tycho.Structure.Internal;
 
 namespace Tycho.Persistence.EFCore.Outbox;
@@ -46,10 +46,7 @@ internal class OutboxConsumer(Internals internals, OutboxConsumerSettings? setti
         await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return messagesToProcess
-            .Select(message => new OutboxEntry(
-                message.Id,
-                HandlerIdentity.FromString(message.Handler), 
-                message.Payload))
+            .Select(message => default(OutboxEntry)!) // TODO
             .ToArray();
     }
 
@@ -82,5 +79,15 @@ internal class OutboxConsumer(Internals internals, OutboxConsumerSettings? setti
             message.Updated = DateTime.UtcNow;
             await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
+    }
+
+    public Task MarkAsDelivered(Guid entryId, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task MarkAsFailed(Guid entryId, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
     }
 }

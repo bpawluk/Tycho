@@ -11,15 +11,15 @@ internal class GetAppScopedServiceUsageEventHandler(IServiceProvider serviceProv
     private readonly IServiceProvider _serviceProvider = serviceProvider;
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;
 
-    public Task Handle(GetAppScopedServiceUsageEvent eventData, CancellationToken cancellationToken)
+    public Task Handle(EventContext<GetAppScopedServiceUsageEvent> context, CancellationToken cancellationToken)
     {
         var firstServiceInstance = _serviceProvider.GetRequiredService<IScopedService>();
         _ = firstServiceInstance.NumberOfCalls;
 
         var secondServiceInstance = _serviceProvider.GetRequiredService<IScopedService>();
-        eventData.Result.NumberOfCalls = secondServiceInstance.NumberOfCalls;
+        context.Payload.Result.NumberOfCalls = secondServiceInstance.NumberOfCalls;
 
-        _testWorkflow.SetResult(eventData.Result);
+        _testWorkflow.SetResult(context.Payload.Result);
         return Task.CompletedTask;
     }
 }

@@ -7,8 +7,8 @@ internal class WorkflowStartedEventHandler(IEventPublisher publisher)
 {
     private readonly IEventPublisher _publisher = publisher;
 
-    public async Task Handle(WorkflowStartedEvent eventData, CancellationToken cancellationToken)
+    public async Task Handle(EventContext<WorkflowStartedEvent> context, CancellationToken cancellationToken)
     {
-        await _publisher.Publish(new WorkflowFinishedEvent(eventData.Result), cancellationToken);
+        await _publisher.Publish(new WorkflowFinishedEvent(context.Payload.Result), cancellationToken);
     }
 }

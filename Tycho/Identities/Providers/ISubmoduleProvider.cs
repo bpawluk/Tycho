@@ -1,6 +1,6 @@
-﻿using Tycho.Identities;
+﻿using Tycho.Structure;
 
-namespace Tycho.Structure.Internal
+namespace Tycho.Identities.Providers
 {
     internal interface ISubmoduleProvider
     {

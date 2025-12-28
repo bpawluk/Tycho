@@ -11,14 +11,14 @@ internal class GetModuleScopedServiceUsageEventHandler(IParent parent, IServiceP
     private readonly IParent _parent = parent;
     private readonly IServiceProvider _serviceProvider = serviceProvider;
 
-    public Task Handle(GetModuleScopedServiceUsageEvent eventData, CancellationToken cancellationToken)
+    public Task Handle(EventContext<GetModuleScopedServiceUsageEvent> context, CancellationToken cancellationToken)
     {
         var firstServiceInstance = _serviceProvider.GetRequiredService<IScopedService>();
         _ = firstServiceInstance.NumberOfCalls;
 
         var secondServiceInstance = _serviceProvider.GetRequiredService<IScopedService>();
-        eventData.Result.NumberOfCalls = secondServiceInstance.NumberOfCalls;
+        context.Payload.Result.NumberOfCalls = secondServiceInstance.NumberOfCalls;
 
-        return _parent.Execute(new EndTestWorkflowRequest(eventData.Result), cancellationToken);
+        return _parent.Execute(new EndTestWorkflowRequest(context.Payload.Result), cancellationToken);
     }
 }

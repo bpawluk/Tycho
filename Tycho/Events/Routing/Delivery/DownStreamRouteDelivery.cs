@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Events.Routing.Payload;
 using Tycho.Events.Routing.Routes;
-using Tycho.Structure.Internal;
+using Tycho.Identities.Providers;
 
 namespace Tycho.Events.Routing.Delivery
 {

@@ -18,7 +18,7 @@ namespace Tycho.Events.Routing.Delivery
         {
             return routeStep switch
             {
-                FinalRouteStep _ => _internals.GetRequiredService<DownStreamRouteDelivery>(),
+                FinalRouteStep _ => _internals.GetRequiredService<FinalRouteDelivery>(),
                 DownStreamRouteStep _ => _internals.GetRequiredService<DownStreamRouteDelivery>(),
                 UpStreamRouteStep _ => _internals.GetRequiredService<UpStreamRouteDelivery>(),
                 _ => throw new InvalidOperationException($"No delivery strategy defined for {routeStep.GetType().Name}."),

@@ -1,5 +1,4 @@
-﻿using Tycho.Persistence.EFCore;
-using Tycho.Requests;
+﻿using Tycho.Requests;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Contract;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Domain;
 using static Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Contract.AddArticleRequest;
