@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/Tycho.IntegrationTests/Tycho.IntegrationTests.csproj" />
+    <Project Path="Tests/Tycho.Persistence.EFCore.UnitTests/Tycho.Persistence.EFCore.UnitTests.csproj" />
+    <Project Path="Tests/Tycho.UnitTests/Tycho.UnitTests.csproj" />
+    <Project Path="Tests/Tycho.UseCaseTests/Tycho.UseCaseTests.csproj" />
+  </Folder>
+  <Project Path="Tycho.Persistence.EFCore/Tycho.Persistence.EFCore.csproj" />
+  <Project Path="Tycho.Utils.SourceGenerator/Tycho.Utils.SourceGenerator.csproj" Id="2bbbd5bf-f0f2-47ff-a3ff-8fedd4b66ab5" />
+  <Project Path="Tycho/Tycho.csproj" />
+</Solution>

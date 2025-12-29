@@ -2,7 +2,6 @@
 using Tycho.Events;
 using Tycho.Events.Routing;
 using Tycho.Events.Routing.Sources;
-using Tycho.OLD.Events.Handling;
 using Tycho.Structure;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
@@ -10,19 +9,19 @@ using Tycho.UnitTests._Data.Modules;
 
 namespace Tycho.UnitTests.Events.Routing.Sources;
 
-public class UpStreamMappedHandlersSourceTests
+public class DownStreamMappedHandlersSourceTests
 {
-    private readonly IEventHandler<OtherEvent> _handlerFromParent = new OtherEventHandler();
+    private readonly IEventHandler<OtherEvent> _handlerFromSubmodule = new OtherEventHandler();
 
-    private readonly HandlerIdentity[] _identitiesFromParent =
+    private readonly HandlerIdentity[] _identitiesFromSubmodule =
     [
         new(typeof(OtherEvent), typeof(OtherEventHandler), typeof(TestModule)),
         new(typeof(OtherEvent), typeof(OtherEventHandler), typeof(OtherModule))
     ];
 
-    private readonly UpStreamMappedHandlersSource<TestEvent, OtherEvent> _sut;
+    private readonly DownStreamMappedRouteSource<TestEvent, OtherEvent, TestModule> _sut;
 
-    public UpStreamMappedHandlersSourceTests()
+    public DownStreamMappedHandlersSourceTests()
     {
         var mapMock = new Mock<Func<TestEvent, OtherEvent>>();
         mapMock.Setup(m => m(It.IsAny<TestEvent>()))
@@ -30,17 +29,17 @@ public class UpStreamMappedHandlersSourceTests
 
         var eventRouterMock = new Mock<IEventRouter>();
         eventRouterMock.Setup(m => m.IdentifyHandlers<OtherEvent>())
-                       .Returns(_identitiesFromParent);
+                       .Returns(_identitiesFromSubmodule);
         eventRouterMock.Setup(m => m.FindHandler(It.Is<HandlerIdentity>(
                            id => id.MatchesEvent(typeof(OtherEvent)))))
-                       .Returns(_handlerFromParent);
+                       .Returns(_handlerFromSubmodule);
 
-        var parentMock = new Mock<IParent>();
-        parentMock.SetupGet(p => p.EventRouter)
-                  .Returns(eventRouterMock.Object);
+        var submoduleMock = new Mock<IModule<TestModule>>();
+        submoduleMock.SetupGet(m => m.EventRouter)
+                     .Returns(eventRouterMock.Object);
 
-        _sut = new UpStreamMappedHandlersSource<TestEvent, OtherEvent>(
-            parentMock.Object, 
+        _sut = new DownStreamMappedHandlersSource<TestEvent, OtherEvent, TestModule>(
+            submoduleMock.Object, 
             mapMock.Object);
     }
 
@@ -48,7 +47,7 @@ public class UpStreamMappedHandlersSourceTests
     public void IdentifyHandlers_ForTestEvent_ReturnsHandlersFromSubmodule()
     {
         // Arrange
-        var expectedIdentities = _identitiesFromParent
+        var expectedIdentities = _identitiesFromSubmodule
             .Select(id => id.ForEvent(typeof(TestEvent)))
             .ToArray();
 

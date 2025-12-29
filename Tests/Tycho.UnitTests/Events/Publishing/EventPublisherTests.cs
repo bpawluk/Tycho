@@ -1,9 +1,8 @@
 ﻿using Moq;
 using Tycho.Events;
+using Tycho.Events.Outbox;
 using Tycho.Events.Routing;
 using Tycho.Events.Serialization;
-using Tycho.OLD.Events.Publishing;
-using Tycho.Persistence;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
 using Tycho.UnitTests._Data.Modules;

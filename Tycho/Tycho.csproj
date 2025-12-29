@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Major>5</Major>
+    <Major>6</Major>
     <Minor>0</Minor>
     <Patch>0</Patch>
     <VersionPrefix>$(Major).$(Minor).$(Patch)</VersionPrefix>
