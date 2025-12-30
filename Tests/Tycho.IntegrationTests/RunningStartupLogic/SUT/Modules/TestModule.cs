@@ -9,7 +9,8 @@ namespace Tycho.IntegrationTests.RunningStartupLogic.SUT.Modules;
 // Handles
 public record GetModuleValueRequest : IRequest<string>;
 
-internal class TestModule : TychoModule
+[ModuleDefinition]
+public partial class TestModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

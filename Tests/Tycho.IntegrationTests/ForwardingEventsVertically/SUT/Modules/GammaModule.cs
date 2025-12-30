@@ -9,7 +9,8 @@ namespace Tycho.IntegrationTests.ForwardingEventsVertically.SUT.Modules;
 public record GammaWorkflowStartedEvent(TestResult Result) : IEvent;
 public record GammaWorkflowFinishedEvent(TestResult Result) : IEvent;
 
-internal class GammaModule : TychoModule
+[ModuleDefinition]
+public partial class GammaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module) { }
 

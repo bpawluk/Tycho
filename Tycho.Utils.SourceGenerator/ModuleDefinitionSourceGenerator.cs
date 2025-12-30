@@ -43,8 +43,8 @@ namespace Tycho.Utils.SourceGenerator
 
         private static void GenerateSources(SourceProductionContext context, TychoDefinitionModel model)
         {
-            GenerateSource(context, model, "Templates/EventDispatcher.sbncs", $"{model.SourceClassName}EventDispatcher.g.cs");
-            GenerateSource(context, model, "Templates/ModuleDefinition.sbncs", $"{model.SourceClassName}.setup.g.cs");
+            GenerateSource(context, model, "Templates/EventDispatcher.sbncs", $"{model.SourceNamespace}.{model.SourceClassName}EventDispatcher.g.cs");
+            GenerateSource(context, model, "Templates/ModuleDefinition.sbncs", $"{model.SourceNamespace}.{model.SourceClassName}.setup.g.cs");
         }
 
         private static void GenerateSource(

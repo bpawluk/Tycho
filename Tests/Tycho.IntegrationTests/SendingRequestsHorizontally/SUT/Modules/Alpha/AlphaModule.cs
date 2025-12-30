@@ -13,7 +13,8 @@ public record AlphaInRequestWithResponse(TestResult Result) : IRequest<string>;
 public record AlphaOutRequest(TestResult Result) : IRequest;
 public record AlphaOutRequestWithResponse(TestResult Result) : IRequest<string>;
 
-internal class AlphaModule : TychoModule
+[ModuleDefinition]
+public partial class AlphaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

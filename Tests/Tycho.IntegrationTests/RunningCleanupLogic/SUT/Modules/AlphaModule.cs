@@ -3,7 +3,8 @@ using Tycho.Modules;
 
 namespace Tycho.IntegrationTests.RunningCleanupLogic.SUT.Modules;
 
-internal class AlphaModule : TychoModule
+[ModuleDefinition]
+public partial class AlphaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module) { }
 

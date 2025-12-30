@@ -9,7 +9,8 @@ namespace Tycho.IntegrationTests.ProvidingSettings.SUT.Modules;
 // Handles
 public record GetBetaValueRequest : IRequest<string>;
 
-internal class BetaModule : TychoModule
+[ModuleDefinition]
+public partial class BetaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

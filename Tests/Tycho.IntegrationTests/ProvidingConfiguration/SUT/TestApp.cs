@@ -10,7 +10,8 @@ namespace Tycho.IntegrationTests.ProvidingConfiguration.SUT;
 // Handles
 public record GetAppValueRequest : IRequest<string>;
 
-public class TestApp : TychoApp
+[AppDefinition]
+public partial class TestApp : TychoApp
 {
     protected override void DefineContract(IAppContract app)
     {

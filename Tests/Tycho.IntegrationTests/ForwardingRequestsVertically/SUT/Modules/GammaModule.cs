@@ -9,7 +9,8 @@ namespace Tycho.IntegrationTests.ForwardingRequestsVertically.SUT.Modules;
 public record GammaRequest(TestResult Result) : IRequest;
 public record GammaRequestWithResponse(TestResult Result) : IRequest<string>;
 
-internal class GammaModule : TychoModule
+[ModuleDefinition]
+public partial class GammaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

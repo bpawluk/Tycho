@@ -9,7 +9,8 @@ namespace Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Alpha;
 public record AlphaWorkflowStartedEvent(TestResult Result) : IEvent;
 public record AlphaWorkflowFinishedEvent(TestResult Result) : IEvent;
 
-internal class AlphaModule : TychoModule
+[ModuleDefinition]
+public partial class AlphaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module) { }
 

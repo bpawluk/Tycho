@@ -4,7 +4,8 @@ using Tycho.IntegrationTests.RunningCleanupLogic.SUT.Modules;
 
 namespace Tycho.IntegrationTests.RunningCleanupLogic.SUT;
 
-public class TestApp : TychoApp
+[AppDefinition]
+public partial class TestApp : TychoApp
 {
     protected override void DefineContract(IAppContract app) { }
 

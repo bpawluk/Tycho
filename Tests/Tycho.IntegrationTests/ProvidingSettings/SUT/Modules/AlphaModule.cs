@@ -9,7 +9,8 @@ namespace Tycho.IntegrationTests.ProvidingSettings.SUT.Modules;
 // Handles
 public record GetAlphaValueRequest : IRequest<string>;
 
-internal class AlphaModule : TychoModule
+[ModuleDefinition]
+public partial class AlphaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

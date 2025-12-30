@@ -9,7 +9,8 @@ namespace Tycho.IntegrationTests.ProvidingSettings.SUT.Modules;
 // Handles
 public record GetGammaValueRequest : IRequest<string>;
 
-internal class GammaModule : TychoModule
+[ModuleDefinition]
+public partial class GammaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

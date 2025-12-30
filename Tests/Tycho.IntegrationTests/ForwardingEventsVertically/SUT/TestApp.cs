@@ -17,7 +17,8 @@ public record WorkflowFinishedEvent(TestResult Result) : IEvent;
 public record WorkflowWithMappingStartedEvent(TestResult Result) : IEvent;
 public record WorkflowWithMappingFinishedEvent(TestResult Result) : IEvent;
 
-internal class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
+[AppDefinition]
+public partial class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;
 

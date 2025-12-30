@@ -13,7 +13,8 @@ public record GammaInRequestWithResponse(TestResult Result) : IRequest<string>;
 public record GammaOutRequest(TestResult Result) : IRequest;
 public record GammaOutRequestWithResponse(TestResult Result) : IRequest<string>;
 
-internal class GammaModule : TychoModule
+[ModuleDefinition]
+public partial class GammaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

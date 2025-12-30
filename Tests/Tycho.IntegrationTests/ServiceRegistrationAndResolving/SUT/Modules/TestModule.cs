@@ -20,7 +20,8 @@ public record GetModuleSingletonServiceUsageEvent(TestResult Result) : IEvent;
 public record GetModuleScopedServiceUsageEvent(TestResult Result) : IEvent;
 public record GetModuleTransientServiceUsageEvent(TestResult Result) : IEvent;
 
-internal class TestModule : TychoModule
+[ModuleDefinition]
+public partial class TestModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
