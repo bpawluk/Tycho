@@ -6,7 +6,6 @@
     <Project Path="Tests/Tycho.UseCaseTests/Tycho.UseCaseTests.csproj" />
   </Folder>
   <Project Path="Tycho.Persistence.EFCore/Tycho.Persistence.EFCore.csproj" />
-  <Project Path="Tycho.SampleConsumer/Tycho.SampleConsumer.csproj" Id="bd05dd36-ca0b-4fc1-ba6c-88a5972fbca1" />
   <Project Path="Tycho.Utils.SourceGenerator/Tycho.Utils.SourceGenerator.csproj" Id="2bbbd5bf-f0f2-47ff-a3ff-8fedd4b66ab5" />
   <Project Path="Tycho/Tycho.csproj" />
 </Solution>
