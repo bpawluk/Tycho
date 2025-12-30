@@ -12,8 +12,8 @@ using Tycho.Events.Routing;
 using Tycho.Events.Routing.Delivery;
 using Tycho.Events.Serialization;
 using Tycho.Events.Serialization.InMemory;
-using Tycho.Identities.Providers;
 using Tycho.Modules.Routing;
+using Tycho.Registry;
 using Tycho.Structure.Internal;
 
 namespace Tycho.Modules.Setup
@@ -22,6 +22,7 @@ namespace Tycho.Modules.Setup
     {
         private readonly Internals _internals;
         private readonly Registrator _registrator;
+        private readonly IEventHandlerRegistry _handlerRegistry;
 
         private IEventRouter? _parentEventRouter;
 
@@ -31,7 +32,8 @@ namespace Tycho.Modules.Setup
         public ModuleEvents(Internals internals)
         {
             _internals = internals;
-            _registrator = new Registrator(internals);
+            _handlerRegistry = new EventHandlerRegistry(internals);
+            _registrator = new Registrator(internals, _handlerRegistry);
         }
 
         public void WithParentEventRouter(IEventRouter parentEventRouter)
@@ -85,13 +87,13 @@ namespace Tycho.Modules.Setup
             services.AddTransient<InboxProcessorJob>();
             services.AddTransient<IInboxEntryHandler, InboxEntryHandler>();
 
+            services.AddSingleton(_handlerRegistry);
             services.AddTransient<IEventPublisher, EventPublisher>();
             services.AddTransient<IEventRouter, EventRouter>();
             services.AddTransient<IDeliveryStrategyProvider, DeliveryStrategyProvider>();
             services.AddTransient<DownStreamRouteDelivery>();
             services.AddTransient<FinalRouteDelivery>();
             services.AddTransient<UpStreamRouteDelivery>();
-            services.AddTransient<IEventHandlerProvider, EventHandlerProvider>();
 
             _internals.InternalsBuilt += OnInternalsBuilt;
             return Task.CompletedTask;

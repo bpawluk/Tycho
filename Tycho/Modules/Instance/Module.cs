@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Routing;
+using Tycho.Registry;
 using Tycho.Requests;
 using Tycho.Requests.Broker;
 using Tycho.Structure;
@@ -46,7 +47,8 @@ namespace Tycho.Modules.Instance
         public async ValueTask DisposeAsync()
         {
             await _cleanup(_internals).ConfigureAwait(false);
-            foreach (var module in _internals.GetServices<IModule>())
+            var moduleRegistry = _internals.GetRequiredService<IModuleRegistry>();
+            foreach (var module in moduleRegistry.GetAllModules())
             {
                 await module.DisposeAsync().ConfigureAwait(false);
             }

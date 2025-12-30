@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Tycho.Identities
+namespace Tycho.Registry
 {
     internal class ModuleIdentity : IEquatable<ModuleIdentity>
     {

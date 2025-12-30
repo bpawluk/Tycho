@@ -7,13 +7,11 @@ using Tycho.Structure.Internal;
 
 namespace Tycho.Events.Handling
 {
-    internal class ScopedEventHandler<TEvent, TEventHandler> : IEventHandlerWrapper, IEventHandler<TEvent>
+    internal class ScopedEventHandler<TEvent, TEventHandler> : IEventHandler<TEvent>
         where TEvent : class, IEvent
         where TEventHandler : IEventHandler<TEvent> 
     {
         private readonly Internals _internals;
-
-        public Type InnerHandlerType => typeof(TEventHandler);
 
         public ScopedEventHandler(Internals internals)
         {

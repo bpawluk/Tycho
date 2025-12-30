@@ -1,6 +1,6 @@
 ﻿using System;
 using Tycho.Events.Routing.Routes;
-using Tycho.Identities;
+using Tycho.Registry;
 
 namespace Tycho.Events.Routing.Payload
 {

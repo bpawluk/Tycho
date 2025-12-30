@@ -4,14 +4,20 @@ namespace Tycho.Events.Serialization.InMemory
 {
     internal class InMemoryPayloadSerializer : IPayloadSerializer
     {
+        public object Serialize(IEvent eventData)
+        {
+            return eventData;
+        }
+
         public IEvent Deserialize(Type eventType, object payload)
         {
             return (payload as IEvent)!;
         }
 
-        public object Serialize(IEvent eventData)
+        public TEvent Deserialize<TEvent>(object payload)
+            where TEvent : class, IEvent
         {
-            return eventData;
+            return (payload as TEvent)!;
         }
     }
 }

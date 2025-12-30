@@ -3,17 +3,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Events.Routing.Payload;
 using Tycho.Events.Routing.Routes;
-using Tycho.Identities.Providers;
+using Tycho.Registry;
 
 namespace Tycho.Events.Routing.Delivery
 {
     internal class DownStreamRouteDelivery : IDeliveryStrategy
     {
-        private readonly ISubmoduleProvider _submoduleProvider;
+        private readonly IModuleRegistry _moduleRegistry;
 
-        public DownStreamRouteDelivery(ISubmoduleProvider submoduleProvider)
+        public DownStreamRouteDelivery(IModuleRegistry moduleRegistry)
         {
-            _submoduleProvider = submoduleProvider;
+            _moduleRegistry = moduleRegistry;
         }
 
         public async Task DeliverAsync(IRoutedEvent routedEvent, CancellationToken cancellationToken)
@@ -23,7 +23,7 @@ namespace Tycho.Events.Routing.Delivery
                 throw new InvalidOperationException($"Invalid route in {GetType().Name}");
             }
 
-            var submodule = _submoduleProvider.GetSubmodule(downStreamRouteStep.Destination);
+            var submodule = _moduleRegistry.GetModule(downStreamRouteStep.Destination);
             await submodule.EventRouter.DeliverAsync(routedEvent, cancellationToken);
         }
     }

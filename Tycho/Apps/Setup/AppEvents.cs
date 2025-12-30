@@ -13,7 +13,7 @@ using Tycho.Events.Routing;
 using Tycho.Events.Routing.Delivery;
 using Tycho.Events.Serialization;
 using Tycho.Events.Serialization.InMemory;
-using Tycho.Identities.Providers;
+using Tycho.Registry;
 using Tycho.Structure.Internal;
 
 namespace Tycho.Apps.Setup
@@ -22,11 +22,13 @@ namespace Tycho.Apps.Setup
     {
         private readonly Internals _internals;
         private readonly Registrator _registrator;
+        private readonly IEventHandlerRegistry _handlerRegistry;
 
         public AppEvents(Internals internals)
         {
             _internals = internals;
-            _registrator = new Registrator(internals);
+            _handlerRegistry = new EventHandlerRegistry(internals);
+            _registrator = new Registrator(internals, _handlerRegistry);
         }
 
         public IAppEvents Handles<TEvent, THandler>()
@@ -75,13 +77,13 @@ namespace Tycho.Apps.Setup
             services.AddTransient<InboxProcessorJob>();
             services.AddTransient<IInboxEntryHandler, InboxEntryHandler>();
 
+            services.AddSingleton(_handlerRegistry);
             services.AddTransient<IEventPublisher, EventPublisher>();
             services.AddTransient<IEventRouter, EventRouter>();
             services.AddTransient<IDeliveryStrategyProvider, DeliveryStrategyProvider>();
             services.AddTransient<DownStreamRouteDelivery>();
             services.AddTransient<FinalRouteDelivery>();
             services.AddTransient<UpStreamRouteDelivery>();
-            services.AddTransient<IEventHandlerProvider, EventHandlerProvider>();
 
             _internals.InternalsBuilt += OnInternalsBuilt;
             return Task.CompletedTask;

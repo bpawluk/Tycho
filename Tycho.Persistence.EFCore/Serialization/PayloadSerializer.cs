@@ -16,17 +16,18 @@ internal class PayloadSerializer : IPayloadSerializer
         return JsonSerializer.Serialize(eventData, eventData.GetType());
     }
 
-    public IEvent Deserialize(Type eventType, object payload)
+    public TEvent Deserialize<TEvent>(object payload) where TEvent : class, IEvent
     {
-        if (payload is string stringPayload)
+        if (payload is string stringPayload && !string.IsNullOrWhiteSpace(stringPayload))
         {
-            var eventData = JsonSerializer.Deserialize(stringPayload, eventType) as IEvent;
+            var eventData = JsonSerializer.Deserialize<TEvent>(stringPayload);
             if (eventData is null)
             {
-                throw new InvalidOperationException($"Failed to deserialize payload to {eventType.Name}");
+                throw new InvalidOperationException(
+                    $"Failed to deserialize payload to {typeof(TEvent).Name}");
             }
             return eventData;
         }
-        throw new ArgumentException("Payload must be a non-null string", nameof(payload));
+        throw new ArgumentException("Payload must be a non-empty string", nameof(payload));
     }
 }
