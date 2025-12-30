@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tycho.Apps;
+using Tycho.Modules;
+
 
 namespace Tycho.SampleConsumer
 {
@@ -19,6 +21,26 @@ namespace Tycho.SampleConsumer
         }
 
         protected override void RegisterServices(IServiceCollection app)
+        {
+        }
+    }
+
+    [ModuleDefinition]
+    public partial class TestModule : TychoModule
+    {
+        protected override void DefineContract(IModuleContract module)
+        {
+        }
+
+        protected override void DefineEvents(IModuleEvents module)
+        {
+        }
+
+        protected override void IncludeModules(IModuleStructure module)
+        {
+        }
+
+        protected override void RegisterServices(IServiceCollection module)
         {
         }
     }

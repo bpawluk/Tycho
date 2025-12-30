@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Tycho.Utils.SourceGenerator.Utils
 {
-    internal static class EmbeddedResource
+    public static class EmbeddedResource
     {
         public static string GetContent(string relativePath)
         {

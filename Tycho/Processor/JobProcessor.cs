@@ -70,7 +70,7 @@ namespace Tycho.Processor
                 if (_currentInterval != _settings.InitialInterval)
                 {
                     _currentInterval = _settings.InitialInterval;
-                    _timer.Change(_currentInterval, _currentInterval);
+                    _timer.Change(TimeSpan.Zero, _currentInterval);
                 }
             }
         }

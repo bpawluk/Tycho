@@ -17,9 +17,11 @@ namespace {{ source_namespace }}
         {
             switch (eventHandler)
             {
-             // case global::Tycho.Events.IEventHandler<global::SomeNamespace.TestEvent> castHandler:
-                 // await DispatchAs(eventId, eventPayload, castHandler, cancellationToken);
-                 // break;
+            {{~ for event in events ~}}
+                case global::Tycho.Events.IEventHandler<global::{{ event.source_namespace }}.{{ event.source_class_name }}> castHandler:
+                    await DispatchAs(eventId, eventPayload, castHandler, cancellationToken);
+                    break;
+            {{~ end ~}}
                 default:
                     throw new global::System.InvalidOperationException(
                         $"Missing handling logic for {eventHandler.GetType().FullName} event handler.");

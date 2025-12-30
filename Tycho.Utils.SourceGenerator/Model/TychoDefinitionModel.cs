@@ -1,17 +1,21 @@
 ﻿namespace Tycho.Utils.SourceGenerator.Model
 {
-    internal struct TychoDefinitionModel
+    public readonly struct TychoDefinitionModel
     {
-        public string SourceNamespace { get; set; }
+        public string SourceNamespace { get; }
 
-        public string SourceClassName { get; set; }
+        public string SourceClassName { get; }
+
+        public ImmutableEquatableArray<EventModel> Events { get; }
 
         public TychoDefinitionModel(
             string sourceNamespace,
-            string sourceClassName)
+            string sourceClassName,
+            ImmutableEquatableArray<EventModel> events)
         {
             SourceNamespace = sourceNamespace;
             SourceClassName = sourceClassName;
+            Events = events;
         }
     }
 }
