@@ -1,0 +1,41 @@
+namespace {{ source_namespace }}
+{
+    internal class {{ source_class_name }}EventDispatcher : global::Tycho.Events.Handling.IEventHandlingDispatcher
+    {
+        private readonly global::Tycho.Events.Serialization.IPayloadSerializer _payloadSerializer;
+
+        public {{ source_class_name }}EventDispatcher(global::Tycho.Events.Serialization.IPayloadSerializer payloadSerializer)
+        {
+            _payloadSerializer = payloadSerializer;
+        }
+
+        public async global::System.Threading.Tasks.Task Dispatch(
+            global::System.Guid eventId,
+            object eventPayload,
+            global::Tycho.Events.IEventHandler eventHandler,
+            global::System.Threading.CancellationToken cancellationToken)
+        {
+            switch (eventHandler)
+            {
+             // case global::Tycho.Events.IEventHandler<global::SomeNamespace.TestEvent> castHandler:
+                 // await DispatchAs(eventId, eventPayload, castHandler, cancellationToken);
+                 // break;
+                default:
+                    throw new global::System.InvalidOperationException(
+                        $"Missing handling logic for {eventHandler.GetType().FullName} event handler.");
+            }
+        }
+
+        private async global::System.Threading.Tasks.Task DispatchAs<TEvent>(
+            global::System.Guid eventId,
+            object eventPayload,
+            global::Tycho.Events.IEventHandler<TEvent> eventHandler,
+            global::System.Threading.CancellationToken cancellationToken)
+            where TEvent : class, global::Tycho.Events.IEvent
+        {
+            var deserializedPyaload = _payloadSerializer.Deserialize<TEvent>(eventPayload);
+            var context = new global::Tycho.Events.EventContext<TEvent>(eventId, deserializedPyaload);
+            await eventHandler.Handle(context, cancellationToken);
+        }
+    }
+}

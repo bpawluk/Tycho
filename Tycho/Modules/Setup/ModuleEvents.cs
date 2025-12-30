@@ -85,7 +85,6 @@ namespace Tycho.Modules.Setup
             services.AddSingleton<InboxActivity>();
             services.AddSingleton<InboxProcessor>();
             services.AddTransient<InboxProcessorJob>();
-            services.AddTransient<IInboxEntryHandler, InboxEntryHandler>();
 
             services.AddSingleton(_handlerRegistry);
             services.AddTransient<IEventPublisher, EventPublisher>();

@@ -75,10 +75,25 @@ namespace Tycho.Modules
         /// Override this method if you need to execute code before the module is disposed
         /// </summary>
         /// <param name="app">A provider of the services configured for the module</param>
-        protected virtual Task Cleanup(IServiceProvider app)
+        protected virtual Task Cleanup(IServiceProvider module)
         {
             return Task.CompletedTask;
         }
+
+        /// <summary>
+        /// Provides automated setup for the module.
+        /// </summary>
+        /// <remarks>
+        /// Do not override this! Implemented via source generators.
+        /// </remarks>
+#pragma warning disable IDE1006
+        protected virtual void __AutoSetup__(IServiceCollection module)
+        {
+            throw new NotImplementedException(
+                $"Failed to provide automated setup for {GetType()} module. " +
+                $"Make sure your module definition is a public partial class marked with the ModuleDefinition attribute");
+        }
+#pragma warning restore IDE1006
 
         internal TychoModule WithGlobals(Globals globals)
         {
@@ -109,6 +124,7 @@ namespace Tycho.Modules
             EnsureItIsRunOnlyOnce();
 
             _builder.WithCleanup(Cleanup).Init();
+            __AutoSetup__(_builder.Services);
             RegisterServices(_builder.Services);
             DefineContract(_builder.Contract);
             DefineEvents(_builder.Events);

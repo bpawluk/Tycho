@@ -69,6 +69,21 @@ namespace Tycho.Apps
         }
 
         /// <summary>
+        /// Provides automated setup for the app.
+        /// </summary>
+        /// <remarks>
+        /// Do not override this! Implemented via source generators.
+        /// </remarks>
+#pragma warning disable IDE1006
+        protected virtual void __AutoSetup__(IServiceCollection app)
+        {
+            throw new NotImplementedException(
+                $"Failed to provide automated setup for {GetType()} app. " +
+                $"Make sure your app definition is a public partial class marked with the AppDefinition attribute");
+        }
+#pragma warning restore IDE1006
+
+        /// <summary>
         /// Supplies global configuration for the application and its modules
         /// </summary>
         /// <param name="globalConfiguration">Configuration to be used</param>
@@ -98,6 +113,7 @@ namespace Tycho.Apps
             EnsureItIsRunOnlyOnce();
 
             _builder.WithCleanup(Cleanup).Init();
+            __AutoSetup__(_builder.Services);
             RegisterServices(_builder.Services);
             DefineContract(_builder.Contract);
             DefineEvents(_builder.Events);

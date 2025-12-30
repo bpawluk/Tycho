@@ -8,7 +8,8 @@ namespace Tycho.IntegrationTests.ConfiguringLogging.SUT.Modules;
 // Handles
 public record LogBetaRequest : IRequest;
 
-internal class BetaModule : TychoModule
+[ModuleDefinition]
+public partial class BetaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

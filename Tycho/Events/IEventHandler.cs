@@ -9,9 +9,8 @@ namespace Tycho.Events
     /// </summary>
     public interface IEventHandler
     {
+        // TODO: Remove
         internal Type EventType { get; }
-
-        internal Type HandlerType { get; }
     }
 
     /// <summary>
@@ -22,8 +21,6 @@ namespace Tycho.Events
         where TEvent : class, IEvent
     {
         Type IEventHandler.EventType => typeof(TEvent);
-
-        Type IEventHandler.HandlerType => GetType();
 
         /// <summary>
         /// Handles an event of type <typeparamref name="TEvent"/>

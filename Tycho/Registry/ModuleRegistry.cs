@@ -26,7 +26,6 @@ namespace Tycho.Registry
             {
                 return module;
             }
-
             throw new InvalidOperationException($"Module with identity '{moduleId}' not found.");
         }
 

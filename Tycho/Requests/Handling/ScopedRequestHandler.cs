@@ -5,9 +5,9 @@ using Tycho.Structure.Internal;
 
 namespace Tycho.Requests.Handling
 {
-    internal class ScopedRequestHandler<TRequest, TRequestHandler> : IRequestHandler<TRequest>
+    internal class ScopedRequestHandler<TRequest, THandler> : IRequestHandler<TRequest>
         where TRequest : class, IRequest
-        where TRequestHandler : IRequestHandler<TRequest>
+        where THandler : IRequestHandler<TRequest>
     {
         private readonly Internals _internals;
 
@@ -19,7 +19,7 @@ namespace Tycho.Requests.Handling
         public async Task Handle(TRequest requestData, CancellationToken cancellationToken)
         {
             await using var scope = _internals.CreateAsyncScope();
-            var handler = scope.ServiceProvider.GetRequiredService<TRequestHandler>();
+            var handler = scope.ServiceProvider.GetRequiredService<THandler>();
 
             var transactionalHandler = handler as ITransactionalRequestHandler;
             if (transactionalHandler != null)
@@ -47,9 +47,9 @@ namespace Tycho.Requests.Handling
         }
     }
 
-    internal class ScopedRequestHandler<TRequest, TResponse, TRequestHandler> : IRequestHandler<TRequest, TResponse>
+    internal class ScopedRequestHandler<TRequest, TResponse, THandler> : IRequestHandler<TRequest, TResponse>
         where TRequest : class, IRequest<TResponse>
-        where TRequestHandler : IRequestHandler<TRequest, TResponse>
+        where THandler : IRequestHandler<TRequest, TResponse>
     {
         private readonly Internals _internals;
 
@@ -61,7 +61,7 @@ namespace Tycho.Requests.Handling
         public async Task<TResponse> Handle(TRequest requestData, CancellationToken cancellationToken)
         {
             await using var scope = _internals.CreateAsyncScope();
-            var handler = scope.ServiceProvider.GetRequiredService<TRequestHandler>();
+            var handler = scope.ServiceProvider.GetRequiredService<THandler>();
 
             var transactionalHandler = handler as ITransactionalRequestHandler;
             if (transactionalHandler != null)

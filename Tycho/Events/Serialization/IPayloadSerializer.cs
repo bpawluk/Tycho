@@ -2,7 +2,7 @@
 
 namespace Tycho.Events.Serialization
 {
-    internal interface IPayloadSerializer
+    public interface IPayloadSerializer
     {
         object Serialize(IEvent eventData);
 

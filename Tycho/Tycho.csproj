@@ -24,6 +24,7 @@
     <PackageIcon>logo-128x128.png</PackageIcon>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Tycho.snk</AssemblyOriginatorKeyFile>
+    <IncludeReferencedAnalyzers>True</IncludeReferencedAnalyzers>
   </PropertyGroup>
 
   <ItemGroup>
@@ -51,14 +52,27 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Tycho.Utils.SourceGenerator\Tycho.Utils.SourceGenerator.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Tycho.Utils.SourceGenerator\bin\$(Configuration)\netstandard2.0\Tycho.Utils.SourceGenerator.dll"
+          Pack="true"
+          PackagePath="analyzers/dotnet/cs"
+          Visible="false"
+          CopyToOutputDirectory="Never" />
+    <None Include="..\Tycho.Utils.SourceGenerator\bin\$(Configuration)\netstandard2.0\Scriban.dll"
+          Pack="true"
+          PackagePath="analyzers/dotnet/cs"
+          Visible="false"
+          CopyToOutputDirectory="Never" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\Assets\logo-128x128.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Tycho.Utils.SourceGenerator\Tycho.Utils.SourceGenerator.csproj" />
   </ItemGroup>
 
 </Project>

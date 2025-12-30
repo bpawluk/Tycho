@@ -1,28 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Major>6</Major>
-    <Minor>0</Minor>
-    <Patch>0</Patch>
-    <VersionPrefix>$(Major).$(Minor).$(Patch)</VersionPrefix>
-    <AssemblyVersion>$(Major).0.0.0</AssemblyVersion>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Authors>Bartosz Pawluk</Authors>
-    <Title>$(AssemblyName)</Title>
-    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <IncludeBuildOutput>False</IncludeBuildOutput>
-    <Copyright>Copyright Bartosz Pawluk</Copyright>
-    <PackageProjectUrl>https://github.com/bpawluk/Tycho</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/bpawluk/Tycho</RepositoryUrl>
-    <PackageTags>tycho; module; modular; architecture; framework</PackageTags>
-    <Description>Lightweight framework for writing modular .NET apps</Description>
-    <PackageIcon>logo-128x128.png</PackageIcon>
-    <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\Tycho.snk</AssemblyOriginatorKeyFile>
-
+    <CopyLocalLockFileAssemblies>True</CopyLocalLockFileAssemblies>
+    <EnforceExtendedAnalyzerRules>True</EnforceExtendedAnalyzerRules>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,23 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Remove="Templates\**" />
     <EmbeddedResource Include="Templates\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="bin\Debug\netstandard2.0\\Tycho.Utils.SourceGenerator.dll" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\Assets\logo-128x128.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
   </ItemGroup>
 
 </Project>

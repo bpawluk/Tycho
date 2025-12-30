@@ -5,14 +5,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Tycho.Events.Handling;
 using Tycho.Processor;
+using Tycho.Registry;
 
 namespace Tycho.Events.Inbox
 {
     internal class InboxProcessorJob : IJob
     {
         private readonly IInboxConsumer _inboxConsumer;
-        private readonly IInboxEntryHandler _entryHandler;
+        private readonly IEventHandlerRegistry _handlerRegistry;
+        private readonly IEventHandlingDispatcher _handlingDispatcher;
         private readonly InboxProcessorSettings _settings;
         private readonly ILogger<InboxProcessorJob> _logger;
 
@@ -20,12 +23,14 @@ namespace Tycho.Events.Inbox
 
         public InboxProcessorJob(
             IInboxConsumer inboxConsumer,
-            IInboxEntryHandler entryHandler,
+            IEventHandlerRegistry handlerRegistry,
+            IEventHandlingDispatcher handlingDispatcher,
             InboxProcessorSettings? settings = null,
             ILogger<InboxProcessorJob>? logger = null)
         {
             _inboxConsumer = inboxConsumer;
-            _entryHandler = entryHandler;
+            _handlerRegistry = handlerRegistry;
+            _handlingDispatcher = handlingDispatcher;
             _settings = settings ?? InboxProcessorSettings.Default;
             _logger = logger ?? NullLogger<InboxProcessorJob>.Instance;
         }
@@ -55,7 +60,9 @@ namespace Tycho.Events.Inbox
             try
             {
                 // TODO: Handler timeout support
-                await _entryHandler.HandleEntryAsync(entry, CancellationToken.None).ConfigureAwait(false);
+                var handlingCancellationToken = CancellationToken.None;
+                var eventHandler = _handlerRegistry.GetHandler(entry.HandlerId);
+                await _handlingDispatcher.Dispatch(entry.Id, entry.Payload, eventHandler, handlingCancellationToken);
             }
             catch (Exception ex)
             {

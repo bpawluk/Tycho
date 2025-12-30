@@ -6,9 +6,9 @@ using Tycho.Structure.Internal;
 
 namespace Tycho.Events.Handling
 {
-    internal class ScopedEventHandler<TEvent, TEventHandler> : IEventHandler<TEvent>
+    internal class ScopedEventHandler<TEvent, THandler> : IEventHandler<TEvent>
         where TEvent : class, IEvent
-        where TEventHandler : IEventHandler<TEvent> 
+        where THandler : IEventHandler<TEvent> 
     {
         private readonly Internals _internals;
 
@@ -22,7 +22,7 @@ namespace Tycho.Events.Handling
             await using var scope = _internals.CreateAsyncScope();
 
             var inbox = scope.ServiceProvider.GetRequiredService<IInboxConsumer>();
-            var handler = scope.ServiceProvider.GetRequiredService<TEventHandler>();
+            var handler = scope.ServiceProvider.GetRequiredService<THandler>();
 
             var transactionalHandler = handler as ITransactionalEventHandler;
             if (transactionalHandler != null)
