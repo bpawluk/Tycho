@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Tycho.Events.Handling;
 using Tycho.Events.Serialization;
 using Tycho.Registry;
 
@@ -60,9 +61,8 @@ namespace Tycho.Events.Inbox
         {
             switch (_handlerRegistry.GetHandler(entry.HandlerId))
             {
-                // TODO Never matches due to ScopedEventHandler wrapper
-                case TestEventHandler testEventHandler:
-                    await HandleAs<TestEvent, TestEventHandler>(entry, testEventHandler, cancellationToken);
+                case IEventHandler<TestEvent> testEventHandler:
+                    await HandleAs(entry, testEventHandler, cancellationToken);
                     break;
                 default:
                     throw new InvalidOperationException(
@@ -70,9 +70,11 @@ namespace Tycho.Events.Inbox
             }
         }
 
-        private async Task HandleAs<TEvent, THandler>(InboxEntry entry, THandler handler,  CancellationToken cancellationToken)
+        private async Task HandleAs<TEvent>(
+            InboxEntry entry, 
+            IEventHandler<TEvent> handler,  
+            CancellationToken cancellationToken)
             where TEvent : class, IEvent
-            where THandler : class, IEventHandler<TEvent>
         {
             var deserializedPyaload = _payloadSerializer.Deserialize<TEvent>(entry.Payload);
             var context = new EventContext<TEvent>(entry.Id, deserializedPyaload);
@@ -82,14 +84,6 @@ namespace Tycho.Events.Inbox
 
     internal class TestEvent : IEvent
     {
-    }
-
-    internal class TestEventHandler : IEventHandler<TestEvent>
-    {
-        public Task Handle(EventContext<TestEvent> context, CancellationToken cancellationToken)
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }
 
