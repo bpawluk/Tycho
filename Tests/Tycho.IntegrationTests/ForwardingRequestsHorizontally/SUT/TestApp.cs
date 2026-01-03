@@ -19,7 +19,7 @@ public record RequestToMapWithResponse(TestResult Result) : IRequest<Response>
     public record Response(string Value);
 }
 
-[AppDefinition]
+[TychoDefinition]
 public partial class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;

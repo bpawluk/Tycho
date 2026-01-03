@@ -9,7 +9,7 @@ namespace Tycho.IntegrationTests.ConfiguringLogging.SUT;
 // Handles
 public record LogAppRequest : IRequest;
 
-[AppDefinition]
+[TychoDefinition]
 public partial class TestApp : TychoApp
 {
     protected override void DefineContract(IAppContract app)

@@ -91,7 +91,7 @@ namespace Tycho.Modules
         {
             throw new NotImplementedException(
                 $"Failed to provide automated setup for {GetType()} module. " +
-                $"Make sure your module definition is a public partial class marked with the ModuleDefinition attribute");
+                $"Make sure your module definition is a public partial class marked with the TychoDefinition attribute");
         }
 #pragma warning restore IDE1006
 

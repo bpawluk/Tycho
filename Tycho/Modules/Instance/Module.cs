@@ -11,8 +11,8 @@ using Tycho.Structure.Internal;
 
 namespace Tycho.Modules.Instance
 {
-    internal class Module<TModuleDefinition> : IModule<TModuleDefinition>
-        where TModuleDefinition : TychoModule
+    internal class Module<TTychoDefinition> : IModule<TTychoDefinition>
+        where TTychoDefinition : TychoModule
     {
         private readonly Internals _internals;
         private readonly Func<IServiceProvider, Task> _cleanup;

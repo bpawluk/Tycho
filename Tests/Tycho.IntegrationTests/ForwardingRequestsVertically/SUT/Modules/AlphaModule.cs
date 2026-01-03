@@ -8,7 +8,7 @@ namespace Tycho.IntegrationTests.ForwardingRequestsVertically.SUT.Modules;
 public record AlphaRequest(TestResult Result) : IRequest;
 public record AlphaRequestWithResponse(TestResult Result) : IRequest<string>;
 
-[ModuleDefinition]
+[TychoDefinition]
 public partial class AlphaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)

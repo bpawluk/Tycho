@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace {{ source_namespace }}
+namespace {{ definition_type.type_namespace }}
 {
-    public partial class {{ source_class_name }} : global::Tycho.Modules.TychoModule
+    public partial class {{ definition_type.type_name }} : global::Tycho.Modules.TychoModule
     {
         protected override void __AutoSetup__(IServiceCollection module)
         {
-            module.AddTransient<global::Tycho.Events.Handling.IEventHandlingDispatcher, {{ source_class_name }}EventDispatcher>();
+            module.AddTransient<global::Tycho.Events.Handling.IEventHandlingDispatcher, {{ definition_type.type_name }}EventDispatcher>();
         }
     }
 }

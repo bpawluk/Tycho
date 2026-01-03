@@ -1,21 +1,41 @@
-﻿namespace Tycho.Utils.SourceGenerator.Model
+﻿using System;
+using Tycho.Utils.SourceGenerator.Model.Partial;
+using Tycho.Utils.SourceGenerator.Utils;
+
+namespace Tycho.Utils.SourceGenerator.Model
 {
-    public readonly struct TychoDefinitionModel
+    public readonly struct TychoDefinitionModel : IEquatable<TychoDefinitionModel>
     {
-        public string SourceNamespace { get; }
+        public TypeModel DefinitionType { get; }
 
-        public string SourceClassName { get; }
+        public TychoDefinitionKind DefinitionKind { get; }
 
-        public ImmutableEquatableArray<EventModel> Events { get; }
-
-        public TychoDefinitionModel(
-            string sourceNamespace,
-            string sourceClassName,
-            ImmutableEquatableArray<EventModel> events)
+        public TychoDefinitionModel(TypeModel definitionType, TychoDefinitionKind definitionKind)
         {
-            SourceNamespace = sourceNamespace;
-            SourceClassName = sourceClassName;
-            Events = events;
+            DefinitionType = definitionType;
+            DefinitionKind = definitionKind;
         }
+
+        public bool Equals(TychoDefinitionModel other)
+        {
+            return DefinitionType.Equals(other.DefinitionType) &&
+                   DefinitionKind.Equals(other.DefinitionKind);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is TychoDefinitionModel other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(
+                DefinitionType.GetHashCode(),
+                DefinitionKind.GetHashCode());
+        }
+
+        public static bool operator ==(TychoDefinitionModel left, TychoDefinitionModel right) => left.Equals(right);
+
+        public static bool operator !=(TychoDefinitionModel left, TychoDefinitionModel right) => !left.Equals(right);
     }
 }

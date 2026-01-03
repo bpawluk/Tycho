@@ -3,7 +3,7 @@ using Tycho.Modules;
 
 namespace Tycho.IntegrationTests.RunningCleanupLogic.SUT.Modules;
 
-[ModuleDefinition]
+[TychoDefinition]
 public partial class GammaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module) { }

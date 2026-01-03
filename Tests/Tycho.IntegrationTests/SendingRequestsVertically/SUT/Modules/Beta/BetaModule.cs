@@ -14,7 +14,7 @@ public record BetaInRequestWithResponse(TestResult Result) : IRequest<string>;
 public record BetaOutRequest(TestResult Result) : IRequest;
 public record BetaOutRequestWithResponse(TestResult Result) : IRequest<string>;
 
-[ModuleDefinition]
+[TychoDefinition]
 public partial class BetaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)

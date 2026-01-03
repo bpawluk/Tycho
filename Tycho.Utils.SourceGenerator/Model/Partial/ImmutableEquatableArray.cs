@@ -2,13 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Tycho.Utils.SourceGenerator.Utils;
 
 public static class ImmutableEquatableArray
 {
     public static ImmutableEquatableArray<T> Empty<T>()
         where T : IEquatable<T> => ImmutableEquatableArray<T>.Empty;
 
-    public static ImmutableEquatableArray<T> ToImmutableEquatableArray<T>(this IEnumerable<T>? values)
+    public static ImmutableEquatableArray<T> ToImmutableEquatableArray<T>(this IEnumerable<T> values)
         where T : IEquatable<T> => values == null ? Empty<T>() : new ImmutableEquatableArray<T>(values);
 }
 
@@ -25,25 +26,18 @@ public sealed class ImmutableEquatableArray<T> : IEquatable<ImmutableEquatableAr
 
     public ImmutableEquatableArray(IEnumerable<T> values) => _values = values.ToArray();
 
-    public bool Equals(ImmutableEquatableArray<T>? other) =>
+    public bool Equals(ImmutableEquatableArray<T> other) =>
         other != null && ((ReadOnlySpan<T>)_values).SequenceEqual(other._values);
 
-    public override bool Equals(object? obj) => obj is ImmutableEquatableArray<T> other && Equals(other);
+    public override bool Equals(object obj) => obj is ImmutableEquatableArray<T> other && Equals(other);
 
     public override int GetHashCode()
     {
         var hash = 0;
+
         foreach (T value in _values)
         {
-            hash = Combine(hash, value.GetHashCode());
-        }
-
-        static int Combine(int h1, int h2)
-        {
-            // RyuJIT optimizes this to use the ROL instruction
-            // Related GitHub pull request: https://github.com/dotnet/coreclr/pull/1830
-            uint rol5 = ((uint)h1 << 5) | ((uint)h1 >> 27);
-            return ((int)rol5 + h1) ^ h2;
+            hash = HashCode.Combine(hash, value.GetHashCode());
         }
 
         return hash;

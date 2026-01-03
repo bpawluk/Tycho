@@ -8,7 +8,7 @@ namespace Tycho.IntegrationTests.ConfiguringLogging.SUT.Modules;
 // Handles
 public record LogAlphaRequest : IRequest;
 
-[ModuleDefinition]
+[TychoDefinition]
 public partial class AlphaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)

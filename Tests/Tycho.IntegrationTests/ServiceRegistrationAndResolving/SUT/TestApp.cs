@@ -20,7 +20,7 @@ public record GetAppSingletonServiceUsageEvent(TestResult Result) : IEvent;
 public record GetAppScopedServiceUsageEvent(TestResult Result) : IEvent;
 public record GetAppTransientServiceUsageEvent(TestResult Result) : IEvent;
 
-[AppDefinition]
+[TychoDefinition]
 public partial class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;

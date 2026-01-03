@@ -8,7 +8,7 @@ namespace Tycho.IntegrationTests.ForwardingEventsVertically.SUT.Modules;
 public record BetaWorkflowStartedEvent(TestResult Result) : IEvent;
 public record BetaWorkflowFinishedEvent(TestResult Result) : IEvent;
 
-[ModuleDefinition]
+[TychoDefinition]
 public partial class BetaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module) { }

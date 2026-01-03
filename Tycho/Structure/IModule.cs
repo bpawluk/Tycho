@@ -17,11 +17,11 @@ namespace Tycho.Structure
     }
 
     /// <summary>
-    /// An interface for a Tycho module defined by <typeparamref name="TModuleDefinition"/>
+    /// An interface for a Tycho module defined by <typeparamref name="TTychoDefinition"/>
     /// </summary>
-    /// <typeparam name="TModuleDefinition">The definition of the module</typeparam>
-    public interface IModule<TModuleDefinition> : IModule
-        where TModuleDefinition : TychoModule
+    /// <typeparam name="TTychoDefinition">The definition of the module</typeparam>
+    public interface IModule<TTychoDefinition> : IModule
+        where TTychoDefinition : TychoModule
     {
     }
 }

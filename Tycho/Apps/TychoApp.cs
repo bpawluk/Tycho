@@ -79,7 +79,7 @@ namespace Tycho.Apps
         {
             throw new NotImplementedException(
                 $"Failed to provide automated setup for {GetType()} app. " +
-                $"Make sure your app definition is a public partial class marked with the AppDefinition attribute");
+                $"Make sure your app definition is a public partial class marked with the TychoDefinition attribute");
         }
 #pragma warning restore IDE1006
 

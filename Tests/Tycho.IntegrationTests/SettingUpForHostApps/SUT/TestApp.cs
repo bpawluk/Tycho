@@ -8,7 +8,7 @@ namespace Tycho.IntegrationTests.SettingUpForHostApps.SUT;
 // Handles
 public record TestRequest : IRequest<string>;
 
-[AppDefinition]
+[TychoDefinition]
 public partial class TestApp : TychoApp
 {
     protected override void DefineContract(IAppContract app)
