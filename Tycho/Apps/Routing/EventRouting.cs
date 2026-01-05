@@ -2,6 +2,7 @@
 using Tycho.Events;
 using Tycho.Events.Registrating;
 using Tycho.Modules;
+using Tycho.Utils;
 
 namespace Tycho.Apps.Routing
 {
@@ -26,6 +27,7 @@ namespace Tycho.Apps.Routing
             where TTargetEvent : class, IEvent
             where TModule : TychoModule
         {
+            map.ThrowIfNull();
             _registrator.ForwardEvent<TEvent, TTargetEvent, TModule>(map);
             return this;
         }

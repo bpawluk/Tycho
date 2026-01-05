@@ -97,7 +97,6 @@ namespace Tycho.Modules.Setup
                     $"Parent module does not handle " +
                     $"the required {typeof(TRequest).Name} request");
             }
-
             return this;
         }
 
@@ -110,7 +109,6 @@ namespace Tycho.Modules.Setup
                     $"Parent module does not handle " +
                     $"the required {typeof(TRequest).Name} request");
             }
-
             return this;
         }
 
