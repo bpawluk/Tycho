@@ -47,7 +47,7 @@ namespace Tycho
                             ActivityTrackingOptions.ParentId;
                     });
                 })
-                .Run()
+                .RunAsync()
                 .ConfigureAwait(false);
 
             builder.Services.AddSingleton(appInstance);

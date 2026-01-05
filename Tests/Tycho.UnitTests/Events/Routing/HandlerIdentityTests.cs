@@ -1,4 +1,5 @@
 ﻿using Tycho.Events.Routing;
+using Tycho.Registry;
 
 namespace Tycho.UnitTests.Events.Routing;
 

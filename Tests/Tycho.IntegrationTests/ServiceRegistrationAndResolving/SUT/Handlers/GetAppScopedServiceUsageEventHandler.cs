@@ -11,7 +11,7 @@ internal class GetAppScopedServiceUsageEventHandler(IServiceProvider serviceProv
     private readonly IServiceProvider _serviceProvider = serviceProvider;
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;
 
-    public Task Handle(EventContext<GetAppScopedServiceUsageEvent> context, CancellationToken cancellationToken)
+    public Task HandleAsync(EventContext<GetAppScopedServiceUsageEvent> context, CancellationToken cancellationToken)
     {
         var firstServiceInstance = _serviceProvider.GetRequiredService<IScopedService>();
         _ = firstServiceInstance.NumberOfCalls;

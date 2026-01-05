@@ -14,7 +14,7 @@ namespace Tycho.Events
         /// <typeparam name="TEvent">The type of the event to publish.</typeparam>
         /// <param name="eventPayload">The data of the event to publish.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
-        Task Publish<TEvent>(TEvent eventPayload, CancellationToken cancellationToken = default)
+        Task PublishAsync<TEvent>(TEvent eventPayload, CancellationToken cancellationToken = default)
             where TEvent : class, IEvent;
     }
 }

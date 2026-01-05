@@ -10,7 +10,7 @@ internal class AlphaWorkflowFinishedEventHandler(TestWorkflow<TestResult> testWo
     private readonly CompoundResult<Type> _compoundResult = result;
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;
 
-    public Task Handle(EventContext<AlphaWorkflowFinishedEvent> context, CancellationToken cancellationToken)
+    public Task HandleAsync(EventContext<AlphaWorkflowFinishedEvent> context, CancellationToken cancellationToken)
     {
         _compoundResult.AddSubResult(typeof(AlphaModule));
 

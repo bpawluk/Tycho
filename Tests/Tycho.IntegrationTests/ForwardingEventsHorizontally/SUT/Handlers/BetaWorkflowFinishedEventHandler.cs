@@ -10,7 +10,7 @@ internal class BetaWorkflowFinishedEventHandler(TestWorkflow<TestResult> testWor
     private readonly CompoundResult<Type> _compoundResult = result;
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;
 
-    public Task Handle(EventContext<BetaWorkflowFinishedEvent> context, CancellationToken cancellationToken)
+    public Task HandleAsync(EventContext<BetaWorkflowFinishedEvent> context, CancellationToken cancellationToken)
     {
         _compoundResult.AddSubResult(typeof(BetaModule));
 

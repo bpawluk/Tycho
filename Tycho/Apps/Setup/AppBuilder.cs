@@ -68,13 +68,13 @@ namespace Tycho.Apps.Setup
             return this;
         }
 
-        public async Task<IApp> Build()
+        public async Task<IApp> BuildAsync()
         {
             var app = (IApp)Activator.CreateInstance(_appType, _internals, _cleanup);
 
-            await Contract.Build().ConfigureAwait(false);
-            await Events.Build().ConfigureAwait(false);
-            await Structure.Build().ConfigureAwait(false);
+            await Contract.BuildAsync().ConfigureAwait(false);
+            await Events.BuildAsync().ConfigureAwait(false);
+            await Structure.BuildAsync().ConfigureAwait(false);
             _internals.Build();
 
             return app;

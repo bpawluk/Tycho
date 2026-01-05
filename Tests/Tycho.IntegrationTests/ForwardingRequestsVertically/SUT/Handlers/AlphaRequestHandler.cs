@@ -10,13 +10,13 @@ internal class AlphaRequestHandler(TestWorkflow<TestResult> testWorkflow)
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;
 
-    public Task Handle(AlphaRequest requestData, CancellationToken cancellationToken)
+    public Task HandleAsync(AlphaRequest requestData, CancellationToken cancellationToken)
     {
         _testWorkflow.SetResult(requestData.Result);
         return Task.CompletedTask;
     }
 
-    public Task<string> Handle(AlphaRequestWithResponse requestData, CancellationToken cancellationToken)
+    public Task<string> HandleAsync(AlphaRequestWithResponse requestData, CancellationToken cancellationToken)
     {
         _testWorkflow.SetResult(requestData.Result);
         return Task.FromResult("Test = Passed");

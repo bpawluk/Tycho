@@ -11,7 +11,7 @@ public class ProvidingSettingsTests : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        _sut = await new TestApp().Run();
+        _sut = await new TestApp().RunAsync();
     }
 
     [Fact(Timeout = 500)]
@@ -21,9 +21,9 @@ public class ProvidingSettingsTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var alphaValue = await _sut.Execute<GetAlphaValueRequest, string>(new GetAlphaValueRequest());
-        var betaValue = await _sut.Execute<GetBetaValueRequest, string>(new GetBetaValueRequest());
-        var gammaValue = await _sut.Execute<GetGammaValueRequest, string>(new GetGammaValueRequest());
+        var alphaValue = await _sut.ExecuteAsync<GetAlphaValueRequest, string>(new GetAlphaValueRequest());
+        var betaValue = await _sut.ExecuteAsync<GetBetaValueRequest, string>(new GetBetaValueRequest());
+        var gammaValue = await _sut.ExecuteAsync<GetGammaValueRequest, string>(new GetGammaValueRequest());
 
         // Assert
         Assert.Equal("Alpha", alphaValue);

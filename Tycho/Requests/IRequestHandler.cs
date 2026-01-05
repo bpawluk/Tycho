@@ -22,7 +22,7 @@ namespace Tycho.Requests
         /// </summary>
         /// <param name="requestData">The data of the request to handle.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
-        Task Handle(TRequest requestData, CancellationToken cancellationToken);
+        Task HandleAsync(TRequest requestData, CancellationToken cancellationToken);
     }
 
     /// <summary>
@@ -40,6 +40,6 @@ namespace Tycho.Requests
         /// <param name="requestData">The data of the request to handle.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
         /// <returns>A response of type <typeparamref name="TResponse"/>.</returns>
-        Task<TResponse> Handle(TRequest requestData, CancellationToken cancellationToken);
+        Task<TResponse> HandleAsync(TRequest requestData, CancellationToken cancellationToken);
     }
 }

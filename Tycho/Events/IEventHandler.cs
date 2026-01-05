@@ -23,6 +23,6 @@ namespace Tycho.Events
         /// </summary>
         /// <param name="context">The data of the event to handle.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
-        Task Handle(EventContext<TEvent> context, CancellationToken cancellationToken);
+        Task HandleAsync(EventContext<TEvent> context, CancellationToken cancellationToken);
     }
 }

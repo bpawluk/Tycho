@@ -11,16 +11,16 @@ internal class AlphaOutRequestHandler(IModule<BetaModule> betaModule)
 {
     private readonly IModule<BetaModule> _betaModule = betaModule;
 
-    public Task Handle(AlphaOutRequest requestData, CancellationToken cancellationToken)
+    public Task HandleAsync(AlphaOutRequest requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        return _betaModule.Execute(new BetaInRequest(requestData.Result), cancellationToken);
+        return _betaModule.ExecuteAsync(new BetaInRequest(requestData.Result), cancellationToken);
     }
 
-    public Task<string> Handle(AlphaOutRequestWithResponse requestData, CancellationToken cancellationToken)
+    public Task<string> HandleAsync(AlphaOutRequestWithResponse requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        return _betaModule.Execute<BetaInRequestWithResponse, string>(
+        return _betaModule.ExecuteAsync<BetaInRequestWithResponse, string>(
             new BetaInRequestWithResponse(requestData.Result),
             cancellationToken);
     }

@@ -6,8 +6,8 @@ internal class BetaWorkflowStartedEventHandler(IEventPublisher publisher) : IEve
 {
     private readonly IEventPublisher _publisher = publisher;
 
-    public async Task Handle(EventContext<BetaWorkflowStartedEvent> context, CancellationToken cancellationToken)
+    public async Task HandleAsync(EventContext<BetaWorkflowStartedEvent> context, CancellationToken cancellationToken)
     {
-        await _publisher.Publish(new BetaWorkflowFinishedEvent(context.Payload.Result), cancellationToken);
+        await _publisher.PublishAsync(new BetaWorkflowFinishedEvent(context.Payload.Result), cancellationToken);
     }
 }

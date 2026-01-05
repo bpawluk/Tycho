@@ -10,12 +10,12 @@ internal class GetValueRequestHandler(TestService testService)
 {
     private readonly TestService _testService = testService;
 
-    public Task<string> Handle(GetAppValueRequest requestData, CancellationToken cancellationToken)
+    public Task<string> HandleAsync(GetAppValueRequest requestData, CancellationToken cancellationToken)
     {
         return Task.FromResult(_testService.Value!);
     }
 
-    public Task<string> Handle(GetModuleValueRequest requestData, CancellationToken cancellationToken)
+    public Task<string> HandleAsync(GetModuleValueRequest requestData, CancellationToken cancellationToken)
     {
         return Task.FromResult(_testService.Value!);
     }

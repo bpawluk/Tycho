@@ -87,13 +87,13 @@ namespace Tycho.Modules.Setup
             return this;
         }
 
-        public async Task<IModule> Build()
+        public async Task<IModule> BuildAsync()
         {
             var module = (IModule)Activator.CreateInstance(_moduleType, _internals, _cleanup);
 
-            await Contract.Build().ConfigureAwait(false);
-            await Events.Build().ConfigureAwait(false);
-            await Structure.Build().ConfigureAwait(false);
+            await Contract.BuildAsync().ConfigureAwait(false);
+            await Events.BuildAsync().ConfigureAwait(false);
+            await Structure.BuildAsync().ConfigureAwait(false);
             _internals.Build();
 
             return module;

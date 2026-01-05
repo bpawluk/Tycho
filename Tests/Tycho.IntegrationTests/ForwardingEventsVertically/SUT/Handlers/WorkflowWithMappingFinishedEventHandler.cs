@@ -8,7 +8,7 @@ internal class WorkflowWithMappingFinishedEventHandler(TestWorkflow<TestResult> 
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;
 
-    public Task Handle(EventContext<WorkflowWithMappingFinishedEvent> context, CancellationToken cancellationToken)
+    public Task HandleAsync(EventContext<WorkflowWithMappingFinishedEvent> context, CancellationToken cancellationToken)
     {
         _testWorkflow.SetResult(context.Payload.Result);
         return Task.CompletedTask;

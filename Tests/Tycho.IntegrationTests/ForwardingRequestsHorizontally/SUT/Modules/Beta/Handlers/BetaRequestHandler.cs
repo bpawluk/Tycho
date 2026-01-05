@@ -9,13 +9,13 @@ internal class BetaRequestHandler(IParent parent)
 {
     private readonly IParent _parent = parent;
 
-    public Task Handle(BetaRequest requestData, CancellationToken cancellationToken)
+    public Task HandleAsync(BetaRequest requestData, CancellationToken cancellationToken)
     {
-        return _parent.Execute(requestData, cancellationToken);
+        return _parent.ExecuteAsync(requestData, cancellationToken);
     }
 
-    public Task<string> Handle(BetaRequestWithResponse requestData, CancellationToken cancellationToken)
+    public Task<string> HandleAsync(BetaRequestWithResponse requestData, CancellationToken cancellationToken)
     {
-        return _parent.Execute<BetaRequestWithResponse, string>(requestData, cancellationToken);
+        return _parent.ExecuteAsync<BetaRequestWithResponse, string>(requestData, cancellationToken);
     }
 }

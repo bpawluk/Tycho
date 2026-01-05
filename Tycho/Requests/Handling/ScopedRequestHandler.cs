@@ -16,7 +16,7 @@ namespace Tycho.Requests.Handling
             _internals = internals;
         }
 
-        public async Task Handle(TRequest requestData, CancellationToken cancellationToken)
+        public async Task HandleAsync(TRequest requestData, CancellationToken cancellationToken)
         {
             await using var scope = _internals.CreateAsyncScope();
             var handler = scope.ServiceProvider.GetRequiredService<THandler>();
@@ -29,7 +29,7 @@ namespace Tycho.Requests.Handling
 
             try
             {
-                await handler.Handle(requestData, cancellationToken).ConfigureAwait(false);
+                await handler.HandleAsync(requestData, cancellationToken).ConfigureAwait(false);
                 if (transactionalHandler != null)
                 {
                     await transactionalHandler.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
@@ -58,7 +58,7 @@ namespace Tycho.Requests.Handling
             _internals = internals;
         }
 
-        public async Task<TResponse> Handle(TRequest requestData, CancellationToken cancellationToken)
+        public async Task<TResponse> HandleAsync(TRequest requestData, CancellationToken cancellationToken)
         {
             await using var scope = _internals.CreateAsyncScope();
             var handler = scope.ServiceProvider.GetRequiredService<THandler>();
@@ -71,7 +71,7 @@ namespace Tycho.Requests.Handling
 
             try
             {
-                var result = await handler.Handle(requestData, cancellationToken).ConfigureAwait(false);
+                var result = await handler.HandleAsync(requestData, cancellationToken).ConfigureAwait(false);
                 if (transactionalHandler != null)
                 {
                     await transactionalHandler.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);

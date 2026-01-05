@@ -13,17 +13,17 @@ internal class GetValueRequestHandler(IConfiguration config)
 
     private string Value => _config["Value"]!;
 
-    public Task<string> Handle(GetAppValueRequest requestData, CancellationToken cancellationToken = default)
+    public Task<string> HandleAsync(GetAppValueRequest requestData, CancellationToken cancellationToken = default)
     {
         return Task.FromResult(Value);
     }
 
-    public Task<string> Handle(GetAlphaValueRequest requestData, CancellationToken cancellationToken)
+    public Task<string> HandleAsync(GetAlphaValueRequest requestData, CancellationToken cancellationToken)
     {
         return Task.FromResult(Value);
     }
 
-    public Task<string> Handle(GetBetaValueRequest requestData, CancellationToken cancellationToken)
+    public Task<string> HandleAsync(GetBetaValueRequest requestData, CancellationToken cancellationToken)
     {
         return Task.FromResult(Value);
     }

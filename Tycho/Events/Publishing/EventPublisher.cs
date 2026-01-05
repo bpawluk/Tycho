@@ -21,7 +21,7 @@ namespace Tycho.Events.Publishing
             _outbox = outbox;
         }
 
-        public async Task Publish<TEvent>(TEvent eventPayload, CancellationToken cancellationToken)
+        public async Task PublishAsync<TEvent>(TEvent eventPayload, CancellationToken cancellationToken)
             where TEvent : class, IEvent
         {
             if (eventPayload is null)

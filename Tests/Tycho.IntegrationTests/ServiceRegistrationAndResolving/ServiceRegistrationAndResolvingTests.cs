@@ -12,7 +12,7 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        _sut = await new TestApp(_testWorkflow).Run();
+        _sut = await new TestApp(_testWorkflow).RunAsync();
     }
 
     [Fact(Timeout = 500)]
@@ -22,9 +22,9 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var firstResult = await _sut.Execute<GetAppSingletonServiceUsageRequest, int>(
+        var firstResult = await _sut.ExecuteAsync<GetAppSingletonServiceUsageRequest, int>(
             new GetAppSingletonServiceUsageRequest());
-        var secondResult =  await _sut.Execute<GetAppSingletonServiceUsageRequest, int>(
+        var secondResult =  await _sut.ExecuteAsync<GetAppSingletonServiceUsageRequest, int>(
             new GetAppSingletonServiceUsageRequest());
 
         // Assert
@@ -39,9 +39,9 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var firstResult = await _sut.Execute<GetModuleSingletonServiceUsageRequest, int>(
+        var firstResult = await _sut.ExecuteAsync<GetModuleSingletonServiceUsageRequest, int>(
             new GetModuleSingletonServiceUsageRequest());
-        var secondResult = await _sut.Execute<GetModuleSingletonServiceUsageRequest, int>(
+        var secondResult = await _sut.ExecuteAsync<GetModuleSingletonServiceUsageRequest, int>(
             new GetModuleSingletonServiceUsageRequest());
 
         // Assert
@@ -58,10 +58,10 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         var secondRequest = new BeginTestWorkflowRequest(new TestResult { Id = workflowId });
 
         // Act
-        await _sut!.Execute(firstRequest);
+        await _sut!.ExecuteAsync(firstRequest);
         var firstResult = (await _testWorkflow.GetResult()).NumberOfCalls;
         _testWorkflow.Reset();
-        await _sut!.Execute(secondRequest);
+        await _sut!.ExecuteAsync(secondRequest);
         var secondResult = (await _testWorkflow.GetResult()).NumberOfCalls;
 
         // Assert
@@ -78,10 +78,10 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         var secondRequest = new BeginTestWorkflowRequest(new TestResult { Id = workflowId });
 
         // Act
-        await _sut!.Execute(firstRequest);
+        await _sut!.ExecuteAsync(firstRequest);
         var firstResult = (await _testWorkflow.GetResult()).NumberOfCalls;
         _testWorkflow.Reset();
-        await _sut!.Execute(secondRequest);
+        await _sut!.ExecuteAsync(secondRequest);
         var secondResult = (await _testWorkflow.GetResult()).NumberOfCalls;
 
         // Assert
@@ -96,9 +96,9 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var firstResult = await _sut.Execute<GetAppScopedServiceUsageRequest, int>(
+        var firstResult = await _sut.ExecuteAsync<GetAppScopedServiceUsageRequest, int>(
             new GetAppScopedServiceUsageRequest());
-        var secondResult = await _sut.Execute<GetAppScopedServiceUsageRequest, int>(
+        var secondResult = await _sut.ExecuteAsync<GetAppScopedServiceUsageRequest, int>(
             new GetAppScopedServiceUsageRequest());
 
         // Assert
@@ -113,9 +113,9 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var firstResult = await _sut.Execute<GetModuleScopedServiceUsageRequest, int>(
+        var firstResult = await _sut.ExecuteAsync<GetModuleScopedServiceUsageRequest, int>(
             new GetModuleScopedServiceUsageRequest());
-        var secondResult = await _sut.Execute<GetModuleScopedServiceUsageRequest, int>(
+        var secondResult = await _sut.ExecuteAsync<GetModuleScopedServiceUsageRequest, int>(
             new GetModuleScopedServiceUsageRequest());
 
         // Assert
@@ -132,10 +132,10 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         var secondRequest = new BeginTestWorkflowRequest(new TestResult { Id = workflowId });
 
         // Act
-        await _sut!.Execute(firstRequest);
+        await _sut!.ExecuteAsync(firstRequest);
         var firstResult = (await _testWorkflow.GetResult()).NumberOfCalls;
         _testWorkflow.Reset();
-        await _sut!.Execute(secondRequest);
+        await _sut!.ExecuteAsync(secondRequest);
         var secondResult = (await _testWorkflow.GetResult()).NumberOfCalls;
 
         // Assert
@@ -152,10 +152,10 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         var secondRequest = new BeginTestWorkflowRequest(new TestResult { Id = workflowId });
 
         // Act
-        await _sut!.Execute(firstRequest);
+        await _sut!.ExecuteAsync(firstRequest);
         var firstResult = (await _testWorkflow.GetResult()).NumberOfCalls;
         _testWorkflow.Reset();
-        await _sut!.Execute(secondRequest);
+        await _sut!.ExecuteAsync(secondRequest);
         var secondResult = (await _testWorkflow.GetResult()).NumberOfCalls;
 
         // Assert
@@ -170,9 +170,9 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var firstResult = await _sut.Execute<GetAppTransientServiceUsageRequest, int>(
+        var firstResult = await _sut.ExecuteAsync<GetAppTransientServiceUsageRequest, int>(
             new GetAppTransientServiceUsageRequest());
-        var secondResult = await _sut.Execute<GetAppTransientServiceUsageRequest, int>(
+        var secondResult = await _sut.ExecuteAsync<GetAppTransientServiceUsageRequest, int>(
             new GetAppTransientServiceUsageRequest());
 
         // Assert
@@ -187,9 +187,9 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var firstResult = await _sut.Execute<GetModuleTransientServiceUsageRequest, int>(
+        var firstResult = await _sut.ExecuteAsync<GetModuleTransientServiceUsageRequest, int>(
             new GetModuleTransientServiceUsageRequest());
-        var secondResult = await _sut.Execute<GetModuleTransientServiceUsageRequest, int>(
+        var secondResult = await _sut.ExecuteAsync<GetModuleTransientServiceUsageRequest, int>(
             new GetModuleTransientServiceUsageRequest());
 
         // Assert
@@ -206,10 +206,10 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         var secondRequest = new BeginTestWorkflowRequest(new TestResult { Id = workflowId });
 
         // Act
-        await _sut!.Execute(firstRequest);
+        await _sut!.ExecuteAsync(firstRequest);
         var firstResult = (await _testWorkflow.GetResult()).NumberOfCalls;
         _testWorkflow.Reset();
-        await _sut!.Execute(secondRequest);
+        await _sut!.ExecuteAsync(secondRequest);
         var secondResult = (await _testWorkflow.GetResult()).NumberOfCalls;
 
         // Assert
@@ -226,10 +226,10 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         var secondRequest = new BeginTestWorkflowRequest(new TestResult { Id = workflowId });
 
         // Act
-        await _sut!.Execute(firstRequest);
+        await _sut!.ExecuteAsync(firstRequest);
         var firstResult = (await _testWorkflow.GetResult()).NumberOfCalls;
         _testWorkflow.Reset();
-        await _sut!.Execute(secondRequest);
+        await _sut!.ExecuteAsync(secondRequest);
         var secondResult = (await _testWorkflow.GetResult()).NumberOfCalls;
 
         // Assert

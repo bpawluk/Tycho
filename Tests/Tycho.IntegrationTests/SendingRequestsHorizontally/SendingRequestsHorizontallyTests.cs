@@ -11,7 +11,7 @@ public class SendingRequestsHorizontallyTests : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        _sut = await new TestApp(_testWorkflow).Run();
+        _sut = await new TestApp(_testWorkflow).RunAsync();
     }
 
     [Fact(Timeout = 500)]
@@ -22,7 +22,7 @@ public class SendingRequestsHorizontallyTests : IAsyncLifetime
         var request = new Request(new TestResult { Id = workflowId });
 
         // Act
-        await _sut!.Execute(request);
+        await _sut!.ExecuteAsync(request);
         var testResult = await _testWorkflow.GetResult();
 
         // Assert
@@ -38,7 +38,7 @@ public class SendingRequestsHorizontallyTests : IAsyncLifetime
         var message = new RequestWithResponse(new TestResult { Id = workflowId });
 
         // Act
-        var response = await _sut!.Execute<RequestWithResponse, string>(message);
+        var response = await _sut!.ExecuteAsync<RequestWithResponse, string>(message);
         var testResult = await _testWorkflow.GetResult();
 
         // Assert

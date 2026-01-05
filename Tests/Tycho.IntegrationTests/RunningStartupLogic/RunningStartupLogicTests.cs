@@ -10,7 +10,7 @@ public class RunningStartupLogicTests : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        _sut = await new TestApp().Run();
+        _sut = await new TestApp().RunAsync();
     }
 
     [Fact(Timeout = 500)]
@@ -20,7 +20,7 @@ public class RunningStartupLogicTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var appValue = await _sut.Execute<GetAppValueRequest, string>(new GetAppValueRequest());
+        var appValue = await _sut.ExecuteAsync<GetAppValueRequest, string>(new GetAppValueRequest());
 
         // Assert
         Assert.Equal("Test = Passed", appValue);
@@ -33,7 +33,7 @@ public class RunningStartupLogicTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var moduleValue = await _sut.Execute<GetModuleValueRequest, string>(new GetModuleValueRequest());
+        var moduleValue = await _sut.ExecuteAsync<GetModuleValueRequest, string>(new GetModuleValueRequest());
 
         // Assert
         Assert.Equal("Test = Passed", moduleValue);

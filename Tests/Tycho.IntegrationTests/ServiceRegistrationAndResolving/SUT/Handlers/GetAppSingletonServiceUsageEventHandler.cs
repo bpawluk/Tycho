@@ -11,7 +11,7 @@ internal class GetAppSingletonServiceUsageEventHandler(IServiceProvider serviceP
     private readonly IServiceProvider _serviceProvider = serviceProvider;
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;
 
-    public Task Handle(EventContext<GetAppSingletonServiceUsageEvent> context, CancellationToken cancellationToken)
+    public Task HandleAsync(EventContext<GetAppSingletonServiceUsageEvent> context, CancellationToken cancellationToken)
     {
         var firstServiceInstance = _serviceProvider.GetRequiredService<ISingletonService>();
         _ = firstServiceInstance.NumberOfCalls;

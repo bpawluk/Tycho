@@ -55,7 +55,7 @@ namespace Tycho.Modules.Setup
             return new EventRouting<TEvent>(_registrator);
         }
 
-        public Task Build()
+        public Task BuildAsync()
         {
             var services = _internals.GetServiceCollection();
 

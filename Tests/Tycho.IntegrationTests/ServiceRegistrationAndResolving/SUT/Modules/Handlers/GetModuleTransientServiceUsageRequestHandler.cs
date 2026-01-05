@@ -9,7 +9,7 @@ internal class GetModuleTransientServiceUsageRequestHandler(IServiceProvider ser
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider;
 
-    public Task<int> Handle(GetModuleTransientServiceUsageRequest requestData, CancellationToken cancellationToken)
+    public Task<int> HandleAsync(GetModuleTransientServiceUsageRequest requestData, CancellationToken cancellationToken)
     {
         var firstServiceInstance = _serviceProvider.GetRequiredService<ITransientService>();
         _ = firstServiceInstance.NumberOfCalls;

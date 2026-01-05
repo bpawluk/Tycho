@@ -11,7 +11,7 @@ public class ForwardingEventsVerticallyTests : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        _sut = await new TestApp(_testWorkflow).Run();
+        _sut = await new TestApp(_testWorkflow).RunAsync();
     }
 
     [Fact(Timeout = 500)]
@@ -22,7 +22,7 @@ public class ForwardingEventsVerticallyTests : IAsyncLifetime
         var request = new BeginTestWorkflowRequest(new TestResult { Id = workflowId });
 
         // Act
-        await _sut!.Execute(request);
+        await _sut!.ExecuteAsync(request);
         var testResult = await _testWorkflow.GetResult();
 
         // Assert
@@ -37,7 +37,7 @@ public class ForwardingEventsVerticallyTests : IAsyncLifetime
         var request = new BeginTestWorkflowRequest(new TestResult { Id = workflowId });
 
         // Act
-        await _sut!.Execute(request);
+        await _sut!.ExecuteAsync(request);
         var testResult = await _testWorkflow.GetResult();
 
         // Assert

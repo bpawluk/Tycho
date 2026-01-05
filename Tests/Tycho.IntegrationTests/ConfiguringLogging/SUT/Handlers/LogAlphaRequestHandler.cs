@@ -8,7 +8,7 @@ internal class LogAlphaRequestHandler(ILogger<LogAlphaRequestHandler> logger) : 
 {
     private readonly ILogger<LogAlphaRequestHandler> _logger = logger;
 
-    public Task Handle(LogAlphaRequest requestData, CancellationToken cancellationToken)
+    public Task HandleAsync(LogAlphaRequest requestData, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Alpha");
         return Task.CompletedTask;

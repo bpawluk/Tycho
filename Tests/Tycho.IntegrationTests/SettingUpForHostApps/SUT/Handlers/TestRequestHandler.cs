@@ -7,7 +7,7 @@ internal class TestRequestHandler(IConfiguration configuration) : IRequestHandle
 {
     private readonly IConfiguration _configuration = configuration;
 
-    public Task<string> Handle(TestRequest requestData, CancellationToken cancellationToken)
+    public Task<string> HandleAsync(TestRequest requestData, CancellationToken cancellationToken)
     {
         return Task.FromResult(_configuration["Response"]!);
     }

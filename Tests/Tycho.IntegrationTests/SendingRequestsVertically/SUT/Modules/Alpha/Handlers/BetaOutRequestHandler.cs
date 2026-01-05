@@ -10,16 +10,16 @@ internal class GammaOutRequestHandler(IParent parent)
 {
     private readonly IParent _parent = parent;
 
-    public Task Handle(BetaOutRequest requestData, CancellationToken cancellationToken)
+    public Task HandleAsync(BetaOutRequest requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        return _parent.Execute(new AlphaOutRequest(requestData.Result), cancellationToken);
+        return _parent.ExecuteAsync(new AlphaOutRequest(requestData.Result), cancellationToken);
     }
 
-    public Task<string> Handle(BetaOutRequestWithResponse requestData, CancellationToken cancellationToken)
+    public Task<string> HandleAsync(BetaOutRequestWithResponse requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        return _parent.Execute<AlphaOutRequestWithResponse, string>(
+        return _parent.ExecuteAsync<AlphaOutRequestWithResponse, string>(
             new AlphaOutRequestWithResponse(requestData.Result),
             cancellationToken);
     }

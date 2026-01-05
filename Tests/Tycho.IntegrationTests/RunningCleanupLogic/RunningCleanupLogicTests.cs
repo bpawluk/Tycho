@@ -8,7 +8,7 @@ public class RunningCleanupLogicTests
     public async Task TychoEnables_RunningCleanupLogic_InAppsAndModules()
     {
         // Arrange
-        var sut = await new TestApp().Run();
+        var sut = await new TestApp().RunAsync();
         var testResult = TestResult.Instance;
 
         // Act

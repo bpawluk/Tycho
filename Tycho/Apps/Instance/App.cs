@@ -28,18 +28,18 @@ namespace Tycho.Apps.Instance
             _requestBroker = new UpStreamBroker(_internals);
         }
 
-        public Task Execute<TRequest>(TRequest requestData, CancellationToken cancellationToken)
+        public Task ExecuteAsync<TRequest>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest
         {
             requestData.ThrowIfNull(nameof(requestData));
-            return _requestBroker.Execute(requestData, cancellationToken);
+            return _requestBroker.ExecuteAsync(requestData, cancellationToken);
         }
 
-        public Task<TResponse> Execute<TRequest, TResponse>(TRequest requestData, CancellationToken cancellationToken)
+        public Task<TResponse> ExecuteAsync<TRequest, TResponse>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest<TResponse>
         {
             requestData.ThrowIfNull(nameof(requestData));
-            return _requestBroker.Execute<TRequest, TResponse>(requestData, cancellationToken);
+            return _requestBroker.ExecuteAsync<TRequest, TResponse>(requestData, cancellationToken);
         }
 
         public async ValueTask DisposeAsync()

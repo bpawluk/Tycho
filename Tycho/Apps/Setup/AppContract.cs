@@ -76,7 +76,7 @@ namespace Tycho.Apps.Setup
             return this;
         }
 
-        public Task Build()
+        public Task BuildAsync()
         {
             return Task.CompletedTask;
         }

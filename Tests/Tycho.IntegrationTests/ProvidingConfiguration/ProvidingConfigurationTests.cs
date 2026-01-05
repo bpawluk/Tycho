@@ -23,7 +23,7 @@ public class ProvidingConfigurationTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         var builtAppConfig = new ConfigurationBuilder().AddInMemoryCollection(_appConfig).Build();
-        _sut = await new TestApp().WithConfiguration(builtAppConfig).Run();
+        _sut = await new TestApp().WithConfiguration(builtAppConfig).RunAsync();
     }
 
     [Fact(Timeout = 500)]
@@ -33,9 +33,9 @@ public class ProvidingConfigurationTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var appValue = await _sut.Execute<GetAppValueRequest, string>(new GetAppValueRequest());
-        var alphaValue = await _sut.Execute<GetAlphaValueRequest, string>(new GetAlphaValueRequest());
-        var betaValue = await _sut.Execute<GetBetaValueRequest, string>(new GetBetaValueRequest());
+        var appValue = await _sut.ExecuteAsync<GetAppValueRequest, string>(new GetAppValueRequest());
+        var alphaValue = await _sut.ExecuteAsync<GetAlphaValueRequest, string>(new GetAlphaValueRequest());
+        var betaValue = await _sut.ExecuteAsync<GetBetaValueRequest, string>(new GetBetaValueRequest());
 
         // Assert
         Assert.Equal(_appValue, appValue);

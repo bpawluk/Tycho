@@ -8,7 +8,7 @@ internal class EndTestWorkflowRequestHandler(TestWorkflow<TestResult> testWorkfl
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;
 
-    public Task Handle(EndTestWorkflowRequest requestData, CancellationToken cancellationToken = default)
+    public Task HandleAsync(EndTestWorkflowRequest requestData, CancellationToken cancellationToken = default)
     {
         _testWorkflow.SetResult(requestData.Result);
         return Task.CompletedTask;

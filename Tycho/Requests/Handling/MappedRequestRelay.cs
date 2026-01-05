@@ -18,10 +18,10 @@ namespace Tycho.Requests.Handling
             _map = map;
         }
 
-        public Task Handle(TRequest requestData, CancellationToken cancellationToken)
+        public Task HandleAsync(TRequest requestData, CancellationToken cancellationToken)
         {
             var targetRequestData = _map(requestData);
-            return _targetExecutor.Execute(targetRequestData, cancellationToken);
+            return _targetExecutor.ExecuteAsync(targetRequestData, cancellationToken);
         }
     }
 
@@ -44,11 +44,11 @@ namespace Tycho.Requests.Handling
             _mapResponse = mapResponse;
         }
 
-        public async Task<TResponse> Handle(TRequest requestData, CancellationToken cancellationToken)
+        public async Task<TResponse> HandleAsync(TRequest requestData, CancellationToken cancellationToken)
         {
             var targetRequestData = _mapRequest(requestData);
             var targetRequestResponse = await _targetExecutor
-                .Execute<TTargetRequest, TTargetResponse>(
+                .ExecuteAsync<TTargetRequest, TTargetResponse>(
                     targetRequestData, 
                     cancellationToken)
                 .ConfigureAwait(false);

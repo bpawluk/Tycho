@@ -112,7 +112,7 @@ namespace Tycho.Modules.Setup
             return this;
         }
 
-        public Task Build()
+        public Task BuildAsync()
         {
             return Task.CompletedTask;
         }

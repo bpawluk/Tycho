@@ -7,7 +7,7 @@ internal class LogAppRequestHandler(ILogger<LogAppRequestHandler> logger) : IReq
 {
     private readonly ILogger<LogAppRequestHandler> _logger = logger;
 
-    public Task Handle(LogAppRequest requestData, CancellationToken cancellationToken)
+    public Task HandleAsync(LogAppRequest requestData, CancellationToken cancellationToken)
     {
         _logger.LogInformation("App");
         return Task.CompletedTask;

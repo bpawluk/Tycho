@@ -11,7 +11,7 @@ internal class GetModuleTransientServiceUsageEventHandler(IParent parent, IServi
     private readonly IParent _parent = parent;
     private readonly IServiceProvider _serviceProvider = serviceProvider;
 
-    public Task Handle(EventContext<GetModuleTransientServiceUsageEvent> context, CancellationToken cancellationToken)
+    public Task HandleAsync(EventContext<GetModuleTransientServiceUsageEvent> context, CancellationToken cancellationToken)
     {
         var firstServiceInstance = _serviceProvider.GetRequiredService<ITransientService>();
         _ = firstServiceInstance.NumberOfCalls;
@@ -19,6 +19,6 @@ internal class GetModuleTransientServiceUsageEventHandler(IParent parent, IServi
         var secondServiceInstance = _serviceProvider.GetRequiredService<ITransientService>();
         context.Payload.Result.NumberOfCalls = secondServiceInstance.NumberOfCalls;
 
-        return _parent.Execute(new EndTestWorkflowRequest(context.Payload.Result), cancellationToken);
+        return _parent.ExecuteAsync(new EndTestWorkflowRequest(context.Payload.Result), cancellationToken);
     }
 }

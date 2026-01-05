@@ -11,16 +11,16 @@ internal class BetaOutRequestHandler(IModule<GammaModule> gammaModule)
 {
     private readonly IModule<GammaModule> _gammaModule = gammaModule;
 
-    public Task Handle(BetaOutRequest requestData, CancellationToken cancellationToken)
+    public Task HandleAsync(BetaOutRequest requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        return _gammaModule.Execute(new GammaInRequest(requestData.Result), cancellationToken);
+        return _gammaModule.ExecuteAsync(new GammaInRequest(requestData.Result), cancellationToken);
     }
 
-    public Task<string> Handle(BetaOutRequestWithResponse requestData, CancellationToken cancellationToken)
+    public Task<string> HandleAsync(BetaOutRequestWithResponse requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        return _gammaModule.Execute<GammaInRequestWithResponse, string>(
+        return _gammaModule.ExecuteAsync<GammaInRequestWithResponse, string>(
             new GammaInRequestWithResponse(requestData.Result),
             cancellationToken);
     }

@@ -12,17 +12,17 @@ internal class GetValueRequestHandler(ModuleSettings moduleSettings, OtherSettin
     private readonly ModuleSettings _moduleSettings = moduleSettings;
     private readonly OtherSettings _otherSettings = otherSettings;
 
-    public Task<string> Handle(GetAlphaValueRequest requestData, CancellationToken cancellationToken)
+    public Task<string> HandleAsync(GetAlphaValueRequest requestData, CancellationToken cancellationToken)
     {
         return Task.FromResult(_moduleSettings.AlphaValue);
     }
 
-    public Task<string> Handle(GetBetaValueRequest requestData, CancellationToken cancellationToken)
+    public Task<string> HandleAsync(GetBetaValueRequest requestData, CancellationToken cancellationToken)
     {
         return Task.FromResult(_moduleSettings.BetaValue);
     }
 
-    public Task<string> Handle(GetGammaValueRequest requestData, CancellationToken cancellationToken = default)
+    public Task<string> HandleAsync(GetGammaValueRequest requestData, CancellationToken cancellationToken = default)
     {
         return Task.FromResult(_otherSettings.Value);
     }

@@ -9,7 +9,7 @@ internal class GetAppTransientServiceUsageRequestHandler(IServiceProvider servic
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider;
 
-    public Task<int> Handle(GetAppTransientServiceUsageRequest requestData, CancellationToken cancellationToken)
+    public Task<int> HandleAsync(GetAppTransientServiceUsageRequest requestData, CancellationToken cancellationToken)
     {
         var firstServiceInstance = _serviceProvider.GetRequiredService<ITransientService>();
         _ = firstServiceInstance.NumberOfCalls;

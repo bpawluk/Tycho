@@ -9,7 +9,7 @@ internal class GetAppSingletonServiceUsageRequestHandler(IServiceProvider servic
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider;
 
-    public Task<int> Handle(GetAppSingletonServiceUsageRequest requestData, CancellationToken cancellationToken)
+    public Task<int> HandleAsync(GetAppSingletonServiceUsageRequest requestData, CancellationToken cancellationToken)
     {
         var firstServiceInstance = _serviceProvider.GetRequiredService<ISingletonService>();
         _ = firstServiceInstance.NumberOfCalls;

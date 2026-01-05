@@ -10,14 +10,14 @@ internal class GammaOutRequestHandler(TestWorkflow<TestResult> testWorkflow)
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;
 
-    public Task Handle(GammaOutRequest requestData, CancellationToken cancellationToken)
+    public Task HandleAsync(GammaOutRequest requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
         _testWorkflow.SetResult(requestData.Result);
         return Task.CompletedTask;
     }
 
-    public Task<string> Handle(GammaOutRequestWithResponse requestData, CancellationToken cancellationToken)
+    public Task<string> HandleAsync(GammaOutRequestWithResponse requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
         _testWorkflow.SetResult(requestData.Result);

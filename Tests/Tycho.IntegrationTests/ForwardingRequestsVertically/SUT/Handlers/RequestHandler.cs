@@ -9,13 +9,13 @@ internal class RequestHandler(TestWorkflow<TestResult> testWorkflow)
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;
 
-    public Task Handle(Request requestData, CancellationToken cancellationToken)
+    public Task HandleAsync(Request requestData, CancellationToken cancellationToken)
     {
         _testWorkflow.SetResult(requestData.Result);
         return Task.CompletedTask;
     }
 
-    public Task<string> Handle(RequestWithResponse requestData, CancellationToken cancellationToken)
+    public Task<string> HandleAsync(RequestWithResponse requestData, CancellationToken cancellationToken)
     {
         _testWorkflow.SetResult(requestData.Result);
         return Task.FromResult("Test = Passed");

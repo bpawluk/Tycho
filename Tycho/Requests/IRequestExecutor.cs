@@ -14,7 +14,7 @@ namespace Tycho.Requests
         /// <typeparam name="TRequest">The type of the request to execute.</typeparam>
         /// <param name="requestData">The data of the request to execute.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
-        Task Execute<TRequest>(TRequest requestData, CancellationToken cancellationToken = default)
+        Task ExecuteAsync<TRequest>(TRequest requestData, CancellationToken cancellationToken = default)
             where TRequest : class, IRequest;
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace Tycho.Requests
         /// <param name="requestData">The data of the request to execute.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
         /// <returns>A response of type <typeparamref name="TResponse"/>.</returns>
-        Task<TResponse> Execute<TRequest, TResponse>(TRequest requestData, CancellationToken cancellationToken = default)
+        Task<TResponse> ExecuteAsync<TRequest, TResponse>(TRequest requestData, CancellationToken cancellationToken = default)
             where TRequest : class, IRequest<TResponse>;
     }
 }

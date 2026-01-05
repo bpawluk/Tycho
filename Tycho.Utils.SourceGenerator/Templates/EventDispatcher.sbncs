@@ -43,7 +43,7 @@ namespace {{ definition_type.type_namespace }}
         {
             var deserializedPyaload = _payloadSerializer.Deserialize<TEvent>(eventPayload);
             var context = new global::Tycho.Events.EventContext<TEvent>(eventId, deserializedPyaload);
-            await eventHandler.Handle(context, cancellationToken);
+            await eventHandler.HandleAsync(context, cancellationToken);
         }
     }
 {{~ for containing_type in definition_type.containing_types ~}}

@@ -10,14 +10,14 @@ internal class AlphaOutRequestHandler(TestWorkflow<TestResult> testWorkflow)
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;
 
-    public Task Handle(AlphaOutRequest requestData, CancellationToken cancellationToken)
+    public Task HandleAsync(AlphaOutRequest requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
         _testWorkflow.SetResult(requestData.Result);
         return Task.CompletedTask;
     }
 
-    public Task<string> Handle(AlphaOutRequestWithResponse requestData, CancellationToken cancellationToken)
+    public Task<string> HandleAsync(AlphaOutRequestWithResponse requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
         _testWorkflow.SetResult(requestData.Result);

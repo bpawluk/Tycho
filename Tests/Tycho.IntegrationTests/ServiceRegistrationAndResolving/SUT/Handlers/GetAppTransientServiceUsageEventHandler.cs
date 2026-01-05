@@ -11,7 +11,7 @@ internal class GetAppTransientServiceUsageEventHandler(IServiceProvider serviceP
     private readonly IServiceProvider _serviceProvider = serviceProvider;
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;
 
-    public Task Handle(EventContext<GetAppTransientServiceUsageEvent> context, CancellationToken cancellationToken)
+    public Task HandleAsync(EventContext<GetAppTransientServiceUsageEvent> context, CancellationToken cancellationToken)
     {
         var firstServiceInstance = _serviceProvider.GetRequiredService<ITransientService>();
         _ = firstServiceInstance.NumberOfCalls;

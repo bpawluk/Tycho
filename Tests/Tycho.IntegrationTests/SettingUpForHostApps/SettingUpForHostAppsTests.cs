@@ -21,7 +21,7 @@ public class SettingUpForHostAppsTests
 
         // Act
         var app = host.Services.GetRequiredService<IApp>();
-        var response = await app.Execute<TestRequest, string>(new());
+        var response = await app.ExecuteAsync<TestRequest, string>(new());
 
         // Assert
         Assert.Equal(expectedResponse, response);

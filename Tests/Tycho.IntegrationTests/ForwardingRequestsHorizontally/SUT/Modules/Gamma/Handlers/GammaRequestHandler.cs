@@ -9,13 +9,13 @@ internal class GammaRequestHandler(IParent parent)
 {
     private readonly IParent _parent = parent;
 
-    public Task Handle(GammaRequest requestData, CancellationToken cancellationToken)
+    public Task HandleAsync(GammaRequest requestData, CancellationToken cancellationToken)
     {
-        return _parent.Execute(requestData, cancellationToken);
+        return _parent.ExecuteAsync(requestData, cancellationToken);
     }
 
-    public Task<string> Handle(GammaRequestWithResponse requestData, CancellationToken cancellationToken)
+    public Task<string> HandleAsync(GammaRequestWithResponse requestData, CancellationToken cancellationToken)
     {
-        return _parent.Execute<GammaRequestWithResponse, string>(requestData, cancellationToken);
+        return _parent.ExecuteAsync<GammaRequestWithResponse, string>(requestData, cancellationToken);
     }
 }

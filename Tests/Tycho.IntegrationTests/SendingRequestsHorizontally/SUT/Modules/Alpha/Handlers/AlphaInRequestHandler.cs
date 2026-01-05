@@ -9,16 +9,16 @@ internal class AlphaInRequestHandler(IParent parent)
 {
     private readonly IParent _parent = parent;
 
-    public Task Handle(AlphaInRequest requestData, CancellationToken cancellationToken)
+    public Task HandleAsync(AlphaInRequest requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        return _parent.Execute(new AlphaOutRequest(requestData.Result), cancellationToken);
+        return _parent.ExecuteAsync(new AlphaOutRequest(requestData.Result), cancellationToken);
     }
 
-    public Task<string> Handle(AlphaInRequestWithResponse requestData, CancellationToken cancellationToken)
+    public Task<string> HandleAsync(AlphaInRequestWithResponse requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        return _parent.Execute<AlphaOutRequestWithResponse, string>(
+        return _parent.ExecuteAsync<AlphaOutRequestWithResponse, string>(
             new AlphaOutRequestWithResponse(requestData.Result),
             cancellationToken);
     }

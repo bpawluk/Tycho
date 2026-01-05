@@ -20,18 +20,18 @@ namespace Tycho.Structure.External
             _parentEventRouter = parentEventRouter;
         }
 
-        public Task Execute<TRequest>(TRequest requestData, CancellationToken cancellationToken)
+        public Task ExecuteAsync<TRequest>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest
         {
             requestData.ThrowIfNull();
-            return _contractFulfillingBroker.Execute(requestData, cancellationToken);
+            return _contractFulfillingBroker.ExecuteAsync(requestData, cancellationToken);
         }
 
-        public Task<TResponse> Execute<TRequest, TResponse>(TRequest requestData, CancellationToken cancellationToken)
+        public Task<TResponse> ExecuteAsync<TRequest, TResponse>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest<TResponse>
         {
             requestData.ThrowIfNull();
-            return _contractFulfillingBroker.Execute<TRequest, TResponse>(requestData, cancellationToken);
+            return _contractFulfillingBroker.ExecuteAsync<TRequest, TResponse>(requestData, cancellationToken);
         }
     }
 }

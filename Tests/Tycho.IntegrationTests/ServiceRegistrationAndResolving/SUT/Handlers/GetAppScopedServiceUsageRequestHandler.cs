@@ -9,7 +9,7 @@ internal class GetAppScopedServiceUsageRequestHandler(IServiceProvider servicePr
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider;
 
-    public Task<int> Handle(GetAppScopedServiceUsageRequest requestData, CancellationToken cancellationToken)
+    public Task<int> HandleAsync(GetAppScopedServiceUsageRequest requestData, CancellationToken cancellationToken)
     {
         var firstServiceInstance = _serviceProvider.GetRequiredService<IScopedService>();
         _ = firstServiceInstance.NumberOfCalls;

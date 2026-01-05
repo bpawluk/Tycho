@@ -17,7 +17,7 @@ namespace Tycho.Events.Handling
             _internals = internals;
         }
 
-        public async Task Handle(EventContext<TEvent> context, CancellationToken cancellationToken)
+        public async Task HandleAsync(EventContext<TEvent> context, CancellationToken cancellationToken)
         {
             await using var scope = _internals.CreateAsyncScope();
 
@@ -32,7 +32,7 @@ namespace Tycho.Events.Handling
 
             try
             {
-                await handler.Handle(context, cancellationToken).ConfigureAwait(false);
+                await handler.HandleAsync(context, cancellationToken).ConfigureAwait(false);
                 await inbox.MarkAsHandled(context.Id, cancellationToken).ConfigureAwait(false);
 
                 if (transactionalHandler != null)

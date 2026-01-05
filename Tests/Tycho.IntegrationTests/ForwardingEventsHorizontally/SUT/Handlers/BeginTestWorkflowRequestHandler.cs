@@ -8,15 +8,15 @@ internal class BeginTestWorkflowRequestHandler(IEventPublisher publisher)
 {
     private readonly IEventPublisher _publisher = publisher;
 
-    public async Task Handle(BeginTestWorkflowRequest requestData, CancellationToken cancellationToken)
+    public async Task HandleAsync(BeginTestWorkflowRequest requestData, CancellationToken cancellationToken)
     {
         if (requestData.Result.Id == "event-workflow")
         {
-            await _publisher.Publish(new WorkflowStartedEvent(requestData.Result), cancellationToken);
+            await _publisher.PublishAsync(new WorkflowStartedEvent(requestData.Result), cancellationToken);
         }
         else if (requestData.Result.Id == "mapped-event-workflow")
         {
-            await _publisher.Publish(new WorkflowWithMappingStartedEvent(requestData.Result), cancellationToken);
+            await _publisher.PublishAsync(new WorkflowWithMappingStartedEvent(requestData.Result), cancellationToken);
         }
         else
         {

@@ -121,7 +121,7 @@ namespace Tycho.Apps
         /// </summary>
         /// <returns>A fresh and ready to use instance of the application</returns>
         /// <exception cref="InvalidOperationException"/>
-        public async Task<IApp> Run()
+        public async Task<IApp> RunAsync()
         {
             EnsureItIsRunOnlyOnce();
 
@@ -132,7 +132,7 @@ namespace Tycho.Apps
             DefineEvents(_builder.Events);
             IncludeModules(_builder.Structure);
 
-            var app = await _builder.Build().ConfigureAwait(false);
+            var app = await _builder.BuildAsync().ConfigureAwait(false);
             await Startup(app.Internals).ConfigureAwait(false);
 
             return app;

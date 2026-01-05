@@ -13,9 +13,9 @@ namespace Tycho.Requests.Handling
             _targetExecutor = targetExecutor;
         }
 
-        public Task Handle(TRequest requestData, CancellationToken cancellationToken)
+        public Task HandleAsync(TRequest requestData, CancellationToken cancellationToken)
         {
-            return _targetExecutor.Execute(requestData, cancellationToken);
+            return _targetExecutor.ExecuteAsync(requestData, cancellationToken);
         }
     }
 
@@ -29,9 +29,9 @@ namespace Tycho.Requests.Handling
             _targetExecutor = targetExecutor;
         }
 
-        public Task<TResponse> Handle(TRequest requestData, CancellationToken cancellationToken)
+        public Task<TResponse> HandleAsync(TRequest requestData, CancellationToken cancellationToken)
         {
-            return _targetExecutor.Execute<TRequest, TResponse>(requestData, cancellationToken);
+            return _targetExecutor.ExecuteAsync<TRequest, TResponse>(requestData, cancellationToken);
         }
     }
 }

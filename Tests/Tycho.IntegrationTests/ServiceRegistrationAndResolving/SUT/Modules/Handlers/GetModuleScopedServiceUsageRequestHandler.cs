@@ -9,7 +9,7 @@ internal class GetModuleScopedServiceUsageRequestHandler(IServiceProvider servic
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider;
 
-    public Task<int> Handle(GetModuleScopedServiceUsageRequest requestData, CancellationToken cancellationToken)
+    public Task<int> HandleAsync(GetModuleScopedServiceUsageRequest requestData, CancellationToken cancellationToken)
     {
         var firstServiceInstance = _serviceProvider.GetRequiredService<IScopedService>();
         _ = firstServiceInstance.NumberOfCalls;

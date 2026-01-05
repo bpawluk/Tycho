@@ -9,16 +9,16 @@ internal class GammaInRequestHandler(IParent parent)
 {
     private readonly IParent _parent = parent;
 
-    public Task Handle(GammaInRequest requestData, CancellationToken cancellationToken)
+    public Task HandleAsync(GammaInRequest requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        return _parent.Execute(new GammaOutRequest(requestData.Result), cancellationToken);
+        return _parent.ExecuteAsync(new GammaOutRequest(requestData.Result), cancellationToken);
     }
 
-    public Task<string> Handle(GammaInRequestWithResponse requestData, CancellationToken cancellationToken)
+    public Task<string> HandleAsync(GammaInRequestWithResponse requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        return _parent.Execute<GammaOutRequestWithResponse, string>(
+        return _parent.ExecuteAsync<GammaOutRequestWithResponse, string>(
             new GammaOutRequestWithResponse(requestData.Result),
             cancellationToken);
     }

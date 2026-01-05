@@ -8,7 +8,7 @@ internal class LogBetaRequestHandler(ILogger<LogBetaRequestHandler> logger) : IR
 {
     private readonly ILogger<LogBetaRequestHandler> _logger = logger;
 
-    public Task Handle(LogBetaRequest requestData, CancellationToken cancellationToken)
+    public Task HandleAsync(LogBetaRequest requestData, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Beta");
         return Task.CompletedTask;

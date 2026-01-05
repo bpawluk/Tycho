@@ -10,16 +10,16 @@ internal class RequestHandler(IModule<AlphaModule> alphaModule)
 {
     private readonly IModule<AlphaModule> _alphaModule = alphaModule;
 
-    public Task Handle(Request requestData, CancellationToken cancellationToken)
+    public Task HandleAsync(Request requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        return _alphaModule.Execute(new AlphaInRequest(requestData.Result), cancellationToken);
+        return _alphaModule.ExecuteAsync(new AlphaInRequest(requestData.Result), cancellationToken);
     }
 
-    public Task<string> Handle(RequestWithResponse requestData, CancellationToken cancellationToken)
+    public Task<string> HandleAsync(RequestWithResponse requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        return _alphaModule.Execute<AlphaInRequestWithResponse, string>(
+        return _alphaModule.ExecuteAsync<AlphaInRequestWithResponse, string>(
             new AlphaInRequestWithResponse(requestData.Result),
             cancellationToken);
     }

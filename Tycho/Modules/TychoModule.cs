@@ -125,7 +125,7 @@ namespace Tycho.Modules
             return this;
         }
 
-        internal async Task<IModule> Run()
+        internal async Task<IModule> RunAsync()
         {
             EnsureItIsRunOnlyOnce();
 
@@ -136,7 +136,7 @@ namespace Tycho.Modules
             DefineEvents(_builder.Events);
             IncludeModules(_builder.Structure);
 
-            var module = await _builder.Build().ConfigureAwait(false);
+            var module = await _builder.BuildAsync().ConfigureAwait(false);
             await Startup(module.Internals).ConfigureAwait(false);
 
             return module;
