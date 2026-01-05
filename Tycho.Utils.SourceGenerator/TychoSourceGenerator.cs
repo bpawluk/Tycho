@@ -30,27 +30,27 @@ namespace Tycho.Utils.SourceGenerator
             methodName: "DefineEvents",
             parameters: new ImmutableEquatableArray<TypeModel>(new[]
             {
-                new TypeModel("Tycho.Apps", "IAppEvents"),
+                new TypeModel("Tycho.Apps", ImmutableEquatableArray<string>.Empty, "IAppEvents"),
             }),
-            result: new TypeModel("System", "Void"));
+            result: new TypeModel("System", ImmutableEquatableArray<string>.Empty, "Void"));
 
         private static readonly MethodSignatureModel DefineModuleEventsMethodSignature = new MethodSignatureModel(
             methodName: "DefineEvents",
             parameters: new ImmutableEquatableArray<TypeModel>(new[]
             {
-                new TypeModel("Tycho.Modules", "IModuleEvents"),
+                new TypeModel("Tycho.Modules", ImmutableEquatableArray<string>.Empty, "IModuleEvents"),
             }),
-            result: new TypeModel("System", "Void"));
+            result: new TypeModel("System", ImmutableEquatableArray<string>.Empty, "Void"));
 
         private static readonly MethodSignatureModel AppHandlesMethodSignature = new MethodSignatureModel(
             methodName: "Handles",
             parameters: ImmutableEquatableArray<TypeModel>.Empty,
-            result: new TypeModel("Tycho.Apps", "IAppEvents"));
+            result: new TypeModel("Tycho.Apps", ImmutableEquatableArray<string>.Empty, "IAppEvents"));
 
         private static readonly MethodSignatureModel ModuleHandlesMethodSignature = new MethodSignatureModel(
             methodName: "Handles",
             parameters: ImmutableEquatableArray<TypeModel>.Empty,
-            result: new TypeModel("Tycho.Modules", "IModuleEvents"));
+            result: new TypeModel("Tycho.Modules", ImmutableEquatableArray<string>.Empty, "IModuleEvents"));
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
@@ -88,7 +88,7 @@ namespace Tycho.Utils.SourceGenerator
                         outputContext,
                         model,
                         template,
-                        $"{model.DefinitionType.TypeNamespace}.{model.DefinitionType.TypeName}.setup.g.cs");
+                        $"{model.DefinitionType}.setup.g.cs");
                 });
 
             context.RegisterSourceOutput(
@@ -99,7 +99,7 @@ namespace Tycho.Utils.SourceGenerator
                         outputContext,
                         model,
                         EventDispatcherTemplate,
-                        $"{model.DefinitionType.TypeNamespace}.{model.DefinitionType.TypeName}EventDispatcher.g.cs");
+                        $"{model.DefinitionType}EventDispatcher.g.cs");
                 });
         }
 
@@ -113,7 +113,7 @@ namespace Tycho.Utils.SourceGenerator
             token.ThrowIfCancellationRequested();
 
             var definitionKind = GetDefinitionKind(context, token);
-            var classType = GetClassTypeModel(context, token);
+            var classType = GetTypeModel(context.TargetSymbol);
             var methods = GetMethodDefinitionModels(context, classType, token);
 
             return (definitionKind, new ClassDefinitionModel(classType, methods));
@@ -184,16 +184,6 @@ namespace Tycho.Utils.SourceGenerator
             return TychoDefinitionKind.Unknown;
         }
 
-        private static TypeModel GetClassTypeModel(GeneratorAttributeSyntaxContext context, CancellationToken token)
-        {
-            token.ThrowIfCancellationRequested();
-
-            var classNamespace = GetTypeNamespace(context.TargetSymbol);
-            var className = GetTypeName(context.TargetSymbol);
-
-            return new TypeModel(classNamespace, className);
-        }
-
         private static ImmutableEquatableArray<MethodDefinitionModel> GetMethodDefinitionModels(GeneratorAttributeSyntaxContext context, TypeModel containingType, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
@@ -257,9 +247,7 @@ namespace Tycho.Utils.SourceGenerator
                     methodInvocations.Add(new MethodInvocationModel(
                         GetMethodSignatureModel(invokedMethodSymbol),
                         invokedMethodSymbol.TypeArguments
-                            .Select(typeArgument => new TypeModel(
-                                GetTypeNamespace(typeArgument),
-                                GetTypeName(typeArgument)))
+                            .Select(GetTypeModel)
                             .ToImmutableEquatableArray()));
                 }
             }
@@ -271,14 +259,10 @@ namespace Tycho.Utils.SourceGenerator
         {
             var methodName = methodSymbol.Name;
 
-            var returnType = new TypeModel(
-                GetTypeNamespace(methodSymbol.ReturnType),
-                GetTypeName(methodSymbol.ReturnType));
+            var returnType = GetTypeModel(methodSymbol.ReturnType);
 
             var parameters = methodSymbol.Parameters
-                .Select(parameterSymbol => new TypeModel(
-                    GetTypeNamespace(parameterSymbol.Type),
-                    GetTypeName(parameterSymbol.Type)))
+                .Select(paramSymbol => GetTypeModel(paramSymbol.Type))
                 .ToImmutableEquatableArray();
 
             return new MethodSignatureModel(methodName, parameters, returnType);
@@ -296,18 +280,24 @@ namespace Tycho.Utils.SourceGenerator
             return false;
         }
 
-        private static string GetTypeName(ISymbol symbol)
+        private static TypeModel GetTypeModel(ISymbol symbol)
         {
-            return symbol.Name;
-        }
-
-        private static string GetTypeNamespace(ISymbol symbol)
-        {
-            return symbol
+            var typeNamespace = symbol
                 .ContainingNamespace
                 .ToDisplayString(SymbolDisplayFormat
                     .FullyQualifiedFormat
                     .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted));
+
+            var containingTypes = new Stack<string>();
+            for (var current = symbol.ContainingType; current != null; current = current.ContainingType)
+            {
+                containingTypes.Push(current.Name);
+            }
+
+            return new TypeModel(
+                typeNamespace,
+                containingTypes.ToImmutableEquatableArray(), 
+                symbol.Name);
         }
 
         private static void GenerateSourceFromTemplate(

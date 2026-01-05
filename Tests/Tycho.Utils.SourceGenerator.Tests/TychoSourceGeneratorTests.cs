@@ -23,40 +23,45 @@ public class TychoSourceGeneratorTests
 
             namespace SampleApp.App
             {
-                [TychoDefinition]
-                public partial class TestApp : TychoApp
+                public class Outer 
                 {
-                    protected override void DefineContract(IAppContract app) { }
-
-                    protected override void DefineEvents(IAppEvents app)
+                    public class Inner 
                     {
-                        app.Handles<TestAppEvent, TestAppEventHandler>();
-                        app.Handles<OtherTestAppEvent, OtherTestAppEventHandler>();
+                        [TychoDefinition]
+                        public partial class TestApp : TychoApp
+                        {
+                            protected override void DefineContract(IAppContract app) { }
+
+                            protected override void DefineEvents(IAppEvents app)
+                            {
+                                app.Handles<TestAppEvent, TestAppEventHandler>();
+                                app.Handles<OtherTestAppEvent, OtherTestAppEventHandler>();
+                            }
+
+                            protected override void IncludeModules(IAppStructure app) { }
+
+                            protected override void RegisterServices(IServiceCollection app) { }
+                        }
                     }
-
-                    protected override void IncludeModules(IAppStructure app) { }
-
-                    protected override void RegisterServices(IServiceCollection app) { }
+                    
                 }
             }
 
-            namespace SampleApp.Modules
+            
+            [TychoDefinition]
+            public partial class TestModule : TychoModule
             {
-                [TychoDefinition]
-                public partial class TestModule : TychoModule
+                protected override void DefineContract(IModuleContract module) { }
+
+                protected override void DefineEvents(IModuleEvents module)
                 {
-                    protected override void DefineContract(IModuleContract module) { }
-
-                    protected override void DefineEvents(IModuleEvents module)
-                    {
-                        module.Handles<TestModuleEvent, TestModuleEventHandler>();
-                        module.Handles<OtherTestModuleEvent, OtherTestModuleEventHandler>();
-                    }
-
-                    protected override void IncludeModules(IModuleStructure module) { }
-
-                    protected override void RegisterServices(IServiceCollection module) { }
+                    module.Handles<TestModuleEvent, TestModuleEventHandler>();
+                    module.Handles<OtherTestModuleEvent, OtherTestModuleEventHandler>();
                 }
+
+                protected override void IncludeModules(IModuleStructure module) { }
+
+                protected override void RegisterServices(IServiceCollection module) { }
             }
 
             namespace SampleApp.AppEvents
@@ -124,10 +129,10 @@ public class TychoSourceGeneratorTests
             .Select(t => Path.GetFileName(t.FilePath))
             .ToArray();
 
-        Assert.Contains("SampleApp.App.TestApp.setup.g.cs", generatedFileNames);
-        Assert.Contains("SampleApp.Modules.TestModule.setup.g.cs", generatedFileNames);
-        Assert.Contains("SampleApp.App.TestAppEventDispatcher.g.cs", generatedFileNames);
-        Assert.Contains("SampleApp.Modules.TestModuleEventDispatcher.g.cs", generatedFileNames);
+        Assert.Contains("SampleApp.App.Outer.Inner.TestApp.setup.g.cs", generatedFileNames);
+        Assert.Contains("TestModule.setup.g.cs", generatedFileNames);
+        Assert.Contains("SampleApp.App.Outer.Inner.TestAppEventDispatcher.g.cs", generatedFileNames);
+        Assert.Contains("TestModuleEventDispatcher.g.cs", generatedFileNames);
     }
 
     private static CSharpCompilation CreateCompilation(string source)
