@@ -56,11 +56,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\Tycho.Utils.SourceGenerator\bin\$(Configuration)\netstandard2.0\Tycho.Utils.SourceGenerator.dll"
-          Pack="true"
-          PackagePath="analyzers/dotnet/cs"
-          Visible="false"
-          CopyToOutputDirectory="Never" />
+    <None Include="..\Tycho.Utils.SourceGenerator\bin\$(Configuration)\netstandard2.0\Tycho.Utils.SourceGenerator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" CopyToOutputDirectory="Never" />
   </ItemGroup>
 
   <ItemGroup>

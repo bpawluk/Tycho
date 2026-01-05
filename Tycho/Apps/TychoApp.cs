@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Tycho.Apps.Setup;
 using Tycho.Structure;
+using Tycho.Utils;
 
 namespace Tycho.Apps
 {
@@ -18,10 +19,16 @@ namespace Tycho.Apps
 
         private bool _wasAlreadyRun = false;
 
+        /// <summary>
+        /// Gets the global configuration used by the application and its modules.
+        /// </summary>
         protected IConfiguration Configuration => _builder.Globals.Configuration;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TychoApp"/> class.
+        /// </summary>
         public TychoApp()
-        { 
+        {
             _runLock = new object();
             _builder = new AppBuilder(GetType());
         }
@@ -72,7 +79,7 @@ namespace Tycho.Apps
         /// Provides automated setup for the app.
         /// </summary>
         /// <remarks>
-        /// Do not override this! Implemented via source generators.
+        /// Do not override – it is implemented using source generation.
         /// </remarks>
 #pragma warning disable IDE1006
         protected virtual void __AutoSetup__(IServiceCollection app)
@@ -84,27 +91,33 @@ namespace Tycho.Apps
 #pragma warning restore IDE1006
 
         /// <summary>
-        /// Supplies global configuration for the application and its modules
+        /// Supplies global configuration for the application and its modules.
         /// </summary>
         /// <param name="globalConfiguration">Configuration to be used</param>
+        /// <returns>The current <see cref="TychoApp"/> instance.</returns>
+        /// <exception cref="ArgumentNullException"/>"
         public TychoApp WithConfiguration(IConfiguration globalConfiguration)
         {
+            globalConfiguration.ThrowIfNull();
             _builder.WithConfiguration(globalConfiguration);
             return this;
         }
 
         /// <summary>
-        /// Configures logging for the application and its modules
+        /// Supplies logging setup for the application and its modules.
         /// </summary>
         /// <param name="loggingSetup">Logging setup to be used</param>
+        /// <returns>The current <see cref="TychoApp"/> instance.</returns>
+        /// <exception cref="ArgumentNullException"/>"
         public TychoApp WithLogging(Action<ILoggingBuilder> loggingSetup)
         {
+            loggingSetup.ThrowIfNull();
             _builder.WithLogging(loggingSetup);
             return this;
         }
 
         /// <summary>
-        /// Builds the application according to the definition and runs it
+        /// Builds and runs the application according to the definition.
         /// </summary>
         /// <returns>A fresh and ready to use instance of the application</returns>
         /// <exception cref="InvalidOperationException"/>

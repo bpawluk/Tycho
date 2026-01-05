@@ -20,8 +20,14 @@ namespace Tycho.Modules
 
         private bool _wasAlreadyRun = false;
 
+        /// <summary>
+        /// Gets the global configuration used by the module and its submodules.
+        /// </summary>
         protected IConfiguration Configuration => _builder.Globals.Configuration;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TychoModule"/> class.
+        /// </summary>
         public TychoModule()
         {
             _runLock = new object();
@@ -74,7 +80,7 @@ namespace Tycho.Modules
         /// <summary>
         /// Override this method if you need to execute code before the module is disposed
         /// </summary>
-        /// <param name="app">A provider of the services configured for the module</param>
+        /// <param name="module">A provider of the services configured for the module</param>
         protected virtual Task Cleanup(IServiceProvider module)
         {
             return Task.CompletedTask;
@@ -84,7 +90,7 @@ namespace Tycho.Modules
         /// Provides automated setup for the module.
         /// </summary>
         /// <remarks>
-        /// Do not override this! Implemented via source generators.
+        /// Do not override – it is implemented using source generation.
         /// </remarks>
 #pragma warning disable IDE1006
         protected virtual void __AutoSetup__(IServiceCollection module)
