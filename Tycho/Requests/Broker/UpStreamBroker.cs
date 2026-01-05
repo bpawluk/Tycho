@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Requests.Registrating.Registrations;
@@ -31,10 +30,6 @@ namespace Tycho.Requests.Broker
         public Task Execute<TRequest>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest
         {
-            if (requestData is null)
-            {
-                throw new ArgumentNullException(nameof(requestData), $"{nameof(requestData)} cannot be null");
-            }
             var registration = _internals.GetRequiredService<IUpStreamHandlerRegistration<TRequest>>();
             return registration.Handler.Handle(requestData, cancellationToken);
         }
@@ -42,10 +37,6 @@ namespace Tycho.Requests.Broker
         public Task<TResponse> Execute<TRequest, TResponse>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest<TResponse>
         {
-            if (requestData is null)
-            {
-                throw new ArgumentNullException(nameof(requestData), $"{nameof(requestData)} cannot be null");
-            }
             var registration = _internals.GetRequiredService<IUpStreamHandlerRegistration<TRequest, TResponse>>();
             return registration.Handler.Handle(requestData, cancellationToken);
         }

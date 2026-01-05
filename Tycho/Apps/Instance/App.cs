@@ -7,6 +7,7 @@ using Tycho.Requests;
 using Tycho.Requests.Broker;
 using Tycho.Structure;
 using Tycho.Structure.Internal;
+using Tycho.Utils;
 
 namespace Tycho.Apps.Instance
 {
@@ -30,23 +31,36 @@ namespace Tycho.Apps.Instance
         public Task Execute<TRequest>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest
         {
+            requestData.ThrowIfNull(nameof(requestData));
             return _requestBroker.Execute(requestData, cancellationToken);
         }
 
         public Task<TResponse> Execute<TRequest, TResponse>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest<TResponse>
         {
+            requestData.ThrowIfNull(nameof(requestData));
             return _requestBroker.Execute<TRequest, TResponse>(requestData, cancellationToken);
         }
 
         public async ValueTask DisposeAsync()
         {
-            await _cleanup(_internals).ConfigureAwait(false);
             var moduleRegistry = _internals.GetRequiredService<IModuleRegistry>();
+
+            try
+            {
+                await _cleanup(_internals).ConfigureAwait(false);
+            }
+            catch { }
+
             foreach (var module in moduleRegistry.GetAllModules())
             {
-                await module.DisposeAsync().ConfigureAwait(false);
+                try
+                {
+                    await module.DisposeAsync().ConfigureAwait(false);
+                }
+                catch { }
             }
+
             _internals.Dispose();
         }
     }

@@ -4,6 +4,7 @@ using Tycho.Modules;
 using Tycho.Requests;
 using Tycho.Requests.Registrating;
 using Tycho.Structure.Internal;
+using Tycho.Utils;
 
 namespace Tycho.Apps.Setup
 {
@@ -38,6 +39,7 @@ namespace Tycho.Apps.Setup
             where TTargetRequest : class, IRequest
             where TModule : TychoModule
         {
+            map.ThrowIfNull();
             _registrator.ForwardMappedUpStreamRequest<TRequest, TTargetRequest, TModule>(map);
             return this;
         }
@@ -49,6 +51,8 @@ namespace Tycho.Apps.Setup
             where TTargetRequest : class, IRequest<TTargetResponse>
             where TModule : TychoModule
         {
+            mapRequest.ThrowIfNull();
+            mapResponse.ThrowIfNull();
             _registrator.ForwardMappedUpStreamRequest<
                 TRequest, TResponse, 
                 TTargetRequest, TTargetResponse, 

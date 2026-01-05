@@ -12,7 +12,14 @@ namespace Tycho.Utils
         {
             if (argument is null)
             {
-                throw new ArgumentNullException(paramName);
+                if (paramName is null)
+                {
+                    throw new ArgumentNullException();
+                }
+                else
+                {
+                    throw new ArgumentNullException(paramName);
+                }
             }
         }
     }

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Tycho.Events.Routing;
 using Tycho.Requests;
 using Tycho.Requests.Broker;
+using Tycho.Utils;
 
 namespace Tycho.Structure.External
 {
@@ -22,12 +23,14 @@ namespace Tycho.Structure.External
         public Task Execute<TRequest>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest
         {
+            requestData.ThrowIfNull();
             return _contractFulfillingBroker.Execute(requestData, cancellationToken);
         }
 
         public Task<TResponse> Execute<TRequest, TResponse>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest<TResponse>
         {
+            requestData.ThrowIfNull();
             return _contractFulfillingBroker.Execute<TRequest, TResponse>(requestData, cancellationToken);
         }
     }
