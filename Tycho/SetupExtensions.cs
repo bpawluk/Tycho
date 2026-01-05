@@ -7,14 +7,16 @@ using Tycho.Apps;
 namespace Tycho
 {
     /// <summary>
-    /// Extension methods for setting up Tycho applications
+    /// Extension methods for setting up Tycho applications.
     /// </summary>
     public static class SetupExtensions
     {
         /// <summary>
-        /// Sets up and runs the specified Tycho application and registers it in the Host Application Builder
+        /// Sets up and runs the specified Tycho application and registers it in the host application builder.
         /// </summary>
-        /// <typeparam name="TApp">The type of the application to run</typeparam>
+        /// <typeparam name="TApp">The type of the application to run.</typeparam>
+        /// <param name="builder">The host application builder to extend.</param>
+        /// <returns>The host application builder.</returns>
         public static Task<IHostApplicationBuilder> AddTycho<TApp>(this IHostApplicationBuilder builder)
             where TApp : TychoApp, new()
         {
@@ -22,10 +24,12 @@ namespace Tycho
         }
 
         /// <summary>
-        /// Sets up and runs the specified Tycho application and registers it in the Host Application Builder
+        /// Sets up and runs the specified Tycho application and registers it in the host application builder.
         /// </summary>
-        /// <typeparam name="TApp">The type of the application to run</typeparam>
-        /// <param name="app">An instance of the application to run</param>
+        /// <typeparam name="TApp">The type of the application to run.</typeparam>
+        /// <param name="builder">The host application builder to extend.</param>
+        /// <param name="app">An instance of the application to run.</param>
+        /// <returns>The host application builder.</returns>
         public static async Task<IHostApplicationBuilder> AddTycho<TApp>(this IHostApplicationBuilder builder, TApp app)
             where TApp : TychoApp
         {

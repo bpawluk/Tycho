@@ -7,7 +7,7 @@ using Tycho.Structure.Internal;
 namespace Tycho.Structure
 {
     /// <summary>
-    /// An interface for a Tycho module
+    /// Represents a running Tycho module instance.
     /// </summary>
     public interface IModule : IRequestExecutor, IAsyncDisposable
     {
@@ -17,9 +17,9 @@ namespace Tycho.Structure
     }
 
     /// <summary>
-    /// An interface for a Tycho module defined by <typeparamref name="TTychoDefinition"/>
+    /// Represents a running Tycho module instance defined by <typeparamref name="TTychoDefinition"/>.
     /// </summary>
-    /// <typeparam name="TTychoDefinition">The definition of the module</typeparam>
+    /// <typeparam name="TTychoDefinition">The module definition type.</typeparam>
     public interface IModule<TTychoDefinition> : IModule
         where TTychoDefinition : TychoModule
     {
