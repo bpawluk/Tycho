@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-{{~ if definition_type.type_namespace != "" ~}}
+﻿{{~ if definition_type.type_namespace != "" ~}}
 namespace {{ definition_type.type_namespace }}
 {
 {{~ end ~}}
@@ -10,9 +8,39 @@ namespace {{ definition_type.type_namespace }}
 {{~ end ~}}
     public partial class {{ definition_type.type_name }} : global::Tycho.Apps.TychoApp
     {
-        protected override void __AutoSetup__(IServiceCollection app)
+        /// <summary>
+        /// Supplies global configuration for the application and its modules.
+        /// </summary>
+        /// <param name="globalConfiguration">Configuration to be used</param>
+        /// <returns>The current <see cref="{{ definition_type.type_name }}"/> instance.</returns>
+        /// <exception cref="ArgumentNullException"/>"
+        public {{ definition_type.type_name }} WithConfiguration(global::Microsoft.Extensions.Configuration.IConfiguration globalConfiguration)
         {
-            app.AddTransient<global::Tycho.Events.Handling.IEventHandlingDispatcher, {{ definition_type.type_name }}EventDispatcher>();
+            WithConfigurationBase(globalConfiguration);
+            return this;
+        }
+
+        /// <summary>
+        /// Supplies logging setup for the application and its modules.
+        /// </summary>
+        /// <param name="loggingSetup">Logging setup to be used</param>
+        /// <returns>The current <see cref="{{ definition_type.type_name }}"/> instance.</returns>
+        /// <exception cref="ArgumentNullException"/>"
+        public {{ definition_type.type_name }} WithLogging(global::System.Action<global::Microsoft.Extensions.Logging.ILoggingBuilder> loggingSetup)
+        {
+            WithLoggingBase(loggingSetup);
+            return this;
+        }
+
+        /// <summary>
+        /// Builds and runs the application according to the definition.
+        /// </summary>
+        /// <returns>A fresh and ready to use instance of the application</returns>
+        /// <exception cref="InvalidOperationException"/>
+        public async global::System.Threading.Tasks.Task<I{{ definition_type.type_name }}> RunAsync()
+        {
+            var app = await RunBaseAsync().ConfigureAwait(false);
+            return new {{ definition_type.type_name }}Facade(app);
         }
     }
 {{~ for containing_type in definition_type.containing_types ~}}

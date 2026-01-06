@@ -11,6 +11,20 @@ namespace Tycho.Utils.SourceGenerator.Model.Partial
 
         public string TypeName { get; }
 
+        public string TypePrefix
+        {
+            get
+            {
+                var namespacePrefix = string.IsNullOrWhiteSpace(TypeNamespace) ? string.Empty : TypeNamespace;
+                var containingTypesPrefix = ContainingTypes.Count == 0 ? string.Empty : string.Join(".", ContainingTypes);
+                return string.IsNullOrWhiteSpace(namespacePrefix)
+                    ? containingTypesPrefix
+                    : string.IsNullOrWhiteSpace(containingTypesPrefix)
+                        ? namespacePrefix
+                        : $"{namespacePrefix}.{containingTypesPrefix}";
+            }
+        }
+
         public TypeModel(
             string typeNamespace,
             ImmutableEquatableArray<string> containingTypes,
@@ -43,9 +57,8 @@ namespace Tycho.Utils.SourceGenerator.Model.Partial
 
         public override string ToString()
         {
-            var namespacePrefix = string.IsNullOrWhiteSpace(TypeNamespace) ? string.Empty : TypeNamespace + ".";
-            var containingTypesPrefix = ContainingTypes.Count == 0 ? string.Empty : string.Join(".", ContainingTypes) + ".";
-            return $"{namespacePrefix}{containingTypesPrefix}{TypeName}";
+            var typePrefix = TypePrefix;
+            return string.IsNullOrWhiteSpace(typePrefix) ? TypeName : $"{typePrefix}.{TypeName}";
         }
 
         public static bool operator ==(TypeModel left, TypeModel right) => left.Equals(right);

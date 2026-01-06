@@ -129,10 +129,12 @@ public class TychoSourceGeneratorTests
             .Select(t => Path.GetFileName(t.FilePath))
             .ToArray();
 
-        Assert.Contains("SampleApp.App.Outer.Inner.TestApp.setup.g.cs", generatedFileNames);
-        Assert.Contains("TestModule.setup.g.cs", generatedFileNames);
-        Assert.Contains("SampleApp.App.Outer.Inner.TestAppEventDispatcher.g.cs", generatedFileNames);
-        Assert.Contains("TestModuleEventDispatcher.g.cs", generatedFileNames);
+        Assert.Contains("SampleApp.App.Outer.Inner.TestApp.g.cs", generatedFileNames);
+        Assert.Contains("SampleApp.App.Outer.Inner.TestApp.Setup.g.cs", generatedFileNames);
+        Assert.Contains("SampleApp.App.Outer.Inner.TestApp.Facade.g.cs", generatedFileNames);
+        Assert.Contains("SampleApp.App.Outer.Inner.TestApp.EventDispatcher.g.cs", generatedFileNames);
+        Assert.Contains("TestModule.g.cs", generatedFileNames);
+        Assert.Contains("TestModule.EventDispatcher.g.cs", generatedFileNames);
     }
 
     private static CSharpCompilation CreateCompilation(string source)

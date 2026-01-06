@@ -1,0 +1,34 @@
+﻿using Microsoft.Extensions.DependencyInjection;
+
+{{~ if definition_type.type_namespace != "" ~}}
+namespace {{ definition_type.type_namespace }}
+{
+{{~ end ~}}
+{{~ for containing_type in definition_type.containing_types ~}}
+    public partial class {{ containing_type }}
+    {
+{{~ end ~}}
+    public interface I{{ definition_type.type_name }} : global::System.IAsyncDisposable
+    {
+    }
+
+    public class {{ definition_type.type_name }}Facade : I{{ definition_type.type_name }}
+    {
+        private readonly global::Tycho.Structure.IApp _app;
+
+        public {{ definition_type.type_name }}Facade(global::Tycho.Structure.IApp app) 
+        {
+            _app = app;
+        }
+
+        public async global::System.Threading.Tasks.ValueTask DisposeAsync()
+        {
+            await _app.DisposeAsync().ConfigureAwait(false);
+        }
+    }
+{{~ for containing_type in definition_type.containing_types ~}}
+    }
+{{~ end ~}}
+{{~ if definition_type.type_namespace != "" ~}}
+}
+{{~ end ~}}

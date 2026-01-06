@@ -1,13 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using Tycho.IntegrationTests.ConfiguringLogging.SUT;
 using Tycho.IntegrationTests.ConfiguringLogging.SUT.Modules;
-using Tycho.Structure;
 
 namespace Tycho.IntegrationTests.ConfiguringLogging;
 
 public class ConfiguringLoggingTests : IAsyncLifetime
 {
-    private IApp _sut = null!;
+    private ITestApp _sut = null!;
 
     public async Task InitializeAsync()
     {

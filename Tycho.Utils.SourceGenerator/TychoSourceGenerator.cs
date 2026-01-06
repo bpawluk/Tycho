@@ -22,6 +22,10 @@ namespace Tycho.Utils.SourceGenerator
 
         private static readonly string AppDefinitionTemplate = EmbeddedResource.GetContent("Templates/AppDefinition.sbncs");
 
+        private static readonly string AppFacadeTemplate = EmbeddedResource.GetContent("Templates/AppFacade.sbncs");
+
+        private static readonly string AppSetupTemplate = EmbeddedResource.GetContent("Templates/AppSetup.sbncs");
+
         private static readonly string ModuleDefinitionTemplate = EmbeddedResource.GetContent("Templates/ModuleDefinition.sbncs");
 
         private static readonly string EventDispatcherTemplate = EmbeddedResource.GetContent("Templates/EventDispatcher.sbncs");
@@ -62,6 +66,12 @@ namespace Tycho.Utils.SourceGenerator
             var getTychoDefinitionModelStepResult = getTychoDefinitionTypeSymbolStepResult
                 .Select(GetTychoDefinitionModelStepTransform);
 
+            var getTychoFacadeModelStepResult = getTychoDefinitionTypeSymbolStepResult
+                .Select(GetTychoFacadeModelStepTransform);
+
+            var getTychoSetupModelStepResult = getTychoDefinitionTypeSymbolStepResult
+                .Select(GetTychoSetupModelStepTransform);
+
             var getDefineEventsMethodDefinitionsStepResult = getTychoDefinitionTypeSymbolStepResult
                 .SelectMany(GetDefineEventsMethodDefinitionsStepTransform);
 
@@ -72,26 +82,6 @@ namespace Tycho.Utils.SourceGenerator
                 .Select(GetEventDispatcherModelStepTransform);
 
             context.RegisterSourceOutput(
-                getTychoDefinitionModelStepResult,
-                (outputContext, model) =>
-                {
-                    if (model.DefinitionKind == TychoDefinitionKind.Unknown)
-                    {
-                        return;
-                    }
-
-                    var template = model.DefinitionKind == TychoDefinitionKind.App
-                        ? AppDefinitionTemplate
-                        : ModuleDefinitionTemplate;
-
-                    GenerateSourceFromTemplate(
-                        outputContext,
-                        model,
-                        template,
-                        $"{model.DefinitionType}.setup.g.cs");
-                });
-
-            context.RegisterSourceOutput(
                 getEventDispatcherModelStepResult,
                 (outputContext, model) =>
                 {
@@ -99,7 +89,46 @@ namespace Tycho.Utils.SourceGenerator
                         outputContext,
                         model,
                         EventDispatcherTemplate,
-                        $"{model.DefinitionType}EventDispatcher.g.cs");
+                        $"{model.DefinitionType}.EventDispatcher.g.cs");
+                });
+
+            context.RegisterSourceOutput(
+                getTychoFacadeModelStepResult,
+                (outputContext, model) =>
+                {
+                    //if (model.DefinitionKind == TychoDefinitionKind.Unknown) return;
+
+                    GenerateSourceFromTemplate(
+                        outputContext,
+                        model,
+                        AppFacadeTemplate,
+                        $"{model.DefinitionType}.Facade.g.cs");
+                });
+
+            context.RegisterSourceOutput(
+                getTychoDefinitionModelStepResult,
+                (outputContext, model) =>
+                {
+                    if (model.DefinitionKind == TychoDefinitionKind.Unknown) return;
+
+                    GenerateSourceFromTemplate(
+                        outputContext,
+                        model,
+                        ChooseTemplate(model.DefinitionKind, AppDefinitionTemplate, ModuleDefinitionTemplate),
+                        $"{model.DefinitionType}.g.cs");
+                });
+
+            context.RegisterSourceOutput(
+                getTychoSetupModelStepResult,
+                (outputContext, model) =>
+                {
+                    //if (model.DefinitionKind == TychoDefinitionKind.Unknown) return;
+
+                    GenerateSourceFromTemplate(
+                        outputContext,
+                        model,
+                        AppSetupTemplate,
+                        $"{model.DefinitionType}.Setup.g.cs");
                 });
         }
 
@@ -123,6 +152,18 @@ namespace Tycho.Utils.SourceGenerator
         {
             token.ThrowIfCancellationRequested();
             return new TychoDefinitionModel(input.Model.ClassType, input.Kind);
+        }
+
+        private static TychoFacadeModel GetTychoFacadeModelStepTransform((TychoDefinitionKind Kind, ClassDefinitionModel Model) input, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            return new TychoFacadeModel(input.Model.ClassType);
+        }
+
+        private static TychoSetupModel GetTychoSetupModelStepTransform((TychoDefinitionKind Kind, ClassDefinitionModel Model) input, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            return new TychoSetupModel(input.Model.ClassType);
         }
 
         private static ImmutableEquatableArray<MethodDefinitionModel> GetDefineEventsMethodDefinitionsStepTransform((TychoDefinitionKind, ClassDefinitionModel Model) input, CancellationToken token)
@@ -298,6 +339,16 @@ namespace Tycho.Utils.SourceGenerator
                 typeNamespace,
                 containingTypes.ToImmutableEquatableArray(), 
                 symbol.Name);
+        }
+
+        private static string ChooseTemplate(TychoDefinitionKind kind, string appTemplate, string moduleTemplate)
+        {
+            return kind switch
+            {
+                TychoDefinitionKind.App => appTemplate,
+                TychoDefinitionKind.Module => moduleTemplate,
+                _ => throw new ArgumentOutOfRangeException(nameof(kind), $"Unsupported definition kind: {kind}"),
+            };
         }
 
         private static void GenerateSourceFromTemplate(

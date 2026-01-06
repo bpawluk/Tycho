@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Tycho.Structure.External
 {
-    internal class Globals
+    public class Globals
     {
         public IConfiguration Configuration { get; set; }
 

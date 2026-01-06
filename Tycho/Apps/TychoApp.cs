@@ -94,26 +94,22 @@ namespace Tycho.Apps
         /// Supplies global configuration for the application and its modules.
         /// </summary>
         /// <param name="globalConfiguration">Configuration to be used</param>
-        /// <returns>The current <see cref="TychoApp"/> instance.</returns>
         /// <exception cref="ArgumentNullException"/>"
-        public TychoApp WithConfiguration(IConfiguration globalConfiguration)
+        protected void WithConfigurationBase(IConfiguration globalConfiguration)
         {
             globalConfiguration.ThrowIfNull();
             _builder.WithConfiguration(globalConfiguration);
-            return this;
         }
 
         /// <summary>
         /// Supplies logging setup for the application and its modules.
         /// </summary>
         /// <param name="loggingSetup">Logging setup to be used</param>
-        /// <returns>The current <see cref="TychoApp"/> instance.</returns>
         /// <exception cref="ArgumentNullException"/>"
-        public TychoApp WithLogging(Action<ILoggingBuilder> loggingSetup)
+        protected void WithLoggingBase(Action<ILoggingBuilder> loggingSetup)
         {
             loggingSetup.ThrowIfNull();
             _builder.WithLogging(loggingSetup);
-            return this;
         }
 
         /// <summary>
@@ -121,7 +117,7 @@ namespace Tycho.Apps
         /// </summary>
         /// <returns>A fresh and ready to use instance of the application</returns>
         /// <exception cref="InvalidOperationException"/>
-        public async Task<IApp> RunAsync()
+        protected async Task<IApp> RunBaseAsync()
         {
             EnsureItIsRunOnlyOnce();
 
