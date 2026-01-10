@@ -42,6 +42,11 @@ namespace {{ definition_type.type_namespace }}
             var app = await RunBaseAsync().ConfigureAwait(false);
             return new {{ definition_type.type_name }}Facade(app);
         }
+
+        protected override void __AutoSetup__(global::Microsoft.Extensions.DependencyInjection.IServiceCollection app)
+        {
+            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<global::Tycho.Events.Handling.IEventHandlingDispatcher, {{ definition_type.type_name }}EventDispatcher>(app);
+        }
     }
 {{~ for containing_type in definition_type.containing_types ~}}
     }
