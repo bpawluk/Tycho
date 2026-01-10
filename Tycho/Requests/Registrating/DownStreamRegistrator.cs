@@ -88,7 +88,7 @@ namespace Tycho.Requests.Registrating
                 MappedRequestForwarder<TRequest, TTargetRequest, TTargetModule>>();
             Services.TryAddTransient(sp =>
                 new MappedRequestForwarder<TRequest, TTargetRequest, TTargetModule>(
-                    sp.GetRequiredService<IModule<TTargetModule>>(),
+                    sp.GetRequiredService<IModuleInstance<TTargetModule>>(),
                     map));
         }
 
@@ -105,7 +105,7 @@ namespace Tycho.Requests.Registrating
                 MappedRequestForwarder<TRequest, TResponse, TTargetRequest, TTargetResponse, TTargetModule>>();
             Services.TryAddTransient(sp =>
                 new MappedRequestForwarder<TRequest, TResponse, TTargetRequest, TTargetResponse, TTargetModule>(
-                    sp.GetRequiredService<IModule<TTargetModule>>(),
+                    sp.GetRequiredService<IModuleInstance<TTargetModule>>(),
                     mapRequest,
                     mapResponse));
         }

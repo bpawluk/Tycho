@@ -89,7 +89,7 @@ public class RegistratorTests
     public void Forward_NewEvent_RegistersHandlersSource()
     {
         // Arrange
-        var targetModuleMock = new Mock<IModule<TestModule>>();
+        var targetModuleMock = new Mock<IModuleInstance<TestModule>>();
         _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
 
         // Act
@@ -120,7 +120,7 @@ public class RegistratorTests
     public void Forward_NewEventWithMapping_RegistersHandlersSource()
     {
         // Arrange
-        var targetModuleMock = new Mock<IModule<TestModule>>();
+        var targetModuleMock = new Mock<IModuleInstance<TestModule>>();
         _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
 
         // Act

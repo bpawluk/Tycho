@@ -29,7 +29,7 @@ public class DownStreamHandlersSourceTests
         eventRouterMock.Setup(m => m.FindHandler(It.IsAny<HandlerIdentity>()))
                        .Returns(_expectedHandler);
 
-        var submoduleMock = new Mock<IModule<TestModule>>();
+        var submoduleMock = new Mock<IModuleInstance<TestModule>>();
         submoduleMock.SetupGet(m => m.EventRouter)
                      .Returns(eventRouterMock.Object);
 

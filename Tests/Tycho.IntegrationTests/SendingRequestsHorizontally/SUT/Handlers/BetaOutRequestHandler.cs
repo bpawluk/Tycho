@@ -5,11 +5,11 @@ using Tycho.Structure;
 
 namespace Tycho.IntegrationTests.SendingRequestsHorizontally.SUT.Handlers;
 
-internal class BetaOutRequestHandler(IModule<GammaModule> gammaModule)
+internal class BetaOutRequestHandler(IModuleInstance<GammaModule> gammaModule)
     : IRequestHandler<BetaOutRequest>
     , IRequestHandler<BetaOutRequestWithResponse, string>
 {
-    private readonly IModule<GammaModule> _gammaModule = gammaModule;
+    private readonly IModuleInstance<GammaModule> _gammaModule = gammaModule;
 
     public Task HandleAsync(BetaOutRequest requestData, CancellationToken cancellationToken)
     {

@@ -10,14 +10,15 @@ namespace {{ definition_type.type_namespace }}
     {
         {{~ for request in requests ~}}
         global::System.Threading.Tasks.Task{{ if request.has_response }}<global::{{ request.response_type }}>{{ end }} ExecuteAsync(global::{{ request.request_type }} requestData, global::System.Threading.CancellationToken cancellationToken = default);
+        
         {{~ end ~}}
     }
 
     public class {{ definition_type.type_name }}Facade : I{{ definition_type.type_name }}
     {
-        private readonly global::Tycho.Structure.IApp _app;
+        private readonly global::Tycho.Structure.IAppInstance _app;
 
-        public {{ definition_type.type_name }}Facade(global::Tycho.Structure.IApp app) 
+        public {{ definition_type.type_name }}Facade(global::Tycho.Structure.IAppInstance app) 
         {
             _app = app;
         }
@@ -27,8 +28,8 @@ namespace {{ definition_type.type_namespace }}
         {
             return _app.ExecuteAsync<global::{{ request.request_type }}{{ if request.has_response }}, global::{{ request.response_type }}{{ end }}>(requestData, cancellationToken);
         }
+        
         {{~ end ~}}
-
         public async global::System.Threading.Tasks.ValueTask DisposeAsync()
         {
             await _app.DisposeAsync().ConfigureAwait(false);

@@ -31,7 +31,7 @@ namespace Tycho.Modules.Setup
 
         public ModuleBuilder(Type moduleDefinitionType)
         {
-            _moduleType = typeof(Module<>).MakeGenericType(moduleDefinitionType);
+            _moduleType = typeof(ModuleInstance<>).MakeGenericType(moduleDefinitionType);
             _internals = new Internals(moduleDefinitionType);
             Globals = new Globals();
             Settings = null!;
@@ -87,9 +87,9 @@ namespace Tycho.Modules.Setup
             return this;
         }
 
-        public async Task<IModule> BuildAsync()
+        public async Task<IModuleInstance> BuildAsync()
         {
-            var module = (IModule)Activator.CreateInstance(_moduleType, _internals, _cleanup);
+            var module = (IModuleInstance)Activator.CreateInstance(_moduleType, _internals, _cleanup);
 
             await Contract.BuildAsync().ConfigureAwait(false);
             await Events.BuildAsync().ConfigureAwait(false);

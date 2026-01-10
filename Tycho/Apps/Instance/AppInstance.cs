@@ -11,7 +11,7 @@ using Tycho.Utils;
 
 namespace Tycho.Apps.Instance
 {
-    internal class App<TAppDefinition> : IApp<TAppDefinition>
+    internal class AppInstance<TAppDefinition> : IAppInstance<TAppDefinition>
         where TAppDefinition : TychoApp
     {
         private readonly Internals _internals;
@@ -19,9 +19,9 @@ namespace Tycho.Apps.Instance
 
         private readonly UpStreamBroker _requestBroker;
 
-        Internals IApp.Internals => _internals;
+        Internals IAppInstance.Internals => _internals;
 
-        public App(Internals internals, Func<IServiceProvider, Task> cleanup)
+        public AppInstance(Internals internals, Func<IServiceProvider, Task> cleanup)
         {
             _internals = internals;
             _cleanup = cleanup;

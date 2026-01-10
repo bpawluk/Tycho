@@ -117,7 +117,7 @@ namespace Tycho.Apps
         /// </summary>
         /// <returns>A fresh and ready to use instance of the application</returns>
         /// <exception cref="InvalidOperationException"/>
-        protected async Task<IApp> RunBaseAsync()
+        protected async Task<IAppInstance> RunBaseAsync()
         {
             EnsureItIsRunOnlyOnce();
 

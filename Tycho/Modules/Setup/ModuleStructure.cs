@@ -91,7 +91,7 @@ namespace Tycho.Modules.Setup
             {
                 var runningModule = await module.RunAsync().ConfigureAwait(false);
                 moduleRegistry.RegisterModule(runningModule);
-                var genericIface = typeof(IModule<>).MakeGenericType(module.GetType());
+                var genericIface = typeof(IModuleInstance<>).MakeGenericType(module.GetType());
                 services.AddSingleton(genericIface, runningModule);
             })).ConfigureAwait(false);
         }

@@ -9,7 +9,7 @@ namespace Tycho.Structure
     /// <summary>
     /// Represents a running Tycho module instance.
     /// </summary>
-    public interface IModule : IRequestExecutor, IAsyncDisposable
+    public interface IModuleInstance : IRequestExecutor, IAsyncDisposable
     {
         internal Internals Internals { get; }
 
@@ -20,7 +20,7 @@ namespace Tycho.Structure
     /// Represents a running Tycho module instance defined by <typeparamref name="TTychoDefinition"/>.
     /// </summary>
     /// <typeparam name="TTychoDefinition">The module definition type.</typeparam>
-    public interface IModule<TTychoDefinition> : IModule
+    public interface IModuleInstance<TTychoDefinition> : IModuleInstance
         where TTychoDefinition : TychoModule
     {
     }

@@ -10,7 +10,7 @@ namespace Tycho.Requests.Handling
         where TTargetRequest : class, IRequest
         where TModule : TychoModule
     {
-        public MappedRequestForwarder(IModule<TModule> childModule, Func<TRequest, TTargetRequest> map)
+        public MappedRequestForwarder(IModuleInstance<TModule> childModule, Func<TRequest, TTargetRequest> map)
             : base(childModule, map)
         {
         }
@@ -23,7 +23,7 @@ namespace Tycho.Requests.Handling
         where TModule : TychoModule
     {
         public MappedRequestForwarder(
-            IModule<TModule> childModule,
+            IModuleInstance<TModule> childModule,
             Func<TRequest, TTargetRequest> mapRequest,
             Func<TTargetResponse, TResponse> mapResponse)
             : base(childModule, mapRequest, mapResponse)

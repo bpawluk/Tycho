@@ -5,11 +5,11 @@ using Tycho.Structure;
 
 namespace Tycho.IntegrationTests.SendingRequestsHorizontally.SUT.Handlers;
 
-internal class AlphaOutRequestHandler(IModule<BetaModule> betaModule)
+internal class AlphaOutRequestHandler(IModuleInstance<BetaModule> betaModule)
     : IRequestHandler<AlphaOutRequest>
     , IRequestHandler<AlphaOutRequestWithResponse, string>
 {
-    private readonly IModule<BetaModule> _betaModule = betaModule;
+    private readonly IModuleInstance<BetaModule> _betaModule = betaModule;
 
     public Task HandleAsync(AlphaOutRequest requestData, CancellationToken cancellationToken)
     {

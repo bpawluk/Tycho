@@ -13,7 +13,7 @@ namespace {{ definition_type.type_namespace }}
         /// </summary>
         /// <param name="globalConfiguration">Configuration to be used</param>
         /// <returns>The current <see cref="{{ definition_type.type_name }}"/> instance.</returns>
-        /// <exception cref="ArgumentNullException"/>"
+        /// <exception cref="global::System.ArgumentNullException"/>"
         public {{ definition_type.type_name }} WithConfiguration(global::Microsoft.Extensions.Configuration.IConfiguration globalConfiguration)
         {
             WithConfigurationBase(globalConfiguration);
@@ -25,7 +25,7 @@ namespace {{ definition_type.type_namespace }}
         /// </summary>
         /// <param name="loggingSetup">Logging setup to be used</param>
         /// <returns>The current <see cref="{{ definition_type.type_name }}"/> instance.</returns>
-        /// <exception cref="ArgumentNullException"/>"
+        /// <exception cref="global::System.ArgumentNullException"/>"
         public {{ definition_type.type_name }} WithLogging(global::System.Action<global::Microsoft.Extensions.Logging.ILoggingBuilder> loggingSetup)
         {
             WithLoggingBase(loggingSetup);
@@ -36,7 +36,7 @@ namespace {{ definition_type.type_namespace }}
         /// Builds and runs the application according to the definition.
         /// </summary>
         /// <returns>A fresh and ready to use instance of the application</returns>
-        /// <exception cref="InvalidOperationException"/>
+        /// <exception cref="global::System.InvalidOperationException"/>
         public async global::System.Threading.Tasks.Task<I{{ definition_type.type_name }}> RunAsync()
         {
             var app = await RunBaseAsync().ConfigureAwait(false);

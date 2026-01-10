@@ -5,10 +5,10 @@ namespace Tycho.Registry
 {
     internal interface IModuleRegistry
     {
-        void RegisterModule(IModule module);
+        void RegisterModule(IModuleInstance module);
 
-        IModule GetModule(ModuleIdentity moduleId);
+        IModuleInstance GetModule(ModuleIdentity moduleId);
 
-        IReadOnlyCollection<IModule> GetAllModules();
+        IReadOnlyCollection<IModuleInstance> GetAllModules();
     }
 }

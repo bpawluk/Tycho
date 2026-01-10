@@ -80,7 +80,7 @@ namespace Tycho.Events.Registrating
 
             Services.AddTransient<IRouteSource<TEvent>>(
                 sp => new DownStreamMappedRouteSource<TEvent, TTargetEvent, TModule>(
-                    sp.GetRequiredService<IModule<TModule>>(),
+                    sp.GetRequiredService<IModuleInstance<TModule>>(),
                     map));
         }
 

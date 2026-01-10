@@ -125,7 +125,7 @@ namespace Tycho.Modules
             return this;
         }
 
-        internal async Task<IModule> RunAsync()
+        internal async Task<IModuleInstance> RunAsync()
         {
             EnsureItIsRunOnlyOnce();
 

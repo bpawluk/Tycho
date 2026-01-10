@@ -34,7 +34,7 @@ public class DownStreamMappedHandlersSourceTests
                            id => id.MatchesEvent(typeof(OtherEvent)))))
                        .Returns(_handlerFromSubmodule);
 
-        var submoduleMock = new Mock<IModule<TestModule>>();
+        var submoduleMock = new Mock<IModuleInstance<TestModule>>();
         submoduleMock.SetupGet(m => m.EventRouter)
                      .Returns(eventRouterMock.Object);
 

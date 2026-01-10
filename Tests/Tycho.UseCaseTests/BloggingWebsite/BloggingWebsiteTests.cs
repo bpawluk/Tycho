@@ -9,7 +9,7 @@ namespace Tycho.UseCaseTests.BloggingWebsite;
 public class BloggingWebsiteTests : IAsyncLifetime
 {
     private readonly TestData _testData = new();
-    private IApp _sut = null!;
+    private IAppInstance _sut = null!;
 
     public async Task InitializeAsync()
     {

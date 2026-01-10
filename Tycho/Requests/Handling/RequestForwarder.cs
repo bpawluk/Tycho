@@ -7,7 +7,7 @@ namespace Tycho.Requests.Handling
         where TRequest : class, IRequest
         where TModule : TychoModule
     {
-        public RequestForwarder(IModule<TModule> childModule) : base(childModule)
+        public RequestForwarder(IModuleInstance<TModule> childModule) : base(childModule)
         {
         }
     }
@@ -16,7 +16,7 @@ namespace Tycho.Requests.Handling
         where TRequest : class, IRequest<TResponse>
         where TModule : TychoModule
     {
-        public RequestForwarder(IModule<TModule> childModule) : base(childModule)
+        public RequestForwarder(IModuleInstance<TModule> childModule) : base(childModule)
         {
         }
     }

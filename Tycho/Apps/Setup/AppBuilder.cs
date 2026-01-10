@@ -29,7 +29,7 @@ namespace Tycho.Apps.Setup
 
         public AppBuilder(Type appDefinitionType)
         {
-            _appType = typeof(App<>).MakeGenericType(appDefinitionType);
+            _appType = typeof(AppInstance<>).MakeGenericType(appDefinitionType);
             _internals = new Internals(appDefinitionType);
             Globals = new Globals();
             Contract = new AppContract(_internals);
@@ -68,9 +68,9 @@ namespace Tycho.Apps.Setup
             return this;
         }
 
-        public async Task<IApp> BuildAsync()
+        public async Task<IAppInstance> BuildAsync()
         {
-            var app = (IApp)Activator.CreateInstance(_appType, _internals, _cleanup);
+            var app = (IAppInstance)Activator.CreateInstance(_appType, _internals, _cleanup);
 
             await Contract.BuildAsync().ConfigureAwait(false);
             await Events.BuildAsync().ConfigureAwait(false);

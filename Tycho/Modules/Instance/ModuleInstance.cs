@@ -12,7 +12,7 @@ using Tycho.Utils;
 
 namespace Tycho.Modules.Instance
 {
-    internal class Module<TTychoDefinition> : IModule<TTychoDefinition>
+    internal class ModuleInstance<TTychoDefinition> : IModuleInstance<TTychoDefinition>
         where TTychoDefinition : TychoModule
     {
         private readonly Internals _internals;
@@ -21,10 +21,10 @@ namespace Tycho.Modules.Instance
         private readonly UpStreamBroker _requestBroker;
         private readonly IEventRouter _eventRouter;
 
-        Internals IModule.Internals => _internals;
-        IEventRouter IModule.EventRouter => _eventRouter;
+        Internals IModuleInstance.Internals => _internals;
+        IEventRouter IModuleInstance.EventRouter => _eventRouter;
 
-        public Module(Internals internals, Func<IServiceProvider, Task> cleanup)
+        public ModuleInstance(Internals internals, Func<IServiceProvider, Task> cleanup)
         {
             _internals = internals;
             _cleanup = cleanup;
