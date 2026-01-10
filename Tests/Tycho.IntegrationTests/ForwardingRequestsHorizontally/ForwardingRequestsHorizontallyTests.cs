@@ -1,14 +1,12 @@
 ﻿using Tycho.IntegrationTests._Utils;
 using Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT;
-using Tycho.Structure;
-using static Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.RequestToMapWithResponse;
 
 namespace Tycho.IntegrationTests.ForwardingRequestsHorizontally;
 
 public class ForwardingRequestsHorizontallyTests : IAsyncLifetime
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = new();
-    private IApp _sut = null!;
+    private ITestApp _sut = null!;
 
     public async Task InitializeAsync()
     {
@@ -38,7 +36,7 @@ public class ForwardingRequestsHorizontallyTests : IAsyncLifetime
         var message = new RequestWithResponse(new TestResult { Id = workflowId });
 
         // Act
-        var response = await _sut!.ExecuteAsync<RequestWithResponse, string>(message);
+        var response = await _sut!.ExecuteAsync(message);
         var testResult = await _testWorkflow.GetResult();
 
         // Assert
@@ -69,7 +67,7 @@ public class ForwardingRequestsHorizontallyTests : IAsyncLifetime
         var message = new RequestToMapWithResponse(new TestResult { Id = workflowId });
 
         // Act
-        var response = await _sut!.ExecuteAsync<RequestToMapWithResponse, Response>(message);
+        var response = await _sut!.ExecuteAsync(message);
         var testResult = await _testWorkflow.GetResult();
 
         // Assert

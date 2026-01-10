@@ -1,13 +1,12 @@
 ﻿using Tycho.IntegrationTests._Utils;
 using Tycho.IntegrationTests.ForwardingEventsVertically.SUT;
-using Tycho.Structure;
 
 namespace Tycho.IntegrationTests.ForwardingEventsVertically;
 
 public class ForwardingEventsVerticallyTests : IAsyncLifetime
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = new();
-    private IApp _sut = null!;
+    private ITestApp _sut = null!;
 
     public async Task InitializeAsync()
     {

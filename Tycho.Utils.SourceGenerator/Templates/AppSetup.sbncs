@@ -15,38 +15,17 @@ namespace {{ definition_type.type_namespace }}
         /// Sets up and runs the specified Tycho application and registers it in the host application builder.
         /// </summary>
         /// <param name="builder">The host application builder to extend.</param>
-        /// <returns>The host application builder.</returns>
-        public static global::System.Threading.Tasks.Task<global::Microsoft.Extensions.Hosting.IHostApplicationBuilder> Add{{ definition_type.type_name }}(this global::Microsoft.Extensions.Hosting.IHostApplicationBuilder builder)
-        {
-            return builder.Add{{ definition_type.type_name }}(new {{ definition_type.type_name }}());
-        }
-
-        /// <summary>
-        /// Sets up and runs the specified Tycho application and registers it in the host application builder.
-        /// </summary>
-        /// <param name="builder">The host application builder to extend.</param>
         /// <param name="app">An instance of the application to run.</param>
         /// <returns>The host application builder.</returns>
         public static async global::System.Threading.Tasks.Task<global::Microsoft.Extensions.Hosting.IHostApplicationBuilder> Add{{ definition_type.type_name }}(this global::Microsoft.Extensions.Hosting.IHostApplicationBuilder builder, {{ definition_type.type_name }} app)
         {
             var appInstance = await app
                 .WithConfiguration(builder.Configuration)
-                .WithLogging(logging =>
-                {
-                    logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
-                    logging.AddConsole();
-                    logging.Configure(options =>
-                    {
-                        options.ActivityTrackingOptions =
-                            ActivityTrackingOptions.SpanId |
-                            ActivityTrackingOptions.TraceId |
-                            ActivityTrackingOptions.ParentId;
-                    });
-                })
+                .WithLogging(logging => global::Tycho.Logging.LoggingConfiguration.ConfigureLogging(logging, builder.Configuration))
                 .RunAsync()
                 .ConfigureAwait(false);
 
-            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionContainerBuilderExtensions.AddSingleton(builder.Services, appInstance.GetType(), appInstance);
+            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton(builder.Services, appInstance);
 
             return builder;
         }

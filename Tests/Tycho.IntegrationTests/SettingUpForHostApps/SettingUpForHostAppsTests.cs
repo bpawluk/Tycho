@@ -16,7 +16,7 @@ public class SettingUpForHostAppsTests
         var expectedResponse = "Hello World!";
         hostapplicationBuilder.Configuration["Response"] = expectedResponse;
 
-        await hostapplicationBuilder.AddTycho<TestApp>();
+        await hostapplicationBuilder.AddTestApp(new());
         var host = hostapplicationBuilder.Build();
 
         // Act

@@ -1,13 +1,12 @@
 ﻿using Tycho.IntegrationTests._Utils;
 using Tycho.IntegrationTests.SendingRequestsVertically.SUT;
-using Tycho.Structure;
 
 namespace Tycho.IntegrationTests.SendingRequestsVertically;
 
 public class SendingRequestsVerticallyTests : IAsyncLifetime
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = new();
-    private IApp _sut = null!;
+    private ITestApp _sut = null!;
 
     public async Task InitializeAsync()
     {
@@ -38,7 +37,7 @@ public class SendingRequestsVerticallyTests : IAsyncLifetime
         var message = new RequestWithResponse(new TestResult { Id = workflowId });
 
         // Act
-        var response = await _sut!.ExecuteAsync<RequestWithResponse, string>(message);
+        var response = await _sut!.ExecuteAsync(message);
         var testResult = await _testWorkflow.GetResult();
 
         // Assert
