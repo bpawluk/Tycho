@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
-using Scriban;
-using Tycho.Utils.SourceGenerator.Model;
 using Tycho.Utils.SourceGenerator.Model.Partial;
-using Tycho.Utils.SourceGenerator.Utils;
+using Tycho.Utils.SourceGenerator.Pipelines;
 
 namespace Tycho.Utils.SourceGenerator
 {
@@ -20,153 +16,25 @@ namespace Tycho.Utils.SourceGenerator
         private const string TychoAppBaseClass = "Tycho.Apps.TychoApp";
         private const string TychoModuleBaseClass = "Tycho.Modules.TychoModule";
 
-        public const string TychoRequestTypeParameterName = "TRequest";
-        public const string TychoResponseTypeParameterName = "TResponse";
-
-        private static readonly string AppDefinitionTemplate = EmbeddedResource.GetContent("Templates/AppDefinition.sbncs");
-
-        private static readonly string AppFacadeTemplate = EmbeddedResource.GetContent("Templates/AppFacade.sbncs");
-
-        private static readonly string AppSetupTemplate = EmbeddedResource.GetContent("Templates/AppSetup.sbncs");
-
-        private static readonly string ModuleDefinitionTemplate = EmbeddedResource.GetContent("Templates/ModuleDefinition.sbncs");
-
-        private static readonly string EventDispatcherTemplate = EmbeddedResource.GetContent("Templates/EventDispatcher.sbncs");
-
-        private static readonly TypeModel IAppContractType = new TypeModel(
-            "Tycho.Apps",
-            ImmutableEquatableArray<string>.Empty,
-            "IAppContract");
-
-        private static readonly MethodSignatureModel DefineAppContractMethodSignature = new MethodSignatureModel(
-            methodName: "DefineContract",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
-            {
-                new TypeModel("Tycho.Apps", ImmutableEquatableArray<string>.Empty, "IAppContract"),
-            }),
-            result: new TypeModel("System", ImmutableEquatableArray<string>.Empty, "Void"));
-
-        private static readonly MethodSignatureModel DefineModuleContractMethodSignature = new MethodSignatureModel(
-            methodName: "DefineContract",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
-            {
-                new TypeModel("Tycho.Modules", ImmutableEquatableArray<string>.Empty, "IModuleContract"),
-            }),
-            result: new TypeModel("System", ImmutableEquatableArray<string>.Empty, "Void"));
-
-        private static readonly MethodSignatureModel DefineAppEventsMethodSignature = new MethodSignatureModel(
-            methodName: "DefineEvents",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
-            {
-                new TypeModel("Tycho.Apps", ImmutableEquatableArray<string>.Empty, "IAppEvents"),
-            }),
-            result: new TypeModel("System", ImmutableEquatableArray<string>.Empty, "Void"));
-
-        private static readonly MethodSignatureModel DefineModuleEventsMethodSignature = new MethodSignatureModel(
-            methodName: "DefineEvents",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
-            {
-                new TypeModel("Tycho.Modules", ImmutableEquatableArray<string>.Empty, "IModuleEvents"),
-            }),
-            result: new TypeModel("System", ImmutableEquatableArray<string>.Empty, "Void"));
-
-        private static readonly MethodSignatureModel AppHandlesMethodSignature = new MethodSignatureModel(
-            methodName: "Handles",
-            parameters: ImmutableEquatableArray<TypeModel>.Empty,
-            result: new TypeModel("Tycho.Apps", ImmutableEquatableArray<string>.Empty, "IAppEvents"));
-
-        private static readonly MethodSignatureModel ModuleHandlesMethodSignature = new MethodSignatureModel(
-            methodName: "Handles",
-            parameters: ImmutableEquatableArray<TypeModel>.Empty,
-            result: new TypeModel("Tycho.Modules", ImmutableEquatableArray<string>.Empty, "IModuleEvents"));
-
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            var getTychoDefinitionTypeSymbolStepResult = context.SyntaxProvider.ForAttributeWithMetadataName(
+            var tychoPipelineBase = context.SyntaxProvider.ForAttributeWithMetadataName(
                 fullyQualifiedMetadataName: TychoDefinitionAttribute,
-                predicate: GetTychoDefinitionClassStepPredicate,
-                transform: GetTychoDefinitionClassStepTransform);
+                predicate: GetTychoPipelineBasePredicate,
+                transform: GetTychoPipelineBaseTransform);
 
-            var getTychoDefinitionModelStepResult = getTychoDefinitionTypeSymbolStepResult
-                .Select(GetTychoDefinitionModelStepTransform);
-
-            var getTychoSetupModelStepResult = getTychoDefinitionTypeSymbolStepResult
-                .Where(GetTychoSetupModelStepPredicate)
-                .Select(GetTychoSetupModelStepTransform);
-
-            var getDefineContractMethodDefinitionsStepResult = getTychoDefinitionTypeSymbolStepResult
-                .SelectMany(GetDefineContractMethodDefinitionsStepTransform);
-
-            var getIAppContractMethodInvocationsStepResult = getDefineContractMethodDefinitionsStepResult
-                .Select(GetIAppContractMethodInvocationsStepTransform);
-
-            var getTychoFacadeModelStepResult = getIAppContractMethodInvocationsStepResult
-                .Select(GetTychoFacadeModelStepTransform);
-
-            var getDefineEventsMethodDefinitionsStepResult = getTychoDefinitionTypeSymbolStepResult
-                .SelectMany(GetDefineEventsMethodDefinitionsStepTransform);
-
-            var getHandlesMethodInvocationsStepResult = getDefineEventsMethodDefinitionsStepResult
-                .Select(GetHandlesMethodInvocationsStepTransform);
-
-            var getEventDispatcherModelStepResult = getHandlesMethodInvocationsStepResult
-                .Select(GetEventDispatcherModelStepTransform);
-
-            context.RegisterSourceOutput(
-                getEventDispatcherModelStepResult,
-                (outputContext, model) =>
-                {
-                    GenerateSourceFromTemplate(
-                        outputContext,
-                        model,
-                        EventDispatcherTemplate,
-                        $"{model.DefinitionType}.EventDispatcher.g.cs");
-                });
-
-            context.RegisterSourceOutput(
-                getTychoFacadeModelStepResult,
-                (outputContext, model) =>
-                {
-                    //if (model.DefinitionKind == TychoDefinitionKind.Unknown) return;
-
-                    GenerateSourceFromTemplate(
-                        outputContext,
-                        model,
-                        AppFacadeTemplate,
-                        $"{model.DefinitionType}.Facade.g.cs");
-                });
-
-            context.RegisterSourceOutput(
-                getTychoDefinitionModelStepResult,
-                (outputContext, model) =>
-                {
-                    if (model.DefinitionKind == TychoDefinitionKind.Unknown) return;
-
-                    GenerateSourceFromTemplate(
-                        outputContext,
-                        model,
-                        ChooseTemplate(model.DefinitionKind, AppDefinitionTemplate, ModuleDefinitionTemplate),
-                        $"{model.DefinitionType}.g.cs");
-                });
-
-            context.RegisterSourceOutput(
-                getTychoSetupModelStepResult,
-                (outputContext, model) =>
-                {
-                    GenerateSourceFromTemplate(
-                        outputContext,
-                        model,
-                        AppSetupTemplate,
-                        $"{model.DefinitionType}.Setup.g.cs");
-                });
+            context.AddTychoDefinitionPipeline(tychoPipelineBase)
+                   .AddTychoSetupPipeline(tychoPipelineBase)
+                   .AddTychoFacadePipeline(tychoPipelineBase)
+                   .AddEventDispatcherPipeline(tychoPipelineBase);
         }
 
-        private static bool GetTychoDefinitionClassStepPredicate(SyntaxNode node, CancellationToken token)
+        private static bool GetTychoPipelineBasePredicate(SyntaxNode node, CancellationToken token)
         {
             return node is ClassDeclarationSyntax;
         }
 
-        private static (TychoDefinitionKind, ClassDefinitionModel) GetTychoDefinitionClassStepTransform(GeneratorAttributeSyntaxContext context, CancellationToken token)
+        private static (TychoDefinitionKind, ClassDefinitionModel) GetTychoPipelineBaseTransform(GeneratorAttributeSyntaxContext context, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
 
@@ -175,101 +43,6 @@ namespace Tycho.Utils.SourceGenerator
             var methods = GetMethodDefinitionModels(context, classType, token);
 
             return (definitionKind, new ClassDefinitionModel(classType, methods));
-        }
-
-        private static TychoDefinitionModel GetTychoDefinitionModelStepTransform((TychoDefinitionKind Kind, ClassDefinitionModel Model) input, CancellationToken token)
-        {
-            token.ThrowIfCancellationRequested();
-            return new TychoDefinitionModel(input.Model.ClassType, input.Kind);
-        }
-
-        private static bool GetTychoSetupModelStepPredicate((TychoDefinitionKind Kind, ClassDefinitionModel Model) input)
-        {
-            return input.Kind == TychoDefinitionKind.App;
-        }
-
-        private static TychoSetupModel GetTychoSetupModelStepTransform((TychoDefinitionKind Kind, ClassDefinitionModel Model) input, CancellationToken token)
-        {
-            token.ThrowIfCancellationRequested();
-            return new TychoSetupModel(input.Model.ClassType);
-        }
-
-        private static ImmutableEquatableArray<MethodDefinitionModel> GetDefineContractMethodDefinitionsStepTransform((TychoDefinitionKind, ClassDefinitionModel Model) input, CancellationToken token)
-        {
-            token.ThrowIfCancellationRequested();
-            return input.Model.Methods
-                .Where(method =>
-                    method.Signature == DefineAppContractMethodSignature ||
-                    method.Signature == DefineModuleContractMethodSignature)
-                .ToImmutableEquatableArray();
-        }
-
-        private static (TypeModel, ImmutableEquatableArray<MethodInvocationModel>) GetIAppContractMethodInvocationsStepTransform(MethodDefinitionModel model, CancellationToken token)
-        {
-            token.ThrowIfCancellationRequested();
-            var invocations = model.Body
-                .Where(invocation => invocation.ReceiverType == IAppContractType)
-                .ToImmutableEquatableArray();
-            return (model.ContainingType, invocations);
-        }
-
-        private static TychoFacadeModel GetTychoFacadeModelStepTransform(
-            (TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocation) input,
-            CancellationToken token)
-        {
-            token.ThrowIfCancellationRequested();
-            return new TychoFacadeModel(
-                input.DefinitionType,
-                input.MethodInvocation
-                    .Where(methodInvocationModel => methodInvocationModel.TypeParameters.Any(parameter => parameter.ParameterName == TychoRequestTypeParameterName))
-                    .Select(GetTychoRequestModel)
-                    .ToImmutableEquatableArray()
-                );
-        }
-
-        private static TychoRequestModel GetTychoRequestModel(MethodInvocationModel model)
-        {
-            var requestType = model.TypeParameters.Single(parameter => parameter.ParameterName == TychoRequestTypeParameterName).ParameterValue;
-            if (model.TypeParameters.Any(parameter => parameter.ParameterName == TychoResponseTypeParameterName))
-            {
-                return new TychoRequestModel(
-                    requestType, 
-                    model.TypeParameters.First(parameter => parameter.ParameterName == TychoResponseTypeParameterName).ParameterValue);
-            }
-            return new TychoRequestModel(requestType);
-        }
-
-        private static ImmutableEquatableArray<MethodDefinitionModel> GetDefineEventsMethodDefinitionsStepTransform((TychoDefinitionKind, ClassDefinitionModel Model) input, CancellationToken token)
-        {
-            token.ThrowIfCancellationRequested();
-            return input.Model.Methods
-                .Where(method =>
-                    method.Signature == DefineAppEventsMethodSignature ||
-                    method.Signature == DefineModuleEventsMethodSignature)
-                .ToImmutableEquatableArray();
-        }
-
-        private static (TypeModel, ImmutableEquatableArray<MethodInvocationModel>) GetHandlesMethodInvocationsStepTransform(MethodDefinitionModel model, CancellationToken token)
-        {
-            token.ThrowIfCancellationRequested();
-            var invocations = model.Body
-                .Where(invocation =>
-                    invocation.Signature == AppHandlesMethodSignature ||
-                    invocation.Signature == ModuleHandlesMethodSignature)
-                .ToImmutableEquatableArray();
-            return (model.ContainingType, invocations);
-        }
-
-        private static EventDispatcherModel GetEventDispatcherModelStepTransform(
-            (TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocation) input,
-            CancellationToken token)
-        {
-            token.ThrowIfCancellationRequested();
-            return new EventDispatcherModel(
-                input.DefinitionType,
-                input.MethodInvocation
-                    .Select(methodInvocationModel => methodInvocationModel.TypeParameters.First().ParameterValue)
-                    .ToImmutableEquatableArray());
         }
 
         private static TychoDefinitionKind GetDefinitionKind(GeneratorAttributeSyntaxContext context, CancellationToken token)
@@ -285,12 +58,12 @@ namespace Tycho.Utils.SourceGenerator
             var tychoAppSymbol = compilation.GetTypeByMetadataName(TychoAppBaseClass);
             var tychoModuleSymbol = compilation.GetTypeByMetadataName(TychoModuleBaseClass);
 
-            if (tychoAppSymbol != null && InheritsFrom(typeSymbol, tychoAppSymbol))
+            if (tychoAppSymbol != null && TypeInheritsFrom(typeSymbol, tychoAppSymbol))
             {
                 return TychoDefinitionKind.App;
             }
 
-            if (tychoModuleSymbol != null && InheritsFrom(typeSymbol, tychoModuleSymbol))
+            if (tychoModuleSymbol != null && TypeInheritsFrom(typeSymbol, tychoModuleSymbol))
             {
                 return TychoDefinitionKind.Module;
             }
@@ -393,18 +166,6 @@ namespace Tycho.Utils.SourceGenerator
             return new TypeParameter(typeParameter.Name, GetTypeModel(typeArgument));
         }
 
-        private static bool InheritsFrom(ITypeSymbol type, ITypeSymbol baseType)
-        {
-            for (var current = type; current != null; current = current.BaseType)
-            {
-                if (SymbolEqualityComparer.Default.Equals(current, baseType))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
         private static TypeModel GetTypeModel(ISymbol symbol)
         {
             var typeNamespace = symbol
@@ -425,26 +186,16 @@ namespace Tycho.Utils.SourceGenerator
                 symbol.Name);
         }
 
-        private static string ChooseTemplate(TychoDefinitionKind kind, string appTemplate, string moduleTemplate)
+        private static bool TypeInheritsFrom(ITypeSymbol type, ITypeSymbol baseType)
         {
-            return kind switch
+            for (var current = type; current != null; current = current.BaseType)
             {
-                TychoDefinitionKind.App => appTemplate,
-                TychoDefinitionKind.Module => moduleTemplate,
-                _ => throw new ArgumentOutOfRangeException(nameof(kind), $"Unsupported definition kind: {kind}"),
-            };
-        }
-
-        private static void GenerateSourceFromTemplate(
-            SourceProductionContext context,
-            object model,
-            string templateContent,
-            string targetFileName)
-        {
-            var template = Template.Parse(templateContent);
-            var output = template.Render(model);
-            var sourceText = SourceText.From(output, Encoding.UTF8);
-            context.AddSource(targetFileName, sourceText);
+                if (SymbolEqualityComparer.Default.Equals(current, baseType))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
