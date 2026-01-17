@@ -34,7 +34,9 @@ namespace Tycho.Utils.SourceGenerator
             return node is ClassDeclarationSyntax;
         }
 
-        private static (TychoDefinitionKind, ClassDefinitionModel) GetTychoPipelineBaseTransform(GeneratorAttributeSyntaxContext context, CancellationToken token)
+        private static (TychoDefinitionKind, ClassDefinitionModel) GetTychoPipelineBaseTransform(
+            GeneratorAttributeSyntaxContext context, 
+            CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
 
@@ -45,7 +47,9 @@ namespace Tycho.Utils.SourceGenerator
             return (definitionKind, new ClassDefinitionModel(classType, methods));
         }
 
-        private static TychoDefinitionKind GetDefinitionKind(GeneratorAttributeSyntaxContext context, CancellationToken token)
+        private static TychoDefinitionKind GetDefinitionKind(
+            GeneratorAttributeSyntaxContext context, 
+            CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
 
@@ -71,11 +75,46 @@ namespace Tycho.Utils.SourceGenerator
             return TychoDefinitionKind.Unknown;
         }
 
-        private static ImmutableEquatableArray<MethodDefinitionModel> GetMethodDefinitionModels(GeneratorAttributeSyntaxContext context, TypeModel containingType, CancellationToken token)
+        private static bool TypeInheritsFrom(ITypeSymbol type, ITypeSymbol baseType)
+        {
+            for (var current = type; current != null; current = current.BaseType)
+            {
+                if (SymbolEqualityComparer.Default.Equals(current, baseType))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static TypeModel GetTypeModel(ISymbol symbol)
+        {
+            var typeNamespace = symbol
+                .ContainingNamespace
+                .ToDisplayString(SymbolDisplayFormat
+                    .FullyQualifiedFormat
+                    .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted));
+
+            var containingTypes = new Stack<string>();
+            for (var current = symbol.ContainingType; current != null; current = current.ContainingType)
+            {
+                containingTypes.Push(current.Name);
+            }
+
+            return new TypeModel(
+                typeNamespace,
+                containingTypes.ToImmutableEquatableArray(),
+                symbol.Name);
+        }
+
+        private static ImmutableEquatableArray<MethodDefinitionModel> GetMethodDefinitionModels(
+            GeneratorAttributeSyntaxContext context, 
+            TypeModel containingType, 
+            CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
 
-            if (!(context.TargetSymbol is INamespaceOrTypeSymbol classSymbol))
+            if (!(context.TargetSymbol is ITypeSymbol classSymbol))
             {
                 return ImmutableEquatableArray<MethodDefinitionModel>.Empty;
             }
@@ -100,6 +139,19 @@ namespace Tycho.Utils.SourceGenerator
             }
 
             return methodModels.ToImmutableEquatableArray();
+        }
+
+        private static MethodSignatureModel GetMethodSignatureModel(IMethodSymbol methodSymbol)
+        {
+            var methodName = methodSymbol.Name;
+
+            var returnType = GetTypeModel(methodSymbol.ReturnType);
+
+            var parameters = methodSymbol.Parameters
+                .Select(paramSymbol => GetTypeModel(paramSymbol.Type))
+                .ToImmutableEquatableArray();
+
+            return new MethodSignatureModel(methodName, parameters, returnType);
         }
 
         private static ImmutableEquatableArray<MethodInvocationModel> GetMethodBody(GeneratorAttributeSyntaxContext context, IMethodSymbol methodSymbol, CancellationToken token)
@@ -148,54 +200,9 @@ namespace Tycho.Utils.SourceGenerator
             return methodInvocations.ToImmutableEquatableArray();
         }
 
-        private static MethodSignatureModel GetMethodSignatureModel(IMethodSymbol methodSymbol)
-        {
-            var methodName = methodSymbol.Name;
-
-            var returnType = GetTypeModel(methodSymbol.ReturnType);
-
-            var parameters = methodSymbol.Parameters
-                .Select(paramSymbol => GetTypeModel(paramSymbol.Type))
-                .ToImmutableEquatableArray();
-
-            return new MethodSignatureModel(methodName, parameters, returnType);
-        }
-
         private static TypeParameter GetTypeParameterModel(ITypeParameterSymbol typeParameter, ITypeSymbol typeArgument)
         {
             return new TypeParameter(typeParameter.Name, GetTypeModel(typeArgument));
-        }
-
-        private static TypeModel GetTypeModel(ISymbol symbol)
-        {
-            var typeNamespace = symbol
-                .ContainingNamespace
-                .ToDisplayString(SymbolDisplayFormat
-                    .FullyQualifiedFormat
-                    .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted));
-
-            var containingTypes = new Stack<string>();
-            for (var current = symbol.ContainingType; current != null; current = current.ContainingType)
-            {
-                containingTypes.Push(current.Name);
-            }
-
-            return new TypeModel(
-                typeNamespace,
-                containingTypes.ToImmutableEquatableArray(),
-                symbol.Name);
-        }
-
-        private static bool TypeInheritsFrom(ITypeSymbol type, ITypeSymbol baseType)
-        {
-            for (var current = type; current != null; current = current.BaseType)
-            {
-                if (SymbolEqualityComparer.Default.Equals(current, baseType))
-                {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 }
