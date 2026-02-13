@@ -2,7 +2,7 @@
 using Tycho.Utils.SourceGenerator.References;
 using Tycho.Utils.SourceGenerator.Utils;
 
-namespace Tycho.Utils.SourceGenerator.Model.Partial
+namespace Tycho.Utils.SourceGenerator.Model.System
 {
     public readonly struct TypeArgument : IEquatable<TypeArgument>
     {

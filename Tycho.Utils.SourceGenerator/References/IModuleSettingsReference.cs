@@ -1,4 +1,5 @@
-﻿using Tycho.Utils.SourceGenerator.Model.Partial;
+﻿using Tycho.Utils.SourceGenerator.Model.Generic;
+using Tycho.Utils.SourceGenerator.Model.System;
 
 namespace Tycho.Utils.SourceGenerator.References
 {

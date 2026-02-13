@@ -4,9 +4,13 @@ using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Tycho.Utils.SourceGenerator.Model.Partial;
+using Tycho.Utils.SourceGenerator.Model.Generic;
+using Tycho.Utils.SourceGenerator.Model.System;
+using Tycho.Utils.SourceGenerator.Model.Tycho;
 using Tycho.Utils.SourceGenerator.Pipelines;
 using Tycho.Utils.SourceGenerator.References;
+
+// TODO: Cleanup templates - move all types and methods to the model
 
 namespace Tycho.Utils.SourceGenerator
 {

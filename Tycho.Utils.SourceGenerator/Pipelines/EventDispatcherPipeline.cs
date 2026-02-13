@@ -5,7 +5,9 @@ using System.Threading;
 using Microsoft.CodeAnalysis;
 using Tycho.Utils.SourceGenerator.Extensions;
 using Tycho.Utils.SourceGenerator.Model;
-using Tycho.Utils.SourceGenerator.Model.Partial;
+using Tycho.Utils.SourceGenerator.Model.Generic;
+using Tycho.Utils.SourceGenerator.Model.System;
+using Tycho.Utils.SourceGenerator.Model.Tycho;
 using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.Pipelines

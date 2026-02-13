@@ -1,5 +1,5 @@
 ﻿using System;
-using Tycho.Utils.SourceGenerator.Model.Partial;
+using Tycho.Utils.SourceGenerator.Model.System;
 
 namespace Tycho.Utils.SourceGenerator.Model
 {

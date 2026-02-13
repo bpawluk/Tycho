@@ -1,7 +1,8 @@
 ﻿using System;
+using Tycho.Utils.SourceGenerator.Model.Generic;
 using Tycho.Utils.SourceGenerator.Utils;
 
-namespace Tycho.Utils.SourceGenerator.Model.Partial
+namespace Tycho.Utils.SourceGenerator.Model.System
 {
     public readonly struct MethodDefinitionModel : IEquatable<MethodDefinitionModel>
     {

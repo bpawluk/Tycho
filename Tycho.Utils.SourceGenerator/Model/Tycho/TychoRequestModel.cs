@@ -1,7 +1,8 @@
 ﻿using System;
+using Tycho.Utils.SourceGenerator.Model.System;
 using Tycho.Utils.SourceGenerator.Utils;
 
-namespace Tycho.Utils.SourceGenerator.Model.Partial
+namespace Tycho.Utils.SourceGenerator.Model.Tycho
 {
     public readonly struct TychoRequestModel : IEquatable<TychoRequestModel>
     {
