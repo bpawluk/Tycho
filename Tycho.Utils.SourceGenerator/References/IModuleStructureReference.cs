@@ -30,7 +30,7 @@ namespace Tycho.Utils.SourceGenerator.References
             methodName: "Uses",
             parameters: new ImmutableEquatableArray<TypeModel>(new[]
             {
-                ActionReference.OneParamTypeModel,
+                ActionReference.TypeModel,
             }),
             result: TypeModel);
 
@@ -46,7 +46,7 @@ namespace Tycho.Utils.SourceGenerator.References
             methodName: "Uses",
             parameters: new ImmutableEquatableArray<TypeModel>(new[]
             {
-                ActionReference.OneParamTypeModel,
+                ActionReference.TypeModel,
                 IModuleSettingsReference.TypeModel,
             }),
             result: TypeModel);

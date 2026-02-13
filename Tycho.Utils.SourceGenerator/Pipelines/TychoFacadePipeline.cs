@@ -71,12 +71,20 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                 input.DefinitionType,
                 input.DefinitionKind,
                 input.MethodInvocations
-                    .Where(methodInvocationModel => methodInvocationModel.Signature.IsContractDefiningMethod)
-                    .Select(methodInvocationModel => new TychoRequestModel(
-                        methodInvocationModel.TypeArguments.Single(argument => argument.IsRequestType).Value,
-                        methodInvocationModel.TypeArguments.SingleOrDefault(argument => argument.IsResponseType).Value))
+                    .Select(GetTychoRequestModel)
                     .Distinct()
                     .ToImmutableEquatableArray());
+        }
+
+        private static TychoRequestModel GetTychoRequestModel(MethodInvocationModel model)
+        {
+            var requestType = model.TypeArguments.Single(argument => argument.IsRequestType).Value;
+            if (model.TypeArguments.Any(argument => argument.IsResponseType))
+            {
+                var responseType = model.TypeArguments.Single(argument => argument.IsResponseType).Value;
+                return new TychoRequestModel(requestType, responseType);
+            }
+            return new TychoRequestModel(requestType);
         }
 
         private static string ChooseTemplate(TychoDefinitionKind kind)

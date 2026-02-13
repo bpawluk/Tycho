@@ -40,7 +40,7 @@ namespace Tycho.Utils.SourceGenerator.References
             methodName: "ForwardsAs",
             parameters: new ImmutableEquatableArray<TypeModel>(new[]
             {
-                FuncReference.OneParamTypeModel,
+                FuncReference.TypeModel,
             }),
             result: TypeModel);
 
@@ -48,8 +48,8 @@ namespace Tycho.Utils.SourceGenerator.References
             methodName: "ForwardsAs",
             parameters: new ImmutableEquatableArray<TypeModel>(new[]
             {
-                FuncReference.OneParamTypeModel,
-                FuncReference.OneParamTypeModel,
+                FuncReference.TypeModel,
+                FuncReference.TypeModel,
             }),
             result: TypeModel);
 
