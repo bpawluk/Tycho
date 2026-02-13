@@ -1,0 +1,43 @@
+{{~ if definition_type.type_namespace != "" ~}}
+namespace {{ definition_type.type_namespace }}
+{
+{{~ end ~}}
+{{~ for containing_type in definition_type.containing_types ~}}
+    public partial class {{ containing_type }}
+    {
+{{~ end ~}}
+    public interface I{{ definition_type.type_name }} : global::System.IAsyncDisposable
+    {
+        {{~ for request in requests ~}}
+        global::System.Threading.Tasks.Task{{ if request.has_response }}<global::{{ request.response_type }}>{{ end }} ExecuteAsync(global::{{ request.request_type }} requestData, global::System.Threading.CancellationToken cancellationToken = default);
+        
+        {{~ end ~}}
+    }
+
+    public class {{ definition_type.type_name }}Facade : I{{ definition_type.type_name }}
+    {
+        private readonly global::Tycho.Structure.IModuleInstance _module;
+
+        public {{ definition_type.type_name }}Facade(global::Tycho.Structure.IModuleInstance module)
+        {
+            _module = module;
+        }
+
+        {{~ for request in requests ~}}
+        public global::System.Threading.Tasks.Task{{ if request.has_response }}<global::{{ request.response_type }}>{{ end }} ExecuteAsync(global::{{ request.request_type }} requestData, global::System.Threading.CancellationToken cancellationToken)
+        {
+            return _module.ExecuteAsync<global::{{ request.request_type }}{{ if request.has_response }}, global::{{ request.response_type }}{{ end }}>(requestData, cancellationToken);
+        }
+        
+        {{~ end ~}}
+        public async global::System.Threading.Tasks.ValueTask DisposeAsync()
+        {
+            await _module.DisposeAsync().ConfigureAwait(false);
+        }
+    }
+{{~ for containing_type in definition_type.containing_types ~}}
+    }
+{{~ end ~}}
+{{~ if definition_type.type_namespace != "" ~}}
+}
+{{~ end ~}}

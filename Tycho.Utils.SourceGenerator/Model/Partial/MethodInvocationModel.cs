@@ -9,23 +9,23 @@ namespace Tycho.Utils.SourceGenerator.Model.Partial
 
         public TypeModel? ReceiverType { get; }
 
-        public ImmutableEquatableArray<TypeParameter> TypeParameters { get; }
+        public ImmutableEquatableArray<TypeArgument> TypeArguments { get; }
 
         public MethodInvocationModel(
             MethodSignatureModel signature,
             TypeModel? receiverType,
-            ImmutableEquatableArray<TypeParameter> typeParameters)
+            ImmutableEquatableArray<TypeArgument> typeArguments)
         {
             Signature = signature;
             ReceiverType = receiverType;
-            TypeParameters = typeParameters;
+            TypeArguments = typeArguments;
         }
 
         public bool Equals(MethodInvocationModel other)
         {
             return Signature.Equals(other.Signature) && 
                    ReceiverType.Equals(other.ReceiverType) &&
-                   TypeParameters.Equals(other.TypeParameters);
+                   TypeArguments.Equals(other.TypeArguments);
         }
 
         public override bool Equals(object obj)
@@ -38,7 +38,7 @@ namespace Tycho.Utils.SourceGenerator.Model.Partial
             return HashCode.Combine(
                 Signature.GetHashCode(),
                 ReceiverType.GetHashCode(),
-                TypeParameters.GetHashCode());
+                TypeArguments.GetHashCode());
         }
 
         public static bool operator ==(MethodInvocationModel left, MethodInvocationModel right) => left.Equals(right);

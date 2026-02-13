@@ -40,7 +40,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
         private static TychoDefinitionModel GetTychoDefinitionModelStepTransform((TychoDefinitionKind Kind, ClassDefinitionModel Model) input, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            return new TychoDefinitionModel(input.Model.ClassType, input.Kind);
+            return new TychoDefinitionModel(input.Model.ClassType, input.Kind, null); // TODO
         }
 
         private static string ChooseTemplate(TychoDefinitionKind kind)

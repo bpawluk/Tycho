@@ -14,40 +14,14 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
     {
         private static readonly string EventDispatcherTemplate = EmbeddedResource.GetContent("Templates/EventDispatcher.sbncs");
 
-        private static readonly MethodSignatureModel DefineAppEventsMethodSignature = new MethodSignatureModel(
-            methodName: "DefineEvents",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
-            {
-                new TypeModel("Tycho.Apps", ImmutableEquatableArray<string>.Empty, "IAppEvents"),
-            }),
-            result: new TypeModel("System", ImmutableEquatableArray<string>.Empty, "Void"));
-
-        private static readonly MethodSignatureModel DefineModuleEventsMethodSignature = new MethodSignatureModel(
-            methodName: "DefineEvents",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
-            {
-                new TypeModel("Tycho.Modules", ImmutableEquatableArray<string>.Empty, "IModuleEvents"),
-            }),
-            result: new TypeModel("System", ImmutableEquatableArray<string>.Empty, "Void"));
-
-        private static readonly MethodSignatureModel AppHandlesMethodSignature = new MethodSignatureModel(
-            methodName: "Handles",
-            parameters: ImmutableEquatableArray<TypeModel>.Empty,
-            result: new TypeModel("Tycho.Apps", ImmutableEquatableArray<string>.Empty, "IAppEvents"));
-
-        private static readonly MethodSignatureModel ModuleHandlesMethodSignature = new MethodSignatureModel(
-            methodName: "Handles",
-            parameters: ImmutableEquatableArray<TypeModel>.Empty,
-            result: new TypeModel("Tycho.Modules", ImmutableEquatableArray<string>.Empty, "IModuleEvents"));
-
         public static IncrementalGeneratorInitializationContext AddEventDispatcherPipeline(
             this IncrementalGeneratorInitializationContext context, 
             IncrementalValuesProvider<(TychoDefinitionKind, ClassDefinitionModel)> pipelineBase)
         {
-            var getDefineEventsMethodDefinitionsStepResult = pipelineBase
-                .SelectMany(GetDefineEventsMethodDefinitionsStepTransform);
+            var getDefineEventsMethodDefinitionStepResult = pipelineBase
+                .Select(GetDefineEventsMethodDefinitionStepTransform);
 
-            var getHandlesMethodInvocationsStepResult = getDefineEventsMethodDefinitionsStepResult
+            var getHandlesMethodInvocationsStepResult = getDefineEventsMethodDefinitionStepResult
                 .Select(GetHandlesMethodInvocationsStepTransform);
 
             var getEventDispatcherModelStepResult = getHandlesMethodInvocationsStepResult
@@ -66,23 +40,17 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             return context;
         }
 
-        private static ImmutableEquatableArray<MethodDefinitionModel> GetDefineEventsMethodDefinitionsStepTransform((TychoDefinitionKind, ClassDefinitionModel Model) input, CancellationToken token)
+        private static MethodDefinitionModel GetDefineEventsMethodDefinitionStepTransform((TychoDefinitionKind, ClassDefinitionModel Model) input, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            return input.Model.Methods
-                .Where(method =>
-                    method.Signature == DefineAppEventsMethodSignature ||
-                    method.Signature == DefineModuleEventsMethodSignature)
-                .ToImmutableEquatableArray();
+            return input.Model.Methods.Single(method => method.Signature.IsDefineEventsMethod);
         }
 
         private static (TypeModel, ImmutableEquatableArray<MethodInvocationModel>) GetHandlesMethodInvocationsStepTransform(MethodDefinitionModel model, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             var invocations = model.Body
-                .Where(invocation =>
-                    invocation.Signature == AppHandlesMethodSignature ||
-                    invocation.Signature == ModuleHandlesMethodSignature)
+                .Where(invocation => invocation.Signature.IsEventDefiningMethod)
                 .ToImmutableEquatableArray();
             return (model.ContainingType, invocations);
         }
@@ -95,7 +63,9 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             return new EventDispatcherModel(
                 input.DefinitionType,
                 input.MethodInvocation
-                    .Select(methodInvocationModel => methodInvocationModel.TypeParameters.First().ParameterValue)
+                    .Select(methodInvocationModel => methodInvocationModel.TypeArguments
+                        .Single(argument => argument.IsEventType)
+                        .Value)
                     .ToImmutableEquatableArray());
         }
     }

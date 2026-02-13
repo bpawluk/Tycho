@@ -6,20 +6,17 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Tycho.Utils.SourceGenerator.Model.Partial;
 using Tycho.Utils.SourceGenerator.Pipelines;
+using Tycho.Utils.SourceGenerator.References;
 
 namespace Tycho.Utils.SourceGenerator
 {
     [Generator]
     public sealed class TychoSourceGenerator : IIncrementalGenerator
     {
-        private const string TychoDefinitionAttribute = "Tycho.TychoDefinitionAttribute";
-        private const string TychoAppBaseClass = "Tycho.Apps.TychoApp";
-        private const string TychoModuleBaseClass = "Tycho.Modules.TychoModule";
-
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             var tychoPipelineBase = context.SyntaxProvider.ForAttributeWithMetadataName(
-                fullyQualifiedMetadataName: TychoDefinitionAttribute,
+                fullyQualifiedMetadataName: TychoDefinitionAttributeReference.TypeName,
                 predicate: GetTychoPipelineBasePredicate,
                 transform: GetTychoPipelineBaseTransform);
 
@@ -39,11 +36,9 @@ namespace Tycho.Utils.SourceGenerator
             CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-
             var definitionKind = GetDefinitionKind(context, token);
             var classType = GetTypeModel(context.TargetSymbol);
             var methods = GetMethodDefinitionModels(context, classType, token);
-
             return (definitionKind, new ClassDefinitionModel(classType, methods));
         }
 
@@ -59,32 +54,19 @@ namespace Tycho.Utils.SourceGenerator
             }
 
             var compilation = context.SemanticModel.Compilation;
-            var tychoAppSymbol = compilation.GetTypeByMetadataName(TychoAppBaseClass);
-            var tychoModuleSymbol = compilation.GetTypeByMetadataName(TychoModuleBaseClass);
-
+            var tychoAppSymbol = compilation.GetTypeByMetadataName(TychoAppReference.TypeName);
             if (tychoAppSymbol != null && TypeInheritsFrom(typeSymbol, tychoAppSymbol))
             {
                 return TychoDefinitionKind.App;
             }
 
+            var tychoModuleSymbol = compilation.GetTypeByMetadataName(TychoModuleReference.TypeName);
             if (tychoModuleSymbol != null && TypeInheritsFrom(typeSymbol, tychoModuleSymbol))
             {
                 return TychoDefinitionKind.Module;
             }
 
             return TychoDefinitionKind.Unknown;
-        }
-
-        private static bool TypeInheritsFrom(ITypeSymbol type, ITypeSymbol baseType)
-        {
-            for (var current = type; current != null; current = current.BaseType)
-            {
-                if (SymbolEqualityComparer.Default.Equals(current, baseType))
-                {
-                    return true;
-                }
-            }
-            return false;
         }
 
         private static TypeModel GetTypeModel(ISymbol symbol)
@@ -101,10 +83,7 @@ namespace Tycho.Utils.SourceGenerator
                 containingTypes.Push(current.Name);
             }
 
-            return new TypeModel(
-                typeNamespace,
-                containingTypes.ToImmutableEquatableArray(),
-                symbol.Name);
+            return new TypeModel(typeNamespace, containingTypes.ToImmutableEquatableArray(), symbol.Name);
         }
 
         private static ImmutableEquatableArray<MethodDefinitionModel> GetMethodDefinitionModels(
@@ -140,17 +119,25 @@ namespace Tycho.Utils.SourceGenerator
 
             return methodModels.ToImmutableEquatableArray();
         }
+        private static bool TypeInheritsFrom(ITypeSymbol type, ITypeSymbol baseType)
+        {
+            for (var current = type; current != null; current = current.BaseType)
+            {
+                if (SymbolEqualityComparer.Default.Equals(current, baseType))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         private static MethodSignatureModel GetMethodSignatureModel(IMethodSymbol methodSymbol)
         {
             var methodName = methodSymbol.Name;
-
             var returnType = GetTypeModel(methodSymbol.ReturnType);
-
             var parameters = methodSymbol.Parameters
                 .Select(paramSymbol => GetTypeModel(paramSymbol.Type))
                 .ToImmutableEquatableArray();
-
             return new MethodSignatureModel(methodName, parameters, returnType);
         }
 
@@ -159,7 +146,6 @@ namespace Tycho.Utils.SourceGenerator
             token.ThrowIfCancellationRequested();
 
             var methodInvocations = new HashSet<MethodInvocationModel>();
-
             foreach (var syntaxRef in methodSymbol.DeclaringSyntaxReferences)
             {
                 token.ThrowIfCancellationRequested();
@@ -168,7 +154,6 @@ namespace Tycho.Utils.SourceGenerator
                 {
                     continue;
                 }
-
                 var semanticModel = context.SemanticModel.Compilation.GetSemanticModel(methodSyntax.SyntaxTree);
 
                 foreach (var invocationSyntax in methodSyntax.Body.DescendantNodes().OfType<InvocationExpressionSyntax>())
@@ -190,9 +175,7 @@ namespace Tycho.Utils.SourceGenerator
                                 ? GetTypeModel(receiverSymbol)
                                 : default,
                             invokedMethodSymbol.TypeParameters
-                                .Zip(
-                                    invokedMethodSymbol.TypeArguments, 
-                                    GetTypeParameterModel)
+                                .Zip(invokedMethodSymbol.TypeArguments, GetTypeArgumentModel)
                                 .ToImmutableEquatableArray()));
                 }
             }
@@ -200,9 +183,9 @@ namespace Tycho.Utils.SourceGenerator
             return methodInvocations.ToImmutableEquatableArray();
         }
 
-        private static TypeParameter GetTypeParameterModel(ITypeParameterSymbol typeParameter, ITypeSymbol typeArgument)
+        private static TypeArgument GetTypeArgumentModel(ITypeParameterSymbol typeParameter, ITypeSymbol typeArgument)
         {
-            return new TypeParameter(typeParameter.Name, GetTypeModel(typeArgument));
+            return new TypeArgument(typeParameter.Name, GetTypeModel(typeArgument));
         }
     }
 }

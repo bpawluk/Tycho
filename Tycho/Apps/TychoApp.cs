@@ -12,6 +12,7 @@ namespace Tycho.Apps
     /// <summary>
     /// Base class for defining a Tycho application
     /// </summary>
+    [ReferencedBySourceGenerator]
     public abstract class TychoApp
     {
         private readonly object _runLock;
@@ -37,18 +38,21 @@ namespace Tycho.Apps
         /// Use this method to define requests handled by the application
         /// </summary>
         /// <param name="app">An interface to define the requests</param>
+        [ReferencedBySourceGenerator]
         protected abstract void DefineContract(IAppContract app);
 
         /// <summary>
         /// Use this method to define events handled and routed by the application
         /// </summary>
         /// <param name="app">An interface to define the events</param>
+        [ReferencedBySourceGenerator]
         protected abstract void DefineEvents(IAppEvents app);
 
         /// <summary>
         /// Use this method to define modules used by the application
         /// </summary>
         /// <param name="app">An interface to include the modules</param>
+        [ReferencedBySourceGenerator]
         protected abstract void IncludeModules(IAppStructure app);
 
         /// <summary>

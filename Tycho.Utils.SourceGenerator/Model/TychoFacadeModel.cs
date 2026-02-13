@@ -8,19 +8,24 @@ namespace Tycho.Utils.SourceGenerator.Model
     {
         public TypeModel DefinitionType { get; }
 
+        public TychoDefinitionKind DefinitionKind { get; }
+
         public ImmutableEquatableArray<TychoRequestModel> Requests { get; }
 
         public TychoFacadeModel(
             TypeModel definitionType,
+            TychoDefinitionKind definitionKind,
             ImmutableEquatableArray<TychoRequestModel> requests)
         {
             DefinitionType = definitionType;
+            DefinitionKind = definitionKind;
             Requests = requests;
         }
 
         public bool Equals(TychoFacadeModel other)
         {
             return DefinitionType.Equals(other.DefinitionType) &&
+                   DefinitionKind.Equals(other.DefinitionKind) &&
                    Requests.Equals(other.Requests);
         }
 
@@ -33,6 +38,7 @@ namespace Tycho.Utils.SourceGenerator.Model
         {
             return HashCode.Combine(
                 DefinitionType.GetHashCode(),
+                DefinitionKind.GetHashCode(),
                 Requests.GetHashCode());
         }
 

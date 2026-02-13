@@ -1,4 +1,5 @@
 ﻿using System;
+using Tycho.Utils.SourceGenerator.References;
 using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.Model.Partial
@@ -10,6 +11,22 @@ namespace Tycho.Utils.SourceGenerator.Model.Partial
         public ImmutableEquatableArray<TypeModel> Parameters { get; }
 
         public TypeModel Result { get; }
+
+        public bool IsDefineContractMethod =>
+            TychoAppReference.DefineContractMethodSignature.Equals(this) ||
+            TychoModuleReference.DefineContractMethodSignature.Equals(this);
+
+        public bool IsContractDefiningMethod =>
+            IAppContractReference.ContractDefiningMethods.Contains(this) ||
+            IModuleContractReference.ContractDefiningMethods.Contains(this);
+
+        public bool IsDefineEventsMethod => 
+            TychoAppReference.DefineEventsMethodSignature.Equals(this) ||
+            TychoModuleReference.DefineEventsMethodSignature.Equals(this);
+
+        public bool IsEventDefiningMethod =>
+            IAppEventsReference.EventDefiningMethods.Contains(this) ||
+            IModuleEventsReference.EventDefiningMethods.Contains(this);
 
         public MethodSignatureModel(
             string methodName,

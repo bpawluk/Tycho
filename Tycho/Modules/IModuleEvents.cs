@@ -1,11 +1,13 @@
 ﻿using Tycho.Events;
 using Tycho.Modules.Routing;
+using Tycho.Utils;
 
 namespace Tycho.Modules
 {
     /// <summary>
     /// An interface for declaring the events expected by a module.
     /// </summary>
+    [ReferencedBySourceGenerator]
     public interface IModuleEvents
     {
         /// <summary>
@@ -14,6 +16,7 @@ namespace Tycho.Modules
         /// </summary>
         /// <typeparam name="TEvent">The type of the event to handle.</typeparam>
         /// <typeparam name="THandler">The type of event handler.</typeparam>
+        [ReferencedBySourceGenerator]
         IModuleEvents Handles<TEvent, THandler>()
             where TEvent : class, IEvent
             where THandler : class, IEventHandler<TEvent>;

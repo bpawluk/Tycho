@@ -7,12 +7,14 @@ using Tycho.Modules.Setup;
 using Tycho.Requests.Broker;
 using Tycho.Structure;
 using Tycho.Structure.External;
+using Tycho.Utils;
 
 namespace Tycho.Modules
 {
     /// <summary>
     /// Base class for defining a Tycho module
     /// </summary>
+    [ReferencedBySourceGenerator]
     public abstract class TychoModule
     {
         private readonly object _runLock;
@@ -48,18 +50,21 @@ namespace Tycho.Modules
         /// Use this method to define requests handled and required by the module
         /// </summary>
         /// <param name="module">An interface to define the requests</param>
+        [ReferencedBySourceGenerator] 
         protected abstract void DefineContract(IModuleContract module);
 
         /// <summary>
         /// Use this method to define events handled and routed by the module
         /// </summary>
         /// <param name="module">An interface to define the events</param>
+        [ReferencedBySourceGenerator] 
         protected abstract void DefineEvents(IModuleEvents module);
 
         /// <summary>
         /// Use this method to define submodules used by the module
         /// </summary>
         /// <param name="module">An interface to include the submodules</param>
+        [ReferencedBySourceGenerator] 
         protected abstract void IncludeModules(IModuleStructure module);
 
         /// <summary>
