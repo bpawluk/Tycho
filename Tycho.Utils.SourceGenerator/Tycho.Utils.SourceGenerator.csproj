@@ -20,8 +20,4 @@
     <EmbeddedResource Include="Templates\**" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="References\Microsoft\" />
-  </ItemGroup>
-
 </Project>
