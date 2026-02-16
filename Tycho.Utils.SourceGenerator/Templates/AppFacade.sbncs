@@ -1,43 +1,47 @@
-﻿{{~ if definition_type.namespace != "" ~}}
-namespace {{ definition_type.namespace }}
+﻿{{~ for used_namespace in used_namespaces ~}}
+using {{ used_namespace }};
+{{~ end ~}}
+
+{{~ if namespace != "" ~}}
+namespace {{ namespace }}
 {
 {{~ end ~}}
-{{~ for containing_type in definition_type.containing_types ~}}
+{{~ for containing_type in containing_types ~}}
     public partial class {{ containing_type }}
     {
 {{~ end ~}}
-    public interface I{{ definition_type.name }} : global::System.IAsyncDisposable
+    public interface {{ interfaces.app_interface }} : {{ interfaces.async_disposable_interface }}
     {
         {{~ for request in requests ~}}
-        global::System.Threading.Tasks.Task{{ if request.has_response }}<global::{{ request.response_type }}>{{ end }} ExecuteAsync(global::{{ request.request_type }} requestData, global::System.Threading.CancellationToken cancellationToken = default);
+        {{ classes.task_class }}{{ if request.has_response }}<{{ request.response_type }}>{{ end }} ExecuteAsync({{ request.request_type }} requestData, {{ structs.cancellation_token_struct }} cancellationToken = default);
         
         {{~ end ~}}
     }
 
-    public class {{ definition_type.name }}Facade : I{{ definition_type.name }}
+    public class {{ classes.facade_class }} : {{ interfaces.app_interface }}
     {
-        private readonly global::Tycho.Structure.IAppInstance _app;
+        private readonly {{ interfaces.instance_interface }} _app;
 
-        public {{ definition_type.name }}Facade(global::Tycho.Structure.IAppInstance app) 
+        public {{ classes.facade_class }}({{ interfaces.instance_interface }} app) 
         {
             _app = app;
         }
 
         {{~ for request in requests ~}}
-        public global::System.Threading.Tasks.Task{{ if request.has_response }}<global::{{ request.response_type }}>{{ end }} ExecuteAsync(global::{{ request.request_type }} requestData, global::System.Threading.CancellationToken cancellationToken)
+        public {{ classes.task_class }}{{ if request.has_response }}<{{ request.response_type }}>{{ end }} ExecuteAsync({{ request.request_type }} requestData, {{ structs.cancellation_token_struct }} cancellationToken)
         {
-            return _app.ExecuteAsync<global::{{ request.request_type }}{{ if request.has_response }}, global::{{ request.response_type }}{{ end }}>(requestData, cancellationToken);
+            return _app.ExecuteAsync<{{ request.request_type }}{{ if request.has_response }}, {{ request.response_type }}{{ end }}>(requestData, cancellationToken);
         }
         
         {{~ end ~}}
-        public async global::System.Threading.Tasks.ValueTask DisposeAsync()
+        public async {{ classes.value_task_class }} DisposeAsync()
         {
             await _app.DisposeAsync().ConfigureAwait(false);
         }
     }
-{{~ for containing_type in definition_type.containing_types ~}}
+{{~ for containing_type in containing_types ~}}
     }
 {{~ end ~}}
-{{~ if definition_type.namespace != "" ~}}
+{{~ if namespace != "" ~}}
 }
 {{~ end ~}}

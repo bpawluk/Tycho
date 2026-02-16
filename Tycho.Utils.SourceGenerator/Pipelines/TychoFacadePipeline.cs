@@ -7,6 +7,7 @@ using Tycho.Utils.SourceGenerator.Extensions;
 using Tycho.Utils.SourceGenerator.Models;
 using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.Models.Tycho;
+using Tycho.Utils.SourceGenerator.TemplateModels;
 using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.Pipelines
@@ -36,7 +37,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                     if (model.DefinitionKind == TychoDefinitionKind.Unknown) return;
 
                     outputContext.GenerateSourceFromTemplate(
-                        model,
+                        CreateTemplateModel(model),
                         ChooseTemplate(model.DefinitionKind),
                         $"{model.DefinitionType}.Facade.g.cs");
                 });
@@ -86,6 +87,16 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                 return new TychoRequestModel(requestType, responseType);
             }
             return new TychoRequestModel(requestType);
+        }
+
+        private static object CreateTemplateModel(TychoFacadeModel model)
+        {
+            return model.DefinitionKind switch
+            {
+                TychoDefinitionKind.App => new AppFacadeTM(model),
+                TychoDefinitionKind.Module => new ModuleFacadeTM(model),
+                _ => throw new ArgumentOutOfRangeException(nameof(model.DefinitionKind), $"Unsupported definition kind: {model.DefinitionKind}"),
+            };
         }
 
         private static string ChooseTemplate(TychoDefinitionKind kind)
