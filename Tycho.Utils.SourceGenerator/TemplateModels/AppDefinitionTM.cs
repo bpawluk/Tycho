@@ -26,7 +26,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             ContainingTypes = tychoDefinitionModel.DefinitionType.ContainingTypes.ToArray();
             Classes = new ClassesTM(this, tychoDefinitionModel);
             Interfaces = new InterfacesTM(this, tychoDefinitionModel);
-            Methods = new MethodsTM(this);
+            Methods = new MethodsTM();
             Exceptions = new ExceptionsTM(this);
         }
 
@@ -78,7 +78,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string AutoSetupMethod { get; }
             public string AddTransientMethod { get; }
 
-            public MethodsTM(AppDefinitionTM owner)
+            public MethodsTM()
             {
                 WithConfigurationBaseMethod = TychoAppReference.WithConfigurationBaseMethodSignature.MethodName;
                 WithLoggingBaseMethod = TychoAppReference.WithLoggingBaseMethodSignature.MethodName;

@@ -1,4 +1,5 @@
 ﻿using Tycho.Utils.SourceGenerator.Models.System;
+using Tycho.Utils.SourceGenerator.References.Microsoft;
 using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.Utils;
 
@@ -34,6 +35,14 @@ namespace Tycho.Utils.SourceGenerator.References
             parameters: new ImmutableEquatableArray<TypeModel>(new[]
             {
                 IModuleStructureReference.TypeModel,
+            }),
+            result: VoidReference.TypeModel);
+
+        public static MethodSignatureModel AutoSetupMethodSignature => new MethodSignatureModel(
+            methodName: "__AutoSetup__",
+            parameters: new ImmutableEquatableArray<TypeModel>(new[]
+            {
+                IServiceCollectionReference.TypeModel,
             }),
             result: VoidReference.TypeModel);
     }

@@ -50,7 +50,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             return model.DefinitionKind switch
             {
                 TychoDefinitionKind.App => new AppDefinitionTM(model),
-                TychoDefinitionKind.Module => model,
+                TychoDefinitionKind.Module => new ModuleDefinitionTM(model),
                 _ => throw new ArgumentOutOfRangeException(nameof(model.DefinitionKind), $"Unsupported definition kind: {model.DefinitionKind}"),
             };
         }
