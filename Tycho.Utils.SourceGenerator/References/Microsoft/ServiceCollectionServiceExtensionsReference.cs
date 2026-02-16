@@ -17,5 +17,13 @@ namespace Tycho.Utils.SourceGenerator.References.Microsoft
                 IServiceCollectionReference.TypeModel,
             }),
             result: IServiceCollectionReference.TypeModel);
+
+        public static MethodSignatureModel AddSingletonMethodSignature => new MethodSignatureModel(
+            methodName: "AddSingleton",
+            parameters: new ImmutableEquatableArray<TypeModel>(new[]
+            {
+                IServiceCollectionReference.TypeModel,
+            }),
+            result: IServiceCollectionReference.TypeModel);
     }
 }

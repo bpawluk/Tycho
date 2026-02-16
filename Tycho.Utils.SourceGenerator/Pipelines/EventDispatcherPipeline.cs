@@ -7,6 +7,7 @@ using Tycho.Utils.SourceGenerator.Extensions;
 using Tycho.Utils.SourceGenerator.Models;
 using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.Models.Tycho;
+using Tycho.Utils.SourceGenerator.TemplateModels;
 using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.Pipelines
@@ -33,7 +34,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                 (outputContext, model) =>
                 {
                     outputContext.GenerateSourceFromTemplate(
-                        model,
+                        new EventDispatcherTM(model),
                         EventDispatcherTemplate,
                         $"{model.DefinitionType}.EventDispatcher.g.cs");
                 });

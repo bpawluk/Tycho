@@ -1,15 +1,19 @@
-﻿{{~ if definition_type.namespace != "" ~}}
-namespace {{ definition_type.namespace }}
+﻿{{~ for used_namespace in used_namespaces ~}}
+using {{ used_namespace }};
+{{~ end ~}}
+
+{{~ if namespace != "" ~}}
+namespace {{ namespace }}
 {
 {{~ end ~}}
-{{~ for containing_type in definition_type.containing_types ~}}
+{{~ for containing_type in containing_types ~}}
     public partial class {{ containing_type }}
     {
 {{~ end ~}}
     /// <summary>
     /// Extension methods for setting up Tycho applications.
     /// </summary>
-    public static class {{ definition_type.name }}SetupExtensions
+    public static class {{ classes.setup_extensions_class }}
     {
         /// <summary>
         /// Sets up and runs the specified Tycho application and registers it in the host application builder.
@@ -17,22 +21,22 @@ namespace {{ definition_type.namespace }}
         /// <param name="builder">The host application builder to extend.</param>
         /// <param name="app">An instance of the application to run.</param>
         /// <returns>The host application builder.</returns>
-        public static async global::System.Threading.Tasks.Task<global::Microsoft.Extensions.Hosting.IHostApplicationBuilder> Add{{ definition_type.name }}(this global::Microsoft.Extensions.Hosting.IHostApplicationBuilder builder, {{ definition_type.name }} app)
+        public static async {{ classes.task_class }}<{{ interfaces.host_application_builder_interface }}> {{ methods.add_app_method }}(this {{ interfaces.host_application_builder_interface }} builder, {{ classes.app_class }} app)
         {
             var appInstance = await app
                 .WithConfiguration(builder.Configuration)
-                .WithLogging(logging => global::Tycho.Logging.LoggingConfiguration.ConfigureLogging(logging, builder.Configuration))
+                .WithLogging(logging => {{ classes.logging_configuration_class }}.{{ methods.configure_logging_method }}(logging, builder.Configuration))
                 .RunAsync()
                 .ConfigureAwait(false);
 
-            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton(builder.Services, appInstance);
+            {{ classes.service_collection_service_extensions_class }}.{{ methods.add_singleton_method }}(builder.Services, appInstance);
 
             return builder;
         }
     }
-{{~ for containing_type in definition_type.containing_types ~}}
+{{~ for containing_type in containing_types ~}}
     }
 {{~ end ~}}
-{{~ if definition_type.namespace != "" ~}}
+{{~ if namespace != "" ~}}
 }
 {{~ end ~}}

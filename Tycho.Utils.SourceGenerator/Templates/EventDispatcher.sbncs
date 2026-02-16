@@ -1,54 +1,58 @@
-{{~ if definition_type.namespace != "" ~}}
-namespace {{ definition_type.namespace }}
+{{~ for used_namespace in used_namespaces ~}}
+using {{ used_namespace }};
+{{~ end ~}}
+
+{{~ if namespace != "" ~}}
+namespace {{ namespace }}
 {
 {{~ end ~}}
-{{~ for containing_type in definition_type.containing_types ~}}
+{{~ for containing_type in containing_types ~}}
     public partial class {{ containing_type }}
     {
 {{~ end ~}}
-    internal class {{ definition_type.name }}EventDispatcher : global::Tycho.Events.Handling.IEventHandlingDispatcher
+    internal class {{ classes.event_dispatcher_class }} : {{ interfaces.event_handling_dispatcher_interface }}
     {
-        private readonly global::Tycho.Events.Serialization.IPayloadSerializer _payloadSerializer;
+        private readonly {{ interfaces.payload_serializer_interface }} _payloadSerializer;
 
-        public {{ definition_type.name }}EventDispatcher(global::Tycho.Events.Serialization.IPayloadSerializer payloadSerializer)
+        public {{ classes.event_dispatcher_class }}({{ interfaces.payload_serializer_interface }} payloadSerializer)
         {
             _payloadSerializer = payloadSerializer;
         }
 
-        public async global::System.Threading.Tasks.Task Dispatch(
-            global::System.Guid eventId,
+        public async {{ classes.task_class }} Dispatch(
+            {{ structs.guid_struct }} eventId,
             object eventPayload,
-            global::Tycho.Events.IEventHandler eventHandler,
-            global::System.Threading.CancellationToken cancellationToken)
+            {{ interfaces.event_handler_interface }} eventHandler,
+            {{ structs.cancellation_token_struct }} cancellationToken)
         {
             switch (eventHandler)
             {
             {{~ for event in events ~}}
-                case global::Tycho.Events.IEventHandler<global::{{ event }}> castHandler:
+                case {{ interfaces.event_handler_interface }}<{{ event }}> castHandler:
                     await DispatchAs(eventId, eventPayload, castHandler, cancellationToken);
                     break;
             {{~ end ~}}
                 default:
-                    throw new global::System.InvalidOperationException(
+                    throw new {{ exceptions.invalid_operation_exception }}(
                         $"Missing handling logic for {eventHandler.GetType().FullName} event handler.");
             }
         }
 
-        private async global::System.Threading.Tasks.Task DispatchAs<TEvent>(
-            global::System.Guid eventId,
+        private async {{ classes.task_class }} DispatchAs<TEvent>(
+            {{ structs.guid_struct }} eventId,
             object eventPayload,
-            global::Tycho.Events.IEventHandler<TEvent> eventHandler,
-            global::System.Threading.CancellationToken cancellationToken)
-            where TEvent : class, global::Tycho.Events.IEvent
+            {{ interfaces.event_handler_interface }}<TEvent> eventHandler,
+            {{ structs.cancellation_token_struct }} cancellationToken)
+            where TEvent : class, {{ interfaces.event_interface }}
         {
             var deserializedPyaload = _payloadSerializer.Deserialize<TEvent>(eventPayload);
-            var context = new global::Tycho.Events.EventContext<TEvent>(eventId, deserializedPyaload);
+            var context = new {{ classes.event_context_class }}<TEvent>(eventId, deserializedPyaload);
             await eventHandler.HandleAsync(context, cancellationToken);
         }
     }
-{{~ for containing_type in definition_type.containing_types ~}}
+{{~ for containing_type in containing_types ~}}
     }
 {{~ end ~}}
-{{~ if definition_type.namespace != "" ~}}
+{{~ if namespace != "" ~}}
 }
 {{~ end ~}}
