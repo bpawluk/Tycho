@@ -1,8 +1,7 @@
 ﻿using System;
-using Tycho.Utils.SourceGenerator.Model.Generic;
 using Tycho.Utils.SourceGenerator.Utils;
 
-namespace Tycho.Utils.SourceGenerator.Model.System
+namespace Tycho.Utils.SourceGenerator.Models.System
 {
     public readonly struct MethodInvocationModel : IEquatable<MethodInvocationModel>
     {

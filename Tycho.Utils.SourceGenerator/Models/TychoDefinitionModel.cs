@@ -1,10 +1,9 @@
 ﻿using System;
-using Tycho.Utils.SourceGenerator.Model.Generic;
-using Tycho.Utils.SourceGenerator.Model.System;
-using Tycho.Utils.SourceGenerator.Model.Tycho;
+using Tycho.Utils.SourceGenerator.Models.System;
+using Tycho.Utils.SourceGenerator.Models.Tycho;
 using Tycho.Utils.SourceGenerator.Utils;
 
-namespace Tycho.Utils.SourceGenerator.Model
+namespace Tycho.Utils.SourceGenerator.Models
 {
     public readonly struct TychoDefinitionModel : IEquatable<TychoDefinitionModel>
     {
@@ -15,7 +14,7 @@ namespace Tycho.Utils.SourceGenerator.Model
         public ImmutableEquatableArray<TypeModel> Submodules { get; }
 
         public TychoDefinitionModel(
-            TypeModel definitionType, 
+            TypeModel definitionType,
             TychoDefinitionKind definitionKind,
             ImmutableEquatableArray<TypeModel> submodules)
         {

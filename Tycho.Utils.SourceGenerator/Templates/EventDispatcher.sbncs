@@ -1,16 +1,16 @@
-{{~ if definition_type.type_namespace != "" ~}}
-namespace {{ definition_type.type_namespace }}
+{{~ if definition_type.namespace != "" ~}}
+namespace {{ definition_type.namespace }}
 {
 {{~ end ~}}
 {{~ for containing_type in definition_type.containing_types ~}}
     public partial class {{ containing_type }}
     {
 {{~ end ~}}
-    internal class {{ definition_type.type_name }}EventDispatcher : global::Tycho.Events.Handling.IEventHandlingDispatcher
+    internal class {{ definition_type.name }}EventDispatcher : global::Tycho.Events.Handling.IEventHandlingDispatcher
     {
         private readonly global::Tycho.Events.Serialization.IPayloadSerializer _payloadSerializer;
 
-        public {{ definition_type.type_name }}EventDispatcher(global::Tycho.Events.Serialization.IPayloadSerializer payloadSerializer)
+        public {{ definition_type.name }}EventDispatcher(global::Tycho.Events.Serialization.IPayloadSerializer payloadSerializer)
         {
             _payloadSerializer = payloadSerializer;
         }
@@ -49,6 +49,6 @@ namespace {{ definition_type.type_namespace }}
 {{~ for containing_type in definition_type.containing_types ~}}
     }
 {{~ end ~}}
-{{~ if definition_type.type_namespace != "" ~}}
+{{~ if definition_type.namespace != "" ~}}
 }
 {{~ end ~}}

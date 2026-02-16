@@ -2,9 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Tycho.Utils.SourceGenerator.Utils;
 
-namespace Tycho.Utils.SourceGenerator.Model.Generic
+namespace Tycho.Utils.SourceGenerator.Utils
 {
     public static class ImmutableEquatableArray
     {

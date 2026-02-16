@@ -1,12 +1,12 @@
-﻿{{~ if definition_type.type_namespace != "" ~}}
-namespace {{ definition_type.type_namespace }}
+﻿{{~ if definition_type.namespace != "" ~}}
+namespace {{ definition_type.namespace }}
 {
 {{~ end ~}}
 {{~ for containing_type in definition_type.containing_types ~}}
     public partial class {{ containing_type }}
     {
 {{~ end ~}}
-    public interface I{{ definition_type.type_name }} : global::System.IAsyncDisposable
+    public interface I{{ definition_type.name }} : global::System.IAsyncDisposable
     {
         {{~ for request in requests ~}}
         global::System.Threading.Tasks.Task{{ if request.has_response }}<global::{{ request.response_type }}>{{ end }} ExecuteAsync(global::{{ request.request_type }} requestData, global::System.Threading.CancellationToken cancellationToken = default);
@@ -14,11 +14,11 @@ namespace {{ definition_type.type_namespace }}
         {{~ end ~}}
     }
 
-    public class {{ definition_type.type_name }}Facade : I{{ definition_type.type_name }}
+    public class {{ definition_type.name }}Facade : I{{ definition_type.name }}
     {
         private readonly global::Tycho.Structure.IAppInstance _app;
 
-        public {{ definition_type.type_name }}Facade(global::Tycho.Structure.IAppInstance app) 
+        public {{ definition_type.name }}Facade(global::Tycho.Structure.IAppInstance app) 
         {
             _app = app;
         }
@@ -38,6 +38,6 @@ namespace {{ definition_type.type_namespace }}
 {{~ for containing_type in definition_type.containing_types ~}}
     }
 {{~ end ~}}
-{{~ if definition_type.type_namespace != "" ~}}
+{{~ if definition_type.namespace != "" ~}}
 }
 {{~ end ~}}

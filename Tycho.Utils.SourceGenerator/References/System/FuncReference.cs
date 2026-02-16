@@ -1,10 +1,11 @@
-﻿using Tycho.Utils.SourceGenerator.Model.Generic;
-using Tycho.Utils.SourceGenerator.Model.System;
+﻿using System;
+using Tycho.Utils.SourceGenerator.Models.System;
+using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.References.System
 {
     internal static class FuncReference
     {
-        public static TypeModel TypeModel { get; } = new TypeModel("System", ImmutableEquatableArray<string>.Empty, "Func");
+        public static TypeModel TypeModel { get; } = new TypeModel(typeof(Func<object>).Namespace, ImmutableEquatableArray<string>.Empty, nameof(Func<object>));
     }
 }

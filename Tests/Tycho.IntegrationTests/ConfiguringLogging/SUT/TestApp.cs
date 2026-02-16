@@ -26,5 +26,8 @@ public partial class TestApp : TychoApp
         app.Uses<AlphaModule>();
     }
 
-    protected override void RegisterServices(IServiceCollection app) { }
+    protected override void RegisterServices(IServiceCollection app) 
+    {
+        app.AddTransient<LogAppRequestHandler>();
+    }
 }

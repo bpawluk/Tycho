@@ -1,21 +1,21 @@
-﻿{{~ if definition_type.type_namespace != "" ~}}
-namespace {{ definition_type.type_namespace }}
+﻿{{~ if definition_type.namespace != "" ~}}
+namespace {{ definition_type.namespace }}
 {
 {{~ end ~}}
 {{~ for containing_type in definition_type.containing_types ~}}
     public partial class {{ containing_type }}
     {
 {{~ end ~}}
-    public partial class {{ definition_type.type_name }} : global::Tycho.Modules.TychoModule
+    public partial class {{ definition_type.name }} : global::Tycho.Modules.TychoModule
     {
         protected override void __AutoSetup__(global::Microsoft.Extensions.DependencyInjection.IServiceCollection module)
         {
-            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<global::Tycho.Events.Handling.IEventHandlingDispatcher, {{ definition_type.type_name }}EventDispatcher>(module);
+            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<global::Tycho.Events.Handling.IEventHandlingDispatcher, {{ definition_type.name }}EventDispatcher>(module);
         }
     }
 {{~ for containing_type in definition_type.containing_types ~}}
     }
 {{~ end ~}}
-{{~ if definition_type.type_namespace != "" ~}}
+{{~ if definition_type.namespace != "" ~}}
 }
 {{~ end ~}}

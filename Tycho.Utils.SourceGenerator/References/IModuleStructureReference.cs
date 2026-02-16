@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Tycho.Utils.SourceGenerator.Model.Generic;
-using Tycho.Utils.SourceGenerator.Model.System;
+using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.References.System;
+using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.References
 {

@@ -20,4 +20,9 @@
     <EmbeddedResource Include="Templates\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="TemplateModels\AppDefinitionTM.cs" />
+    <EmbeddedResource Include="TemplateModels\TemplateModelBase.cs" />
+  </ItemGroup>
+
 </Project>

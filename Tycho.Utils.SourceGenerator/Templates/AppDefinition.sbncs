@@ -1,22 +1,26 @@
-﻿{{~ if definition_type.type_namespace != "" ~}}
-namespace {{ definition_type.type_namespace }}
+﻿{{~ for used_namespace in used_namespaces ~}}
+using {{ used_namespace }};
+{{~ end ~}}
+
+{{~ if namespace != "" ~}}
+namespace {{ namespace }}
 {
 {{~ end ~}}
-{{~ for containing_type in definition_type.containing_types ~}}
+{{~ for containing_type in containing_types ~}}
     public partial class {{ containing_type }}
     {
 {{~ end ~}}
-    public partial class {{ definition_type.type_name }} : global::Tycho.Apps.TychoApp
+    public partial class {{ classes.app_class }} : {{ classes.base_class }}
     {
         /// <summary>
         /// Supplies global configuration for the application and its modules.
         /// </summary>
         /// <param name="globalConfiguration">Configuration to be used</param>
-        /// <returns>The current <see cref="{{ definition_type.type_name }}"/> instance.</returns>
-        /// <exception cref="global::System.ArgumentNullException"/>"
-        public {{ definition_type.type_name }} WithConfiguration(global::Microsoft.Extensions.Configuration.IConfiguration globalConfiguration)
+        /// <returns>The current <see cref="{{ classes.app_class }}"/> instance.</returns>
+        /// <exception cref="{{ exceptions.argument_null_exception }}"/>"
+        public {{ classes.app_class }} WithConfiguration({{ interfaces.configuration_interface }} globalConfiguration)
         {
-            WithConfigurationBase(globalConfiguration);
+            {{ methods.with_configuration_base_method }}(globalConfiguration);
             return this;
         }
 
@@ -24,11 +28,11 @@ namespace {{ definition_type.type_namespace }}
         /// Supplies logging setup for the application and its modules.
         /// </summary>
         /// <param name="loggingSetup">Logging setup to be used</param>
-        /// <returns>The current <see cref="{{ definition_type.type_name }}"/> instance.</returns>
-        /// <exception cref="global::System.ArgumentNullException"/>"
-        public {{ definition_type.type_name }} WithLogging(global::System.Action<global::Microsoft.Extensions.Logging.ILoggingBuilder> loggingSetup)
+        /// <returns>The current <see cref="{{ classes.app_class }}"/> instance.</returns>
+        /// <exception cref="{{ exceptions.argument_null_exception }}"/>"
+        public {{ classes.app_class }} WithLogging({{ classes.action_class }}<{{ interfaces.logging_builder_interface }}> loggingSetup)
         {
-            WithLoggingBase(loggingSetup);
+            {{ methods.with_logging_base_method }}(loggingSetup);
             return this;
         }
 
@@ -36,21 +40,21 @@ namespace {{ definition_type.type_namespace }}
         /// Builds and runs the application according to the definition.
         /// </summary>
         /// <returns>A fresh and ready to use instance of the application</returns>
-        /// <exception cref="global::System.InvalidOperationException"/>
-        public async global::System.Threading.Tasks.Task<I{{ definition_type.type_name }}> RunAsync()
+        /// <exception cref="{{ exceptions.invalid_operation_exception }}"/>
+        public async {{ classes.task_class }}<{{ interfaces.app_interface }}> RunAsync()
         {
-            var app = await RunBaseAsync().ConfigureAwait(false);
-            return new {{ definition_type.type_name }}Facade(app);
+            var app = await {{ methods.run_base_method }}().ConfigureAwait(false);
+            return new {{ classes.facade_class }}(app);
         }
 
-        protected override void __AutoSetup__(global::Microsoft.Extensions.DependencyInjection.IServiceCollection app)
+        protected override void {{ methods.auto_setup_method }}({{ interfaces.service_collection_interface }} app)
         {
-            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<global::Tycho.Events.Handling.IEventHandlingDispatcher, {{ definition_type.type_name }}EventDispatcher>(app);
+            {{classes.service_collection_service_extensions_class}}.{{ methods.add_transient_method }}<{{ interfaces.event_handling_dispatcher_interface }}, {{ classes.event_dispatcher_class }}>(app);
         }
     }
-{{~ for containing_type in definition_type.containing_types ~}}
+{{~ for containing_type in containing_types ~}}
     }
 {{~ end ~}}
-{{~ if definition_type.type_namespace != "" ~}}
+{{~ if namespace != "" ~}}
 }
 {{~ end ~}}

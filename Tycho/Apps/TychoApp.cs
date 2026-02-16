@@ -86,6 +86,7 @@ namespace Tycho.Apps
         /// Do not override – it is implemented using source generation.
         /// </remarks>
 #pragma warning disable IDE1006
+        [ReferencedBySourceGenerator]
         protected virtual void __AutoSetup__(IServiceCollection app)
         {
             throw new NotImplementedException(
@@ -99,6 +100,7 @@ namespace Tycho.Apps
         /// </summary>
         /// <param name="globalConfiguration">Configuration to be used</param>
         /// <exception cref="ArgumentNullException"/>"
+        [ReferencedBySourceGenerator]
         protected void WithConfigurationBase(IConfiguration globalConfiguration)
         {
             globalConfiguration.ThrowIfNull();
@@ -110,6 +112,7 @@ namespace Tycho.Apps
         /// </summary>
         /// <param name="loggingSetup">Logging setup to be used</param>
         /// <exception cref="ArgumentNullException"/>"
+        [ReferencedBySourceGenerator]
         protected void WithLoggingBase(Action<ILoggingBuilder> loggingSetup)
         {
             loggingSetup.ThrowIfNull();
@@ -121,6 +124,7 @@ namespace Tycho.Apps
         /// </summary>
         /// <returns>A fresh and ready to use instance of the application</returns>
         /// <exception cref="InvalidOperationException"/>
+        [ReferencedBySourceGenerator]
         protected async Task<IAppInstance> RunBaseAsync()
         {
             EnsureItIsRunOnlyOnce();
