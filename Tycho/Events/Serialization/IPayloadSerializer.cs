@@ -1,10 +1,12 @@
 ﻿using System;
+using Tycho.Utils;
 
 namespace Tycho.Events.Serialization
 {
     /// <summary>
     /// Serializes and deserializes event payloads for storage and transport.
     /// </summary>
+    [ReferencedBySourceGenerator]
     public interface IPayloadSerializer
     {
         /// <summary>
@@ -28,6 +30,7 @@ namespace Tycho.Events.Serialization
         /// <typeparam name="TEvent">The target event type.</typeparam>
         /// <param name="payload">The serialized payload.</param>
         /// <returns>An instance of <typeparamref name="TEvent"/>.</returns>
+        [ReferencedBySourceGenerator]
         TEvent Deserialize<TEvent>(object payload) where TEvent : class, IEvent;
     }
 }

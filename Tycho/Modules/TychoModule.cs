@@ -98,6 +98,7 @@ namespace Tycho.Modules
         /// Do not override – it is implemented using source generation.
         /// </remarks>
 #pragma warning disable IDE1006
+        [ReferencedBySourceGenerator]
         protected virtual void __AutoSetup__(IServiceCollection module)
         {
             throw new NotImplementedException(

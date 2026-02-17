@@ -26,12 +26,10 @@ namespace Tycho.Utils.SourceGenerator.References
             RequiresWithResponseMethodSignature,
         });
 
-        public static string TypeName => $"{_namespace}.{_typeName}";
-        public static string GlobalTypeName => $"global::{TypeName}";
-        public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
-
         public static string RequestTypeParameterName => "TRequest";
         public static string ResponseTypeParameterName => "TResponse";
+
+        public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
 
         public static MethodSignatureModel ForwardsMethodSignature => new MethodSignatureModel(
             methodName: "Forwards",

@@ -2,6 +2,7 @@ using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
 using Tycho.Utils.SourceGenerator.References;
 using Tycho.Utils.SourceGenerator.References.Microsoft;
+using Tycho.Utils.SourceGenerator.Symbols;
 
 namespace Tycho.Utils.SourceGenerator.TemplateModels
 {
@@ -17,6 +18,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public MethodsTM Methods { get; }
 
+        public SymbolsTM Symbols { get; }
+
         public ModuleDefinitionTM(TychoDefinitionModel tychoDefinitionModel)
         {
             Namespace = tychoDefinitionModel.DefinitionType.Namespace;
@@ -24,6 +27,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             Classes = new ClassesTM(this, tychoDefinitionModel);
             Interfaces = new InterfacesTM(this);
             Methods = new MethodsTM();
+            Symbols = new SymbolsTM();
         }
 
         internal class ClassesTM
@@ -63,6 +67,16 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             {
                 AutoSetupMethod = TychoModuleReference.AutoSetupMethodSignature.MethodName;
                 AddTransientMethod = ServiceCollectionServiceExtensionsReference.AddTransientMethodSignature.MethodName;
+            }
+        }
+
+        internal class SymbolsTM
+        {
+            public string ModuleParameter { get; }
+
+            public SymbolsTM()
+            {
+                ModuleParameter = ModuleDefinitionSymbols.ModuleParameterName;
             }
         }
     }

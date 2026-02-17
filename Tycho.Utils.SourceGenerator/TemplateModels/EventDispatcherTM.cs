@@ -2,6 +2,7 @@ using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
 using Tycho.Utils.SourceGenerator.References;
 using Tycho.Utils.SourceGenerator.References.System;
+using Tycho.Utils.SourceGenerator.Symbols;
 
 namespace Tycho.Utils.SourceGenerator.TemplateModels
 {
@@ -19,6 +20,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public ExceptionsTM Exceptions { get; }
 
+        public MethodsTM Methods { get; }
+
+        public SymbolsTM Symbols { get; }
+
         public string[] Events { get; }
 
         public EventDispatcherTM(EventDispatcherModel eventDispatcherModel)
@@ -29,6 +34,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             Interfaces = new InterfacesTM(this);
             Structs = new StructsTM(this);
             Exceptions = new ExceptionsTM(this);
+            Methods = new MethodsTM();
+            Symbols = new SymbolsTM();
             Events = eventDispatcherModel.Events.Select(e => UseType(e)).ToArray();
         }
 
@@ -81,6 +88,54 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public ExceptionsTM(EventDispatcherTM owner)
             {
                 InvalidOperationException = owner.UseType(InvalidOperationExceptionReference.TypeModel);
+            }
+        }
+
+        internal class MethodsTM
+        {
+            public string DeserializeMethod { get; }
+            public string HandleAsyncMethod { get; }
+            public string GetTypeMethod { get; }
+            public string FullNameProperty { get; }
+
+            public MethodsTM()
+            {
+                DeserializeMethod = IPayloadSerializerReference.DeserializeMethodName;
+                HandleAsyncMethod = IEventHandlerReference.HandleAsyncMethodSignature.MethodName;
+                GetTypeMethod = "GetType";
+                FullNameProperty = "FullName";
+            }
+        }
+
+        internal class SymbolsTM
+        {
+            public string PayloadSerializerField { get; }
+            public string PayloadSerializerParameter { get; }
+            public string DispatchMethod { get; }
+            public string EventIdParameter { get; }
+            public string EventPayloadParameter { get; }
+            public string EventHandlerParameter { get; }
+            public string CancellationTokenParameter { get; }
+            public string CastHandlerVariable { get; }
+            public string DispatchAsMethod { get; }
+            public string TEventTypeParameter { get; }
+            public string DeserializedPayloadVariable { get; }
+            public string ContextVariable { get; }
+
+            public SymbolsTM()
+            {
+                PayloadSerializerField = EventDispatcherSymbols.PayloadSerializerFieldName;
+                PayloadSerializerParameter = EventDispatcherSymbols.PayloadSerializerParameterName;
+                DispatchMethod = EventDispatcherSymbols.DispatchMethodName;
+                EventIdParameter = EventDispatcherSymbols.EventIdParameterName;
+                EventPayloadParameter = EventDispatcherSymbols.EventPayloadParameterName;
+                EventHandlerParameter = EventDispatcherSymbols.EventHandlerParameterName;
+                CancellationTokenParameter = EventDispatcherSymbols.CancellationTokenParameterName;
+                CastHandlerVariable = EventDispatcherSymbols.CastHandlerVariableName;
+                DispatchAsMethod = EventDispatcherSymbols.DispatchAsMethodName;
+                TEventTypeParameter = EventDispatcherSymbols.TEventTypeParameterName;
+                DeserializedPayloadVariable = EventDispatcherSymbols.DeserializedPayloadVariableName;
+                ContextVariable = EventDispatcherSymbols.ContextVariableName;
             }
         }
     }

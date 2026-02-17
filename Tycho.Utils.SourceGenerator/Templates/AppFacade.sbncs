@@ -10,33 +10,33 @@ namespace {{ namespace }}
     public partial class {{ containing_type }}
     {
 {{~ end ~}}
-    public interface {{ interfaces.app_interface }} : {{ interfaces.async_disposable_interface }}
+    public interface {{ interfaces.facade_interface }} : {{ interfaces.async_disposable_interface }}
     {
         {{~ for request in requests ~}}
-        {{ classes.task_class }}{{ if request.has_response }}<{{ request.response_type }}>{{ end }} ExecuteAsync({{ request.request_type }} requestData, {{ structs.cancellation_token_struct }} cancellationToken = default);
+        {{ classes.task_class }}{{ if request.has_response }}<{{ request.response_type }}>{{ end }} {{ methods.execute_async_method }}({{ request.request_type }} {{ parameters.request_data_parameter }}, {{ classes.cancellation_token_class }} {{ parameters.cancellation_token_parameter }} = default);
         
         {{~ end ~}}
     }
 
-    public class {{ classes.facade_class }} : {{ interfaces.app_interface }}
+    public class {{ classes.facade_class }} : {{ interfaces.facade_interface }}
     {
         private readonly {{ interfaces.instance_interface }} _app;
 
-        public {{ classes.facade_class }}({{ interfaces.instance_interface }} app) 
+        public {{ classes.facade_class }}({{ interfaces.instance_interface }} {{ parameters.app_parameter }}) 
         {
-            _app = app;
+            _app = {{ parameters.app_parameter }};
         }
 
         {{~ for request in requests ~}}
-        public {{ classes.task_class }}{{ if request.has_response }}<{{ request.response_type }}>{{ end }} ExecuteAsync({{ request.request_type }} requestData, {{ structs.cancellation_token_struct }} cancellationToken)
+        public {{ classes.task_class }}{{ if request.has_response }}<{{ request.response_type }}>{{ end }} {{ methods.execute_async_method }}({{ request.request_type }} {{ parameters.request_data_parameter }}, {{ classes.cancellation_token_class }} {{ parameters.cancellation_token_parameter }})
         {
-            return _app.ExecuteAsync<{{ request.request_type }}{{ if request.has_response }}, {{ request.response_type }}{{ end }}>(requestData, cancellationToken);
+            return _app.{{ methods.execute_async_method }}<{{ request.request_type }}{{ if request.has_response }}, {{ request.response_type }}{{ end }}>({{ parameters.request_data_parameter }}, {{ parameters.cancellation_token_parameter }});
         }
         
         {{~ end ~}}
-        public async {{ classes.value_task_class }} DisposeAsync()
+        public async {{ classes.value_task_class }} {{ methods.dispose_async_method }}()
         {
-            await _app.DisposeAsync().ConfigureAwait(false);
+            await _app.{{ methods.dispose_async_method }}().{{ methods.configure_await_method }}(false);
         }
     }
 {{~ for containing_type in containing_types ~}}

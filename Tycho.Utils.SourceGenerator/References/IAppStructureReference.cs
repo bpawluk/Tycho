@@ -18,8 +18,6 @@ namespace Tycho.Utils.SourceGenerator.References
             UsesWithContractFulfillmentAndSettingsMethodSignature,
         });
 
-        public static string TypeName => $"{_namespace}.{_typeName}";
-        public static string GlobalTypeName => $"global::{TypeName}";
         public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
 
         public static MethodSignatureModel UsesMethodSignature => new MethodSignatureModel(

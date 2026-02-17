@@ -15,24 +15,24 @@ namespace {{ namespace }}
         /// <summary>
         /// Supplies global configuration for the application and its modules.
         /// </summary>
-        /// <param name="globalConfiguration">Configuration to be used</param>
+        /// <param name="{{ parameters.global_configuration_parameter }}">Configuration to be used</param>
         /// <returns>The current <see cref="{{ classes.app_class }}"/> instance.</returns>
-        /// <exception cref="{{ exceptions.argument_null_exception }}"/>"
-        public {{ classes.app_class }} WithConfiguration({{ interfaces.configuration_interface }} globalConfiguration)
+        /// <exception cref="{{ exceptions.argument_null_exception }}"/>
+        public {{ classes.app_class }} {{ methods.with_configuration_method }}({{ interfaces.configuration_interface }} {{ parameters.global_configuration_parameter }})
         {
-            {{ methods.with_configuration_base_method }}(globalConfiguration);
+            {{ methods.with_configuration_base_method }}({{ parameters.global_configuration_parameter }});
             return this;
         }
 
         /// <summary>
         /// Supplies logging setup for the application and its modules.
         /// </summary>
-        /// <param name="loggingSetup">Logging setup to be used</param>
+        /// <param name="{{ parameters.logging_setup_parameter }}">Logging setup to be used</param>
         /// <returns>The current <see cref="{{ classes.app_class }}"/> instance.</returns>
-        /// <exception cref="{{ exceptions.argument_null_exception }}"/>"
-        public {{ classes.app_class }} WithLogging({{ classes.action_class }}<{{ interfaces.logging_builder_interface }}> loggingSetup)
+        /// <exception cref="{{ exceptions.argument_null_exception }}"/>
+        public {{ classes.app_class }} {{ methods.with_logging_method }}({{ classes.action_class }}<{{ interfaces.logging_builder_interface }}> {{ parameters.logging_setup_parameter }})
         {
-            {{ methods.with_logging_base_method }}(loggingSetup);
+            {{ methods.with_logging_base_method }}({{ parameters.logging_setup_parameter }});
             return this;
         }
 
@@ -41,15 +41,15 @@ namespace {{ namespace }}
         /// </summary>
         /// <returns>A fresh and ready to use instance of the application</returns>
         /// <exception cref="{{ exceptions.invalid_operation_exception }}"/>
-        public async {{ classes.task_class }}<{{ interfaces.app_interface }}> RunAsync()
+        public async {{ classes.task_class }}<{{ interfaces.facade_interface }}> {{ methods.run_async_method }}()
         {
-            var app = await {{ methods.run_base_method }}().ConfigureAwait(false);
-            return new {{ classes.facade_class }}(app);
+            var appInstance = await {{ methods.run_base_method }}().{{ methods.configure_await_method }}(false);
+            return new {{ classes.facade_class }}(appInstance);
         }
 
-        protected override void {{ methods.auto_setup_method }}({{ interfaces.service_collection_interface }} app)
+        protected override void {{ methods.auto_setup_method }}({{ interfaces.service_collection_interface }} {{ parameters.app_parameter }})
         {
-            {{classes.service_collection_service_extensions_class}}.{{ methods.add_transient_method }}<{{ interfaces.event_handling_dispatcher_interface }}, {{ classes.event_dispatcher_class }}>(app);
+            {{classes.service_collection_service_extensions_class}}.{{ methods.add_transient_method }}<{{ interfaces.event_handling_dispatcher_interface }}, {{ classes.event_dispatcher_class }}>({{ parameters.app_parameter }});
         }
     }
 {{~ for containing_type in containing_types ~}}

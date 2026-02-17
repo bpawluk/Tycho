@@ -14,11 +14,9 @@ namespace Tycho.Utils.SourceGenerator.References
             HandlesMethodSignature,
         });
 
-        public static string TypeName => $"{_namespace}.{_typeName}";
-        public static string GlobalTypeName => $"global::{TypeName}";
-        public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
-
         public static string EventTypeParameterName => "TEvent";
+
+        public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
 
         public static MethodSignatureModel HandlesMethodSignature => new MethodSignatureModel(
             methodName: "Handles",

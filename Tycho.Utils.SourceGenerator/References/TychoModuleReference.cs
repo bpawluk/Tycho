@@ -10,8 +10,8 @@ namespace Tycho.Utils.SourceGenerator.References
         private const string _namespace = "Tycho.Modules";
         private const string _typeName = "TychoModule";
 
-        public static string TypeName => $"{_namespace}.{_typeName}";
-        public static string GlobalTypeName => $"global::{TypeName}";
+        public static string FullName => $"{_namespace}.{_typeName}";
+
         public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
 
         public static MethodSignatureModel DefineContractMethodSignature => new MethodSignatureModel(

@@ -10,16 +10,16 @@ namespace Tycho.Utils.SourceGenerator.References.Microsoft
 
         public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
 
-        public static MethodSignatureModel AddTransientMethodSignature => new MethodSignatureModel(
-            methodName: "AddTransient",
+        public static MethodSignatureModel AddSingletonMethodSignature => new MethodSignatureModel(
+            methodName: "AddSingleton",
             parameters: new ImmutableEquatableArray<TypeModel>(new[]
             {
                 IServiceCollectionReference.TypeModel,
             }),
             result: IServiceCollectionReference.TypeModel);
 
-        public static MethodSignatureModel AddSingletonMethodSignature => new MethodSignatureModel(
-            methodName: "AddSingleton",
+        public static MethodSignatureModel AddTransientMethodSignature => new MethodSignatureModel(
+            methodName: "AddTransient",
             parameters: new ImmutableEquatableArray<TypeModel>(new[]
             {
                 IServiceCollectionReference.TypeModel,

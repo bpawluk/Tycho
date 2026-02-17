@@ -18,20 +18,20 @@ namespace {{ namespace }}
         /// <summary>
         /// Sets up and runs the specified Tycho application and registers it in the host application builder.
         /// </summary>
-        /// <param name="builder">The host application builder to extend.</param>
-        /// <param name="app">An instance of the application to run.</param>
+        /// <param name="{{ parameters.builder_parameter }}">The host application builder to extend.</param>
+        /// <param name="{{ parameters.app_parameter }}">An instance of the application to run.</param>
         /// <returns>The host application builder.</returns>
-        public static async {{ classes.task_class }}<{{ interfaces.host_application_builder_interface }}> {{ methods.add_app_method }}(this {{ interfaces.host_application_builder_interface }} builder, {{ classes.app_class }} app)
+        public static async {{ classes.task_class }}<{{ interfaces.host_application_builder_interface }}> {{ methods.add_app_method }}(this {{ interfaces.host_application_builder_interface }} {{ parameters.builder_parameter }}, {{ classes.app_class }} {{ parameters.app_parameter }})
         {
-            var appInstance = await app
-                .WithConfiguration(builder.Configuration)
-                .WithLogging(logging => {{ classes.logging_configuration_class }}.{{ methods.configure_logging_method }}(logging, builder.Configuration))
-                .RunAsync()
-                .ConfigureAwait(false);
+            var appInstance = await {{ parameters.app_parameter }}
+                .{{ methods.with_configuration_method }}({{ parameters.builder_parameter }}.{{ properties.configuration_property }})
+                .{{ methods.with_logging_method }}({{ parameters.logging_parameter }} => {{ classes.logging_configuration_class }}.{{ methods.configure_logging_method }}({{ parameters.logging_parameter }}, {{ parameters.builder_parameter }}.{{ properties.configuration_property }}))
+                .{{ methods.run_async_method }}()
+                .{{ methods.configure_await_method }}(false);
 
-            {{ classes.service_collection_service_extensions_class }}.{{ methods.add_singleton_method }}(builder.Services, appInstance);
+            {{ classes.service_collection_service_extensions_class }}.{{ methods.add_singleton_method }}({{ parameters.builder_parameter }}.{{ properties.services_property }}, appInstance);
 
-            return builder;
+            return {{ parameters.builder_parameter }};
         }
     }
 {{~ for containing_type in containing_types ~}}

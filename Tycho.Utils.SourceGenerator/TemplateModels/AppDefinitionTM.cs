@@ -3,6 +3,7 @@ using Tycho.Utils.SourceGenerator.Models;
 using Tycho.Utils.SourceGenerator.References;
 using Tycho.Utils.SourceGenerator.References.Microsoft;
 using Tycho.Utils.SourceGenerator.References.System;
+using Tycho.Utils.SourceGenerator.Symbols;
 
 namespace Tycho.Utils.SourceGenerator.TemplateModels
 {
@@ -18,6 +19,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public MethodsTM Methods { get; }
 
+        public ParametersVM Parameters { get; }
+
         public ExceptionsTM Exceptions { get; }
 
         public AppDefinitionTM(TychoDefinitionModel tychoDefinitionModel)
@@ -27,6 +30,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             Classes = new ClassesTM(this, tychoDefinitionModel);
             Interfaces = new InterfacesTM(this, tychoDefinitionModel);
             Methods = new MethodsTM();
+            Parameters = new ParametersVM();
             Exceptions = new ExceptionsTM(this);
         }
 
@@ -44,8 +48,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             {
                 AppClass = tychoDefinitionModel.DefinitionType.Name;
                 BaseClass = owner.UseType(TychoAppReference.TypeModel);
-                FacadeClass = $"{AppClass}Facade";
-                EventDispatcherClass = $"{AppClass}EventDispatcher";
+                FacadeClass = AppFacadeSymbols.GetAppFacadeClass(AppClass);
+                EventDispatcherClass = EventDispatcherSymbols.GetEventDispatcherClass(AppClass);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 ActionClass = owner.UseType(ActionReference.TypeModel);
                 ServiceCollectionServiceExtensionsClass = owner.UseType(ServiceCollectionServiceExtensionsReference.TypeModel);
@@ -54,7 +58,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         internal class InterfacesTM 
         { 
-            public string AppInterface { get; }
+            public string FacadeInterface { get; }
             public string ConfigurationInterface { get; }
             public string LoggingBuilderInterface { get; }
             public string ServiceCollectionInterface { get; }
@@ -62,7 +66,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(AppDefinitionTM owner, TychoDefinitionModel tychoDefinitionModel)
             {
-                AppInterface = $"I{tychoDefinitionModel.DefinitionType.Name}";
+                FacadeInterface = AppFacadeSymbols.GetAppFacadeInterface(tychoDefinitionModel.DefinitionType.Name);
                 ConfigurationInterface = owner.UseType(IConfigurationReference.TypeModel);
                 LoggingBuilderInterface = owner.UseType(ILoggingBuilderReference.TypeModel);
                 ServiceCollectionInterface = owner.UseType(IServiceCollectionReference.TypeModel);
@@ -77,6 +81,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string RunBaseMethod { get; }
             public string AutoSetupMethod { get; }
             public string AddTransientMethod { get; }
+            public string ConfigureAwaitMethod { get; }
+            public string WithConfigurationMethod { get; }
+            public string WithLoggingMethod { get; }
+            public string RunAsyncMethod { get; }
 
             public MethodsTM()
             {
@@ -85,6 +93,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 RunBaseMethod = TychoAppReference.RunBaseAsyncMethodSignature.MethodName;
                 AutoSetupMethod = TychoAppReference.AutoSetupMethodSignature.MethodName;
                 AddTransientMethod = ServiceCollectionServiceExtensionsReference.AddTransientMethodSignature.MethodName;
+                ConfigureAwaitMethod = TaskReference.ConfigureAwaitMethodSignature.MethodName; 
+                WithConfigurationMethod = AppDefinitionSymbols.WithConfigurationMethod;
+                WithLoggingMethod = AppDefinitionSymbols.WithLoggingMethod;
+                RunAsyncMethod = AppDefinitionSymbols.RunAsyncMethod;
             }
         }
 
@@ -97,6 +109,20 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             {
                 ArgumentNullException = owner.UseType(ArgumentNullExceptionReference.TypeModel);
                 InvalidOperationException = owner.UseType(InvalidOperationExceptionReference.TypeModel);
+            }
+        }
+
+        internal class ParametersVM
+        {
+            public string GlobalConfigurationParameter { get; }
+            public string LoggingSetupParameter { get; }
+            public string AppParameter { get; }
+
+            public ParametersVM()
+            {
+                GlobalConfigurationParameter = AppDefinitionSymbols.GlobalConfigurationParameter;
+                LoggingSetupParameter = AppDefinitionSymbols.LoggingSetupParameter;
+                AppParameter = AppDefinitionSymbols.AppParameter;
             }
         }
     }

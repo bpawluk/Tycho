@@ -1,11 +1,13 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Tycho.Utils;
 
 namespace Tycho.Requests
 {
     /// <summary>
     /// An interface for executing requests.
     /// </summary>
+    [ReferencedBySourceGenerator]
     public interface IRequestExecutor
     {
         /// <summary>
@@ -14,6 +16,7 @@ namespace Tycho.Requests
         /// <typeparam name="TRequest">The type of the request to execute.</typeparam>
         /// <param name="requestData">The data of the request to execute.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
+        [ReferencedBySourceGenerator]
         Task ExecuteAsync<TRequest>(TRequest requestData, CancellationToken cancellationToken = default)
             where TRequest : class, IRequest;
 
@@ -25,6 +28,7 @@ namespace Tycho.Requests
         /// <param name="requestData">The data of the request to execute.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
         /// <returns>A response of type <typeparamref name="TResponse"/>.</returns>
+        [ReferencedBySourceGenerator]
         Task<TResponse> ExecuteAsync<TRequest, TResponse>(TRequest requestData, CancellationToken cancellationToken = default)
             where TRequest : class, IRequest<TResponse>;
     }

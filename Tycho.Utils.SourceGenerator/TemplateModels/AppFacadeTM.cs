@@ -3,6 +3,7 @@ using Tycho.Utils.SourceGenerator.Models;
 using Tycho.Utils.SourceGenerator.Models.Tycho;
 using Tycho.Utils.SourceGenerator.References;
 using Tycho.Utils.SourceGenerator.References.System;
+using Tycho.Utils.SourceGenerator.Symbols;
 
 namespace Tycho.Utils.SourceGenerator.TemplateModels
 {
@@ -16,7 +17,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public InterfacesTM Interfaces { get; }
 
-        public StructsTM Structs { get; }
+        public MethodsTM Methods { get; }
+
+        public ParametersTM Parameters { get; }
 
         public RequestTM[] Requests { get; }
 
@@ -26,7 +29,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             ContainingTypes = tychoFacadeModel.DefinitionType.ContainingTypes.ToArray();
             Classes = new ClassesTM(this, tychoFacadeModel);
             Interfaces = new InterfacesTM(this, tychoFacadeModel);
-            Structs = new StructsTM(this);
+            Methods = new MethodsTM();
+            Parameters = new ParametersTM();
             Requests = tychoFacadeModel.Requests.Select(r => new RequestTM(this, r)).ToArray();
         }
 
@@ -36,37 +40,57 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string FacadeClass { get; }
             public string TaskClass { get; }
             public string ValueTaskClass { get; }
+            public string CancellationTokenClass { get; }
 
             public ClassesTM(AppFacadeTM owner, TychoFacadeModel tychoFacadeModel)
             {
                 AppClass = tychoFacadeModel.DefinitionType.Name;
-                FacadeClass = $"{AppClass}Facade";
+                FacadeClass = AppFacadeSymbols.GetAppFacadeClass(AppClass);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 ValueTaskClass = owner.UseType(ValueTaskReference.TypeModel);
+                CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);
             }
         }
 
         internal class InterfacesTM
         {
-            public string AppInterface { get; }
+            public string FacadeInterface { get; }
             public string AsyncDisposableInterface { get; }
             public string InstanceInterface { get; }
 
             public InterfacesTM(AppFacadeTM owner, TychoFacadeModel tychoFacadeModel)
             {
-                AppInterface = $"I{tychoFacadeModel.DefinitionType.Name}";
+                FacadeInterface = AppFacadeSymbols.GetAppFacadeInterface(tychoFacadeModel.DefinitionType.Name);
                 AsyncDisposableInterface = owner.UseType(IAsyncDisposableReference.TypeModel);
                 InstanceInterface = owner.UseType(IAppInstanceReference.TypeModel);
             }
         }
 
-        internal class StructsTM
+        internal class MethodsTM
         {
-            public string CancellationTokenStruct { get; }
+            public string ExecuteAsyncMethod { get; }
+            public string DisposeAsyncMethod { get; }
+            public string ConfigureAwaitMethod { get; }
 
-            public StructsTM(AppFacadeTM owner)
+            public MethodsTM()
             {
-                CancellationTokenStruct = owner.UseType(CancellationTokenReference.TypeModel);
+                ExecuteAsyncMethod = IAppInstanceReference.ExecuteAsyncMethodSignature.MethodName;
+                DisposeAsyncMethod = IAsyncDisposableReference.DisposeAsyncMethodSignature.MethodName;
+                ConfigureAwaitMethod = ValueTaskReference.ConfigureAwaitMethodSignature.MethodName;
+            }
+        }
+
+        internal class ParametersTM
+        {
+            public string AppParameter { get; }
+            public string RequestDataParameter { get; }
+            public string CancellationTokenParameter { get; }
+
+            public ParametersTM()
+            {
+                AppParameter = AppFacadeSymbols.AppParameter;
+                RequestDataParameter = AppFacadeSymbols.RequestDataParameter;
+                CancellationTokenParameter = AppFacadeSymbols.CancellationTokenParameter;
             }
         }
 

@@ -18,7 +18,7 @@ namespace Tycho.Utils.SourceGenerator
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             var tychoPipelineBase = context.SyntaxProvider.ForAttributeWithMetadataName(
-                fullyQualifiedMetadataName: TychoDefinitionAttributeReference.TypeName,
+                fullyQualifiedMetadataName: TychoDefinitionAttributeReference.FullName,
                 predicate: GetTychoPipelineBasePredicate,
                 transform: GetTychoPipelineBaseTransform);
 
@@ -56,13 +56,13 @@ namespace Tycho.Utils.SourceGenerator
             }
 
             var compilation = context.SemanticModel.Compilation;
-            var tychoAppSymbol = compilation.GetTypeByMetadataName(TychoAppReference.TypeName);
+            var tychoAppSymbol = compilation.GetTypeByMetadataName(TychoAppReference.FullName);
             if (tychoAppSymbol != null && TypeInheritsFrom(typeSymbol, tychoAppSymbol))
             {
                 return TychoDefinitionKind.App;
             }
 
-            var tychoModuleSymbol = compilation.GetTypeByMetadataName(TychoModuleReference.TypeName);
+            var tychoModuleSymbol = compilation.GetTypeByMetadataName(TychoModuleReference.FullName);
             if (tychoModuleSymbol != null && TypeInheritsFrom(typeSymbol, tychoModuleSymbol))
             {
                 return TychoDefinitionKind.Module;

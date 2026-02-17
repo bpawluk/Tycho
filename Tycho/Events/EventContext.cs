@@ -1,4 +1,5 @@
 ﻿using System;
+using Tycho.Utils;
 
 namespace Tycho.Events
 {
@@ -6,6 +7,7 @@ namespace Tycho.Events
     /// Represents an event being handled by an <see cref="IEventHandler{TEvent}"/> together with its metadata.
     /// </summary>
     /// <typeparam name="TEvent">The type of the event payload.</typeparam>
+    [ReferencedBySourceGenerator]
     public class EventContext<TEvent> where TEvent : class, IEvent
     {
         /// <summary>
@@ -23,6 +25,7 @@ namespace Tycho.Events
         /// </summary>
         /// <param name="id">The event identifier.</param>
         /// <param name="payload">The event payload.</param>
+        [ReferencedBySourceGenerator]
         public EventContext(Guid id, TEvent payload)
         {
             Id = id;

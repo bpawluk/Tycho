@@ -9,5 +9,10 @@ namespace Tycho.Utils.SourceGenerator.References.System
         private const string _typeName = "IAsyncDisposable";
 
         public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
+
+        public static MethodSignatureModel DisposeAsyncMethodSignature => new MethodSignatureModel(
+            methodName: "DisposeAsync",
+            parameters: ImmutableEquatableArray<TypeModel>.Empty,
+            result: ValueTaskReference.TypeModel);
     }
 }

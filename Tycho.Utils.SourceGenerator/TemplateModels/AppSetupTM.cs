@@ -3,6 +3,7 @@ using Tycho.Utils.SourceGenerator.Models;
 using Tycho.Utils.SourceGenerator.References;
 using Tycho.Utils.SourceGenerator.References.Microsoft;
 using Tycho.Utils.SourceGenerator.References.System;
+using Tycho.Utils.SourceGenerator.Symbols;
 
 namespace Tycho.Utils.SourceGenerator.TemplateModels
 {
@@ -18,6 +19,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public MethodsTM Methods { get; }
 
+        public PropertiesTM Properties { get; }
+
+        public ParametersTM Parameters { get; }
+
         public AppSetupTM(TychoSetupModel tychoSetupModel)
         {
             Namespace = tychoSetupModel.DefinitionType.Namespace;
@@ -25,6 +30,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             Classes = new ClassesTM(this, tychoSetupModel);
             Interfaces = new InterfacesTM(this);
             Methods = new MethodsTM(tychoSetupModel);
+            Properties = new PropertiesTM();
+            Parameters = new ParametersTM();
         }
 
         internal class ClassesTM
@@ -38,7 +45,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public ClassesTM(AppSetupTM owner, TychoSetupModel tychoSetupModel)
             {
                 AppClass = tychoSetupModel.DefinitionType.Name;
-                SetupExtensionsClass = $"{AppClass}SetupExtensions";
+                SetupExtensionsClass = AppSetupSymbols.GetAppSetupExtensionsClass(AppClass);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 LoggingConfigurationClass = owner.UseType(LoggingConfigurationReference.TypeModel);
                 ServiceCollectionServiceExtensionsClass = owner.UseType(ServiceCollectionServiceExtensionsReference.TypeModel);
@@ -60,12 +67,46 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string AddAppMethod { get; }
             public string ConfigureLoggingMethod { get; }
             public string AddSingletonMethod { get; }
+            public string WithConfigurationMethod { get; }
+            public string WithLoggingMethod { get; }
+            public string RunAsyncMethod { get; }
+            public string ConfigureAwaitMethod { get; }
 
             public MethodsTM(TychoSetupModel tychoSetupModel)
             {
-                AddAppMethod = $"Add{tychoSetupModel.DefinitionType.Name}";
-                ConfigureLoggingMethod = LoggingConfigurationReference.ConfigureLoggingMethodSignature.MethodName;
+                AddAppMethod = AppSetupSymbols.GetAddAppMethod(tychoSetupModel.DefinitionType.Name);
+                WithConfigurationMethod = AppDefinitionSymbols.WithConfigurationMethod;
+                WithLoggingMethod = AppDefinitionSymbols.WithLoggingMethod;
+                RunAsyncMethod = AppDefinitionSymbols.RunAsyncMethod;
                 AddSingletonMethod = ServiceCollectionServiceExtensionsReference.AddSingletonMethodSignature.MethodName;
+                ConfigureLoggingMethod = LoggingConfigurationReference.ConfigureLoggingMethodSignature.MethodName;
+                ConfigureAwaitMethod = TaskReference.ConfigureAwaitMethodSignature.MethodName;         
+            }
+        }
+
+        internal class PropertiesTM
+        {
+            public string ConfigurationProperty { get; }
+            public string ServicesProperty { get; }
+
+            public PropertiesTM()
+            {
+                ConfigurationProperty = IHostApplicationBuilderReference.ConfigurationProperty;
+                ServicesProperty = IHostApplicationBuilderReference.ServicesProperty;
+            }
+        }
+
+        internal class ParametersTM
+        {
+            public string AppParameter { get; }
+            public string BuilderParameter { get; }
+            public string LoggingParameter { get; }
+
+            public ParametersTM()
+            {
+                AppParameter = AppSetupSymbols.AppParameter;
+                BuilderParameter = AppSetupSymbols.BuilderParameter;
+                LoggingParameter = AppSetupSymbols.LoggingParameter;
             }
         }
     }
