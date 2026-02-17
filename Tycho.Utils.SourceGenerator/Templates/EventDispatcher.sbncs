@@ -45,8 +45,8 @@ namespace {{ namespace }}
             {{ structs.cancellation_token_struct }} cancellationToken)
             where TEvent : class, {{ interfaces.event_interface }}
         {
-            var deserializedPyaload = _payloadSerializer.Deserialize<TEvent>(eventPayload);
-            var context = new {{ classes.event_context_class }}<TEvent>(eventId, deserializedPyaload);
+            var deserializedPayload = _payloadSerializer.Deserialize<TEvent>(eventPayload);
+            var context = new {{ classes.event_context_class }}<TEvent>(eventId, deserializedPayload);
             await eventHandler.HandleAsync(context, cancellationToken);
         }
     }
