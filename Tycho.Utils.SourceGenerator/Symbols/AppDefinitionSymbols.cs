@@ -9,5 +9,6 @@
         public const string GlobalConfigurationParameter = "globalConfiguration";
         public const string LoggingSetupParameter = "loggingSetup";
         public const string AppParameter = "app";
+        public const string ProviderParameter = "provider";
     }
 }

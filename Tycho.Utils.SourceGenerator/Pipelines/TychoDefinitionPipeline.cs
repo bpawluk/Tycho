@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
@@ -21,7 +20,13 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             this IncrementalGeneratorInitializationContext context,
             IncrementalValuesProvider<(TychoDefinitionKind, ClassDefinitionModel)> pipelineBase)
         {
-            var getTychoDefinitionModelStepResult = pipelineBase
+            var getIncludeModulesMethodDefinitionStepResult = pipelineBase
+                .Select(GetIncludeModulesMethodDefinitionStepTransform);
+
+            var getSubmoduleMethodInvocationsStepResult = getIncludeModulesMethodDefinitionStepResult
+                .Select(GetSubmoduleMethodInvocationsStepTransform);
+
+            var getTychoDefinitionModelStepResult = getSubmoduleMethodInvocationsStepResult
                 .Select(GetTychoDefinitionModelStepTransform);
 
             context.RegisterSourceOutput(
@@ -39,10 +44,39 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             return context;
         }
 
-        private static TychoDefinitionModel GetTychoDefinitionModelStepTransform((TychoDefinitionKind Kind, ClassDefinitionModel Model) input, CancellationToken token)
+        private static (TychoDefinitionKind DefinitionKind, MethodDefinitionModel Method) GetIncludeModulesMethodDefinitionStepTransform(
+            (TychoDefinitionKind DefinitionKind, ClassDefinitionModel Model) input,
+            CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            return new TychoDefinitionModel(input.Model.ClassType, input.Kind, null); // TODO support submodules
+            return (input.DefinitionKind, input.Model.Methods.FirstOrDefault(method => method.Signature.IsIncludeModulesMethod));
+        }
+
+        private static (TychoDefinitionKind DefinitionKind, TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) GetSubmoduleMethodInvocationsStepTransform(
+            (TychoDefinitionKind DefinitionKind, MethodDefinitionModel Method) input,
+            CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            var invocations = input.Method.Body
+                .Where(invocation => invocation.Signature.IsSubmoduleDefiningMethod)
+                .ToImmutableEquatableArray();
+            return (input.DefinitionKind, input.Method.ContainingType, invocations);
+        }
+
+        private static TychoDefinitionModel GetTychoDefinitionModelStepTransform(
+            (TychoDefinitionKind DefinitionKind, TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) input,
+            CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            return new TychoDefinitionModel(
+                input.DefinitionType,
+                input.DefinitionKind,
+                input.MethodInvocations
+                    .Select(invocation => invocation.TypeArguments
+                        .Single(argument => argument.IsModuleType)
+                        .Value)
+                    .Distinct()
+                    .ToImmutableEquatableArray());
         }
 
         private static object CreateTemplateModel(TychoDefinitionModel model)

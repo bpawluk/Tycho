@@ -28,6 +28,14 @@ namespace Tycho.Utils.SourceGenerator.Models.System
             IAppEventsReference.EventDefiningMethods.Contains(this) ||
             IModuleEventsReference.EventDefiningMethods.Contains(this);
 
+        public bool IsIncludeModulesMethod =>
+            TychoAppReference.IncludeModulesMethodSignature.Equals(this) ||
+            TychoModuleReference.IncludeModulesMethodSignature.Equals(this);
+
+        public bool IsSubmoduleDefiningMethod =>
+            IAppStructureReference.SubmoduleDefiningMethods.Contains(this) ||
+            IModuleStructureReference.SubmoduleDefiningMethods.Contains(this);
+
         public MethodSignatureModel(
             string methodName,
             ImmutableEquatableArray<TypeModel> parameters,

@@ -18,6 +18,8 @@ namespace Tycho.Utils.SourceGenerator.References
             UsesWithContractFulfillmentAndSettingsMethodSignature,
         });
 
+        public static string ModuleTypeParameterName => "TModule";
+
         public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
 
         public static MethodSignatureModel UsesMethodSignature => new MethodSignatureModel(

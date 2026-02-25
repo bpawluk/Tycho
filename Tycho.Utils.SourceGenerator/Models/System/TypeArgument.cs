@@ -22,6 +22,10 @@ namespace Tycho.Utils.SourceGenerator.Models.System
             Name == IAppEventsReference.EventTypeParameterName || 
             Name == IModuleEventsReference.EventTypeParameterName;
 
+        public bool IsModuleType =>
+            Name == IAppStructureReference.ModuleTypeParameterName ||
+            Name == IModuleStructureReference.ModuleTypeParameterName;
+
         public TypeArgument(string name, TypeModel value)
         {
             Name = name;

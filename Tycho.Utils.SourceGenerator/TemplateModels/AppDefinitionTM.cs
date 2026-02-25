@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
+using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.References;
 using Tycho.Utils.SourceGenerator.References.Microsoft;
 using Tycho.Utils.SourceGenerator.References.System;
@@ -23,6 +24,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public ExceptionsTM Exceptions { get; }
 
+        public SubmoduleTM[] Submodules { get; }
+
         public AppDefinitionTM(TychoDefinitionModel tychoDefinitionModel)
         {
             Namespace = tychoDefinitionModel.DefinitionType.Namespace;
@@ -32,6 +35,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             Methods = new MethodsTM();
             Parameters = new ParametersVM();
             Exceptions = new ExceptionsTM(this);
+            Submodules = tychoDefinitionModel.Submodules.Select(s => new SubmoduleTM(this, s)).ToArray();
         }
 
         internal class ClassesTM 
@@ -43,6 +47,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string TaskClass { get; }
             public string ActionClass { get; }
             public string ServiceCollectionServiceExtensionsClass { get; }
+            public string ServiceProviderServiceExtensionsClass { get; }
 
             public ClassesTM(AppDefinitionTM owner, TychoDefinitionModel tychoDefinitionModel)
             {
@@ -53,6 +58,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 ActionClass = owner.UseType(ActionReference.TypeModel);
                 ServiceCollectionServiceExtensionsClass = owner.UseType(ServiceCollectionServiceExtensionsReference.TypeModel);
+                ServiceProviderServiceExtensionsClass = owner.UseType(ServiceProviderServiceExtensionsReference.TypeModel);
             }
         }
 
@@ -63,6 +69,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string LoggingBuilderInterface { get; }
             public string ServiceCollectionInterface { get; }
             public string EventHandlingDispatcherInterface { get; }
+            public string ModuleInstanceInterface { get; }
 
             public InterfacesTM(AppDefinitionTM owner, TychoDefinitionModel tychoDefinitionModel)
             {
@@ -71,6 +78,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 LoggingBuilderInterface = owner.UseType(ILoggingBuilderReference.TypeModel);
                 ServiceCollectionInterface = owner.UseType(IServiceCollectionReference.TypeModel);
                 EventHandlingDispatcherInterface = owner.UseType(IEventHandlingDispatcherReference.TypeModel);
+                ModuleInstanceInterface = owner.UseType(IModuleInstanceReference.TypeModel);
             }
         }
 
@@ -85,6 +93,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string WithConfigurationMethod { get; }
             public string WithLoggingMethod { get; }
             public string RunAsyncMethod { get; }
+            public string GetRequiredServiceMethod { get; }
 
             public MethodsTM()
             {
@@ -97,6 +106,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 WithConfigurationMethod = AppDefinitionSymbols.WithConfigurationMethod;
                 WithLoggingMethod = AppDefinitionSymbols.WithLoggingMethod;
                 RunAsyncMethod = AppDefinitionSymbols.RunAsyncMethod;
+                GetRequiredServiceMethod = ServiceProviderServiceExtensionsReference.GetRequiredServiceMethodSignature.MethodName;
             }
         }
 
@@ -117,12 +127,28 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string GlobalConfigurationParameter { get; }
             public string LoggingSetupParameter { get; }
             public string AppParameter { get; }
+            public string ProviderParameter { get; }
 
             public ParametersVM()
             {
                 GlobalConfigurationParameter = AppDefinitionSymbols.GlobalConfigurationParameter;
                 LoggingSetupParameter = AppDefinitionSymbols.LoggingSetupParameter;
                 AppParameter = AppDefinitionSymbols.AppParameter;
+                ProviderParameter = AppDefinitionSymbols.ProviderParameter;
+            }
+        }
+
+        internal class SubmoduleTM
+        {
+            public string ModuleClass { get; }
+            public string FacadeInterface { get; }
+            public string FacadeClass { get; }
+
+            public SubmoduleTM(AppDefinitionTM owner, TypeModel moduleType)
+            {
+                ModuleClass = owner.UseType(moduleType);
+                FacadeInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(ModuleClass);
+                FacadeClass = ModuleFacadeSymbols.GetModuleFacadeClass(ModuleClass);
             }
         }
     }

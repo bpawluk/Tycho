@@ -1,15 +1,14 @@
 ﻿using Tycho.IntegrationTests.SendingRequestsHorizontally.SUT.Modules.Alpha;
 using Tycho.IntegrationTests.SendingRequestsHorizontally.SUT.Modules.Beta;
 using Tycho.Requests;
-using Tycho.Structure;
 
 namespace Tycho.IntegrationTests.SendingRequestsHorizontally.SUT.Handlers;
 
-internal class AlphaOutRequestHandler(IModuleInstance<BetaModule> betaModule)
+internal class AlphaOutRequestHandler(IBetaModule betaModule)
     : IRequestHandler<AlphaOutRequest>
     , IRequestHandler<AlphaOutRequestWithResponse, string>
 {
-    private readonly IModuleInstance<BetaModule> _betaModule = betaModule;
+    private readonly IBetaModule _betaModule = betaModule;
 
     public Task HandleAsync(AlphaOutRequest requestData, CancellationToken cancellationToken)
     {
@@ -20,8 +19,6 @@ internal class AlphaOutRequestHandler(IModuleInstance<BetaModule> betaModule)
     public Task<string> HandleAsync(AlphaOutRequestWithResponse requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        return _betaModule.ExecuteAsync<BetaInRequestWithResponse, string>(
-            new BetaInRequestWithResponse(requestData.Result),
-            cancellationToken);
+        return _betaModule.ExecuteAsync(new BetaInRequestWithResponse(requestData.Result), cancellationToken);
     }
 }
