@@ -18,7 +18,7 @@ namespace {{ namespace }}
         {{~ end ~}}
     }
 
-    public class {{ classes.facade_class }} : {{ interfaces.facade_interface }}
+    internal class {{ classes.facade_class }} : {{ interfaces.facade_interface }}
     {
         private readonly {{ interfaces.instance_interface }} _app;
 
