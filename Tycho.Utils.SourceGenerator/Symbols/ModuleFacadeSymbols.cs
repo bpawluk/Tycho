@@ -2,9 +2,9 @@ namespace Tycho.Utils.SourceGenerator.Symbols
 {
     internal static class ModuleFacadeSymbols
     {
-        public const string ModuleParameterName = "module";
-        public const string RequestDataParameterName = "requestData";
-        public const string CancellationTokenParameterName = "cancellationToken";
+        public const string ModuleParameter = "module";
+        public const string RequestDataParameter = "requestData";
+        public const string CancellationTokenParameter = "cancellationToken";
 
         public static string GetModuleFacadeClass(string moduleClass) => $"{moduleClass}Facade";
 

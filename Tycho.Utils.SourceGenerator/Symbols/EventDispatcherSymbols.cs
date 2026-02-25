@@ -2,13 +2,13 @@ namespace Tycho.Utils.SourceGenerator.Symbols
 {
     internal static class EventDispatcherSymbols
     {
-        public const string DispatchMethodName = "Dispatch";
+        public const string DispatchMethod = "Dispatch";
 
-        public const string EventIdParameterName = "eventId";
-        public const string EventPayloadParameterName = "eventPayload";
-        public const string EventHandlerParameterName = "eventHandler";
-        public const string PayloadSerializerParameterName = "payloadSerializer";
-        public const string CancellationTokenParameterName = "cancellationToken";
+        public const string EventIdParameter = "eventId";
+        public const string EventPayloadParameter = "eventPayload";
+        public const string EventHandlerParameter = "eventHandler";
+        public const string PayloadSerializerParameter = "payloadSerializer";
+        public const string CancellationTokenParameter = "cancellationToken";
 
         public static string GetEventDispatcherClass(string appClass) => $"{appClass}EventDispatcher";
     }

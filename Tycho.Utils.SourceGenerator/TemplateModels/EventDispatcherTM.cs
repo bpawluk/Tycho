@@ -97,7 +97,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 DeserializeMethod = IPayloadSerializerReference.DeserializeMethodSignature.MethodName;
                 HandleAsyncMethod = IEventHandlerReference.HandleAsyncMethodSignature.MethodName;
                 GetTypeMethod = ObjectReference.GetTypeMethodSignature.MethodName;
-                DispatchMethod = EventDispatcherSymbols.DispatchMethodName;
+                DispatchMethod = EventDispatcherSymbols.DispatchMethod;
             }
         }
 
@@ -121,11 +121,11 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public ParametersTM()
             {
-                PayloadSerializerParameter = EventDispatcherSymbols.PayloadSerializerParameterName;
-                EventIdParameter = EventDispatcherSymbols.EventIdParameterName;
-                EventPayloadParameter = EventDispatcherSymbols.EventPayloadParameterName;
-                EventHandlerParameter = EventDispatcherSymbols.EventHandlerParameterName;
-                CancellationTokenParameter = EventDispatcherSymbols.CancellationTokenParameterName;
+                PayloadSerializerParameter = EventDispatcherSymbols.PayloadSerializerParameter;
+                EventIdParameter = EventDispatcherSymbols.EventIdParameter;
+                EventPayloadParameter = EventDispatcherSymbols.EventPayloadParameter;
+                EventHandlerParameter = EventDispatcherSymbols.EventHandlerParameter;
+                CancellationTokenParameter = EventDispatcherSymbols.CancellationTokenParameter;
             }
         }
     }

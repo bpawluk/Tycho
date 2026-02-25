@@ -89,9 +89,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public ParametersTM()
             {
-                RequestDataParameter = ModuleFacadeSymbols.RequestDataParameterName;
-                CancellationTokenParameter = ModuleFacadeSymbols.CancellationTokenParameterName;
-                ModuleParameter = ModuleFacadeSymbols.ModuleParameterName;
+                RequestDataParameter = ModuleFacadeSymbols.RequestDataParameter;
+                CancellationTokenParameter = ModuleFacadeSymbols.CancellationTokenParameter;
+                ModuleParameter = ModuleFacadeSymbols.ModuleParameter;
             }
         }
 
