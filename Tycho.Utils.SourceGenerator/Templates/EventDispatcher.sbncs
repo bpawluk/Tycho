@@ -12,42 +12,42 @@ namespace {{ namespace }}
 {{~ end ~}}
     internal class {{ classes.event_dispatcher_class }} : {{ interfaces.event_handling_dispatcher_interface }}
     {
-        private readonly {{ interfaces.payload_serializer_interface }} {{ symbols.payload_serializer_field }};
+        private readonly {{ interfaces.payload_serializer_interface }} _payloadSerializer;
 
-        public {{ classes.event_dispatcher_class }}({{ interfaces.payload_serializer_interface }} {{ symbols.payload_serializer_parameter }})
+        public {{ classes.event_dispatcher_class }}({{ interfaces.payload_serializer_interface }} {{ parameters.payload_serializer_parameter }})
         {
-            {{ symbols.payload_serializer_field }} = {{ symbols.payload_serializer_parameter }};
+            _payloadSerializer = {{ parameters.payload_serializer_parameter }};
         }
 
-        public async {{ classes.task_class }} {{ symbols.dispatch_method }}(
-            {{ structs.guid_struct }} {{ symbols.event_id_parameter }},
-            object {{ symbols.event_payload_parameter }},
-            {{ interfaces.event_handler_interface }} {{ symbols.event_handler_parameter }},
-            {{ structs.cancellation_token_struct }} {{ symbols.cancellation_token_parameter }})
+        public async {{ classes.task_class }} {{ methods.dispatch_method }}(
+            {{ classes.guid_class }} {{ parameters.event_id_parameter }},
+            {{ classes.object_class }} {{ parameters.event_payload_parameter }},
+            {{ interfaces.event_handler_interface }} {{ parameters.event_handler_parameter }},
+            {{ classes.cancellation_token_class }} {{ parameters.cancellation_token_parameter }})
         {
-            switch ({{ symbols.event_handler_parameter }})
+            switch ({{ parameters.event_handler_parameter }})
             {
             {{~ for event in events ~}}
-                case {{ interfaces.event_handler_interface }}<{{ event }}> {{ symbols.cast_handler_variable }}:
-                    await {{ symbols.dispatch_as_method }}({{ symbols.event_id_parameter }}, {{ symbols.event_payload_parameter }}, {{ symbols.cast_handler_variable }}, {{ symbols.cancellation_token_parameter }});
+                case {{ interfaces.event_handler_interface }}<{{ event }}> castHandler:
+                    await DispatchAs({{ parameters.event_id_parameter }}, {{ parameters.event_payload_parameter }}, castHandler, {{ parameters.cancellation_token_parameter }});
                     break;
             {{~ end ~}}
                 default:
                     throw new {{ exceptions.invalid_operation_exception }}(
-                        $"Missing handling logic for {{{ symbols.event_handler_parameter }}.{{ methods.get_type_method }}().{{ methods.full_name_property }}} event handler.");
+                        $"Missing handling logic for {{{ parameters.event_handler_parameter }}.{{ methods.get_type_method }}().{{ properties.full_name_property }}} event handler.");
             }
         }
 
-        private async {{ classes.task_class }} {{ symbols.dispatch_as_method }}<{{ symbols.t_event_type_parameter }}>(
-            {{ structs.guid_struct }} {{ symbols.event_id_parameter }},
-            object {{ symbols.event_payload_parameter }},
-            {{ interfaces.event_handler_interface }}<{{ symbols.t_event_type_parameter }}> {{ symbols.event_handler_parameter }},
-            {{ structs.cancellation_token_struct }} {{ symbols.cancellation_token_parameter }})
-            where {{ symbols.t_event_type_parameter }} : class, {{ interfaces.event_interface }}
+        private async {{ classes.task_class }} DispatchAs<TEvent>(
+            {{ classes.guid_class }} {{ parameters.event_id_parameter }},
+            {{ classes.object_class }} {{ parameters.event_payload_parameter }},
+            {{ interfaces.event_handler_interface }}<TEvent> {{ parameters.event_handler_parameter }},
+            {{ classes.cancellation_token_class }} {{ parameters.cancellation_token_parameter }})
+            where TEvent : class, {{ interfaces.event_interface }}
         {
-            var {{ symbols.deserialized_payload_variable }} = {{ symbols.payload_serializer_field }}.{{ methods.deserialize_method }}<{{ symbols.t_event_type_parameter }}>({{ symbols.event_payload_parameter }});
-            var {{ symbols.context_variable }} = new {{ classes.event_context_class }}<{{ symbols.t_event_type_parameter }}>({{ symbols.event_id_parameter }}, {{ symbols.deserialized_payload_variable }});
-            await {{ symbols.event_handler_parameter }}.{{ methods.handle_async_method }}({{ symbols.context_variable }}, {{ symbols.cancellation_token_parameter }});
+            var deserializedPayload = _payloadSerializer.{{ methods.deserialize_method }}<TEvent>({{ parameters.event_payload_parameter }});
+            var eventContext = new {{ classes.event_context_class }}<TEvent>({{ parameters.event_id_parameter }}, deserializedPayload);
+            await {{ parameters.event_handler_parameter }}.{{ methods.handle_async_method }}(eventContext, {{ parameters.cancellation_token_parameter }});
         }
     }
 {{~ for containing_type in containing_types ~}}

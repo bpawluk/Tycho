@@ -16,13 +16,13 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public InterfacesTM Interfaces { get; }
 
-        public StructsTM Structs { get; }
-
         public ExceptionsTM Exceptions { get; }
 
         public MethodsTM Methods { get; }
 
-        public SymbolsTM Symbols { get; }
+        public PropertiesTM Properties { get; }
+
+        public ParametersTM Parameters { get; }
 
         public string[] Events { get; }
 
@@ -32,10 +32,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             ContainingTypes = eventDispatcherModel.DefinitionType.ContainingTypes.ToArray();
             Classes = new ClassesTM(this, eventDispatcherModel);
             Interfaces = new InterfacesTM(this);
-            Structs = new StructsTM(this);
             Exceptions = new ExceptionsTM(this);
             Methods = new MethodsTM();
-            Symbols = new SymbolsTM();
+            Properties = new PropertiesTM();
+            Parameters = new ParametersTM();
             Events = eventDispatcherModel.Events.Select(e => UseType(e)).ToArray();
         }
 
@@ -44,12 +44,18 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string EventDispatcherClass { get; }
             public string TaskClass { get; }
             public string EventContextClass { get; }
+            public string GuidClass { get; }
+            public string CancellationTokenClass { get; }
+            public string ObjectClass { get; }
 
             public ClassesTM(EventDispatcherTM owner, EventDispatcherModel eventDispatcherModel)
             {
-                EventDispatcherClass = $"{eventDispatcherModel.DefinitionType.Name}EventDispatcher";
+                EventDispatcherClass = EventDispatcherSymbols.GetEventDispatcherClass(eventDispatcherModel.DefinitionType.Name);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 EventContextClass = owner.UseType(EventContextReference.TypeModel);
+                GuidClass = owner.UseType(GuidReference.TypeModel);
+                CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);
+                ObjectClass = owner.UseType(ObjectReference.TypeModel);
             }
         }
 
@@ -69,18 +75,6 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             }
         }
 
-        internal class StructsTM
-        {
-            public string GuidStruct { get; }
-            public string CancellationTokenStruct { get; }
-
-            public StructsTM(EventDispatcherTM owner)
-            {
-                GuidStruct = owner.UseType(GuidReference.TypeModel);
-                CancellationTokenStruct = owner.UseType(CancellationTokenReference.TypeModel);
-            }
-        }
-
         internal class ExceptionsTM
         {
             public string InvalidOperationException { get; }
@@ -96,46 +90,42 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string DeserializeMethod { get; }
             public string HandleAsyncMethod { get; }
             public string GetTypeMethod { get; }
-            public string FullNameProperty { get; }
+            public string DispatchMethod { get; }
 
             public MethodsTM()
             {
-                DeserializeMethod = IPayloadSerializerReference.DeserializeMethodName;
+                DeserializeMethod = IPayloadSerializerReference.DeserializeMethodSignature.MethodName;
                 HandleAsyncMethod = IEventHandlerReference.HandleAsyncMethodSignature.MethodName;
-                GetTypeMethod = "GetType";
-                FullNameProperty = "FullName";
+                GetTypeMethod = ObjectReference.GetTypeMethodSignature.MethodName;
+                DispatchMethod = EventDispatcherSymbols.DispatchMethodName;
             }
         }
 
-        internal class SymbolsTM
+        internal class PropertiesTM
         {
-            public string PayloadSerializerField { get; }
-            public string PayloadSerializerParameter { get; }
-            public string DispatchMethod { get; }
+            public string FullNameProperty { get; }
+
+            public PropertiesTM()
+            {
+                FullNameProperty = TypeReference.FullNamePropertyName;
+            }
+        }
+
+        internal class ParametersTM
+        {
             public string EventIdParameter { get; }
             public string EventPayloadParameter { get; }
             public string EventHandlerParameter { get; }
             public string CancellationTokenParameter { get; }
-            public string CastHandlerVariable { get; }
-            public string DispatchAsMethod { get; }
-            public string TEventTypeParameter { get; }
-            public string DeserializedPayloadVariable { get; }
-            public string ContextVariable { get; }
+            public string PayloadSerializerParameter { get; }
 
-            public SymbolsTM()
+            public ParametersTM()
             {
-                PayloadSerializerField = EventDispatcherSymbols.PayloadSerializerFieldName;
                 PayloadSerializerParameter = EventDispatcherSymbols.PayloadSerializerParameterName;
-                DispatchMethod = EventDispatcherSymbols.DispatchMethodName;
                 EventIdParameter = EventDispatcherSymbols.EventIdParameterName;
                 EventPayloadParameter = EventDispatcherSymbols.EventPayloadParameterName;
                 EventHandlerParameter = EventDispatcherSymbols.EventHandlerParameterName;
                 CancellationTokenParameter = EventDispatcherSymbols.CancellationTokenParameterName;
-                CastHandlerVariable = EventDispatcherSymbols.CastHandlerVariableName;
-                DispatchAsMethod = EventDispatcherSymbols.DispatchAsMethodName;
-                TEventTypeParameter = EventDispatcherSymbols.TEventTypeParameterName;
-                DeserializedPayloadVariable = EventDispatcherSymbols.DeserializedPayloadVariableName;
-                ContextVariable = EventDispatcherSymbols.ContextVariableName;
             }
         }
     }

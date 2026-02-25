@@ -11,8 +11,6 @@ namespace Tycho.Utils.SourceGenerator.References
 
         public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
 
-        public const string DeserializeMethodName = "Deserialize";
-
         public static MethodSignatureModel DeserializeMethodSignature => new MethodSignatureModel(
             methodName: "Deserialize",
             parameters: new ImmutableEquatableArray<TypeModel>(new[]

@@ -12,9 +12,9 @@ namespace {{ namespace }}
 {{~ end ~}}
     public partial class {{ classes.module_class }} : {{ classes.base_class }}
     {
-        protected override void {{ methods.auto_setup_method }}({{ interfaces.service_collection_interface }} {{ symbols.module_parameter }})
+        protected override void {{ methods.auto_setup_method }}({{ interfaces.service_collection_interface }} {{ parameters.module_parameter }})
         {
-            {{ classes.service_collection_service_extensions_class }}.{{ methods.add_transient_method }}<{{ interfaces.event_handling_dispatcher_interface }}, {{ classes.event_dispatcher_class }}>({{ symbols.module_parameter }});
+            {{ classes.service_collection_service_extensions_class }}.{{ methods.add_transient_method }}<{{ interfaces.event_handling_dispatcher_interface }}, {{ classes.event_dispatcher_class }}>({{ parameters.module_parameter }});
         }
     }
 {{~ for containing_type in containing_types ~}}

@@ -91,8 +91,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public PropertiesTM()
             {
-                ConfigurationProperty = IHostApplicationBuilderReference.ConfigurationProperty;
-                ServicesProperty = IHostApplicationBuilderReference.ServicesProperty;
+                ConfigurationProperty = IHostApplicationBuilderReference.ConfigurationPropertyName;
+                ServicesProperty = IHostApplicationBuilderReference.ServicesPropertyName;
             }
         }
 

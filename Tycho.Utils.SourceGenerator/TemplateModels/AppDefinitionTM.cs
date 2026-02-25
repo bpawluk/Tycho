@@ -37,9 +37,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         internal class ClassesTM 
         {
             public string AppClass { get; }
-            public string BaseClass { get; }
             public string FacadeClass { get; }
             public string EventDispatcherClass { get; }
+            public string BaseClass { get; }
             public string TaskClass { get; }
             public string ActionClass { get; }
             public string ServiceCollectionServiceExtensionsClass { get; }
@@ -47,9 +47,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public ClassesTM(AppDefinitionTM owner, TychoDefinitionModel tychoDefinitionModel)
             {
                 AppClass = tychoDefinitionModel.DefinitionType.Name;
-                BaseClass = owner.UseType(TychoAppReference.TypeModel);
                 FacadeClass = AppFacadeSymbols.GetAppFacadeClass(AppClass);
                 EventDispatcherClass = EventDispatcherSymbols.GetEventDispatcherClass(AppClass);
+                BaseClass = owner.UseType(TychoAppReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 ActionClass = owner.UseType(ActionReference.TypeModel);
                 ServiceCollectionServiceExtensionsClass = owner.UseType(ServiceCollectionServiceExtensionsReference.TypeModel);

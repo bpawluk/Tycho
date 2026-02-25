@@ -18,7 +18,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public MethodsTM Methods { get; }
 
-        public SymbolsTM Symbols { get; }
+        public ParametersTM Parameters { get; }
 
         public ModuleDefinitionTM(TychoDefinitionModel tychoDefinitionModel)
         {
@@ -27,21 +27,21 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             Classes = new ClassesTM(this, tychoDefinitionModel);
             Interfaces = new InterfacesTM(this);
             Methods = new MethodsTM();
-            Symbols = new SymbolsTM();
+            Parameters = new ParametersTM();
         }
 
         internal class ClassesTM
         {
             public string ModuleClass { get; }
-            public string BaseClass { get; }
             public string EventDispatcherClass { get; }
+            public string BaseClass { get; }
             public string ServiceCollectionServiceExtensionsClass { get; }
 
             public ClassesTM(ModuleDefinitionTM owner, TychoDefinitionModel tychoDefinitionModel)
             {
                 ModuleClass = tychoDefinitionModel.DefinitionType.Name;
+                EventDispatcherClass = EventDispatcherSymbols.GetEventDispatcherClass(tychoDefinitionModel.DefinitionType.Name);
                 BaseClass = owner.UseType(TychoModuleReference.TypeModel);
-                EventDispatcherClass = $"{ModuleClass}EventDispatcher";
                 ServiceCollectionServiceExtensionsClass = owner.UseType(ServiceCollectionServiceExtensionsReference.TypeModel);
             }
         }
@@ -70,11 +70,11 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             }
         }
 
-        internal class SymbolsTM
+        internal class ParametersTM
         {
             public string ModuleParameter { get; }
 
-            public SymbolsTM()
+            public ParametersTM()
             {
                 ModuleParameter = ModuleDefinitionSymbols.ModuleParameterName;
             }

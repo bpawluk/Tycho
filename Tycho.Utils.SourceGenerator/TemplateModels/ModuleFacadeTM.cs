@@ -17,11 +17,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public InterfacesTM Interfaces { get; }
 
-        public StructsTM Structs { get; }
 
         public MethodsTM Methods { get; }
 
-        public SymbolsTM Symbols { get; }
+        public ParametersTM Parameters { get; }
 
         public RequestTM[] Requests { get; }
 
@@ -31,9 +30,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             ContainingTypes = tychoFacadeModel.DefinitionType.ContainingTypes.ToArray();
             Classes = new ClassesTM(this, tychoFacadeModel);
             Interfaces = new InterfacesTM(this, tychoFacadeModel);
-            Structs = new StructsTM(this);
             Methods = new MethodsTM();
-            Symbols = new SymbolsTM();
+            Parameters = new ParametersTM();
             Requests = tychoFacadeModel.Requests.Select(r => new RequestTM(this, r)).ToArray();
         }
 
@@ -43,13 +41,15 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string FacadeClass { get; }
             public string TaskClass { get; }
             public string ValueTaskClass { get; }
+            public string CancellationTokenClass { get; }
 
             public ClassesTM(ModuleFacadeTM owner, TychoFacadeModel tychoFacadeModel)
             {
                 ModuleClass = tychoFacadeModel.DefinitionType.Name;
-                FacadeClass = $"{ModuleClass}Facade";
+                FacadeClass = ModuleFacadeSymbols.GetModuleFacadeClass(ModuleClass);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 ValueTaskClass = owner.UseType(ValueTaskReference.TypeModel);
+                CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);
             }
         }
 
@@ -61,19 +61,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(ModuleFacadeTM owner, TychoFacadeModel tychoFacadeModel)
             {
-                ModuleInterface = $"I{tychoFacadeModel.DefinitionType.Name}";
+                ModuleInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(tychoFacadeModel.DefinitionType.Name);
                 AsyncDisposableInterface = owner.UseType(IAsyncDisposableReference.TypeModel);
                 InstanceInterface = owner.UseType(IModuleInstanceReference.TypeModel);
-            }
-        }
-
-        internal class StructsTM
-        {
-            public string CancellationTokenStruct { get; }
-
-            public StructsTM(ModuleFacadeTM owner)
-            {
-                CancellationTokenStruct = owner.UseType(CancellationTokenReference.TypeModel);
             }
         }
 
@@ -91,23 +81,17 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             }
         }
 
-        internal class SymbolsTM
+        internal class ParametersTM
         {
-            public string ExecuteAsyncMethod { get; }
+            public string ModuleParameter { get; }
             public string RequestDataParameter { get; }
             public string CancellationTokenParameter { get; }
-            public string ModuleField { get; }
-            public string ModuleParameter { get; }
-            public string DisposeAsyncMethod { get; }
 
-            public SymbolsTM()
+            public ParametersTM()
             {
-                ExecuteAsyncMethod = ModuleFacadeSymbols.ExecuteAsyncMethodName;
                 RequestDataParameter = ModuleFacadeSymbols.RequestDataParameterName;
                 CancellationTokenParameter = ModuleFacadeSymbols.CancellationTokenParameterName;
-                ModuleField = ModuleFacadeSymbols.ModuleFieldName;
                 ModuleParameter = ModuleFacadeSymbols.ModuleParameterName;
-                DisposeAsyncMethod = ModuleFacadeSymbols.DisposeAsyncMethodName;
             }
         }
 

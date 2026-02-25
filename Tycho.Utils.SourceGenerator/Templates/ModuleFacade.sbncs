@@ -13,30 +13,30 @@ namespace {{ namespace }}
     public interface {{ interfaces.module_interface }} : {{ interfaces.async_disposable_interface }}
     {
         {{~ for request in requests ~}}
-        {{ classes.task_class }}{{ if request.has_response }}<{{ request.response_type }}>{{ end }} {{ symbols.execute_async_method }}({{ request.request_type }} {{ symbols.request_data_parameter }}, {{ structs.cancellation_token_struct }} {{ symbols.cancellation_token_parameter }} = default);
+        {{ classes.task_class }}{{ if request.has_response }}<{{ request.response_type }}>{{ end }} {{ methods.execute_async_method }}({{ request.request_type }} {{ parameters.request_data_parameter }}, {{ classes.cancellation_token_class }} {{ parameters.cancellation_token_parameter }} = default);
         
         {{~ end ~}}
     }
 
     public class {{ classes.facade_class }} : {{ interfaces.module_interface }}
     {
-        private readonly {{ interfaces.instance_interface }} {{ symbols.module_field }};
+        private readonly {{ interfaces.instance_interface }} _module;
 
-        public {{ classes.facade_class }}({{ interfaces.instance_interface }} {{ symbols.module_parameter }})
+        public {{ classes.facade_class }}({{ interfaces.instance_interface }} {{ parameters.module_parameter }})
         {
-            {{ symbols.module_field }} = {{ symbols.module_parameter }};
+            _module = {{ parameters.module_parameter }};
         }
 
         {{~ for request in requests ~}}
-        public {{ classes.task_class }}{{ if request.has_response }}<{{ request.response_type }}>{{ end }} {{ symbols.execute_async_method }}({{ request.request_type }} {{ symbols.request_data_parameter }}, {{ structs.cancellation_token_struct }} {{ symbols.cancellation_token_parameter }})
+        public {{ classes.task_class }}{{ if request.has_response }}<{{ request.response_type }}>{{ end }} {{ methods.execute_async_method }}({{ request.request_type }} {{ parameters.request_data_parameter }}, {{ classes.cancellation_token_class }} {{ parameters.cancellation_token_parameter }})
         {
-            return {{ symbols.module_field }}.{{ methods.execute_async_method }}<{{ request.request_type }}{{ if request.has_response }}, {{ request.response_type }}{{ end }}>({{ symbols.request_data_parameter }}, {{ symbols.cancellation_token_parameter }});
+            return _module.{{ methods.execute_async_method }}<{{ request.request_type }}{{ if request.has_response }}, {{ request.response_type }}{{ end }}>({{ parameters.request_data_parameter }}, {{ parameters.cancellation_token_parameter }});
         }
         
         {{~ end ~}}
-        public async {{ classes.value_task_class }} {{ symbols.dispose_async_method }}()
+        public async {{ classes.value_task_class }} {{ methods.dispose_async_method }}()
         {
-            await {{ symbols.module_field }}.{{ methods.dispose_async_method }}().{{ methods.configure_await_method }}(false);
+            await _module.{{ methods.dispose_async_method }}().{{ methods.configure_await_method }}(false);
         }
     }
 {{~ for containing_type in containing_types ~}}
