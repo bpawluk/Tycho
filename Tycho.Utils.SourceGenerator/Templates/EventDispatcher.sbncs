@@ -34,7 +34,7 @@ namespace {{ namespace }}
             {{~ end ~}}
                 default:
                     throw new {{ exceptions.invalid_operation_exception }}(
-                        $"Missing handling logic for {{{ parameters.event_handler_parameter }}.{{ methods.get_type_method }}().{{ properties.full_name_property }}} event handler.");
+                        $"Missing handling logic for { {{ parameters.event_handler_parameter }}.{{ methods.get_type_method }}().{{ properties.full_name_property }} } event handler.");
             }
         }
 
