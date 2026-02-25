@@ -1,0 +1,25 @@
+{{~ for used_namespace in used_namespaces ~}}
+using {{ used_namespace }};
+{{~ end ~}}
+
+{{~ if namespace != "" ~}}
+namespace {{ namespace }}
+{
+{{~ end ~}}
+{{~ for containing_type in containing_types ~}}
+    public partial class {{ containing_type }}
+    {
+{{~ end ~}}
+    public interface {{ interfaces.facade_interface }} : {{ interfaces.async_disposable_interface }}
+    {
+        {{~ for request in requests ~}}
+        {{ classes.task_class }}{{ if request.has_response }}<{{ request.response_type }}>{{ end }} {{ methods.execute_async_method }}({{ request.request_type }} {{ parameters.request_data_parameter }}, {{ classes.cancellation_token_class }} {{ parameters.cancellation_token_parameter }} = default);
+        
+        {{~ end ~}}
+    }
+{{~ for containing_type in containing_types ~}}
+    }
+{{~ end ~}}
+{{~ if namespace != "" ~}}
+}
+{{~ end ~}}

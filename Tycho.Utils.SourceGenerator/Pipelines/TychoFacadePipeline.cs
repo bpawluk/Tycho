@@ -15,7 +15,9 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
     internal static class TychoFacadePipeline
     {
         private static readonly string AppFacadeTemplate = EmbeddedResource.GetContent("Templates/AppFacade.sbncs");
+        private static readonly string AppInterfaceTemplate = EmbeddedResource.GetContent("Templates/AppInterface.sbncs");
         private static readonly string ModuleFacadeTemplate = EmbeddedResource.GetContent("Templates/ModuleFacade.sbncs");
+        private static readonly string ModuleInterfaceTemplate = EmbeddedResource.GetContent("Templates/ModuleInterface.sbncs");
 
         public static IncrementalGeneratorInitializationContext AddTychoFacadePipeline(
             this IncrementalGeneratorInitializationContext context,
@@ -36,9 +38,16 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                 {
                     if (model.DefinitionKind == TychoDefinitionKind.Unknown) return;
 
+                    var templateModel = CreateTemplateModel(model);
+
                     outputContext.GenerateSourceFromTemplate(
-                        CreateTemplateModel(model),
-                        ChooseTemplate(model.DefinitionKind),
+                        templateModel,
+                        ChooseInterfaceTemplate(model.DefinitionKind),
+                        $"{model.DefinitionType}.Interface.g.cs");
+
+                    outputContext.GenerateSourceFromTemplate(
+                        templateModel,
+                        ChooseFacadeTemplate(model.DefinitionKind),
                         $"{model.DefinitionType}.Facade.g.cs");
                 });
 
@@ -99,7 +108,17 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             };
         }
 
-        private static string ChooseTemplate(TychoDefinitionKind kind)
+        private static string ChooseInterfaceTemplate(TychoDefinitionKind kind)
+        {
+            return kind switch
+            {
+                TychoDefinitionKind.App => AppInterfaceTemplate,
+                TychoDefinitionKind.Module => ModuleInterfaceTemplate,
+                _ => throw new ArgumentOutOfRangeException(nameof(kind), $"Unsupported definition kind: {kind}"),
+            };
+        }
+
+        private static string ChooseFacadeTemplate(TychoDefinitionKind kind)
         {
             return kind switch
             {
