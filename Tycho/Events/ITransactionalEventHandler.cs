@@ -34,11 +34,5 @@ namespace Tycho.Events
     public interface ITransactionalEventHandler<TEvent> : ITransactionalEventHandler, IEventHandler<TEvent>
         where TEvent : class, IEvent
     {
-        /// <summary>
-        /// Handles an event of type <typeparamref name="TEvent"/>.
-        /// </summary>
-        /// <param name="eventData">The data of the event to handle.</param>
-        /// <param name="cancellationToken">A cancellation token.</param>
-        Task Handle(TEvent eventData, CancellationToken cancellationToken);
     }
 }
