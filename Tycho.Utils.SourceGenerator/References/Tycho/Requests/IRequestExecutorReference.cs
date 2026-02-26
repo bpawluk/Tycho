@@ -2,7 +2,7 @@
 using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.Utils;
 
-namespace Tycho.Utils.SourceGenerator.References
+namespace Tycho.Utils.SourceGenerator.References.Tycho.Requests
 {
     internal static class IRequestExecutorReference
     {

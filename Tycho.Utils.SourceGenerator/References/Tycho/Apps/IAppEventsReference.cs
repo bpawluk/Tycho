@@ -2,7 +2,7 @@
 using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.Utils;
 
-namespace Tycho.Utils.SourceGenerator.References
+namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
 {
     internal static class IAppEventsReference
     {

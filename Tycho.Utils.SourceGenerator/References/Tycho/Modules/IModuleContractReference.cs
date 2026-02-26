@@ -3,12 +3,12 @@ using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.Utils;
 
-namespace Tycho.Utils.SourceGenerator.References
+namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
 {
-    internal static class IAppContractReference
+    internal static class IModuleContractReference
     {
-        private const string _namespace = "Tycho.Apps";
-        private const string _typeName = "IAppContract";
+        private const string _namespace = "Tycho.Modules";
+        private const string _typeName = "IModuleContract";
 
         public static HashSet<MethodSignatureModel> ContractDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
         {
@@ -18,6 +18,12 @@ namespace Tycho.Utils.SourceGenerator.References
             ForwardsAsWithResponseMethodSignature,
             HandlesMethodSignature,
             HandlesWithResponseMethodSignature,
+        });
+
+        public static HashSet<MethodSignatureModel> RequirementDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
+        {
+            RequiresMethodSignature,
+            RequiresWithResponseMethodSignature,
         });
 
         public static string RequestTypeParameterName => "TRequest";
@@ -59,6 +65,16 @@ namespace Tycho.Utils.SourceGenerator.References
 
         public static MethodSignatureModel HandlesWithResponseMethodSignature => new MethodSignatureModel(
             methodName: "Handles",
+            parameters: ImmutableEquatableArray<TypeModel>.Empty,
+            result: TypeModel);
+
+        public static MethodSignatureModel RequiresMethodSignature => new MethodSignatureModel(
+            methodName: "Requires",
+            parameters: ImmutableEquatableArray<TypeModel>.Empty,
+            result: TypeModel);
+
+        public static MethodSignatureModel RequiresWithResponseMethodSignature => new MethodSignatureModel(
+            methodName: "Requires",
             parameters: ImmutableEquatableArray<TypeModel>.Empty,
             result: TypeModel);
     }

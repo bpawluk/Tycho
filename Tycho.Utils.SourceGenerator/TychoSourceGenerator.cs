@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
@@ -7,7 +7,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.Models.Tycho;
 using Tycho.Utils.SourceGenerator.Pipelines;
-using Tycho.Utils.SourceGenerator.References;
+using Tycho.Utils.SourceGenerator.References.Tycho;
+using Tycho.Utils.SourceGenerator.References.Tycho.Apps;
+using Tycho.Utils.SourceGenerator.References.Tycho.Modules;
 using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator

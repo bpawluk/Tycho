@@ -57,13 +57,11 @@ namespace Tycho.Apps.Setup
 
         public AppBuilder Init()
         {
-            var services = _internals.GetServiceCollection();
-
             if (Globals.LoggingSetup != null)
             {
-                services.AddLogging(Globals.LoggingSetup);
+                Services.AddLogging(Globals.LoggingSetup);
             }
-            services.AddSingleton(_internals);
+            Services.AddSingleton(_internals);
 
             return this;
         }

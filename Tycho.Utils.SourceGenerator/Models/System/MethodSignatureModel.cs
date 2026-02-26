@@ -1,5 +1,6 @@
 ﻿using System;
-using Tycho.Utils.SourceGenerator.References;
+using Tycho.Utils.SourceGenerator.References.Tycho.Apps;
+using Tycho.Utils.SourceGenerator.References.Tycho.Modules;
 using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.Models.System

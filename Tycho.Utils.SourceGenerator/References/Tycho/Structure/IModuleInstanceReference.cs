@@ -1,13 +1,14 @@
 using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.References.System;
+using Tycho.Utils.SourceGenerator.References.Tycho.Requests;
 using Tycho.Utils.SourceGenerator.Utils;
 
-namespace Tycho.Utils.SourceGenerator.References
+namespace Tycho.Utils.SourceGenerator.References.Tycho.Structure
 {
-    internal static class IAppInstanceReference
+    internal static class IModuleInstanceReference
     {
         private const string _namespace = "Tycho.Structure";
-        private const string _typeName = "IAppInstance";
+        private const string _typeName = "IModuleInstance";
 
         public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
 

@@ -1,8 +1,8 @@
 using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
-using Tycho.Utils.SourceGenerator.References;
 using Tycho.Utils.SourceGenerator.References.Microsoft;
 using Tycho.Utils.SourceGenerator.References.System;
+using Tycho.Utils.SourceGenerator.References.Tycho.Logging;
 using Tycho.Utils.SourceGenerator.Symbols;
 
 namespace Tycho.Utils.SourceGenerator.TemplateModels

@@ -3,12 +3,12 @@ using Tycho.Utils.SourceGenerator.References.Microsoft;
 using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.Utils;
 
-namespace Tycho.Utils.SourceGenerator.References
+namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
 {
-    internal static class TychoAppReference
+    internal static class TychoModuleReference
     {
-        private const string _namespace = "Tycho.Apps";
-        private const string _typeName = "TychoApp";
+        private const string _namespace = "Tycho.Modules";
+        private const string _typeName = "TychoModule";
 
         public static string FullName => $"{_namespace}.{_typeName}";
 
@@ -18,7 +18,7 @@ namespace Tycho.Utils.SourceGenerator.References
             methodName: "DefineContract",
             parameters: new ImmutableEquatableArray<TypeModel>(new[]
             {
-                IAppContractReference.TypeModel,
+                IModuleContractReference.TypeModel,
             }),
             result: VoidReference.TypeModel);
 
@@ -26,7 +26,7 @@ namespace Tycho.Utils.SourceGenerator.References
             methodName: "DefineEvents",
             parameters: new ImmutableEquatableArray<TypeModel>(new[]
             {
-                IAppEventsReference.TypeModel,
+                IModuleEventsReference.TypeModel,
             }),
             result: VoidReference.TypeModel);
 
@@ -34,30 +34,9 @@ namespace Tycho.Utils.SourceGenerator.References
             methodName: "IncludeModules",
             parameters: new ImmutableEquatableArray<TypeModel>(new[]
             {
-                IAppStructureReference.TypeModel,
+                IModuleStructureReference.TypeModel,
             }),
             result: VoidReference.TypeModel);
-
-        public static MethodSignatureModel WithConfigurationBaseMethodSignature => new MethodSignatureModel(
-            methodName: "WithConfigurationBase",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
-            {
-                IConfigurationReference.TypeModel,
-            }),
-            result: VoidReference.TypeModel);
-
-        public static MethodSignatureModel WithLoggingBaseMethodSignature => new MethodSignatureModel(
-            methodName: "WithLoggingBase",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
-            {
-                ActionReference.TypeModel,
-            }),
-            result: VoidReference.TypeModel);
-
-        public static MethodSignatureModel RunBaseAsyncMethodSignature => new MethodSignatureModel(
-            methodName: "RunBaseAsync",
-            parameters: ImmutableEquatableArray<TypeModel>.Empty,
-            result: TaskReference.TypeModel);
 
         public static MethodSignatureModel AutoSetupMethodSignature => new MethodSignatureModel(
             methodName: "__AutoSetup__",

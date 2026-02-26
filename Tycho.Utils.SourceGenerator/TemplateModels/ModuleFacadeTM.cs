@@ -1,8 +1,8 @@
 using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
 using Tycho.Utils.SourceGenerator.Models.Tycho;
-using Tycho.Utils.SourceGenerator.References;
 using Tycho.Utils.SourceGenerator.References.System;
+using Tycho.Utils.SourceGenerator.References.Tycho.Structure;
 using Tycho.Utils.SourceGenerator.Symbols;
 
 namespace Tycho.Utils.SourceGenerator.TemplateModels
@@ -16,7 +16,6 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public ClassesTM Classes { get; }
 
         public InterfacesTM Interfaces { get; }
-
 
         public MethodsTM Methods { get; }
 
@@ -37,7 +36,6 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         internal class ClassesTM
         {
-            public string ModuleClass { get; }
             public string FacadeClass { get; }
             public string TaskClass { get; }
             public string ValueTaskClass { get; }
@@ -45,8 +43,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public ClassesTM(ModuleFacadeTM owner, TychoFacadeModel tychoFacadeModel)
             {
-                ModuleClass = tychoFacadeModel.DefinitionType.Name;
-                FacadeClass = ModuleFacadeSymbols.GetModuleFacadeClass(ModuleClass);
+                FacadeClass = ModuleFacadeSymbols.GetModuleFacadeClass(tychoFacadeModel.DefinitionType.Name);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 ValueTaskClass = owner.UseType(ValueTaskReference.TypeModel);
                 CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);
@@ -56,13 +53,11 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         internal class InterfacesTM
         {
             public string ModuleInterface { get; }
-            public string AsyncDisposableInterface { get; }
             public string InstanceInterface { get; }
 
             public InterfacesTM(ModuleFacadeTM owner, TychoFacadeModel tychoFacadeModel)
             {
                 ModuleInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(tychoFacadeModel.DefinitionType.Name);
-                AsyncDisposableInterface = owner.UseType(IAsyncDisposableReference.TypeModel);
                 InstanceInterface = owner.UseType(IModuleInstanceReference.TypeModel);
             }
         }

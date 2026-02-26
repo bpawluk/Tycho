@@ -10,7 +10,7 @@ namespace {{ namespace }}
     public partial class {{ containing_type }}
     {
 {{~ end ~}}
-    public interface {{ interfaces.module_interface }} : {{ interfaces.async_disposable_interface }}
+    public partial interface {{ interfaces.module_interface }} : {{ interfaces.async_disposable_interface }}
     {
         {{~ for request in requests ~}}
         {{ classes.task_class }}{{ if request.has_response }}<{{ request.response_type }}>{{ end }} {{ methods.execute_async_method }}({{ request.request_type }} {{ parameters.request_data_parameter }}, {{ classes.cancellation_token_class }} {{ parameters.cancellation_token_parameter }} = default);

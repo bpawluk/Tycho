@@ -3,12 +3,12 @@ using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.Utils;
 
-namespace Tycho.Utils.SourceGenerator.References
+namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
 {
-    internal static class IAppStructureReference
+    internal static class IModuleStructureReference
     {
-        private const string _namespace = "Tycho.Apps";
-        private const string _typeName = "IAppStructure";
+        private const string _namespace = "Tycho.Modules";
+        private const string _typeName = "IModuleStructure";
 
         public static HashSet<MethodSignatureModel> SubmoduleDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
         {

@@ -74,14 +74,13 @@ namespace Tycho.Modules.Setup
         public ModuleBuilder Init()
         {
             var parentProxy = new ParentProxy(Contract.ContractFulfillingBroker, Events.ParentEventRouter);
-            var services = _internals.GetServiceCollection();
 
             if (Globals.LoggingSetup != null)
             {
-                services.AddLogging(Globals.LoggingSetup);
+                Services.AddLogging(Globals.LoggingSetup);
             }
 
-            services.AddSingleton<IParent>(parentProxy)
+            Services.AddSingleton<IParent>(parentProxy)
                     .AddSingleton(_internals);
 
             return this;

@@ -37,15 +37,13 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                 {
                     if (model.DefinitionKind == TychoDefinitionKind.Unknown) return;
 
-                    var templateModel = CreateTemplateModel(model);
-
                     outputContext.GenerateSourceFromTemplate(
-                        templateModel,
+                        CreateInterfaceTemplateModel(model),
                         ChooseInterfaceTemplate(model.DefinitionKind),
                         $"{model.DefinitionType}.Interface.g.cs");
 
                     outputContext.GenerateSourceFromTemplate(
-                        templateModel,
+                        CreateFacadeTemplateModel(model),
                         ChooseFacadeTemplate(model.DefinitionKind),
                         $"{model.DefinitionType}.Facade.g.cs");
                 });
@@ -97,7 +95,17 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             return new TychoRequestModel(requestType);
         }
 
-        private static object CreateTemplateModel(TychoFacadeModel model)
+        private static object CreateInterfaceTemplateModel(TychoFacadeModel model)
+        {
+            return model.DefinitionKind switch
+            {
+                TychoDefinitionKind.App => new AppInterfaceTM(model),
+                TychoDefinitionKind.Module => new ModuleInterfaceTM(model),
+                _ => throw new ArgumentOutOfRangeException(nameof(model.DefinitionKind), $"Unsupported definition kind: {model.DefinitionKind}"),
+            };
+        }
+
+        private static object CreateFacadeTemplateModel(TychoFacadeModel model)
         {
             return model.DefinitionKind switch
             {
