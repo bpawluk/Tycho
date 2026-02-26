@@ -72,14 +72,14 @@ namespace Tycho.Modules.Setup
 
         public ModuleBuilder Init()
         {
-            var parent = new Parent(Events.ParentEventRouter, Contract.ContractFulfillingBroker);
+            var parent = new ParentReference(Events.ParentEventRouter, Contract.ContractFulfillingBroker);
 
             if (Globals.LoggingSetup != null)
             {
                 Services.AddLogging(Globals.LoggingSetup);
             }
 
-            Services.AddSingleton<IParent>(parent)
+            Services.AddSingleton<IParentReference>(parent)
                     .AddSingleton(_internals);
 
             return this;

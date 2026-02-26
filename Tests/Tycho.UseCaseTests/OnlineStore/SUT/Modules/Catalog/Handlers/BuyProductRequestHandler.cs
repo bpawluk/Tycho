@@ -7,9 +7,9 @@ using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Domain;
 
 namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Handlers;
 
-internal class BuyProductRequestHandler(IParent parent, IUnitOfWork unitOfWork) : IRequestHandler<BuyProductRequest>
+internal class BuyProductRequestHandler(IParentReference parent, IUnitOfWork unitOfWork) : IRequestHandler<BuyProductRequest>
 {
-    private readonly IParent _parent = parent;
+    private readonly IParentReference _parent = parent;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public async Task Handle(BuyProductRequest requestData, CancellationToken cancellationToken)

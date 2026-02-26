@@ -76,7 +76,7 @@ namespace Tycho.Apps.Setup
             services.AddTransient<InboxProcessorJob>();
 
             services.AddSingleton(_handlerRegistry);
-            services.AddTransient<IEventPublisher, EventPublisher>();
+            services.AddTransient<IGenericPublisher, GenericPublisher>();
             services.AddTransient<IEventRouter, EventRouter>();
             services.AddTransient<IDeliveryStrategyProvider, DeliveryStrategyProvider>();
             services.AddTransient<DownStreamRouteDelivery>();

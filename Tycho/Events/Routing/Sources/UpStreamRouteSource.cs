@@ -8,7 +8,7 @@ namespace Tycho.Events.Routing.Sources
         : ExternalRouteSource<TEvent>
         where TEvent : class, IEvent
     {
-        public UpStreamRouteSource(IParent parent)
+        public UpStreamRouteSource(IParentReference parent)
             : base(parent.EventRouter)
         {
         }
@@ -21,7 +21,7 @@ namespace Tycho.Events.Routing.Sources
         where TEvent : class, IEvent
         where TTargetEvent : class, IEvent
     {
-        public UpStreamMappedRouteSource(IParent parent, Func<TEvent, TTargetEvent> map)
+        public UpStreamMappedRouteSource(IParentReference parent, Func<TEvent, TTargetEvent> map)
             : base(parent.EventRouter, map)
         {
         }

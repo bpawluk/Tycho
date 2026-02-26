@@ -3,11 +3,11 @@ using Tycho.Structure.External;
 
 namespace Tycho.IntegrationTests.SendingRequestsHorizontally.SUT.Modules.Beta.Handlers;
 
-internal class BetaInRequestHandler(IParent parent)
+internal class BetaInRequestHandler(IParentReference parent)
     : IRequestHandler<BetaInRequest>
     , IRequestHandler<BetaInRequestWithResponse, string>
 {
-    private readonly IParent _parent = parent;
+    private readonly IParentReference _parent = parent;
 
     public Task HandleAsync(BetaInRequest requestData, CancellationToken cancellationToken)
     {

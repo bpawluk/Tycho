@@ -1,20 +1,19 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Requests;
 using Tycho.Utils;
 
-namespace Tycho.Apps.Instance
+namespace Tycho.Structure.External
 {
     [ReferencedBySourceGenerator]
-    public abstract class AppFacadeBase : IAsyncDisposable
+    public abstract class ParentBase
     {
-        private readonly IApp _app;
+        private readonly IParentReference _parentReference;
 
         [ReferencedBySourceGenerator]
-        public AppFacadeBase(IApp app)
+        public ParentBase(IParentReference parentReference)
         {
-            _app = app;
+            _parentReference = parentReference;
         }
 
         [ReferencedBySourceGenerator]
@@ -22,7 +21,7 @@ namespace Tycho.Apps.Instance
             where TRequest : class, IRequest
         {
             requestData.ThrowIfNull();
-            return _app.RequestBroker.ExecuteAsync(requestData, cancellationToken);
+            return _parentReference.RequestBroker.ExecuteAsync(requestData, cancellationToken);
         }
 
         [ReferencedBySourceGenerator]
@@ -30,9 +29,7 @@ namespace Tycho.Apps.Instance
             where TRequest : class, IRequest<TResponse>
         {
             requestData.ThrowIfNull();
-            return _app.RequestBroker.ExecuteAsync<TRequest, TResponse>(requestData, cancellationToken);
+            return _parentReference.RequestBroker.ExecuteAsync<TRequest, TResponse>(requestData, cancellationToken);
         }
-
-        public ValueTask DisposeAsync() => _app.DisposeAsync();
     }
 }

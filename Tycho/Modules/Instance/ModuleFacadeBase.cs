@@ -21,7 +21,7 @@ namespace Tycho.Modules.Instance
         protected Task ExecuteAsync<TRequest>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest
         {
-            requestData.ThrowIfNull(nameof(requestData));
+            requestData.ThrowIfNull();
             return _module.RequestBroker.ExecuteAsync(requestData, cancellationToken);
         }
 
@@ -29,7 +29,7 @@ namespace Tycho.Modules.Instance
         protected Task<TResponse> ExecuteAsync<TRequest, TResponse>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest<TResponse>
         {
-            requestData.ThrowIfNull(nameof(requestData));
+            requestData.ThrowIfNull();
             return _module.RequestBroker.ExecuteAsync<TRequest, TResponse>(requestData, cancellationToken);
         }
 

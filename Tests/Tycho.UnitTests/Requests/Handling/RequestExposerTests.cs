@@ -12,7 +12,7 @@ public class RequestExposerTests
     {
         // Arrange
         var request = new TestRequest();
-        var parentMock = new Mock<IParent>();
+        var parentMock = new Mock<IParentReference>();
 
         var sut = new RequestExposer<TestRequest>(parentMock.Object);
 
@@ -30,7 +30,7 @@ public class RequestExposerTests
         var request = new TestRequestWithResponse();
         var response = "success";
 
-        var parentMock = new Mock<IParent>();
+        var parentMock = new Mock<IParentReference>();
         parentMock.Setup(p => p.Execute<TestRequestWithResponse, string>(request, CancellationToken.None))
                   .ReturnsAsync(response);
 

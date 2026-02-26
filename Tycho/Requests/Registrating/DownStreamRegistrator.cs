@@ -36,7 +36,7 @@ namespace Tycho.Requests.Registrating
             AddDownStreamRegistration<TSourceModule, TRequest, MappedRequestExposer<TRequest, TTargetRequest>>();
             Services.TryAddTransient(sp =>
                 new MappedRequestExposer<TRequest, TTargetRequest>(
-                    sp.GetRequiredService<IParent>(),
+                    sp.GetRequiredService<IParentReference>(),
                     map));
         }
 
@@ -52,7 +52,7 @@ namespace Tycho.Requests.Registrating
                 MappedRequestExposer<TRequest, TResponse, TTargetRequest, TTargetResponse>>();
             Services.TryAddTransient(sp =>
                 new MappedRequestExposer<TRequest, TResponse, TTargetRequest, TTargetResponse>(
-                    sp.GetRequiredService<IParent>(),
+                    sp.GetRequiredService<IParentReference>(),
                     mapRequest,
                     mapResponse));
         }

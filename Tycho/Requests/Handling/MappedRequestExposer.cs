@@ -8,7 +8,7 @@ namespace Tycho.Requests.Handling
         where TRequest : class, IRequest
         where TTargetRequest : class, IRequest
     {
-        public MappedRequestExposer(IParent parent, Func<TRequest, TTargetRequest> map)
+        public MappedRequestExposer(IParentReference parent, Func<TRequest, TTargetRequest> map)
             : base(parent.RequestBroker, map)
         {
         }
@@ -20,7 +20,7 @@ namespace Tycho.Requests.Handling
         where TTargetRequest : class, IRequest<TTargetResponse>
     {
         public MappedRequestExposer(
-            IParent parent, 
+            IParentReference parent, 
             Func<TRequest, TTargetRequest> mapRequest,
             Func<TTargetResponse, TResponse> mapResponse)
             : base(parent.RequestBroker, mapRequest, mapResponse)

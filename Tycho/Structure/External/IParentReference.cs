@@ -6,7 +6,7 @@ namespace Tycho.Structure.External
     /// <summary>
     /// Represents a parent that owns the current module.
     /// </summary>
-    public interface IParent
+    public interface IParentReference
     {
         internal IEventRouter EventRouter { get; }
         internal IRequestBroker RequestBroker { get; }

@@ -28,7 +28,7 @@ public class DownStreamRegistratorTests
     [Fact]
     public void Expose_NewRequest_RegistersExposer()
     {
-        var targetModuleMock = new Mock<IParent>();
+        var targetModuleMock = new Mock<IParentReference>();
         _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
 
         // Act
@@ -58,7 +58,7 @@ public class DownStreamRegistratorTests
     [Fact]
     public void Expose_NewRequestWithResponse_RegistersExposer()
     {
-        var targetModuleMock = new Mock<IParent>();
+        var targetModuleMock = new Mock<IParentReference>();
         _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
 
         // Act
@@ -90,7 +90,7 @@ public class DownStreamRegistratorTests
     public void Expose_NewMappedRequest_RegistersExposer()
     {
         var mapMock = new Mock<Func<TestRequest, OtherRequest>>();
-        var targetModuleMock = new Mock<IParent>();
+        var targetModuleMock = new Mock<IParentReference>();
         _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
 
         // Act
@@ -123,7 +123,7 @@ public class DownStreamRegistratorTests
     {
         var mapRequestMock = new Mock<Func<TestRequestWithResponse, OtherRequestWithResponse>>();
         var mapResponseMock = new Mock<Func<string, string>>();
-        var targetModuleMock = new Mock<IParent>();
+        var targetModuleMock = new Mock<IParentReference>();
         _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
 
         // Act

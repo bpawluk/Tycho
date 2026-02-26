@@ -28,7 +28,7 @@ public class RegistratorTests
     public void Expose_NewEvent_RegistersHandlersSource()
     {
         // Arrange
-        var targetModuleMock = new Mock<IParent>();
+        var targetModuleMock = new Mock<IParentReference>();
         _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
 
         // Act
@@ -59,7 +59,7 @@ public class RegistratorTests
     public void Expose_NewEventWithMapping_RegistersHandlersSource()
     {
         // Arrange
-        var targetModuleMock = new Mock<IParent>();
+        var targetModuleMock = new Mock<IParentReference>();
         _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
 
         // Act

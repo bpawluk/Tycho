@@ -9,9 +9,9 @@ namespace Tycho.Events.Routing.Delivery
 {
     internal class UpStreamRouteDelivery : IDeliveryStrategy
     {
-        private readonly IParent _parent;
+        private readonly IParentReference _parent;
 
-        public UpStreamRouteDelivery(IParent parent)
+        public UpStreamRouteDelivery(IParentReference parent)
         {
             _parent = parent;
         }

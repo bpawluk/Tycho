@@ -8,13 +8,13 @@ using Tycho.Events.Serialization;
 
 namespace Tycho.Events.Publishing
 {
-    internal class EventPublisher : IEventPublisher
+    internal class GenericPublisher : IGenericPublisher
     {
         private readonly IEventRouter _router;
         private readonly IPayloadSerializer _serializer;
         private readonly IOutboxWriter _outbox;
 
-        public EventPublisher(IEventRouter router, IPayloadSerializer serializer, IOutboxWriter outbox)
+        public GenericPublisher(IEventRouter router, IPayloadSerializer serializer, IOutboxWriter outbox)
         {
             _router = router;
             _serializer = serializer;
@@ -24,11 +24,6 @@ namespace Tycho.Events.Publishing
         public async Task PublishAsync<TEvent>(TEvent eventPayload, CancellationToken cancellationToken)
             where TEvent : class, IEvent
         {
-            if (eventPayload is null)
-            {
-                throw new ArgumentNullException(nameof(eventPayload), $"{nameof(eventPayload)} cannot be null");
-            }
-
             var eventId = Guid.NewGuid();
             var routedEvents = _router.FindRoutes(eventId, eventPayload);
 

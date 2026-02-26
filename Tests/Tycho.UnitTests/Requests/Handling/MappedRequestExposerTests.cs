@@ -13,7 +13,7 @@ public class MappedRequestExposerTests
         // Arrange
         var request = new TestRequest();
         var mappedRequest = new OtherRequest();
-        var parentMock = new Mock<IParent>();
+        var parentMock = new Mock<IParentReference>();
 
         var mapMock = new Mock<Func<TestRequest, OtherRequest>>();
         mapMock.Setup(m => m(It.IsAny<TestRequest>()))
@@ -37,7 +37,7 @@ public class MappedRequestExposerTests
         var mappedRequest = new OtherRequestWithResponse();
         var response = "success";
 
-        var parentMock = new Mock<IParent>();
+        var parentMock = new Mock<IParentReference>();
         parentMock.Setup(p => p.Execute<OtherRequestWithResponse, string>(mappedRequest, CancellationToken.None))
                   .ReturnsAsync(response);
 

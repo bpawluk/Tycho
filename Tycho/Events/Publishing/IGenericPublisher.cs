@@ -1,12 +1,12 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace Tycho.Events
+namespace Tycho.Events.Publishing
 {
     /// <summary>
     /// An interface for publishing events.
     /// </summary>
-    public interface IEventPublisher
+    public interface IGenericPublisher
     {
         /// <summary>
         /// Publishes an event of type <typeparamref name="TEvent"/>.

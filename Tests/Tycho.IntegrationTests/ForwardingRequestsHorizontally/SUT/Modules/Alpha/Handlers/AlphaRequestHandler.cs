@@ -3,11 +3,11 @@ using Tycho.Structure.External;
 
 namespace Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Modules.Alpha.Handlers;
 
-internal class AlphaRequestHandler(IParent parent)
+internal class AlphaRequestHandler(IParentReference parent)
     : IRequestHandler<AlphaRequest>
     , IRequestHandler<AlphaRequestWithResponse, string>
 {
-    private readonly IParent _parent = parent;
+    private readonly IParentReference _parent = parent;
 
     public Task HandleAsync(AlphaRequest requestData, CancellationToken cancellationToken)
     {

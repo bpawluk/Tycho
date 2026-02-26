@@ -7,10 +7,10 @@ using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Domain;
 
 namespace Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Handlers;
 
-internal class RemovePostRequestHandler(IUnitOfWork unitOfWork, IParent parent) : IRequestHandler<RemovePostRequest>
+internal class RemovePostRequestHandler(IUnitOfWork unitOfWork, IParentReference parent) : IRequestHandler<RemovePostRequest>
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
-    private readonly IParent _parent = parent;
+    private readonly IParentReference _parent = parent;
 
     public async Task Handle(RemovePostRequest requestData, CancellationToken cancellationToken)
     {

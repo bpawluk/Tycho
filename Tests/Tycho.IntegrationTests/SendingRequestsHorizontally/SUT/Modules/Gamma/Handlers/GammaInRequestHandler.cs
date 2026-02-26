@@ -3,11 +3,11 @@ using Tycho.Structure.External;
 
 namespace Tycho.IntegrationTests.SendingRequestsHorizontally.SUT.Modules.Gamma.Handlers;
 
-internal class GammaInRequestHandler(IParent parent)
+internal class GammaInRequestHandler(IParentReference parent)
     : IRequestHandler<GammaInRequest>
     , IRequestHandler<GammaInRequestWithResponse, string>
 {
-    private readonly IParent _parent = parent;
+    private readonly IParentReference _parent = parent;
 
     public Task HandleAsync(GammaInRequest requestData, CancellationToken cancellationToken)
     {

@@ -5,10 +5,10 @@ using Tycho.Structure.External;
 
 namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules.Handlers;
 
-internal class GetModuleScopedServiceUsageEventHandler(IParent parent, IServiceProvider serviceProvider)
+internal class GetModuleScopedServiceUsageEventHandler(IParentReference parent, IServiceProvider serviceProvider)
     : IEventHandler<GetModuleScopedServiceUsageEvent>
 {
-    private readonly IParent _parent = parent;
+    private readonly IParentReference _parent = parent;
     private readonly IServiceProvider _serviceProvider = serviceProvider;
 
     public Task HandleAsync(EventContext<GetModuleScopedServiceUsageEvent> context, CancellationToken cancellationToken)

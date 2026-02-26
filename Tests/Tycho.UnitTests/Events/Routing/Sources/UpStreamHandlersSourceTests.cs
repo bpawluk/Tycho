@@ -28,7 +28,7 @@ public class UpStreamHandlersSourceTests
         eventRouterMock.Setup(m => m.FindHandler(It.IsAny<HandlerIdentity>()))
                        .Returns(_expectedHandler);
 
-        var parentMock = new Mock<IParent>();
+        var parentMock = new Mock<IParentReference>();
         parentMock.SetupGet(p => p.EventRouter)
                   .Returns(eventRouterMock.Object);
 

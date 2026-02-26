@@ -33,7 +33,7 @@ public class UpStreamMappedHandlersSourceTests
                            id => id.MatchesEvent(typeof(OtherEvent)))))
                        .Returns(_handlerFromParent);
 
-        var parentMock = new Mock<IParent>();
+        var parentMock = new Mock<IParentReference>();
         parentMock.SetupGet(p => p.EventRouter)
                   .Returns(eventRouterMock.Object);
 

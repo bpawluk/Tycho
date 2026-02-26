@@ -49,7 +49,7 @@ namespace Tycho.Events.Registrating
 
             Services.AddTransient<IRouteSource<TEvent>>(
                 sp => new UpStreamMappedRouteSource<TEvent, TTargetEvent>(
-                    sp.GetRequiredService<IParent>(),
+                    sp.GetRequiredService<IParentReference>(),
                     map));
         }
 
