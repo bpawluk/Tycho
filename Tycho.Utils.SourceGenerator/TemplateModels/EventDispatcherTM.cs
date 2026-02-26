@@ -42,6 +42,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         internal class ClassesTM
         {
             public string EventDispatcherClass { get; }
+            public string EventDispatcherBaseClass { get; }
             public string TaskClass { get; }
             public string EventContextClass { get; }
             public string GuidClass { get; }
@@ -51,6 +52,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public ClassesTM(EventDispatcherTM owner, EventDispatcherModel eventDispatcherModel)
             {
                 EventDispatcherClass = EventDispatcherSymbols.GetEventDispatcherClass(eventDispatcherModel.DefinitionType.Name);
+                EventDispatcherBaseClass = owner.UseType(EventDispatcherBaseReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 EventContextClass = owner.UseType(EventContextReference.TypeModel);
                 GuidClass = owner.UseType(GuidReference.TypeModel);
@@ -61,14 +63,12 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         internal class InterfacesTM
         {
-            public string EventHandlingDispatcherInterface { get; }
             public string PayloadSerializerInterface { get; }
             public string EventHandlerInterface { get; }
             public string EventInterface { get; }
 
             public InterfacesTM(EventDispatcherTM owner)
             {
-                EventHandlingDispatcherInterface = owner.UseType(IEventHandlingDispatcherReference.TypeModel);
                 PayloadSerializerInterface = owner.UseType(IPayloadSerializerReference.TypeModel);
                 EventHandlerInterface = owner.UseType(IEventHandlerReference.TypeModel);
                 EventInterface = owner.UseType(IEventReference.TypeModel);
@@ -87,16 +87,14 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         internal class MethodsTM
         {
-            public string DeserializeMethod { get; }
-            public string HandleAsyncMethod { get; }
             public string GetTypeMethod { get; }
+            public string DispatchAsMethod { get; }
             public string DispatchMethod { get; }
 
             public MethodsTM()
             {
-                DeserializeMethod = IPayloadSerializerReference.DeserializeMethodSignature.MethodName;
-                HandleAsyncMethod = IEventHandlerReference.HandleAsyncMethodSignature.MethodName;
                 GetTypeMethod = ObjectReference.GetTypeMethodSignature.MethodName;
+                DispatchAsMethod = EventDispatcherBaseReference.DispatchAsMethodSignature.MethodName;
                 DispatchMethod = EventDispatcherSymbols.DispatchMethod;
             }
         }

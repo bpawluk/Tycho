@@ -70,7 +70,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string ConfigurationInterface { get; }
             public string LoggingBuilderInterface { get; }
             public string ServiceCollectionInterface { get; }
-            public string EventHandlingDispatcherInterface { get; }
+            public string EventDispatcherInterface { get; }
             public string ModuleInstanceInterface { get; }
 
             public InterfacesTM(AppDefinitionTM owner, TychoDefinitionModel tychoDefinitionModel)
@@ -79,7 +79,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 ConfigurationInterface = owner.UseType(IConfigurationReference.TypeModel);
                 LoggingBuilderInterface = owner.UseType(ILoggingBuilderReference.TypeModel);
                 ServiceCollectionInterface = owner.UseType(IServiceCollectionReference.TypeModel);
-                EventHandlingDispatcherInterface = owner.UseType(IEventHandlingDispatcherReference.TypeModel);
+                EventDispatcherInterface = owner.UseType(IEventDispatcherReference.TypeModel);
                 ModuleInstanceInterface = owner.UseType(IModuleReference.TypeModel);
             }
         }

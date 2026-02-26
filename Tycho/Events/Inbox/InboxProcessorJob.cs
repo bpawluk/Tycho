@@ -15,7 +15,7 @@ namespace Tycho.Events.Inbox
     {
         private readonly IInboxConsumer _inboxConsumer;
         private readonly IEventHandlerRegistry _handlerRegistry;
-        private readonly IEventHandlingDispatcher _handlingDispatcher;
+        private readonly IEventDispatcher _handlingDispatcher;
         private readonly InboxProcessorSettings _settings;
         private readonly ILogger<InboxProcessorJob> _logger;
 
@@ -24,7 +24,7 @@ namespace Tycho.Events.Inbox
         public InboxProcessorJob(
             IInboxConsumer inboxConsumer,
             IEventHandlerRegistry handlerRegistry,
-            IEventHandlingDispatcher handlingDispatcher,
+            IEventDispatcher handlingDispatcher,
             InboxProcessorSettings? settings = null,
             ILogger<InboxProcessorJob>? logger = null)
         {

@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Tycho.Utils;
 
 namespace Tycho.Events.Handling
 {
     /// <summary>
     /// Dispatches events to respective event handlers.
     /// </summary>
-    [ReferencedBySourceGenerator]
-    public interface IEventHandlingDispatcher
+    public interface IEventDispatcher
     {
         /// <summary>
         /// Dispatches the specified event to the provided <paramref name="eventHandler"/>.
@@ -18,7 +16,6 @@ namespace Tycho.Events.Handling
         /// <param name="eventPayload">The event payload of the event instance.</param>
         /// <param name="eventHandler">The handler that will process the event.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
-        [ReferencedBySourceGenerator]
         Task Dispatch(
             Guid eventId,
             object eventPayload,

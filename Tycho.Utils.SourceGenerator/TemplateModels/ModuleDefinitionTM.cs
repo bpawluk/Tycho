@@ -56,13 +56,13 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         internal class InterfacesTM
         {
             public string ServiceCollectionInterface { get; }
-            public string EventHandlingDispatcherInterface { get; }
+            public string EventDispatcherInterface { get; }
             public string ModuleInstanceInterface { get; }
 
             public InterfacesTM(ModuleDefinitionTM owner)
             {
                 ServiceCollectionInterface = owner.UseType(IServiceCollectionReference.TypeModel);
-                EventHandlingDispatcherInterface = owner.UseType(IEventHandlingDispatcherReference.TypeModel);
+                EventDispatcherInterface = owner.UseType(IEventDispatcherReference.TypeModel);
                 ModuleInstanceInterface = owner.UseType(IModuleReference.TypeModel);
             }
         }
