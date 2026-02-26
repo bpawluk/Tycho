@@ -12,7 +12,6 @@ using Tycho.Events.Routing;
 using Tycho.Events.Routing.Delivery;
 using Tycho.Events.Serialization;
 using Tycho.Events.Serialization.InMemory;
-using Tycho.Modules.Routing;
 using Tycho.Registry;
 using Tycho.Structure.Internal;
 

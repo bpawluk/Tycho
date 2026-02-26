@@ -1,5 +1,4 @@
 ﻿using Tycho.Events;
-using Tycho.Modules.Routing;
 using Tycho.Utils;
 
 namespace Tycho.Modules

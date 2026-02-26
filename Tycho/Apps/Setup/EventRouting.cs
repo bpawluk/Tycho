@@ -1,9 +1,10 @@
 ﻿using System;
 using Tycho.Events;
 using Tycho.Events.Registrating;
+using Tycho.Modules;
 using Tycho.Utils;
 
-namespace Tycho.Modules.Routing
+namespace Tycho.Apps.Setup
 {
     internal class EventRouting<TEvent> : IEventRouting<TEvent>
         where TEvent : class, IEvent
@@ -15,20 +16,6 @@ namespace Tycho.Modules.Routing
             _registrator = registrator;
         }
 
-        public IEventRouting<TEvent> Exposes()
-        {
-            _registrator.ExposeEvent<TEvent>();
-            return this;
-        }
-
-        public IEventRouting<TEvent> ExposesAs<TOtherEvent>(Func<TEvent, TOtherEvent> map)
-            where TOtherEvent : class, IEvent
-        {
-            map.ThrowIfNull();
-            _registrator.ExposeEvent(map);
-            return this;
-        }
-
         public IEventRouting<TEvent> Forwards<TModule>()
             where TModule : TychoModule
         {
@@ -36,12 +23,12 @@ namespace Tycho.Modules.Routing
             return this;
         }
 
-        public IEventRouting<TEvent> ForwardsAs<TOtherEvent, TModule>(Func<TEvent, TOtherEvent> map)
-            where TOtherEvent : class, IEvent
+        public IEventRouting<TEvent> ForwardsAs<TTargetEvent, TModule>(Func<TEvent, TTargetEvent> map)
+            where TTargetEvent : class, IEvent
             where TModule : TychoModule
         {
             map.ThrowIfNull();
-            _registrator.ForwardEvent<TEvent, TOtherEvent, TModule>(map);
+            _registrator.ForwardEvent<TEvent, TTargetEvent, TModule>(map);
             return this;
         }
     }

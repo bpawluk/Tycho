@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Tycho.Apps.Routing;
 using Tycho.Events;
 using Tycho.Events.Inbox;
 using Tycho.Events.Inbox.InMemory;

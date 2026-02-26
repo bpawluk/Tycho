@@ -2,7 +2,7 @@
 using Tycho.Events;
 using Tycho.Modules;
 
-namespace Tycho.Apps.Routing
+namespace Tycho.Apps
 {
     /// <summary>
     /// An interface for routing events of type <typeparamref name="TEvent"/>.
