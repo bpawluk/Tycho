@@ -10,26 +10,16 @@ namespace {{ namespace }}
     public partial class {{ containing_type }}
     {
 {{~ end ~}}
-    internal class {{ classes.facade_class }} : {{ interfaces.module_interface }}
+    internal class {{ classes.facade_class }} : {{ classes.facade_base_class }}, {{ interfaces.module_interface }}
     {
-        private readonly {{ interfaces.instance_interface }} _module;
-
-        public {{ classes.facade_class }}({{ interfaces.instance_interface }} {{ parameters.module_parameter }})
-        {
-            _module = {{ parameters.module_parameter }};
-        }
-
+        public {{ classes.facade_class }}({{ interfaces.instance_interface }} {{ parameters.module_parameter }}) : base({{ parameters.module_parameter }}) { }
         {{~ for request in requests ~}}
+
         public {{ classes.task_class }}{{ if request.has_response }}<{{ request.response_type }}>{{ end }} {{ methods.execute_async_method }}({{ request.request_type }} {{ parameters.request_data_parameter }}, {{ classes.cancellation_token_class }} {{ parameters.cancellation_token_parameter }})
         {
-            return _module.{{ methods.execute_async_method }}<{{ request.request_type }}{{ if request.has_response }}, {{ request.response_type }}{{ end }}>({{ parameters.request_data_parameter }}, {{ parameters.cancellation_token_parameter }});
+            return {{ methods.execute_async_method }}<{{ request.request_type }}{{ if request.has_response }}, {{ request.response_type }}{{ end }}>({{ parameters.request_data_parameter }}, {{ parameters.cancellation_token_parameter }});
         }
-        
         {{~ end ~}}
-        public async {{ classes.value_task_class }} {{ methods.dispose_async_method }}()
-        {
-            await _module.{{ methods.dispose_async_method }}().{{ methods.configure_await_method }}(false);
-        }
     }
 {{~ for containing_type in containing_types ~}}
     }

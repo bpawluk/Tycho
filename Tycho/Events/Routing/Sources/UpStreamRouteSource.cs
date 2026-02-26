@@ -1,6 +1,6 @@
 ﻿using System;
 using Tycho.Events.Routing.Routes;
-using Tycho.Structure;
+using Tycho.Structure.External;
 
 namespace Tycho.Events.Routing.Sources
 {

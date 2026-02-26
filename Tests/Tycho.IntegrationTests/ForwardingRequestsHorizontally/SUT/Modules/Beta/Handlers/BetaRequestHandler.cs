@@ -1,5 +1,5 @@
 ﻿using Tycho.Requests;
-using Tycho.Structure;
+using Tycho.Structure.External;
 
 namespace Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Modules.Beta.Handlers;
 
@@ -11,11 +11,13 @@ internal class BetaRequestHandler(IParent parent)
 
     public Task HandleAsync(BetaRequest requestData, CancellationToken cancellationToken)
     {
-        return _parent.ExecuteAsync(requestData, cancellationToken);
+        return Task.CompletedTask;
+        //return _parent.ExecuteAsync(requestData, cancellationToken);
     }
 
     public Task<string> HandleAsync(BetaRequestWithResponse requestData, CancellationToken cancellationToken)
     {
-        return _parent.ExecuteAsync<BetaRequestWithResponse, string>(requestData, cancellationToken);
+        return Task.FromResult("Error");
+        //return _parent.ExecuteAsync<BetaRequestWithResponse, string>(requestData, cancellationToken);
     }
 }

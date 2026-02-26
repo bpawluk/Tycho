@@ -1,6 +1,6 @@
 ﻿using Tycho.Persistence.EFCore;
 using Tycho.Requests;
-using Tycho.Structure;
+using Tycho.Structure.External;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Incoming;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Outgoing;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Domain;

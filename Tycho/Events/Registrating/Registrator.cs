@@ -3,8 +3,9 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Routing.Sources;
 using Tycho.Modules;
+using Tycho.Modules.Instance;
 using Tycho.Registry;
-using Tycho.Structure;
+using Tycho.Structure.External;
 using Tycho.Structure.Internal;
 
 namespace Tycho.Events.Registrating
@@ -80,7 +81,7 @@ namespace Tycho.Events.Registrating
 
             Services.AddTransient<IRouteSource<TEvent>>(
                 sp => new DownStreamMappedRouteSource<TEvent, TTargetEvent, TModule>(
-                    sp.GetRequiredService<IModuleInstance<TModule>>(),
+                    sp.GetRequiredService<IModule<TModule>>(),
                     map));
         }
 

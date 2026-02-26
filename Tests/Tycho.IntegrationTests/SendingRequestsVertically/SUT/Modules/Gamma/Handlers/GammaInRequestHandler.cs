@@ -1,5 +1,5 @@
 ﻿using Tycho.Requests;
-using Tycho.Structure;
+using Tycho.Structure.External;
 
 namespace Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Gamma.Handlers;
 
@@ -12,14 +12,16 @@ internal class GammaInRequestHandler(IParent parent)
     public Task HandleAsync(GammaInRequest requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        return _parent.ExecuteAsync(new GammaOutRequest(requestData.Result), cancellationToken);
+        return Task.CompletedTask;
+        //return _parent.ExecuteAsync(new GammaOutRequest(requestData.Result), cancellationToken);
     }
 
     public Task<string> HandleAsync(GammaInRequestWithResponse requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        return _parent.ExecuteAsync<GammaOutRequestWithResponse, string>(
-            new GammaOutRequestWithResponse(requestData.Result),
-            cancellationToken);
+        return Task.FromResult("Error");
+        //return _parent.ExecuteAsync<GammaOutRequestWithResponse, string>(
+        //    new GammaOutRequestWithResponse(requestData.Result),
+        //    cancellationToken);
     }
 }

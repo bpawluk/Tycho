@@ -1,6 +1,6 @@
 ﻿using Moq;
+using Tycho.Modules.Instance;
 using Tycho.Requests.Handling;
-using Tycho.Structure;
 using Tycho.UnitTests._Data.Modules;
 using Tycho.UnitTests._Data.Requests;
 
@@ -14,7 +14,7 @@ public class MappedRequestForwarderTests
         // Arrange
         var request = new TestRequest();
         var mappedRequest = new OtherRequest();
-        var targetModuleMock = new Mock<IModuleInstance<TestModule>>();
+        var targetModuleMock = new Mock<IModule<TestModule>>();
 
         var mapMock = new Mock<Func<TestRequest, OtherRequest>>();
         mapMock.Setup(m => m(It.IsAny<TestRequest>()))
@@ -39,7 +39,7 @@ public class MappedRequestForwarderTests
         var mappedRequest = new OtherRequestWithResponse();
         var response = "success";
 
-        var targetModuleMock = new Mock<IModuleInstance<TestModule>>();
+        var targetModuleMock = new Mock<IModule<TestModule>>();
         targetModuleMock.Setup(m => m.Execute<OtherRequestWithResponse, string>(mappedRequest, CancellationToken.None))
                         .ReturnsAsync(response);
 

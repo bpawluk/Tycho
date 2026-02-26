@@ -1,5 +1,5 @@
 ﻿using System;
-using Tycho.Structure;
+using Tycho.Structure.External;
 
 namespace Tycho.Requests.Handling
 {
@@ -9,7 +9,7 @@ namespace Tycho.Requests.Handling
         where TTargetRequest : class, IRequest
     {
         public MappedRequestExposer(IParent parent, Func<TRequest, TTargetRequest> map)
-            : base(parent, map)
+            : base(parent.RequestBroker, map)
         {
         }
     }
@@ -23,7 +23,7 @@ namespace Tycho.Requests.Handling
             IParent parent, 
             Func<TRequest, TTargetRequest> mapRequest,
             Func<TTargetResponse, TResponse> mapResponse)
-            : base(parent, mapRequest, mapResponse)
+            : base(parent.RequestBroker, mapRequest, mapResponse)
         {
         }
     }

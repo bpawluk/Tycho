@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Routing;
 using Tycho.Modules.Instance;
 using Tycho.Requests.Broker;
-using Tycho.Structure;
 using Tycho.Structure.External;
 using Tycho.Structure.Internal;
 
@@ -31,7 +30,7 @@ namespace Tycho.Modules.Setup
 
         public ModuleBuilder(Type moduleDefinitionType)
         {
-            _moduleType = typeof(ModuleInstance<>).MakeGenericType(moduleDefinitionType);
+            _moduleType = typeof(Module<>).MakeGenericType(moduleDefinitionType);
             _internals = new Internals(moduleDefinitionType);
             Globals = new Globals();
             Settings = null!;
@@ -73,22 +72,22 @@ namespace Tycho.Modules.Setup
 
         public ModuleBuilder Init()
         {
-            var parentProxy = new ParentProxy(Contract.ContractFulfillingBroker, Events.ParentEventRouter);
+            var parent = new Parent(Events.ParentEventRouter, Contract.ContractFulfillingBroker);
 
             if (Globals.LoggingSetup != null)
             {
                 Services.AddLogging(Globals.LoggingSetup);
             }
 
-            Services.AddSingleton<IParent>(parentProxy)
+            Services.AddSingleton<IParent>(parent)
                     .AddSingleton(_internals);
 
             return this;
         }
 
-        public async Task<IModuleInstance> BuildAsync()
+        public async Task<IModule> BuildAsync()
         {
-            var module = (IModuleInstance)Activator.CreateInstance(_moduleType, _internals, _cleanup);
+            var module = (IModule)Activator.CreateInstance(_moduleType, _internals, _cleanup);
 
             await Contract.BuildAsync().ConfigureAwait(false);
             await Events.BuildAsync().ConfigureAwait(false);

@@ -1,26 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using Tycho.Structure;
+using Tycho.Modules.Instance;
 
 namespace Tycho.Registry
 {
     internal class ModuleRegistry : IModuleRegistry
     {
-        private readonly Dictionary<ModuleIdentity, IModuleInstance> _modules;
+        private readonly Dictionary<ModuleIdentity, IModule> _modules;
 
         public ModuleRegistry()
         {
-            _modules = new Dictionary<ModuleIdentity, IModuleInstance>();
+            _modules = new Dictionary<ModuleIdentity, IModule>();
         }
 
-        public void RegisterModule(IModuleInstance module)
+        public void RegisterModule(IModule module)
         {
             var moduleType = module.Internals.Owner;
             var moduleIdentity = new ModuleIdentity(moduleType);
             _modules[moduleIdentity] = module;
         }
 
-        public IModuleInstance GetModule(ModuleIdentity moduleId)
+        public IModule GetModule(ModuleIdentity moduleId)
         {
             if (_modules.TryGetValue(moduleId, out var module))
             {
@@ -29,7 +29,7 @@ namespace Tycho.Registry
             throw new InvalidOperationException($"Module with identity '{moduleId}' not found.");
         }
 
-        public IReadOnlyCollection<IModuleInstance> GetAllModules()
+        public IReadOnlyCollection<IModule> GetAllModules()
         {
             return _modules.Values;
         }

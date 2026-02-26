@@ -5,7 +5,7 @@ using Tycho.Utils.SourceGenerator.References.Microsoft;
 using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.References.Tycho.Apps;
 using Tycho.Utils.SourceGenerator.References.Tycho.Events;
-using Tycho.Utils.SourceGenerator.References.Tycho.Structure;
+using Tycho.Utils.SourceGenerator.References.Tycho.Modules;
 using Tycho.Utils.SourceGenerator.Symbols;
 
 namespace Tycho.Utils.SourceGenerator.TemplateModels
@@ -80,7 +80,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 LoggingBuilderInterface = owner.UseType(ILoggingBuilderReference.TypeModel);
                 ServiceCollectionInterface = owner.UseType(IServiceCollectionReference.TypeModel);
                 EventHandlingDispatcherInterface = owner.UseType(IEventHandlingDispatcherReference.TypeModel);
-                ModuleInstanceInterface = owner.UseType(IModuleInstanceReference.TypeModel);
+                ModuleInstanceInterface = owner.UseType(IModuleReference.TypeModel);
             }
         }
 

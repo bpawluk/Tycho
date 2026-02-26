@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
-using Tycho.Structure;
+using Tycho.Modules.Instance;
 
 namespace Tycho.Registry
 {
     internal interface IModuleRegistry
     {
-        void RegisterModule(IModuleInstance module);
+        void RegisterModule(IModule module);
 
-        IModuleInstance GetModule(ModuleIdentity moduleId);
+        IModule GetModule(ModuleIdentity moduleId);
 
-        IReadOnlyCollection<IModuleInstance> GetAllModules();
+        IReadOnlyCollection<IModule> GetAllModules();
     }
 }

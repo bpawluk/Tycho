@@ -1,6 +1,6 @@
 ﻿using System;
 using Tycho.Modules;
-using Tycho.Structure;
+using Tycho.Modules.Instance;
 
 namespace Tycho.Requests.Handling
 {
@@ -10,8 +10,8 @@ namespace Tycho.Requests.Handling
         where TTargetRequest : class, IRequest
         where TModule : TychoModule
     {
-        public MappedRequestForwarder(IModuleInstance<TModule> childModule, Func<TRequest, TTargetRequest> map)
-            : base(childModule, map)
+        public MappedRequestForwarder(IModule<TModule> childModule, Func<TRequest, TTargetRequest> map)
+            : base(childModule.RequestBroker, map)
         {
         }
     }
@@ -23,10 +23,10 @@ namespace Tycho.Requests.Handling
         where TModule : TychoModule
     {
         public MappedRequestForwarder(
-            IModuleInstance<TModule> childModule,
+            IModule<TModule> childModule,
             Func<TRequest, TTargetRequest> mapRequest,
             Func<TTargetResponse, TResponse> mapResponse)
-            : base(childModule, mapRequest, mapResponse)
+            : base(childModule.RequestBroker, mapRequest, mapResponse)
         {
         }
     }

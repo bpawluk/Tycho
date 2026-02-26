@@ -1,7 +1,7 @@
 ﻿using System;
 using Tycho.Events.Routing.Routes;
 using Tycho.Modules;
-using Tycho.Structure;
+using Tycho.Modules.Instance;
 
 namespace Tycho.Events.Routing.Sources
 {
@@ -10,7 +10,7 @@ namespace Tycho.Events.Routing.Sources
         where TEvent : class, IEvent
         where TModule : TychoModule
     {
-        public DownStreamRouteSource(IModuleInstance<TModule> submodule) : base(submodule.EventRouter)
+        public DownStreamRouteSource(IModule<TModule> submodule) : base(submodule.EventRouter)
         {
         }
 
@@ -23,7 +23,7 @@ namespace Tycho.Events.Routing.Sources
         where TTargetEvent : class, IEvent
         where TModule : TychoModule
     {
-        public DownStreamMappedRouteSource(IModuleInstance<TModule> submodule, Func<TEvent, TTargetEvent> map) : base(submodule.EventRouter, map)
+        public DownStreamMappedRouteSource(IModule<TModule> submodule, Func<TEvent, TTargetEvent> map) : base(submodule.EventRouter, map)
         {
         }
 

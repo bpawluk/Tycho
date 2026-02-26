@@ -2,7 +2,7 @@ using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
 using Tycho.Utils.SourceGenerator.Models.Tycho;
 using Tycho.Utils.SourceGenerator.References.System;
-using Tycho.Utils.SourceGenerator.References.Tycho.Structure;
+using Tycho.Utils.SourceGenerator.References.Tycho.Modules;
 using Tycho.Utils.SourceGenerator.Symbols;
 
 namespace Tycho.Utils.SourceGenerator.TemplateModels
@@ -64,7 +64,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public MethodsTM()
             {
-                ExecuteAsyncMethod = IModuleInstanceReference.ExecuteAsyncMethodSignature.MethodName;
+                ExecuteAsyncMethod = ModuleFacadeBaseReference.ExecuteAsyncMethodSignature.MethodName;
             }
         }
 

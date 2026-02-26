@@ -1,5 +1,5 @@
 ﻿using Tycho.Requests;
-using Tycho.Structure;
+using Tycho.Structure.External;
 
 namespace Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Modules.Alpha.Handlers;
 
@@ -11,11 +11,13 @@ internal class RequestHandler(IParent parent)
 
     public Task HandleAsync(Request requestData, CancellationToken cancellationToken)
     {
-        return _parent.ExecuteAsync(requestData, cancellationToken);
+        return Task.CompletedTask;
+        //return _parent.ExecuteAsync(requestData, cancellationToken);
     }
 
     public Task<string> HandleAsync(RequestWithResponse requestData, CancellationToken cancellationToken)
     {
-        return _parent.ExecuteAsync<RequestWithResponse, string>(requestData, cancellationToken);
+        return Task.FromResult("Error");
+        //return _parent.ExecuteAsync<RequestWithResponse, string>(requestData, cancellationToken);
     }
 }

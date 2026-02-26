@@ -1,13 +1,13 @@
-﻿using Tycho.Utils.SourceGenerator.Models.System;
+using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.Utils;
 
-namespace Tycho.Utils.SourceGenerator.References.Tycho.Requests
+namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
 {
-    internal static class IRequestExecutorReference
+    internal static class ModuleFacadeBaseReference
     {
-        private const string _namespace = "Tycho.Requests";
-        private const string _typeName = "IRequestExecutor";
+        private const string _namespace = "Tycho.Modules.Instance";
+        private const string _typeName = "ModuleFacadeBase";
 
         public static string RequestTypeParameterName => "TRequest";
         public static string ResponseTypeParameterName => "TResponse";
@@ -18,6 +18,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Requests
             methodName: "ExecuteAsync",
             parameters: new ImmutableEquatableArray<TypeModel>(new[]
             {
+                ObjectReference.TypeModel,
                 CancellationTokenReference.TypeModel,
             }),
             result: TaskReference.TypeModel);

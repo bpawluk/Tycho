@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Routing;
+using Tycho.Modules.Instance;
 using Tycho.Registry;
 using Tycho.Requests.Broker;
-using Tycho.Structure;
 using Tycho.Structure.External;
 using Tycho.Structure.Internal;
 
@@ -91,7 +91,7 @@ namespace Tycho.Modules.Setup
             {
                 var runningModule = await module.RunAsync().ConfigureAwait(false);
                 moduleRegistry.RegisterModule(runningModule);
-                var genericIface = typeof(IModuleInstance<>).MakeGenericType(module.GetType());
+                var genericIface = typeof(IModule<>).MakeGenericType(module.GetType());
                 services.AddSingleton(genericIface, runningModule);
             })).ConfigureAwait(false);
         }

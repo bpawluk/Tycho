@@ -1,6 +1,6 @@
 ﻿using Moq;
+using Tycho.Modules.Instance;
 using Tycho.Requests.Handling;
-using Tycho.Structure;
 using Tycho.UnitTests._Data.Modules;
 using Tycho.UnitTests._Data.Requests;
 
@@ -13,7 +13,7 @@ public class RequestForwarderTests
     {
         // Arrange
         var request = new TestRequest();
-        var targetModuleMock = new Mock<IModuleInstance<TestModule>>();
+        var targetModuleMock = new Mock<IModule<TestModule>>();
 
         var sut = new RequestForwarder<TestRequest, TestModule>(targetModuleMock.Object);
 
@@ -31,7 +31,7 @@ public class RequestForwarderTests
         var request = new TestRequestWithResponse();
         var response = "success";
 
-        var targetModuleMock = new Mock<IModuleInstance<TestModule>>();
+        var targetModuleMock = new Mock<IModule<TestModule>>();
         targetModuleMock.Setup(m => m.Execute<TestRequestWithResponse, string>(request, CancellationToken.None))
                         .ReturnsAsync(response);
 

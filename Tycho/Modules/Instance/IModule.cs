@@ -1,21 +1,22 @@
 ﻿using System;
 using Tycho.Events.Routing;
-using Tycho.Modules;
-using Tycho.Requests;
+using Tycho.Requests.Broker;
 using Tycho.Structure.Internal;
 using Tycho.Utils;
 
-namespace Tycho.Structure
+namespace Tycho.Modules.Instance
 {
     /// <summary>
     /// Represents a running Tycho module instance.
     /// </summary>
     [ReferencedBySourceGenerator]
-    public interface IModuleInstance : IRequestExecutor, IAsyncDisposable
+    public interface IModule : IAsyncDisposable
     {
         internal Internals Internals { get; }
 
         internal IEventRouter EventRouter { get; }
+
+        internal IRequestBroker RequestBroker { get; }
     }
 
     /// <summary>
@@ -23,7 +24,7 @@ namespace Tycho.Structure
     /// </summary>
     /// <typeparam name="TTychoDefinition">The module definition type.</typeparam>
     [ReferencedBySourceGenerator]
-    public interface IModuleInstance<TTychoDefinition> : IModuleInstance
+    public interface IModule<TTychoDefinition> : IModule
         where TTychoDefinition : TychoModule
     {
     }

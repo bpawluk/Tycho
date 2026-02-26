@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Tycho.Apps.Instance;
 using Tycho.Apps.Setup;
-using Tycho.Structure;
 using Tycho.Utils;
 
 namespace Tycho.Apps
@@ -125,7 +125,7 @@ namespace Tycho.Apps
         /// <returns>A fresh and ready to use instance of the application</returns>
         /// <exception cref="InvalidOperationException"/>
         [ReferencedBySourceGenerator]
-        protected async Task<IAppInstance> RunBaseAsync()
+        protected async Task<IApp> RunBaseAsync()
         {
             EnsureItIsRunOnlyOnce();
 

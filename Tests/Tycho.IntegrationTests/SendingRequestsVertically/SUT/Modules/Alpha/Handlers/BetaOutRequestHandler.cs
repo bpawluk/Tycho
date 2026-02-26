@@ -1,6 +1,6 @@
 ﻿using Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Beta;
 using Tycho.Requests;
-using Tycho.Structure;
+using Tycho.Structure.External;
 
 namespace Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Alpha.Handlers;
 
@@ -13,14 +13,16 @@ internal class GammaOutRequestHandler(IParent parent)
     public Task HandleAsync(BetaOutRequest requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        return _parent.ExecuteAsync(new AlphaOutRequest(requestData.Result), cancellationToken);
+        return Task.CompletedTask;
+        //return _parent.ExecuteAsync(new AlphaOutRequest(requestData.Result), cancellationToken);
     }
 
     public Task<string> HandleAsync(BetaOutRequestWithResponse requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        return _parent.ExecuteAsync<AlphaOutRequestWithResponse, string>(
-            new AlphaOutRequestWithResponse(requestData.Result),
-            cancellationToken);
+        return Task.FromResult("Error");
+        //return _parent.ExecuteAsync<AlphaOutRequestWithResponse, string>(
+        //    new AlphaOutRequestWithResponse(requestData.Result),
+        //    cancellationToken);
     }
 }

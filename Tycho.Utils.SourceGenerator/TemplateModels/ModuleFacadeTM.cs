@@ -2,7 +2,8 @@ using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
 using Tycho.Utils.SourceGenerator.Models.Tycho;
 using Tycho.Utils.SourceGenerator.References.System;
-using Tycho.Utils.SourceGenerator.References.Tycho.Structure;
+using Tycho.Utils.SourceGenerator.References.Tycho.Apps;
+using Tycho.Utils.SourceGenerator.References.Tycho.Modules;
 using Tycho.Utils.SourceGenerator.Symbols;
 
 namespace Tycho.Utils.SourceGenerator.TemplateModels
@@ -37,6 +38,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         internal class ClassesTM
         {
             public string FacadeClass { get; }
+            public string FacadeBaseClass { get; }
             public string TaskClass { get; }
             public string ValueTaskClass { get; }
             public string CancellationTokenClass { get; }
@@ -44,6 +46,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public ClassesTM(ModuleFacadeTM owner, TychoFacadeModel tychoFacadeModel)
             {
                 FacadeClass = ModuleFacadeSymbols.GetModuleFacadeClass(tychoFacadeModel.DefinitionType.Name);
+                FacadeBaseClass = owner.UseType(ModuleFacadeBaseReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 ValueTaskClass = owner.UseType(ValueTaskReference.TypeModel);
                 CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);
@@ -58,7 +61,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public InterfacesTM(ModuleFacadeTM owner, TychoFacadeModel tychoFacadeModel)
             {
                 ModuleInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(tychoFacadeModel.DefinitionType.Name);
-                InstanceInterface = owner.UseType(IModuleInstanceReference.TypeModel);
+                InstanceInterface = owner.UseType(IModuleReference.TypeModel);
             }
         }
 
@@ -70,7 +73,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public MethodsTM()
             {
-                ExecuteAsyncMethod = IModuleInstanceReference.ExecuteAsyncMethodSignature.MethodName;
+                ExecuteAsyncMethod = ModuleFacadeBaseReference.ExecuteAsyncMethodSignature.MethodName;
                 DisposeAsyncMethod = IAsyncDisposableReference.DisposeAsyncMethodSignature.MethodName;
                 ConfigureAwaitMethod = ValueTaskReference.ConfigureAwaitMethodSignature.MethodName;
             }

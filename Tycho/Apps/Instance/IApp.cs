@@ -1,18 +1,18 @@
 ﻿using System;
-using Tycho.Apps;
-using Tycho.Requests;
+using Tycho.Requests.Broker;
 using Tycho.Structure.Internal;
 using Tycho.Utils;
 
-namespace Tycho.Structure
+namespace Tycho.Apps.Instance
 {
     /// <summary>
     /// Represents a running Tycho application instance.
     /// </summary>
     [ReferencedBySourceGenerator]
-    public interface IAppInstance : IRequestExecutor, IAsyncDisposable
+    public interface IApp : IAsyncDisposable
     {
         internal Internals Internals { get; }
+        internal IRequestBroker RequestBroker { get; }
     }
 
     /// <summary>
@@ -20,8 +20,7 @@ namespace Tycho.Structure
     /// </summary>
     /// <typeparam name="TAppDefinition">The application definition type.</typeparam>
     [ReferencedBySourceGenerator]
-    public interface IAppInstance<TAppDefinition> : IAppInstance
-        where TAppDefinition : TychoApp
+    public interface IApp<TAppDefinition> : IApp where TAppDefinition : TychoApp
     {
     }
 }

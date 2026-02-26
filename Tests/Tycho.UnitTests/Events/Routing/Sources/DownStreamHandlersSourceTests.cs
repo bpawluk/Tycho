@@ -2,7 +2,7 @@
 using Tycho.Events;
 using Tycho.Events.Routing;
 using Tycho.Events.Routing.Sources;
-using Tycho.Structure;
+using Tycho.Modules.Instance;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
 using Tycho.UnitTests._Data.Modules;
@@ -29,7 +29,7 @@ public class DownStreamHandlersSourceTests
         eventRouterMock.Setup(m => m.FindHandler(It.IsAny<HandlerIdentity>()))
                        .Returns(_expectedHandler);
 
-        var submoduleMock = new Mock<IModuleInstance<TestModule>>();
+        var submoduleMock = new Mock<IModule<TestModule>>();
         submoduleMock.SetupGet(m => m.EventRouter)
                      .Returns(eventRouterMock.Object);
 

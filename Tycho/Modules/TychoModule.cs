@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Routing;
+using Tycho.Modules.Instance;
 using Tycho.Modules.Setup;
 using Tycho.Requests.Broker;
-using Tycho.Structure;
 using Tycho.Structure.External;
 using Tycho.Utils;
 
@@ -131,7 +131,7 @@ namespace Tycho.Modules
             return this;
         }
 
-        internal async Task<IModuleInstance> RunAsync()
+        internal async Task<IModule> RunAsync()
         {
             EnsureItIsRunOnlyOnce();
 

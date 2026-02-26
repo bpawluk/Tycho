@@ -1,9 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using Tycho.Modules.Instance;
 using Tycho.Requests.Handling;
 using Tycho.Requests.Registrating;
 using Tycho.Requests.Registrating.Registrations;
-using Tycho.Structure;
+using Tycho.Structure.External;
 using Tycho.Structure.Internal;
 using Tycho.UnitTests._Data.Handlers;
 using Tycho.UnitTests._Data.Modules;
@@ -167,7 +168,7 @@ public class DownStreamRegistratorTests
     public void Forward_NewRequest_RegistersForwarder()
     {
         // Arrange
-        var targetModuleMock = new Mock<IModuleInstance<TestModule>>();
+        var targetModuleMock = new Mock<IModule<TestModule>>();
         _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
 
         // Act
@@ -198,7 +199,7 @@ public class DownStreamRegistratorTests
     public void Forward_NewRequestWithResponse_RegistersForwarder()
     {
         // Arrange
-        var targetModuleMock = new Mock<IModuleInstance<TestModule>>();
+        var targetModuleMock = new Mock<IModule<TestModule>>();
         _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
 
         // Act
@@ -231,7 +232,7 @@ public class DownStreamRegistratorTests
     {
         // Arrange
         var mapMock = new Mock<Func<TestRequest, OtherRequest>>();
-        var targetModuleMock = new Mock<IModuleInstance<TestModule>>();
+        var targetModuleMock = new Mock<IModule<TestModule>>();
         _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
 
         // Act
@@ -267,7 +268,7 @@ public class DownStreamRegistratorTests
         // Arrange
         var mapRequestMock = new Mock<Func<TestRequestWithResponse, OtherRequestWithResponse>>();
         var mapResponseMock = new Mock<Func<string, string>>();
-        var targetModuleMock = new Mock<IModuleInstance<TestModule>>();
+        var targetModuleMock = new Mock<IModule<TestModule>>();
         _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
 
         // Act
@@ -345,7 +346,7 @@ public class DownStreamRegistratorTests
     public void Handle_NewRequestWithResponse_RegistersHandler()
     {
         // Arrange
-        var targetModuleMock = new Mock<IModuleInstance<TestModule>>();
+        var targetModuleMock = new Mock<IModule<TestModule>>();
         _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
 
         // Act

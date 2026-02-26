@@ -1,4 +1,4 @@
-﻿using Tycho.Structure;
+﻿using Tycho.Modules.Instance;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Contract;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments;
@@ -9,13 +9,13 @@ using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Contract;
 namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
 
 internal class ContentRepository(
-    IModuleInstance<ArticlesModule> articlesModule,
-    IModuleInstance<PostsModule> postsModule,
-    IModuleInstance<CommentsModule> commentsModule)
+    IModule<ArticlesModule> articlesModule,
+    IModule<PostsModule> postsModule,
+    IModule<CommentsModule> commentsModule)
 {
-    private readonly IModuleInstance<ArticlesModule> _articlesModule = articlesModule;
-    private readonly IModuleInstance<PostsModule> _postsModule = postsModule;
-    private readonly IModuleInstance<CommentsModule> _commentsModule = commentsModule;
+    private readonly IModule<ArticlesModule> _articlesModule = articlesModule;
+    private readonly IModule<PostsModule> _postsModule = postsModule;
+    private readonly IModule<CommentsModule> _commentsModule = commentsModule;
 
     public async Task<int> AddEntryContent(EntryType type, Content content)
     {

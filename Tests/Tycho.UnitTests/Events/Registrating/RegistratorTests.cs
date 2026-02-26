@@ -4,7 +4,8 @@ using Tycho.Events;
 using Tycho.Events.Handling;
 using Tycho.Events.Registrating;
 using Tycho.Events.Routing.Sources;
-using Tycho.Structure;
+using Tycho.Modules.Instance;
+using Tycho.Structure.External;
 using Tycho.Structure.Internal;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
@@ -89,7 +90,7 @@ public class RegistratorTests
     public void Forward_NewEvent_RegistersHandlersSource()
     {
         // Arrange
-        var targetModuleMock = new Mock<IModuleInstance<TestModule>>();
+        var targetModuleMock = new Mock<IModule<TestModule>>();
         _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
 
         // Act
@@ -120,7 +121,7 @@ public class RegistratorTests
     public void Forward_NewEventWithMapping_RegistersHandlersSource()
     {
         // Arrange
-        var targetModuleMock = new Mock<IModuleInstance<TestModule>>();
+        var targetModuleMock = new Mock<IModule<TestModule>>();
         _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
 
         // Act

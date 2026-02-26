@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Tycho.Apps.Instance;
-using Tycho.Structure;
 using Tycho.Structure.External;
 using Tycho.Structure.Internal;
 
@@ -29,7 +28,7 @@ namespace Tycho.Apps.Setup
 
         public AppBuilder(Type appDefinitionType)
         {
-            _appType = typeof(AppInstance<>).MakeGenericType(appDefinitionType);
+            _appType = typeof(App<>).MakeGenericType(appDefinitionType);
             _internals = new Internals(appDefinitionType);
             Globals = new Globals();
             Contract = new AppContract(_internals);
@@ -66,9 +65,9 @@ namespace Tycho.Apps.Setup
             return this;
         }
 
-        public async Task<IAppInstance> BuildAsync()
+        public async Task<IApp> BuildAsync()
         {
-            var app = (IAppInstance)Activator.CreateInstance(_appType, _internals, _cleanup);
+            var app = (IApp)Activator.CreateInstance(_appType, _internals, _cleanup);
 
             await Contract.BuildAsync().ConfigureAwait(false);
             await Events.BuildAsync().ConfigureAwait(false);
