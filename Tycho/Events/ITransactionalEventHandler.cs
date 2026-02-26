@@ -31,7 +31,7 @@ namespace Tycho.Events
     /// Transactional event handler for an event of type <typeparamref name="TEvent"/>.
     /// </summary>
     /// <typeparam name="TEvent">The type of the event to handle.</typeparam>
-    public interface ITransactionalEventHandler<TEvent> : ITransactionalEventHandler
+    public interface ITransactionalEventHandler<TEvent> : ITransactionalEventHandler, IEventHandler<TEvent>
         where TEvent : class, IEvent
     {
         /// <summary>
