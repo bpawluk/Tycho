@@ -134,6 +134,10 @@ public class TychoSourceGeneratorTests
         Assert.Contains("SampleApp.App.Outer.Inner.TestApp.Facade.Interface.g.cs", generatedFileNames);
         Assert.Contains("SampleApp.App.Outer.Inner.TestApp.Events.Dispatcher.g.cs", generatedFileNames);
         Assert.Contains("TestModule.g.cs", generatedFileNames);
+        Assert.Contains("TestModule.Facade.g.cs", generatedFileNames);
+        Assert.Contains("TestModule.Facade.Interface.g.cs", generatedFileNames);
+        Assert.Contains("TestModule.Parent.g.cs", generatedFileNames);
+        Assert.Contains("TestModule.Parent.Interface.g.cs", generatedFileNames);
         Assert.Contains("TestModule.Events.Dispatcher.g.cs", generatedFileNames);
     }
 

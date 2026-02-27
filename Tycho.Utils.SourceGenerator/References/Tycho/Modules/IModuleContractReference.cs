@@ -20,7 +20,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
             HandlesWithResponseMethodSignature,
         });
 
-        public static HashSet<MethodSignatureModel> RequirementDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
+        public static HashSet<MethodSignatureModel> RequiredContractDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
         {
             RequiresMethodSignature,
             RequiresWithResponseMethodSignature,

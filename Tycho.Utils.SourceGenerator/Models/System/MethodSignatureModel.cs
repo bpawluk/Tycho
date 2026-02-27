@@ -21,6 +21,9 @@ namespace Tycho.Utils.SourceGenerator.Models.System
             IAppContractReference.ContractDefiningMethods.Contains(this) ||
             IModuleContractReference.ContractDefiningMethods.Contains(this);
 
+        public bool IsRequiredContractDefiningMethod =>
+            IModuleContractReference.RequiredContractDefiningMethods.Contains(this);
+
         public bool IsDefineEventsMethod => 
             TychoAppReference.DefineEventsMethodSignature.Equals(this) ||
             TychoModuleReference.DefineEventsMethodSignature.Equals(this);

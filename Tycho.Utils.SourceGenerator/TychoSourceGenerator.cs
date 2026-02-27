@@ -27,6 +27,7 @@ namespace Tycho.Utils.SourceGenerator
             context.AddTychoDefinitionPipeline(tychoPipelineBase)
                    .AddTychoSetupPipeline(tychoPipelineBase)
                    .AddTychoFacadePipeline(tychoPipelineBase)
+                   .AddTychoParentPipeline(tychoPipelineBase)
                    .AddEventDispatcherPipeline(tychoPipelineBase);
         }
 
