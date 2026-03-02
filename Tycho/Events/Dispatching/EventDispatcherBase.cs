@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Tycho.Events.Serialization;
 using Tycho.Utils;
 
-namespace Tycho.Events.Handling
+namespace Tycho.Events.Dispatching
 {
     [ReferencedBySourceGenerator]
     public abstract class EventDispatcherBase : IEventDispatcher

@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Utils;
 
-namespace Tycho.Events.Handling
+namespace Tycho.Events.Dispatching
 {
     /// <summary>
     /// Dispatches events to respective event handlers.
