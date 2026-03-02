@@ -1,12 +1,12 @@
-﻿using Tycho.Events.Publishing;
-using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules;
+﻿using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules;
 using Tycho.Requests;
+using static Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.TestApp;
 
 namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Handlers;
 
-internal class BeginTestWorkflowRequestHandler(IGenericPublisher publisher) : IRequestHandler<BeginTestWorkflowRequest>
+internal class BeginTestWorkflowRequestHandler(IPublisher publisher) : IRequestHandler<BeginTestWorkflowRequest>
 {
-    private readonly IGenericPublisher _publisher = publisher;
+    private readonly IPublisher _publisher = publisher;
 
     public async Task HandleAsync(BeginTestWorkflowRequest requestData, CancellationToken cancellationToken)
     {

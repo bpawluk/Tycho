@@ -39,6 +39,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         {
             public string ModuleClass { get; }
             public string ModuleParentClass { get; }
+            public string PublisherClass { get; }
             public string EventDispatcherClass { get; }
             public string BaseClass { get; }
             public string ServiceCollectionServiceExtensionsClass { get; }
@@ -48,6 +49,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             {
                 ModuleClass = tychoDefinitionModel.DefinitionType.Name;
                 ModuleParentClass = ModuleParentSymbols.ParentClass;
+                PublisherClass = PublisherSymbols.PublisherClass;
                 EventDispatcherClass = EventDispatcherSymbols.GetEventDispatcherClass(tychoDefinitionModel.DefinitionType.Name);
                 BaseClass = owner.UseType(TychoModuleReference.TypeModel);
                 ServiceCollectionServiceExtensionsClass = owner.UseType(ServiceCollectionServiceExtensionsReference.TypeModel);
@@ -58,6 +60,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         internal class InterfacesTM
         {
             public string ModuleParentInterface { get; }
+            public string PublisherInterface { get; }
             public string ServiceCollectionInterface { get; }
             public string EventDispatcherInterface { get; }
             public string ModuleInstanceInterface { get; }
@@ -65,6 +68,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public InterfacesTM(ModuleDefinitionTM owner)
             {
                 ModuleParentInterface = ModuleParentSymbols.ParentInterface;
+                PublisherInterface = PublisherSymbols.PublisherInterface;
                 ServiceCollectionInterface = owner.UseType(IServiceCollectionReference.TypeModel);
                 EventDispatcherInterface = owner.UseType(IEventDispatcherReference.TypeModel);
                 ModuleInstanceInterface = owner.UseType(IModuleReference.TypeModel);

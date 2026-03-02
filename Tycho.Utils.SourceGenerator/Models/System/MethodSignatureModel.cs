@@ -32,6 +32,10 @@ namespace Tycho.Utils.SourceGenerator.Models.System
             IAppEventsReference.EventDefiningMethods.Contains(this) ||
             IModuleEventsReference.EventDefiningMethods.Contains(this);
 
+        public bool IsPublishableEventDefiningMethod =>
+            IAppEventsReference.PublishableEventDefiningMethods.Contains(this) ||
+            IModuleEventsReference.PublishableEventDefiningMethods.Contains(this);
+
         public bool IsIncludeModulesMethod =>
             TychoAppReference.IncludeModulesMethodSignature.Equals(this) ||
             TychoModuleReference.IncludeModulesMethodSignature.Equals(this);

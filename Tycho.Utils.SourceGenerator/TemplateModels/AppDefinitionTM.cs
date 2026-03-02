@@ -44,6 +44,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         {
             public string AppClass { get; }
             public string FacadeClass { get; }
+            public string PublisherClass { get; }
             public string EventDispatcherClass { get; }
             public string BaseClass { get; }
             public string TaskClass { get; }
@@ -55,6 +56,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             {
                 AppClass = tychoDefinitionModel.DefinitionType.Name;
                 FacadeClass = AppFacadeSymbols.GetAppFacadeClass(AppClass);
+                PublisherClass = PublisherSymbols.PublisherClass;
                 EventDispatcherClass = EventDispatcherSymbols.GetEventDispatcherClass(AppClass);
                 BaseClass = owner.UseType(TychoAppReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
@@ -67,6 +69,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         internal class InterfacesTM 
         { 
             public string FacadeInterface { get; }
+            public string PublisherInterface { get; }
             public string ConfigurationInterface { get; }
             public string LoggingBuilderInterface { get; }
             public string ServiceCollectionInterface { get; }
@@ -76,6 +79,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public InterfacesTM(AppDefinitionTM owner, TychoDefinitionModel tychoDefinitionModel)
             {
                 FacadeInterface = AppFacadeSymbols.GetAppFacadeInterface(tychoDefinitionModel.DefinitionType.Name);
+                PublisherInterface = PublisherSymbols.PublisherInterface;
                 ConfigurationInterface = owner.UseType(IConfigurationReference.TypeModel);
                 LoggingBuilderInterface = owner.UseType(ILoggingBuilderReference.TypeModel);
                 ServiceCollectionInterface = owner.UseType(IServiceCollectionReference.TypeModel);

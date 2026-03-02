@@ -1,0 +1,30 @@
+{{~ for used_namespace in used_namespaces ~}}
+using {{ used_namespace }};
+{{~ end ~}}
+
+{{~ if namespace != "" ~}}
+namespace {{ namespace }}
+{
+{{~ end ~}}
+{{~ for containing_type in containing_types ~}}
+    public partial class {{ containing_type }}
+    {
+{{~ end ~}}
+    public partial class {{ classes.app_class }} : {{ classes.app_base_class }}
+    {
+        public interface {{ interfaces.publisher_interface }}
+        {
+            {{~ for event in events ~}}
+            {{ classes.task_class }} {{ methods.publish_async_method }}({{ event }} {{ parameters.event_payload_parameter }}, {{ classes.cancellation_token_class }} {{ parameters.cancellation_token_parameter }} = default);
+            {{~ if !for.last ~}}
+
+            {{~ end ~}}
+            {{~ end ~}}
+        }
+    }
+{{~ for containing_type in containing_types ~}}
+    }
+{{~ end ~}}
+{{~ if namespace != "" ~}}
+}
+{{~ end ~}}

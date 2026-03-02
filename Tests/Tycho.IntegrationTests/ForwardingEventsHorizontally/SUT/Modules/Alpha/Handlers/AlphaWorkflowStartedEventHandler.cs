@@ -1,11 +1,11 @@
 ﻿using Tycho.Events;
-using Tycho.Events.Publishing;
+using static Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Alpha.AlphaModule;
 
 namespace Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Alpha.Handlers;
 
-internal class AlphaWorkflowStartedEventHandler(IGenericPublisher publisher) : IEventHandler<AlphaWorkflowStartedEvent>
+internal class AlphaWorkflowStartedEventHandler(IPublisher publisher) : IEventHandler<AlphaWorkflowStartedEvent>
 {
-    private readonly IGenericPublisher _publisher = publisher;
+    private readonly IPublisher _publisher = publisher;
 
     public async Task HandleAsync(EventContext<AlphaWorkflowStartedEvent> context, CancellationToken cancellationToken)
     {
