@@ -66,7 +66,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                 input.DefinitionType,
                 input.MethodInvocation
                     .Select(methodInvocationModel => methodInvocationModel.TypeArguments
-                        .Single(argument => argument.IsEventType)
+                        .Single(argument => argument.IsEventType())
                         .Value)
                     .ToImmutableEquatableArray());
         }

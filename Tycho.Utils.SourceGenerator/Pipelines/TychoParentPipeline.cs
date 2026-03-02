@@ -33,8 +33,6 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                 getTychoParentModelStepResult,
                 (outputContext, model) =>
                 {
-                    if (model.DefinitionKind == TychoDefinitionKind.Unknown) return;
-
                     outputContext.GenerateSourceFromTemplate(
                         new ModuleParentInterfaceTM(model),
                         ModuleParentInterfaceTemplate,
@@ -49,33 +47,32 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             return context;
         }
 
-        private static (TychoDefinitionKind DefinitionKind, MethodDefinitionModel Method) GetDefineContractMethodDefinitionsStepTransform(
+        private static MethodDefinitionModel GetDefineContractMethodDefinitionsStepTransform(
             (TychoDefinitionKind DefinitionKind, ClassDefinitionModel Model) input,
             CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            return (input.DefinitionKind, input.Model.Methods.Single(method => method.Signature.IsDefineContractMethod));
+            return input.Model.Methods.Single(method => method.Signature.IsDefineContractMethod);
         }
 
-        private static (TychoDefinitionKind DefinitionKind, TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) GetRequirementMethodInvocationsStepTransform(
-            (TychoDefinitionKind DefinitionKind, MethodDefinitionModel Method) input,
+        private static (TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) GetRequirementMethodInvocationsStepTransform(
+            MethodDefinitionModel input,
             CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            var invocations = input.Method.Body
+            var invocations = input.Body
                 .Where(invocation => invocation.Signature.IsRequiredContractDefiningMethod)
                 .ToImmutableEquatableArray();
-            return (input.DefinitionKind, input.Method.ContainingType, invocations);
+            return (input.ContainingType, invocations);
         }
 
         private static TychoParentModel GetTychoParentModelStepTransform(
-            (TychoDefinitionKind DefinitionKind, TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) input,
+            (TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) input,
             CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             return new TychoParentModel(
                 input.DefinitionType,
-                input.DefinitionKind,
                 input.MethodInvocations
                     .Select(GetTychoRequestModel)
                     .Distinct()
@@ -84,10 +81,10 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
 
         private static TychoRequestModel GetTychoRequestModel(MethodInvocationModel model)
         {
-            var requestType = model.TypeArguments.Single(argument => argument.IsRequestType).Value;
-            if (model.TypeArguments.Any(argument => argument.IsResponseType))
+            var requestType = model.TypeArguments.Single(argument => argument.IsRequestType()).Value;
+            if (model.TypeArguments.Any(argument => argument.IsResponseType()))
             {
-                var responseType = model.TypeArguments.Single(argument => argument.IsResponseType).Value;
+                var responseType = model.TypeArguments.Single(argument => argument.IsResponseType()).Value;
                 return new TychoRequestModel(requestType, responseType);
             }
             return new TychoRequestModel(requestType);

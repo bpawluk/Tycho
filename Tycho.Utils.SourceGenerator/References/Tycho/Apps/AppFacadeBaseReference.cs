@@ -9,9 +9,6 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
         private const string _namespace = "Tycho.Apps.Instance";
         private const string _typeName = "AppFacadeBase";
 
-        public static string RequestTypeParameterName => "TRequest";
-        public static string ResponseTypeParameterName => "TResponse";
-
         public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
 
         public static MethodSignatureModel ExecuteAsyncMethodSignature => new MethodSignatureModel(

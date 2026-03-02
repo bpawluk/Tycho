@@ -76,11 +76,11 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
         {
             token.ThrowIfCancellationRequested();
             return new TychoPublisherModel(
-                input.DefinitionType,
                 input.DefinitionKind,
+                input.DefinitionType,
                 input.MethodInvocations
                     .Select(invocation => invocation.TypeArguments
-                        .Single(argument => argument.IsEventType)
+                        .Single(argument => argument.IsEventType())
                         .Value)
                     .Distinct()
                     .ToImmutableEquatableArray());

@@ -76,8 +76,8 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
         {
             token.ThrowIfCancellationRequested();
             return new TychoFacadeModel(
-                input.DefinitionType,
                 input.DefinitionKind,
+                input.DefinitionType,
                 input.MethodInvocations
                     .Select(GetTychoRequestModel)
                     .Distinct()
@@ -86,10 +86,10 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
 
         private static TychoRequestModel GetTychoRequestModel(MethodInvocationModel model)
         {
-            var requestType = model.TypeArguments.Single(argument => argument.IsRequestType).Value;
-            if (model.TypeArguments.Any(argument => argument.IsResponseType))
+            var requestType = model.TypeArguments.Single(argument => argument.IsRequestType()).Value;
+            if (model.TypeArguments.Any(argument => argument.IsResponseType()))
             {
-                var responseType = model.TypeArguments.Single(argument => argument.IsResponseType).Value;
+                var responseType = model.TypeArguments.Single(argument => argument.IsResponseType()).Value;
                 return new TychoRequestModel(requestType, responseType);
             }
             return new TychoRequestModel(requestType);

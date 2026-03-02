@@ -1,6 +1,4 @@
 ﻿using System;
-using Tycho.Utils.SourceGenerator.References.Tycho.Apps;
-using Tycho.Utils.SourceGenerator.References.Tycho.Modules;
 using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.Models.System
@@ -10,22 +8,6 @@ namespace Tycho.Utils.SourceGenerator.Models.System
         public string Name { get; }
 
         public TypeModel Value { get; }
-
-        public bool IsRequestType =>
-            Name == IAppContractReference.RequestTypeParameterName ||
-            Name == IModuleContractReference.RequestTypeParameterName;
-
-        public bool IsResponseType =>
-            Name == IAppContractReference.ResponseTypeParameterName ||
-            Name == IModuleContractReference.ResponseTypeParameterName;
-
-        public bool IsEventType =>
-            Name == IAppEventsReference.EventTypeParameterName || 
-            Name == IModuleEventsReference.EventTypeParameterName;
-
-        public bool IsModuleType =>
-            Name == IAppStructureReference.ModuleTypeParameterName ||
-            Name == IModuleStructureReference.ModuleTypeParameterName;
 
         public TypeArgument(string name, TypeModel value)
         {

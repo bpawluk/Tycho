@@ -7,26 +7,26 @@ namespace Tycho.Utils.SourceGenerator.Models
 {
     public readonly struct TychoFacadeModel : IEquatable<TychoFacadeModel>
     {
-        public TypeModel DefinitionType { get; }
-
         public TychoDefinitionKind DefinitionKind { get; }
+
+        public TypeModel DefinitionType { get; }
 
         public ImmutableEquatableArray<TychoRequestModel> Requests { get; }
 
         public TychoFacadeModel(
-            TypeModel definitionType,
             TychoDefinitionKind definitionKind,
+            TypeModel definitionType,
             ImmutableEquatableArray<TychoRequestModel> requests)
         {
-            DefinitionType = definitionType;
             DefinitionKind = definitionKind;
+            DefinitionType = definitionType;
             Requests = requests;
         }
 
         public bool Equals(TychoFacadeModel other)
         {
-            return DefinitionType.Equals(other.DefinitionType) &&
-                   DefinitionKind.Equals(other.DefinitionKind) &&
+            return DefinitionKind.Equals(other.DefinitionKind) &&
+                   DefinitionType.Equals(other.DefinitionType) &&
                    Requests.Equals(other.Requests);
         }
 
@@ -38,8 +38,8 @@ namespace Tycho.Utils.SourceGenerator.Models
         public override int GetHashCode()
         {
             return HashCode.Combine(
-                DefinitionType.GetHashCode(),
                 DefinitionKind.GetHashCode(),
+                DefinitionType.GetHashCode(),
                 Requests.GetHashCode());
         }
 

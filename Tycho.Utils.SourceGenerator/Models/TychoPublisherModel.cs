@@ -7,26 +7,26 @@ namespace Tycho.Utils.SourceGenerator.Models
 {
     public readonly struct TychoPublisherModel : IEquatable<TychoPublisherModel>
     {
-        public TypeModel DefinitionType { get; }
-
         public TychoDefinitionKind DefinitionKind { get; }
+
+        public TypeModel DefinitionType { get; }
 
         public ImmutableEquatableArray<TypeModel> Events { get; }
 
         public TychoPublisherModel(
-            TypeModel definitionType,
             TychoDefinitionKind definitionKind,
+            TypeModel definitionType,
             ImmutableEquatableArray<TypeModel> events)
         {
-            DefinitionType = definitionType;
             DefinitionKind = definitionKind;
+            DefinitionType = definitionType;
             Events = events;
         }
 
         public bool Equals(TychoPublisherModel other)
         {
-            return DefinitionType.Equals(other.DefinitionType) &&
-                   DefinitionKind.Equals(other.DefinitionKind) &&
+            return DefinitionKind.Equals(other.DefinitionKind) &&
+                   DefinitionType.Equals(other.DefinitionType) &&
                    Events.Equals(other.Events);
         }
 
@@ -38,8 +38,8 @@ namespace Tycho.Utils.SourceGenerator.Models
         public override int GetHashCode()
         {
             return HashCode.Combine(
-                DefinitionType.GetHashCode(),
                 DefinitionKind.GetHashCode(),
+                DefinitionType.GetHashCode(),
                 Events.GetHashCode());
         }
 

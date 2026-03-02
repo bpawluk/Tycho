@@ -7,26 +7,26 @@ namespace Tycho.Utils.SourceGenerator.Models
 {
     public readonly struct TychoDefinitionModel : IEquatable<TychoDefinitionModel>
     {
-        public TypeModel DefinitionType { get; }
-
         public TychoDefinitionKind DefinitionKind { get; }
+
+        public TypeModel DefinitionType { get; }
 
         public ImmutableEquatableArray<TypeModel> Submodules { get; }
 
         public TychoDefinitionModel(
-            TypeModel definitionType,
             TychoDefinitionKind definitionKind,
+            TypeModel definitionType,
             ImmutableEquatableArray<TypeModel> submodules)
         {
-            DefinitionType = definitionType;
             DefinitionKind = definitionKind;
+            DefinitionType = definitionType;
             Submodules = submodules;
         }
 
         public bool Equals(TychoDefinitionModel other)
         {
-            return DefinitionType.Equals(other.DefinitionType) &&
-                   DefinitionKind.Equals(other.DefinitionKind) &&
+            return DefinitionKind.Equals(other.DefinitionKind) &&
+                   DefinitionType.Equals(other.DefinitionType) &&
                    Submodules.Equals(other.Submodules);
         }
 
@@ -38,8 +38,8 @@ namespace Tycho.Utils.SourceGenerator.Models
         public override int GetHashCode()
         {
             return HashCode.Combine(
-                DefinitionType.GetHashCode(),
                 DefinitionKind.GetHashCode(),
+                DefinitionType.GetHashCode(),
                 Submodules.GetHashCode());
         }
 

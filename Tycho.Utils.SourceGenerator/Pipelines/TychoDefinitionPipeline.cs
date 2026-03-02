@@ -69,11 +69,11 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
         {
             token.ThrowIfCancellationRequested();
             return new TychoDefinitionModel(
-                input.DefinitionType,
                 input.DefinitionKind,
+                input.DefinitionType,
                 input.MethodInvocations
                     .Select(invocation => invocation.TypeArguments
-                        .Single(argument => argument.IsModuleType)
+                        .Single(argument => argument.IsModuleType())
                         .Value)
                     .Distinct()
                     .ToImmutableEquatableArray());

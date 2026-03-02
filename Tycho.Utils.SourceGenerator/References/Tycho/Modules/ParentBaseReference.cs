@@ -9,9 +9,6 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
         private const string _namespace = "Tycho.Structure.External";
         private const string _typeName = "ParentBase";
 
-        public static string RequestTypeParameterName => "TRequest";
-        public static string ResponseTypeParameterName => "TResponse";
-
         public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
 
         public static MethodSignatureModel ExecuteAsyncMethodSignature => new MethodSignatureModel(
