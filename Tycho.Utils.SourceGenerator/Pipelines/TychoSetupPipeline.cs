@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
+﻿using System.Threading;
 using Microsoft.CodeAnalysis;
 using Tycho.Utils.SourceGenerator.Extensions;
 using Tycho.Utils.SourceGenerator.Models;

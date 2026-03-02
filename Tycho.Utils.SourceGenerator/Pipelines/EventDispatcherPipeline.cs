@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Tycho.Utils.SourceGenerator.Extensions;
@@ -45,14 +43,14 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
         private static MethodDefinitionModel GetDefineEventsMethodDefinitionStepTransform((TychoDefinitionKind, ClassDefinitionModel Model) input, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            return input.Model.Methods.Single(method => method.Signature.IsDefineEventsMethod);
+            return input.Model.Methods.Single(method => method.Signature.IsDefineEventsMethod());
         }
 
         private static (TypeModel, ImmutableEquatableArray<MethodInvocationModel>) GetHandlesMethodInvocationsStepTransform(MethodDefinitionModel model, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             var invocations = model.Body
-                .Where(invocation => invocation.Signature.IsEventDefiningMethod)
+                .Where(invocation => invocation.Signature.IsHandledEventDefiningMethod())
                 .ToImmutableEquatableArray();
             return (model.ContainingType, invocations);
         }

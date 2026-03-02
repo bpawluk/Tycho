@@ -56,7 +56,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            return (input.DefinitionKind, input.Model.Methods.Single(method => method.Signature.IsDefineContractMethod));
+            return (input.DefinitionKind, input.Model.Methods.Single(method => method.Signature.IsDefineContractMethod()));
         }
 
         private static (TychoDefinitionKind DefinitionKind, TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) GetContractMethodInvocationsStepTransform(
@@ -65,7 +65,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
         {
             token.ThrowIfCancellationRequested();
             var invocations = input.Method.Body
-                .Where(invocation => invocation.Signature.IsContractDefiningMethod)
+                .Where(invocation => invocation.Signature.IsDownstreamContractDefiningMethod())
                 .ToImmutableEquatableArray();
             return (input.DefinitionKind, input.Method.ContainingType, invocations);
         }

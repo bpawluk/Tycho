@@ -10,12 +10,12 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
         private const string _typeName = "IModuleEvents";
         private const string _eventRoutingTypeName = "IEventRouting";
 
-        public static HashSet<MethodSignatureModel> EventDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
+        public static HashSet<MethodSignatureModel> HandledEventDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
         {
             HandlesMethodSignature,
         });
 
-        public static HashSet<MethodSignatureModel> PublishableEventDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
+        public static HashSet<MethodSignatureModel> HandledOrRoutedEventDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
         {
             HandlesMethodSignature,
             RoutesMethodSignature,

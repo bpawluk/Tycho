@@ -56,7 +56,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            return (input.DefinitionKind, input.Model.Methods.Single(method => method.Signature.IsDefineEventsMethod));
+            return (input.DefinitionKind, input.Model.Methods.Single(method => method.Signature.IsDefineEventsMethod()));
         }
 
         private static (TychoDefinitionKind DefinitionKind, TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) GetPublishableEventMethodInvocationsStepTransform(
@@ -65,7 +65,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
         {
             token.ThrowIfCancellationRequested();
             var invocations = input.Method.Body
-                .Where(invocation => invocation.Signature.IsPublishableEventDefiningMethod)
+                .Where(invocation => invocation.Signature.IsHandledOrRoutedEventDefiningMethod())
                 .ToImmutableEquatableArray();
             return (input.DefinitionKind, input.Method.ContainingType, invocations);
         }

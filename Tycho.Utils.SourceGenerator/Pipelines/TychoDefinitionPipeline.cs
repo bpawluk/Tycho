@@ -49,7 +49,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            return (input.DefinitionKind, input.Model.Methods.FirstOrDefault(method => method.Signature.IsIncludeModulesMethod));
+            return (input.DefinitionKind, input.Model.Methods.FirstOrDefault(method => method.Signature.IsIncludeModulesMethod()));
         }
 
         private static (TychoDefinitionKind DefinitionKind, TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) GetSubmoduleMethodInvocationsStepTransform(
@@ -58,7 +58,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
         {
             token.ThrowIfCancellationRequested();
             var invocations = input.Method.Body
-                .Where(invocation => invocation.Signature.IsSubmoduleDefiningMethod)
+                .Where(invocation => invocation.Signature.IsSubmoduleDefiningMethod())
                 .ToImmutableEquatableArray();
             return (input.DefinitionKind, input.Method.ContainingType, invocations);
         }

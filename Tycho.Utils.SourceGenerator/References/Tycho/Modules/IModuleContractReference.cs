@@ -10,7 +10,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
         private const string _namespace = "Tycho.Modules";
         private const string _typeName = "IModuleContract";
 
-        public static HashSet<MethodSignatureModel> ContractDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
+        public static HashSet<MethodSignatureModel> DownstreamContractDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
         {
             ForwardsMethodSignature,
             ForwardsWithResponseMethodSignature,
@@ -20,7 +20,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
             HandlesWithResponseMethodSignature,
         });
 
-        public static HashSet<MethodSignatureModel> RequiredContractDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
+        public static HashSet<MethodSignatureModel> UpstreamContractDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
         {
             RequiresMethodSignature,
             RequiresWithResponseMethodSignature,

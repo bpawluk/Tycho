@@ -20,7 +20,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             IncrementalValuesProvider<(TychoDefinitionKind, ClassDefinitionModel)> pipelineBase)
         {
             var getDefineContractMethodDefinitionsStepResult = pipelineBase
-                .Where(input => input.Item1 == TychoDefinitionKind.Module)
+                .Where(GetDefineContractMethodDefinitionsStepPredicate)
                 .Select(GetDefineContractMethodDefinitionsStepTransform);
 
             var getRequirementMethodInvocationsStepResult = getDefineContractMethodDefinitionsStepResult
@@ -47,12 +47,17 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             return context;
         }
 
+        private static bool GetDefineContractMethodDefinitionsStepPredicate((TychoDefinitionKind Kind, ClassDefinitionModel Model) input)
+        {
+            return input.Kind == TychoDefinitionKind.Module;
+        }
+
         private static MethodDefinitionModel GetDefineContractMethodDefinitionsStepTransform(
             (TychoDefinitionKind DefinitionKind, ClassDefinitionModel Model) input,
             CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            return input.Model.Methods.Single(method => method.Signature.IsDefineContractMethod);
+            return input.Model.Methods.Single(method => method.Signature.IsDefineContractMethod());
         }
 
         private static (TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) GetRequirementMethodInvocationsStepTransform(
@@ -61,7 +66,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
         {
             token.ThrowIfCancellationRequested();
             var invocations = input.Body
-                .Where(invocation => invocation.Signature.IsRequiredContractDefiningMethod)
+                .Where(invocation => invocation.Signature.IsUpstreamContractDefiningMethod())
                 .ToImmutableEquatableArray();
             return (input.ContainingType, invocations);
         }

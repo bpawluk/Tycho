@@ -1,6 +1,4 @@
 ﻿using System;
-using Tycho.Utils.SourceGenerator.References.Tycho.Apps;
-using Tycho.Utils.SourceGenerator.References.Tycho.Modules;
 using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.Models.System
@@ -12,37 +10,6 @@ namespace Tycho.Utils.SourceGenerator.Models.System
         public ImmutableEquatableArray<TypeModel> Parameters { get; }
 
         public TypeModel Result { get; }
-
-        public bool IsDefineContractMethod =>
-            TychoAppReference.DefineContractMethodSignature.Equals(this) ||
-            TychoModuleReference.DefineContractMethodSignature.Equals(this);
-
-        public bool IsContractDefiningMethod =>
-            IAppContractReference.ContractDefiningMethods.Contains(this) ||
-            IModuleContractReference.ContractDefiningMethods.Contains(this);
-
-        public bool IsRequiredContractDefiningMethod =>
-            IModuleContractReference.RequiredContractDefiningMethods.Contains(this);
-
-        public bool IsDefineEventsMethod => 
-            TychoAppReference.DefineEventsMethodSignature.Equals(this) ||
-            TychoModuleReference.DefineEventsMethodSignature.Equals(this);
-
-        public bool IsEventDefiningMethod =>
-            IAppEventsReference.EventDefiningMethods.Contains(this) ||
-            IModuleEventsReference.EventDefiningMethods.Contains(this);
-
-        public bool IsPublishableEventDefiningMethod =>
-            IAppEventsReference.PublishableEventDefiningMethods.Contains(this) ||
-            IModuleEventsReference.PublishableEventDefiningMethods.Contains(this);
-
-        public bool IsIncludeModulesMethod =>
-            TychoAppReference.IncludeModulesMethodSignature.Equals(this) ||
-            TychoModuleReference.IncludeModulesMethodSignature.Equals(this);
-
-        public bool IsSubmoduleDefiningMethod =>
-            IAppStructureReference.SubmoduleDefiningMethods.Contains(this) ||
-            IModuleStructureReference.SubmoduleDefiningMethods.Contains(this);
 
         public MethodSignatureModel(
             string methodName,

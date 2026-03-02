@@ -10,7 +10,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
         private const string _namespace = "Tycho.Apps";
         private const string _typeName = "IAppContract";
 
-        public static HashSet<MethodSignatureModel> ContractDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
+        public static HashSet<MethodSignatureModel> DownstreamContractDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
         {
             ForwardsMethodSignature,
             ForwardsWithResponseMethodSignature,
