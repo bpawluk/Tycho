@@ -14,9 +14,9 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
     internal static class TychoFacadePipeline
     {
         private static readonly string AppFacadeTemplate = EmbeddedResource.GetContent("Templates/AppFacade.sbncs");
-        private static readonly string AppInterfaceTemplate = EmbeddedResource.GetContent("Templates/AppInterface.sbncs");
+        private static readonly string AppInterfaceTemplate = EmbeddedResource.GetContent("Templates/AppFacadeInterface.sbncs");
         private static readonly string ModuleFacadeTemplate = EmbeddedResource.GetContent("Templates/ModuleFacade.sbncs");
-        private static readonly string ModuleInterfaceTemplate = EmbeddedResource.GetContent("Templates/ModuleInterface.sbncs");
+        private static readonly string ModuleInterfaceTemplate = EmbeddedResource.GetContent("Templates/ModuleFacadeInterface.sbncs");
 
         public static IncrementalGeneratorInitializationContext AddTychoFacadePipeline(
             this IncrementalGeneratorInitializationContext context,
@@ -99,8 +99,8 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
         {
             return model.DefinitionKind switch
             {
-                TychoDefinitionKind.App => new AppInterfaceTM(model),
-                TychoDefinitionKind.Module => new ModuleInterfaceTM(model),
+                TychoDefinitionKind.App => new AppFacadeInterfaceTM(model),
+                TychoDefinitionKind.Module => new ModuleFacadeInterfaceTM(model),
                 _ => throw new ArgumentOutOfRangeException(nameof(model.DefinitionKind), $"Unsupported definition kind: {model.DefinitionKind}"),
             };
         }

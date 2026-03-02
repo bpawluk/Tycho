@@ -2,12 +2,13 @@ using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
 using Tycho.Utils.SourceGenerator.Models.Tycho;
 using Tycho.Utils.SourceGenerator.References.System;
+using Tycho.Utils.SourceGenerator.References.Tycho.Apps;
 using Tycho.Utils.SourceGenerator.References.Tycho.Modules;
 using Tycho.Utils.SourceGenerator.Symbols;
 
 namespace Tycho.Utils.SourceGenerator.TemplateModels
 {
-    internal class ModuleInterfaceTM : TemplateModelBase
+    internal class AppFacadeInterfaceTM : TemplateModelBase
     {
         public string Namespace { get; }
 
@@ -23,11 +24,11 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public RequestTM[] Requests { get; }
 
-        public ModuleInterfaceTM(TychoFacadeModel tychoFacadeModel)
+        public AppFacadeInterfaceTM(TychoFacadeModel tychoFacadeModel)
         {
             Namespace = tychoFacadeModel.DefinitionType.Namespace;
             ContainingTypes = tychoFacadeModel.DefinitionType.ContainingTypes.ToArray();
-            Classes = new ClassesTM(this, tychoFacadeModel);
+            Classes = new ClassesTM(this);
             Interfaces = new InterfacesTM(this, tychoFacadeModel);
             Methods = new MethodsTM();
             Parameters = new ParametersTM();
@@ -39,7 +40,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string TaskClass { get; }
             public string CancellationTokenClass { get; }
 
-            public ClassesTM(ModuleInterfaceTM owner, TychoFacadeModel tychoFacadeModel)
+            public ClassesTM(AppFacadeInterfaceTM owner)
             {
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);
@@ -48,12 +49,12 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         internal class InterfacesTM
         {
-            public string ModuleInterface { get; }
+            public string FacadeInterface { get; }
             public string AsyncDisposableInterface { get; }
 
-            public InterfacesTM(ModuleInterfaceTM owner, TychoFacadeModel tychoFacadeModel)
+            public InterfacesTM(AppFacadeInterfaceTM owner, TychoFacadeModel tychoFacadeModel)
             {
-                ModuleInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(tychoFacadeModel.DefinitionType.Name);
+                FacadeInterface = AppFacadeSymbols.GetAppFacadeInterface(tychoFacadeModel.DefinitionType.Name);
                 AsyncDisposableInterface = owner.UseType(IAsyncDisposableReference.TypeModel);
             }
         }
@@ -64,7 +65,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public MethodsTM()
             {
-                ExecuteAsyncMethod = ModuleFacadeBaseReference.ExecuteAsyncMethodSignature.MethodName;
+                ExecuteAsyncMethod = AppFacadeBaseReference.ExecuteAsyncMethodSignature.MethodName;
             }
         }
 
@@ -75,8 +76,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public ParametersTM()
             {
-                RequestDataParameter = ModuleFacadeSymbols.RequestDataParameter;
-                CancellationTokenParameter = ModuleFacadeSymbols.CancellationTokenParameter;
+                RequestDataParameter = AppFacadeSymbols.RequestDataParameter;
+                CancellationTokenParameter = AppFacadeSymbols.CancellationTokenParameter;
             }
         }
 
@@ -86,11 +87,11 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string ResponseType { get; }
             public bool HasResponse { get; }
 
-            public RequestTM(ModuleInterfaceTM owner, TychoRequestModel tychoRequestModel)
+            public RequestTM(AppFacadeInterfaceTM owner, TychoRequestModel tychoRequestModel)
             {
                 RequestType = owner.UseType(tychoRequestModel.RequestType);
                 HasResponse = tychoRequestModel.HasResponse;
-                ResponseType = HasResponse ? owner.UseType(tychoRequestModel.ResponseType.Value) : string.Empty;
+                ResponseType = HasResponse ? owner.UseType(tychoRequestModel.ResponseType.Value) : null;
             }
         }
     }
