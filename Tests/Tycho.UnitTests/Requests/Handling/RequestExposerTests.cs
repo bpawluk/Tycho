@@ -1,6 +1,6 @@
 ﻿using Moq;
 using Tycho.Requests.Handling;
-using Tycho.Structure.External;
+using Tycho.Structure.Parent;
 using Tycho.UnitTests._Data.Requests;
 
 namespace Tycho.UnitTests.Requests.Handling;

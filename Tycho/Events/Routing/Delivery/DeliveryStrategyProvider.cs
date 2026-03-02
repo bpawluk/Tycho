@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Routing.Routes;
-using Tycho.Structure.Internal;
+using Tycho.Structure;
 
 namespace Tycho.Events.Routing.Delivery
 {

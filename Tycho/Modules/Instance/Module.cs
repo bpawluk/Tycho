@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Routing;
 using Tycho.Registry;
 using Tycho.Requests.Broker;
-using Tycho.Structure.Internal;
+using Tycho.Structure;
 
 namespace Tycho.Modules.Instance
 {

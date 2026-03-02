@@ -1,7 +1,7 @@
 ﻿using Tycho.Events.Routing;
 using Tycho.Requests.Broker;
 
-namespace Tycho.Structure.External
+namespace Tycho.Structure.Parent
 {
     internal class ParentReference : IParentReference
     {

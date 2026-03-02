@@ -1,7 +1,7 @@
 ﻿using Moq;
 using Tycho.Events;
 using Tycho.Events.Routing;
-using Tycho.Structure.External;
+using Tycho.Structure.Parent;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
 using Tycho.UnitTests._Data.Modules;

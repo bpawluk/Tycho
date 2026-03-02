@@ -2,7 +2,7 @@
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Tycho.Structure.Internal
+namespace Tycho.Structure
 {
     internal class Internals : IServiceProvider, IDisposable
     {

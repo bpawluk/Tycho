@@ -6,7 +6,7 @@ using Tycho.Events.Routing;
 using Tycho.Modules.Instance;
 using Tycho.Modules.Setup;
 using Tycho.Requests.Broker;
-using Tycho.Structure.External;
+using Tycho.Structure;
 using Tycho.Utils;
 
 namespace Tycho.Modules

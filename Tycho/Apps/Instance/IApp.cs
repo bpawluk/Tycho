@@ -1,6 +1,6 @@
 ﻿using System;
 using Tycho.Requests.Broker;
-using Tycho.Structure.Internal;
+using Tycho.Structure;
 using Tycho.Utils;
 
 namespace Tycho.Apps.Instance

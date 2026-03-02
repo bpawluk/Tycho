@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tycho.Requests.Registrating.Registrations;
-using Tycho.Structure.Internal;
+using Tycho.Structure;
 
 namespace Tycho.Requests.Registrating
 {

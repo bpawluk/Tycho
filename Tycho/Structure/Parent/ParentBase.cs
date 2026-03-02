@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Tycho.Requests;
 using Tycho.Utils;
 
-namespace Tycho.Structure.External
+namespace Tycho.Structure.Parent
 {
     [ReferencedBySourceGenerator]
     public abstract class ParentBase

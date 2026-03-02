@@ -4,7 +4,7 @@ using Tycho.Modules.Instance;
 using Tycho.Requests.Handling;
 using Tycho.Requests.Registrating;
 using Tycho.Requests.Registrating.Registrations;
-using Tycho.Structure.Internal;
+using Tycho.Structure;
 using Tycho.UnitTests._Data.Handlers;
 using Tycho.UnitTests._Data.Modules;
 using Tycho.UnitTests._Data.Requests;

@@ -4,8 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Tycho.Apps.Instance;
-using Tycho.Structure.External;
-using Tycho.Structure.Internal;
+using Tycho.Structure;
 
 namespace Tycho.Apps.Setup
 {

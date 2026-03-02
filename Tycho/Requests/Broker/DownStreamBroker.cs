@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
 using Tycho.Requests.Registrating.Registrations;
-using Tycho.Structure.Internal;
+using Tycho.Structure;
 
 namespace Tycho.Requests.Broker
 {

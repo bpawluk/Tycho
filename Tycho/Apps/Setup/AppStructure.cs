@@ -8,8 +8,7 @@ using Tycho.Modules;
 using Tycho.Modules.Instance;
 using Tycho.Registry;
 using Tycho.Requests.Broker;
-using Tycho.Structure.External;
-using Tycho.Structure.Internal;
+using Tycho.Structure;
 
 namespace Tycho.Apps.Setup
 {

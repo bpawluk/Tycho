@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Tycho.Requests;
 using Tycho.Requests.Broker;
 using Tycho.Requests.Registrating;
-using Tycho.Structure.Internal;
+using Tycho.Structure;
 using Tycho.Utils;
 
 namespace Tycho.Modules.Setup

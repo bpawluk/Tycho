@@ -4,8 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Routing;
 using Tycho.Modules.Instance;
 using Tycho.Requests.Broker;
-using Tycho.Structure.External;
-using Tycho.Structure.Internal;
+using Tycho.Structure;
+using Tycho.Structure.Parent;
 
 namespace Tycho.Modules.Setup
 {

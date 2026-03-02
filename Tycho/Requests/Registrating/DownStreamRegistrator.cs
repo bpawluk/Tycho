@@ -5,7 +5,7 @@ using Tycho.Modules;
 using Tycho.Modules.Instance;
 using Tycho.Requests.Handling;
 using Tycho.Requests.Registrating.Registrations;
-using Tycho.Structure.External;
+using Tycho.Structure.Parent;
 
 namespace Tycho.Requests.Registrating
 {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Tycho.Events;
 using Tycho.Events.Handling;
-using Tycho.Structure.Internal;
+using Tycho.Structure;
 
 namespace Tycho.Registry
 {

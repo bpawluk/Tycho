@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Outbox;
-using Tycho.Structure.Internal;
+using Tycho.Structure;
 
 namespace Tycho.Persistence.EFCore.Outbox;
 

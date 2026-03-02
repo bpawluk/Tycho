@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Inbox;
-using Tycho.Structure.Internal;
+using Tycho.Structure;
 
 namespace Tycho.Events.Handling
 {

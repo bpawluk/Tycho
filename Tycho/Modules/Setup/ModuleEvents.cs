@@ -13,7 +13,7 @@ using Tycho.Events.Routing.Delivery;
 using Tycho.Events.Serialization;
 using Tycho.Events.Serialization.InMemory;
 using Tycho.Registry;
-using Tycho.Structure.Internal;
+using Tycho.Structure;
 
 namespace Tycho.Modules.Setup
 {

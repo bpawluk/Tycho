@@ -1,7 +1,7 @@
 ﻿using System;
 using Tycho.Events.Routing;
 using Tycho.Requests.Broker;
-using Tycho.Structure.Internal;
+using Tycho.Structure;
 using Tycho.Utils;
 
 namespace Tycho.Modules.Instance

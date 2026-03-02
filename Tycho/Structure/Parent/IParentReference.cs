@@ -1,7 +1,7 @@
 ﻿using Tycho.Events.Routing;
 using Tycho.Requests.Broker;
 
-namespace Tycho.Structure.External
+namespace Tycho.Structure.Parent
 {
     /// <summary>
     /// Represents a parent that owns the current module.
