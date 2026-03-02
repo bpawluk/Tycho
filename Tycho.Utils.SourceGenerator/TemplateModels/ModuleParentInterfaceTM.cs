@@ -27,8 +27,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         {
             Namespace = tychoParentModel.DefinitionType.Namespace;
             ContainingTypes = tychoParentModel.DefinitionType.ContainingTypes.ToArray();
-            Classes = new ClassesTM(this);
-            Interfaces = new InterfacesTM(this, tychoParentModel);
+            Classes = new ClassesTM(this, tychoParentModel);
+            Interfaces = new InterfacesTM();
             Methods = new MethodsTM();
             Parameters = new ParametersTM();
             Requests = tychoParentModel.Requests.Select(r => new RequestTM(this, r)).ToArray();
@@ -36,11 +36,15 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         internal class ClassesTM
         {
+            public string ModuleClass { get; }
+            public string ModuleBaseClass { get; }
             public string TaskClass { get; }
             public string CancellationTokenClass { get; }
 
-            public ClassesTM(ModuleParentInterfaceTM owner)
+            public ClassesTM(ModuleParentInterfaceTM owner, TychoParentModel tychoParentModel)
             {
+                ModuleClass = tychoParentModel.DefinitionType.Name;
+                ModuleBaseClass = owner.UseType(TychoModuleReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);
             }
@@ -50,9 +54,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         {
             public string ParentInterface { get; }
 
-            public InterfacesTM(ModuleParentInterfaceTM owner, TychoParentModel tychoParentModel)
+            public InterfacesTM()
             {
-                ParentInterface = ModuleParentSymbols.GetModuleParentInterface(tychoParentModel.DefinitionType.Name);
+                ParentInterface = ModuleParentSymbols.ParentInterface;
             }
         }
 

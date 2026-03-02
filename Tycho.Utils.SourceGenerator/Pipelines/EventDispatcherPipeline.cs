@@ -36,7 +36,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                     outputContext.GenerateSourceFromTemplate(
                         new EventDispatcherTM(model),
                         EventDispatcherTemplate,
-                        $"{model.DefinitionType}.Events.Dispatcher.g.cs");
+                        $"{model.DefinitionType}.Dispatcher.g.cs");
                 });
 
             return context;

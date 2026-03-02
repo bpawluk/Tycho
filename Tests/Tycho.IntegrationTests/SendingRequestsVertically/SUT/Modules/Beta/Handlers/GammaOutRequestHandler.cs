@@ -1,28 +1,24 @@
 ﻿using Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Gamma;
 using Tycho.Requests;
-using Tycho.Structure.External;
+using static Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Beta.BetaModule;
 
 namespace Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Beta.Handlers;
 
-internal class GammaOutRequestHandler(IParentReference parent)
+internal class GammaOutRequestHandler(IParent parent)
     : IRequestHandler<GammaOutRequest>
     , IRequestHandler<GammaOutRequestWithResponse, string>
 {
-    private readonly IParentReference _parent = parent;
+    private readonly IParent _parent = parent;
 
     public Task HandleAsync(GammaOutRequest requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        return Task.CompletedTask;
-        //return _parent.ExecuteAsync(new BetaOutRequest(requestData.Result), cancellationToken);
+        return _parent.ExecuteAsync(new BetaOutRequest(requestData.Result), cancellationToken);
     }
 
     public Task<string> HandleAsync(GammaOutRequestWithResponse requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        return Task.FromResult("Error");
-        //return _parent.ExecuteAsync<BetaOutRequestWithResponse, string>(
-        //    new BetaOutRequestWithResponse(requestData.Result),
-        //    cancellationToken);
+        return _parent.ExecuteAsync(new BetaOutRequestWithResponse(requestData.Result), cancellationToken);
     }
 }

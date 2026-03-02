@@ -17,8 +17,8 @@ public partial class AlphaModule : TychoModule
         module.Handles<Request, RequestHandler>()
               .Handles<RequestWithResponse, string, RequestHandler>();
 
-        module.Requires<AlphaRequest>()
-              .Requires<AlphaRequestWithResponse, string>();
+        module.Requires<Request>()
+              .Requires<RequestWithResponse, string>();
 
         module.Handles<AlphaRequest, AlphaRequestHandler>()
               .Handles<AlphaRequestWithResponse, string, AlphaRequestHandler>();

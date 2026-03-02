@@ -1,23 +1,21 @@
 ﻿using Tycho.Requests;
-using Tycho.Structure.External;
+using static Tycho.IntegrationTests.ForwardingRequestsVertically.SUT.Modules.GammaModule;
 
 namespace Tycho.IntegrationTests.ForwardingRequestsVertically.SUT.Modules.Handlers;
 
-internal class RequestHandler(IParentReference parent)
+internal class RequestHandler(IParent parent)
     : IRequestHandler<Request>
     , IRequestHandler<RequestWithResponse, string>
 {
-    private readonly IParentReference _parent = parent;
+    private readonly IParent _parent = parent;
 
     public Task HandleAsync(Request requestData, CancellationToken cancellationToken)
     {
-        return Task.CompletedTask;
-        //return _parent.ExecuteAsync(requestData, cancellationToken);
+        return _parent.ExecuteAsync(requestData, cancellationToken);
     }
 
     public Task<string> HandleAsync(RequestWithResponse requestData, CancellationToken cancellationToken)
     {
-        return Task.FromResult("Error");
-        //return _parent.ExecuteAsync<RequestWithResponse, string>(requestData, cancellationToken);
+        return _parent.ExecuteAsync(requestData, cancellationToken);
     }
 }

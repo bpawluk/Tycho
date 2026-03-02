@@ -1,27 +1,23 @@
 ﻿using Tycho.Requests;
-using Tycho.Structure.External;
+using static Tycho.IntegrationTests.SendingRequestsHorizontally.SUT.Modules.Beta.BetaModule;
 
 namespace Tycho.IntegrationTests.SendingRequestsHorizontally.SUT.Modules.Beta.Handlers;
 
-internal class BetaInRequestHandler(IParentReference parent)
+internal class BetaInRequestHandler(IParent parent)
     : IRequestHandler<BetaInRequest>
     , IRequestHandler<BetaInRequestWithResponse, string>
 {
-    private readonly IParentReference _parent = parent;
+    private readonly IParent _parent = parent;
 
     public Task HandleAsync(BetaInRequest requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        return Task.CompletedTask;
-        //return _parent.ExecuteAsync(new BetaOutRequest(requestData.Result), cancellationToken);
+        return _parent.ExecuteAsync(new BetaOutRequest(requestData.Result), cancellationToken);
     }
 
     public Task<string> HandleAsync(BetaInRequestWithResponse requestData, CancellationToken cancellationToken)
     {
         requestData.Result.HandlingCount++;
-        return Task.FromResult("Error");
-        //return _parent.ExecuteAsync<BetaOutRequestWithResponse, string>(
-        //    new BetaOutRequestWithResponse(requestData.Result),
-        //    cancellationToken);
+        return _parent.ExecuteAsync(new BetaOutRequestWithResponse(requestData.Result), cancellationToken);
     }
 }

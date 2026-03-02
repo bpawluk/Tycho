@@ -1,23 +1,21 @@
 ﻿using Tycho.Requests;
-using Tycho.Structure.External;
+using static Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Modules.Alpha.AlphaModule;
 
 namespace Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Modules.Alpha.Handlers;
 
-internal class AlphaRequestHandler(IParentReference parent)
+internal class AlphaRequestHandler(IParent parent)
     : IRequestHandler<AlphaRequest>
     , IRequestHandler<AlphaRequestWithResponse, string>
 {
-    private readonly IParentReference _parent = parent;
+    private readonly IParent _parent = parent;
 
     public Task HandleAsync(AlphaRequest requestData, CancellationToken cancellationToken)
     {
-        return Task.CompletedTask;
-        //return _parent.ExecuteAsync(requestData, cancellationToken);
+        return _parent.ExecuteAsync(requestData, cancellationToken);
     }
 
     public Task<string> HandleAsync(AlphaRequestWithResponse requestData, CancellationToken cancellationToken)
     {
-        return Task.FromResult("Error");
-        //return _parent.ExecuteAsync<AlphaRequestWithResponse, string>(requestData, cancellationToken);
+        return _parent.ExecuteAsync(requestData, cancellationToken);
     }
 }
