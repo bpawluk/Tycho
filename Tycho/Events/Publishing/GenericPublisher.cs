@@ -21,8 +21,7 @@ namespace Tycho.Events.Publishing
             _outbox = outbox;
         }
 
-        public async Task PublishAsync<TEvent>(TEvent eventPayload, CancellationToken cancellationToken)
-            where TEvent : class, IEvent
+        async Task IGenericPublisher.PublishAsync<TEvent>(TEvent eventPayload, CancellationToken cancellationToken)
         {
             var eventId = Guid.NewGuid();
             var routedEvents = _router.FindRoutes(eventId, eventPayload);
