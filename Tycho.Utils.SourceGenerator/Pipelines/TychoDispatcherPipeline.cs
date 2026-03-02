@@ -10,11 +10,11 @@ using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.Pipelines
 {
-    internal static class EventDispatcherPipeline
+    internal static class TychoDispatcherPipeline
     {
         private static readonly string EventDispatcherTemplate = EmbeddedResource.GetContent("Templates/EventDispatcher.sbncs");
 
-        public static IncrementalGeneratorInitializationContext AddEventDispatcherPipeline(
+        public static IncrementalGeneratorInitializationContext AddTychoDispatcherPipeline(
             this IncrementalGeneratorInitializationContext context, 
             IncrementalValuesProvider<(TychoDefinitionKind, ClassDefinitionModel)> pipelineBase)
         {

@@ -28,7 +28,7 @@ namespace Tycho.Utils.SourceGenerator
                    .AddTychoFacadePipeline(tychoPipelineBase)
                    .AddTychoParentPipeline(tychoPipelineBase)
                    .AddTychoPublisherPipeline(tychoPipelineBase)
-                   .AddEventDispatcherPipeline(tychoPipelineBase);
+                   .AddTychoDispatcherPipeline(tychoPipelineBase);
         }
 
         private static bool GetTychoPipelineBasePredicate(SyntaxNode node, CancellationToken token)
@@ -36,20 +36,16 @@ namespace Tycho.Utils.SourceGenerator
             return node is ClassDeclarationSyntax;
         }
 
-        private static (TychoDefinitionKind, ClassDefinitionModel) GetTychoPipelineBaseTransform(
-            GeneratorAttributeSyntaxContext context, 
-            CancellationToken token)
+        private static (TychoDefinitionKind, ClassDefinitionModel) GetTychoPipelineBaseTransform(GeneratorAttributeSyntaxContext context, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             var definitionKind = GetDefinitionKind(context, token);
-            var classType = GetTypeModel(context.TargetSymbol);
-            var methods = GetMethodDefinitionModels(context, classType, token);
-            return (definitionKind, new ClassDefinitionModel(classType, methods));
+            var definitionType = GetDefinitionType(context.TargetSymbol, token);
+            var methods = GetMethodDefinitionModels(context, definitionType, token);
+            return (definitionKind, new ClassDefinitionModel(definitionType, methods));
         }
 
-        private static TychoDefinitionKind GetDefinitionKind(
-            GeneratorAttributeSyntaxContext context, 
-            CancellationToken token)
+        private static TychoDefinitionKind GetDefinitionKind(GeneratorAttributeSyntaxContext context, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
 
@@ -74,21 +70,10 @@ namespace Tycho.Utils.SourceGenerator
             return TychoDefinitionKind.Unknown;
         }
 
-        private static TypeModel GetTypeModel(ISymbol symbol)
+        private static TypeModel GetDefinitionType(ISymbol symbol, CancellationToken token)
         {
-            var typeNamespace = symbol
-                .ContainingNamespace
-                .ToDisplayString(SymbolDisplayFormat
-                    .FullyQualifiedFormat
-                    .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted));
-
-            var containingTypes = new Stack<string>();
-            for (var current = symbol.ContainingType; current != null; current = current.ContainingType)
-            {
-                containingTypes.Push(current.Name);
-            }
-
-            return new TypeModel(typeNamespace, containingTypes.ToImmutableEquatableArray(), symbol.Name);
+            token.ThrowIfCancellationRequested();
+            return GetTypeModel(symbol);
         }
 
         private static ImmutableEquatableArray<MethodDefinitionModel> GetMethodDefinitionModels(
@@ -148,13 +133,9 @@ namespace Tycho.Utils.SourceGenerator
 
         private static ImmutableEquatableArray<MethodInvocationModel> GetMethodBody(GeneratorAttributeSyntaxContext context, IMethodSymbol methodSymbol, CancellationToken token)
         {
-            token.ThrowIfCancellationRequested();
-
             var methodInvocations = new HashSet<MethodInvocationModel>();
             foreach (var syntaxRef in methodSymbol.DeclaringSyntaxReferences)
             {
-                token.ThrowIfCancellationRequested();
-
                 if (!(syntaxRef.GetSyntax(token) is MethodDeclarationSyntax methodSyntax) || methodSyntax.Body == null)
                 {
                     continue;
@@ -163,8 +144,6 @@ namespace Tycho.Utils.SourceGenerator
 
                 foreach (var invocationSyntax in methodSyntax.Body.DescendantNodes().OfType<InvocationExpressionSyntax>())
                 {
-                    token.ThrowIfCancellationRequested();
-
                     var symbolInfo = semanticModel.GetSymbolInfo(invocationSyntax, token);
                     var symbol = symbolInfo.Symbol ?? symbolInfo.CandidateSymbols.FirstOrDefault();
 
@@ -186,6 +165,23 @@ namespace Tycho.Utils.SourceGenerator
             }
 
             return methodInvocations.ToImmutableEquatableArray();
+        }
+
+        private static TypeModel GetTypeModel(ISymbol symbol)
+        {
+            var typeNamespace = symbol
+                .ContainingNamespace
+                .ToDisplayString(SymbolDisplayFormat
+                    .FullyQualifiedFormat
+                    .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted));
+
+            var containingTypes = new Stack<string>();
+            for (var current = symbol.ContainingType; current != null; current = current.ContainingType)
+            {
+                containingTypes.Push(current.Name);
+            }
+
+            return new TypeModel(typeNamespace, containingTypes.ToImmutableEquatableArray(), symbol.Name);
         }
 
         private static TypeArgument GetTypeArgumentModel(ITypeParameterSymbol typeParameter, ITypeSymbol typeArgument)
