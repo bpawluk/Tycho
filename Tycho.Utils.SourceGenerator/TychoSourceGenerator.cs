@@ -27,8 +27,7 @@ namespace Tycho.Utils.SourceGenerator
                    .AddTychoSetupPipeline(tychoPipelineBase)
                    .AddTychoFacadePipeline(tychoPipelineBase)
                    .AddTychoParentPipeline(tychoPipelineBase)
-                   .AddTychoPublisherPipeline(tychoPipelineBase)
-                   .AddTychoDispatcherPipeline(tychoPipelineBase);
+                   .AddTychoPublisherPipeline(tychoPipelineBase);
         }
 
         private static bool GetTychoPipelineBasePredicate(SyntaxNode node, CancellationToken token)

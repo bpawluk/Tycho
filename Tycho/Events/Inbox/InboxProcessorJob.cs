@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Tycho.Events.Dispatching;
+using Tycho.Events.Routing;
 using Tycho.Processor;
 using Tycho.Registry;
 
@@ -55,19 +56,18 @@ namespace Tycho.Events.Inbox
             return newEntriesCount > 0 || entriesInProcessingCount > 0;
         }
 
-        private async Task HandleEntryAsync(InboxEntry entry, CancellationToken cancellationToken)
+        private async Task HandleEntryAsync(RoutedEvent routedEvent, CancellationToken cancellationToken)
         {
             try
             {
                 // TODO: Handler timeout support
-                var handlingCancellationToken = CancellationToken.None;
-                var eventHandler = _handlerRegistry.GetHandler(entry.HandlerId);
-                await _handlingDispatcher.Dispatch(entry.Id, entry.Payload, eventHandler, handlingCancellationToken);
+                await routedEvent.DispatchAsync(_handlingDispatcher, cancellationToken).ConfigureAwait(false);
+                await _inboxConsumer.MarkAsHandled(routedEvent.Id, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to process inbox entry with ID {entryId}", entry.Id);
-                await _inboxConsumer.MarkAsFailed(entry.Id, cancellationToken).ConfigureAwait(false);
+                _logger.LogError(ex, "Failed to process inbox entry with ID {entryId}", routedEvent.Id);
+                await _inboxConsumer.MarkAsFailed(routedEvent.Id, cancellationToken).ConfigureAwait(false);
             }
         }
     }

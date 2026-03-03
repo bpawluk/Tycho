@@ -89,7 +89,7 @@ namespace Tycho.Events.Registrating
             where TEvent : class, IEvent
             where THandler : class, IEventHandler<TEvent>
         {
-            // TODO: support one handler for multiple events (issue in generated dispatchers)
+            // TODO: support one handler for multiple events
             if (IsHandlerAlreadyRegistered<TEvent, THandler>())
             {
                 throw new ArgumentException(

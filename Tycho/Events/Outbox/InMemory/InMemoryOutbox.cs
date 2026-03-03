@@ -1,22 +1,24 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Tycho.Events.Routing;
 
 namespace Tycho.Events.Outbox.InMemory
 {
     internal class InMemoryOutbox : IOutboxWriter, IOutboxConsumer
     {
         private readonly OutboxActivity _outboxActivity;
-        private readonly Queue<OutboxEntry> _entries;
+        private readonly ConcurrentQueue<RoutedEvent> _entries;
 
         public InMemoryOutbox(OutboxActivity outboxActivity)
         {
             _outboxActivity = outboxActivity;
-            _entries = new Queue<OutboxEntry>();
+            _entries = new ConcurrentQueue<RoutedEvent>();
         }
 
-        public Task Write(IReadOnlyCollection<OutboxEntry> entries, CancellationToken cancellationToken)
+        public Task Write(IReadOnlyCollection<RoutedEvent> entries, CancellationToken cancellationToken)
         {
             foreach (var entry in entries)
             {
@@ -27,18 +29,24 @@ namespace Tycho.Events.Outbox.InMemory
             return Task.CompletedTask;
         }
 
-        public Task<IReadOnlyCollection<OutboxEntry>> Read(int count, CancellationToken cancellationToken)
+        public Task<IReadOnlyCollection<RoutedEvent>> Read(int count, CancellationToken cancellationToken)
         {
-            var entries = new List<OutboxEntry>();
+            var entries = new List<RoutedEvent>();
 
             count = Math.Min(count, _entries.Count);
             for (var i = 0; i < count; i++)
             {
-                var entry = _entries.Dequeue();
-                entries.Add(entry);
+                if (_entries.TryDequeue(out var nextMessage))
+                {
+                    entries.Add(nextMessage);
+                }
+                else
+                {
+                    break;
+                }
             }
 
-            return Task.FromResult<IReadOnlyCollection<OutboxEntry>>(entries);
+            return Task.FromResult<IReadOnlyCollection<RoutedEvent>>(entries);
         }
 
         public Task MarkAsDelivered(Guid entryId, CancellationToken cancellationToken)

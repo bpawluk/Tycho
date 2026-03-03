@@ -31,8 +31,8 @@ public class EventPublisherTests
 
         _outboxMock = new Mock<IOutboxWriter>();
 
-        var serializerMock = new Mock<IPayloadSerializer>();
-        serializerMock.Setup(s => s.Serialize(It.IsAny<IEvent>()))
+        var serializerMock = new Mock<IEventSerializer>();
+        serializerMock.Setup(s => s.SerializePayload(It.IsAny<IEvent>()))
                       .Returns((IEvent eventData) => SerializeMock(eventData));
 
         _sut = new EventPublisher(routerMock.Object, _outboxMock.Object, serializerMock.Object);

@@ -4,8 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Tycho.Events.Routing.Delivery;
-using Tycho.Events.Routing.Payload;
+using Tycho.Events.Delivery;
 using Tycho.Events.Routing.Sources;
 using Tycho.Structure;
 
@@ -20,14 +19,15 @@ namespace Tycho.Events.Routing
             _internals = internals;
         }
 
-        public IReadOnlyCollection<IRoutedEvent<IEvent>> FindRoutes<TEvent>(Guid eventId, TEvent eventPayload) 
+        public IReadOnlyCollection<RoutedEvent> Route<TEvent>(Guid eventId, TEvent eventPayload) 
             where TEvent : class, IEvent
         {
             var sources = _internals.GetServices<IRouteSource<TEvent>>();
-            return sources.SelectMany(source => source.GetRoutes(eventId, eventPayload)).ToArray();
+            return sources.SelectMany(source => source.Route(eventId, eventPayload)).ToArray();
         }
 
-        public async Task DeliverAsync(IRoutedEvent routedEvent, CancellationToken cancellationToken)
+        public async Task DeliverAsync<TEvent>(RoutedEvent<TEvent> routedEvent, CancellationToken cancellationToken)
+            where TEvent : class, IEvent
         {
             if (!routedEvent.Route.TryPeek(out var nextRouteStep))
             {

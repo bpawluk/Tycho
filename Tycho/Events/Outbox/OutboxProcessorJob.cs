@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Tycho.Events.Routing;
-using Tycho.Events.Routing.Payload;
 using Tycho.Processor;
 
 namespace Tycho.Events.Outbox
@@ -44,18 +43,17 @@ namespace Tycho.Events.Outbox
             }
         }
 
-        private async Task DeliverEntryAsync(OutboxEntry entry, CancellationToken cancellationToken)
+        private async Task DeliverEntryAsync(RoutedEvent routedEvent, CancellationToken cancellationToken)
         {
             try 
             {
-                var routedEvent = new RoutedEvent(entry.Id, entry.Payload, entry.Route);
-                await _eventRouter.DeliverAsync(routedEvent, cancellationToken).ConfigureAwait(false);
-                await _outboxConsumer.MarkAsDelivered(entry.Id, cancellationToken).ConfigureAwait(false);
+                await routedEvent.DeliverAsync(_eventRouter, cancellationToken).ConfigureAwait(false);
+                await _outboxConsumer.MarkAsDelivered(routedEvent.Id, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex) 
             {
-                _logger.LogError(ex, "Failed to deliver outbox entry with ID {entryId}", entry.Id);
-                await _outboxConsumer.MarkAsFailed(entry.Id, cancellationToken).ConfigureAwait(false);
+                _logger.LogError(ex, "Failed to deliver outbox entry with ID {entryId}", routedEvent.Id);
+                await _outboxConsumer.MarkAsFailed(routedEvent.Id, cancellationToken).ConfigureAwait(false);
             }
         }
     }

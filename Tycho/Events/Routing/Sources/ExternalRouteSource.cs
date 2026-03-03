@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Tycho.Events.Routing.Payload;
 using Tycho.Events.Routing.Routes;
 
 namespace Tycho.Events.Routing.Sources
@@ -15,10 +14,10 @@ namespace Tycho.Events.Routing.Sources
             _externalEventRouter = externalEventRouter;
         }
 
-        public IReadOnlyCollection<IRoutedEvent<IEvent>> GetRoutes(Guid eventId, TEvent eventPayload)
+        public IReadOnlyCollection<RoutedEvent> Route(Guid eventId, TEvent eventPayload)
         {
             var routeStep = GetRouteStep();
-            var routedEvents = _externalEventRouter.FindRoutes(eventId, eventPayload);
+            var routedEvents = _externalEventRouter.Route(eventId, eventPayload);
 
             foreach (var routedEvent in routedEvents)
             {
@@ -28,6 +27,6 @@ namespace Tycho.Events.Routing.Sources
             return routedEvents;
         }
 
-        protected abstract IRouteStep GetRouteStep();
+        protected abstract RouteStep GetRouteStep();
     }
 }

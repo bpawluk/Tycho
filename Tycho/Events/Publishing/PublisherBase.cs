@@ -7,10 +7,10 @@ namespace Tycho.Events.Publishing
     [ReferencedBySourceGenerator]
     public abstract class PublisherBase
     {
-        private readonly IGenericPublisher _genericPublisher;
+        private readonly IEventPublisher _genericPublisher;
 
         [ReferencedBySourceGenerator]
-        public PublisherBase(IGenericPublisher genericPublisher)
+        public PublisherBase(IEventPublisher genericPublisher)
         {
             _genericPublisher = genericPublisher;
         }

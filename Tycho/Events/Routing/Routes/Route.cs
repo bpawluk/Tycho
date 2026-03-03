@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
-using Tycho.Registry;
 
 namespace Tycho.Events.Routing.Routes
 {
-    internal class Route : Stack<IRouteStep>
+    internal class Route : Stack<RouteStep>
     {
-        public static Route WithHandler(EventHandlerIdentity handlerId)
+        public static Route Empty()
         {
             var route = new Route();
-            route.Push(FinalRouteStep.Create(handlerId));
+            route.Push(new FinalRouteStep());
             return route;
         }
     }

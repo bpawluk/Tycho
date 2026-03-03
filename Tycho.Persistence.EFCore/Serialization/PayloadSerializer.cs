@@ -5,9 +5,9 @@ using Tycho.Events.Serialization;
 
 namespace Tycho.Persistence.EFCore.Serialization;
 
-internal class PayloadSerializer : IPayloadSerializer
+internal class PayloadSerializer : IEventSerializer
 {
-    public object Serialize(IEvent eventData)
+    public object SerializePayload(IEvent eventData)
     {
         if (eventData is null)
         {
@@ -32,7 +32,7 @@ internal class PayloadSerializer : IPayloadSerializer
         return eventData;
     }
 
-    public TEvent Deserialize<TEvent>(object payload) where TEvent : class, IEvent
+    public TEvent DeserializePayload<TEvent>(object payload) where TEvent : class, IEvent
     {
         if (payload is string stringPayload && !string.IsNullOrWhiteSpace(stringPayload))
         {

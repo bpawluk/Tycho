@@ -14,7 +14,7 @@ namespace Tycho.Events.Routing.Sources
         {
         }
 
-        protected override IRouteStep GetRouteStep() => DownStreamRouteStep.Create<TModule>();
+        protected override RouteStep GetRouteStep() => DownStreamRouteStep.Create<TModule>();
     }
 
     internal class DownStreamMappedRouteSource<TEvent, TTargetEvent, TModule>
@@ -27,6 +27,6 @@ namespace Tycho.Events.Routing.Sources
         {
         }
 
-        protected override IRouteStep GetRouteStep() => DownStreamRouteStep.Create<TModule>();
+        protected override RouteStep GetRouteStep() => DownStreamRouteStep.Create<TModule>();
     }
 }

@@ -23,7 +23,7 @@ public class PayloadSerializerTests
         var eventData = new TestEventWithData();
 
         // Act
-        var payload = _sut.Serialize(eventData);
+        var payload = _sut.SerializePayload(eventData);
 
         // Assert
         Assert.Equal(eventData.GetSerializedPayload(), payload);
@@ -38,7 +38,7 @@ public class PayloadSerializerTests
         // Act
         void Act()
         {
-            _sut.Serialize(eventData);
+            _sut.SerializePayload(eventData);
         }
 
         // Assert

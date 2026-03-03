@@ -22,7 +22,7 @@ public static class ServiceCollectionExtensions
                 .AddScoped<TychoDbContext, TDbContext>()
                 .AddTransient<IOutboxWriter, OutboxWriter>()
                 .AddTransient<IOutboxConsumer, OutboxConsumer>()
-                .AddTransient<IPayloadSerializer, PayloadSerializer>();
+                .AddTransient<IEventSerializer, PayloadSerializer>();
         return services;
     }
 }

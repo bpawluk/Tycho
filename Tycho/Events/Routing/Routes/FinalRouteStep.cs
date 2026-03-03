@@ -2,18 +2,7 @@
 
 namespace Tycho.Events.Routing.Routes
 {
-    internal class FinalRouteStep : IRouteStep
+    internal class FinalRouteStep : RouteStep
     {
-        public EventHandlerIdentity HandlerId { get; }
-
-        private FinalRouteStep(EventHandlerIdentity handlerId)
-        {
-            HandlerId = handlerId;
-        }
-
-        public static FinalRouteStep Create(EventHandlerIdentity handlerId)
-        {
-            return new FinalRouteStep(handlerId);
-        }
     }
 }

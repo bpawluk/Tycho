@@ -4,7 +4,6 @@ using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.References.Microsoft;
 using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.References.Tycho.Apps;
-using Tycho.Utils.SourceGenerator.References.Tycho.Events;
 using Tycho.Utils.SourceGenerator.References.Tycho.Modules;
 using Tycho.Utils.SourceGenerator.Symbols;
 
@@ -45,7 +44,6 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string AppClass { get; }
             public string FacadeClass { get; }
             public string PublisherClass { get; }
-            public string EventDispatcherClass { get; }
             public string BaseClass { get; }
             public string TaskClass { get; }
             public string ActionClass { get; }
@@ -57,7 +55,6 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 AppClass = tychoDefinitionModel.DefinitionType.Name;
                 FacadeClass = AppFacadeSymbols.GetAppFacadeClass(AppClass);
                 PublisherClass = PublisherSymbols.PublisherClass;
-                EventDispatcherClass = EventDispatcherSymbols.GetEventDispatcherClass(AppClass);
                 BaseClass = owner.UseType(TychoAppReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 ActionClass = owner.UseType(ActionReference.TypeModel);
@@ -73,7 +70,6 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string ConfigurationInterface { get; }
             public string LoggingBuilderInterface { get; }
             public string ServiceCollectionInterface { get; }
-            public string EventDispatcherInterface { get; }
             public string ModuleInstanceInterface { get; }
 
             public InterfacesTM(AppDefinitionTM owner, TychoDefinitionModel tychoDefinitionModel)
@@ -83,7 +79,6 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 ConfigurationInterface = owner.UseType(IConfigurationReference.TypeModel);
                 LoggingBuilderInterface = owner.UseType(ILoggingBuilderReference.TypeModel);
                 ServiceCollectionInterface = owner.UseType(IServiceCollectionReference.TypeModel);
-                EventDispatcherInterface = owner.UseType(IEventDispatcherReference.TypeModel);
                 ModuleInstanceInterface = owner.UseType(IModuleReference.TypeModel);
             }
         }

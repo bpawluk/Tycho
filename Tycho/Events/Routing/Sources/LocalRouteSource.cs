@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Tycho.Events.Routing.Payload;
 using Tycho.Registry;
 
 namespace Tycho.Events.Routing.Sources
@@ -16,11 +15,11 @@ namespace Tycho.Events.Routing.Sources
             _handlerRegistry = handlerRegistry;
         }
 
-        public IReadOnlyCollection<IRoutedEvent<IEvent>> GetRoutes(Guid eventId, TEvent eventPayload)
+        public IReadOnlyCollection<RoutedEvent> Route(Guid eventId, TEvent eventPayload)
         {
             return _handlerRegistry
                 .IdenitfyHandlers<TEvent>()
-                .Select(handlerId => new RoutedEvent<IEvent>(eventId, eventPayload, handlerId))
+                .Select(handlerId => new RoutedEvent<TEvent>(eventId, handlerId, eventPayload))
                 .ToList();
         }
     }

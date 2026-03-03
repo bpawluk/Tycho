@@ -13,7 +13,7 @@ namespace Tycho.Events.Routing.Sources
         {
         }
 
-        protected override IRouteStep GetRouteStep() => UpStreamRouteStep.Create();
+        protected override RouteStep GetRouteStep() => new UpStreamRouteStep();
     }
 
     internal class UpStreamMappedRouteSource<TEvent, TTargetEvent>
@@ -26,6 +26,6 @@ namespace Tycho.Events.Routing.Sources
         {
         }
 
-        protected override IRouteStep GetRouteStep() => UpStreamRouteStep.Create();
+        protected override RouteStep GetRouteStep() => new UpStreamRouteStep();
     }
 }

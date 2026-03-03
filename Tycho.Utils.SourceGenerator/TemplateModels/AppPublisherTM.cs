@@ -52,7 +52,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 PublisherBaseClass = owner.UseType(PublisherBaseReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);
-                GenericPublisherClass = owner.UseType(IGenericPublisherReference.TypeModel);
+                GenericPublisherClass = owner.UseType(IEventPublisherReference.TypeModel);
             }
         }
 

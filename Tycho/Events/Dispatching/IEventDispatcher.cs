@@ -1,28 +1,12 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
-using Tycho.Utils;
+using Tycho.Events.Routing;
 
 namespace Tycho.Events.Dispatching
 {
-    /// <summary>
-    /// Dispatches events to respective event handlers.
-    /// </summary>
-    [ReferencedBySourceGenerator]
-    public interface IEventDispatcher
+    internal interface IEventDispatcher
     {
-        /// <summary>
-        /// Dispatches the specified event to the provided <paramref name="eventHandler"/>.
-        /// </summary>
-        /// <param name="eventId">The unique identifier of the event instance.</param>
-        /// <param name="eventPayload">The event payload of the event instance.</param>
-        /// <param name="eventHandler">The handler that will process the event.</param>
-        /// <param name="cancellationToken">A cancellation token.</param>
-        [ReferencedBySourceGenerator]
-        Task Dispatch(
-            Guid eventId,
-            object eventPayload,
-            IEventHandler eventHandler,
-            CancellationToken cancellationToken);
+        Task DispatchAsync<TEvent>(RoutedEvent<TEvent> routedEvent, CancellationToken cancellationToken) 
+            where TEvent : class, IEvent;
     }
 }

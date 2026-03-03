@@ -1,10 +1,6 @@
 ﻿namespace Tycho.Events.Routing.Routes
 {
-    internal class UpStreamRouteStep : IRouteStep
+    internal class UpStreamRouteStep : RouteStep
     {
-        public static UpStreamRouteStep Create()
-        {
-            return new UpStreamRouteStep();
-        }
     }
 }

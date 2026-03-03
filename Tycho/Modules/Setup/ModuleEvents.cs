@@ -2,6 +2,9 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events;
+using Tycho.Events.Delivery;
+using Tycho.Events.Delivery.Strategies;
+using Tycho.Events.Dispatching;
 using Tycho.Events.Inbox;
 using Tycho.Events.Inbox.InMemory;
 using Tycho.Events.Outbox;
@@ -9,9 +12,6 @@ using Tycho.Events.Outbox.InMemory;
 using Tycho.Events.Publishing;
 using Tycho.Events.Registrating;
 using Tycho.Events.Routing;
-using Tycho.Events.Routing.Delivery;
-using Tycho.Events.Serialization;
-using Tycho.Events.Serialization.InMemory;
 using Tycho.Registry;
 using Tycho.Structure;
 
@@ -58,11 +58,6 @@ namespace Tycho.Modules.Setup
         {
             var services = _internals.GetServiceCollection();
 
-            if (!_internals.HasService<IPayloadSerializer>())
-            {
-                 services.AddTransient<IPayloadSerializer, InMemoryPayloadSerializer>();
-            }
-
             if (!_internals.HasService<IOutboxWriter>() || !_internals.HasService<IOutboxConsumer>())
             {
                 services.AddSingleton<InMemoryOutbox>()
@@ -86,8 +81,9 @@ namespace Tycho.Modules.Setup
             services.AddTransient<InboxProcessorJob>();
 
             services.AddSingleton(_handlerRegistry);
-            services.AddTransient<IGenericPublisher, GenericPublisher>();
+            services.AddTransient<IEventPublisher, EventPublisher>();
             services.AddTransient<IEventRouter, EventRouter>();
+            services.AddTransient<IEventDispatcher, EventDispatcher>();
             services.AddTransient<IDeliveryStrategyProvider, DeliveryStrategyProvider>();
             services.AddTransient<DownStreamRouteDelivery>();
             services.AddTransient<FinalRouteDelivery>();

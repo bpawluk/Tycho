@@ -2,7 +2,7 @@
 
 namespace Tycho.Events.Routing.Routes
 {
-    internal class DownStreamRouteStep : IRouteStep
+    internal class DownStreamRouteStep : RouteStep
     {
         public ModuleIdentity Destination { get; }
 
