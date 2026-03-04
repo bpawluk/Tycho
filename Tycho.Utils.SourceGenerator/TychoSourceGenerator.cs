@@ -24,7 +24,7 @@ namespace Tycho.Utils.SourceGenerator
                 transform: GetTychoPipelineBaseTransform);
 
             context.AddTychoDefinitionPipeline(tychoPipelineBase)
-                   .AddTychoSetupPipeline(tychoPipelineBase)
+                   .AddTychoExtensionsPipeline(tychoPipelineBase)
                    .AddTychoFacadePipeline(tychoPipelineBase)
                    .AddTychoParentPipeline(tychoPipelineBase)
                    .AddTychoPublisherPipeline(tychoPipelineBase);

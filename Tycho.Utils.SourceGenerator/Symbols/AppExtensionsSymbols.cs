@@ -1,6 +1,6 @@
 namespace Tycho.Utils.SourceGenerator.Symbols
 {
-    internal static class AppSetupSymbols
+    internal static class AppExtensionsSymbols
     {
         public const string AppParameter = "app";
         public const string BuilderParameter = "builder";

@@ -7,7 +7,7 @@ using Tycho.Utils.SourceGenerator.Symbols;
 
 namespace Tycho.Utils.SourceGenerator.TemplateModels
 {
-    internal class AppSetupTM : TemplateModelBase
+    internal class AppExtensionsTM : TemplateModelBase
     {
         public string Namespace { get; }
 
@@ -23,13 +23,13 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public ParametersTM Parameters { get; }
 
-        public AppSetupTM(TychoSetupModel tychoSetupModel)
+        public AppExtensionsTM(TychoExtensionsModel tychoExtensionsModel)
         {
-            Namespace = tychoSetupModel.DefinitionType.Namespace;
-            ContainingTypes = tychoSetupModel.DefinitionType.ContainingTypes.ToArray();
-            Classes = new ClassesTM(this, tychoSetupModel);
+            Namespace = tychoExtensionsModel.DefinitionType.Namespace;
+            ContainingTypes = tychoExtensionsModel.DefinitionType.ContainingTypes.ToArray();
+            Classes = new ClassesTM(this, tychoExtensionsModel);
             Interfaces = new InterfacesTM(this);
-            Methods = new MethodsTM(tychoSetupModel);
+            Methods = new MethodsTM(tychoExtensionsModel);
             Properties = new PropertiesTM();
             Parameters = new ParametersTM();
         }
@@ -42,10 +42,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string LoggingConfigurationClass { get; }
             public string ServiceCollectionServiceExtensionsClass { get; }
 
-            public ClassesTM(AppSetupTM owner, TychoSetupModel tychoSetupModel)
+            public ClassesTM(AppExtensionsTM owner, TychoExtensionsModel tychoExtensionsModel)
             {
-                AppClass = tychoSetupModel.DefinitionType.Name;
-                SetupExtensionsClass = AppSetupSymbols.GetAppSetupExtensionsClass(AppClass);
+                AppClass = tychoExtensionsModel.DefinitionType.Name;
+                SetupExtensionsClass = AppExtensionsSymbols.GetAppSetupExtensionsClass(AppClass);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 LoggingConfigurationClass = owner.UseType(LoggingConfigurationReference.TypeModel);
                 ServiceCollectionServiceExtensionsClass = owner.UseType(ServiceCollectionServiceExtensionsReference.TypeModel);
@@ -56,7 +56,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         {
             public string HostApplicationBuilderInterface { get; }
 
-            public InterfacesTM(AppSetupTM owner)
+            public InterfacesTM(AppExtensionsTM owner)
             {
                 HostApplicationBuilderInterface = owner.UseType(IHostApplicationBuilderReference.TypeModel);
             }
@@ -72,9 +72,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string RunAsyncMethod { get; }
             public string ConfigureAwaitMethod { get; }
 
-            public MethodsTM(TychoSetupModel tychoSetupModel)
+            public MethodsTM(TychoExtensionsModel tychoextensionsModel)
             {
-                AddAppMethod = AppSetupSymbols.GetAddAppMethod(tychoSetupModel.DefinitionType.Name);
+                AddAppMethod = AppExtensionsSymbols.GetAddAppMethod(tychoextensionsModel.DefinitionType.Name);
                 WithConfigurationMethod = AppDefinitionSymbols.WithConfigurationMethod;
                 WithLoggingMethod = AppDefinitionSymbols.WithLoggingMethod;
                 RunAsyncMethod = AppDefinitionSymbols.RunAsyncMethod;
@@ -104,9 +104,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public ParametersTM()
             {
-                AppParameter = AppSetupSymbols.AppParameter;
-                BuilderParameter = AppSetupSymbols.BuilderParameter;
-                LoggingParameter = AppSetupSymbols.LoggingParameter;
+                AppParameter = AppExtensionsSymbols.AppParameter;
+                BuilderParameter = AppExtensionsSymbols.BuilderParameter;
+                LoggingParameter = AppExtensionsSymbols.LoggingParameter;
             }
         }
     }
