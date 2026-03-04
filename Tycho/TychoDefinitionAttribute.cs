@@ -4,7 +4,7 @@ using Tycho.Utils;
 namespace Tycho
 {
     /// <summary>
-    /// Marks a class as a Tycho app definition.
+    /// Marks a class as a Tycho definition.
     /// </summary>
     [ReferencedBySourceGenerator]
     [AttributeUsage(AttributeTargets.Class)]
