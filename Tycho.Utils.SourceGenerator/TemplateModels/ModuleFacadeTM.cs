@@ -2,7 +2,6 @@ using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
 using Tycho.Utils.SourceGenerator.Models.Tycho;
 using Tycho.Utils.SourceGenerator.References.System;
-using Tycho.Utils.SourceGenerator.References.Tycho.Apps;
 using Tycho.Utils.SourceGenerator.References.Tycho.Modules;
 using Tycho.Utils.SourceGenerator.Symbols;
 
@@ -68,13 +67,11 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         internal class MethodsTM
         {
             public string ExecuteAsyncMethod { get; }
-            public string DisposeAsyncMethod { get; }
             public string ConfigureAwaitMethod { get; }
 
             public MethodsTM()
             {
                 ExecuteAsyncMethod = ModuleFacadeBaseReference.ExecuteAsyncMethodSignature.MethodName;
-                DisposeAsyncMethod = IAsyncDisposableReference.DisposeAsyncMethodSignature.MethodName;
                 ConfigureAwaitMethod = ValueTaskReference.ConfigureAwaitMethodSignature.MethodName;
             }
         }

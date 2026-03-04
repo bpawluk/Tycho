@@ -3,15 +3,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Events.Routing;
 using Tycho.Events.Routing.Routes;
-using Tycho.Registry;
+using Tycho.Identity.Modules;
 
 namespace Tycho.Events.Delivery.Strategies
 {
     internal class DownStreamRouteDelivery : IDeliveryStrategy
     {
-        private readonly IModuleRegistry _moduleRegistry;
+        private readonly IModuleProvider _moduleRegistry;
 
-        public DownStreamRouteDelivery(IModuleRegistry moduleRegistry)
+        public DownStreamRouteDelivery(IModuleProvider moduleRegistry)
         {
             _moduleRegistry = moduleRegistry;
         }

@@ -1,4 +1,4 @@
-﻿using Tycho.Registry;
+﻿using Tycho.Identity.Modules;
 
 namespace Tycho.Events.Routing.Routes
 {

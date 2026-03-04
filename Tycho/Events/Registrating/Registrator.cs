@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Tycho.Events.Handling;
 using Tycho.Events.Routing.Sources;
 using Tycho.Modules;
 using Tycho.Modules.Instance;
-using Tycho.Registry;
 using Tycho.Structure;
 using Tycho.Structure.Parent;
 
@@ -13,14 +13,12 @@ namespace Tycho.Events.Registrating
     internal class Registrator
     {
         private readonly Internals _internals;
-        private readonly IEventHandlerRegistry _handlerRegistry;
 
         private IServiceCollection Services => _internals.GetServiceCollection();
 
-        public Registrator(Internals internals, IEventHandlerRegistry handlerRegistry)
+        public Registrator(Internals internals)
         {
             _internals = internals;
-            _handlerRegistry = handlerRegistry;
         }
 
         public void ExposeEvent<TEvent>()
@@ -28,9 +26,7 @@ namespace Tycho.Events.Registrating
         {
             if (IsSourceAlreadyRegistered<TEvent, UpStreamRouteSource<TEvent>>())
             {
-                throw new ArgumentException(
-                    $"{typeof(TEvent).Name} is already exposed", 
-                    nameof(TEvent));
+                throw new ArgumentException($"{typeof(TEvent).Name} is already exposed", nameof(TEvent));
             }
 
             Services.AddTransient<IRouteSource<TEvent>, UpStreamRouteSource<TEvent>>();
@@ -42,13 +38,11 @@ namespace Tycho.Events.Registrating
         {
             if (IsSourceAlreadyRegistered<TEvent, UpStreamMappedRouteSource<TEvent, TTargetEvent>>())
             {
-                throw new ArgumentException(
-                    $"{typeof(TEvent).Name} is already exposed",
-                    nameof(TEvent));
+                throw new ArgumentException($"{typeof(TEvent).Name} is already exposed", nameof(TEvent));
             }
 
-            Services.AddTransient<IRouteSource<TEvent>>(
-                sp => new UpStreamMappedRouteSource<TEvent, TTargetEvent>(
+            Services.AddTransient<IRouteSource<TEvent>>(sp => 
+                new UpStreamMappedRouteSource<TEvent, TTargetEvent>(
                     sp.GetRequiredService<IParentReference>(),
                     map));
         }
@@ -60,7 +54,7 @@ namespace Tycho.Events.Registrating
             if (IsSourceAlreadyRegistered<TEvent, DownStreamRouteSource<TEvent, TModule>>())
             {
                 throw new ArgumentException(
-                    $"{typeof(TEvent).Name} is already forwarded to {typeof(TModule).Name}",
+                    $"{typeof(TEvent).Name} is already forwarded to {typeof(TModule).Name}", 
                     nameof(TEvent));
             }
 
@@ -79,8 +73,8 @@ namespace Tycho.Events.Registrating
                     nameof(TEvent));
             }
 
-            Services.AddTransient<IRouteSource<TEvent>>(
-                sp => new DownStreamMappedRouteSource<TEvent, TTargetEvent, TModule>(
+            Services.AddTransient<IRouteSource<TEvent>>(sp => 
+                new DownStreamMappedRouteSource<TEvent, TTargetEvent, TModule>(
                     sp.GetRequiredService<IModule<TModule>>(),
                     map));
         }
@@ -89,29 +83,17 @@ namespace Tycho.Events.Registrating
             where TEvent : class, IEvent
             where THandler : class, IEventHandler<TEvent>
         {
-            // TODO: support one handler for multiple events
-            if (IsHandlerAlreadyRegistered<TEvent, THandler>())
+            if (IsSourceAlreadyRegistered<TEvent, LocalRouteSource<TEvent, ScopedEventHandler<TEvent, THandler>>>())
             {
                 throw new ArgumentException(
                     $"Event handler for {typeof(TEvent).Name} is already registered",
                     nameof(THandler));
             }
 
+            Services.AddTransient<IRouteSource<TEvent>, LocalRouteSource<TEvent, ScopedEventHandler<TEvent, THandler>>>();
+            Services.AddTransient<IHandlerRegistration<TEvent>, LocalRouteSource<TEvent, ScopedEventHandler<TEvent, THandler>>>();
+            Services.AddTransient<ScopedEventHandler<TEvent, THandler>>();
             Services.AddScoped<THandler>();
-            _handlerRegistry.RegisterHandler<TEvent, THandler>();
-
-            if (!IsSourceAlreadyRegistered<TEvent, LocalRouteSource<TEvent>>())
-            {
-                Services.AddTransient<IRouteSource<TEvent>, LocalRouteSource<TEvent>>();
-            }
-        }
-
-        private bool IsHandlerAlreadyRegistered<TEvent, THandler>()
-            where TEvent : class, IEvent
-            where THandler : class, IEventHandler<TEvent>
-        {
-            return Services.Any(descriptor => 
-                descriptor.ServiceType == typeof(THandler));
         }
 
         private bool IsSourceAlreadyRegistered<TEvent, TRouteSource>()

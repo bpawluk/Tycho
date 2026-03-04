@@ -7,15 +7,15 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Tycho.Events.Dispatching;
 using Tycho.Events.Routing;
+using Tycho.Identity.Events;
 using Tycho.Processor;
-using Tycho.Registry;
 
 namespace Tycho.Events.Inbox
 {
     internal class InboxProcessorJob : IJob
     {
         private readonly IInboxConsumer _inboxConsumer;
-        private readonly IEventHandlerRegistry _handlerRegistry;
+        private readonly IEventHandlerProvider _handlerRegistry;
         private readonly IEventDispatcher _handlingDispatcher;
         private readonly InboxProcessorSettings _settings;
         private readonly ILogger<InboxProcessorJob> _logger;
@@ -24,7 +24,7 @@ namespace Tycho.Events.Inbox
 
         public InboxProcessorJob(
             IInboxConsumer inboxConsumer,
-            IEventHandlerRegistry handlerRegistry,
+            IEventHandlerProvider handlerRegistry,
             IEventDispatcher handlingDispatcher,
             InboxProcessorSettings? settings = null,
             ILogger<InboxProcessorJob>? logger = null)

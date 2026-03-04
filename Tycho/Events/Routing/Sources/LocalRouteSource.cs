@@ -1,26 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using Tycho.Registry;
+using Tycho.Events.Registrating;
+using Tycho.Identity.Events;
 
 namespace Tycho.Events.Routing.Sources
 {
-    internal class LocalRouteSource<TEvent> : IRouteSource<TEvent>
+    internal class LocalRouteSource<TEvent, TEventHandler> : IRouteSource<TEvent>, IHandlerRegistration<TEvent>
         where TEvent : class, IEvent
+        where TEventHandler : IEventHandler<TEvent>
     {
-        private readonly IEventHandlerRegistry _handlerRegistry;
+        public EventHandlerIdentity Identity { get; }
 
-        public LocalRouteSource(IEventHandlerRegistry handlerRegistry)
+        public IEventHandler<TEvent> Handler { get; }
+
+        public LocalRouteSource(TEventHandler handler)
         {
-            _handlerRegistry = handlerRegistry;
+            Identity = new EventHandlerIdentity(typeof(TEvent), typeof(TEventHandler));
+            Handler = handler;
         }
 
         public IReadOnlyCollection<RoutedEvent> Route(Guid eventId, TEvent eventPayload)
         {
-            return _handlerRegistry
-                .IdenitfyHandlers<TEvent>()
-                .Select(handlerId => new RoutedEvent<TEvent>(eventId, handlerId, eventPayload))
-                .ToList();
+            return new[] { new RoutedEvent<TEvent>(eventId, Identity, eventPayload) };
         }
     }
 }

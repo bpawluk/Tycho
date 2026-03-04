@@ -49,12 +49,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         internal class InterfacesTM
         {
             public string ModuleInterface { get; }
-            public string AsyncDisposableInterface { get; }
 
             public InterfacesTM(ModuleFacadeInterfaceTM owner, TychoFacadeModel tychoFacadeModel)
             {
                 ModuleInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(tychoFacadeModel.DefinitionType.Name);
-                AsyncDisposableInterface = owner.UseType(IAsyncDisposableReference.TypeModel);
             }
         }
 

@@ -12,7 +12,7 @@ using Tycho.Events.Outbox.InMemory;
 using Tycho.Events.Publishing;
 using Tycho.Events.Registrating;
 using Tycho.Events.Routing;
-using Tycho.Registry;
+using Tycho.Identity.Events;
 using Tycho.Structure;
 
 namespace Tycho.Apps.Setup
@@ -21,13 +21,11 @@ namespace Tycho.Apps.Setup
     {
         private readonly Internals _internals;
         private readonly Registrator _registrator;
-        private readonly IEventHandlerRegistry _handlerRegistry;
 
         public AppEvents(Internals internals)
         {
             _internals = internals;
-            _handlerRegistry = new EventHandlerRegistry(internals);
-            _registrator = new Registrator(internals, _handlerRegistry);
+            _registrator = new Registrator(internals);
         }
 
         public IAppEvents Handles<TEvent, THandler>()
@@ -70,10 +68,10 @@ namespace Tycho.Apps.Setup
             services.AddSingleton<InboxProcessor>();
             services.AddTransient<InboxProcessorJob>();
 
-            services.AddSingleton(_handlerRegistry);
             services.AddTransient<IEventPublisher, EventPublisher>();
             services.AddTransient<IEventRouter, EventRouter>();
             services.AddTransient<IEventDispatcher, EventDispatcher>();
+            services.AddTransient<IEventHandlerProvider, EventHandlerProvider>();
             services.AddTransient<IDeliveryStrategyProvider, DeliveryStrategyProvider>();
             services.AddTransient<DownStreamRouteDelivery>();
             services.AddTransient<FinalRouteDelivery>();

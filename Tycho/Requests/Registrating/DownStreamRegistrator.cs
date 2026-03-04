@@ -159,7 +159,7 @@ namespace Tycho.Requests.Registrating
                     DownStreamHandlerRegistration<TRequest, THandler, TSourceModule>>())
             {
                 throw new ArgumentException(
-                    $"Request handler for {typeof(TRequest).Name} already registered",
+                    $"Request handler for {typeof(TRequest).Name} is already registered",
                     nameof(THandler));
             }
         }
@@ -174,7 +174,7 @@ namespace Tycho.Requests.Registrating
                     DownStreamHandlerRegistration<TRequest, TResponse, THandler, TSourceModule>>())
             {
                 throw new ArgumentException(
-                    $"Request handler for {typeof(TRequest).Name} already registered",
+                    $"Request handler for {typeof(TRequest).Name} is already registered",
                     nameof(THandler));
             }
         }

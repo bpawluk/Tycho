@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Requests;
 using Tycho.Utils;
@@ -7,7 +6,7 @@ using Tycho.Utils;
 namespace Tycho.Modules.Instance
 {
     [ReferencedBySourceGenerator]
-    public abstract class ModuleFacadeBase : IAsyncDisposable
+    public abstract class ModuleFacadeBase
     {
         private readonly IModule _module;
 
@@ -32,7 +31,5 @@ namespace Tycho.Modules.Instance
             requestData.ThrowIfNull();
             return _module.RequestBroker.ExecuteAsync<TRequest, TResponse>(requestData, cancellationToken);
         }
-
-        public ValueTask DisposeAsync() => _module.DisposeAsync();
     }
 }

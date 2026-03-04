@@ -1,5 +1,6 @@
 ﻿using System;
 using Tycho.Events.Routing;
+using Tycho.Identity.Modules;
 using Tycho.Requests.Broker;
 using Tycho.Structure;
 using Tycho.Utils;
@@ -12,6 +13,8 @@ namespace Tycho.Modules.Instance
     [ReferencedBySourceGenerator]
     public interface IModule : IAsyncDisposable
     {
+        internal ModuleIdentity Identity { get; }
+
         internal Internals Internals { get; }
 
         internal IEventRouter EventRouter { get; }

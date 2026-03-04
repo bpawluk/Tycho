@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Tycho.Registry
+namespace Tycho.Identity.Events
 {
     internal class EventHandlerIdentity : IEquatable<EventHandlerIdentity>
     {

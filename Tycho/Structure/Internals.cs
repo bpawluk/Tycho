@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Tycho.Structure
 {
-    internal class Internals : IServiceProvider, IDisposable
+    internal class Internals : IServiceProvider, IAsyncDisposable
     {
         private ServiceCollection? _serviceCollection = new ServiceCollection();
         private ServiceProvider? _serviceProvider;
@@ -60,9 +61,13 @@ namespace Tycho.Structure
             return GetService(serviceType) != null;
         }
 
-        public void Dispose()
+        public ValueTask DisposeAsync()
         {
-            _serviceProvider?.Dispose();
+            if (_serviceProvider != null)
+            {
+                return _serviceProvider.DisposeAsync();
+            }
+            return default;
         }
     }
 }

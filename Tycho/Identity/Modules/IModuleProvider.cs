@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
 using Tycho.Modules.Instance;
 
-namespace Tycho.Registry
+namespace Tycho.Identity.Modules
 {
-    internal interface IModuleRegistry
+    internal interface IModuleProvider
     {
-        void RegisterModule(IModule module);
-
         IModule GetModule(ModuleIdentity moduleId);
 
         IReadOnlyCollection<IModule> GetAllModules();
