@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Tycho.Events.Broker;
 using Tycho.Events.Routing;
 using Tycho.Identity.Modules;
 using Tycho.Requests.Broker;
@@ -14,20 +15,20 @@ namespace Tycho.Modules.Instance
         private readonly ModuleIdentity _identity;
         private readonly Internals _internals;
         private readonly IRequestBroker _requestBroker;
-        private readonly IEventRouter _eventRouter;
+        private readonly IEventBroker _eventBroker;
 
         private readonly Func<IServiceProvider, Task> _cleanup;
 
         ModuleIdentity IModule.Identity => _identity;
         Internals IModule.Internals => _internals;
-        IEventRouter IModule.EventRouter => _eventRouter;
+        IEventBroker IModule.EventBroker => _eventBroker;
         IRequestBroker IModule.RequestBroker => _requestBroker;
 
         public Module(Internals internals, Func<IServiceProvider, Task> cleanup)
         {
             _identity = ModuleIdentity.Create<TTychoDefinition>();
             _internals = internals;
-            _eventRouter = new EventRouter(_internals);
+            _eventBroker = new EventBroker(_internals);
             _requestBroker = new UpStreamBroker(_internals);
             _cleanup = cleanup;
         }

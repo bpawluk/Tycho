@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Tycho.Events.Broker;
 using Tycho.Events.Routing;
 using Tycho.Processor;
 
@@ -12,18 +13,18 @@ namespace Tycho.Events.Outbox
     internal class OutboxProcessorJob : IJob
     {
         private readonly IOutboxConsumer _outboxConsumer;
-        private readonly IEventRouter _eventRouter;
+        private readonly IEventBroker _eventBroker;
         private readonly OutboxProcessorSettings _settings;
         private readonly ILogger<OutboxProcessorJob> _logger;   
 
         public OutboxProcessorJob(
             IOutboxConsumer outboxConsumer,
-            IEventRouter eventRouter,
+            IEventBroker eventBroker,
             OutboxProcessorSettings? settings = null,
             ILogger<OutboxProcessorJob>? logger = null)
         {
             _outboxConsumer = outboxConsumer;
-            _eventRouter = eventRouter;
+            _eventBroker = eventBroker;
             _settings = settings ?? OutboxProcessorSettings.Default;
             _logger = logger ?? NullLogger<OutboxProcessorJob>.Instance;
         }
@@ -47,7 +48,7 @@ namespace Tycho.Events.Outbox
         {
             try 
             {
-                await routedEvent.DeliverAsync(_eventRouter, cancellationToken).ConfigureAwait(false);
+                await routedEvent.DeliverAsync(_eventBroker, cancellationToken).ConfigureAwait(false);
                 await _outboxConsumer.MarkAsDelivered(routedEvent.Id, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex) 

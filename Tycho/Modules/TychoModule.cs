@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Tycho.Events.Routing;
+using Tycho.Events.Broker;
 using Tycho.Modules.Instance;
 using Tycho.Modules.Setup;
 using Tycho.Requests.Broker;
@@ -125,9 +125,9 @@ namespace Tycho.Modules
             return this;
         }
 
-        internal TychoModule PassEventRouter(IEventRouter parentEventRouter)
+        internal TychoModule PassEventBroker(IEventBroker parentEventBroker)
         {
-            _builder.WithParentEventRouter(parentEventRouter);
+            _builder.WithParentEventBroker(parentEventBroker);
             return this;
         }
 

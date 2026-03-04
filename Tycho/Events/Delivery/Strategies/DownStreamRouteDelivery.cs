@@ -16,6 +16,12 @@ namespace Tycho.Events.Delivery.Strategies
             _moduleRegistry = moduleRegistry;
         }
 
+        public bool CanDeliver<TEvent>(RoutedEvent<TEvent> routedEvent)
+            where TEvent : class, IEvent
+        {
+            return routedEvent.Route.TryPeek(out var routeStep) && routeStep is DownStreamRouteStep;
+        }
+
         public async Task DeliverAsync<TEvent>(RoutedEvent<TEvent> routedEvent, CancellationToken cancellationToken)
             where TEvent : class, IEvent
         {
@@ -24,7 +30,7 @@ namespace Tycho.Events.Delivery.Strategies
                 throw new InvalidOperationException($"Invalid route in {GetType().Name}");
             }
             var submodule = _moduleRegistry.GetModule(downStreamRouteStep.Destination);
-            await submodule.EventRouter.DeliverAsync(routedEvent, cancellationToken);
+            await submodule.EventBroker.DeliverAsync(routedEvent, cancellationToken);
         }
     }
 }

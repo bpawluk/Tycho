@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Tycho.Events.Broker;
 using Tycho.Events.Routing.Routes;
 
 namespace Tycho.Events.Routing.Sources
@@ -8,19 +9,19 @@ namespace Tycho.Events.Routing.Sources
         where TEvent : class, IEvent
         where TTargetEvent : class, IEvent
     {
-        private readonly IEventRouter _externalEventRouter;
+        private readonly IEventBroker _externalEventBroker;
         private readonly Func<TEvent, TTargetEvent> _map;
 
-        public MappedExternalRouteSource(IEventRouter externalEventRouter, Func<TEvent, TTargetEvent> map)
+        public MappedExternalRouteSource(IEventBroker externalEventBroker, Func<TEvent, TTargetEvent> map)
         {
-            _externalEventRouter = externalEventRouter;
+            _externalEventBroker = externalEventBroker;
             _map = map;
         }
 
         public IReadOnlyCollection<RoutedEvent> Route(Guid eventId, TEvent eventPayload)
         {
             var routeStep = GetRouteStep();
-            var routedEvents = _externalEventRouter.Route(eventId, _map(eventPayload));
+            var routedEvents = _externalEventBroker.Route(eventId, _map(eventPayload));
 
             foreach (var routedEvent in routedEvents)
             {

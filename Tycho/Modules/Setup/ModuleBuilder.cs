@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Tycho.Events.Routing;
+using Tycho.Events.Broker;
 using Tycho.Modules.Instance;
 using Tycho.Requests.Broker;
 using Tycho.Structure;
@@ -58,9 +58,9 @@ namespace Tycho.Modules.Setup
             return this;
         }
 
-        public ModuleBuilder WithParentEventRouter(IEventRouter parentEventRouter)
+        public ModuleBuilder WithParentEventBroker(IEventBroker parentEventBroker)
         {
-            Events.WithParentEventRouter(parentEventRouter);
+            Events.WithParentEventBroker(parentEventBroker);
             return this;
         }
 
@@ -72,7 +72,7 @@ namespace Tycho.Modules.Setup
 
         public ModuleBuilder Init()
         {
-            var parent = new ParentReference(Events.ParentEventRouter, Contract.ContractFulfillingBroker);
+            var parent = new ParentReference(Events.ParentEventBroker, Contract.ContractFulfillingBroker);
 
             if (Globals.LoggingSetup != null)
             {

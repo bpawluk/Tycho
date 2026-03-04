@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Tycho.Events.Routing;
+using Tycho.Events.Broker;
 using Tycho.Identity.Modules;
 using Tycho.Modules.Instance;
 using Tycho.Requests.Broker;
@@ -74,8 +74,8 @@ namespace Tycho.Modules.Setup
             var downStreamBroker = new DownStreamBroker<TModule>(_internals);
             submodule.FulfillContract(downStreamBroker);
 
-            var parentEventRouter = new EventRouter(_internals);
-            submodule.PassEventRouter(parentEventRouter);
+            var parentEventBroker = new EventBroker(_internals);
+            submodule.PassEventBroker(parentEventBroker);
 
             AddSubmodule(submodule);
         }

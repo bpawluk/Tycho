@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events;
+using Tycho.Events.Broker;
 using Tycho.Events.Delivery;
 using Tycho.Events.Delivery.Strategies;
 using Tycho.Events.Dispatching;
@@ -11,7 +12,6 @@ using Tycho.Events.Outbox;
 using Tycho.Events.Outbox.InMemory;
 using Tycho.Events.Publishing;
 using Tycho.Events.Registrating;
-using Tycho.Events.Routing;
 using Tycho.Identity.Events;
 using Tycho.Structure;
 
@@ -22,10 +22,10 @@ namespace Tycho.Modules.Setup
         private readonly Internals _internals;
         private readonly Registrator _registrator;
 
-        private IEventRouter? _parentEventRouter;
+        private IEventBroker? _parentEventBroker;
 
-        public IEventRouter ParentEventRouter => _parentEventRouter ??
-            throw new InvalidOperationException("Parent event router has not been defined yet.");
+        public IEventBroker ParentEventBroker => _parentEventBroker ??
+            throw new InvalidOperationException("Parent event broker has not been defined yet.");
 
         public ModuleEvents(Internals internals)
         {
@@ -33,9 +33,9 @@ namespace Tycho.Modules.Setup
             _registrator = new Registrator(internals);
         }
 
-        public void WithParentEventRouter(IEventRouter parentEventRouter)
+        public void WithParentEventBroker(IEventBroker parentEventBroker)
         {
-            _parentEventRouter = parentEventRouter;
+            _parentEventBroker = parentEventBroker;
         }
 
         public IModuleEvents Handles<TEvent, THandler>()
@@ -78,14 +78,13 @@ namespace Tycho.Modules.Setup
             services.AddSingleton<InboxProcessor>();
             services.AddTransient<InboxProcessorJob>();
 
+            services.AddTransient<IEventBroker, EventBroker>();
             services.AddTransient<IEventPublisher, EventPublisher>();
-            services.AddTransient<IEventRouter, EventRouter>();
             services.AddTransient<IEventDispatcher, EventDispatcher>();
             services.AddTransient<IEventHandlerProvider, EventHandlerProvider>();
-            services.AddTransient<IDeliveryStrategyProvider, DeliveryStrategyProvider>();
-            services.AddTransient<DownStreamRouteDelivery>();
-            services.AddTransient<FinalRouteDelivery>();
-            services.AddTransient<UpStreamRouteDelivery>();
+            services.AddTransient<IDeliveryStrategy, FinalRouteDelivery>();
+            services.AddTransient<IDeliveryStrategy, DownStreamRouteDelivery>();
+            services.AddTransient<IDeliveryStrategy, UpStreamRouteDelivery>();
 
             _internals.InternalsBuilt += OnInternalsBuilt;
             return Task.CompletedTask;

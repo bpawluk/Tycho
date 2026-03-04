@@ -1,6 +1,6 @@
 ﻿using Moq;
 using Tycho.Events;
-using Tycho.Events.Routing;
+using Tycho.Events.Broker;
 using Tycho.Events.Routing.Sources;
 using Tycho.Modules.Instance;
 using Tycho.UnitTests._Data.Events;
@@ -23,7 +23,7 @@ public class DownStreamHandlersSourceTests
 
     public DownStreamHandlersSourceTests()
     {
-        var eventRouterMock = new Mock<IEventRouter>();
+        var eventRouterMock = new Mock<IEventBroker>();
         eventRouterMock.Setup(m => m.IdentifyHandlers<TestEvent>())
                        .Returns(_expectedIdentities);
         eventRouterMock.Setup(m => m.FindHandler(It.IsAny<HandlerIdentity>()))

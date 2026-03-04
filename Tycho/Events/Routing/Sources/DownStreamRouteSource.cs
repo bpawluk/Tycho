@@ -10,7 +10,7 @@ namespace Tycho.Events.Routing.Sources
         where TEvent : class, IEvent
         where TModule : TychoModule
     {
-        public DownStreamRouteSource(IModule<TModule> submodule) : base(submodule.EventRouter)
+        public DownStreamRouteSource(IModule<TModule> submodule) : base(submodule.EventBroker)
         {
         }
 
@@ -23,7 +23,7 @@ namespace Tycho.Events.Routing.Sources
         where TTargetEvent : class, IEvent
         where TModule : TychoModule
     {
-        public DownStreamMappedRouteSource(IModule<TModule> submodule, Func<TEvent, TTargetEvent> map) : base(submodule.EventRouter, map)
+        public DownStreamMappedRouteSource(IModule<TModule> submodule, Func<TEvent, TTargetEvent> map) : base(submodule.EventBroker, map)
         {
         }
 

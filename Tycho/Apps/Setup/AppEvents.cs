@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events;
+using Tycho.Events.Broker;
 using Tycho.Events.Delivery;
 using Tycho.Events.Delivery.Strategies;
 using Tycho.Events.Dispatching;
@@ -11,7 +12,6 @@ using Tycho.Events.Outbox;
 using Tycho.Events.Outbox.InMemory;
 using Tycho.Events.Publishing;
 using Tycho.Events.Registrating;
-using Tycho.Events.Routing;
 using Tycho.Identity.Events;
 using Tycho.Structure;
 
@@ -68,14 +68,12 @@ namespace Tycho.Apps.Setup
             services.AddSingleton<InboxProcessor>();
             services.AddTransient<InboxProcessorJob>();
 
+            services.AddTransient<IEventBroker, EventBroker>();
             services.AddTransient<IEventPublisher, EventPublisher>();
-            services.AddTransient<IEventRouter, EventRouter>();
             services.AddTransient<IEventDispatcher, EventDispatcher>();
             services.AddTransient<IEventHandlerProvider, EventHandlerProvider>();
-            services.AddTransient<IDeliveryStrategyProvider, DeliveryStrategyProvider>();
-            services.AddTransient<DownStreamRouteDelivery>();
-            services.AddTransient<FinalRouteDelivery>();
-            services.AddTransient<UpStreamRouteDelivery>();
+            services.AddTransient<IDeliveryStrategy, FinalRouteDelivery>();
+            services.AddTransient<IDeliveryStrategy, DownStreamRouteDelivery>();
 
             _internals.InternalsBuilt += OnInternalsBuilt;
             return Task.CompletedTask;

@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Tycho.Events.Routing;
 
-namespace Tycho.Events.Routing
+namespace Tycho.Events.Broker
 {
-    internal interface IEventRouter
+    internal interface IEventBroker
     {
         IReadOnlyCollection<RoutedEvent> Route<TEvent>(Guid eventId, TEvent eventPayload) 
             where TEvent : class, IEvent;

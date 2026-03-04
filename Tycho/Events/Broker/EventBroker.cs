@@ -5,16 +5,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Delivery;
+using Tycho.Events.Routing;
 using Tycho.Events.Routing.Sources;
 using Tycho.Structure;
 
-namespace Tycho.Events.Routing
+namespace Tycho.Events.Broker
 {
-    internal class EventRouter : IEventRouter
+    internal class EventBroker : IEventBroker
     {
         private readonly Internals _internals;
 
-        public EventRouter(Internals internals)
+        public EventBroker(Internals internals)
         {
             _internals = internals;
         }
@@ -29,14 +30,8 @@ namespace Tycho.Events.Routing
         public async Task DeliverAsync<TEvent>(RoutedEvent<TEvent> routedEvent, CancellationToken cancellationToken)
             where TEvent : class, IEvent
         {
-            if (!routedEvent.Route.TryPeek(out var nextRouteStep))
-            {
-                throw new InvalidOperationException("No route steps available in the routed event.");
-            }
-
-            var deliveryStrategyProvider = _internals.GetRequiredService<IDeliveryStrategyProvider>();
-            var deliveryStrategy = deliveryStrategyProvider.GetDeliveryStrategy(nextRouteStep);
-
+            var deliveryStrategies = _internals.GetServices<IDeliveryStrategy>();
+            var deliveryStrategy = deliveryStrategies.Single(s => s.CanDeliver(routedEvent));
             await deliveryStrategy.DeliverAsync(routedEvent, cancellationToken);
         }
     }

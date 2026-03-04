@@ -16,6 +16,12 @@ namespace Tycho.Events.Delivery.Strategies
             _inbox = inbox;
         }
 
+        public bool CanDeliver<TEvent>(RoutedEvent<TEvent> routedEvent)
+            where TEvent : class, IEvent
+        {
+            return routedEvent.Route.TryPeek(out var routeStep) && routeStep is FinalRouteStep;
+        }
+
         public async Task DeliverAsync<TEvent>(RoutedEvent<TEvent> routedEvent, CancellationToken cancellationToken)
             where TEvent : class, IEvent
         {

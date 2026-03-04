@@ -9,7 +9,7 @@ namespace Tycho.Events.Routing.Sources
         where TEvent : class, IEvent
     {
         public UpStreamRouteSource(IParentReference parent)
-            : base(parent.EventRouter)
+            : base(parent.EventBroker)
         {
         }
 
@@ -22,7 +22,7 @@ namespace Tycho.Events.Routing.Sources
         where TTargetEvent : class, IEvent
     {
         public UpStreamMappedRouteSource(IParentReference parent, Func<TEvent, TTargetEvent> map)
-            : base(parent.EventRouter, map)
+            : base(parent.EventBroker, map)
         {
         }
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Tycho.Events;
-using Tycho.Events.Routing;
+using Tycho.Events.Broker;
 using Tycho.Structure.Internal;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
@@ -31,7 +31,7 @@ public class EventRouterTests
             typeof(TestModule))
     ];
 
-    private readonly EventRouter _sut;
+    private readonly EventBroker _sut;
 
     private readonly HandlerIdentity[] _thirdSourceHandlers =
     [

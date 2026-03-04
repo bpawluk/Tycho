@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Tycho.Events.Broker;
 using Tycho.Events.Dispatching;
 using Tycho.Events.Routing.Routes;
 using Tycho.Identity.Events;
@@ -23,7 +24,7 @@ namespace Tycho.Events.Routing
             HandlerId = handlerId;
         }
 
-        public abstract Task DeliverAsync(IEventRouter router, CancellationToken cancellationToken);
+        public abstract Task DeliverAsync(IEventBroker broker, CancellationToken cancellationToken);
 
         public abstract Task DispatchAsync(IEventDispatcher dispatcher, CancellationToken cancellationToken);
     }
@@ -42,9 +43,9 @@ namespace Tycho.Events.Routing
             Payload = payload;
         }
 
-        public override Task DeliverAsync(IEventRouter router, CancellationToken cancellationToken)
+        public override Task DeliverAsync(IEventBroker broker, CancellationToken cancellationToken)
         {
-            return router.DeliverAsync(this, cancellationToken);
+            return broker.DeliverAsync(this, cancellationToken);
         }
 
         public override Task DispatchAsync(IEventDispatcher dispatcher, CancellationToken cancellationToken)

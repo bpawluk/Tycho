@@ -1,6 +1,6 @@
 ﻿using Moq;
 using Tycho.Events;
-using Tycho.Events.Routing;
+using Tycho.Events.Broker;
 using Tycho.Structure.Parent;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
@@ -26,7 +26,7 @@ public class UpStreamMappedHandlersSourceTests
         mapMock.Setup(m => m(It.IsAny<TestEvent>()))
                .Returns(new OtherEvent());
 
-        var eventRouterMock = new Mock<IEventRouter>();
+        var eventRouterMock = new Mock<IEventBroker>();
         eventRouterMock.Setup(m => m.IdentifyHandlers<OtherEvent>())
                        .Returns(_identitiesFromParent);
         eventRouterMock.Setup(m => m.FindHandler(It.Is<HandlerIdentity>(
