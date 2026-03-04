@@ -51,7 +51,7 @@ namespace {{ namespace }}
         {
             {{ classes.service_collection_service_extensions_class }}.{{ methods.add_transient_method }}<{{ interfaces.publisher_interface }}, {{ classes.publisher_class }}>({{ parameters.app_parameter }});
             {{~ for submodule in submodules ~}}
-            {{ classes.service_collection_service_extensions_class }}.{{ methods.add_transient_method }}<{{ submodule.facade_interface }}>({{ parameters.app_parameter }}, {{ parameters.provider_parameter }} => new {{ submodule.facade_class }}({{ classes.service_provider_service_extensions_class }}.{{ methods.get_required_service_method }}<{{ interfaces.module_instance_interface }}<{{ submodule.module_class }}>>({{ parameters.provider_parameter }})));
+            {{ classes.service_collection_service_extensions_class }}.{{ methods.add_transient_method }}<{{ submodule.facade_interface }}, {{ submodule.facade_class }}>({{ parameters.app_parameter }});
             {{~ end ~}}
         }
     }

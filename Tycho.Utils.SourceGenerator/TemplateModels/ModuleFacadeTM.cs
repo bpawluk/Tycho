@@ -36,6 +36,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         internal class ClassesTM
         {
+            public string ModuleClass { get; }
             public string FacadeClass { get; }
             public string FacadeBaseClass { get; }
             public string TaskClass { get; }
@@ -44,7 +45,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public ClassesTM(ModuleFacadeTM owner, TychoFacadeModel tychoFacadeModel)
             {
-                FacadeClass = ModuleFacadeSymbols.GetModuleFacadeClass(tychoFacadeModel.DefinitionType.Name);
+                ModuleClass = tychoFacadeModel.DefinitionType.Name;
+                FacadeClass = ModuleFacadeSymbols.GetModuleFacadeClass(ModuleClass);
                 FacadeBaseClass = owner.UseType(ModuleFacadeBaseReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 ValueTaskClass = owner.UseType(ValueTaskReference.TypeModel);
