@@ -37,7 +37,6 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         internal class ClassesTM
         {
             public string AppClass { get; }
-            public string AppBaseClass { get; }
             public string PublisherClass { get; }
             public string PublisherBaseClass { get; }
             public string TaskClass { get; }
@@ -47,8 +46,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public ClassesTM(AppPublisherTM owner, TychoPublisherModel tychoPublisherModel)
             {
                 AppClass = tychoPublisherModel.DefinitionType.Name;
-                AppBaseClass = owner.UseType(TychoAppReference.TypeModel);
-                PublisherClass = PublisherSymbols.PublisherClass;
+                PublisherClass = PublisherSymbols.GetPublisherClass(AppClass);
                 PublisherBaseClass = owner.UseType(PublisherBaseReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);

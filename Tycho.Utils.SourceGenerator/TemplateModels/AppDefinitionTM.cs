@@ -54,7 +54,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             {
                 AppClass = tychoDefinitionModel.DefinitionType.Name;
                 FacadeClass = AppFacadeSymbols.GetAppFacadeClass(AppClass);
-                PublisherClass = PublisherSymbols.PublisherClass;
+                PublisherClass = PublisherSymbols.GetPublisherClass(AppClass);
                 BaseClass = owner.UseType(TychoAppReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 ActionClass = owner.UseType(ActionReference.TypeModel);

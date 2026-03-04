@@ -10,19 +10,16 @@ namespace {{ namespace }}
     public partial class {{ containing_type }}
     {
 {{~ end ~}}
-    public partial class {{ classes.module_class }} : {{ classes.module_base_class }}
+    internal class {{ classes.parent_class }} : {{ classes.parent_base_class }}, {{ classes.module_class }}.{{ interfaces.parent_interface }}
     {
-        internal class {{ classes.parent_class }} : {{ classes.parent_base_class }}, {{ interfaces.parent_interface }}
-        {
-            public {{ classes.parent_class }}({{ classes.parent_reference_class }} {{ parameters.parent_reference_parameter }}) : base({{ parameters.parent_reference_parameter }}) { }
-            {{~ for request in requests ~}}
+        public {{ classes.parent_class }}({{ classes.parent_reference_class }} {{ parameters.parent_reference_parameter }}) : base({{ parameters.parent_reference_parameter }}) { }
+        {{~ for request in requests ~}}
 
-            public {{ classes.task_class }}{{ if request.has_response }}<{{ request.response_type }}>{{ end }} {{ methods.execute_async_method }}({{ request.request_type }} {{ parameters.request_data_parameter }}, {{ classes.cancellation_token_class }} {{ parameters.cancellation_token_parameter }})
-            {
-                return {{ methods.execute_async_method }}<{{ request.request_type }}{{ if request.has_response }}, {{ request.response_type }}{{ end }}>({{ parameters.request_data_parameter }}, {{ parameters.cancellation_token_parameter }});
-            }
-            {{~ end ~}}
+        public {{ classes.task_class }}{{ if request.has_response }}<{{ request.response_type }}>{{ end }} {{ methods.execute_async_method }}({{ request.request_type }} {{ parameters.request_data_parameter }}, {{ classes.cancellation_token_class }} {{ parameters.cancellation_token_parameter }})
+        {
+            return {{ methods.execute_async_method }}<{{ request.request_type }}{{ if request.has_response }}, {{ request.response_type }}{{ end }}>({{ parameters.request_data_parameter }}, {{ parameters.cancellation_token_parameter }});
         }
+        {{~ end ~}}
     }
 {{~ for containing_type in containing_types ~}}
     }

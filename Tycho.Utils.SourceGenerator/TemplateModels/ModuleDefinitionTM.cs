@@ -47,8 +47,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public ClassesTM(ModuleDefinitionTM owner, TychoDefinitionModel tychoDefinitionModel)
             {
                 ModuleClass = tychoDefinitionModel.DefinitionType.Name;
-                ModuleParentClass = ModuleParentSymbols.ParentClass;
-                PublisherClass = PublisherSymbols.PublisherClass;
+                ModuleParentClass = ModuleParentSymbols.GetParentClass(ModuleClass);
+                PublisherClass = PublisherSymbols.GetPublisherClass(ModuleClass);
                 BaseClass = owner.UseType(TychoModuleReference.TypeModel);
                 ServiceCollectionServiceExtensionsClass = owner.UseType(ServiceCollectionServiceExtensionsReference.TypeModel);
                 ServiceProviderServiceExtensionsClass = owner.UseType(ServiceProviderServiceExtensionsReference.TypeModel);

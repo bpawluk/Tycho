@@ -10,19 +10,16 @@ namespace {{ namespace }}
     public partial class {{ containing_type }}
     {
 {{~ end ~}}
-    public partial class {{ classes.app_class }} : {{ classes.app_base_class }}
+    internal class {{ classes.publisher_class }} : {{ classes.publisher_base_class }}, {{ classes.app_class }}.{{ interfaces.publisher_interface }}
     {
-        internal class {{ classes.publisher_class }} : {{ classes.publisher_base_class }}, {{ interfaces.publisher_interface }}
-        {
-            public {{ classes.publisher_class }}({{ classes.generic_publisher_class }} {{ parameters.generic_publisher_parameter }}) : base({{ parameters.generic_publisher_parameter }}) { }
-            {{~ for event in events ~}}
+        public {{ classes.publisher_class }}({{ classes.generic_publisher_class }} {{ parameters.generic_publisher_parameter }}) : base({{ parameters.generic_publisher_parameter }}) { }
+        {{~ for event in events ~}}
 
-            public {{ classes.task_class }} {{ methods.publish_async_method }}({{ event }} {{ parameters.event_payload_parameter }}, {{ classes.cancellation_token_class }} {{ parameters.cancellation_token_parameter }})
-            {
-                return {{ methods.publish_async_method }}<{{ event }}>({{ parameters.event_payload_parameter }}, {{ parameters.cancellation_token_parameter }});
-            }
-            {{~ end ~}}
+        public {{ classes.task_class }} {{ methods.publish_async_method }}({{ event }} {{ parameters.event_payload_parameter }}, {{ classes.cancellation_token_class }} {{ parameters.cancellation_token_parameter }})
+        {
+            return {{ methods.publish_async_method }}<{{ event }}>({{ parameters.event_payload_parameter }}, {{ parameters.cancellation_token_parameter }});
         }
+        {{~ end ~}}
     }
 {{~ for containing_type in containing_types ~}}
     }
