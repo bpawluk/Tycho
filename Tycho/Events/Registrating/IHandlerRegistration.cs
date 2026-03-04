@@ -2,12 +2,7 @@
 
 namespace Tycho.Events.Registrating
 {
-    internal interface IHandlerRegistration
-    {
-        EventHandlerIdentity Identity { get; }
-    }
-
-    internal interface IHandlerRegistration<TEvent> : IHandlerRegistration
+    internal interface IHandlerRegistration<TEvent> : IEventHandlerIdentity
         where TEvent : class, IEvent
     {
         IEventHandler<TEvent> Handler { get; }

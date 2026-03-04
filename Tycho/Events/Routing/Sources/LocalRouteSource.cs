@@ -15,8 +15,10 @@ namespace Tycho.Events.Routing.Sources
 
         public LocalRouteSource(TEventHandler handler)
         {
-            Identity = new EventHandlerIdentity(typeof(TEvent), typeof(TEventHandler));
             Handler = handler;
+            Identity = Handler is IEventHandlerIdentity identifiableHandler
+                ? identifiableHandler.Identity
+                : EventHandlerIdentity.Create<TEvent, TEventHandler>();
         }
 
         public IReadOnlyCollection<RoutedEvent> Route(Guid eventId, TEvent eventPayload)

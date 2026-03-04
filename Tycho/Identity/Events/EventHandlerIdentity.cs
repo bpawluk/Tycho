@@ -14,30 +14,15 @@ namespace Tycho.Identity.Events
             HandlerId = handlerId;
         }
 
-        public EventHandlerIdentity(Type eventType, Type handlerType)
+        private EventHandlerIdentity(Type eventType, Type handlerType)
         {
             EventId = TypeIdentifier.GetId(eventType);
             HandlerId = TypeIdentifier.GetId(handlerType);
         }
 
-        public bool MatchesEvent(Type eventType)
+        public static EventHandlerIdentity Create<TEvent, THandler>()
         {
-            return EventId == TypeIdentifier.GetId(eventType);
-        }
-
-        public bool MatchesEvent<TEvent>()
-        {
-            return EventId == TypeIdentifier.GetId<TEvent>();
-        }
-
-        public bool MatchesHandler(Type handlerType)
-        {
-            return HandlerId == TypeIdentifier.GetId(handlerType);
-        }
-
-        public bool MatchesHandler<THandler>()
-        {
-            return HandlerId == TypeIdentifier.GetId<THandler>();
+            return new EventHandlerIdentity(typeof(TEvent), typeof(THandler));
         }
 
         public bool Equals(EventHandlerIdentity? other)

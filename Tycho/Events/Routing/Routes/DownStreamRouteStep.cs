@@ -13,7 +13,8 @@ namespace Tycho.Events.Routing.Routes
 
         public static DownStreamRouteStep Create<TModule>()
         {
-            return new DownStreamRouteStep(new ModuleIdentity(typeof(TModule)));
+            var moduleIdentity = ModuleIdentity.Create<TModule>();
+            return new DownStreamRouteStep(moduleIdentity);
         }
     }
 }

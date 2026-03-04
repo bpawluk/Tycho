@@ -2,19 +2,23 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Inbox;
+using Tycho.Identity.Events;
 using Tycho.Structure;
 
 namespace Tycho.Events.Handling
 {
-    internal class ScopedEventHandler<TEvent, THandler> : IEventHandler<TEvent>
+    internal class ScopedEventHandler<TEvent, THandler> : IEventHandler<TEvent>, IEventHandlerIdentity
         where TEvent : class, IEvent
         where THandler : IEventHandler<TEvent> 
     {
         private readonly Internals _internals;
 
+        public EventHandlerIdentity Identity { get; }
+
         public ScopedEventHandler(Internals internals)
         {
             _internals = internals;
+            Identity = EventHandlerIdentity.Create<TEvent, THandler>();
         }
 
         public async Task HandleAsync(EventContext<TEvent> context, CancellationToken cancellationToken)

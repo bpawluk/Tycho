@@ -25,7 +25,7 @@ namespace Tycho.Modules.Instance
 
         public Module(Internals internals, Func<IServiceProvider, Task> cleanup)
         {
-            _identity = new ModuleIdentity(typeof(TTychoDefinition));
+            _identity = ModuleIdentity.Create<TTychoDefinition>();
             _internals = internals;
             _eventRouter = new EventRouter(_internals);
             _requestBroker = new UpStreamBroker(_internals);

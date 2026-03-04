@@ -16,14 +16,9 @@ namespace Tycho.Identity.Modules
             ModuleId = TypeIdentifier.GetId(moduleType);
         }
 
-        public bool MatchesModule(Type moduleType)
+        public static ModuleIdentity Create<TModule>()
         {
-            return ModuleId == TypeIdentifier.GetId(moduleType);
-        }
-
-        public bool MatchesModule<TModule>()
-        {
-            return ModuleId == TypeIdentifier.GetId<TModule>();
+            return new ModuleIdentity(typeof(TModule));
         }
 
         public bool Equals(ModuleIdentity? other)
