@@ -1,6 +1,6 @@
 ﻿namespace Tycho.Utils.SourceGenerator.Symbols
 {
-    internal static class AppDefinitionSymbols
+    internal static class AppSetupSymbols
     {
         public const string WithConfigurationMethod = "WithConfiguration";
         public const string WithLoggingMethod = "WithLogging";

@@ -128,13 +128,13 @@ public class TychoSourceGeneratorTests
             .Select(t => Path.GetFileName(t.FilePath))
             .ToArray();
 
-        Assert.Contains("SampleApp.App.Outer.Inner.TestApp.g.cs", generatedFileNames);
         Assert.Contains("SampleApp.App.Outer.Inner.TestApp.Setup.g.cs", generatedFileNames);
+        Assert.Contains("SampleApp.App.Outer.Inner.TestApp.Extensions.g.cs", generatedFileNames);
         Assert.Contains("SampleApp.App.Outer.Inner.TestApp.Facade.g.cs", generatedFileNames);
         Assert.Contains("SampleApp.App.Outer.Inner.TestApp.Facade.Interface.g.cs", generatedFileNames);
         Assert.Contains("SampleApp.App.Outer.Inner.TestApp.Publisher.g.cs", generatedFileNames);
         Assert.Contains("SampleApp.App.Outer.Inner.TestApp.Publisher.Interface.g.cs", generatedFileNames);
-        Assert.Contains("TestModule.g.cs", generatedFileNames);
+        Assert.Contains("TestModule.Setup.g.cs", generatedFileNames);
         Assert.Contains("TestModule.Facade.g.cs", generatedFileNames);
         Assert.Contains("TestModule.Facade.Interface.g.cs", generatedFileNames);
         Assert.Contains("TestModule.Parent.g.cs", generatedFileNames);

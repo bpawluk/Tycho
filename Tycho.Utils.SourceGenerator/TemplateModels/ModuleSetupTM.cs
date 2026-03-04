@@ -8,7 +8,7 @@ using Tycho.Utils.SourceGenerator.Symbols;
 
 namespace Tycho.Utils.SourceGenerator.TemplateModels
 {
-    internal class ModuleDefinitionTM : TemplateModelBase
+    internal class ModuleSetupTM : TemplateModelBase
     {
         public string Namespace { get; }
 
@@ -24,7 +24,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public SubmoduleTM[] Submodules { get; }
 
-        public ModuleDefinitionTM(TychoDefinitionModel tychoDefinitionModel)
+        public ModuleSetupTM(TychoSetupModel tychoDefinitionModel)
         {
             Namespace = tychoDefinitionModel.DefinitionType.Namespace;
             ContainingTypes = tychoDefinitionModel.DefinitionType.ContainingTypes.ToArray();
@@ -44,7 +44,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string ServiceCollectionServiceExtensionsClass { get; }
             public string ServiceProviderServiceExtensionsClass { get; }
 
-            public ClassesTM(ModuleDefinitionTM owner, TychoDefinitionModel tychoDefinitionModel)
+            public ClassesTM(ModuleSetupTM owner, TychoSetupModel tychoDefinitionModel)
             {
                 ModuleClass = tychoDefinitionModel.DefinitionType.Name;
                 ModuleParentClass = ModuleParentSymbols.GetParentClass(ModuleClass);
@@ -62,7 +62,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string ServiceCollectionInterface { get; }
             public string ModuleInstanceInterface { get; }
 
-            public InterfacesTM(ModuleDefinitionTM owner)
+            public InterfacesTM(ModuleSetupTM owner)
             {
                 ModuleParentInterface = ModuleParentSymbols.ParentInterface;
                 PublisherInterface = PublisherSymbols.PublisherInterface;
@@ -103,7 +103,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string FacadeInterface { get; }
             public string FacadeClass { get; }
 
-            public SubmoduleTM(ModuleDefinitionTM owner, TypeModel moduleType)
+            public SubmoduleTM(ModuleSetupTM owner, TypeModel moduleType)
             {
                 ModuleClass = owner.UseType(moduleType);
                 FacadeInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(ModuleClass);

@@ -75,9 +75,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public MethodsTM(TychoExtensionsModel tychoextensionsModel)
             {
                 AddAppMethod = AppExtensionsSymbols.GetAddAppMethod(tychoextensionsModel.DefinitionType.Name);
-                WithConfigurationMethod = AppDefinitionSymbols.WithConfigurationMethod;
-                WithLoggingMethod = AppDefinitionSymbols.WithLoggingMethod;
-                RunAsyncMethod = AppDefinitionSymbols.RunAsyncMethod;
+                WithConfigurationMethod = AppSetupSymbols.WithConfigurationMethod;
+                WithLoggingMethod = AppSetupSymbols.WithLoggingMethod;
+                RunAsyncMethod = AppSetupSymbols.RunAsyncMethod;
                 AddSingletonMethod = ServiceCollectionServiceExtensionsReference.AddSingletonMethodSignature.MethodName;
                 ConfigureLoggingMethod = LoggingConfigurationReference.ConfigureLoggingMethodSignature.MethodName;
                 ConfigureAwaitMethod = TaskReference.ConfigureAwaitMethodSignature.MethodName;         

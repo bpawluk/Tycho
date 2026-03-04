@@ -9,7 +9,7 @@ using Tycho.Utils.SourceGenerator.Symbols;
 
 namespace Tycho.Utils.SourceGenerator.TemplateModels
 {
-    internal class AppDefinitionTM : TemplateModelBase
+    internal class AppSetupTM : TemplateModelBase
     {
         public string Namespace { get; }
 
@@ -27,16 +27,16 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public SubmoduleTM[] Submodules { get; }
 
-        public AppDefinitionTM(TychoDefinitionModel tychoDefinitionModel)
+        public AppSetupTM(TychoSetupModel tychoSetupModel)
         {
-            Namespace = tychoDefinitionModel.DefinitionType.Namespace;
-            ContainingTypes = tychoDefinitionModel.DefinitionType.ContainingTypes.ToArray();
-            Classes = new ClassesTM(this, tychoDefinitionModel);
-            Interfaces = new InterfacesTM(this, tychoDefinitionModel);
+            Namespace = tychoSetupModel.DefinitionType.Namespace;
+            ContainingTypes = tychoSetupModel.DefinitionType.ContainingTypes.ToArray();
+            Classes = new ClassesTM(this, tychoSetupModel);
+            Interfaces = new InterfacesTM(this, tychoSetupModel);
             Methods = new MethodsTM();
             Parameters = new ParametersVM();
             Exceptions = new ExceptionsTM(this);
-            Submodules = tychoDefinitionModel.Submodules.Select(s => new SubmoduleTM(this, s)).ToArray();
+            Submodules = tychoSetupModel.Submodules.Select(s => new SubmoduleTM(this, s)).ToArray();
         }
 
         internal class ClassesTM 
@@ -50,9 +50,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string ServiceCollectionServiceExtensionsClass { get; }
             public string ServiceProviderServiceExtensionsClass { get; }
 
-            public ClassesTM(AppDefinitionTM owner, TychoDefinitionModel tychoDefinitionModel)
+            public ClassesTM(AppSetupTM owner, TychoSetupModel tychoSetupModel)
             {
-                AppClass = tychoDefinitionModel.DefinitionType.Name;
+                AppClass = tychoSetupModel.DefinitionType.Name;
                 FacadeClass = AppFacadeSymbols.GetAppFacadeClass(AppClass);
                 PublisherClass = PublisherSymbols.GetPublisherClass(AppClass);
                 BaseClass = owner.UseType(TychoAppReference.TypeModel);
@@ -72,9 +72,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string ServiceCollectionInterface { get; }
             public string ModuleInstanceInterface { get; }
 
-            public InterfacesTM(AppDefinitionTM owner, TychoDefinitionModel tychoDefinitionModel)
+            public InterfacesTM(AppSetupTM owner, TychoSetupModel tychoSetupModel)
             {
-                FacadeInterface = AppFacadeSymbols.GetAppFacadeInterface(tychoDefinitionModel.DefinitionType.Name);
+                FacadeInterface = AppFacadeSymbols.GetAppFacadeInterface(tychoSetupModel.DefinitionType.Name);
                 PublisherInterface = PublisherSymbols.PublisherInterface;
                 ConfigurationInterface = owner.UseType(IConfigurationReference.TypeModel);
                 LoggingBuilderInterface = owner.UseType(ILoggingBuilderReference.TypeModel);
@@ -104,9 +104,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 AutoSetupMethod = TychoAppReference.AutoSetupMethodSignature.MethodName;
                 AddTransientMethod = ServiceCollectionServiceExtensionsReference.AddTransientMethodSignature.MethodName;
                 ConfigureAwaitMethod = TaskReference.ConfigureAwaitMethodSignature.MethodName; 
-                WithConfigurationMethod = AppDefinitionSymbols.WithConfigurationMethod;
-                WithLoggingMethod = AppDefinitionSymbols.WithLoggingMethod;
-                RunAsyncMethod = AppDefinitionSymbols.RunAsyncMethod;
+                WithConfigurationMethod = AppSetupSymbols.WithConfigurationMethod;
+                WithLoggingMethod = AppSetupSymbols.WithLoggingMethod;
+                RunAsyncMethod = AppSetupSymbols.RunAsyncMethod;
                 GetRequiredServiceMethod = ServiceProviderServiceExtensionsReference.GetRequiredServiceMethodSignature.MethodName;
             }
         }
@@ -116,7 +116,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string ArgumentNullException { get; }
             public string InvalidOperationException { get; }
 
-            public ExceptionsTM(AppDefinitionTM owner)
+            public ExceptionsTM(AppSetupTM owner)
             {
                 ArgumentNullException = owner.UseType(ArgumentNullExceptionReference.TypeModel);
                 InvalidOperationException = owner.UseType(InvalidOperationExceptionReference.TypeModel);
@@ -132,10 +132,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public ParametersVM()
             {
-                GlobalConfigurationParameter = AppDefinitionSymbols.GlobalConfigurationParameter;
-                LoggingSetupParameter = AppDefinitionSymbols.LoggingSetupParameter;
-                AppParameter = AppDefinitionSymbols.AppParameter;
-                ProviderParameter = AppDefinitionSymbols.ProviderParameter;
+                GlobalConfigurationParameter = AppSetupSymbols.GlobalConfigurationParameter;
+                LoggingSetupParameter = AppSetupSymbols.LoggingSetupParameter;
+                AppParameter = AppSetupSymbols.AppParameter;
+                ProviderParameter = AppSetupSymbols.ProviderParameter;
             }
         }
 
@@ -145,7 +145,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string FacadeInterface { get; }
             public string FacadeClass { get; }
 
-            public SubmoduleTM(AppDefinitionTM owner, TypeModel moduleType)
+            public SubmoduleTM(AppSetupTM owner, TypeModel moduleType)
             {
                 ModuleClass = owner.UseType(moduleType);
                 FacadeInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(ModuleClass);

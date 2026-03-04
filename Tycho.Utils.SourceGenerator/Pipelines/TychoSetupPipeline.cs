@@ -11,26 +11,26 @@ using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.Pipelines
 {
-    internal static class TychoDefinitionPipeline
+    internal static class TychoSetupPipeline
     {
-        private static readonly string AppDefinitionTemplate = EmbeddedResource.GetContent("Templates/AppDefinition.sbncs");
-        private static readonly string ModuleDefinitionTemplate = EmbeddedResource.GetContent("Templates/ModuleDefinition.sbncs");
+        private static readonly string AppSetupTemplate = EmbeddedResource.GetContent("Templates/AppSetup.sbncs");
+        private static readonly string ModuleSetupTemplate = EmbeddedResource.GetContent("Templates/ModuleSetup.sbncs");
 
-        public static IncrementalGeneratorInitializationContext AddTychoDefinitionPipeline(
+        public static IncrementalGeneratorInitializationContext AddTychoSetupPipeline(
             this IncrementalGeneratorInitializationContext context,
             IncrementalValuesProvider<(TychoDefinitionKind, ClassDefinitionModel)> pipelineBase)
         {
-            var getIncludeModulesMethodDefinitionStepResult = pipelineBase
-                .Select(GetIncludeModulesMethodDefinitionStepTransform);
+            var getIncludeModulesMethodSetupStepResult = pipelineBase
+                .Select(GetIncludeModulesMethodSetupStepTransform);
 
-            var getSubmoduleMethodInvocationsStepResult = getIncludeModulesMethodDefinitionStepResult
+            var getSubmoduleMethodInvocationsStepResult = getIncludeModulesMethodSetupStepResult
                 .Select(GetSubmoduleMethodInvocationsStepTransform);
 
-            var getTychoDefinitionModelStepResult = getSubmoduleMethodInvocationsStepResult
-                .Select(GetTychoDefinitionModelStepTransform);
+            var getTychoSetupModelStepResult = getSubmoduleMethodInvocationsStepResult
+                .Select(GetTychoSetupModelStepTransform);
 
             context.RegisterSourceOutput(
-                getTychoDefinitionModelStepResult,
+                getTychoSetupModelStepResult,
                 (outputContext, model) =>
                 {
                     if (model.DefinitionKind == TychoDefinitionKind.Unknown) return;
@@ -44,33 +44,33 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             return context;
         }
 
-        private static (TychoDefinitionKind DefinitionKind, MethodDefinitionModel Method) GetIncludeModulesMethodDefinitionStepTransform(
-            (TychoDefinitionKind DefinitionKind, ClassDefinitionModel Model) input,
+        private static (TychoDefinitionKind SetupKind, MethodDefinitionModel Method) GetIncludeModulesMethodSetupStepTransform(
+            (TychoDefinitionKind SetupKind, ClassDefinitionModel Model) input,
             CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            return (input.DefinitionKind, input.Model.Methods.FirstOrDefault(method => method.Signature.IsIncludeModulesMethod()));
+            return (input.SetupKind, input.Model.Methods.FirstOrDefault(method => method.Signature.IsIncludeModulesMethod()));
         }
 
-        private static (TychoDefinitionKind DefinitionKind, TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) GetSubmoduleMethodInvocationsStepTransform(
-            (TychoDefinitionKind DefinitionKind, MethodDefinitionModel Method) input,
+        private static (TychoDefinitionKind SetupKind, TypeModel SetupType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) GetSubmoduleMethodInvocationsStepTransform(
+            (TychoDefinitionKind SetupKind, MethodDefinitionModel Method) input,
             CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             var invocations = input.Method.Body
                 .Where(invocation => invocation.Signature.IsSubmoduleDefiningMethod())
                 .ToImmutableEquatableArray();
-            return (input.DefinitionKind, input.Method.ContainingType, invocations);
+            return (input.SetupKind, input.Method.ContainingType, invocations);
         }
 
-        private static TychoDefinitionModel GetTychoDefinitionModelStepTransform(
-            (TychoDefinitionKind DefinitionKind, TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) input,
+        private static TychoSetupModel GetTychoSetupModelStepTransform(
+            (TychoDefinitionKind SetupKind, TypeModel SetupType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) input,
             CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            return new TychoDefinitionModel(
-                input.DefinitionKind,
-                input.DefinitionType,
+            return new TychoSetupModel(
+                input.SetupKind,
+                input.SetupType,
                 input.MethodInvocations
                     .Select(invocation => invocation.TypeArguments
                         .Single(argument => argument.IsModuleType())
@@ -79,22 +79,22 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                     .ToImmutableEquatableArray());
         }
 
-        private static object CreateTemplateModel(TychoDefinitionModel model)
+        private static object CreateTemplateModel(TychoSetupModel model)
         {
             return model.DefinitionKind switch
             {
-                TychoDefinitionKind.App => new AppDefinitionTM(model),
-                TychoDefinitionKind.Module => new ModuleDefinitionTM(model),
+                TychoDefinitionKind.App => new AppSetupTM(model),
+                TychoDefinitionKind.Module => new ModuleSetupTM(model),
                 _ => throw new ArgumentOutOfRangeException(nameof(model.DefinitionKind), $"Unsupported definition kind: {model.DefinitionKind}"),
             };
         }
 
-        private static string ChooseTemplate(TychoDefinitionModel model)
+        private static string ChooseTemplate(TychoSetupModel model)
         {
             return model.DefinitionKind switch
             {
-                TychoDefinitionKind.App => AppDefinitionTemplate,
-                TychoDefinitionKind.Module => ModuleDefinitionTemplate,
+                TychoDefinitionKind.App => AppSetupTemplate,
+                TychoDefinitionKind.Module => ModuleSetupTemplate,
                 _ => throw new ArgumentOutOfRangeException(nameof(model.DefinitionKind), $"Unsupported definition kind: {model.DefinitionKind}"),
             };
         }

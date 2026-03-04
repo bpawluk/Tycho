@@ -5,7 +5,7 @@ using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.Models
 {
-    public readonly struct TychoDefinitionModel : IEquatable<TychoDefinitionModel>
+    public readonly struct TychoSetupModel : IEquatable<TychoSetupModel>
     {
         public TychoDefinitionKind DefinitionKind { get; }
 
@@ -13,7 +13,7 @@ namespace Tycho.Utils.SourceGenerator.Models
 
         public ImmutableEquatableArray<TypeModel> Submodules { get; }
 
-        public TychoDefinitionModel(
+        public TychoSetupModel(
             TychoDefinitionKind definitionKind,
             TypeModel definitionType,
             ImmutableEquatableArray<TypeModel> submodules)
@@ -23,7 +23,7 @@ namespace Tycho.Utils.SourceGenerator.Models
             Submodules = submodules;
         }
 
-        public bool Equals(TychoDefinitionModel other)
+        public bool Equals(TychoSetupModel other)
         {
             return DefinitionKind.Equals(other.DefinitionKind) &&
                    DefinitionType.Equals(other.DefinitionType) &&
@@ -32,7 +32,7 @@ namespace Tycho.Utils.SourceGenerator.Models
 
         public override bool Equals(object obj)
         {
-            return obj is TychoDefinitionModel other && Equals(other);
+            return obj is TychoSetupModel other && Equals(other);
         }
 
         public override int GetHashCode()
@@ -43,8 +43,8 @@ namespace Tycho.Utils.SourceGenerator.Models
                 Submodules.GetHashCode());
         }
 
-        public static bool operator ==(TychoDefinitionModel left, TychoDefinitionModel right) => left.Equals(right);
+        public static bool operator ==(TychoSetupModel left, TychoSetupModel right) => left.Equals(right);
 
-        public static bool operator !=(TychoDefinitionModel left, TychoDefinitionModel right) => !left.Equals(right);
+        public static bool operator !=(TychoSetupModel left, TychoSetupModel right) => !left.Equals(right);
     }
 }

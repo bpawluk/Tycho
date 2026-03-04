@@ -23,11 +23,11 @@ namespace Tycho.Utils.SourceGenerator
                 predicate: GetTychoPipelineBasePredicate,
                 transform: GetTychoPipelineBaseTransform);
 
-            context.AddTychoDefinitionPipeline(tychoPipelineBase)
-                   .AddTychoExtensionsPipeline(tychoPipelineBase)
-                   .AddTychoFacadePipeline(tychoPipelineBase)
+            context.AddTychoFacadePipeline(tychoPipelineBase)
+                   .AddTychoPublisherPipeline(tychoPipelineBase)
                    .AddTychoParentPipeline(tychoPipelineBase)
-                   .AddTychoPublisherPipeline(tychoPipelineBase);
+                   .AddTychoSetupPipeline(tychoPipelineBase)
+                   .AddTychoExtensionsPipeline(tychoPipelineBase);
         }
 
         private static bool GetTychoPipelineBasePredicate(SyntaxNode node, CancellationToken token)
