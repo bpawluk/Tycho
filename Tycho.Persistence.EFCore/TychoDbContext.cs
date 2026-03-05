@@ -11,10 +11,20 @@ namespace Tycho.Persistence.EFCore;
 public abstract class TychoDbContext : DbContext
 {
     /// <summary>
-    /// An identifier used for naming Inbox and Outbox tables.
-    /// Must be unique for each Module instance to guarantee correct processing.
+    /// Database schema name to use for Tycho tables.
+    /// Return <c>null</c> to use the database default schema.
     /// </summary>
-    public virtual string InboxAndOutboxIdentifier => GetDefaultInboxAndOutboxIdentifier();
+    public virtual string? Schema => null;
+
+    /// <summary>
+    /// Database table name to use for Tycho events inbox.
+    /// </summary>
+    public virtual string InboxTableName => $"{GetDbContextName()}Inbox";
+
+    /// <summary>
+    /// Database table name to use for Tycho events outbox.
+    /// </summary>
+    public virtual string OutboxTableName => $"{GetDbContextName()}Outbox";
 
     /// <inheritdoc/>
     public TychoDbContext() : base() { }
@@ -27,36 +37,23 @@ public abstract class TychoDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        var inboxAndOutboxIdentifier = InboxAndOutboxIdentifier;
-        if (string.IsNullOrWhiteSpace(inboxAndOutboxIdentifier))
-        {
-            throw new InvalidOperationException($"{nameof(InboxAndOutboxIdentifier)} must not be empty.");
-        }
-
         modelBuilder.Entity<InboxMessage>()
-                    .ToTable($"{inboxAndOutboxIdentifier}Inbox");
+                    .ToTable(InboxTableName, Schema);
 
         modelBuilder.Entity<OutboxMessage>()
-                    .ToTable($"{inboxAndOutboxIdentifier}Outbox");
+                    .ToTable(OutboxTableName, Schema);
     }
 
-    private string GetDefaultInboxAndOutboxIdentifier()
+    private string GetDbContextName()
     {
         var suffixesToTrim = new[] { "DbContext", "Db", "Context" };
 
-        static string TrimSuffix(string name, string suffix)
-        {
-            return name.EndsWith(suffix, StringComparison.OrdinalIgnoreCase)
-                ? name[..^suffix.Length]
-                : name;
-        }
-
-        var identifier = GetType().Name;
+        var name = GetType().Name;
         foreach (var suffix in suffixesToTrim)
         {
-            identifier = TrimSuffix(identifier, suffix);
+            name = name.EndsWith(suffix, StringComparison.OrdinalIgnoreCase) ? name[..^suffix.Length] : name;
         }
 
-        return identifier;
+        return name;
     }
 }
