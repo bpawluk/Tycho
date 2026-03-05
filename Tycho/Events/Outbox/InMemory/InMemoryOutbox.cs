@@ -25,7 +25,6 @@ namespace Tycho.Events.Outbox.InMemory
                 _entries.Enqueue(entry);
             }
             _outboxActivity.NotifyNewEntriesAdded();
-
             return Task.CompletedTask;
         }
 
@@ -33,12 +32,11 @@ namespace Tycho.Events.Outbox.InMemory
         {
             var entries = new List<RoutedEvent>();
 
-            count = Math.Min(count, _entries.Count);
             for (var i = 0; i < count; i++)
             {
-                if (_entries.TryDequeue(out var nextMessage))
+                if (_entries.TryDequeue(out var nextEntry))
                 {
-                    entries.Add(nextMessage);
+                    entries.Add(nextEntry);
                 }
                 else
                 {

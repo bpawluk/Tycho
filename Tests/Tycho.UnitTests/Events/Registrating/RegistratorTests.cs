@@ -3,7 +3,7 @@ using Moq;
 using Tycho.Events;
 using Tycho.Events.Handling;
 using Tycho.Events.Registrating;
-using Tycho.Events.Routing.Sources;
+using Tycho.Events.Registrating.Registrations;
 using Tycho.Modules.Instance;
 using Tycho.Structure;
 using Tycho.Structure.Parent;
@@ -36,9 +36,9 @@ public class RegistratorTests
         _internals.Build();
 
         // Assert
-        var source = _internals.GetService<IRouteSource>();
+        var source = _internals.GetService<IEventRegistration>();
         Assert.NotNull(source);
-        Assert.IsType<UpStreamRouteSource<TestEvent>>(source);
+        Assert.IsType<ExposingEventRegistration<TestEvent>>(source);
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class RegistratorTests
     {
         // Arrange
         _internals.GetServiceCollection()
-            .AddTransient<IRouteSource, UpStreamRouteSource<TestEvent>>();
+            .AddTransient<IEventRegistration, ExposingEventRegistration<TestEvent>>();
 
         // Act
         void Act() => _sut.ExposeEvent<TestEvent>();
@@ -67,7 +67,7 @@ public class RegistratorTests
         _internals.Build();
 
         // Assert
-        var source = _internals.GetService<IRouteSource>();
+        var source = _internals.GetService<IEventRegistration>();
         Assert.NotNull(source);
         Assert.IsType<UpStreamMappedHandlersSource<TestEvent, OtherEvent>>(source);
     }
@@ -77,7 +77,7 @@ public class RegistratorTests
     {
         // Arrange
         _internals.GetServiceCollection()
-            .AddTransient<IRouteSource, UpStreamMappedHandlersSource<TestEvent, OtherEvent>>();
+            .AddTransient<IEventRegistration, UpStreamMappedHandlersSource<TestEvent, OtherEvent>>();
 
         // Act
         void Act() => _sut.ExposeEvent<TestEvent, OtherEvent>(eventData => new());
@@ -98,9 +98,9 @@ public class RegistratorTests
         _internals.Build();
 
         // Assert
-        var source = _internals.GetService<IRouteSource>();
+        var source = _internals.GetService<IEventRegistration>();
         Assert.NotNull(source);
-        Assert.IsType<DownStreamRouteSource<TestEvent, TestModule>>(source);
+        Assert.IsType<ForwardingEventRegistration<TestEvent, TestModule>>(source);
     }
 
     [Fact]
@@ -108,7 +108,7 @@ public class RegistratorTests
     {
         // Arrange
         _internals.GetServiceCollection()
-            .AddTransient<IRouteSource, DownStreamRouteSource<TestEvent, TestModule>>();
+            .AddTransient<IEventRegistration, ForwardingEventRegistration<TestEvent, TestModule>>();
 
         // Act
         void Act() => _sut.ForwardEvent<TestEvent, TestModule>();
@@ -129,9 +129,9 @@ public class RegistratorTests
         _internals.Build();
 
         // Assert
-        var source = _internals.GetService<IRouteSource>();
+        var source = _internals.GetService<IEventRegistration>();
         Assert.NotNull(source);
-        Assert.IsType<DownStreamMappedRouteSource<TestEvent, OtherEvent, TestModule>>(source);
+        Assert.IsType<MappedForwardingEventRegistration<TestEvent, OtherEvent, TestModule>>(source);
     }
 
     [Fact]
@@ -139,7 +139,7 @@ public class RegistratorTests
     {
         // Arrange
         _internals.GetServiceCollection()
-            .AddTransient<IRouteSource, DownStreamMappedRouteSource<TestEvent, OtherEvent, TestModule>>();
+            .AddTransient<IEventRegistration, MappedForwardingEventRegistration<TestEvent, OtherEvent, TestModule>>();
 
         // Act
         void Act() => _sut.ForwardEvent<TestEvent, OtherEvent, TestModule>(eventData => new());
@@ -159,9 +159,9 @@ public class RegistratorTests
         _internals.Build();
 
         // Assert
-        var source = _internals.GetService<IRouteSource>();
+        var source = _internals.GetService<IEventRegistration>();
         Assert.NotNull(source);
-        Assert.IsType<LocalRouteSource<TestEvent>>(source);
+        Assert.IsType<FinalEventRegistration<TestEvent>>(source);
 
         var scopedHandler = _internals.GetService<IEventHandler<TestEvent>>();
         Assert.NotNull(scopedHandler);
@@ -177,7 +177,7 @@ public class RegistratorTests
         // Arrange
         _internals.GetServiceCollection()
             .AddSingleton(_internals)
-            .AddTransient<IRouteSource, LocalRouteSource<TestEvent>>()
+            .AddTransient<IEventRegistration, FinalEventRegistration<TestEvent>>()
             .AddTransient<IEventHandler<TestEvent>, ScopedEventHandler<TestEvent, TestEventHandler>>()
             .AddScoped<TestEventHandler>();
 
@@ -197,7 +197,7 @@ public class RegistratorTests
         // Arrange
         _internals.GetServiceCollection()
             .AddSingleton(_internals)
-            .AddTransient<IRouteSource, LocalRouteSource<TestEvent>>()
+            .AddTransient<IEventRegistration, FinalEventRegistration<TestEvent>>()
             .AddTransient<IEventHandler<TestEvent>, ScopedEventHandler<TestEvent, TestEventHandler>>()
             .AddScoped<TestEventHandler>();
 

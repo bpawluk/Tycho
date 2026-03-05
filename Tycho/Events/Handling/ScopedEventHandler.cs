@@ -7,7 +7,7 @@ using Tycho.Structure;
 
 namespace Tycho.Events.Handling
 {
-    internal class ScopedEventHandler<TEvent, THandler> : IEventHandler<TEvent>, IEventHandlerIdentity
+    internal class ScopedEventHandler<TEvent, THandler> : IEventHandler<TEvent>, IIdentifiableEventHandler
         where TEvent : class, IEvent
         where THandler : IEventHandler<TEvent> 
     {

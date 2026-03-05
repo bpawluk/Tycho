@@ -1,7 +1,7 @@
 ﻿using Moq;
 using Tycho.Events;
 using Tycho.Events.Broker;
-using Tycho.Events.Routing.Sources;
+using Tycho.Events.Registrating.Registrations;
 using Tycho.Structure.Parent;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
@@ -18,7 +18,7 @@ public class UpStreamHandlersSourceTests
         new("other-event", "other-handler", "other-module")
     ];
 
-    private readonly UpStreamRouteSource<TestEvent> _sut;
+    private readonly ExposingEventRegistration<TestEvent> _sut;
 
     public UpStreamHandlersSourceTests()
     {
@@ -32,7 +32,7 @@ public class UpStreamHandlersSourceTests
         parentMock.SetupGet(p => p.EventRouter)
                   .Returns(eventRouterMock.Object);
 
-        _sut = new UpStreamRouteSource<TestEvent>(parentMock.Object);
+        _sut = new ExposingEventRegistration<TestEvent>(parentMock.Object);
     }
 
     [Fact]

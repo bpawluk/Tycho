@@ -1,7 +1,7 @@
 ﻿using Moq;
 using Tycho.Events;
 using Tycho.Events.Broker;
-using Tycho.Events.Routing.Sources;
+using Tycho.Events.Registrating.Registrations;
 using Tycho.Modules.Instance;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
@@ -19,7 +19,7 @@ public class DownStreamHandlersSourceTests
         new("other-event", "other-handler", "other-module")
     ];
 
-    private readonly DownStreamRouteSource<TestEvent, TestModule> _sut;
+    private readonly ForwardingEventRegistration<TestEvent, TestModule> _sut;
 
     public DownStreamHandlersSourceTests()
     {
@@ -33,7 +33,7 @@ public class DownStreamHandlersSourceTests
         submoduleMock.SetupGet(m => m.EventRouter)
                      .Returns(eventRouterMock.Object);
 
-        _sut = new DownStreamRouteSource<TestEvent, TestModule>(submoduleMock.Object);
+        _sut = new ForwardingEventRegistration<TestEvent, TestModule>(submoduleMock.Object);
     }
 
     [Fact]

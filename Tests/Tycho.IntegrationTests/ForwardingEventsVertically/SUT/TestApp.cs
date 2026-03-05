@@ -38,7 +38,7 @@ public partial class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
            .ForwardsAs<AlphaWorkflowStartedEvent, AlphaModule>(
                eventData => new(eventData.Result));
 
-        app.Handles<WorkflowWithMappingFinishedEvent, Handlers.WorkflowWithMappingFinishedEventHandler>();
+        app.Handles<WorkflowWithMappingFinishedEvent, WorkflowWithMappingFinishedEventHandler>();
     }
 
     protected override void IncludeModules(IAppStructure app)

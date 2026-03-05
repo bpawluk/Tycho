@@ -33,7 +33,7 @@ namespace Tycho.Events.Routing
     {
         public TEvent Payload { get; }
 
-        public RoutedEvent(Guid id, EventHandlerIdentity handlerId, TEvent payload) : base(id, Route.Empty(), handlerId)
+        public RoutedEvent(Guid id, EventHandlerIdentity handlerId, TEvent payload) : base(id, Route.Create(), handlerId)
         {
             Payload = payload;
         }

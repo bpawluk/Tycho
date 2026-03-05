@@ -29,12 +29,11 @@ namespace Tycho.Events.Inbox.InMemory
         {
             var entries = new List<RoutedEvent>();
 
-            count = Math.Min(count, _entries.Count);
             for (var i = 0; i < count; i++)
             {
-                if (_entries.TryDequeue(out var nextMessage))
+                if (_entries.TryDequeue(out var nextEntry))
                 {
-                    entries.Add(nextMessage);
+                    entries.Add(nextEntry);
                 }
                 else
                 {

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events;
 using Tycho.Events.Routing;
-using Tycho.Events.Routing.Sources;
 using Tycho.Structure.Internal;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;

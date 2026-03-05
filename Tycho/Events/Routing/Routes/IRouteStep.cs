@@ -1,6 +1,6 @@
 ﻿namespace Tycho.Events.Routing.Routes
 {
-    internal abstract class RouteStep
+    internal interface IRouteStep
     {
     }
 }

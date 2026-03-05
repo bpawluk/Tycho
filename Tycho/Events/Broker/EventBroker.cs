@@ -5,8 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Delivery;
+using Tycho.Events.Registrating.Registrations;
 using Tycho.Events.Routing;
-using Tycho.Events.Routing.Sources;
 using Tycho.Structure;
 
 namespace Tycho.Events.Broker
@@ -23,8 +23,8 @@ namespace Tycho.Events.Broker
         public IReadOnlyCollection<RoutedEvent> Route<TEvent>(Guid eventId, TEvent eventPayload) 
             where TEvent : class, IEvent
         {
-            var sources = _internals.GetServices<IRouteSource<TEvent>>();
-            return sources.SelectMany(source => source.Route(eventId, eventPayload)).ToArray();
+            var registrations = _internals.GetServices<IEventRegistration<TEvent>>();
+            return registrations.SelectMany(registration => registration.Route(eventId, eventPayload)).ToArray();
         }
 
         public async Task DeliverAsync<TEvent>(RoutedEvent<TEvent> routedEvent, CancellationToken cancellationToken)

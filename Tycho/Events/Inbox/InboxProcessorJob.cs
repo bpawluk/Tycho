@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Tycho.Events.Dispatching;
 using Tycho.Events.Routing;
-using Tycho.Identity.Events;
 using Tycho.Processor;
 
 namespace Tycho.Events.Inbox
@@ -15,7 +14,6 @@ namespace Tycho.Events.Inbox
     internal class InboxProcessorJob : IJob
     {
         private readonly IInboxConsumer _inboxConsumer;
-        private readonly IEventHandlerProvider _handlerRegistry;
         private readonly IEventDispatcher _handlingDispatcher;
         private readonly InboxProcessorSettings _settings;
         private readonly ILogger<InboxProcessorJob> _logger;
@@ -24,13 +22,11 @@ namespace Tycho.Events.Inbox
 
         public InboxProcessorJob(
             IInboxConsumer inboxConsumer,
-            IEventHandlerProvider handlerRegistry,
             IEventDispatcher handlingDispatcher,
             InboxProcessorSettings? settings = null,
             ILogger<InboxProcessorJob>? logger = null)
         {
             _inboxConsumer = inboxConsumer;
-            _handlerRegistry = handlerRegistry;
             _handlingDispatcher = handlingDispatcher;
             _settings = settings ?? InboxProcessorSettings.Default;
             _logger = logger ?? NullLogger<InboxProcessorJob>.Instance;
@@ -62,7 +58,6 @@ namespace Tycho.Events.Inbox
             {
                 // TODO: Handler timeout support
                 await routedEvent.DispatchAsync(_handlingDispatcher, cancellationToken).ConfigureAwait(false);
-                await _inboxConsumer.MarkAsHandled(routedEvent.Id, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

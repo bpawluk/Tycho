@@ -2,12 +2,13 @@
 
 namespace Tycho.Events.Routing.Routes
 {
-    internal class Route : Stack<RouteStep>
+    internal class Route : Stack<IRouteStep>
     {
-        public static Route Empty()
+        public static Route Create()
         {
             var route = new Route();
-            route.Push(new FinalRouteStep());
+            var finalRouteStep = FinalRouteStep.Create();
+            route.Push(finalRouteStep);
             return route;
         }
     }
