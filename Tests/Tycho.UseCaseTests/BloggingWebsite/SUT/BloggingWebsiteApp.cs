@@ -9,7 +9,8 @@ using Reactions = Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions;
 
 namespace Tycho.UseCaseTests.BloggingWebsite.SUT;
 
-public class BloggingWebsiteApp : TychoApp
+[TychoDefinition]
+public partial class BloggingWebsiteApp : TychoApp
 {
     protected override void DefineContract(IAppContract app)
     {

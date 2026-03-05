@@ -11,7 +11,8 @@ using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract;
 
 namespace Tycho.UseCaseTests.ContentModeration.SUT;
 
-public class ContentModerationApp : TychoApp
+[TychoDefinition]
+public partial class ContentModerationApp : TychoApp
 {
     protected override void DefineContract(IAppContract app)
     {

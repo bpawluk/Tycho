@@ -11,7 +11,8 @@ using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Posts;
 
 namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds;
 
-public class FeedsModule : TychoModule
+[TychoDefinition]
+public partial class FeedsModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

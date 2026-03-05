@@ -8,7 +8,8 @@ using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Persistence;
 
 namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions;
 
-public class ReactionsModule : TychoModule
+[TychoDefinition]
+public partial class ReactionsModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

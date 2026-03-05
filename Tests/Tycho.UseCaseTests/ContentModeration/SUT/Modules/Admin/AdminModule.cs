@@ -8,7 +8,8 @@ using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Persistence;
 
 namespace Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin;
 
-public class AdminModule : TychoModule
+[TychoDefinition]
+public partial class AdminModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

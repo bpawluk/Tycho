@@ -12,6 +12,7 @@ namespace Tycho.IntegrationTests.ForwardingEventsVertically.SUT;
 public record BeginTestWorkflowRequest(TestResult Result) : IRequest;
 
 // Events
+public record Dupka(TestResult Result) : IEvent;
 public record WorkflowStartedEvent(TestResult Result) : IEvent;
 public record WorkflowFinishedEvent(TestResult Result) : IEvent;
 public record WorkflowWithMappingStartedEvent(TestResult Result) : IEvent;

@@ -7,7 +7,8 @@ using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Persistence;
 
 namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles;
 
-public class ArticlesModule : TychoModule
+[TychoDefinition]
+public partial class ArticlesModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

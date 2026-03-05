@@ -1,5 +1,4 @@
 ﻿using Tycho.Events;
-using Tycho.Modules.Instance;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Outgoing;
@@ -9,30 +8,29 @@ using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Incoming;
 namespace Tycho.UseCaseTests.OnlineStore.SUT.Handlers;
 
 internal class BasketItemAddedEventHandler(
-    IModule<InventoryModule> inventoryModule,
-    IModule<BasketModule> basketModule) 
+    IInventoryModule inventoryModule,
+    IBasketModule basketModule) 
     : IEventHandler<BasketItemAddedEvent>
 {
-    private readonly IModule<InventoryModule> _inventoryModule = inventoryModule;
-    private readonly IModule<BasketModule> _basketModule = basketModule;
+    private readonly IInventoryModule _inventoryModule = inventoryModule;
+    private readonly IBasketModule _basketModule = basketModule;
 
-    public async Task Handle(BasketItemAddedEvent eventData, CancellationToken cancellationToken)
+    public async Task HandleAsync(EventContext<BasketItemAddedEvent> context, CancellationToken cancellationToken)
     {
-        var reservationCode = $"{eventData.CustomerId}-{eventData.ProductId}";
-        var reserveItemRequest = new ReserveItemRequest(reservationCode, eventData.ProductId, eventData.Quantity);
+        var reservationCode = $"{context.Payload.CustomerId}-{context.Payload.ProductId}";
+        var reserveItemRequest = new ReserveItemRequest(reservationCode, context.Payload.ProductId, context.Payload.Quantity);
 
-        var response = await _inventoryModule.Execute<ReserveItemRequest, ReserveItemRequest.Response>(
-            reserveItemRequest, cancellationToken);
+        var response = await _inventoryModule.ExecuteAsync(reserveItemRequest, cancellationToken);
 
         if (response.ReservationCreated)
         {
-            var confirmBasketItemRequest = new ConfirmBasketItemRequest(eventData.CustomerId, eventData.ProductId);
-            await _basketModule.Execute(confirmBasketItemRequest, cancellationToken);
+            var confirmBasketItemRequest = new ConfirmBasketItemRequest(context.Payload.CustomerId, context.Payload.ProductId);
+            await _basketModule.ExecuteAsync(confirmBasketItemRequest, cancellationToken);
         }
         else
         {
-            var declineBasketItemRequest = new DeclineBasketItemRequest(eventData.CustomerId, eventData.ProductId);
-            await _basketModule.Execute(declineBasketItemRequest, cancellationToken);
+            var declineBasketItemRequest = new DeclineBasketItemRequest(context.Payload.CustomerId, context.Payload.ProductId);
+            await _basketModule.ExecuteAsync(declineBasketItemRequest, cancellationToken);
         }
     }
 }

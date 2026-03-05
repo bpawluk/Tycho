@@ -8,7 +8,8 @@ using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Persistence;
 
 namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory;
 
-internal class InventoryModule : TychoModule
+[TychoDefinition]
+public partial class InventoryModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

@@ -7,7 +7,8 @@ using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Persistence;
 
 namespace Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users;
 
-public class UsersModule : TychoModule
+[TychoDefinition]
+public partial class UsersModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

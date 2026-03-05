@@ -25,6 +25,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Tycho\Tycho.csproj" />
     <ProjectReference Include="..\..\Tycho.Persistence.EFCore\Tycho.Persistence.EFCore.csproj" />
+    <ProjectReference Include="..\..\Tycho.Utils.SourceGenerator\Tycho.Utils.SourceGenerator.csproj" OutputItemType="Analyzer" />
   </ItemGroup>
 
   <ItemGroup>

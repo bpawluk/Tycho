@@ -7,7 +7,8 @@ using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Persistence;
 
 namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments;
 
-public class CommentsModule : TychoModule
+[TychoDefinition]
+public partial class CommentsModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

@@ -8,7 +8,8 @@ using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Persistence;
 
 namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket;
 
-internal class BasketModule : TychoModule
+[TychoDefinition]
+public partial class BasketModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

@@ -7,7 +7,8 @@ using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Handlers;
 
 namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering;
 
-internal class OrderingModule : TychoModule
+[TychoDefinition]
+public partial class OrderingModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

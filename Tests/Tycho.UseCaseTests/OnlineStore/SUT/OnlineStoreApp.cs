@@ -16,7 +16,8 @@ using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract;
 
 namespace Tycho.UseCaseTests.OnlineStore.SUT;
 
-public class OnlineStoreApp : TychoApp
+[TychoDefinition]
+public partial class OnlineStoreApp : TychoApp
 {
     protected override void DefineContract(IAppContract app)
     {
