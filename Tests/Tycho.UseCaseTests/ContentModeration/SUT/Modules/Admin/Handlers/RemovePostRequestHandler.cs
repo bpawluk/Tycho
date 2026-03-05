@@ -1,18 +1,17 @@
-﻿using Tycho.Persistence.EFCore;
-using Tycho.Requests;
-using Tycho.Structure.Parent;
+﻿using Tycho.Requests;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Incoming;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Outgoing;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Domain;
+using static Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.AdminModule;
 
 namespace Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Handlers;
 
-internal class RemovePostRequestHandler(IUnitOfWork unitOfWork, IParentReference parent) : IRequestHandler<RemovePostRequest>
+internal class RemovePostRequestHandler(IUnitOfWork unitOfWork, IParent parent) : IRequestHandler<RemovePostRequest>
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
-    private readonly IParentReference _parent = parent;
+    private readonly IParent _parent = parent;
 
-    public async Task Handle(RemovePostRequest requestData, CancellationToken cancellationToken)
+    public async Task HandleAsync(RemovePostRequest requestData, CancellationToken cancellationToken)
     {
         await Task.Delay(10, cancellationToken); // Simulate async work
 
@@ -21,7 +20,7 @@ internal class RemovePostRequestHandler(IUnitOfWork unitOfWork, IParentReference
         AdminAction newAdminAction;
         if (requestData.BanAuthor)
         {
-            var author = await _parent.Execute<GetAuthorRequest, GetAuthorRequest.Response>(new(requestData.PostId), cancellationToken);
+            var author = await _parent.ExecuteAsync(new GetAuthorRequest(requestData.PostId), cancellationToken);
             newAdminAction = AdminAction.RemovePostAndBanAuthor(requestData.PostId, author.AuthorId);
             await _unitOfWork.Publish(new UserBannedEvent(author.AuthorId), cancellationToken);
         }

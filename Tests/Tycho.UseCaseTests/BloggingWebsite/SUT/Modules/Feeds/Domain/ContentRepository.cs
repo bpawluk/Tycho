@@ -9,32 +9,32 @@ using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Contract;
 namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
 
 internal class ContentRepository(
-    IModule<ArticlesModule> articlesModule,
-    IModule<PostsModule> postsModule,
-    IModule<CommentsModule> commentsModule)
+    IArticlesModule articlesModule,
+    IPostsModule postsModule,
+    ICommentsModule commentsModule)
 {
-    private readonly IModule<ArticlesModule> _articlesModule = articlesModule;
-    private readonly IModule<PostsModule> _postsModule = postsModule;
-    private readonly IModule<CommentsModule> _commentsModule = commentsModule;
+    private readonly IArticlesModule _articlesModule = articlesModule;
+    private readonly IPostsModule _postsModule = postsModule;
+    private readonly ICommentsModule _commentsModule = commentsModule;
 
     public async Task<int> AddEntryContent(EntryType type, Content content)
     {
         if (type is EntryType.Article)
         {
             var addArticleRequest = new AddArticleRequest(content.Author, content.Value);
-            var result = await _articlesModule.Execute<AddArticleRequest, AddArticleRequest.Response>(addArticleRequest);
+            var result = await _articlesModule.ExecuteAsync(addArticleRequest);
             return result.ArticleId;
         }
         else if (type is EntryType.Post)
         {
             var addPostRequest = new AddPostRequest(content.Author, content.Value);
-            var result = await _postsModule.Execute<AddPostRequest, AddPostRequest.Response>(addPostRequest);
+            var result = await _postsModule.ExecuteAsync(addPostRequest);
             return result.PostId;
         }
         else if (type is EntryType.Comment)
         {
             var addCommentRequest = new AddCommentRequest(content.Author, content.Value);
-            var result = await _commentsModule.Execute<AddCommentRequest, AddCommentRequest.Response>(addCommentRequest);
+            var result = await _commentsModule.ExecuteAsync(addCommentRequest);
             return result.CommentId;
         }
         else
@@ -48,19 +48,19 @@ internal class ContentRepository(
         if (type is EntryType.Article)
         {
             var getArticlesRequest = new GetArticlesRequest(entryIds);
-            var result = await _articlesModule.Execute<GetArticlesRequest, GetArticlesRequest.Response>(getArticlesRequest);
+            var result = await _articlesModule.ExecuteAsync(getArticlesRequest);
             return result.Articles.Select(article => new Content(article.Id, article.Author, article.Content)).ToArray();
         }
         else if (type is EntryType.Post)
         {
             var getPostsRequest = new GetPostsRequest(entryIds);
-            var result = await _postsModule.Execute<GetPostsRequest, GetPostsRequest.Response>(getPostsRequest);
+            var result = await _postsModule.ExecuteAsync(getPostsRequest);
             return result.Posts.Select(post => new Content(post.Id, post.Author, post.Content)).ToArray();
         }
         else if (type is EntryType.Comment)
         {
             var getCommentsRequest = new GetCommentsRequest(entryIds);
-            var result = await _commentsModule.Execute<GetCommentsRequest, GetCommentsRequest.Response>(getCommentsRequest);
+            var result = await _commentsModule.ExecuteAsync(getCommentsRequest);
             return result.Comments.Select(comment => new Content(comment.Id, comment.Author, comment.Content)).ToArray();
         }
         else

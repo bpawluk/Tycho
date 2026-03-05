@@ -1,5 +1,4 @@
-﻿using Tycho.Persistence.EFCore;
-using Tycho.Requests;
+﻿using Tycho.Requests;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
 using static Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract.GetFeedEntriesRequest;
@@ -11,7 +10,7 @@ internal class GetFeedEntriesRequestHandler(IUnitOfWork unitOfWork, ContentRepos
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly ContentRepository _contentRepository = contentRepository;
 
-    public async Task<Response> Handle(GetFeedEntriesRequest requestData, CancellationToken cancellationToken)
+    public async Task<Response> HandleAsync(GetFeedEntriesRequest requestData, CancellationToken cancellationToken)
     {
         var feedId = GetFeedId(requestData);
         var feedProvider = new FeedProvider(_unitOfWork);

@@ -1,72 +1,51 @@
-﻿using Tycho.Events.Routing;
-using Tycho.Registry;
+﻿using Tycho.Identity.Events;
 
 namespace Tycho.UnitTests.Events.Routing;
 
-public class HandlerIdentityTests
+public class EventHandlerIdentityTests
 {
-    private static readonly HandlerIdentity _handlerIdentity = new("EventOne", "HandlerOne", "ModuleOne");
+    private static readonly EventHandlerIdentity _handlerIdentity = new("EventOne", "HandlerOne");
 
     public static readonly IEnumerable<object[]> EqualsTestData =
     [
         [_handlerIdentity, _handlerIdentity, true],
         [
-            new HandlerIdentity("EventOne", "HandlerOne", "ModuleOne"),
-            new HandlerIdentity("EventOne", "HandlerOne", "ModuleOne"), 
+            new EventHandlerIdentity("EventOne", "HandlerOne"),
+            new EventHandlerIdentity("EventOne", "HandlerOne"), 
             true
         ],
         [
-            new HandlerIdentity("EventOne", "HandlerOne", "ModuleOne"),
-            new HandlerIdentity("EventTwo", "HandlerOne", "ModuleOne"), 
+            new EventHandlerIdentity("EventOne", "HandlerOne"),
+            new EventHandlerIdentity("EventTwo", "HandlerOne"), 
             false
         ],
         [
-            new HandlerIdentity("EventOne", "HandlerOne", "ModuleOne"),
-            new HandlerIdentity("EventOne", "HandlerTwo", "ModuleOne"), 
+            new EventHandlerIdentity("EventOne", "HandlerOne"),
+            new EventHandlerIdentity("EventOne", "HandlerTwo"), 
             false
         ],
         [
-            new HandlerIdentity("EventOne", "HandlerOne", "ModuleOne"),
-            new HandlerIdentity("EventOne", "HandlerOne", "ModuleTwo"), 
+            new EventHandlerIdentity("EventOne", "HandlerOne"),
+            new EventHandlerIdentity("EventTwo", "HandlerTwo"), 
             false
         ],
-        [
-            new HandlerIdentity("EventOne", "HandlerOne", "ModuleOne"),
-            new HandlerIdentity("EventTwo", "HandlerTwo", "ModuleOne"), 
-            false
-        ],
-        [
-            new HandlerIdentity("EventOne", "HandlerOne", "ModuleOne"),
-            new HandlerIdentity("EventOne", "HandlerTwo", "ModuleTwo"), 
-            false
-        ],
-        [
-            new HandlerIdentity("EventOne", "HandlerOne", "ModuleOne"),
-            new HandlerIdentity("EventTwo", "HandlerOne", "ModuleTwo"), 
-            false
-        ],
-        [
-            new HandlerIdentity("EventOne", "HandlerOne", "ModuleOne"),
-            new HandlerIdentity("EventTwo", "HandlerTwo", "ModuleTwo"), 
-            false
-        ],
-        [new HandlerIdentity("EventOne", "HandlerOne", "ModuleOne"), null!, false]
+        [new EventHandlerIdentity("EventOne", "HandlerOne"), null!, false]
     ];
 
     public static readonly IEnumerable<object[]> EqualsObjectTestData = EqualsTestData.Concat(
     [
-        [new HandlerIdentity("EventOne", "HandlerOne", "ModuleOne"), new object(), false]
+        [new EventHandlerIdentity("EventOne", "HandlerOne"), new object(), false]
     ]);
 
     public static readonly IEnumerable<object[]> EqualsOperatorTestData = EqualsTestData.Concat(
     [
         [null!, null!, true],
-        [null!, new HandlerIdentity("EventOne", "HandlerOne", "ModuleOne"), false]
+        [null!, new EventHandlerIdentity("EventOne", "HandlerOne"), false]
     ]);
 
     [Theory]
     [MemberData(nameof(EqualsTestData))]
-    internal void HandlerIdentity_Equals_EvaluatesCorrectly(HandlerIdentity left, HandlerIdentity? right, bool areEqual)
+    internal void EventHandlerIdentity_Equals_EvaluatesCorrectly(EventHandlerIdentity left, EventHandlerIdentity? right, bool areEqual)
     {
         // Act
         var result = left.Equals(right);
@@ -77,7 +56,7 @@ public class HandlerIdentityTests
 
     [Theory]
     [MemberData(nameof(EqualsObjectTestData))]
-    internal void HandlerIdentity_EqualsObject_EvaluatesCorrectly(HandlerIdentity left, object? right, bool areEqual)
+    internal void EventHandlerIdentity_EqualsObject_EvaluatesCorrectly(EventHandlerIdentity left, object? right, bool areEqual)
     {
         // Act
         var result = left.Equals(right);
@@ -88,7 +67,7 @@ public class HandlerIdentityTests
 
     [Theory]
     [MemberData(nameof(EqualsOperatorTestData))]
-    internal void HandlerIdentity_EqualsOperator_EvaluatesCorrectly(HandlerIdentity? left, HandlerIdentity? right,
+    internal void EventHandlerIdentity_EqualsOperator_EvaluatesCorrectly(EventHandlerIdentity? left, EventHandlerIdentity? right,
         bool areEqual)
     {
         // Act
@@ -100,7 +79,7 @@ public class HandlerIdentityTests
 
     [Theory]
     [MemberData(nameof(EqualsOperatorTestData))]
-    internal void HandlerIdentity_NotEqualsOperator_EvaluatesCorrectly(HandlerIdentity? left, HandlerIdentity? right,
+    internal void EventHandlerIdentity_NotEqualsOperator_EvaluatesCorrectly(EventHandlerIdentity? left, EventHandlerIdentity? right,
         bool areEqual)
     {
         // Act

@@ -1,5 +1,4 @@
-﻿using Tycho.Persistence.EFCore;
-using Tycho.Requests;
+﻿using Tycho.Requests;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Domain;
 
@@ -9,7 +8,7 @@ internal class AddUserRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<A
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task<AddUserRequest.Response> Handle(AddUserRequest requestData, CancellationToken cancellationToken)
+    public async Task<AddUserRequest.Response> HandleAsync(AddUserRequest requestData, CancellationToken cancellationToken)
     {
         await Task.Delay(10, cancellationToken); // Simulate async work
         var users = _unitOfWork.Set<User>();

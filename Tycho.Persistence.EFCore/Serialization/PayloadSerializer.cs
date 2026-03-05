@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Text.Json;
 using Tycho.Events;
-using Tycho.Events.Serialization;
 
 namespace Tycho.Persistence.EFCore.Serialization;
 
-internal class PayloadSerializer : IEventSerializer
+internal class PayloadSerializer
 {
     public object SerializePayload(IEvent eventData)
     {

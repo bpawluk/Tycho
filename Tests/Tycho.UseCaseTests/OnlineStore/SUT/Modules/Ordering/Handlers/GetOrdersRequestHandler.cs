@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Tycho.Persistence.EFCore;
 using Tycho.Requests;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract;
 using static Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract.GetOrdersRequest;
@@ -10,7 +9,7 @@ internal class GetOrdersRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task<Response> Handle(GetOrdersRequest requestData, CancellationToken cancellationToken)
+    public async Task<Response> HandleAsync(GetOrdersRequest requestData, CancellationToken cancellationToken)
     {
         var orders = _unitOfWork.Set<Domain.Order>();
         var result = await orders

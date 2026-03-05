@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Tycho.Persistence.EFCore;
 using Tycho.Requests;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming;
 using static Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming.GetProductsRequest;
@@ -10,7 +9,7 @@ internal class GetProductsRequestHandler(IUnitOfWork unitOfWork) : IRequestHandl
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task<Response> Handle(GetProductsRequest requestData, CancellationToken cancellationToken)
+    public async Task<Response> HandleAsync(GetProductsRequest requestData, CancellationToken cancellationToken)
     {
         var products = _unitOfWork.Set<Domain.Product>();
         var responseProducts = await products

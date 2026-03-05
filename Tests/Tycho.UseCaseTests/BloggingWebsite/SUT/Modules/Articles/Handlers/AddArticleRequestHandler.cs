@@ -9,7 +9,7 @@ internal class AddArticleRequestHandler(IUnitOfWork unitOfWork) : IRequestHandle
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task<Response> Handle(AddArticleRequest requestData, CancellationToken cancellationToken)
+    public async Task<Response> HandleAsync(AddArticleRequest requestData, CancellationToken cancellationToken)
     {
         var articles = _unitOfWork.Set<Article>();
         var newArticle = new Article(requestData.Author, requestData.Content);

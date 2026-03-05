@@ -1,5 +1,4 @@
-﻿using Tycho.Persistence.EFCore;
-using Tycho.Requests;
+﻿using Tycho.Requests;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Incoming;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Outgoing;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Domain;
@@ -11,7 +10,7 @@ internal class ReserveItemRequestHandler(IUnitOfWork unitOfWork) : IRequestHandl
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task<Response> Handle(ReserveItemRequest requestData, CancellationToken cancellationToken)
+    public async Task<Response> HandleAsync(ReserveItemRequest requestData, CancellationToken cancellationToken)
     {
         var items = _unitOfWork.Set<Item>();
 

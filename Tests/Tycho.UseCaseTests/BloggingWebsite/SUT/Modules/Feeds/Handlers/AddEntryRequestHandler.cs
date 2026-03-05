@@ -1,5 +1,4 @@
-﻿using Tycho.Persistence.EFCore;
-using Tycho.Requests;
+﻿using Tycho.Requests;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
 using static Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract.AddEntryRequest;
@@ -11,7 +10,7 @@ internal class AddEntryRequestHandler(IUnitOfWork unitOfWork, ContentRepository 
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly ContentRepository _contentRepository = contentRepository;
 
-    public async Task<Response> Handle(AddEntryRequest requestData, CancellationToken cancellationToken)
+    public async Task<Response> HandleAsync(AddEntryRequest requestData, CancellationToken cancellationToken)
     {
         var entryType = GetEntryType(requestData);
         var entryContent = new Content(requestData.Entry.Author, requestData.Entry.Content);

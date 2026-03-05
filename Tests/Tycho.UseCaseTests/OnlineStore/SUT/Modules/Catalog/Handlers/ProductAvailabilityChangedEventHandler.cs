@@ -1,5 +1,4 @@
 ﻿using Tycho.Events;
-using Tycho.Persistence.EFCore;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Domain;
 
@@ -9,13 +8,13 @@ internal class ProductAvailabilityChangedEventHandler(IUnitOfWork unitOfWork) : 
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task Handle(ProductAvailabilityChangedEvent eventData, CancellationToken cancellationToken)
+    public async Task HandleAsync(EventContext<ProductAvailabilityChangedEvent> context, CancellationToken cancellationToken)
     {
         var products = _unitOfWork.Set<Product>();
-        var product = await products.FindAsync([eventData.Product], cancellationToken);
+        var product = await products.FindAsync([context.Payload.Product], cancellationToken);
         if (product != null) 
         {
-            var newAvailability = new ProductAvailability(eventData.NewQuantity, eventData.Version);
+            var newAvailability = new ProductAvailability(context.Payload.NewQuantity, context.Payload.Version);
             product.UpdateAvailability(newAvailability);
             await _unitOfWork.SaveChanges(cancellationToken);
         }

@@ -1,5 +1,4 @@
 ﻿using Tycho.Events;
-using Tycho.Persistence.EFCore;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Domain;
 
@@ -9,18 +8,18 @@ internal class UserStatusChangedEventHandler(IUnitOfWork unitOfWork) : IEventHan
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task Handle(UserStatusChangedEvent eventData, CancellationToken cancellationToken)
+    public async Task HandleAsync(EventContext<UserStatusChangedEvent> context, CancellationToken cancellationToken)
     {
         await Task.Delay(10, cancellationToken); // Simulate async work
         var users = _unitOfWork.Set<User>();
 
-        var user = await users.FindAsync([eventData.UserId], cancellationToken);
+        var user = await users.FindAsync([context.Payload.UserId], cancellationToken);
         if (user is null)
         {
-            throw new ArgumentException($"There is no Users with ID {eventData.UserId}");
+            throw new ArgumentException($"There is no Users with ID {context.Payload.UserId}");
         }
 
-        user.Status = GetStatus(eventData.NewStatus);
+        user.Status = GetStatus(context.Payload.NewStatus);
         await _unitOfWork.SaveChanges(cancellationToken);
     }
 

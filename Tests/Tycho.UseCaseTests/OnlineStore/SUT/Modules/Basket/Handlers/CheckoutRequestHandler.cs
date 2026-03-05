@@ -1,5 +1,4 @@
-﻿using Tycho.Persistence.EFCore;
-using Tycho.Requests;
+﻿using Tycho.Requests;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Outgoing;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Domain;
@@ -10,7 +9,7 @@ internal class CheckoutRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task Handle(CheckoutRequest requestData, CancellationToken cancellationToken)
+    public async Task HandleAsync(CheckoutRequest requestData, CancellationToken cancellationToken)
     {
         var basketProvider = new BasketProvider(_unitOfWork);
         var customerBasket = await basketProvider.GetBasket(requestData.CustomerId, cancellationToken);

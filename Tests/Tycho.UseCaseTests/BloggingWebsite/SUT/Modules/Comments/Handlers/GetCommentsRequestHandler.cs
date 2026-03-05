@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Tycho.Persistence.EFCore;
 using Tycho.Requests;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Contract;
 using static Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Contract.GetCommentsRequest;
@@ -10,7 +9,7 @@ internal class GetCommentsRequestHandler(IUnitOfWork unitOfWork) : IRequestHandl
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task<Response> Handle(GetCommentsRequest requestData, CancellationToken cancellationToken)
+    public async Task<Response> HandleAsync(GetCommentsRequest requestData, CancellationToken cancellationToken)
     {
         var posts = _unitOfWork.Set<Domain.Comment>();
         var responseComments = await posts

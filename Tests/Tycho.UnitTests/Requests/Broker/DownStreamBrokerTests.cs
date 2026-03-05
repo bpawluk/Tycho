@@ -196,10 +196,10 @@ public class DownStreamBrokerTests
         _internals.Build();
 
         // Act
-        await _sut.Execute(request, CancellationToken.None);
+        await _sut.ExecuteAsync(request, CancellationToken.None);
 
         // Assert
-        handlerMock.Verify(h => h.Handle(request, CancellationToken.None), Times.Once);
+        handlerMock.Verify(h => h.HandleAsync(request, CancellationToken.None), Times.Once);
     }
 
     [Fact]
@@ -211,7 +211,7 @@ public class DownStreamBrokerTests
         // Act
         async Task Act()
         {
-            await _sut.Execute<TestRequest>(new TestRequest(), CancellationToken.None);
+            await _sut.ExecuteAsync(new TestRequest(), CancellationToken.None);
         }
 
         // Assert
@@ -227,7 +227,7 @@ public class DownStreamBrokerTests
         // Act
         async Task Act()
         {
-            await _sut.Execute(requestData, CancellationToken.None);
+            await _sut.ExecuteAsync(requestData, CancellationToken.None);
         }
 
         // Assert
@@ -242,7 +242,7 @@ public class DownStreamBrokerTests
         var response = "success";
 
         var handlerMock = new Mock<IRequestHandler<TestRequestWithResponse, string>>();
-        handlerMock.Setup(h => h.Handle(request, CancellationToken.None))
+        handlerMock.Setup(h => h.HandleAsync(request, CancellationToken.None))
                    .ReturnsAsync(response);
 
         var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequestWithResponse, string, TestModule>>();
@@ -253,11 +253,11 @@ public class DownStreamBrokerTests
         _internals.Build();
 
         // Act
-        var result = await _sut.Execute<TestRequestWithResponse, string>(request, CancellationToken.None);
+        var result = await _sut.ExecuteAsync<TestRequestWithResponse, string>(request, CancellationToken.None);
 
         // Assert
         Assert.Equal(response, result);
-        handlerMock.Verify(h => h.Handle(request, CancellationToken.None), Times.Once);
+        handlerMock.Verify(h => h.HandleAsync(request, CancellationToken.None), Times.Once);
     }
 
     [Fact]
@@ -269,7 +269,7 @@ public class DownStreamBrokerTests
         // Act
         async Task Act()
         {
-            await _sut.Execute<TestRequestWithResponse, string>(new TestRequestWithResponse(), CancellationToken.None);
+            await _sut.ExecuteAsync<TestRequestWithResponse, string>(new TestRequestWithResponse(), CancellationToken.None);
         }
 
         // Assert
@@ -285,7 +285,7 @@ public class DownStreamBrokerTests
         // Act
         async Task Act()
         {
-            await _sut.Execute<TestRequestWithResponse, string>(requestData, CancellationToken.None);
+            await _sut.ExecuteAsync<TestRequestWithResponse, string>(requestData, CancellationToken.None);
         }
 
         // Assert

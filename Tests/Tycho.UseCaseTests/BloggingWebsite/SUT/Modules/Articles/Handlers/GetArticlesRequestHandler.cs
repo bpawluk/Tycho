@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Tycho.Persistence.EFCore;
 using Tycho.Requests;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Contract;
 using static Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Contract.GetArticlesRequest;
@@ -10,7 +9,7 @@ internal class GetArticlesRequestHandler(IUnitOfWork unitOfWork) : IRequestHandl
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task<Response> Handle(GetArticlesRequest requestData, CancellationToken cancellationToken)
+    public async Task<Response> HandleAsync(GetArticlesRequest requestData, CancellationToken cancellationToken)
     {
         var articles = _unitOfWork.Set<Domain.Article>();
         var responseArticles = await articles

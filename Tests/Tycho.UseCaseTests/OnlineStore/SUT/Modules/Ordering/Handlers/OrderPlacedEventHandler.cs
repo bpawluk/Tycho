@@ -1,5 +1,4 @@
 ﻿using Tycho.Events;
-using Tycho.Persistence.EFCore;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Domain;
 
@@ -9,10 +8,10 @@ internal class OrderPlacedEventHandler(IUnitOfWork unitOfWork) : IEventHandler<O
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task Handle(OrderPlacedEvent eventData, CancellationToken cancellationToken)
+    public async Task HandleAsync(EventContext<OrderPlacedEvent> context, CancellationToken cancellationToken)
     {
         var orders = _unitOfWork.Set<Order>();
-        var newOrder = new Order(eventData.CustomerId, eventData.Total);
+        var newOrder = new Order(context.Payload.CustomerId, context.Payload.Total);
         orders.Add(newOrder);
         await _unitOfWork.SaveChanges(cancellationToken);
     }

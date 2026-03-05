@@ -1,5 +1,4 @@
 ﻿using Tycho.Events;
-using Tycho.Persistence.EFCore;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Domain;
 
@@ -9,18 +8,18 @@ internal class PostStatusChangedEventHandler(IUnitOfWork unitOfWork) : IEventHan
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task Handle(PostStatusChangedEvent eventData, CancellationToken cancellationToken)
+    public async Task HandleAsync(EventContext<PostStatusChangedEvent> context, CancellationToken cancellationToken)
     {
         await Task.Delay(10, cancellationToken); // Simulate async work
         var posts = _unitOfWork.Set<Post>();
 
-        var post = await posts.FindAsync([eventData.PostId], cancellationToken);
+        var post = await posts.FindAsync([context.Payload.PostId], cancellationToken);
         if (post is null)
         {
-            throw new ArgumentException($"There is no Posts with ID {eventData.PostId}");
+            throw new ArgumentException($"There is no Posts with ID {context.Payload.PostId}");
         }
 
-        post.Status = GetStatus(eventData.NewStatus);
+        post.Status = GetStatus(context.Payload.NewStatus);
         await _unitOfWork.SaveChanges(cancellationToken);
     }
 

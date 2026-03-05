@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Tycho.Persistence.EFCore;
 using Tycho.Requests;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Domain;
@@ -10,7 +9,7 @@ internal class GetUsersRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task<GetUsersRequest.Response> Handle(GetUsersRequest requestData, CancellationToken cancellationToken)
+    public async Task<GetUsersRequest.Response> HandleAsync(GetUsersRequest requestData, CancellationToken cancellationToken)
     {
         await Task.Delay(10, cancellationToken); // Simulate async work
         var users = _unitOfWork.Set<User>();

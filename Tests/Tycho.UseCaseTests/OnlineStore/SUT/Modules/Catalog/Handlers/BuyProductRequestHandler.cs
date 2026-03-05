@@ -1,18 +1,17 @@
-﻿using Tycho.Persistence.EFCore;
-using Tycho.Requests;
-using Tycho.Structure.Parent;
+﻿using Tycho.Requests;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Outgoing;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Domain;
+using static Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.CatalogModule;
 
 namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Handlers;
 
-internal class BuyProductRequestHandler(IParentReference parent, IUnitOfWork unitOfWork) : IRequestHandler<BuyProductRequest>
+internal class BuyProductRequestHandler(IParent parent, IUnitOfWork unitOfWork) : IRequestHandler<BuyProductRequest>
 {
-    private readonly IParentReference _parent = parent;
+    private readonly IParent _parent = parent;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task Handle(BuyProductRequest requestData, CancellationToken cancellationToken)
+    public async Task HandleAsync(BuyProductRequest requestData, CancellationToken cancellationToken)
     {
         var products = _unitOfWork.Set<Product>();
         var productToBuy = await products.FindAsync([requestData.ProductId], cancellationToken);
@@ -23,7 +22,7 @@ internal class BuyProductRequestHandler(IParentReference parent, IUnitOfWork uni
                 requestData.ProductId,
                 requestData.Quantity,
                 productToBuy.Price);
-            await _parent.Execute(addToBasketRequest, cancellationToken);
+            await _parent.ExecuteAsync(addToBasketRequest, cancellationToken);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using Tycho.Persistence.EFCore;
-using Tycho.Requests;
+﻿using Tycho.Requests;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Contract;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Domain;
 using static Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Contract.AddCommentRequest;
@@ -10,7 +9,7 @@ internal class AddCommentRequestHandler(IUnitOfWork unitOfWork) : IRequestHandle
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task<Response> Handle(AddCommentRequest requestData, CancellationToken cancellationToken)
+    public async Task<Response> HandleAsync(AddCommentRequest requestData, CancellationToken cancellationToken)
     {
         var comments = _unitOfWork.Set<Comment>();
         var newComment = new Comment(requestData.Author, requestData.Content);

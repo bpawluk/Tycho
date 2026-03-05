@@ -1,5 +1,4 @@
-﻿using Tycho.Persistence.EFCore;
-using Tycho.Requests;
+﻿using Tycho.Requests;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Domain;
 
@@ -9,7 +8,7 @@ internal class GetPostRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<G
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task<GetPostRequest.Response> Handle(GetPostRequest requestData, CancellationToken cancellationToken)
+    public async Task<GetPostRequest.Response> HandleAsync(GetPostRequest requestData, CancellationToken cancellationToken)
     {
         await Task.Delay(10, cancellationToken); // Simulate async work
         var posts = _unitOfWork.Set<Post>();

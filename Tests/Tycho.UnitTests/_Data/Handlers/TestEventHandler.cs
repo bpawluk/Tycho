@@ -5,7 +5,7 @@ namespace Tycho.UnitTests._Data.Handlers;
 
 internal class TestEventHandler : IEventHandler<TestEvent>
 {
-    public Task Handle(EventContext<TestEvent> context, CancellationToken cancellationToken)
+    public Task HandleAsync(EventContext<TestEvent> context, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }

@@ -5,14 +5,14 @@ namespace Tycho.UnitTests._Data.Handlers;
 
 internal class TestRequestHandler
     : IRequestHandler<TestRequest>
-        , IRequestHandler<TestRequestWithResponse, string>
+    , IRequestHandler<TestRequestWithResponse, string>
 {
-    public Task Handle(TestRequest requestData, CancellationToken cancellationToken)
+    public Task HandleAsync(TestRequest requestData, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }
 
-    public Task<string> Handle(TestRequestWithResponse requestData, CancellationToken cancellationToken)
+    public Task<string> HandleAsync(TestRequestWithResponse requestData, CancellationToken cancellationToken)
     {
         return Task.FromResult(default(string)!);
     }

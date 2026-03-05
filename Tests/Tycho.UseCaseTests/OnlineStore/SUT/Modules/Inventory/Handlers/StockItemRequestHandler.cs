@@ -1,5 +1,4 @@
-﻿using Tycho.Persistence.EFCore;
-using Tycho.Requests;
+﻿using Tycho.Requests;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Incoming;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Outgoing;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Domain;
@@ -10,7 +9,7 @@ internal class StockItemRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task Handle(StockItemRequest requestData, CancellationToken cancellationToken)
+    public async Task HandleAsync(StockItemRequest requestData, CancellationToken cancellationToken)
     {
         var items = _unitOfWork.Set<Item>();
 

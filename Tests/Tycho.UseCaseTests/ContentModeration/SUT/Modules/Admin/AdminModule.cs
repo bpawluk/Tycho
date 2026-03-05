@@ -14,6 +14,8 @@ public partial class AdminModule : TychoModule
     protected override void DefineContract(IModuleContract module)
     {
         module.Handles<RemovePostRequest, RemovePostRequestHandler>();
+
+        module.Requires<GetAuthorRequest, GetAuthorRequest.Response>();
     }
 
     protected override void DefineEvents(IModuleEvents module)

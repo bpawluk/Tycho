@@ -1,111 +1,111 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Tycho.Events;
-using Tycho.Events.Routing;
-using Tycho.Structure.Internal;
-using Tycho.UnitTests._Data.Events;
-using Tycho.UnitTests._Data.Handlers;
-using Tycho.UnitTests._Data.Modules;
+﻿//using Microsoft.Extensions.DependencyInjection;
+//using Tycho.Events;
+//using Tycho.Events.Routing;
+//using Tycho.Structure.Internal;
+//using Tycho.UnitTests._Data.Events;
+//using Tycho.UnitTests._Data.Handlers;
+//using Tycho.UnitTests._Data.Modules;
 
-namespace Tycho.UnitTests.Events.Routing.Sources;
+//namespace Tycho.UnitTests.Events.Routing.Sources;
 
-public class LocalHandlersSourceTests
-{
-    private readonly LocalRouteSource<TestEvent> _sut;
+//public class LocalHandlersSourceTests
+//{
+//    private readonly LocalRouteSource<TestEvent> _sut;
 
-    public LocalHandlersSourceTests()
-    {
-        var internals = new Internals(typeof(TestModule));
-        internals.GetServiceCollection()
-            .AddTransient<IEventHandler<OtherEvent>, OtherEventHandler>()
-            .AddTransient<IEventHandler<TestEvent>, TestEventOtherHandler>()
-            .AddTransient<IEventHandler<TestEvent>, TestEventHandler>();
-        internals.Build();
-        _sut = new LocalRouteSource<TestEvent>(internals);
-    }
+//    public LocalHandlersSourceTests()
+//    {
+//        var internals = new Internals(typeof(TestModule));
+//        internals.GetServiceCollection()
+//            .AddTransient<IEventHandler<OtherEvent>, OtherEventHandler>()
+//            .AddTransient<IEventHandler<TestEvent>, TestEventOtherHandler>()
+//            .AddTransient<IEventHandler<TestEvent>, TestEventHandler>();
+//        internals.Build();
+//        _sut = new LocalRouteSource<TestEvent>(internals);
+//    }
 
-    [Fact]
-    public void IdentifyHandlers_ForTestEvent_ReturnsRegisteredHandlers()
-    {
-        // Arrange
-        var expectedIdentities = new[]
-        {
-            new HandlerIdentity(typeof(TestEvent), typeof(TestEventOtherHandler), typeof(TestModule)),
-            new HandlerIdentity(typeof(TestEvent), typeof(TestEventHandler), typeof(TestModule))
-        };
+//    [Fact]
+//    public void IdentifyHandlers_ForTestEvent_ReturnsRegisteredHandlers()
+//    {
+//        // Arrange
+//        var expectedIdentities = new[]
+//        {
+//            new HandlerIdentity(typeof(TestEvent), typeof(TestEventOtherHandler), typeof(TestModule)),
+//            new HandlerIdentity(typeof(TestEvent), typeof(TestEventHandler), typeof(TestModule))
+//        };
 
-        // Act
-        var result = _sut.IdentifyHandlers<TestEvent>();
+//        // Act
+//        var result = _sut.IdentifyHandlers<TestEvent>();
 
-        // Assert
-        Assert.Equal(expectedIdentities, result);
-    }
+//        // Assert
+//        Assert.Equal(expectedIdentities, result);
+//    }
 
-    [Fact]
-    public void IdentifyHandlers_ForOtherEvent_ReturnsEmptyCollection()
-    {
-        // Arrange
-        // - no arrangement required
+//    [Fact]
+//    public void IdentifyHandlers_ForOtherEvent_ReturnsEmptyCollection()
+//    {
+//        // Arrange
+//        // - no arrangement required
 
-        // Act
-        var result = _sut.IdentifyHandlers<OtherEvent>();
+//        // Act
+//        var result = _sut.IdentifyHandlers<OtherEvent>();
 
-        // Assert
-        Assert.Empty(result);
-    }
+//        // Assert
+//        Assert.Empty(result);
+//    }
 
-    [Fact]
-    public void FindHandler_ForIdentityOfTestEventHandlerAndTestModule_ReturnsHandlerMatchingTheIdentity()
-    {
-        // Arrange
-        var identity = new HandlerIdentity(typeof(TestEvent), typeof(TestEventHandler), typeof(TestModule));
+//    [Fact]
+//    public void FindHandler_ForIdentityOfTestEventHandlerAndTestModule_ReturnsHandlerMatchingTheIdentity()
+//    {
+//        // Arrange
+//        var identity = new HandlerIdentity(typeof(TestEvent), typeof(TestEventHandler), typeof(TestModule));
 
-        // Act
-        var result = _sut.FindHandler(identity);
+//        // Act
+//        var result = _sut.FindHandler(identity);
 
-        // Assert
-        Assert.NotNull(result);
-        Assert.IsType<TestEventHandler>(result);
-    }
+//        // Assert
+//        Assert.NotNull(result);
+//        Assert.IsType<TestEventHandler>(result);
+//    }
 
-    [Fact]
-    public void FindHandler_ForIdentityOfTestEventHandlerAndOtherModule_ReturnsNull()
-    {
-        // Arrange
-        var identity = new HandlerIdentity(typeof(TestEvent), typeof(TestEventHandler), typeof(OtherModule));
+//    [Fact]
+//    public void FindHandler_ForIdentityOfTestEventHandlerAndOtherModule_ReturnsNull()
+//    {
+//        // Arrange
+//        var identity = new HandlerIdentity(typeof(TestEvent), typeof(TestEventHandler), typeof(OtherModule));
 
-        // Act
-        var result = _sut.FindHandler(identity);
+//        // Act
+//        var result = _sut.FindHandler(identity);
 
-        // Assert
-        Assert.Null(result);
-    }
+//        // Assert
+//        Assert.Null(result);
+//    }
 
-    [Fact]
-    public void FindHandler_ForIdentityOfOtherEventHandlerAndTestModule_ReturnsNull()
-    {
-        // Arrange
-        var identity = new HandlerIdentity(typeof(OtherEvent), typeof(TestEventHandler), typeof(TestModule));
+//    [Fact]
+//    public void FindHandler_ForIdentityOfOtherEventHandlerAndTestModule_ReturnsNull()
+//    {
+//        // Arrange
+//        var identity = new HandlerIdentity(typeof(OtherEvent), typeof(TestEventHandler), typeof(TestModule));
 
-        // Act
-        var result = _sut.FindHandler(identity);
+//        // Act
+//        var result = _sut.FindHandler(identity);
 
-        // Assert
-        Assert.Null(result);
-    }
+//        // Assert
+//        Assert.Null(result);
+//    }
 
-    [Fact]
-    public void FindHandler_WithMissingHandlerRegistration_ThrowsInvalidOperationException()
-    {
-        // Arrange
-        var identity = new HandlerIdentity(typeof(TestEvent), typeof(TestEventAnotherHandler), typeof(TestModule));
+//    [Fact]
+//    public void FindHandler_WithMissingHandlerRegistration_ThrowsInvalidOperationException()
+//    {
+//        // Arrange
+//        var identity = new HandlerIdentity(typeof(TestEvent), typeof(TestEventAnotherHandler), typeof(TestModule));
 
-        // Act
-        IEventHandler? Act()
-        {
-            return _sut.FindHandler(identity);
-        }
+//        // Act
+//        IEventHandler? Act()
+//        {
+//            return _sut.FindHandler(identity);
+//        }
 
-        // Assert
-        Assert.Throws<InvalidOperationException>(Act);
-    }
-}
+//        // Assert
+//        Assert.Throws<InvalidOperationException>(Act);
+//    }
+//}

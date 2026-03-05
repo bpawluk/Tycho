@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Tycho.Persistence.EFCore;
 using Tycho.Requests;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Contract;
 using static Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Contract.GetPostsRequest;
@@ -10,7 +9,7 @@ internal class GetPostsRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task<Response> Handle(GetPostsRequest requestData, CancellationToken cancellationToken)
+    public async Task<Response> HandleAsync(GetPostsRequest requestData, CancellationToken cancellationToken)
     {
         var posts = _unitOfWork.Set<Domain.Post>();
         var responsePosts = await posts
