@@ -155,8 +155,8 @@ namespace Tycho.Requests.Registrating
             where THandler : class, IRequestHandler<TRequest>
         {
             if (!TryAddRegistration<
-                    IDownStreamHandlerRegistration<TRequest, TSourceModule>,
-                    DownStreamHandlerRegistration<TRequest, THandler, TSourceModule>>())
+                    IDownStreamRequestRegistration<TRequest, TSourceModule>,
+                    DownStreamRequestRegistration<TRequest, THandler, TSourceModule>>())
             {
                 throw new ArgumentException(
                     $"Request handler for {typeof(TRequest).Name} is already registered",
@@ -170,8 +170,8 @@ namespace Tycho.Requests.Registrating
             where THandler : class, IRequestHandler<TRequest, TResponse>
         {
             if (!TryAddRegistration<
-                    IDownStreamHandlerRegistration<TRequest, TResponse, TSourceModule>,
-                    DownStreamHandlerRegistration<TRequest, TResponse, THandler, TSourceModule>>())
+                    IDownStreamRequestRegistration<TRequest, TResponse, TSourceModule>,
+                    DownStreamRequestRegistration<TRequest, TResponse, THandler, TSourceModule>>())
             {
                 throw new ArgumentException(
                     $"Request handler for {typeof(TRequest).Name} is already registered",

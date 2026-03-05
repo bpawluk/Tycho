@@ -16,7 +16,7 @@ namespace Tycho.Requests.Registrating
         }
 
         private bool TryAddRegistration<THandlerRegistrationInterface, THandlerRegistration>()
-            where THandlerRegistrationInterface : class, IHandlerRegistration
+            where THandlerRegistrationInterface : class, IRequestRegistration
             where THandlerRegistration : class, THandlerRegistrationInterface
         {
             if (_internals.HasService<THandlerRegistrationInterface>())

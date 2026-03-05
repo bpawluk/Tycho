@@ -26,7 +26,7 @@ public class DownStreamBrokerTests
     public void CanExecute_RequestThatIsRegistered_ReturnsTrue(bool buildInternals)
     {
         // Arrange
-        var registrationMock = new Mock<IDownStreamHandlerRegistration<TestRequest, TestModule>>();
+        var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequest, TestModule>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         if (buildInternals)
@@ -47,7 +47,7 @@ public class DownStreamBrokerTests
     public void CanExecute_RequestThatIsRegisteredUpstream_ReturnsFalse(bool buildInternals)
     {
         // Arrange
-        var registrationMock = new Mock<IUpStreamHandlerRegistration<TestRequest>>();
+        var registrationMock = new Mock<IUpStreamRequestRegistration<TestRequest>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         if (buildInternals)
@@ -68,7 +68,7 @@ public class DownStreamBrokerTests
     public void CanExecute_RequestThatIsRegisteredForOtherModule_ReturnsFalse(bool buildInternals)
     {
         // Arrange
-        var registrationMock = new Mock<IDownStreamHandlerRegistration<TestRequest, OtherModule>>();
+        var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         if (buildInternals)
@@ -107,7 +107,7 @@ public class DownStreamBrokerTests
     public void CanExecute_RequestWithResponseThatIsRegistered_ReturnsTrue(bool buildInternals)
     {
         // Arrange
-        var registrationMock = new Mock<IDownStreamHandlerRegistration<TestRequestWithResponse, string, TestModule>>();
+        var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequestWithResponse, string, TestModule>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         if (buildInternals)
@@ -128,7 +128,7 @@ public class DownStreamBrokerTests
     public void CanExecute_RequestWithResponseThatIsRegisteredUpstream_ReturnsFalse(bool buildInternals)
     {
         // Arrange
-        var registrationMock = new Mock<IUpStreamHandlerRegistration<TestRequestWithResponse, string>>();
+        var registrationMock = new Mock<IUpStreamRequestRegistration<TestRequestWithResponse, string>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         if (buildInternals)
@@ -149,7 +149,7 @@ public class DownStreamBrokerTests
     public void CanExecute_RequestWithResponseThatIsRegisteredForOtherModule_ReturnsFalse(bool buildInternals)
     {
         // Arrange
-        var registrationMock = new Mock<IDownStreamHandlerRegistration<TestRequestWithResponse, string, OtherModule>>();
+        var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         if (buildInternals)
@@ -189,7 +189,7 @@ public class DownStreamBrokerTests
         var request = new TestRequest();
         var handlerMock = new Mock<IRequestHandler<TestRequest>>();
 
-        var registrationMock = new Mock<IDownStreamHandlerRegistration<TestRequest, TestModule>>();
+        var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequest, TestModule>>();
         registrationMock.Setup(x => x.Handler).Returns(handlerMock.Object);
 
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
@@ -245,7 +245,7 @@ public class DownStreamBrokerTests
         handlerMock.Setup(h => h.Handle(request, CancellationToken.None))
                    .ReturnsAsync(response);
 
-        var registrationMock = new Mock<IDownStreamHandlerRegistration<TestRequestWithResponse, string, TestModule>>();
+        var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequestWithResponse, string, TestModule>>();
         registrationMock.Setup(x => x.Handler)
                         .Returns(handlerMock.Object);
 

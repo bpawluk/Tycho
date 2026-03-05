@@ -79,8 +79,8 @@ namespace Tycho.Requests.Registrating
             where THandler : class, IRequestHandler<TRequest>
         {
             if (!TryAddRegistration<
-                    IUpStreamHandlerRegistration<TRequest>,
-                    UpStreamHandlerRegistration<TRequest, THandler>>())
+                    IUpStreamRequestRegistration<TRequest>,
+                    UpStreamRequestRegistration<TRequest, THandler>>())
             {
                 throw new ArgumentException(
                     $"Request handler for {typeof(TRequest).Name} already registered",
@@ -93,8 +93,8 @@ namespace Tycho.Requests.Registrating
             where THandler : class, IRequestHandler<TRequest, TResponse>
         {
             if (!TryAddRegistration<
-                    IUpStreamHandlerRegistration<TRequest, TResponse>,
-                    UpStreamHandlerRegistration<TRequest, TResponse, THandler>>())
+                    IUpStreamRequestRegistration<TRequest, TResponse>,
+                    UpStreamRequestRegistration<TRequest, TResponse, THandler>>())
             {
                 throw new ArgumentException(
                     $"Request handler for {typeof(TRequest).Name} already registered",

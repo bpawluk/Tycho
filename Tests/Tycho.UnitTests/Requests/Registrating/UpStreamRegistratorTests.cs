@@ -36,7 +36,7 @@ public class UpStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IUpStreamHandlerRegistration<TestRequest>>();
+        var registration = _internals.GetService<IUpStreamRequestRegistration<TestRequest>>();
         Assert.NotNull(registration);
         Assert.IsType<RequestForwarder<TestRequest, TestModule>>(registration.Handler);
     }
@@ -45,7 +45,7 @@ public class UpStreamRegistratorTests
     public void Forward_ExistingRequest_ThrowsArgumentException()
     {
         // Arrange
-        var registrationMock = new Mock<IUpStreamHandlerRegistration<TestRequest>>();
+        var registrationMock = new Mock<IUpStreamRequestRegistration<TestRequest>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
@@ -67,7 +67,7 @@ public class UpStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IUpStreamHandlerRegistration<TestRequestWithResponse, string>>();
+        var registration = _internals.GetService<IUpStreamRequestRegistration<TestRequestWithResponse, string>>();
         Assert.NotNull(registration);
         Assert.IsType<RequestForwarder<TestRequestWithResponse, string, TestModule>>(registration.Handler);
     }
@@ -76,7 +76,7 @@ public class UpStreamRegistratorTests
     public void Forward_ExistingRequestWithResponse_ThrowsArgumentException()
     {
         // Arrange
-        var registrationMock = new Mock<IUpStreamHandlerRegistration<TestRequestWithResponse, string>>();
+        var registrationMock = new Mock<IUpStreamRequestRegistration<TestRequestWithResponse, string>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
@@ -99,7 +99,7 @@ public class UpStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IUpStreamHandlerRegistration<TestRequest>>();
+        var registration = _internals.GetService<IUpStreamRequestRegistration<TestRequest>>();
         Assert.NotNull(registration);
         Assert.IsType<MappedRequestForwarder<TestRequest, OtherRequest, TestModule>>(registration.Handler);
     }
@@ -109,7 +109,7 @@ public class UpStreamRegistratorTests
     {
         // Arrange
         var mapMock = new Mock<Func<TestRequest, OtherRequest>>();
-        var registrationMock = new Mock<IUpStreamHandlerRegistration<TestRequest>>();
+        var registrationMock = new Mock<IUpStreamRequestRegistration<TestRequest>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
@@ -140,7 +140,7 @@ public class UpStreamRegistratorTests
 
         // Assert
         var registration = _internals
-            .GetService<IUpStreamHandlerRegistration<TestRequestWithResponse, string>>();
+            .GetService<IUpStreamRequestRegistration<TestRequestWithResponse, string>>();
         Assert.NotNull(registration);
         Assert.IsType<MappedRequestForwarder<
             TestRequestWithResponse, string,
@@ -155,7 +155,7 @@ public class UpStreamRegistratorTests
         // Arrange
         var mapRequestMock = new Mock<Func<TestRequestWithResponse, OtherRequestWithResponse>>();
         var mapResponseMock = new Mock<Func<string, string>>();
-        var registrationMock = new Mock<IUpStreamHandlerRegistration<TestRequestWithResponse, string>>();
+        var registrationMock = new Mock<IUpStreamRequestRegistration<TestRequestWithResponse, string>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
@@ -180,7 +180,7 @@ public class UpStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IUpStreamHandlerRegistration<TestRequest>>();
+        var registration = _internals.GetService<IUpStreamRequestRegistration<TestRequest>>();
         Assert.NotNull(registration);
         Assert.IsType<ScopedRequestHandler<TestRequest, TestRequestHandler>>(registration.Handler);
     }
@@ -189,7 +189,7 @@ public class UpStreamRegistratorTests
     public void Handle_ExistingRequest_ThrowsArgumentException()
     {
         // Arrange
-        var registrationMock = new Mock<IUpStreamHandlerRegistration<TestRequest>>();
+        var registrationMock = new Mock<IUpStreamRequestRegistration<TestRequest>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
@@ -211,7 +211,7 @@ public class UpStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IUpStreamHandlerRegistration<TestRequestWithResponse, string>>();
+        var registration = _internals.GetService<IUpStreamRequestRegistration<TestRequestWithResponse, string>>();
         Assert.NotNull(registration);
         Assert.IsType<ScopedRequestHandler<TestRequestWithResponse, string, TestRequestHandler>>(registration.Handler);
     }
@@ -220,7 +220,7 @@ public class UpStreamRegistratorTests
     public void Handle_ExistingRequestWithResponse_ThrowsArgumentException()
     {
         // Arrange
-        var registrationMock = new Mock<IUpStreamHandlerRegistration<TestRequestWithResponse, string>>();
+        var registrationMock = new Mock<IUpStreamRequestRegistration<TestRequestWithResponse, string>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act

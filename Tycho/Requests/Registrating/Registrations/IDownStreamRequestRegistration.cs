@@ -2,15 +2,15 @@
 
 namespace Tycho.Requests.Registrating.Registrations
 {
-    internal interface IDownStreamHandlerRegistration<TRequest, TModule> 
-        : IHandlerRegistration<TRequest>
+    internal interface IDownStreamRequestRegistration<TRequest, TModule> 
+        : IRequestRegistration<TRequest>
         where TRequest : class, IRequest
         where TModule : TychoModule
     {
     }
 
-    internal interface IDownStreamHandlerRegistration<TRequest, TResponse, TModule> 
-        : IHandlerRegistration<TRequest, TResponse>
+    internal interface IDownStreamRequestRegistration<TRequest, TResponse, TModule> 
+        : IRequestRegistration<TRequest, TResponse>
         where TRequest : class, IRequest<TResponse>
         where TModule : TychoModule
     {

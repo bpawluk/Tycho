@@ -26,7 +26,7 @@ public class UpStreamBrokerTests
     public void CanExecute_RequestThatIsRegistered_ReturnsTrue(bool buildInternals)
     {
         // Arrange
-        var registrationMock = new Mock<IUpStreamHandlerRegistration<TestRequest>>();
+        var registrationMock = new Mock<IUpStreamRequestRegistration<TestRequest>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         if (buildInternals)
@@ -47,7 +47,7 @@ public class UpStreamBrokerTests
     public void CanExecute_RequestThatIsRegisteredDownstream_ReturnsFalse(bool buildInternals)
     {
         // Arrange
-        var registrationMock = new Mock<IDownStreamHandlerRegistration<TestRequest, TestModule>>();
+        var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequest, TestModule>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         if (buildInternals)
@@ -86,7 +86,7 @@ public class UpStreamBrokerTests
     public void CanExecute_RequestWithResponseThatIsRegistered_ReturnsTrue(bool buildInternals)
     {
         // Arrange
-        var registrationMock = new Mock<IUpStreamHandlerRegistration<TestRequestWithResponse, string>>();
+        var registrationMock = new Mock<IUpStreamRequestRegistration<TestRequestWithResponse, string>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         if (buildInternals)
@@ -107,7 +107,7 @@ public class UpStreamBrokerTests
     public void CanExecute_RequestWithResponseThatIsRegisteredDownstream_ReturnsFalse(bool buildInternals)
     {
         // Arrange
-        var registrationMock = new Mock<IDownStreamHandlerRegistration<TestRequestWithResponse, string, TestModule>>();
+        var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequestWithResponse, string, TestModule>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         if (buildInternals)
@@ -147,7 +147,7 @@ public class UpStreamBrokerTests
         var request = new TestRequest();
         var handlerMock = new Mock<IRequestHandler<TestRequest>>();
 
-        var registrationMock = new Mock<IUpStreamHandlerRegistration<TestRequest>>();
+        var registrationMock = new Mock<IUpStreamRequestRegistration<TestRequest>>();
         registrationMock.Setup(x => x.Handler)
                         .Returns(handlerMock.Object);
 
@@ -204,7 +204,7 @@ public class UpStreamBrokerTests
         handlerMock.Setup(h => h.Handle(request, CancellationToken.None))
                    .ReturnsAsync(response);
 
-        var registrationMock = new Mock<IUpStreamHandlerRegistration<TestRequestWithResponse, string>>();
+        var registrationMock = new Mock<IUpStreamRequestRegistration<TestRequestWithResponse, string>>();
         registrationMock.Setup(x => x.Handler)
                         .Returns(handlerMock.Object);
 

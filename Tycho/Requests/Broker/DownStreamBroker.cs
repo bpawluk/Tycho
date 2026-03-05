@@ -20,26 +20,26 @@ namespace Tycho.Requests.Broker
         public bool CanExecute<TRequest>()
             where TRequest : class, IRequest
         {
-            return _internals.HasService<IDownStreamHandlerRegistration<TRequest, TModule>>();
+            return _internals.HasService<IDownStreamRequestRegistration<TRequest, TModule>>();
         }
 
         public bool CanExecute<TRequest, TResponse>()
             where TRequest : class, IRequest<TResponse>
         {
-            return _internals.HasService<IDownStreamHandlerRegistration<TRequest, TResponse, TModule>>();
+            return _internals.HasService<IDownStreamRequestRegistration<TRequest, TResponse, TModule>>();
         }
 
         public Task ExecuteAsync<TRequest>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest
         {
-            var registration = _internals.GetRequiredService<IDownStreamHandlerRegistration<TRequest, TModule>>();
+            var registration = _internals.GetRequiredService<IDownStreamRequestRegistration<TRequest, TModule>>();
             return registration.Handler.HandleAsync(requestData, cancellationToken);
         }
 
         public Task<TResponse> ExecuteAsync<TRequest, TResponse>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest<TResponse>
         {
-            var registration = _internals.GetRequiredService<IDownStreamHandlerRegistration<TRequest, TResponse, TModule>>();
+            var registration = _internals.GetRequiredService<IDownStreamRequestRegistration<TRequest, TResponse, TModule>>();
             return registration.Handler.HandleAsync(requestData, cancellationToken);
         }
     }

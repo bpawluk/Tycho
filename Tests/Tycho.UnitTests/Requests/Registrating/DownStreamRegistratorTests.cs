@@ -36,7 +36,7 @@ public class DownStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IDownStreamHandlerRegistration<TestRequest, OtherModule>>();
+        var registration = _internals.GetService<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<RequestExposer<TestRequest>>(registration.Handler);
     }
@@ -45,7 +45,7 @@ public class DownStreamRegistratorTests
     public void Expose_ExistingRequest_ThrowsArgumentException()
     {
         // Arrange
-        var registrationMock = new Mock<IDownStreamHandlerRegistration<TestRequest, OtherModule>>();
+        var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
@@ -67,7 +67,7 @@ public class DownStreamRegistratorTests
 
         // Assert
         var registration = _internals.GetService<
-            IDownStreamHandlerRegistration<TestRequestWithResponse, string, OtherModule>>();
+            IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<RequestExposer<TestRequestWithResponse, string>>(registration.Handler);
     }
@@ -76,7 +76,7 @@ public class DownStreamRegistratorTests
     public void Expose_ExistingRequestWithResponse_ThrowsArgumentException()
     {
         // Arrange
-        var registrationMock = new Mock<IDownStreamHandlerRegistration<TestRequestWithResponse, string, OtherModule>>();
+        var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
@@ -98,7 +98,7 @@ public class DownStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IDownStreamHandlerRegistration<TestRequest, OtherModule>>();
+        var registration = _internals.GetService<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<MappedRequestExposer<TestRequest, OtherRequest>>(registration.Handler);
     }
@@ -108,7 +108,7 @@ public class DownStreamRegistratorTests
     {
         // Arrange
         var mapMock = new Mock<Func<TestRequest, OtherRequest>>();
-        var registrationMock = new Mock<IDownStreamHandlerRegistration<TestRequest, OtherModule>>();
+        var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
@@ -136,7 +136,7 @@ public class DownStreamRegistratorTests
 
         // Assert
         var registration = _internals.GetService<
-            IDownStreamHandlerRegistration<TestRequestWithResponse, string, OtherModule>>();
+            IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<MappedRequestExposer<
             TestRequestWithResponse, string,
@@ -150,7 +150,7 @@ public class DownStreamRegistratorTests
         // Arrange
         var mapRequestMock = new Mock<Func<TestRequestWithResponse, OtherRequestWithResponse>>();
         var mapResponseMock = new Mock<Func<string, string>>();
-        var registrationMock = new Mock<IDownStreamHandlerRegistration<TestRequestWithResponse, string, OtherModule>>();
+        var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
@@ -176,7 +176,7 @@ public class DownStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IDownStreamHandlerRegistration<TestRequest, OtherModule>>();
+        var registration = _internals.GetService<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<RequestForwarder<TestRequest, TestModule>>(registration.Handler);
     }
@@ -185,7 +185,7 @@ public class DownStreamRegistratorTests
     public void Forward_ExistingRequest_ThrowsArgumentException()
     {
         // Arrange
-        var registrationMock = new Mock<IDownStreamHandlerRegistration<TestRequest, OtherModule>>();
+        var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
@@ -208,7 +208,7 @@ public class DownStreamRegistratorTests
 
         // Assert
         var registration = _internals
-            .GetService<IDownStreamHandlerRegistration<TestRequestWithResponse, string, OtherModule>>();
+            .GetService<IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<RequestForwarder<TestRequestWithResponse, string, TestModule>>(registration.Handler);
     }
@@ -217,7 +217,7 @@ public class DownStreamRegistratorTests
     public void Forward_ExistingRequestWithResponse_ThrowsArgumentException()
     {
         // Arrange
-        var registrationMock = new Mock<IDownStreamHandlerRegistration<TestRequestWithResponse, string, OtherModule>>();
+        var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
@@ -240,7 +240,7 @@ public class DownStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IDownStreamHandlerRegistration<TestRequest, OtherModule>>();
+        var registration = _internals.GetService<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<MappedRequestForwarder<TestRequest, OtherRequest, TestModule>>(registration.Handler);
     }
@@ -250,7 +250,7 @@ public class DownStreamRegistratorTests
     {
         // Arrange
         var mapMock = new Mock<Func<TestRequest, OtherRequest>>();
-        var registrationMock = new Mock<IDownStreamHandlerRegistration<TestRequest, OtherModule>>();
+        var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
@@ -282,7 +282,7 @@ public class DownStreamRegistratorTests
 
         // Assert
         var registration = _internals
-            .GetService<IDownStreamHandlerRegistration<TestRequestWithResponse, string, OtherModule>>();
+            .GetService<IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<MappedRequestForwarder<
             TestRequestWithResponse, string, 
@@ -297,7 +297,7 @@ public class DownStreamRegistratorTests
         // Arrange
         var mapRequestMock = new Mock<Func<TestRequestWithResponse, OtherRequestWithResponse>>();
         var mapResponseMock = new Mock<Func<string, string>>();
-        var registrationMock = new Mock<IDownStreamHandlerRegistration<TestRequestWithResponse, string, OtherModule>>();
+        var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
@@ -323,7 +323,7 @@ public class DownStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IDownStreamHandlerRegistration<TestRequest, OtherModule>>();
+        var registration = _internals.GetService<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<ScopedRequestHandler<TestRequest, TestRequestHandler>>(registration.Handler);
     }
@@ -332,7 +332,7 @@ public class DownStreamRegistratorTests
     public void Handle_ExistingRequest_ThrowsArgumentException()
     {
         // Arrange
-        var registrationMock = new Mock<IDownStreamHandlerRegistration<TestRequest, OtherModule>>();
+        var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
@@ -355,7 +355,7 @@ public class DownStreamRegistratorTests
 
         // Assert
         var registration = _internals.GetService<
-            IDownStreamHandlerRegistration<TestRequestWithResponse, string, OtherModule>>();
+            IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<ScopedRequestHandler<TestRequestWithResponse, string, TestRequestHandler>>(registration.Handler);
     }
@@ -364,7 +364,7 @@ public class DownStreamRegistratorTests
     public void Handle_ExistingRequestWithResponse_ThrowsArgumentException()
     {
         // Arrange
-        var registrationMock = new Mock<IDownStreamHandlerRegistration<TestRequestWithResponse, string, OtherModule>>();
+        var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
@@ -385,7 +385,7 @@ public class DownStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IDownStreamHandlerRegistration<TestRequest, OtherModule>>();
+        var registration = _internals.GetService<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<RequestIgnorer<TestRequest>>(registration.Handler);
     }
@@ -394,7 +394,7 @@ public class DownStreamRegistratorTests
     public void Ignore_ExistingRequest_ThrowsArgumentException()
     {
         // Arrange
-        var registrationMock = new Mock<IDownStreamHandlerRegistration<TestRequest, OtherModule>>();
+        var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
@@ -416,7 +416,7 @@ public class DownStreamRegistratorTests
 
         // Assert
         var registration = _internals.GetService<
-            IDownStreamHandlerRegistration<TestRequestWithResponse, string, OtherModule>>();
+            IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<RequestIgnorer<TestRequestWithResponse, string>>(registration.Handler);
     }
@@ -425,7 +425,7 @@ public class DownStreamRegistratorTests
     public void Ignore_ExistingRequestWithResponse_ThrowsArgumentException()
     {
         // Arrange
-        var registrationMock = new Mock<IDownStreamHandlerRegistration<TestRequestWithResponse, string, OtherModule>>();
+        var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
         _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
 
         // Act
