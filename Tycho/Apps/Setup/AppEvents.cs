@@ -56,6 +56,7 @@ namespace Tycho.Apps.Setup
             services.AddSingleton<OutboxActivity>();
             services.AddSingleton<OutboxProcessor>();
             services.AddTransient<OutboxProcessorJob>();
+            services.AddTransient<OutboxProcessorJobFactory>();
 
             if (!_internals.HasService<IInboxWriter>() || !_internals.HasService<IInboxConsumer>())
             {
@@ -67,6 +68,7 @@ namespace Tycho.Apps.Setup
             services.AddSingleton<InboxActivity>();
             services.AddSingleton<InboxProcessor>();
             services.AddTransient<InboxProcessorJob>();
+            services.AddTransient<InboxProcessorJobFactory>();
 
             services.AddTransient<IEventBroker, EventBroker>();
             services.AddTransient<IEventPublisher, EventPublisher>();

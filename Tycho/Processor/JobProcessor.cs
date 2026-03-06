@@ -1,66 +1,100 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Tycho.Processor
 {
     internal sealed class JobProcessor : IDisposable
     {
-        private readonly IJob _job;
-        private readonly JobProcessorSettings _settings;
-
         private readonly Timer _timer;
 
-        private readonly object _timerChangeLock;
-        private readonly SemaphoreSlim _processingSemaphore;
+        private readonly IJobFactory _jobFactory;
+        private readonly JobProcessorSettings _settings;
+
+        private readonly SemaphoreSlim _timerElapsedSemaphore = new SemaphoreSlim(1, 1);
+        private readonly object _timerChangeLock = new object();
 
         private TimeSpan _currentInterval = Timeout.InfiniteTimeSpan;
+        private int _jobsInProgress = 0;
 
-        public event EventHandler<Exception>? OnError;
+        public event EventHandler<Exception>? OnScheduleProcessingError;
+        public event EventHandler<Exception>? OnJobProcessingError;
 
-        public JobProcessor(IJob job, JobProcessorSettings settings)
+        public JobProcessor(IJobFactory jobFactory, JobProcessorSettings settings)
         {
-            _job = job;
+            _timer = new Timer(TimerElapsed, null, Timeout.Infinite, Timeout.Infinite);
+            _jobFactory = jobFactory;
             _settings = settings;
-
-            _timer = new Timer(TimerCallback, null, Timeout.Infinite, Timeout.Infinite);
-
-            _timerChangeLock = new object();
-            _processingSemaphore = new SemaphoreSlim(1, 1);
         }
 
         public void Activate() => ResetInterval();
 
-        private async void TimerCallback(object? _)
+        private async void TimerElapsed(object? _)
         {
-            if (await _processingSemaphore.WaitAsync(0).ConfigureAwait(false))
+            if (await _timerElapsedSemaphore.WaitAsync(0).ConfigureAwait(false))
             {
+                using var cts = new CancellationTokenSource(_settings.ScheduleProcessingTimeout);
                 try
                 {
-                    using var cancellationTokenSource = new CancellationTokenSource(_settings.ProcessingTimeout);
+                    var capacity = _settings.ConcurrencyLimit - Volatile.Read(ref _jobsInProgress);
+                    if (capacity > 0)
+                    {
+                        var newJobs = await _jobFactory
+                            .CreateJobsAsync(capacity, cts.Token)
+                            .ConfigureAwait(false);
 
-                    var processed = await _job.ExecuteAsync(cancellationTokenSource.Token).ConfigureAwait(false);
-                    if (processed)
-                    {
-                        ResetInterval();
-                    }
-                    else
-                    {
-                        IncreaseInterval();
+                        if (newJobs.Count > 0)
+                        {
+                            foreach (var job in newJobs)
+                            {
+                                StartJob(job);
+                            }
+                            ResetInterval();
+                        }
+                        else
+                        {
+                            IncreaseInterval();
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
                     try
                     {
-                        OnError?.Invoke(this, ex);
+                        OnScheduleProcessingError?.Invoke(this, ex);
                     }
                     catch { }
                 }
                 finally
                 {
-                    _processingSemaphore.Release();
+                    _timerElapsedSemaphore.Release();
                 }
             }
+        }
+
+        private void StartJob(IJob job)
+        {
+            Interlocked.Increment(ref _jobsInProgress);
+            Task.Run(async () =>
+            {
+                using var cts = new CancellationTokenSource(_settings.JobProcessingTimeout);
+                try
+                {
+                    await job.ExecuteAsync(cts.Token);
+                }
+                catch (Exception ex)
+                {
+                    try
+                    {
+                        OnJobProcessingError?.Invoke(this, ex);
+                    }
+                    catch { }
+                }
+                finally
+                {
+                    Interlocked.Decrement(ref _jobsInProgress);
+                }
+            });
         }
 
         private void ResetInterval()
@@ -83,8 +117,7 @@ namespace Tycho.Processor
 
                 if (newInterval > _settings.MaxInterval)
                 {
-                    // stop processing
-                    newInterval = Timeout.InfiniteTimeSpan; 
+                    newInterval = Timeout.InfiniteTimeSpan;
                 }
 
                 _currentInterval = newInterval;
@@ -98,7 +131,7 @@ namespace Tycho.Processor
             _timer.Dispose(timerDisposal);
 
             timerDisposal.WaitOne();
-            _processingSemaphore.Dispose();
+            _timerElapsedSemaphore.Dispose();
         }
     }
 }

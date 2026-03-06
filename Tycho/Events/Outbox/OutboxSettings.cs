@@ -5,24 +5,30 @@ namespace Tycho.Events.Outbox
     /// <summary>
     /// Settings for Tycho outbox processor.
     /// </summary>
-    public class OutboxProcessorSettings
+    public class OutboxSettings
     {
         /// <summary>
         /// Gets the default settings instance.
         /// </summary>
-        public static OutboxProcessorSettings Default => new OutboxProcessorSettings();
+        public static OutboxSettings Default => new OutboxSettings();
 
         /// <summary>
-        /// Gets or sets the batch size for the outbox processor.
+        /// Gets or sets the concurrency limit for the inbox processor.
         /// </summary>
-        /// <value>The number of messages to read from the outbox in each processor iteration.</value>
-        public int BatchSize { get; set; } = 5;
+        /// <value>The maximum number of messages being processed in parallel.</value>
+        public int ConcurrencyLimit { get; set; } = 10;
 
         /// <summary>
         /// Gets or sets the initial polling interval for the outbox processor.
         /// </summary>
         /// <value>The initial time interval between outbox processor iterations.</value>
         public TimeSpan InitialPollingInterval { get; set; } = TimeSpan.FromSeconds(0.1);
+
+        /// <summary>
+        /// Gets or sets the polling interval multiplier for the outbox processor.
+        /// </summary>
+        /// <value>The factor by which the polling interval increases when the outbox processor is idle.</value>
+        public double PollingIntervalMultiplier { get; set; } = 2.0;
 
         /// <summary>
         /// Gets or sets the maximum polling interval for the outbox processor.
@@ -36,15 +42,9 @@ namespace Tycho.Events.Outbox
         public TimeSpan MaxPollingInterval { get; set; } = TimeSpan.FromSeconds(2);
 
         /// <summary>
-        /// Gets or sets the polling interval multiplier for the outbox processor.
-        /// </summary>
-        /// <value>The factor by which the polling interval increases when the outbox processor is idle.</value>
-        public double PollingIntervalMultiplier { get; set; } = 2.0;
-
-        /// <summary>
         /// Gets or sets the processing timeout for the outbox processor.
         /// </summary>
-        /// <value>The maximum duration of a single outbox processor iteration.</value>
-        public TimeSpan ProcessingTimeout { get; set; } = TimeSpan.FromSeconds(5);
+        /// <value>The maximum duration of processing a single outbox message.</value>
+        public TimeSpan MessageProcessingTimeout { get; set; } = TimeSpan.FromSeconds(5);
     }
 }

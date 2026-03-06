@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -12,49 +11,45 @@ namespace Tycho.Events.Outbox
 {
     internal class OutboxProcessorJob : IJob
     {
-        private readonly IOutboxConsumer _outboxConsumer;
-        private readonly IEventBroker _eventBroker;
-        private readonly OutboxProcessorSettings _settings;
-        private readonly ILogger<OutboxProcessorJob> _logger;   
+        private readonly IOutboxConsumer _outbox;
+        private readonly IEventBroker _broker;
+        private readonly ILogger<OutboxProcessorJob> _logger;
+
+        private RoutedEvent? _event;
 
         public OutboxProcessorJob(
-            IOutboxConsumer outboxConsumer,
-            IEventBroker eventBroker,
-            OutboxProcessorSettings? settings = null,
+            IOutboxConsumer outbox,
+            IEventBroker broker,
             ILogger<OutboxProcessorJob>? logger = null)
         {
-            _outboxConsumer = outboxConsumer;
-            _eventBroker = eventBroker;
-            _settings = settings ?? OutboxProcessorSettings.Default;
+            _outbox = outbox;
+            _broker = broker;
             _logger = logger ?? NullLogger<OutboxProcessorJob>.Instance;
         }
 
-        public async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
+        public OutboxProcessorJob ForEvent(RoutedEvent routedEvent)
         {
-            var entriesRead = await _outboxConsumer.Read(_settings.BatchSize, cancellationToken).ConfigureAwait(false);
-            if (entriesRead.Any())
-            {
-                var deliveryTasks = entriesRead.Select(entry => DeliverEntryAsync(entry, cancellationToken));
-                await Task.WhenAll(deliveryTasks).ConfigureAwait(false);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            _event = routedEvent;
+            return this;
         }
 
-        private async Task DeliverEntryAsync(RoutedEvent routedEvent, CancellationToken cancellationToken)
+        public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            try 
+            if (_event is null)
             {
-                await routedEvent.DeliverAsync(_eventBroker, cancellationToken).ConfigureAwait(false);
-                await _outboxConsumer.MarkAsDelivered(routedEvent.Id, cancellationToken).ConfigureAwait(false);
+                _logger.LogWarning("No event assigned for processing. Skipping execution.");
+                return;
             }
-            catch (Exception ex) 
+
+            try
             {
-                _logger.LogError(ex, "Failed to deliver outbox entry with ID {entryId}", routedEvent.Id);
-                await _outboxConsumer.MarkAsFailed(routedEvent.Id, cancellationToken).ConfigureAwait(false);
+                await _event.DeliverAsync(_broker, cancellationToken).ConfigureAwait(false);
+                await _outbox.MarkAsDelivered(_event.Id, cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to deliver outbox entry with ID {entryId}", _event.Id);
+                await _outbox.MarkAsFailed(_event.Id, cancellationToken).ConfigureAwait(false);
             }
         }
     }

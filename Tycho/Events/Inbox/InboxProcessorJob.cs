@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -13,56 +11,44 @@ namespace Tycho.Events.Inbox
 {
     internal class InboxProcessorJob : IJob
     {
-        private readonly IInboxConsumer _inboxConsumer;
-        private readonly IEventDispatcher _handlingDispatcher;
-        private readonly InboxProcessorSettings _settings;
+        private readonly IInboxConsumer _inbox;
+        private readonly IEventDispatcher _dispatcher;
         private readonly ILogger<InboxProcessorJob> _logger;
 
-        private readonly List<Task> _entriesInProcessing = new List<Task>();
+        private RoutedEvent? _event;
 
         public InboxProcessorJob(
-            IInboxConsumer inboxConsumer,
-            IEventDispatcher handlingDispatcher,
-            InboxProcessorSettings? settings = null,
+            IInboxConsumer inbox,
+            IEventDispatcher dispatcher,
             ILogger<InboxProcessorJob>? logger = null)
         {
-            _inboxConsumer = inboxConsumer;
-            _handlingDispatcher = handlingDispatcher;
-            _settings = settings ?? InboxProcessorSettings.Default;
+            _inbox = inbox;
+            _dispatcher = dispatcher;
             _logger = logger ?? NullLogger<InboxProcessorJob>.Instance;
         }
 
-        public async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
+        public InboxProcessorJob ForEvent(RoutedEvent routedEvent)
         {
-            _entriesInProcessing.RemoveAll(t => t.IsCompleted);
-
-            var newEntriesCount = 0;
-            var entriesInProcessingCount = _entriesInProcessing.Count;
-
-            var entriesToFetch = Math.Min(_settings.ConcurrencyLimit - entriesInProcessingCount, _settings.BatchSize);
-            if (entriesToFetch > 0)
-            {
-                var newEntries = await _inboxConsumer.Read(entriesToFetch, cancellationToken).ConfigureAwait(false);
-                newEntriesCount = newEntries.Count;
-
-                var newEntriesInProcessing = newEntries.Select(entry => HandleEntryAsync(entry, cancellationToken));
-                _entriesInProcessing.AddRange(newEntriesInProcessing);
-            }
-
-            return newEntriesCount > 0 || entriesInProcessingCount > 0;
+            _event = routedEvent;
+            return this;
         }
 
-        private async Task HandleEntryAsync(RoutedEvent routedEvent, CancellationToken cancellationToken)
+        public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
+            if (_event is null)
+            {
+                _logger.LogWarning("No event assigned for processing. Skipping execution.");
+                return;
+            }
+
             try
             {
-                // TODO: Handler timeout support
-                await routedEvent.DispatchAsync(_handlingDispatcher, cancellationToken).ConfigureAwait(false);
+                await _event!.DispatchAsync(_dispatcher, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to process inbox entry with ID {entryId}", routedEvent.Id);
-                await _inboxConsumer.MarkAsFailed(routedEvent.Id, cancellationToken).ConfigureAwait(false);
+                _logger.LogError(ex, "Failed to process inbox entry with ID {entryId}", _event.Id);
+                await _inbox.MarkAsFailed(_event.Id, cancellationToken).ConfigureAwait(false);
             }
         }
     }

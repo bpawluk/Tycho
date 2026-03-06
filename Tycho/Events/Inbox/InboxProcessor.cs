@@ -10,19 +10,23 @@ namespace Tycho.Events.Inbox
 
         public InboxProcessor(
             InboxActivity inboxActivity,
-            InboxProcessorJob outboxProcessorJob, 
-            InboxProcessorSettings? settings = null)
+            InboxProcessorJobFactory inboxJobFactory, 
+            InboxSettings? inboxSettings = null)
         {
-            settings ??= InboxProcessorSettings.Default;
-
-            var jobProcessorSettings = new JobProcessorSettings(
-                settings.InitialPollingInterval,
-                settings.PollingIntervalMultiplier,
-                settings.MaxPollingInterval,
-                settings.ProcessingTimeout);
-
-            _jobProcessor = new JobProcessor(outboxProcessorJob, jobProcessorSettings);
             _inboxActivity = inboxActivity;
+
+            inboxSettings ??= InboxSettings.Default;
+            var jobProcessorSettings = new JobProcessorSettings()
+            {
+                ConcurrencyLimit = inboxSettings.ConcurrencyLimit,
+                InitialInterval = inboxSettings.InitialPollingInterval,
+                IntervalMultiplier = inboxSettings.PollingIntervalMultiplier,
+                MaxInterval = inboxSettings.MaxPollingInterval,
+                JobProcessingTimeout = inboxSettings.MessageProcessingTimeout,
+                ScheduleProcessingTimeout = inboxSettings.MessageProcessingTimeout,
+            };
+
+            _jobProcessor = new JobProcessor(inboxJobFactory, jobProcessorSettings);
         }
 
         public void Initialize() => _inboxActivity.NewEntriesAdded += OnEntriesAdded;

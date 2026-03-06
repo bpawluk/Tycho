@@ -5,6 +5,6 @@ namespace Tycho.Processor
 {
     internal interface IJob
     {
-        Task<bool> ExecuteAsync(CancellationToken cancellationToken);
+        Task ExecuteAsync(CancellationToken cancellationToken);
     }
 }

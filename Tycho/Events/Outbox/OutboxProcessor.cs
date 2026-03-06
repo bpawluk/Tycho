@@ -1,4 +1,5 @@
 ﻿using System;
+using Tycho.Events.Outbox;
 using Tycho.Processor;
 
 namespace Tycho.Events.Outbox
@@ -10,19 +11,23 @@ namespace Tycho.Events.Outbox
 
         public OutboxProcessor(
             OutboxActivity outboxActivity,
-            OutboxProcessorJob outboxProcessorJob, 
-            OutboxProcessorSettings? settings = null)
+            OutboxProcessorJobFactory outboxJobFactory,
+            OutboxSettings? outboxSettings = null)
         {
-            settings ??= OutboxProcessorSettings.Default;
-
-            var jobProcessorSettings = new JobProcessorSettings(
-                settings.InitialPollingInterval,
-                settings.PollingIntervalMultiplier,
-                settings.MaxPollingInterval,
-                settings.ProcessingTimeout);
-
-            _jobProcessor = new JobProcessor(outboxProcessorJob, jobProcessorSettings);
             _outboxActivity = outboxActivity;
+
+            outboxSettings ??= OutboxSettings.Default;
+            var jobProcessorSettings = new JobProcessorSettings()
+            {
+                ConcurrencyLimit = outboxSettings.ConcurrencyLimit,
+                InitialInterval = outboxSettings.InitialPollingInterval,
+                IntervalMultiplier = outboxSettings.PollingIntervalMultiplier,
+                MaxInterval = outboxSettings.MaxPollingInterval,
+                JobProcessingTimeout = outboxSettings.MessageProcessingTimeout,
+                ScheduleProcessingTimeout = outboxSettings.MessageProcessingTimeout,
+            };
+
+            _jobProcessor = new JobProcessor(outboxJobFactory, jobProcessorSettings);
         }
 
         public void Initialize() => _outboxActivity.NewEntriesAdded += OnEntriesAdded;

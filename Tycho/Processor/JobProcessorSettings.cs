@@ -4,24 +4,16 @@ namespace Tycho.Processor
 {
     internal class JobProcessorSettings
     {
-        public TimeSpan InitialInterval { get; set; }
+        public int ConcurrencyLimit { get; set; } = 100;
 
-        public double IntervalMultiplier { get; set; }
+        public TimeSpan InitialInterval { get; set; } = TimeSpan.FromSeconds(1);
 
-        public TimeSpan MaxInterval { get; set; }
+        public double IntervalMultiplier { get; set; } = 2;
 
-        public TimeSpan ProcessingTimeout { get; set; }
+        public TimeSpan MaxInterval { get; set; } = TimeSpan.FromSeconds(5);
 
-        public JobProcessorSettings(
-            TimeSpan initialInterval,
-            double intervalMultiplier,
-            TimeSpan maxInterval,
-            TimeSpan processingTimeout)
-        {
-            InitialInterval = initialInterval;
-            IntervalMultiplier = intervalMultiplier;
-            MaxInterval = maxInterval;
-            ProcessingTimeout = processingTimeout;
-        }
+        public TimeSpan ScheduleProcessingTimeout { get; set; } = TimeSpan.FromSeconds(10);
+
+        public TimeSpan JobProcessingTimeout { get; set; } = TimeSpan.FromSeconds(10);
     }
 }
