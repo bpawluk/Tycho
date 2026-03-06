@@ -11,7 +11,7 @@ namespace Tycho.Processor
         private readonly IJobFactory _jobFactory;
         private readonly JobProcessorSettings _settings;
 
-        private readonly SemaphoreSlim _timerElapsedSemaphore = new SemaphoreSlim(1, 1);
+        private readonly SemaphoreSlim _scheduleProcessingSemaphore = new SemaphoreSlim(1, 1);
         private readonly object _timerChangeLock = new object();
 
         private TimeSpan _currentInterval = Timeout.InfiniteTimeSpan;
@@ -22,39 +22,23 @@ namespace Tycho.Processor
 
         public JobProcessor(IJobFactory jobFactory, JobProcessorSettings settings)
         {
-            _timer = new Timer(ProcessSchedule, null, Timeout.Infinite, Timeout.Infinite);
+            _timer = new Timer(ProcessScheduleAsync, null, Timeout.Infinite, Timeout.Infinite);
             _jobFactory = jobFactory;
             _settings = settings;
         }
 
         public void Activate() => ResetInterval();
 
-        private async void ProcessSchedule(object? _)
+        private async void ProcessScheduleAsync(object? _)
         {
-            if (await _timerElapsedSemaphore.WaitAsync(0).ConfigureAwait(false))
+            if (await _scheduleProcessingSemaphore.WaitAsync(0).ConfigureAwait(false))
             {
-                using var cts = new CancellationTokenSource(_settings.ScheduleProcessingTimeout);
                 try
                 {
                     var capacity = _settings.ConcurrencyLimit - Volatile.Read(ref _jobsInProgress);
                     if (capacity > 0)
                     {
-                        var newJobs = await _jobFactory
-                            .CreateJobsAsync(capacity, cts.Token)
-                            .ConfigureAwait(false);
-
-                        if (newJobs.Count > 0)
-                        {
-                            foreach (var job in newJobs)
-                            {
-                                StartJob(job);
-                            }
-                            ResetInterval();
-                        }
-                        else
-                        {
-                            IncreaseInterval();
-                        }
+                        await StartJobsAsync(capacity).ConfigureAwait(false);
                     }
                 }
                 catch (Exception exception)
@@ -67,18 +51,33 @@ namespace Tycho.Processor
                 }
                 finally
                 {
-                    _timerElapsedSemaphore.Release();
+                    _scheduleProcessingSemaphore.Release();
                 }
             }
         }
 
-        private void StartJob(IJob job)
+        private async Task StartJobsAsync(int amount)
         {
-            Interlocked.Increment(ref _jobsInProgress);
-            Task.Run(async () => await ProcessJob(job).ConfigureAwait(false));
+            using var cts = new CancellationTokenSource(_settings.ScheduleProcessingTimeout);
+            var newJobs = await _jobFactory.CreateJobsAsync(amount, cts.Token).ConfigureAwait(false);
+
+            if (newJobs.Count > 0)
+            {
+                foreach (var job in newJobs)
+                {
+                    cts.Token.ThrowIfCancellationRequested();
+                    Interlocked.Increment(ref _jobsInProgress);
+                    _ = Task.Run(async () => await ProcessJobAsync(job).ConfigureAwait(false));
+                }
+                ResetInterval();
+            }
+            else
+            {
+                IncreaseInterval();
+            }
         }
 
-        private async Task ProcessJob(IJob job)
+        private async Task ProcessJobAsync(IJob job)
         {
             using var cts = new CancellationTokenSource(_settings.JobProcessingTimeout);
             try
@@ -133,7 +132,7 @@ namespace Tycho.Processor
             _timer.Dispose(timerDisposal);
 
             timerDisposal.WaitOne();
-            _timerElapsedSemaphore.Dispose();
+            _scheduleProcessingSemaphore.Dispose();
         }
     }
 }
