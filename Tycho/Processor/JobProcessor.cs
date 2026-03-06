@@ -22,14 +22,14 @@ namespace Tycho.Processor
 
         public JobProcessor(IJobFactory jobFactory, JobProcessorSettings settings)
         {
-            _timer = new Timer(TimerElapsed, null, Timeout.Infinite, Timeout.Infinite);
+            _timer = new Timer(ProcessSchedule, null, Timeout.Infinite, Timeout.Infinite);
             _jobFactory = jobFactory;
             _settings = settings;
         }
 
         public void Activate() => ResetInterval();
 
-        private async void TimerElapsed(object? _)
+        private async void ProcessSchedule(object? _)
         {
             if (await _timerElapsedSemaphore.WaitAsync(0).ConfigureAwait(false))
             {
@@ -57,11 +57,11 @@ namespace Tycho.Processor
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception exception)
                 {
                     try
                     {
-                        OnScheduleProcessingError?.Invoke(this, ex);
+                        OnScheduleProcessingError?.Invoke(this, exception);
                     }
                     catch { }
                 }
@@ -75,26 +75,28 @@ namespace Tycho.Processor
         private void StartJob(IJob job)
         {
             Interlocked.Increment(ref _jobsInProgress);
-            Task.Run(async () =>
+            Task.Run(async () => await ProcessJob(job).ConfigureAwait(false));
+        }
+
+        private async Task ProcessJob(IJob job)
+        {
+            using var cts = new CancellationTokenSource(_settings.JobProcessingTimeout);
+            try
             {
-                using var cts = new CancellationTokenSource(_settings.JobProcessingTimeout);
+                await job.ExecuteAsync(cts.Token).ConfigureAwait(false);
+            }
+            catch (Exception exception)
+            {
                 try
                 {
-                    await job.ExecuteAsync(cts.Token);
+                    OnJobProcessingError?.Invoke(this, exception);
                 }
-                catch (Exception ex)
-                {
-                    try
-                    {
-                        OnJobProcessingError?.Invoke(this, ex);
-                    }
-                    catch { }
-                }
-                finally
-                {
-                    Interlocked.Decrement(ref _jobsInProgress);
-                }
-            });
+                catch { }
+            }
+            finally
+            {
+                Interlocked.Decrement(ref _jobsInProgress);
+            }
         }
 
         private void ResetInterval()
