@@ -1,46 +1,63 @@
 ﻿using Tycho.Identity.Events;
+using Tycho.UnitTests._Data.Events;
+using Tycho.UnitTests._Data.Handlers;
 
 namespace Tycho.UnitTests.Events.Routing;
 
 public class EventHandlerIdentityTests
 {
-    private static readonly EventHandlerIdentity _handlerIdentity = new("EventOne", "HandlerOne");
+    private static readonly EventHandlerIdentity _handlerIdentity = EventHandlerIdentity.Create<TestEventHandler, TestEvent>();
 
     public static readonly IEnumerable<object[]> EqualsTestData =
     [
+        // Same instance => Equal
         [_handlerIdentity, _handlerIdentity, true],
+
+        // Same handler and event types => Equal
         [
-            new EventHandlerIdentity("EventOne", "HandlerOne"),
-            new EventHandlerIdentity("EventOne", "HandlerOne"), 
+            EventHandlerIdentity.Create<TestEventHandler, TestEvent>(),
+            EventHandlerIdentity.Create<TestEventHandler, TestEvent>(), 
             true
         ],
+
+        // Same handler type but different event types => Not Equal
         [
-            new EventHandlerIdentity("EventOne", "HandlerOne"),
-            new EventHandlerIdentity("EventTwo", "HandlerOne"), 
+            EventHandlerIdentity.Create<TestEventHandler, TestEvent>(),
+            EventHandlerIdentity.Create<TestEventHandler, OtherEvent>(), 
             false
         ],
+
+        // Same event type but different handler types => Not Equal
         [
-            new EventHandlerIdentity("EventOne", "HandlerOne"),
-            new EventHandlerIdentity("EventOne", "HandlerTwo"), 
+            EventHandlerIdentity.Create<MultiEventHandler, TestEvent>(),
+            EventHandlerIdentity.Create<MultiEventHandler, OtherEvent>(), 
             false
         ],
+
+        // Different handler and event types => Not Equal
         [
-            new EventHandlerIdentity("EventOne", "HandlerOne"),
-            new EventHandlerIdentity("EventTwo", "HandlerTwo"), 
+            EventHandlerIdentity.Create<TestEventHandler, TestEvent>(),
+            EventHandlerIdentity.Create<OtherEventHandler, OtherEvent>(), 
             false
         ],
-        [new EventHandlerIdentity("EventOne", "HandlerOne"), null!, false]
+
+        // Comparing to null => Not Equal
+        [EventHandlerIdentity.Create<TestEventHandler, TestEvent>(), null!, false]
     ];
 
     public static readonly IEnumerable<object[]> EqualsObjectTestData = EqualsTestData.Concat(
     [
-        [new EventHandlerIdentity("EventOne", "HandlerOne"), new object(), false]
+        // Comparing to an object of a different type => Not Equal
+        [EventHandlerIdentity.Create<TestEventHandler, TestEvent>(), new object(), false]
     ]);
 
     public static readonly IEnumerable<object[]> EqualsOperatorTestData = EqualsTestData.Concat(
     [
+        // Comparing two null references => Equal
         [null!, null!, true],
-        [null!, new EventHandlerIdentity("EventOne", "HandlerOne"), false]
+
+        // Comparing null to an identity => Not Equal
+        [null!, EventHandlerIdentity.Create<TestEventHandler, TestEvent>(), false]
     ]);
 
     [Theory]

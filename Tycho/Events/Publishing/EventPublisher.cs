@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Events.Broker;
 using Tycho.Events.Outbox;
+using Tycho.Utils;
 
 namespace Tycho.Events.Publishing
 {
@@ -19,6 +20,7 @@ namespace Tycho.Events.Publishing
 
         async Task IEventPublisher.PublishAsync<TEvent>(TEvent eventPayload, CancellationToken cancellationToken)
         {
+            eventPayload.ThrowIfNull();
             var eventId = Guid.NewGuid();
             var routedEvents = _broker.Route(eventId, eventPayload);
             await _outbox.Write(routedEvents, cancellationToken).ConfigureAwait(false);

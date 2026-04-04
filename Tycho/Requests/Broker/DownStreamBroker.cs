@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
 using Tycho.Requests.Registrating.Registrations;
 using Tycho.Structure;
+using Tycho.Utils;
 
 namespace Tycho.Requests.Broker
 {
@@ -32,6 +33,7 @@ namespace Tycho.Requests.Broker
         public Task ExecuteAsync<TRequest>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest
         {
+            requestData.ThrowIfNull();
             var registration = _internals.GetRequiredService<IDownStreamRequestRegistration<TRequest, TModule>>();
             return registration.Handler.HandleAsync(requestData, cancellationToken);
         }
@@ -39,6 +41,7 @@ namespace Tycho.Requests.Broker
         public Task<TResponse> ExecuteAsync<TRequest, TResponse>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest<TResponse>
         {
+            requestData.ThrowIfNull();
             var registration = _internals.GetRequiredService<IDownStreamRequestRegistration<TRequest, TResponse, TModule>>();
             return registration.Handler.HandleAsync(requestData, cancellationToken);
         }

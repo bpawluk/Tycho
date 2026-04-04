@@ -8,6 +8,7 @@ namespace Tycho.Events.Routing
     internal class Route : Stack<IRouteStep>
     {
         private const string _separator = "/";
+        
         public static Route Create()
         {
             var route = new Route();
