@@ -28,7 +28,7 @@ namespace Tycho.Modules
         protected IConfiguration Configuration => _builder.Globals.Configuration;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TychoModule"/> class.
+        /// Creates a new instance of the <see cref="TychoModule"/> class.
         /// </summary>
         public TychoModule()
         {
@@ -37,40 +37,30 @@ namespace Tycho.Modules
         }
 
         /// <summary>
-        /// Retrieves the settings provided to the module by its parent
-        /// </summary>
-        /// <typeparam name="TSettings">The type of settings to retrieve</typeparam>
-        /// <returns>Matching settings or a new instance of the requested settings type</returns>
-        protected TSettings GetSettings<TSettings>() where TSettings : class, IModuleSettings, new()
-        {
-            return _builder.Settings as TSettings ?? new TSettings();
-        }
-
-        /// <summary>
         /// Use this method to define requests handled and required by the module
         /// </summary>
-        /// <param name="module">An interface to define the requests</param>
+        /// <param name="module">An interface to define requests</param>
         [ReferencedBySourceGenerator] 
         protected abstract void DefineContract(IModuleContract module);
 
         /// <summary>
         /// Use this method to define events handled and routed by the module
         /// </summary>
-        /// <param name="module">An interface to define the events</param>
+        /// <param name="module">An interface to define events</param>
         [ReferencedBySourceGenerator] 
         protected abstract void DefineEvents(IModuleEvents module);
 
         /// <summary>
         /// Use this method to define submodules used by the module
         /// </summary>
-        /// <param name="module">An interface to include the submodules</param>
+        /// <param name="module">An interface to include submodules</param>
         [ReferencedBySourceGenerator] 
         protected abstract void IncludeModules(IModuleStructure module);
 
         /// <summary>
         /// Use this method to define services required by the module
         /// </summary>
-        /// <param name="module">An interface to register the services</param>
+        /// <param name="module">An interface to register services</param>
         protected abstract void RegisterServices(IServiceCollection module);
 
         /// <summary>
@@ -89,6 +79,16 @@ namespace Tycho.Modules
         protected virtual Task Cleanup(IServiceProvider module)
         {
             return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Retrieves the settings provided to the module by its parent
+        /// </summary>
+        /// <typeparam name="TSettings">The type of settings to retrieve</typeparam>
+        /// <returns>Matching settings or a new instance of the requested settings type</returns>
+        protected TSettings GetSettings<TSettings>() where TSettings : class, IModuleSettings, new()
+        {
+            return _builder.Settings as TSettings ?? new TSettings();
         }
 
         /// <summary>

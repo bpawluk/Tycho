@@ -6,12 +6,12 @@ namespace Tycho.Identity.Modules
     {
         public string ModuleId { get; set; } = string.Empty;
 
-        public ModuleIdentity(string moduleId)
+        private ModuleIdentity(string moduleId)
         {
             ModuleId = moduleId;
         }
 
-        public ModuleIdentity(Type moduleType)
+        private ModuleIdentity(Type moduleType)
         {
             ModuleId = TypeIdentifier.GetId(moduleType);
         }
@@ -41,7 +41,7 @@ namespace Tycho.Identity.Modules
             return ModuleId;
         }
 
-        public static ModuleIdentity FromString(string identity)
+        public static ModuleIdentity Parse(string identity)
         {
             return new ModuleIdentity(identity);
         }

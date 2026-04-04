@@ -26,7 +26,7 @@ namespace Tycho.Apps
         protected IConfiguration Configuration => _builder.Globals.Configuration;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TychoApp"/> class.
+        /// Creates a new instance of the <see cref="TychoApp"/> class.
         /// </summary>
         public TychoApp()
         {
@@ -37,28 +37,28 @@ namespace Tycho.Apps
         /// <summary>
         /// Use this method to define requests handled by the application
         /// </summary>
-        /// <param name="app">An interface to define the requests</param>
+        /// <param name="app">An interface to define requests</param>
         [ReferencedBySourceGenerator]
         protected abstract void DefineContract(IAppContract app);
 
         /// <summary>
         /// Use this method to define events handled and routed by the application
         /// </summary>
-        /// <param name="app">An interface to define the events</param>
+        /// <param name="app">An interface to define events</param>
         [ReferencedBySourceGenerator]
         protected abstract void DefineEvents(IAppEvents app);
 
         /// <summary>
         /// Use this method to define modules used by the application
         /// </summary>
-        /// <param name="app">An interface to include the modules</param>
+        /// <param name="app">An interface to include modules</param>
         [ReferencedBySourceGenerator]
         protected abstract void IncludeModules(IAppStructure app);
 
         /// <summary>
         /// Use this method to define services required by the application
         /// </summary>
-        /// <param name="app">An interface to register the services</param>
+        /// <param name="app">An interface to register services</param>
         protected abstract void RegisterServices(IServiceCollection app);
 
         /// <summary>

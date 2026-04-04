@@ -4,9 +4,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Tycho.Identity.Modules;
 using Tycho.Requests.Broker;
 using Tycho.Structure;
+using Tycho.Utils;
 
 namespace Tycho.Apps.Instance
 {
+    [ReferencedByReflection]
     internal class App<TAppDefinition> : IApp<TAppDefinition>
         where TAppDefinition : TychoApp
     {
@@ -18,6 +20,7 @@ namespace Tycho.Apps.Instance
         Internals IApp.Internals => _internals;
         IRequestBroker IApp.RequestBroker => _requestBroker;
 
+        [ReferencedByReflection]
         public App(Internals internals, Func<IServiceProvider, Task> cleanup)
         {
             _internals = internals;

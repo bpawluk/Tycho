@@ -1,4 +1,4 @@
-﻿namespace Tycho.Events.Routing.Routes
+﻿namespace Tycho.Events.Routing
 {
     internal interface IRouteStep
     {

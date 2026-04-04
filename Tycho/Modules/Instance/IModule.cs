@@ -26,6 +26,7 @@ namespace Tycho.Modules.Instance
     /// Represents a running Tycho module instance defined by <typeparamref name="TTychoDefinition"/>.
     /// </summary>
     /// <typeparam name="TTychoDefinition">The module definition type.</typeparam>
+    [ReferencedByReflection]
     [ReferencedBySourceGenerator]
     public interface IModule<TTychoDefinition> : IModule
         where TTychoDefinition : TychoModule

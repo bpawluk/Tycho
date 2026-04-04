@@ -66,7 +66,6 @@ namespace Tycho.Processor
                 foreach (var job in newJobs)
                 {
                     cts.Token.ThrowIfCancellationRequested();
-                    Interlocked.Increment(ref _jobsInProgress);
                     _ = Task.Run(async () => await ProcessJobAsync(job).ConfigureAwait(false));
                 }
                 ResetInterval();
@@ -79,6 +78,7 @@ namespace Tycho.Processor
 
         private async Task ProcessJobAsync(IJob job)
         {
+            Interlocked.Increment(ref _jobsInProgress);
             using var cts = new CancellationTokenSource(_settings.JobProcessingTimeout);
             try
             {
