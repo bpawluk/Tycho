@@ -1,46 +1,51 @@
-﻿//using Moq;
-//using Tycho.Requests.Handling;
-//using Tycho.Structure.Parent;
-//using Tycho.UnitTests._Data.Requests;
+﻿using Moq;
+using Tycho.Requests.Handling;
+using Tycho.Structure.Parent;
+using Tycho.UnitTests._Data.Requests;
 
-//namespace Tycho.UnitTests.Requests.Handling;
+namespace Tycho.UnitTests.Requests.Handling;
 
-//public class RequestExposerTests
-//{
-//    [Fact]
-//    public async Task Handle_Request_CallsParentExecute()
-//    {
-//        // Arrange
-//        var request = new TestRequest();
-//        var parentMock = new Mock<IParentReference>();
+public class RequestExposerTests
+{
+    [Fact]
+    public async Task Handle_Request_CallsParentExecute()
+    {
+        // Arrange
+        var request = new TestRequest();
+        var cancellationToken = new CancellationToken();
 
-//        var sut = new RequestExposer<TestRequest>(parentMock.Object);
+        var parentMock = new Mock<IParentReference>();
+        parentMock.Setup(p => p.RequestBroker.ExecuteAsync(request, cancellationToken))
+                  .Returns(Task.CompletedTask);
 
-//        // Act
-//        await sut.Handle(request, CancellationToken.None);
+        var sut = new RequestExposer<TestRequest>(parentMock.Object);
 
-//        // Assert
-//        parentMock.Verify(p => p.Execute(request, CancellationToken.None), Times.Once);
-//    }
+        // Act
+        await sut.HandleAsync(request, CancellationToken.None);
 
-//    [Fact]
-//    public async Task Handle_RequestWithResponse_CallsParentExecute()
-//    {
-//        // Arrange
-//        var request = new TestRequestWithResponse();
-//        var response = "success";
+        // Assert
+        parentMock.Verify(p => p.RequestBroker.ExecuteAsync(request, cancellationToken), Times.Once);
+    }
 
-//        var parentMock = new Mock<IParentReference>();
-//        parentMock.Setup(p => p.Execute<TestRequestWithResponse, string>(request, CancellationToken.None))
-//                  .ReturnsAsync(response);
+    [Fact]
+    public async Task Handle_RequestWithResponse_CallsParentExecute()
+    {
+        // Arrange
+        var request = new TestRequestWithResponse();
+        var cancellationToken = new CancellationToken();
+        var response = "success";
 
-//        var sut = new RequestExposer<TestRequestWithResponse, string>(parentMock.Object);
+        var parentMock = new Mock<IParentReference>();
+        parentMock.Setup(p => p.RequestBroker.ExecuteAsync<TestRequestWithResponse, string>(request, cancellationToken))
+                  .ReturnsAsync(response);
 
-//        // Act
-//        var result = await sut.Handle(request, CancellationToken.None);
+        var sut = new RequestExposer<TestRequestWithResponse, string>(parentMock.Object);
 
-//        // Assert
-//        Assert.Equal(response, result);
-//        parentMock.Verify(p => p.Execute<TestRequestWithResponse, string>(request, CancellationToken.None), Times.Once);
-//    }
-//}
+        // Act
+        var result = await sut.HandleAsync(request, cancellationToken);
+
+        // Assert
+        Assert.Equal(response, result);
+        parentMock.Verify(p => p.RequestBroker.ExecuteAsync<TestRequestWithResponse, string>(request, cancellationToken), Times.Once);
+    }
+}

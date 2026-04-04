@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Tycho.Persistence.EFCore.Outbox;
 
 [Index(nameof(Created))]
-internal class OutboxMessage
+internal class OutboxEntry
 {
     [Key]
     public Guid Id { get; set; } = Guid.Empty;
@@ -14,10 +14,13 @@ internal class OutboxMessage
     public string Handler { get; set; } = string.Empty;
 
     [Required]
+    public string Route { get; set; } = string.Empty;
+
+    [Required]
     public string Payload { get; set; } = string.Empty;
 
     [Required]
-    public MessageState State { get; set; } = MessageState.New;
+    public EntryState State { get; set; } = EntryState.New;
 
     [Required]
     public DateTime Created { get; set; } = DateTime.UtcNow;
@@ -26,12 +29,5 @@ internal class OutboxMessage
     public DateTime Updated { get; set; } = DateTime.UtcNow;
 
     [Required]
-    public uint DeliveryCount { get; set; } = 0;
-}
-
-internal enum MessageState
-{
-    New,
-    Processing,
-    Failed
+    public uint DeliveryAttempts { get; set; } = 0;
 }

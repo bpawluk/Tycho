@@ -10,9 +10,10 @@ public class RequestIgnorerTests
     {
         // Arrange
         var sut = new RequestIgnorer<TestRequest>();
+        var cancellationToken = new CancellationToken();
 
         // Act
-        await sut.HandleAsync(new TestRequest(), CancellationToken.None);
+        await sut.HandleAsync(new TestRequest(), cancellationToken);
 
         // Assert
         // - no assertion required
@@ -23,9 +24,10 @@ public class RequestIgnorerTests
     {
         // Arrange
         var sut = new RequestIgnorer<TestRequestWithResponse, string>();
+        var cancellationToken = new CancellationToken();
 
         // Act
-        var result = await sut.HandleAsync(new TestRequestWithResponse(), CancellationToken.None);
+        var result = await sut.HandleAsync(new TestRequestWithResponse(), cancellationToken);
 
         // Assert
         Assert.Equal(default, result);

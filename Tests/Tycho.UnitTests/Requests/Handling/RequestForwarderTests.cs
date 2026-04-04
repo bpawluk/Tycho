@@ -1,51 +1,56 @@
-﻿//using Moq;
-//using Tycho.Modules.Instance;
-//using Tycho.Requests.Handling;
-//using Tycho.UnitTests._Data.Modules;
-//using Tycho.UnitTests._Data.Requests;
+﻿using Moq;
+using Tycho.Modules.Instance;
+using Tycho.Requests.Handling;
+using Tycho.UnitTests._Data.Modules;
+using Tycho.UnitTests._Data.Requests;
 
-//namespace Tycho.UnitTests.Requests.Handling;
+namespace Tycho.UnitTests.Requests.Handling;
 
-//public class RequestForwarderTests
-//{
-//    [Fact]
-//    public async Task Handle_Request_CallsTargetModuleExecute()
-//    {
-//        // Arrange
-//        var request = new TestRequest();
-//        var targetModuleMock = new Mock<IModule<TestModule>>();
+public class RequestForwarderTests
+{
+    [Fact]
+    public async Task Handle_Request_CallsTargetModuleExecute()
+    {
+        // Arrange
+        var request = new TestRequest();
+        var cancellationToken = new CancellationToken();
 
-//        var sut = new RequestForwarder<TestRequest, TestModule>(targetModuleMock.Object);
+        var targetModuleMock = new Mock<IModule<TestModule>>();
+        targetModuleMock.Setup(m => m.RequestBroker.ExecuteAsync(request, cancellationToken))
+                        .Returns(Task.CompletedTask);
 
-//        // Act
-//        await sut.HandleAsync(request, CancellationToken.None);
+        var sut = new RequestForwarder<TestRequest, TestModule>(targetModuleMock.Object);
 
-//        // Assert
-//        targetModuleMock.Verify(m => m.ExecuteAsync(request, CancellationToken.None), Times.Once);
-//    }
+        // Act
+        await sut.HandleAsync(request, cancellationToken);
 
-//    [Fact]
-//    public async Task Handle_RequestWithResponse_CallsTargetModuleExecute()
-//    {
-//        // Arrange
-//        var request = new TestRequestWithResponse();
-//        var response = "success";
+        // Assert
+        targetModuleMock.Verify(m => m.RequestBroker.ExecuteAsync(request, cancellationToken), Times.Once);
+    }
 
-//        var targetModuleMock = new Mock<IModule<TestModule>>();
-//        targetModuleMock.Setup(m => m.Execute<TestRequestWithResponse, string>(request, CancellationToken.None))
-//                        .ReturnsAsync(response);
+    [Fact]
+    public async Task Handle_RequestWithResponse_CallsTargetModuleExecute()
+    {
+        // Arrange
+        var request = new TestRequestWithResponse();
+        var cancellationToken = new CancellationToken();
+        var response = "success";
 
-//        var sut = new RequestForwarder<TestRequestWithResponse, string, TestModule>(targetModuleMock.Object);
+        var targetModuleMock = new Mock<IModule<TestModule>>();
+        targetModuleMock.Setup(m => m.RequestBroker.ExecuteAsync<TestRequestWithResponse, string>(request, cancellationToken))
+                        .ReturnsAsync(response);
 
-//        // Act
-//        var result = await sut.Handle(request, CancellationToken.None);
+        var sut = new RequestForwarder<TestRequestWithResponse, string, TestModule>(targetModuleMock.Object);
 
-//        // Assert
-//        Assert.Equal(response, result);
-//        targetModuleMock.Verify(
-//            m => m.Execute<TestRequestWithResponse, string>(
-//                request, 
-//                CancellationToken.None),
-//            Times.Once);
-//    }
-//}
+        // Act
+        var result = await sut.HandleAsync(request, cancellationToken);
+
+        // Assert
+        Assert.Equal(response, result);
+        targetModuleMock.Verify(
+            m => m.RequestBroker.ExecuteAsync<TestRequestWithResponse, string>(
+                request,
+                cancellationToken),
+            Times.Once);
+    }
+}

@@ -187,6 +187,7 @@ public class DownStreamBrokerTests
     {
         // Arrange
         var request = new TestRequest();
+        var cancellationToken = new CancellationToken();
         var handlerMock = new Mock<IRequestHandler<TestRequest>>();
 
         var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequest, TestModule>>();
@@ -196,10 +197,10 @@ public class DownStreamBrokerTests
         _internals.Build();
 
         // Act
-        await _sut.ExecuteAsync(request, CancellationToken.None);
+        await _sut.ExecuteAsync(request, cancellationToken);
 
         // Assert
-        handlerMock.Verify(h => h.HandleAsync(request, CancellationToken.None), Times.Once);
+        handlerMock.Verify(h => h.HandleAsync(request, cancellationToken), Times.Once);
     }
 
     [Fact]
@@ -207,11 +208,12 @@ public class DownStreamBrokerTests
     {
         // Arrange
         _internals.Build();
+        var cancellationToken = new CancellationToken();
 
         // Act
         async Task Act()
         {
-            await _sut.ExecuteAsync(new TestRequest(), CancellationToken.None);
+            await _sut.ExecuteAsync(new TestRequest(), cancellationToken);
         }
 
         // Assert
@@ -223,11 +225,12 @@ public class DownStreamBrokerTests
     {
         // Arrange
         TestRequest requestData = null!;
+        var cancellationToken = new CancellationToken();
 
         // Act
         async Task Act()
         {
-            await _sut.ExecuteAsync(requestData, CancellationToken.None);
+            await _sut.ExecuteAsync(requestData, cancellationToken);
         }
 
         // Assert
@@ -239,10 +242,11 @@ public class DownStreamBrokerTests
     {
         // Arrange
         var request = new TestRequestWithResponse();
+        var cancellationToken = new CancellationToken();
         var response = "success";
 
         var handlerMock = new Mock<IRequestHandler<TestRequestWithResponse, string>>();
-        handlerMock.Setup(h => h.HandleAsync(request, CancellationToken.None))
+        handlerMock.Setup(h => h.HandleAsync(request, cancellationToken))
                    .ReturnsAsync(response);
 
         var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequestWithResponse, string, TestModule>>();
@@ -253,11 +257,11 @@ public class DownStreamBrokerTests
         _internals.Build();
 
         // Act
-        var result = await _sut.ExecuteAsync<TestRequestWithResponse, string>(request, CancellationToken.None);
+        var result = await _sut.ExecuteAsync<TestRequestWithResponse, string>(request, cancellationToken);
 
         // Assert
         Assert.Equal(response, result);
-        handlerMock.Verify(h => h.HandleAsync(request, CancellationToken.None), Times.Once);
+        handlerMock.Verify(h => h.HandleAsync(request, cancellationToken), Times.Once);
     }
 
     [Fact]
@@ -265,11 +269,12 @@ public class DownStreamBrokerTests
     {
         // Arrange
         _internals.Build();
+        var cancellationToken = new CancellationToken();
 
         // Act
         async Task Act()
         {
-            await _sut.ExecuteAsync<TestRequestWithResponse, string>(new TestRequestWithResponse(), CancellationToken.None);
+            await _sut.ExecuteAsync<TestRequestWithResponse, string>(new TestRequestWithResponse(), cancellationToken);
         }
 
         // Assert
@@ -281,11 +286,12 @@ public class DownStreamBrokerTests
     {
         // Arrange
         TestRequestWithResponse requestData = null!;
+        var cancellationToken = new CancellationToken();
 
         // Act
         async Task Act()
         {
-            await _sut.ExecuteAsync<TestRequestWithResponse, string>(requestData, CancellationToken.None);
+            await _sut.ExecuteAsync<TestRequestWithResponse, string>(requestData, cancellationToken);
         }
 
         // Assert

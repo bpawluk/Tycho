@@ -1,70 +1,75 @@
-﻿//using Moq;
-//using Tycho.Requests.Handling;
-//using Tycho.Structure.Parent;
-//using Tycho.UnitTests._Data.Requests;
+﻿using Moq;
+using Tycho.Requests.Handling;
+using Tycho.Structure.Parent;
+using Tycho.UnitTests._Data.Requests;
 
-//namespace Tycho.UnitTests.Requests.Handling;
+namespace Tycho.UnitTests.Requests.Handling;
 
-//public class MappedRequestExposerTests
-//{
-//    [Fact]
-//    public async Task Handle_Request_CallsParentExecute()
-//    {
-//        // Arrange
-//        var request = new TestRequest();
-//        var mappedRequest = new OtherRequest();
-//        var parentMock = new Mock<IParentReference>();
+public class MappedRequestExposerTests
+{
+    [Fact]
+    public async Task Handle_Request_CallsParentExecute()
+    {
+        // Arrange
+        var request = new TestRequest();
+        var mappedRequest = new OtherRequest();
+        var cancellationToken = new CancellationToken();
 
-//        var mapMock = new Mock<Func<TestRequest, OtherRequest>>();
-//        mapMock.Setup(m => m(It.IsAny<TestRequest>()))
-//               .Returns(mappedRequest);
+        var parentMock = new Mock<IParentReference>();
+        parentMock.Setup(p => p.RequestBroker.ExecuteAsync(mappedRequest, cancellationToken))
+                  .Returns(Task.CompletedTask);
 
-//        var sut = new MappedRequestExposer<TestRequest, OtherRequest>(parentMock.Object, mapMock.Object);
+        var mapMock = new Mock<Func<TestRequest, OtherRequest>>();
+        mapMock.Setup(m => m(It.IsAny<TestRequest>()))
+               .Returns(mappedRequest);
 
-//        // Act
-//        await sut.Handle(request, CancellationToken.None);
+        var sut = new MappedRequestExposer<TestRequest, OtherRequest>(parentMock.Object, mapMock.Object);
 
-//        // Assert
-//        mapMock.Verify(m => m(request), Times.Once);
-//        parentMock.Verify(p => p.Execute(mappedRequest, CancellationToken.None), Times.Once);
-//    }
+        // Act
+        await sut.HandleAsync(request, cancellationToken);
 
-//    [Fact]
-//    public async Task Handle_RequestWithResponse_CallsParentExecute()
-//    {
-//        // Arrange
-//        var request = new TestRequestWithResponse();
-//        var mappedRequest = new OtherRequestWithResponse();
-//        var response = "success";
+        // Assert
+        mapMock.Verify(m => m(request), Times.Once);
+        parentMock.Verify(p => p.RequestBroker.ExecuteAsync(mappedRequest, cancellationToken), Times.Once);
+    }
 
-//        var parentMock = new Mock<IParentReference>();
-//        parentMock.Setup(p => p.Execute<OtherRequestWithResponse, string>(mappedRequest, CancellationToken.None))
-//                  .ReturnsAsync(response);
+    [Fact]
+    public async Task Handle_RequestWithResponse_CallsParentExecute()
+    {
+        // Arrange
+        var request = new TestRequestWithResponse();
+        var mappedRequest = new OtherRequestWithResponse();
+        var cancellationToken = new CancellationToken();
+        var response = "success";
 
-//        var mapRequestMock = new Mock<Func<TestRequestWithResponse, OtherRequestWithResponse>>();
-//        mapRequestMock.Setup(m => m(It.IsAny<TestRequestWithResponse>()))
-//                      .Returns(mappedRequest);
+        var parentMock = new Mock<IParentReference>();
+        parentMock.Setup(p => p.RequestBroker.ExecuteAsync<OtherRequestWithResponse, string>(mappedRequest, cancellationToken))
+                  .ReturnsAsync(response);
 
-//        var mapResponseMock = new Mock<Func<string, string>>();
-//        mapResponseMock.Setup(m => m(It.IsAny<string>()))
-//                       .Returns((string response) => response);
+        var mapRequestMock = new Mock<Func<TestRequestWithResponse, OtherRequestWithResponse>>();
+        mapRequestMock.Setup(m => m(It.IsAny<TestRequestWithResponse>()))
+                      .Returns(mappedRequest);
 
-//        var sut = new MappedRequestExposer<
-//            TestRequestWithResponse, string,
-//            OtherRequestWithResponse, string>(
-//                parentMock.Object,
-//                mapRequestMock.Object,
-//                mapResponseMock.Object);
+        var mapResponseMock = new Mock<Func<string, string>>();
+        mapResponseMock.Setup(m => m(It.IsAny<string>()))
+                       .Returns((string response) => response);
 
-//        // Act
-//        var result = await sut.Handle(request, CancellationToken.None);
+        var sut = new MappedRequestExposer<
+            TestRequestWithResponse, string,
+            OtherRequestWithResponse, string>(
+                parentMock.Object,
+                mapRequestMock.Object,
+                mapResponseMock.Object);
 
-//        // Assert
-//        Assert.Equal(response, result);
-//        mapRequestMock.Verify(m => m(request), Times.Once);
-//        parentMock.Verify(
-//            p => p.Execute<OtherRequestWithResponse, string>(mappedRequest, CancellationToken.None), 
-//            Times.Once);
-//        mapResponseMock.Verify(m => m(response), Times.Once);
-//    }
-//}
+        // Act
+        var result = await sut.HandleAsync(request, cancellationToken);
+
+        // Assert
+        Assert.Equal(response, result);
+        mapRequestMock.Verify(m => m(request), Times.Once);
+        parentMock.Verify(
+            p => p.RequestBroker.ExecuteAsync<OtherRequestWithResponse, string>(mappedRequest, cancellationToken),
+            Times.Once);
+        mapResponseMock.Verify(m => m(response), Times.Once);
+    }
+}

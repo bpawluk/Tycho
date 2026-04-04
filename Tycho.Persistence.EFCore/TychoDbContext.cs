@@ -40,7 +40,7 @@ public abstract class TychoDbContext : DbContext
         modelBuilder.Entity<InboxMessage>()
                     .ToTable(InboxTableName, Schema);
 
-        modelBuilder.Entity<OutboxMessage>()
+        modelBuilder.Entity<OutboxEntry>()
                     .ToTable(OutboxTableName, Schema);
     }
 
