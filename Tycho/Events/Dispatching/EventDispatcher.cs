@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Events.Routing;
 using Tycho.Identity.Events;
@@ -18,6 +19,13 @@ namespace Tycho.Events.Dispatching
             where TEvent : class, IEvent
         {
             var handler = _handlerProvider.GetHandler<TEvent>(routedEvent.HandlerId);
+            if (handler is null)
+            {
+                throw new InvalidOperationException(
+                    $"No handler found for event of type {typeof(TEvent).Name} " +
+                    $"with handler ID {routedEvent.HandlerId}");
+            }
+
             var context = new EventContext<TEvent>(routedEvent.Id, routedEvent.Payload);
             await handler.HandleAsync(context, cancellationToken).ConfigureAwait(false);
         }

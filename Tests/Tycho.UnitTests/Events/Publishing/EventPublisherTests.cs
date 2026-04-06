@@ -1,163 +1,105 @@
-﻿//using Moq;
-//using Tycho.Events;
-//using Tycho.Events.Outbox;
-//using Tycho.Events.Routing;
-//using Tycho.Events.Serialization;
-//using Tycho.UnitTests._Data.Events;
-//using Tycho.UnitTests._Data.Handlers;
-//using Tycho.UnitTests._Data.Modules;
+﻿using Moq;
+using Tycho.Events.Broker;
+using Tycho.Events.Outbox;
+using Tycho.Events.Publishing;
+using Tycho.Events.Routing;
+using Tycho.Identity.Events;
+using Tycho.UnitTests._Data.Events;
+using Tycho.UnitTests._Data.Handlers;
 
-//namespace Tycho.UnitTests.Events.Publishing;
+namespace Tycho.UnitTests.Events.Publishing;
 
-//public class EventPublisherTests
-//{
-//    private readonly Mock<IOutboxWriter> _outboxMock;
+public class EventPublisherTests
+{
+    private readonly Mock<IEventBroker> _eventBrokerMock;
+    private readonly Mock<IOutboxWriter> _outboxWriterMock;
 
-//    private readonly HandlerIdentity[] _testIdentities =
-//    [
-//        new(typeof(TestEvent), typeof(TestEventHandler), typeof(TestModule)),
-//        new(typeof(TestEvent), typeof(TestEventOtherHandler), typeof(TestModule))
-//    ];
+    private readonly IEventPublisher _sut;
 
-//    private readonly EventPublisher _sut;
+    public EventPublisherTests()
+    {
+        _eventBrokerMock = new Mock<IEventBroker>();
+        _outboxWriterMock = new Mock<IOutboxWriter>();
+        _sut = new EventPublisher(_eventBrokerMock.Object, _outboxWriterMock.Object);
+    }
 
-//    public EventPublisherTests()
-//    {
-//        var routerMock = new Mock<IEventRouter>();
-//        routerMock.Setup(r => r.IdentifyHandlers<TestEvent>())
-//                  .Returns(_testIdentities);
-//        routerMock.Setup(r => r.IdentifyHandlers<OtherEvent>())
-//                  .Returns([]);
+    [Fact]
+    public async Task PublishAsync_WithMissingPayload_ThrowsArgumentNullException()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken();
 
-//        _outboxMock = new Mock<IOutboxWriter>();
+        // Act
+        Task Act() => _sut.PublishAsync<TestEvent>(null!, cancellationToken);
 
-//        var serializerMock = new Mock<IEventSerializer>();
-//        serializerMock.Setup(s => s.SerializePayload(It.IsAny<IEvent>()))
-//                      .Returns((IEvent eventData) => SerializeMock(eventData));
+        // Assert
+        await Assert.ThrowsAsync<ArgumentNullException>(Act);
+    }
 
-//        _sut = new EventPublisher(routerMock.Object, _outboxMock.Object, serializerMock.Object);
-//    }
+    [Fact]
+    public async Task PublishAsync_WithMultipleRoutedEvents_WritesAllToOutbox()
+    {
+        // Arrange
+        var eventPayload = new TestEvent();
+        var cancellationToken = new CancellationToken();
+        var routedEvents = new List<RoutedEvent>
+        {
+            CreateRoutedEvent(eventPayload),
+            CreateRoutedEvent(eventPayload),
+        };
 
-//    [Fact]
-//    public async Task Publish_ForEventWithRegisteredHandlers_AddsOutboxEntries()
-//    {
-//        // Arrange
-//        var eventData = new TestEvent();
-//        var cancellationToken = CancellationToken.None;
+        _eventBrokerMock.Setup(eb => eb.Route(It.IsAny<Guid>(), eventPayload))
+                        .Returns(routedEvents);
 
-//        // Act
-//        await _sut.Publish(eventData, cancellationToken);
+        // Act
+        await _sut.PublishAsync(eventPayload, cancellationToken);
 
-//        // Assert
-//        _outboxMock.Verify(
-//            o => o.Write(
-//                It.Is<OutboxEntry[]>(entries =>
-//                    entries.Length == _testIdentities.Length &&
-//                    entries[0].HandlerIdentity == _testIdentities[0] &&
-//                    entries[1].HandlerIdentity == _testIdentities[1] &&
-//                    entries.All(entry => entry.Payload as string == SerializeMock(eventData))),
-//                true,
-//                cancellationToken),
-//            Times.Once);
-//    }
+        // Assert
+        _outboxWriterMock.Verify(ow => ow.Write(routedEvents, cancellationToken), Times.Once);
+    }
 
-//    [Fact]
-//    public async Task PublishWithoutCommitting_ForEventWithRegisteredHandlers_AddsOutboxEntries()
-//    {
-//        // Arrange
-//        var eventData = new TestEvent();
-//        var cancellationToken = CancellationToken.None;
+    [Fact]
+    public async Task PublishAsync_WithNoRoutedEvents_DoesNotWriteToOutbox()
+    {
+        // Arrange
+        var eventPayload = new TestEvent();
+        var routedEvents = new List<RoutedEvent>();
+        var cancellationToken = new CancellationToken();
 
-//        // Act
-//        await _sut.PublishWithoutCommitting(eventData, cancellationToken);
+        _eventBrokerMock.Setup(eb => eb.Route(It.IsAny<Guid>(), eventPayload))
+                        .Returns(routedEvents);
 
-//        // Assert
-//        _outboxMock.Verify(
-//            o => o.Write(
-//                It.Is<OutboxEntry[]>(entries =>
-//                    entries.Length == _testIdentities.Length &&
-//                    entries[0].HandlerIdentity == _testIdentities[0] &&
-//                    entries[1].HandlerIdentity == _testIdentities[1] &&
-//                    entries.All(entry => entry.Payload as string == SerializeMock(eventData))),
-//                false,
-//                cancellationToken),
-//            Times.Once);
-//    }
+        // Act
+        await _sut.PublishAsync(eventPayload, cancellationToken);
 
-//    [Fact]
-//    public async Task Publish_ForEventWithNoHandlers_DoesNotAddAnyEntries()
-//    {
-//        // Arrange
-//        var eventData = new OtherEvent();
-//        var cancellationToken = CancellationToken.None;
+        // Assert
+        _outboxWriterMock.Verify(
+            ow => ow.Write(It.IsAny<IReadOnlyCollection<RoutedEvent>>(), It.IsAny<CancellationToken>()), 
+            Times.Never);
+    }
 
-//        // Act
-//        await _sut.Publish(eventData, cancellationToken);
+    [Fact]
+    public async Task PublishAsync_WithNullRoutedEvents_DoesNotWriteToOutbox()
+    {
+        // Arrange
+        var eventPayload = new TestEvent();
+        var cancellationToken = new CancellationToken();
 
-//        // Assert
-//        _outboxMock.Verify(
-//            o => o.Write(
-//                It.IsAny<IReadOnlyCollection<OutboxEntry>>(),
-//                true,
-//                cancellationToken),
-//            Times.Never);
-//    }
+        _eventBrokerMock.Setup(eb => eb.Route(It.IsAny<Guid>(), eventPayload))
+                        .Returns<IReadOnlyCollection<RoutedEvent>>(null!);
 
-//    [Fact]
-//    public async Task PublishWithoutCommitting_ForEventWithNoHandlers_DoesNotAddAnyEntries()
-//    {
-//        // Arrange
-//        var eventData = new OtherEvent();
-//        var cancellationToken = CancellationToken.None;
+        // Act
+        await _sut.PublishAsync(eventPayload, cancellationToken);
 
-//        // Act
-//        await _sut.PublishWithoutCommitting(eventData, cancellationToken);
+        // Assert
+        _outboxWriterMock.Verify(
+            ow => ow.Write(It.IsAny<IReadOnlyCollection<RoutedEvent>>(), It.IsAny<CancellationToken>()), 
+            Times.Never);
+    }
 
-//        // Assert
-//        _outboxMock.Verify(
-//            o => o.Write(
-//                It.IsAny<IReadOnlyCollection<OutboxEntry>>(),
-//                false,
-//                cancellationToken),
-//            Times.Never);
-//    }
-
-//    [Fact]
-//    public async Task Publish_WithNullEventData_ThrowsArgumentNullException()
-//    {
-//        // Arrange
-//        IEvent eventData = null!;
-//        var cancellationToken = CancellationToken.None;
-
-//        // Act
-//        async Task Act()
-//        {
-//            await _sut.Publish(eventData, cancellationToken);
-//        }
-
-//        // Assert
-//        await Assert.ThrowsAsync<ArgumentNullException>(Act);
-//    }
-
-//    [Fact]
-//    public async Task PublishWithoutCommitting_WithNullEventData_ThrowsArgumentNullException()
-//    {
-//        // Arrange
-//        IEvent eventData = null!;
-//        var cancellationToken = CancellationToken.None;
-
-//        // Act
-//        async Task Act()
-//        {
-//            await _sut.PublishWithoutCommitting(eventData, cancellationToken);
-//        }
-
-//        // Assert
-//        await Assert.ThrowsAsync<ArgumentNullException>(Act);
-//    }
-
-//    private static string SerializeMock(IEvent eventData)
-//    {
-//        return eventData.GetType().Name;
-//    }
-//}
+    private static RoutedEvent<TestEvent> CreateRoutedEvent(TestEvent? payload = null)
+    {
+        var handlerId = EventHandlerIdentity.Create<TestEventHandler, TestEvent>();
+        return new RoutedEvent<TestEvent>(Guid.NewGuid(), handlerId, payload ?? new TestEvent());
+    }
+}

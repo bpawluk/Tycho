@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Handling;
 using Tycho.Events.Registrating.Registrations;
@@ -24,41 +23,35 @@ namespace Tycho.Events.Registrating
         public void ExposeEvent<TEvent>()
             where TEvent : class, IEvent
         {
-            if (IsAlreadyRegistered<TEvent, ExposingEventRegistration<TEvent>>())
+            if (!TryAddRegistration<TEvent, ExposingEventRegistration<TEvent>>())
             {
                 throw new ArgumentException($"{typeof(TEvent).Name} is already exposed", nameof(TEvent));
             }
-
-            Services.AddTransient<IEventRegistration<TEvent>, ExposingEventRegistration<TEvent>>();
         }
 
         public void ExposeEvent<TEvent, TTargetEvent>(Func<TEvent, TTargetEvent> map)
             where TEvent : class, IEvent
             where TTargetEvent : class, IEvent
         {
-            if (IsAlreadyRegistered<TEvent, MappedExposingEventRegistration<TEvent, TTargetEvent>>())
+            if (!TryAddRegistration<TEvent, MappedExposingEventRegistration<TEvent, TTargetEvent>>(sp =>
+                new MappedExposingEventRegistration<TEvent, TTargetEvent>(
+                    sp.GetRequiredService<IParentReference>(),
+                    map)))
             {
                 throw new ArgumentException($"{typeof(TTargetEvent).Name} is already exposed", nameof(TEvent));
             }
-
-            Services.AddTransient<IEventRegistration<TEvent>>(sp => 
-                new MappedExposingEventRegistration<TEvent, TTargetEvent>(
-                    sp.GetRequiredService<IParentReference>(),
-                    map));
         }
 
         public void ForwardEvent<TEvent, TModule>()
             where TEvent : class, IEvent
             where TModule : TychoModule
         {
-            if (IsAlreadyRegistered<TEvent, ForwardingEventRegistration<TEvent, TModule>>())
+            if (!TryAddRegistration<TEvent, ForwardingEventRegistration<TEvent, TModule>>())
             {
                 throw new ArgumentException(
-                    $"{typeof(TEvent).Name} is already forwarded to {typeof(TModule).Name}", 
+                    $"{typeof(TEvent).Name} is already forwarded to {typeof(TModule).Name}",
                     nameof(TEvent));
             }
-
-            Services.AddTransient<IEventRegistration<TEvent>, ForwardingEventRegistration<TEvent, TModule>>();
         }
 
         public void ForwardEvent<TEvent, TTargetEvent, TModule>(Func<TEvent, TTargetEvent> map)
@@ -66,44 +59,73 @@ namespace Tycho.Events.Registrating
             where TTargetEvent : class, IEvent
             where TModule : TychoModule
         {
-            if (IsAlreadyRegistered<TEvent, MappedForwardingEventRegistration<TEvent, TTargetEvent, TModule>>())
+            if (!TryAddRegistration<TEvent, MappedForwardingEventRegistration<TEvent, TTargetEvent, TModule>>(sp =>
+                new MappedForwardingEventRegistration<TEvent, TTargetEvent, TModule>(
+                    sp.GetRequiredService<IModule<TModule>>(),
+                    map)))
             {
                 throw new ArgumentException(
                     $"{typeof(TTargetEvent).Name} is already forwarded to {typeof(TModule).Name}",
                     nameof(TEvent));
             }
-
-            Services.AddTransient<IEventRegistration<TEvent>>(sp => 
-                new MappedForwardingEventRegistration<TEvent, TTargetEvent, TModule>(
-                    sp.GetRequiredService<IModule<TModule>>(),
-                    map));
         }
 
         public void HandleEvent<TEvent, THandler>()
             where TEvent : class, IEvent
             where THandler : class, IEventHandler<TEvent>
         {
-            if (IsAlreadyRegistered<TEvent, FinalEventRegistration<TEvent, ScopedEventHandler<TEvent, THandler>>>())
+            if (!TryAddFinalRegistration<TEvent, FinalEventRegistration<TEvent, ScopedEventHandler<TEvent, THandler>>>())
             {
                 throw new ArgumentException(
                     $"Event handler for {typeof(TEvent).Name} is already registered",
                     nameof(THandler));
             }
 
-            Services.AddTransient<IEventRegistration<TEvent>, FinalEventRegistration<TEvent, ScopedEventHandler<TEvent, THandler>>>();
-            Services.AddTransient<IFinalEventRegistration<TEvent>, FinalEventRegistration<TEvent, ScopedEventHandler<TEvent, THandler>>>();
-
             Services.AddTransient<ScopedEventHandler<TEvent, THandler>>();
             Services.AddScoped<THandler>();
         }
 
-        private bool IsAlreadyRegistered<TEvent, TRegistration>()
+        private bool TryAddRegistration<TEvent, TRegistration>()
             where TEvent : class, IEvent
             where TRegistration : class, IEventRegistration<TEvent>
         {
-            return Services.Any(descriptor =>
-                descriptor.ServiceType == typeof(IEventRegistration<TEvent>) &&
-                descriptor.ImplementationType == typeof(TRegistration));
+            if (_internals.HasService<TRegistration>())
+            {
+                return false;
+            }
+
+            Services.AddTransient<TRegistration>();
+            Services.AddTransient<IEventRegistration<TEvent>>(sp => sp.GetRequiredService<TRegistration>());
+            return true;
+        }
+
+        private bool TryAddRegistration<TEvent, TRegistration>(Func<IServiceProvider, TRegistration> implementationFactory)
+            where TEvent : class, IEvent
+            where TRegistration : class, IEventRegistration<TEvent>
+        {
+            if (_internals.HasService<TRegistration>())
+            {
+                return false;
+            }
+
+            Services.AddTransient(implementationFactory);
+            Services.AddTransient<IEventRegistration<TEvent>>(sp => sp.GetRequiredService<TRegistration>());
+            return true;
+        }
+
+        private bool TryAddFinalRegistration<TEvent, TRegistration>()
+            where TEvent : class, IEvent
+            where TRegistration : class, IFinalEventRegistration<TEvent>
+        {
+            if (_internals.HasService<TRegistration>())
+            {
+                return false;
+            }
+
+            Services.AddTransient<TRegistration>();
+            Services.AddTransient<IEventRegistration<TEvent>>(sp => sp.GetRequiredService<TRegistration>());
+            Services.AddTransient<IFinalEventRegistration<TEvent>>(sp => sp.GetRequiredService<TRegistration>());
+            return true;
         }
     }
 }

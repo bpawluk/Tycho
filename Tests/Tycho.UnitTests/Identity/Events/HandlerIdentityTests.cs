@@ -2,7 +2,7 @@
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
 
-namespace Tycho.UnitTests.Events.Routing;
+namespace Tycho.UnitTests.Identity.Events;
 
 public class EventHandlerIdentityTests
 {

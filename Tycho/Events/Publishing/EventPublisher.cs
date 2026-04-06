@@ -23,7 +23,10 @@ namespace Tycho.Events.Publishing
             eventPayload.ThrowIfNull();
             var eventId = Guid.NewGuid();
             var routedEvents = _broker.Route(eventId, eventPayload);
-            await _outbox.Write(routedEvents, cancellationToken).ConfigureAwait(false);
+            if (routedEvents != null && routedEvents.Count > 0)
+            {
+                await _outbox.Write(routedEvents, cancellationToken).ConfigureAwait(false);
+            }
         }
     }
 }

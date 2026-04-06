@@ -9,11 +9,11 @@ namespace Tycho.Events.Delivery.Strategies
 {
     internal class DownStreamRouteDelivery : IDeliveryStrategy
     {
-        private readonly IModuleProvider _moduleRegistry;
+        private readonly IModuleProvider _moduleProvider;
 
-        public DownStreamRouteDelivery(IModuleProvider moduleRegistry)
+        public DownStreamRouteDelivery(IModuleProvider moduleProvider)
         {
-            _moduleRegistry = moduleRegistry;
+            _moduleProvider = moduleProvider;
         }
 
         public bool CanDeliver<TEvent>(RoutedEvent<TEvent> routedEvent)
@@ -29,7 +29,13 @@ namespace Tycho.Events.Delivery.Strategies
             {
                 throw new InvalidOperationException($"Invalid route in {GetType().Name}");
             }
-            var submodule = _moduleRegistry.GetModule(downStreamRouteStep.Destination);
+
+            var submodule = _moduleProvider.GetModule(downStreamRouteStep.Destination);
+            if (submodule is null)
+            {
+                throw new InvalidOperationException($"Module specified in {routeStep} route step is missing");
+            }
+
             await submodule.EventBroker.DeliverAsync(routedEvent, cancellationToken);
         }
     }
