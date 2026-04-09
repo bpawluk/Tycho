@@ -27,13 +27,13 @@ namespace Tycho.Events.Delivery.Strategies
         {
             if (!routedEvent.Route.TryPop(out var routeStep) || !(routeStep is DownStreamRouteStep downStreamRouteStep))
             {
-                throw new InvalidOperationException($"Invalid route in {GetType().Name}");
+                throw new InvalidOperationException($"Invalid route in {GetType().Name}.");
             }
 
             var submodule = _moduleProvider.GetModule(downStreamRouteStep.Destination);
             if (submodule is null)
             {
-                throw new InvalidOperationException($"Module specified in {routeStep} route step is missing");
+                throw new InvalidOperationException($"Module specified in {routeStep} route step is missing.");
             }
 
             await submodule.EventBroker.DeliverAsync(routedEvent, cancellationToken);

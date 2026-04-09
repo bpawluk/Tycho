@@ -27,7 +27,7 @@ namespace Tycho.Events.Delivery.Strategies
         {
             if (!routedEvent.Route.TryPop(out var routeStep) || !(routeStep is UpStreamRouteStep))
             {
-                throw new InvalidOperationException($"Invalid route in {GetType().Name}");
+                throw new InvalidOperationException($"Invalid route in {GetType().Name}.");
             }
             await _parent.EventBroker.DeliverAsync(routedEvent, cancellationToken);
         }

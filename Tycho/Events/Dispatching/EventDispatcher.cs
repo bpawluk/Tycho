@@ -23,7 +23,7 @@ namespace Tycho.Events.Dispatching
             {
                 throw new InvalidOperationException(
                     $"No handler found for event of type {typeof(TEvent).Name} " +
-                    $"with handler ID {routedEvent.HandlerId}");
+                    $"with handler ID {routedEvent.HandlerId}.");
             }
 
             var context = new EventContext<TEvent>(routedEvent.Id, routedEvent.Payload);

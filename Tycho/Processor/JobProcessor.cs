@@ -80,6 +80,7 @@ namespace Tycho.Processor
         {
             Interlocked.Increment(ref _jobsInProgress);
             using var cts = new CancellationTokenSource(_settings.JobProcessingTimeout);
+
             try
             {
                 await job.ExecuteAsync(cts.Token).ConfigureAwait(false);

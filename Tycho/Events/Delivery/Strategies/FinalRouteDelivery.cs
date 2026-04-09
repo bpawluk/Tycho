@@ -27,7 +27,7 @@ namespace Tycho.Events.Delivery.Strategies
         {
             if (!routedEvent.Route.TryPop(out var routeStep) || !(routeStep is FinalRouteStep))
             {
-                throw new InvalidOperationException($"Invalid route in {GetType().Name}");
+                throw new InvalidOperationException($"Invalid route in {GetType().Name}.");
             }
             await _inbox.Write(routedEvent, cancellationToken);
         }
