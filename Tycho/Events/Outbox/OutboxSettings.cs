@@ -13,7 +13,7 @@ namespace Tycho.Events.Outbox
         public static OutboxSettings Default => new OutboxSettings();
 
         /// <summary>
-        /// Gets or sets the concurrency limit for the inbox processor.
+        /// Gets or sets the concurrency limit for the outbox processor.
         /// </summary>
         /// <value>The maximum number of messages being processed in parallel.</value>
         public int ConcurrencyLimit { get; set; } = 10;

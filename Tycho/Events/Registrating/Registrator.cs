@@ -38,7 +38,7 @@ namespace Tycho.Events.Registrating
                     sp.GetRequiredService<IParentReference>(),
                     map)))
             {
-                throw new ArgumentException($"{typeof(TTargetEvent).Name} is already exposed", nameof(TEvent));
+                throw new ArgumentException($"{typeof(TEvent).Name} is already exposed", nameof(TEvent));
             }
         }
 
@@ -65,7 +65,7 @@ namespace Tycho.Events.Registrating
                     map)))
             {
                 throw new ArgumentException(
-                    $"{typeof(TTargetEvent).Name} is already forwarded to {typeof(TModule).Name}",
+                    $"{typeof(TEvent).Name} is already forwarded to {typeof(TModule).Name}",
                     nameof(TEvent));
             }
         }

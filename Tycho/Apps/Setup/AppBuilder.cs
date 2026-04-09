@@ -66,7 +66,12 @@ namespace Tycho.Apps.Setup
 
         public async Task<IApp> BuildAsync()
         {
-            var app = (IApp)Activator.CreateInstance(_appType, _internals, _cleanup);
+            var app = Activator.CreateInstance(_appType, _internals, _cleanup) as IApp;
+
+            if (app is null)
+            {
+                throw new InvalidOperationException($"Failed to create an instance of {_appType.Name}.");
+            }
 
             await Contract.BuildAsync().ConfigureAwait(false);
             await Events.BuildAsync().ConfigureAwait(false);

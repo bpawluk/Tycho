@@ -87,7 +87,12 @@ namespace Tycho.Modules.Setup
 
         public async Task<IModule> BuildAsync()
         {
-            var module = (IModule)Activator.CreateInstance(_moduleType, _internals, _cleanup);
+            var module = Activator.CreateInstance(_moduleType, _internals, _cleanup) as IModule;
+            
+            if (module is null)
+            {
+                throw new InvalidOperationException($"Failed to create an instance of {_moduleType.Name}.");
+            }
 
             await Contract.BuildAsync().ConfigureAwait(false);
             await Events.BuildAsync().ConfigureAwait(false);

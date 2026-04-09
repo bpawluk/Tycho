@@ -31,7 +31,13 @@ namespace Tycho.Events.Broker
             where TEvent : class, IEvent
         {
             var deliveryStrategies = _internals.GetServices<IDeliveryStrategy>();
-            var deliveryStrategy = deliveryStrategies.Single(s => s.CanDeliver(routedEvent));
+
+            var deliveryStrategy = deliveryStrategies.SingleOrDefault(s => s.CanDeliver(routedEvent));
+            if (deliveryStrategy is null)
+            {
+                throw new InvalidOperationException($"No delivery strategy found for {typeof(TEvent).Name} event.");
+            }
+
             await deliveryStrategy.DeliverAsync(routedEvent, cancellationToken);
         }
     }
