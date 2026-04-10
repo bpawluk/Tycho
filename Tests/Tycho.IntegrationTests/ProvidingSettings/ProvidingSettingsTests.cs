@@ -8,7 +8,7 @@ public class ProvidingSettingsTests : IAsyncLifetime
 {
     private ITestApp _sut = null!;
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         _sut = await new TestApp().RunAsync();
     }
@@ -30,7 +30,7 @@ public class ProvidingSettingsTests : IAsyncLifetime
         Assert.Equal(new OtherSettings().Value, gammaValue);
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await _sut!.DisposeAsync();
     }

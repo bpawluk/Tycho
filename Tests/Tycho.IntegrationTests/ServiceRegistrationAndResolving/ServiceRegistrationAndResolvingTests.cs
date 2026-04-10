@@ -9,7 +9,7 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
     private readonly TestWorkflow<TestResult> _testWorkflow = new();
     private ITestApp _sut = null!;
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         _sut = await new TestApp(_testWorkflow).RunAsync();
     }
@@ -224,7 +224,7 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         Assert.Equal(1, secondResult);
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await _sut!.DisposeAsync();
     }

@@ -11,7 +11,7 @@ public class ContentModerationTests : IAsyncLifetime
     private readonly TestData _testData = new();
     private IContentModerationApp _sut = null!;
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         _sut = await new ContentModerationApp().RunAsync();
     }
@@ -73,7 +73,7 @@ public class ContentModerationTests : IAsyncLifetime
         }
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await _sut!.DisposeAsync();
     }

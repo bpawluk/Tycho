@@ -12,7 +12,7 @@ public class OnlineStoreTests : IAsyncLifetime
     private readonly TestData _testData = new();
     private IOnlineStoreApp _sut = null!;
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
        _sut = await new OnlineStoreApp().RunAsync();
     }
@@ -79,7 +79,7 @@ public class OnlineStoreTests : IAsyncLifetime
         await _sut.ExecuteAsync(checkoutRequest);
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await _sut!.DisposeAsync();
     }

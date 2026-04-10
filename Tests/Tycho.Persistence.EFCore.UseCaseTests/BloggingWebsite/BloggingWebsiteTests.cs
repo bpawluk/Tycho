@@ -10,7 +10,7 @@ public class BloggingWebsiteTests : IAsyncLifetime
     private readonly TestData _testData = new();
     private IBloggingWebsiteApp _sut = null!;
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         _sut = await new BloggingWebsiteApp().RunAsync();
     }
@@ -97,7 +97,7 @@ public class BloggingWebsiteTests : IAsyncLifetime
         }
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await _sut!.DisposeAsync();
     }

@@ -7,7 +7,7 @@ public class RunningStartupLogicTests : IAsyncLifetime
 {
     private ITestApp _sut = null!;
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         _sut = await new TestApp().RunAsync();
     }
@@ -38,7 +38,7 @@ public class RunningStartupLogicTests : IAsyncLifetime
         Assert.Equal("Test = Passed", moduleValue);
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await _sut!.DisposeAsync();
     }

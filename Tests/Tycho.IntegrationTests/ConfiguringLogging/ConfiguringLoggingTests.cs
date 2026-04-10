@@ -8,7 +8,7 @@ public class ConfiguringLoggingTests : IAsyncLifetime
 {
     private ITestApp _sut = null!;
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         _sut = await new TestApp().WithLogging(ConfigureLogging).RunAsync();
     }
@@ -37,7 +37,7 @@ public class ConfiguringLoggingTests : IAsyncLifetime
         builder.AddProvider(new TestLoggerProvider());
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await _sut!.DisposeAsync();
     }
