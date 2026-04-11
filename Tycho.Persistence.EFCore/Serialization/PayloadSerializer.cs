@@ -17,13 +17,12 @@ internal class PayloadSerializer
 
     public IEvent Deserialize(Type eventType, object payload)
     {
-        if (!(payload is string stringPayload) || string.IsNullOrWhiteSpace(stringPayload))
+        if (payload is not string stringPayload || string.IsNullOrWhiteSpace(stringPayload))
         {
             throw new ArgumentException("Payload must be a non-empty string", nameof(payload));
         }
 
-        var eventData = (IEvent?)JsonSerializer.Deserialize(stringPayload, eventType);
-        if (eventData is null)
+        if (JsonSerializer.Deserialize(stringPayload, eventType) is not IEvent eventData)
         {
             throw new InvalidOperationException($"Failed to deserialize payload to {eventType.Name}");
         }
