@@ -44,6 +44,7 @@ namespace Tycho.Events.Inbox
             try
             {
                 await _event!.DispatchAsync(_dispatcher, cancellationToken).ConfigureAwait(false);
+                // do not call _inbox.MarkAsHandled here as this is a responsibility of ScopedEventHandler
             }
             catch (Exception ex)
             {

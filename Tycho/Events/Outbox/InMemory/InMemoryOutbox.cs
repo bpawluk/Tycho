@@ -20,11 +20,17 @@ namespace Tycho.Events.Outbox.InMemory
 
         public Task Write(IReadOnlyCollection<RoutedEvent> entries, CancellationToken cancellationToken)
         {
+            if (entries.Count == 0)
+            {
+                return Task.CompletedTask;
+            }
+
             foreach (var entry in entries)
             {
                 _entries.Enqueue(entry);
             }
             _outboxActivity.NotifyNewEntriesAdded();
+
             return Task.CompletedTask;
         }
 
