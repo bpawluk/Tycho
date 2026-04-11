@@ -115,6 +115,11 @@ namespace Tycho.Processor
         {
             lock (_timerChangeLock)
             {
+                if (_currentInterval == Timeout.InfiniteTimeSpan)
+                {
+                    return;
+                }
+
                 var newInterval = _currentInterval * _settings.IntervalMultiplier;
 
                 if (newInterval > _settings.MaxInterval)
