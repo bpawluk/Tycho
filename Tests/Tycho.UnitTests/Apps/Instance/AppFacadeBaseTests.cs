@@ -21,26 +21,6 @@ public class AppFacadeBaseTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WithNullRequest_ThrowsArgumentNullException()
-    {
-        // Act
-        async Task Act() => await _sut.Send<TestRequest>(null!, CancellationToken.None);
-
-        // Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(Act);
-    }
-
-    [Fact]
-    public async Task ExecuteAsync_WithNullRequestWithResponse_ThrowsArgumentNullException()
-    {
-        // Act
-        async Task Act() => await _sut.Send<TestRequestWithResponse, string>(null!, CancellationToken.None);
-
-        // Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(Act);
-    }
-
-    [Fact]
     public async Task ExecuteAsync_ValidRequest_DelegatesToBroker()
     {
         // Arrange
@@ -68,6 +48,26 @@ public class AppFacadeBaseTests
 
         // Assert
         Assert.Equal("result", result);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WithNullRequest_ThrowsArgumentNullException()
+    {
+        // Act
+        async Task Act() => await _sut.Send<TestRequest>(null!, CancellationToken.None);
+
+        // Assert
+        await Assert.ThrowsAsync<ArgumentNullException>(Act);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WithNullRequestWithResponse_ThrowsArgumentNullException()
+    {
+        // Act
+        async Task Act() => await _sut.Send<TestRequestWithResponse, string>(null!, CancellationToken.None);
+
+        // Assert
+        await Assert.ThrowsAsync<ArgumentNullException>(Act);
     }
 
     [Fact]
