@@ -3,7 +3,7 @@ using Tycho.IntegrationTests.SendingRequestsHorizontally.SUT;
 
 namespace Tycho.IntegrationTests.SendingRequestsHorizontally;
 
-public class SendingRequestsHorizontallyTests : IAsyncLifetime
+public sealed class SendingRequestsHorizontallyTests : IAsyncLifetime
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = new();
     private ITestApp _sut = null!;
@@ -21,7 +21,7 @@ public class SendingRequestsHorizontallyTests : IAsyncLifetime
         var request = new Request(new TestResult { Id = workflowId });
 
         // Act
-        await _sut!.ExecuteAsync(request);
+        await _sut!.ExecuteAsync(request, TestContext.Current.CancellationToken);
         var testResult = await _testWorkflow.GetResult();
 
         // Assert
@@ -37,7 +37,7 @@ public class SendingRequestsHorizontallyTests : IAsyncLifetime
         var message = new RequestWithResponse(new TestResult { Id = workflowId });
 
         // Act
-        var response = await _sut!.ExecuteAsync(message);
+        var response = await _sut!.ExecuteAsync(message, TestContext.Current.CancellationToken);
         var testResult = await _testWorkflow.GetResult();
 
         // Assert

@@ -4,7 +4,7 @@ using Tycho.IntegrationTests.ProvidingConfiguration.SUT.Modules;
 
 namespace Tycho.IntegrationTests.ProvidingConfiguration;
 
-public class ProvidingConfigurationTests : IAsyncLifetime
+public sealed class ProvidingConfigurationTests : IAsyncLifetime
 {
     private const string _appValue = "App";
     private const string _alphaValue = "Alpha";
@@ -32,9 +32,9 @@ public class ProvidingConfigurationTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var appValue = await _sut.ExecuteAsync(new GetAppValueRequest());
-        var alphaValue = await _sut.ExecuteAsync(new GetAlphaValueRequest());
-        var betaValue = await _sut.ExecuteAsync(new GetBetaValueRequest());
+        var appValue = await _sut.ExecuteAsync(new GetAppValueRequest(), TestContext.Current.CancellationToken);
+        var alphaValue = await _sut.ExecuteAsync(new GetAlphaValueRequest(), TestContext.Current.CancellationToken);
+        var betaValue = await _sut.ExecuteAsync(new GetBetaValueRequest(), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(_appValue, appValue);

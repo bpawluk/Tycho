@@ -3,7 +3,7 @@ using Tycho.IntegrationTests.ForwardingEventsVertically.SUT;
 
 namespace Tycho.IntegrationTests.ForwardingEventsVertically;
 
-public class ForwardingEventsVerticallyTests : IAsyncLifetime
+public sealed class ForwardingEventsVerticallyTests : IAsyncLifetime
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = new();
     private ITestApp _sut = null!;
@@ -21,7 +21,7 @@ public class ForwardingEventsVerticallyTests : IAsyncLifetime
         var request = new BeginTestWorkflowRequest(new TestResult { Id = workflowId });
 
         // Act
-        await _sut!.ExecuteAsync(request);
+        await _sut!.ExecuteAsync(request, TestContext.Current.CancellationToken);
         var testResult = await _testWorkflow.GetResult();
 
         // Assert
@@ -36,7 +36,7 @@ public class ForwardingEventsVerticallyTests : IAsyncLifetime
         var request = new BeginTestWorkflowRequest(new TestResult { Id = workflowId });
 
         // Act
-        await _sut!.ExecuteAsync(request);
+        await _sut!.ExecuteAsync(request, TestContext.Current.CancellationToken);
         var testResult = await _testWorkflow.GetResult();
 
         // Assert

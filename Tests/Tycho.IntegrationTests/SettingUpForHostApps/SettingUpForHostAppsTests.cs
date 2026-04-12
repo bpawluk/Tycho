@@ -20,7 +20,7 @@ public class SettingUpForHostAppsTests
 
         // Act
         var app = host.Services.GetRequiredService<ITestApp>();
-        var response = await app.ExecuteAsync(new TestRequest());
+        var response = await app.ExecuteAsync(new TestRequest(), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(expectedResponse, response);

@@ -3,7 +3,7 @@ using Tycho.IntegrationTests.RunningStartupLogic.SUT.Modules;
 
 namespace Tycho.IntegrationTests.RunningStartupLogic;
 
-public class RunningStartupLogicTests : IAsyncLifetime
+public sealed class RunningStartupLogicTests : IAsyncLifetime
 {
     private ITestApp _sut = null!;
 
@@ -19,7 +19,7 @@ public class RunningStartupLogicTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var appValue = await _sut.ExecuteAsync(new GetAppValueRequest());
+        var appValue = await _sut.ExecuteAsync(new GetAppValueRequest(), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal("Test = Passed", appValue);
@@ -32,7 +32,7 @@ public class RunningStartupLogicTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var moduleValue = await _sut.ExecuteAsync(new GetModuleValueRequest());
+        var moduleValue = await _sut.ExecuteAsync(new GetModuleValueRequest(), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal("Test = Passed", moduleValue);

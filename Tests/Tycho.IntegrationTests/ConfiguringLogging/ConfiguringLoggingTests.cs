@@ -4,7 +4,7 @@ using Tycho.IntegrationTests.ConfiguringLogging.SUT.Modules;
 
 namespace Tycho.IntegrationTests.ConfiguringLogging;
 
-public class ConfiguringLoggingTests : IAsyncLifetime
+public sealed class ConfiguringLoggingTests : IAsyncLifetime
 {
     private ITestApp _sut = null!;
 
@@ -20,9 +20,9 @@ public class ConfiguringLoggingTests : IAsyncLifetime
         var logger = (TestLogger)new TestLoggerProvider().CreateLogger(string.Empty)!;
 
         // Act
-        await _sut.ExecuteAsync(new LogAppRequest());
-        await _sut.ExecuteAsync(new LogAlphaRequest());
-        await _sut.ExecuteAsync(new LogBetaRequest());
+        await _sut.ExecuteAsync(new LogAppRequest(), TestContext.Current.CancellationToken);
+        await _sut.ExecuteAsync(new LogAlphaRequest(), TestContext.Current.CancellationToken);
+        await _sut.ExecuteAsync(new LogBetaRequest(), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(3, logger.Logs.Count);

@@ -4,7 +4,7 @@ using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules;
 
 namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving;
 
-public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
+public sealed class ServiceRegistrationAndResolvingTests : IAsyncLifetime
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = new();
     private ITestApp _sut = null!;
@@ -21,8 +21,8 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var firstResult = await _sut.ExecuteAsync(new GetAppSingletonServiceUsageRequest());
-        var secondResult =  await _sut.ExecuteAsync(new GetAppSingletonServiceUsageRequest());
+        var firstResult = await _sut.ExecuteAsync(new GetAppSingletonServiceUsageRequest(), TestContext.Current.CancellationToken);
+        var secondResult =  await _sut.ExecuteAsync(new GetAppSingletonServiceUsageRequest(), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(2, firstResult);
@@ -36,8 +36,8 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var firstResult = await _sut.ExecuteAsync(new GetModuleSingletonServiceUsageRequest());
-        var secondResult = await _sut.ExecuteAsync(new GetModuleSingletonServiceUsageRequest());
+        var firstResult = await _sut.ExecuteAsync(new GetModuleSingletonServiceUsageRequest(), TestContext.Current.CancellationToken);
+        var secondResult = await _sut.ExecuteAsync(new GetModuleSingletonServiceUsageRequest(), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(2, firstResult);
@@ -53,10 +53,10 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         var secondRequest = new BeginTestWorkflowRequest(new TestResult { Id = workflowId });
 
         // Act
-        await _sut!.ExecuteAsync(firstRequest);
+        await _sut!.ExecuteAsync(firstRequest, TestContext.Current.CancellationToken);
         var firstResult = (await _testWorkflow.GetResult()).NumberOfCalls;
         _testWorkflow.Reset();
-        await _sut!.ExecuteAsync(secondRequest);
+        await _sut!.ExecuteAsync(secondRequest, TestContext.Current.CancellationToken);
         var secondResult = (await _testWorkflow.GetResult()).NumberOfCalls;
 
         // Assert
@@ -73,10 +73,10 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         var secondRequest = new BeginTestWorkflowRequest(new TestResult { Id = workflowId });
 
         // Act
-        await _sut!.ExecuteAsync(firstRequest);
+        await _sut!.ExecuteAsync(firstRequest, TestContext.Current.CancellationToken);
         var firstResult = (await _testWorkflow.GetResult()).NumberOfCalls;
         _testWorkflow.Reset();
-        await _sut!.ExecuteAsync(secondRequest);
+        await _sut!.ExecuteAsync(secondRequest, TestContext.Current.CancellationToken);
         var secondResult = (await _testWorkflow.GetResult()).NumberOfCalls;
 
         // Assert
@@ -91,8 +91,8 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var firstResult = await _sut.ExecuteAsync(new GetAppScopedServiceUsageRequest());
-        var secondResult = await _sut.ExecuteAsync(new GetAppScopedServiceUsageRequest());
+        var firstResult = await _sut.ExecuteAsync(new GetAppScopedServiceUsageRequest(), TestContext.Current.CancellationToken);
+        var secondResult = await _sut.ExecuteAsync(new GetAppScopedServiceUsageRequest(), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(2, firstResult);
@@ -106,8 +106,8 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var firstResult = await _sut.ExecuteAsync(new GetModuleScopedServiceUsageRequest());
-        var secondResult = await _sut.ExecuteAsync(new GetModuleScopedServiceUsageRequest());
+        var firstResult = await _sut.ExecuteAsync(new GetModuleScopedServiceUsageRequest(), TestContext.Current.CancellationToken);
+        var secondResult = await _sut.ExecuteAsync(new GetModuleScopedServiceUsageRequest(), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(2, firstResult);
@@ -123,10 +123,10 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         var secondRequest = new BeginTestWorkflowRequest(new TestResult { Id = workflowId });
 
         // Act
-        await _sut!.ExecuteAsync(firstRequest);
+        await _sut!.ExecuteAsync(firstRequest, TestContext.Current.CancellationToken);
         var firstResult = (await _testWorkflow.GetResult()).NumberOfCalls;
         _testWorkflow.Reset();
-        await _sut!.ExecuteAsync(secondRequest);
+        await _sut!.ExecuteAsync(secondRequest, TestContext.Current.CancellationToken);
         var secondResult = (await _testWorkflow.GetResult()).NumberOfCalls;
 
         // Assert
@@ -143,10 +143,10 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         var secondRequest = new BeginTestWorkflowRequest(new TestResult { Id = workflowId });
 
         // Act
-        await _sut!.ExecuteAsync(firstRequest);
+        await _sut!.ExecuteAsync(firstRequest, TestContext.Current.CancellationToken);
         var firstResult = (await _testWorkflow.GetResult()).NumberOfCalls;
         _testWorkflow.Reset();
-        await _sut!.ExecuteAsync(secondRequest);
+        await _sut!.ExecuteAsync(secondRequest, TestContext.Current.CancellationToken);
         var secondResult = (await _testWorkflow.GetResult()).NumberOfCalls;
 
         // Assert
@@ -161,8 +161,8 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var firstResult = await _sut.ExecuteAsync(new GetAppTransientServiceUsageRequest());
-        var secondResult = await _sut.ExecuteAsync(new GetAppTransientServiceUsageRequest());
+        var firstResult = await _sut.ExecuteAsync(new GetAppTransientServiceUsageRequest(), TestContext.Current.CancellationToken);
+        var secondResult = await _sut.ExecuteAsync(new GetAppTransientServiceUsageRequest(), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(1, firstResult);
@@ -176,8 +176,8 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var firstResult = await _sut.ExecuteAsync(new GetModuleTransientServiceUsageRequest());
-        var secondResult = await _sut.ExecuteAsync(new GetModuleTransientServiceUsageRequest());
+        var firstResult = await _sut.ExecuteAsync(new GetModuleTransientServiceUsageRequest(), TestContext.Current.CancellationToken);
+        var secondResult = await _sut.ExecuteAsync(new GetModuleTransientServiceUsageRequest(), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(1, firstResult);
@@ -193,10 +193,10 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         var secondRequest = new BeginTestWorkflowRequest(new TestResult { Id = workflowId });
 
         // Act
-        await _sut!.ExecuteAsync(firstRequest);
+        await _sut!.ExecuteAsync(firstRequest, TestContext.Current.CancellationToken);
         var firstResult = (await _testWorkflow.GetResult()).NumberOfCalls;
         _testWorkflow.Reset();
-        await _sut!.ExecuteAsync(secondRequest);
+        await _sut!.ExecuteAsync(secondRequest, TestContext.Current.CancellationToken);
         var secondResult = (await _testWorkflow.GetResult()).NumberOfCalls;
 
         // Assert
@@ -213,10 +213,10 @@ public class ServiceRegistrationAndResolvingTests : IAsyncLifetime
         var secondRequest = new BeginTestWorkflowRequest(new TestResult { Id = workflowId });
 
         // Act
-        await _sut!.ExecuteAsync(firstRequest);
+        await _sut!.ExecuteAsync(firstRequest, TestContext.Current.CancellationToken);
         var firstResult = (await _testWorkflow.GetResult()).NumberOfCalls;
         _testWorkflow.Reset();
-        await _sut!.ExecuteAsync(secondRequest);
+        await _sut!.ExecuteAsync(secondRequest, TestContext.Current.CancellationToken);
         var secondResult = (await _testWorkflow.GetResult()).NumberOfCalls;
 
         // Assert

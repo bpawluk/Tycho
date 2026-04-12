@@ -3,7 +3,7 @@ using Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT;
 
 namespace Tycho.IntegrationTests.ForwardingRequestsHorizontally;
 
-public class ForwardingRequestsHorizontallyTests : IAsyncLifetime
+public sealed class ForwardingRequestsHorizontallyTests : IAsyncLifetime
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = new();
     private ITestApp _sut = null!;
@@ -21,7 +21,7 @@ public class ForwardingRequestsHorizontallyTests : IAsyncLifetime
         var request = new Request(new TestResult { Id = workflowId });
 
         // Act
-        await _sut!.ExecuteAsync(request);
+        await _sut!.ExecuteAsync(request, TestContext.Current.CancellationToken);
         var testResult = await _testWorkflow.GetResult();
 
         // Assert
@@ -36,7 +36,7 @@ public class ForwardingRequestsHorizontallyTests : IAsyncLifetime
         var message = new RequestWithResponse(new TestResult { Id = workflowId });
 
         // Act
-        var response = await _sut!.ExecuteAsync(message);
+        var response = await _sut!.ExecuteAsync(message, TestContext.Current.CancellationToken);
         var testResult = await _testWorkflow.GetResult();
 
         // Assert
@@ -52,7 +52,7 @@ public class ForwardingRequestsHorizontallyTests : IAsyncLifetime
         var request = new RequestToMap(new TestResult { Id = workflowId });
 
         // Act
-        await _sut!.ExecuteAsync(request);
+        await _sut!.ExecuteAsync(request, TestContext.Current.CancellationToken);
         var testResult = await _testWorkflow.GetResult();
 
         // Assert
@@ -67,7 +67,7 @@ public class ForwardingRequestsHorizontallyTests : IAsyncLifetime
         var message = new RequestToMapWithResponse(new TestResult { Id = workflowId });
 
         // Act
-        var response = await _sut!.ExecuteAsync(message);
+        var response = await _sut!.ExecuteAsync(message, TestContext.Current.CancellationToken);
         var testResult = await _testWorkflow.GetResult();
 
         // Assert
