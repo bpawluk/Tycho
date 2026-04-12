@@ -66,7 +66,16 @@ namespace Tycho.Processor
                 foreach (var job in newJobs)
                 {
                     cts.Token.ThrowIfCancellationRequested();
-                    _ = Task.Run(async () => await ProcessJobAsync(job).ConfigureAwait(false));
+                    Interlocked.Increment(ref _jobsInProgress);
+                    try
+                    {
+                        _ = Task.Run(async () => await ProcessJobAsync(job).ConfigureAwait(false));
+                    }
+                    catch
+                    {
+                        Interlocked.Decrement(ref _jobsInProgress);
+                        throw;
+                    }
                 }
                 ResetInterval();
             }
@@ -78,9 +87,7 @@ namespace Tycho.Processor
 
         private async Task ProcessJobAsync(IJob job)
         {
-            Interlocked.Increment(ref _jobsInProgress);
             using var cts = new CancellationTokenSource(_settings.JobProcessingTimeout);
-
             try
             {
                 await job.ExecuteAsync(cts.Token).ConfigureAwait(false);
