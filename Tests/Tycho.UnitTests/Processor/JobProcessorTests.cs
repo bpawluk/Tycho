@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using Moq;
 using Tycho.Processor;
 
@@ -5,9 +7,9 @@ namespace Tycho.UnitTests.Processor;
 
 public class JobProcessorTests
 {
-    private static readonly TimeSpan _waitingTimeout = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan _waitingTimeout = TimeSpan.FromSeconds(10);
 
-    private static readonly TimeSpan _initialInterval = TimeSpan.FromMilliseconds(10);
+    private static readonly TimeSpan _initialInterval = TimeSpan.FromMilliseconds(5);
     private static readonly TimeSpan _maxInterval = TimeSpan.FromMilliseconds(50);
     private static readonly double _intervalMultiplier = 2;
 
@@ -16,14 +18,15 @@ public class JobProcessorTests
     #region ACTIVATION
 
     [Fact]
-    public async Task JobProcessor_OnActivation_StartsProcessingSchedule()
+    public async Task JobProcessor_OnActivation_StartsProcessing()
     {
         // Arrange
         var factoryCalledSignal = new ManualResetEventSlim(false);
 
-        _factoryMock.Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
-                    .ReturnsAsync([])
-                    .Callback(factoryCalledSignal.Set);
+        _factoryMock
+            .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([])
+            .Callback(factoryCalledSignal.Set);
 
         using var sut = CreateSut();
 
@@ -46,13 +49,14 @@ public class JobProcessorTests
         int? capturedMaxCount = null;
         var factoryCalledSignal = new ManualResetEventSlim(false);
 
-        _factoryMock.Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
-                    .ReturnsAsync([])
-                    .Callback<int, CancellationToken>((maxCount, _) =>
-                    {
-                        capturedMaxCount ??= maxCount;
-                        factoryCalledSignal.Set();
-                    });
+        _factoryMock
+            .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([])
+            .Callback<int, CancellationToken>((maxCount, _) =>
+            {
+                capturedMaxCount ??= maxCount;
+                factoryCalledSignal.Set();
+            });
 
         using var sut = CreateSut(s => s.ConcurrencyLimit = concurrencyLimit);
 
@@ -72,13 +76,14 @@ public class JobProcessorTests
         var capturedMaxCounts = new List<int>();
         var factoryCalledSignal = new CountdownEvent(3);
 
-        _factoryMock.Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
-                    .ReturnsAsync([CreateInfiniteJob().Object, CreateInfiniteJob().Object])
-                    .Callback<int, CancellationToken>((maxCount, _) =>
-                    {
-                        capturedMaxCounts.Add(maxCount);
-                        factoryCalledSignal.Signal();
-                    });
+        _factoryMock
+            .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([CreateInfiniteJob().Object, CreateInfiniteJob().Object])
+            .Callback<int, CancellationToken>((maxCount, _) =>
+            {
+                capturedMaxCounts.Add(maxCount);
+                factoryCalledSignal.Signal();
+            });
 
         using var sut = CreateSut(s => s.ConcurrencyLimit = concurrencyLimit);
 
@@ -96,8 +101,9 @@ public class JobProcessorTests
         // Arrange
         var concurrencyLimit = 1;
 
-        _factoryMock.Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
-                    .ReturnsAsync([CreateInfiniteJob().Object]);
+        _factoryMock
+            .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([CreateInfiniteJob().Object]);
 
         using var sut = CreateSut(s => s.ConcurrencyLimit = concurrencyLimit);
 
@@ -115,8 +121,9 @@ public class JobProcessorTests
         // Arrange
         var concurrencyLimit = 0;
 
-        _factoryMock.Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
-                    .ReturnsAsync([]);
+        _factoryMock
+            .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
 
         using var sut = CreateSut(s => s.ConcurrencyLimit = concurrencyLimit);
 
@@ -132,387 +139,445 @@ public class JobProcessorTests
 
     #region JOB EXECUTION
 
-
-
-    #endregion JOB EXECUTION
-
-    #region PROCESSOR TIMING
-
-
-
-    #endregion PROCESSOR TIMING
-
-    #region ERROR HANDLING
-
-
-
-    #endregion ERROR HANDLING
-
-    #region DISPOSAL
-
-
-
-    #endregion DISPOSAL
-
-    // --- Job Execution ---
-
     [Fact]
-    public async Task ProcessSchedule_WithJobsReturned_ExecutesAllJobs()
-    {
-        // Arrange
-        var jobExecutedSignal = new SemaphoreSlim(0, 10);
-
-        var firstJobMock = new Mock<IJob>();
-        firstJobMock
-            .Setup(j => j.ExecuteAsync(It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask)
-            .Callback(() => jobExecutedSignal.Release());
-
-        var secondJobMock = new Mock<IJob>();
-        secondJobMock
-            .Setup(j => j.ExecuteAsync(It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask)
-            .Callback(() => jobExecutedSignal.Release());
-
-        int callCount = 0;
-        _factoryMock
-            .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(() =>
-            {
-                if (Interlocked.Increment(ref callCount) == 1) return [firstJobMock.Object, secondJobMock.Object];
-                return [];
-            });
-
-        using var sut = CreateSut();
-
-        // Act
-        sut.Activate();
-        await jobExecutedSignal.WaitAsync(_waitingTimeout);
-        await jobExecutedSignal.WaitAsync(_waitingTimeout);
-
-        // Assert
-        firstJobMock.Verify(j => j.ExecuteAsync(It.IsAny<CancellationToken>()), Times.Once);
-        secondJobMock.Verify(j => j.ExecuteAsync(It.IsAny<CancellationToken>()), Times.Once);
-    }
-
-    // --- Concurrency Limiting ---
-
-    [Fact]
-    public async Task ProcessSchedule_WhenJobCompletes_RestoresCapacity()
-    {
-        // Arrange
-        var jobStartedSignal = new SemaphoreSlim(0, 1);
-        var jobBlocker = new TaskCompletionSource();
-        var blockingJobMock = CreateBlockingJob(jobStartedSignal, jobBlocker);
-
-        int factoryCallCount = 0;
-        var factoryCalledAfterRelease = new SemaphoreSlim(0, 100);
-
-        _ = _factoryMock
-            .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(() =>
-            {
-                var n = Interlocked.Increment(ref factoryCallCount);
-                if (n == 1) return [blockingJobMock.Object];
-                factoryCalledAfterRelease.Release();
-                return [];
-            });
-
-        using var sut = CreateSut(s => s.ConcurrencyLimit = 1);
-
-        // Act
-        sut.Activate();
-        await jobStartedSignal.WaitAsync(_waitingTimeout);
-        await Task.Delay(200);
-        var callCountWhileBlocked = Volatile.Read(ref factoryCallCount);
-
-        jobBlocker.SetResult();
-        sut.Activate();
-        await factoryCalledAfterRelease.WaitAsync(_waitingTimeout);
-
-        // Assert
-        Assert.True(Volatile.Read(ref factoryCallCount) > callCountWhileBlocked);
-    }
-
-    // --- Backoff ---
-
-    [Fact]
-    public async Task ProcessSchedule_WithNoJobsAvailable_EventuallyStopsPolling()
-    {
-        // Arrange
-        int factoryCallCount = 0;
-
-        _factoryMock
-            .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Array.Empty<IJob>())
-            .Callback(() => Interlocked.Increment(ref factoryCallCount));
-
-        using var sut = CreateSut(s =>
-        {
-            s.InitialInterval = TimeSpan.FromMilliseconds(10);
-            s.IntervalMultiplier = 2;
-            s.MaxInterval = TimeSpan.FromMilliseconds(50);
-        });
-
-        // Act
-        sut.Activate();
-        await Task.Delay(500);
-        var callCountSnapshot = Volatile.Read(ref factoryCallCount);
-        await Task.Delay(500);
-
-        // Assert
-        Assert.True(callCountSnapshot >= 3);
-        Assert.Equal(callCountSnapshot, Volatile.Read(ref factoryCallCount));
-    }
-
-    // --- Reentrancy Guard ---
-
-    [Fact]
-    public async Task ProcessSchedule_WhenAlreadyProcessing_SkipsOverlappingTick()
-    {
-        // Arrange
-        var factoryBlocker = new TaskCompletionSource<IReadOnlyCollection<IJob>>();
-        int factoryCallCount = 0;
-
-        _factoryMock
-            .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
-            .Returns<int, CancellationToken>((_, __) =>
-            {
-                Interlocked.Increment(ref factoryCallCount);
-                return factoryBlocker.Task;
-            });
-
-        using var sut = CreateSut(s =>
-        {
-            s.InitialInterval = TimeSpan.FromMilliseconds(10);
-            s.ScheduleProcessingTimeout = TimeSpan.FromSeconds(30);
-        });
-
-        // Act
-        sut.Activate();
-        await Task.Delay(200);
-        var callCountWhileBlocked = Volatile.Read(ref factoryCallCount);
-        factoryBlocker.SetResult(Array.Empty<IJob>());
-
-        // Assert
-        Assert.Equal(1, callCountWhileBlocked);
-    }
-
-    // --- Schedule Processing Errors ---
-
-    [Fact]
-    public async Task ProcessSchedule_WhenFactoryThrows_RaisesOnScheduleProcessingError()
-    {
-        // Arrange
-        var expectedException = new InvalidOperationException("factory error");
-        Exception? capturedError = null;
-        var errorSignal = new SemaphoreSlim(0, 1);
-
-        _factoryMock
-            .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
-            .ThrowsAsync(expectedException);
-
-        using var sut = CreateSut();
-        sut.OnScheduleProcessingError += (_, ex) =>
-        {
-            capturedError = ex;
-            errorSignal.Release();
-        };
-
-        // Act
-        sut.Activate();
-        await errorSignal.WaitAsync(_waitingTimeout);
-
-        // Assert
-        Assert.Same(expectedException, capturedError);
-    }
-
-    [Fact]
-    public async Task ProcessSchedule_WhenFactoryThrows_ContinuesProcessingNextTick()
-    {
-        // Arrange
-        int callCount = 0;
-        var secondCallSignal = new SemaphoreSlim(0, 1);
-
-        _factoryMock
-            .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
-            .Returns<int, CancellationToken>((_, __) =>
-            {
-                if (Interlocked.Increment(ref callCount) == 1)
-                    return Task.FromException<IReadOnlyCollection<IJob>>(new InvalidOperationException("factory error"));
-                secondCallSignal.Release();
-                return Task.FromResult<IReadOnlyCollection<IJob>>(Array.Empty<IJob>());
-            });
-
-        using var sut = CreateSut();
-
-        // Act
-        sut.Activate();
-        await secondCallSignal.WaitAsync(_waitingTimeout);
-
-        // Assert
-        Assert.True(Volatile.Read(ref callCount) >= 2);
-    }
-
-    [Fact]
-    public async Task ProcessSchedule_WhenScheduleErrorSubscriberThrows_DoesNotCrash()
-    {
-        // Arrange
-        int callCount = 0;
-        var secondCallSignal = new SemaphoreSlim(0, 1);
-
-        _factoryMock
-            .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
-            .Returns<int, CancellationToken>((_, __) =>
-            {
-                if (Interlocked.Increment(ref callCount) == 1)
-                    return Task.FromException<IReadOnlyCollection<IJob>>(new InvalidOperationException("factory error"));
-                secondCallSignal.Release();
-                return Task.FromResult<IReadOnlyCollection<IJob>>(Array.Empty<IJob>());
-            });
-
-        using var sut = CreateSut();
-        sut.OnScheduleProcessingError += (_, _) => throw new Exception("subscriber error");
-
-        // Act
-        sut.Activate();
-        await secondCallSignal.WaitAsync(_waitingTimeout);
-
-        // Assert
-        Assert.True(Volatile.Read(ref callCount) >= 2);
-    }
-
-    // --- Job Processing Errors ---
-
-    [Fact]
-    public async Task ProcessJob_WhenJobThrows_RaisesOnJobProcessingError()
-    {
-        // Arrange
-        var expectedException = new InvalidOperationException("job error");
-        Exception? capturedError = null;
-        var errorSignal = new SemaphoreSlim(0, 1);
-
-        var jobMock = new Mock<IJob>();
-        jobMock
-            .Setup(j => j.ExecuteAsync(It.IsAny<CancellationToken>()))
-            .ThrowsAsync(expectedException);
-
-        int callCount = 0;
-
-        _factoryMock
-            .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(() =>
-            {
-                if (Interlocked.Increment(ref callCount) == 1)
-                    return new IJob[] { jobMock.Object };
-                return Array.Empty<IJob>();
-            });
-
-        using var sut = CreateSut();
-        sut.OnJobProcessingError += (_, ex) =>
-        {
-            capturedError = ex;
-            errorSignal.Release();
-        };
-
-        // Act
-        sut.Activate();
-        await errorSignal.WaitAsync(_waitingTimeout);
-
-        // Assert
-        Assert.Same(expectedException, capturedError);
-    }
-
-    [Fact]
-    public async Task ProcessJob_WhenJobThrows_RestoresCapacity()
+    public async Task JobProcessor_WithJobsToProcess_ExecutesAllJobsAndEventuallyStopsPolling()
     {
         // Arrange
         var concurrencyLimit = 3;
-        var errorSignal = new SemaphoreSlim(0, 1);
-        var capacitySignal = new SemaphoreSlim(0, 10);
-        int? capturedCapacityAfterError = null;
+        var jobsToExecuteCount = 10;
+
+        var jobsToExecute = Enumerable.Range(0, jobsToExecuteCount).Select(_ => 
+        {
+            var jobCompletedSignal = new ManualResetEventSlim(false);
+            var jobMock = CreateActualJob(jobCompletedSignal);
+            return (Job: jobMock, Signal: jobCompletedSignal);
+        }).ToArray();
+
+        int factoryCallCount = 0;
+        var jobsQueue = new Queue<Mock<IJob>>(jobsToExecute.Select(jobData => jobData.Job));
+
+         _factoryMock
+            .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((int maxCount, CancellationToken _) =>
+            {
+                Interlocked.Increment(ref factoryCallCount);
+                var jobs = new List<IJob>();
+                for (var i = 0; i < maxCount; i++)
+                {
+                    if (jobsQueue.TryDequeue(out var nextJob))
+                    {
+                        jobs.Add(nextJob.Object);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                return jobs;
+            });
+
+        using var sut = CreateSut(s => s.ConcurrencyLimit = concurrencyLimit);
+
+        // STAGE 1
+
+        // Act
+        sut.Activate();
+
+        // Assert
+        foreach (var (_, Signal) in jobsToExecute)
+        {
+            Assert.True(Signal.Wait(_waitingTimeout, CancellationToken.None));
+        }
+
+        // STAGE 2
+
+        // Act
+        await WaitTillProcessorIdles();
+        var finalFactoryCallCount = Volatile.Read(ref factoryCallCount);
+        await WaitForPotentialNextIteration();
+
+        // Assert
+
+        Assert.Equal(finalFactoryCallCount, Volatile.Read(ref factoryCallCount));
+    }
+
+    [Fact]
+    public async Task JobProcessor_WhenJobCompletes_RestoresCapacity()
+    {
+        // Arrange
+        var concurrencyLimit = 3;
 
         var jobMock = new Mock<IJob>();
+        var completeJobSignal = new ManualResetEventSlim(false);
+        bool jobCompleted = false;
+
         jobMock
             .Setup(j => j.ExecuteAsync(It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new InvalidOperationException("job error"));
+            .Returns(() =>
+            {
+                completeJobSignal.Wait(_waitingTimeout, CancellationToken.None);
+                Volatile.Write(ref jobCompleted, true);
+                return Task.CompletedTask;
+            });
 
-        var errorFired = false;
-        int callCount = 0;
+        int factoryCallCount = 0;
+        int capturedCapacity = -1;
+
+        var factoryCalledBeforeCompletionSignal = new ManualResetEventSlim(false);
+        var factoryCalledAfterCompletionSignal = new ManualResetEventSlim(false);
 
         _factoryMock
             .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((int maxCount, CancellationToken _) =>
             {
-                var n = Interlocked.Increment(ref callCount);
-                if (n == 1)
-                    return new IJob[] { jobMock.Object };
-                if (Volatile.Read(ref errorFired))
+                Volatile.Write(ref capturedCapacity, maxCount);
+
+                if (Interlocked.Increment(ref factoryCallCount) == 1)
                 {
-                    capturedCapacityAfterError ??= maxCount;
-                    capacitySignal.Release();
+                    return [jobMock.Object];
                 }
-                return Array.Empty<IJob>();
+
+                if (Volatile.Read(ref jobCompleted))
+                {
+                    factoryCalledAfterCompletionSignal.Set();
+                }
+                else
+                {
+                    factoryCalledBeforeCompletionSignal.Set();
+                }
+
+                return [];
             });
 
         using var sut = CreateSut(s => s.ConcurrencyLimit = concurrencyLimit);
-        sut.OnJobProcessingError += (_, _) =>
-        {
-            Volatile.Write(ref errorFired, true);
-            errorSignal.Release();
-        };
+
+        // STAGE 1
 
         // Act
         sut.Activate();
-        await errorSignal.WaitAsync(_waitingTimeout);
-        sut.Activate();
-        await capacitySignal.WaitAsync(_waitingTimeout);
+        factoryCalledBeforeCompletionSignal.Wait(_waitingTimeout, CancellationToken.None);
 
         // Assert
-        Assert.Equal(concurrencyLimit, capturedCapacityAfterError);
+        Assert.Equal(concurrencyLimit - 1, Volatile.Read(ref capturedCapacity));
+
+        // STAGE 2
+
+        // Act
+        completeJobSignal.Set();
+        factoryCalledAfterCompletionSignal.Wait(_waitingTimeout, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(concurrencyLimit, Volatile.Read(ref capturedCapacity));
     }
 
     [Fact]
-    public async Task ProcessJob_WhenJobErrorSubscriberThrows_DoesNotCrash()
+    public async Task JobProcessor_WithNoJobsAvailable_EventuallyStopsPolling()
     {
         // Arrange
-        var jobMock = new Mock<IJob>();
-        jobMock
-            .Setup(j => j.ExecuteAsync(It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new InvalidOperationException("job error"));
-
-        int callCount = 0;
-        var secondFactoryCallSignal = new SemaphoreSlim(0, 1);
+        int factoryCallCount = 0;
 
         _factoryMock
             .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(() =>
             {
-                if (Interlocked.Increment(ref callCount) == 1)
-                    return [jobMock.Object];
-                secondFactoryCallSignal.Release();
+                Interlocked.Increment(ref factoryCallCount);
                 return [];
             });
 
         using var sut = CreateSut();
-        sut.OnJobProcessingError += (_, _) => throw new Exception("subscriber error");
 
         // Act
         sut.Activate();
-        await secondFactoryCallSignal.WaitAsync(_waitingTimeout);
+        await WaitTillProcessorIdles();
+
+        var finalFactoryCallCount = Volatile.Read(ref factoryCallCount);
+        await WaitForPotentialNextIteration();
 
         // Assert
-        Assert.True(Volatile.Read(ref callCount) >= 2);
+        Assert.Equal(finalFactoryCallCount, Volatile.Read(ref factoryCallCount));
     }
 
-    // --- Disposal ---
+    #endregion JOB EXECUTION
+
+    #region PROCESSOR TIMING
 
     [Fact]
-    public async Task Dispose_StopsProcessing()
+    public async Task JobProcessor_WhenProcessingScheduleIsInProgress_SkipsOverlappingTick()
     {
         // Arrange
         int factoryCallCount = 0;
-        var factoryCalledSignal = new SemaphoreSlim(0, 100);
+        var factoryCalledForTheFirstTimeSignal = new ManualResetEventSlim(false);
+        var factoryCalledAgainSignal = new ManualResetEventSlim(false);
+        var completeFactoryMethodSignal = new ManualResetEventSlim(false);
+
+        _factoryMock
+            .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() =>
+            {
+                if (Interlocked.Increment(ref factoryCallCount) == 1)
+                {
+                    factoryCalledForTheFirstTimeSignal.Set();
+                }
+                else
+                {
+                    factoryCalledAgainSignal.Set();
+                }
+                completeFactoryMethodSignal.Wait(_waitingTimeout, CancellationToken.None);
+                return [];
+            });
+
+        using var sut = CreateSut();
+
+        // STAGE 1
+
+        // Act
+        sut.Activate();
+
+        factoryCalledForTheFirstTimeSignal.Wait(_waitingTimeout, CancellationToken.None);
+        await WaitForPotentialNextIteration();
+
+        // Assert
+        Assert.Equal(1, Volatile.Read(ref factoryCallCount));
+
+        // STAGE 2
+
+        // Act
+        completeFactoryMethodSignal.Set();
+        factoryCalledAgainSignal.Wait(_waitingTimeout, CancellationToken.None);
+
+        // Assert
+        Assert.True(Volatile.Read(ref factoryCallCount) >= 2);
+    }
+
+    #endregion PROCESSOR TIMING
+
+    #region ERROR HANDLING
+
+    [Fact]
+    public async Task JobProcessor_WhenFactoryThrows_RaisesScheduleProcessingErrorAndContinuesProcessing()
+    {
+        // Arrange
+        var expectedException = new InvalidOperationException("Factory error!");
+
+        int factoryCallCount = 0;
+        var factoryCalledAfterExceptionSignal = new ManualResetEventSlim(false);
+
+        _factoryMock
+            .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() =>
+            {
+                if (Interlocked.Increment(ref factoryCallCount) == 1)
+                {
+                    throw expectedException;
+                }
+                factoryCalledAfterExceptionSignal.Set();
+                return [];
+            });
+
+        using var sut = CreateSut();
+
+        Exception? capturedException = null;
+        var onScheduleProcessingErrorCalledSignal = new ManualResetEventSlim(false);
+
+        sut.OnScheduleProcessingError += (_, ex) =>
+        {
+            capturedException = ex;
+            onScheduleProcessingErrorCalledSignal.Set();
+        };
+
+        // STAGE 1
+
+        // Act
+        sut.Activate();
+        onScheduleProcessingErrorCalledSignal.Wait(_waitingTimeout, CancellationToken.None);
+
+        // Assert
+        Assert.Same(expectedException, capturedException);
+
+        // STAGE 2
+
+        // Act
+        factoryCalledAfterExceptionSignal.Wait(_waitingTimeout, CancellationToken.None);
+
+        // Assert
+        Assert.True(Volatile.Read(ref factoryCallCount) >= 2);
+    }
+
+    [Fact]
+    public async Task JobProcessor_WhenScheduleProcessingErrorSubscriberThrows_IgnoresAndContinuesProcessing()
+    {
+        // Arrange
+        int factoryCallCount = 0;
+        var factoryCalledAfterExceptionSignal = new ManualResetEventSlim(false);
+
+        _factoryMock
+            .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() =>
+            {
+                if (Interlocked.Increment(ref factoryCallCount) == 1)
+                {
+                    throw new InvalidOperationException("Factory error!");
+                }
+                factoryCalledAfterExceptionSignal.Set();
+                return [];
+            });
+
+        using var sut = CreateSut();
+
+        sut.OnScheduleProcessingError += (_, _) => throw new Exception("Subscriber error!");
+
+        // Act
+        sut.Activate();
+        factoryCalledAfterExceptionSignal.Wait(_waitingTimeout, CancellationToken.None);
+
+        // Assert
+        Assert.True(Volatile.Read(ref factoryCallCount) >= 2);
+    }
+
+    [Fact]
+    public async Task JobProcessor_WhenJobThrows_RaisesJobProcessingErrorAndRestoresCapacity()
+    {
+        // Arrange
+        var concurrencyLimit = 3;
+
+        var jobMock = new Mock<IJob>();
+        var completeJobSignal = new ManualResetEventSlim(false);
+        var expectedException = new InvalidOperationException("Job error!");
+
+        jobMock
+            .Setup(j => j.ExecuteAsync(It.IsAny<CancellationToken>()))
+            .Returns(async () => 
+            {
+                completeJobSignal.Wait(_waitingTimeout, CancellationToken.None);
+                throw expectedException;
+            });
+
+        int factoryCallCount = 0;
+        int capturedCapacity = -1;
+        bool exceptionCaptured = false;
+
+        var factoryCalledBeforeTheExceptionSignal = new ManualResetEventSlim(false);
+        var factoryCalledAfterExceptionSignal = new ManualResetEventSlim(false);
+
+        _factoryMock
+            .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((int maxCount, CancellationToken _) =>
+            {
+                Volatile.Write(ref capturedCapacity, maxCount);
+
+                if (Interlocked.Increment(ref factoryCallCount) == 1)
+                {
+                    return [jobMock.Object];
+                }
+
+                if (Volatile.Read(ref exceptionCaptured))
+                {
+                    factoryCalledAfterExceptionSignal.Set();
+                }
+                else
+                {
+                    factoryCalledBeforeTheExceptionSignal.Set();
+                }
+
+                return [];
+            });
+
+        using var sut = CreateSut(s => s.ConcurrencyLimit = concurrencyLimit);
+
+        Exception? capturedException = null;
+        var onJobProcessingErrorCalledSignal = new ManualResetEventSlim(false);
+
+        sut.OnJobProcessingError += (_, ex) =>
+        {
+            capturedException = ex;
+            Volatile.Write(ref exceptionCaptured, true);
+            onJobProcessingErrorCalledSignal.Set();
+        };
+
+        // STAGE 1
+
+        // Act
+        sut.Activate();
+        factoryCalledBeforeTheExceptionSignal.Wait(_waitingTimeout, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(concurrencyLimit - 1, Volatile.Read(ref capturedCapacity));
+
+        // STAGE 2
+
+        // Act
+        completeJobSignal.Set();
+        onJobProcessingErrorCalledSignal.Wait(_waitingTimeout, CancellationToken.None);
+
+        // Assert
+        Assert.True(Volatile.Read(ref exceptionCaptured));
+        Assert.Same(expectedException, capturedException);
+
+        // STAGE 3
+
+        // Act
+        factoryCalledAfterExceptionSignal.Wait(_waitingTimeout, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(concurrencyLimit, Volatile.Read(ref capturedCapacity));
+    }
+
+    [Fact]
+    public async Task JobProcessor_WhenJobProcessingErrorSubscriberThrows_IgnoresAndContinuesProcessing()
+    {
+        // Arrange
+        var jobMock = new Mock<IJob>();
+        jobMock
+            .Setup(j => j.ExecuteAsync(It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Job error!"));
+
+        int factoryCallCount = 0;
+        bool exceptionCaptured = false;
+        var factoryCalledAfterExceptionSignal = new ManualResetEventSlim(false);
+
+        _factoryMock
+            .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() =>
+            {
+                if (Interlocked.Increment(ref factoryCallCount) == 1)
+                {
+                    return [jobMock.Object];
+                }
+
+                if (Volatile.Read(ref exceptionCaptured))
+                {
+                    factoryCalledAfterExceptionSignal.Set();
+                }
+
+                return [];
+            });
+
+        using var sut = CreateSut();
+
+        sut.OnJobProcessingError += (_, ex) =>
+        {
+            Volatile.Write(ref exceptionCaptured, true);
+            throw new Exception("Subscriber error!");
+        };
+
+        // Act
+        sut.Activate();
+        factoryCalledAfterExceptionSignal.Wait(_waitingTimeout, CancellationToken.None);
+
+        // Assert
+        Assert.True(Volatile.Read(ref factoryCallCount) >= 2);
+    }
+
+    #endregion ERROR HANDLING
+
+    #region DISPOSAL
+
+    [Fact]
+    public async Task JobProcessor_AfterDisposal_StopsProcessing()
+    {
+        // Arrange
+        int factoryCallCount = 0;
+        var factoryCalledSignal = new ManualResetEventSlim(false);
 
         _factoryMock
             .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
@@ -520,35 +585,25 @@ public class JobProcessorTests
             .Callback(() =>
             {
                 Interlocked.Increment(ref factoryCallCount);
-                factoryCalledSignal.Release();
+                factoryCalledSignal.Set();
             });
 
         var sut = CreateSut();
 
         // Act
         sut.Activate();
-        await factoryCalledSignal.WaitAsync(_waitingTimeout);
+        factoryCalledSignal.Wait(_waitingTimeout, CancellationToken.None);
+
         sut.Dispose();
         var callCountAfterDispose = Volatile.Read(ref factoryCallCount);
-        await Task.Delay(200);
+        
+        await WaitTillProcessorIdles();
 
         // Assert
         Assert.Equal(callCountAfterDispose, Volatile.Read(ref factoryCallCount));
     }
 
-    [Fact]
-    public void Dispose_CompletesSuccessfully()
-    {
-        // Arrange
-        _factoryMock
-            .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync([]);
-
-        var sut = CreateSut();
-
-        // Act & Assert
-        sut.Dispose();
-    }
+    #endregion DISPOSAL
 
     private JobProcessor CreateSut(Action<JobProcessorSettings>? configure = null)
     {
@@ -565,31 +620,7 @@ public class JobProcessorTests
         return new JobProcessor(_factoryMock.Object, settings);
     }
 
-    private static Mock<IJob> CreateInfiniteJob()
-    {
-        var jobMock = new Mock<IJob>();
-        jobMock.Setup(j => j.ExecuteAsync(It.IsAny<CancellationToken>()))
-               .Returns(async (CancellationToken cancellationToken) =>
-               {
-                   await Task.Delay(Timeout.Infinite, cancellationToken);
-               });
-        return jobMock;
-    }
-
-    private static Mock<IJob> CreateBlockingJob(SemaphoreSlim startedSignal, TaskCompletionSource blocker)
-    {
-        var jobMock = new Mock<IJob>();
-        jobMock
-            .Setup(j => j.ExecuteAsync(It.IsAny<CancellationToken>()))
-            .Returns(async (CancellationToken _) =>
-            {
-                startedSignal.Release();
-                await blocker.Task;
-            });
-        return jobMock;
-    }
-
-    private async static Task WaitForPotentialNextIteration()
+    private static async Task WaitForPotentialNextIteration()
     {
         // an arbitrary delay long enough to allow for the processor
         // to execute another tick if it was going to
@@ -597,7 +628,7 @@ public class JobProcessorTests
         await Task.Delay(timeToWait);
     }
 
-    private async static Task WaitTillProcessorIdles()
+    private static async Task WaitTillProcessorIdles()
     {
         var timeToWait = _initialInterval;
 
@@ -610,5 +641,37 @@ public class JobProcessorTests
 
         var safetyMargin = _maxInterval;
         await Task.Delay(timeToWait + safetyMargin);
+    }
+
+    private static Mock<IJob> CreateInfiniteJob()
+    {
+        var jobMock = new Mock<IJob>();
+        var completeJobSignal = new ManualResetEventSlim(false);
+        jobMock
+            .Setup(j => j.ExecuteAsync(It.IsAny<CancellationToken>()))
+            .Returns(() => 
+            { 
+                completeJobSignal.Wait(_waitingTimeout, CancellationToken.None);
+                return Task.CompletedTask;
+            });
+        return jobMock;
+    }
+
+    private static Mock<IJob> CreateActualJob(ManualResetEventSlim? jobCompletedSignal = null, int iterations = 50_000)
+    {
+        var jobMock = new Mock<IJob>();
+        jobMock
+            .Setup(j => j.ExecuteAsync(It.IsAny<CancellationToken>()))
+            .Returns(() =>
+            {
+                byte[] hash = Encoding.UTF8.GetBytes("payload");
+                for (int i = 0; i < iterations; i++)
+                {
+                    hash = SHA256.HashData(hash);
+                }
+                jobCompletedSignal?.Set();
+                return Task.CompletedTask;
+            });
+        return jobMock;
     }
 }
