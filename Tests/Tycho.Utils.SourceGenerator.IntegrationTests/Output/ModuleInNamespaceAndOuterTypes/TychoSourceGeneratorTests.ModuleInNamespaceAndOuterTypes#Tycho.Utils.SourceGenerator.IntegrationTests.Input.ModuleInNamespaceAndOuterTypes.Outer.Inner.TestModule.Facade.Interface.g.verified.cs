@@ -6,11 +6,11 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInNamespaceAn
 {
     public partial class Outer
     {
-    public partial class Inner
-    {
-    public interface ITestModule
-    {
-    }
-    }
+        public partial class Inner
+        {
+            public interface ITestModule
+            {
+            }
+        }
     }
 }

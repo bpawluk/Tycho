@@ -7,12 +7,12 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInNamespaceAndOu
 {
     public partial class Outer
     {
-    public partial class Inner
-    {
-    internal class TestAppFacade : AppFacadeBase, ITestApp
-    {
-        public TestAppFacade(IApp app) : base(app) { }
-    }
-    }
+        public partial class Inner
+        {
+            internal class TestAppFacade : AppFacadeBase, ITestApp
+            {
+                public TestAppFacade(IApp app) : base(app) { }
+            }
+        }
     }
 }

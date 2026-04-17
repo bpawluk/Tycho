@@ -7,12 +7,12 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInNamespaceAndOu
 {
     public partial class Outer
     {
-    public partial class Inner
-    {
-    internal class TestAppPublisher : PublisherBase, TestApp.IPublisher
-    {
-        public TestAppPublisher(IEventPublisher genericPublisher) : base(genericPublisher) { }
-    }
-    }
+        public partial class Inner
+        {
+            internal class TestAppPublisher : PublisherBase, TestApp.IPublisher
+            {
+                public TestAppPublisher(IEventPublisher genericPublisher) : base(genericPublisher) { }
+            }
+        }
     }
 }

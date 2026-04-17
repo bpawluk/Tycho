@@ -7,14 +7,14 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInNamespaceAn
 {
     public partial class Outer
     {
-    public partial class Inner
-    {
-    public partial class TestModule : TychoModule
-    {
-        public interface IParent
+        public partial class Inner
         {
+            public partial class TestModule : TychoModule
+            {
+                public interface IParent
+                {
+                }
+            }
         }
-    }
-    }
     }
 }

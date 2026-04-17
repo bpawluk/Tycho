@@ -7,11 +7,11 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInNamespaceAndOu
 {
     public partial class Outer
     {
-    public partial class Inner
-    {
-    public interface ITestApp : IAsyncDisposable
-    {
-    }
-    }
+        public partial class Inner
+        {
+            public interface ITestApp : IAsyncDisposable
+            {
+            }
+        }
     }
 }

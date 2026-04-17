@@ -2,6 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-    public interface ITestModule
-    {
-    }
+public interface ITestModule
+{
+}

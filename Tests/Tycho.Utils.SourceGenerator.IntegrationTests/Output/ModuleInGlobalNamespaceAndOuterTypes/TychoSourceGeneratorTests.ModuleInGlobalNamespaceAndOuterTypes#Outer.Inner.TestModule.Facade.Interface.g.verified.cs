@@ -2,12 +2,12 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-    public partial class Outer
-    {
+public partial class Outer
+{
     public partial class Inner
     {
-    public interface ITestModule
-    {
+        public interface ITestModule
+        {
+        }
     }
-    }
-    }
+}

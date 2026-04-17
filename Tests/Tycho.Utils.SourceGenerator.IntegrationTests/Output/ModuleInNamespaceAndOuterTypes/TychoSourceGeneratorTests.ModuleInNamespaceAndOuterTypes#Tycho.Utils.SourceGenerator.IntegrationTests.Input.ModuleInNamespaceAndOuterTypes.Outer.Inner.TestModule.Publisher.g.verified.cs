@@ -7,12 +7,12 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInNamespaceAn
 {
     public partial class Outer
     {
-    public partial class Inner
-    {
-    internal class TestModulePublisher : PublisherBase, TestModule.IPublisher
-    {
-        public TestModulePublisher(IEventPublisher genericPublisher) : base(genericPublisher) { }
-    }
-    }
+        public partial class Inner
+        {
+            internal class TestModulePublisher : PublisherBase, TestModule.IPublisher
+            {
+                public TestModulePublisher(IEventPublisher genericPublisher) : base(genericPublisher) { }
+            }
+        }
     }
 }

@@ -3,9 +3,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Apps;
 
-    public partial class TestApp : TychoApp
+public partial class TestApp : TychoApp
+{
+    public interface IPublisher
     {
-        public interface IPublisher
-        {
-        }
     }
+}

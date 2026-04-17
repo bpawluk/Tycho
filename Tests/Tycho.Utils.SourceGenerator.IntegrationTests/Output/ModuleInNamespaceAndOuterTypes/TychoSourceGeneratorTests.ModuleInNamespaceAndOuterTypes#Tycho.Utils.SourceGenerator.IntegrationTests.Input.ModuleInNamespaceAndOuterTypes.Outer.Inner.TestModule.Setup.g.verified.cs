@@ -7,16 +7,16 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInNamespaceAn
 {
     public partial class Outer
     {
-    public partial class Inner
-    {
-    public partial class TestModule : TychoModule
-    {
-        protected override void __AutoSetup__(IServiceCollection module)
+        public partial class Inner
         {
-            ServiceCollectionServiceExtensions.AddTransient<IPublisher, TestModulePublisher>(module);
-            ServiceCollectionServiceExtensions.AddTransient<IParent, TestModuleParent>(module);
+            public partial class TestModule : TychoModule
+            {
+                protected override void __AutoSetup__(IServiceCollection module)
+                {
+                    ServiceCollectionServiceExtensions.AddTransient<IPublisher, TestModulePublisher>(module);
+                    ServiceCollectionServiceExtensions.AddTransient<IParent, TestModuleParent>(module);
+                }
+            }
         }
-    }
-    }
     }
 }
