@@ -1,4 +1,10 @@
-﻿{{~ for used_namespace in used_namespaces ~}}
+﻿{{~ ns_offset = namespace != "" ? 1 : 0 ~}}
+{{~ ct_count = array.size containing_types ~}}
+{{~ bi = ns_offset + ct_count ~}}
+{{~ i0 = string.pad_left "" (bi * 4) ~}}
+{{~ i1 = string.pad_left "" ((bi + 1) * 4) ~}}
+{{~ i2 = string.pad_left "" ((bi + 2) * 4) ~}}
+{{~ for used_namespace in used_namespaces ~}}
 using {{ used_namespace }};
 {{~ end ~}}
 
@@ -7,22 +13,22 @@ namespace {{ namespace }}
 {
 {{~ end ~}}
 {{~ for containing_type in containing_types ~}}
-    public partial class {{ containing_type }}
-    {
+{{ string.pad_left "" ((ns_offset + for.index) * 4) }}public partial class {{ containing_type }}
+{{ string.pad_left "" ((ns_offset + for.index) * 4) }}{
 {{~ end ~}}
-    public partial class {{ classes.module_class }} : {{ classes.base_class }}
-    {
-        protected override void {{ methods.auto_setup_method }}({{ interfaces.service_collection_interface }} {{ parameters.module_parameter }})
-        {
-            {{ classes.service_collection_service_extensions_class }}.{{ methods.add_transient_method }}<{{ interfaces.publisher_interface }}, {{ classes.publisher_class }}>({{ parameters.module_parameter }});
-            {{ classes.service_collection_service_extensions_class }}.{{ methods.add_transient_method }}<{{ interfaces.module_parent_interface }}, {{ classes.module_parent_class }}>({{ parameters.module_parameter }});
-            {{~ for submodule in submodules ~}}
-            {{ classes.service_collection_service_extensions_class }}.{{ methods.add_transient_method }}<{{ submodule.facade_interface }}, {{ submodule.facade_class }}>({{ parameters.module_parameter }});
-            {{~ end ~}}
-        }
-    }
+{{ i0 }}public partial class {{ classes.module_class }} : {{ classes.base_class }}
+{{ i0 }}{
+{{ i1 }}protected override void {{ methods.auto_setup_method }}({{ interfaces.service_collection_interface }} {{ parameters.module_parameter }})
+{{ i1 }}{
+{{ i2 }}{{ classes.service_collection_service_extensions_class }}.{{ methods.add_transient_method }}<{{ interfaces.publisher_interface }}, {{ classes.publisher_class }}>({{ parameters.module_parameter }});
+{{ i2 }}{{ classes.service_collection_service_extensions_class }}.{{ methods.add_transient_method }}<{{ interfaces.module_parent_interface }}, {{ classes.module_parent_class }}>({{ parameters.module_parameter }});
+{{~ for submodule in submodules ~}}
+{{ i2 }}{{ classes.service_collection_service_extensions_class }}.{{ methods.add_transient_method }}<{{ submodule.facade_interface }}, {{ submodule.facade_class }}>({{ parameters.module_parameter }});
+{{~ end ~}}
+{{ i1 }}}
+{{ i0 }}}
 {{~ for containing_type in containing_types ~}}
-    }
+{{ string.pad_left "" ((bi - 1 - for.index) * 4) }}}
 {{~ end ~}}
 {{~ if namespace != "" ~}}
 }

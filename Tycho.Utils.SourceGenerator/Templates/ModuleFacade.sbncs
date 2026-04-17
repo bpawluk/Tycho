@@ -1,3 +1,9 @@
+{{~ ns_offset = namespace != "" ? 1 : 0 ~}}
+{{~ ct_count = array.size containing_types ~}}
+{{~ bi = ns_offset + ct_count ~}}
+{{~ i0 = string.pad_left "" (bi * 4) ~}}
+{{~ i1 = string.pad_left "" ((bi + 1) * 4) ~}}
+{{~ i2 = string.pad_left "" ((bi + 2) * 4) ~}}
 {{~ for used_namespace in used_namespaces ~}}
 using {{ used_namespace }};
 {{~ end ~}}
@@ -7,22 +13,22 @@ namespace {{ namespace }}
 {
 {{~ end ~}}
 {{~ for containing_type in containing_types ~}}
-    public partial class {{ containing_type }}
-    {
+{{ string.pad_left "" ((ns_offset + for.index) * 4) }}public partial class {{ containing_type }}
+{{ string.pad_left "" ((ns_offset + for.index) * 4) }}{
 {{~ end ~}}
-    internal class {{ classes.facade_class }} : {{ classes.facade_base_class }}, {{ interfaces.module_interface }}
-    {
-        public {{ classes.facade_class }}({{ interfaces.instance_interface }}<{{ classes.module_class }}> {{ parameters.module_parameter }}) : base({{ parameters.module_parameter }}) { }
-        {{~ for request in requests ~}}
+{{ i0 }}internal class {{ classes.facade_class }} : {{ classes.facade_base_class }}, {{ interfaces.module_interface }}
+{{ i0 }}{
+{{ i1 }}public {{ classes.facade_class }}({{ interfaces.instance_interface }}<{{ classes.module_class }}> {{ parameters.module_parameter }}) : base({{ parameters.module_parameter }}) { }
+{{~ for request in requests ~}}
 
-        public {{ classes.task_class }}{{ if request.has_response }}<{{ request.response_type }}>{{ end }} {{ methods.execute_async_method }}({{ request.request_type }} {{ parameters.request_data_parameter }}, {{ classes.cancellation_token_class }} {{ parameters.cancellation_token_parameter }})
-        {
-            return {{ methods.execute_async_method }}<{{ request.request_type }}{{ if request.has_response }}, {{ request.response_type }}{{ end }}>({{ parameters.request_data_parameter }}, {{ parameters.cancellation_token_parameter }});
-        }
-        {{~ end ~}}
-    }
+{{ i1 }}public {{ classes.task_class }}{{ if request.has_response }}<{{ request.response_type }}>{{ end }} {{ methods.execute_async_method }}({{ request.request_type }} {{ parameters.request_data_parameter }}, {{ classes.cancellation_token_class }} {{ parameters.cancellation_token_parameter }})
+{{ i1 }}{
+{{ i2 }}return {{ methods.execute_async_method }}<{{ request.request_type }}{{ if request.has_response }}, {{ request.response_type }}{{ end }}>({{ parameters.request_data_parameter }}, {{ parameters.cancellation_token_parameter }});
+{{ i1 }}}
+{{~ end ~}}
+{{ i0 }}}
 {{~ for containing_type in containing_types ~}}
-    }
+{{ string.pad_left "" ((bi - 1 - for.index) * 4) }}}
 {{~ end ~}}
 {{~ if namespace != "" ~}}
 }
