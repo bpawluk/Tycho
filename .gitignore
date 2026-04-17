@@ -351,6 +351,3 @@ MigrationBackup/
 
 # Verify
 *.received.*
-
-# Ignore generated test Output files (source generator verification files)
-Tests/Tycho.Utils.SourceGenerator.IntegrationTests/Output/
