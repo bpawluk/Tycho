@@ -3,152 +3,248 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Tycho.Utils.SourceGenerator.Tests;
+namespace Tycho.Utils.SourceGenerator.IntegrationTests;
 
-public class TychoSourceGeneratorTests
+public class TychoSourceGeneratorTests : VerifyBase
 {
+    public TychoSourceGeneratorTests() : base() { }
+
     [Fact]
-    public void TychoSourceGenerator_GeneratesAllExpectedFiles()
+    public Task AppInGlobalNamespace()
     {
-        Compilation inputCompilation = CreateCompilation(@"
-            using Microsoft.Extensions.DependencyInjection;
-            using SampleApp.AppEventHandlers;
-            using SampleApp.AppEvents;
-            using SampleApp.ModuleEventHandlers;
-            using SampleApp.ModuleEvents;
-            using Tycho;
-            using Tycho.Apps;
-            using Tycho.Events;
-            using Tycho.Modules;
-
-            namespace SampleApp.App
-            {
-                public class Outer 
-                {
-                    public class Inner 
-                    {
-                        [TychoDefinition]
-                        public partial class TestApp : TychoApp
-                        {
-                            protected override void DefineContract(IAppContract app) { }
-
-                            protected override void DefineEvents(IAppEvents app)
-                            {
-                                app.Handles<TestAppEvent, TestAppEventHandler>();
-                                app.Handles<OtherTestAppEvent, OtherTestAppEventHandler>();
-                            }
-
-                            protected override void IncludeModules(IAppStructure app) { }
-
-                            protected override void RegisterServices(IServiceCollection app) { }
-                        }
-                    }
-                    
-                }
-            }
-
-            [TychoDefinition]
-            public partial class TestModule : TychoModule
-            {
-                protected override void DefineContract(IModuleContract module) { }
-
-                protected override void DefineEvents(IModuleEvents module)
-                {
-                    module.Handles<TestModuleEvent, TestModuleEventHandler>();
-                    module.Handles<OtherTestModuleEvent, OtherTestModuleEventHandler>();
-                }
-
-                protected override void IncludeModules(IModuleStructure module) { }
-
-                protected override void RegisterServices(IServiceCollection module) { }
-            }
-
-            namespace SampleApp.AppEvents
-            {
-                public class TestAppEvent : IEvent { }
-                public class OtherTestAppEvent : IEvent { }
-            }
-
-            namespace SampleApp.AppEventHandlers
-            {
-                public class TestAppEventHandler : IEventHandler<TestAppEvent>
-                {
-                    public Task Handle(EventContext<TestAppEvent> context, CancellationToken cancellationToken)
-                    {
-                        throw new NotImplementedException();
-                    }
-                }
-
-                public class OtherTestAppEventHandler : IEventHandler<OtherTestAppEvent>
-                {
-                    public Task Handle(EventContext<OtherTestAppEvent> context, CancellationToken cancellationToken)
-                    {
-                        throw new NotImplementedException();
-                    }
-                }
-            }
-
-            namespace SampleApp.ModuleEvents
-            {
-                public class TestModuleEvent : IEvent { }
-                public class OtherTestModuleEvent : IEvent { }
-            }
-
-            namespace SampleApp.ModuleEventHandlers
-            {
-                public class TestModuleEventHandler : IEventHandler<TestModuleEvent>
-                {
-                    public Task Handle(EventContext<TestModuleEvent> context, CancellationToken cancellationToken)
-                    {
-                        throw new NotImplementedException();
-                    }
-                }
-
-                public class OtherTestModuleEventHandler : IEventHandler<OtherTestModuleEvent>
-                {
-                    public Task Handle(EventContext<OtherTestModuleEvent> context, CancellationToken cancellationToken)
-                    {
-                        throw new NotImplementedException();
-                    }
-                }
-            }");
-
-        var generator = new TychoSourceGenerator();
-        GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
-        driver = driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
-
-        var runResult = driver.GetRunResult();
-        Assert.Empty(runResult.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
-        Assert.Single(runResult.Results);
-
-        var generatedTrees = outputCompilation.SyntaxTrees.Except(inputCompilation.SyntaxTrees).ToArray();
-        Assert.NotEmpty(generatedTrees);
-
-        var generatedFileNames = generatedTrees
-            .Select(t => Path.GetFileName(t.FilePath))
-            .ToArray();
-
-        Assert.Contains("SampleApp.App.Outer.Inner.TestApp.Setup.g.cs", generatedFileNames);
-        Assert.Contains("SampleApp.App.Outer.Inner.TestApp.Extensions.g.cs", generatedFileNames);
-        Assert.Contains("SampleApp.App.Outer.Inner.TestApp.Facade.g.cs", generatedFileNames);
-        Assert.Contains("SampleApp.App.Outer.Inner.TestApp.Facade.Interface.g.cs", generatedFileNames);
-        Assert.Contains("SampleApp.App.Outer.Inner.TestApp.Publisher.g.cs", generatedFileNames);
-        Assert.Contains("SampleApp.App.Outer.Inner.TestApp.Publisher.Interface.g.cs", generatedFileNames);
-        Assert.Contains("TestModule.Setup.g.cs", generatedFileNames);
-        Assert.Contains("TestModule.Facade.g.cs", generatedFileNames);
-        Assert.Contains("TestModule.Facade.Interface.g.cs", generatedFileNames);
-        Assert.Contains("TestModule.Parent.g.cs", generatedFileNames);
-        Assert.Contains("TestModule.Parent.Interface.g.cs", generatedFileNames);
-        Assert.Contains("TestModule.Publisher.g.cs", generatedFileNames);
-        Assert.Contains("TestModule.Publisher.Interface.g.cs", generatedFileNames);
+        string[] sources =
+        [
+            "AppInGlobalNamespace/TestApp.cs"
+        ];
+        var driver = RunGenerator(sources);
+        return Verify(driver);
     }
 
-    private static CSharpCompilation CreateCompilation(string source)
-        => CSharpCompilation.Create("compilation",
-            [CSharpSyntaxTree.ParseText(source)],
-            [
-                MetadataReference.CreateFromFile(typeof(TychoDefinitionAttribute).GetTypeInfo().Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(IServiceCollection).GetTypeInfo().Assembly.Location)
-            ],
-            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+    [Fact]
+    public Task AppInGlobalNamespaceAndOuterTypes()
+    {
+        string[] sources =
+        [
+            "AppInGlobalNamespaceAndOuterTypes/TestApp.cs"
+        ];
+        var driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    [Fact]
+    public Task AppInNamespace()
+    {
+        string[] sources =
+        [
+            "AppInNamespace/TestApp.cs"
+        ];
+        var driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    [Fact]
+    public Task AppInNamespaceAndOuterTypes()
+    {
+        string[] sources =
+        [
+            "AppInNamespaceAndOuterTypes/TestApp.cs"
+        ];
+        var driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    [Fact]
+    public Task AppWithDownstreamContract()
+    {
+        string[] sources =
+        [
+            "AppWithDownstreamContract/TestApp.cs",
+            "AppWithDownstreamContract/Handlers/DeleteItemCommandHandler.cs",
+            "AppWithDownstreamContract/Handlers/GetItemQueryHandler.cs",
+            "AppWithDownstreamContract/Requests/DeleteItemCommand.cs",
+            "AppWithDownstreamContract/Requests/GetItemQuery.cs"
+        ];
+        var driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    [Fact]
+    public Task AppWithEvents()
+    {
+        string[] sources =
+        [
+            "AppWithEvents/TestApp.cs",
+            "AppWithEvents/Events/OrderCreatedEvent.cs",
+            "AppWithEvents/Events/PaymentFailedEvent.cs",
+            "AppWithEvents/Events/PaymentProcessedEvent.cs",
+            "AppWithEvents/Handlers/OrderCreatedEventHandler.cs",
+            "AppWithEvents/Handlers/PaymentProcessedEventHandler.cs",
+            "AppWithEvents/Modules/ModuleA.cs"
+        ];
+        var driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    [Fact]
+    public Task AppWithoutAttribute()
+    {
+        string[] sources =
+        [
+            "AppWithoutAttribute/TestApp.cs"
+        ];
+        var driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    [Fact]
+    public Task AppWithSubmodules()
+    {
+        string[] sources =
+        [
+            "AppWithSubmodules/TestApp.cs",
+            "AppWithSubmodules/Modules/ModuleA.cs",
+            "AppWithSubmodules/Modules/ModuleB.cs"
+        ];
+        var driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    [Fact]
+    public Task ModuleInGlobalNamespace()
+    {
+        string[] sources =
+        [
+            "ModuleInGlobalNamespace/TestModule.cs"
+        ];
+        var driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    [Fact]
+    public Task ModuleInGlobalNamespaceAndOuterTypes()
+    {
+        string[] sources =
+        [
+            "ModuleInGlobalNamespaceAndOuterTypes/TestModule.cs"
+        ];
+        var driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    [Fact]
+    public Task ModuleInNamespace()
+    {
+        string[] sources =
+        [
+            "ModuleInNamespace/TestModule.cs"
+        ];
+        var driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    [Fact]
+    public Task ModuleInNamespaceAndOuterTypes()
+    {
+        string[] sources =
+        [
+            "ModuleInNamespaceAndOuterTypes/TestModule.cs"
+        ];
+        var driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    [Fact]
+    public Task ModuleWithDownstreamContract()
+    {
+        string[] sources =
+        [
+            "ModuleWithDownstreamContract/TestModule.cs",
+            "ModuleWithDownstreamContract/Handlers/DeleteItemCommandHandler.cs",
+            "ModuleWithDownstreamContract/Handlers/GetItemQueryHandler.cs",
+            "ModuleWithDownstreamContract/Requests/DeleteItemCommand.cs",
+            "ModuleWithDownstreamContract/Requests/GetItemQuery.cs"
+        ];
+        var driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    [Fact]
+    public Task ModuleWithEvents()
+    {
+        string[] sources =
+        [
+            "ModuleWithEvents/TestModule.cs",
+            "ModuleWithEvents/Events/OrderCreatedEvent.cs",
+            "ModuleWithEvents/Events/PaymentFailedEvent.cs",
+            "ModuleWithEvents/Events/PaymentProcessedEvent.cs",
+            "ModuleWithEvents/Handlers/OrderCreatedEventHandler.cs",
+            "ModuleWithEvents/Handlers/PaymentProcessedEventHandler.cs",
+            "ModuleWithEvents/Modules/ModuleA.cs"
+        ];
+        var driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    [Fact]
+    public Task ModuleWithSubmodules()
+    {
+        string[] sources =
+        [
+            "ModuleWithSubmodules/TestModule.cs",
+            "ModuleWithSubmodules/Modules/ModuleA.cs",
+            "ModuleWithSubmodules/Modules/ModuleB.cs"
+        ];
+        var driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    [Fact]
+    public Task ModuleWithUpstreamContract()
+    {
+        string[] sources =
+        [
+            "ModuleWithUpstreamContract/TestModule.cs",
+            "ModuleWithUpstreamContract/Requests/GetParentDataQuery.cs",
+            "ModuleWithUpstreamContract/Requests/NotifyParentCommand.cs"
+        ];
+        var driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    [Fact]
+    public Task NonClassTypes()
+    {
+        string[] sources =
+        [
+            "NonClassTypes/TestInterface.cs",
+            "NonClassTypes/TestStruct.cs"
+        ];
+        var driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    private static GeneratorDriver RunGenerator(string[] sources)
+    {
+        var compilation = CreateCompilation(sources);
+        var generator = new TychoSourceGenerator();
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+        return driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out _);
+    }
+
+    private static CSharpCompilation CreateCompilation(string[] sources)
+    {
+        var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
+        var syntaxTrees = sources.Select(source =>
+        {
+            var sourcePath = Path.Combine(AppContext.BaseDirectory, "Input", source);
+            var sourceContent = File.ReadAllText(sourcePath);
+            return CSharpSyntaxTree.ParseText(sourceContent);
+        });
+        PortableExecutableReference[] references =
+        [
+            MetadataReference.CreateFromFile(typeof(TychoDefinitionAttribute).GetTypeInfo().Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(IServiceCollection).GetTypeInfo().Assembly.Location)
+        ];
+        return CSharpCompilation.Create("Compilation", syntaxTrees, references, options);
+    }
 }
