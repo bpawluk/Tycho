@@ -3,6 +3,7 @@ using Tycho.Modules;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithSubmodules.Modules;
 
+[TychoDefinition]
 public class ModuleB : TychoModule
 {
     protected override void DefineContract(IModuleContract module) { }

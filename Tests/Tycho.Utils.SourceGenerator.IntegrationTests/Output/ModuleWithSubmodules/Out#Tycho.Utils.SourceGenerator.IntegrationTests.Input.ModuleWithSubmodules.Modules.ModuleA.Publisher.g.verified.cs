@@ -1,0 +1,12 @@
+﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithSubmodules.Modules.ModuleA.Publisher.g.cs
+using System.Threading;
+using System.Threading.Tasks;
+using Tycho.Events.Publishing;
+
+namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithSubmodules.Modules
+{
+    internal class ModuleAPublisher : PublisherBase, ModuleA.IPublisher
+    {
+        public ModuleAPublisher(IEventPublisher genericPublisher) : base(genericPublisher) { }
+    }
+}
