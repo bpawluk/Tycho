@@ -1,36 +1,49 @@
+{{~#--------- Calculate indentation ---------#~}}
 {{~ ns_offset = namespace != "" ? 1 : 0 ~}}
 {{~ ct_count = array.size containing_types ~}}
 {{~ bi = ns_offset + ct_count ~}}
 {{~ i0 = string.pad_left "" (bi * 4) ~}}
 {{~ i1 = string.pad_left "" ((bi + 1) * 4) ~}}
 {{~ i2 = string.pad_left "" ((bi + 2) * 4) ~}}
+{{~#-----------------------------------------#~}}
+{{~#--------- Write used namespaces ---------#~}}
 {{~ for used_namespace in used_namespaces ~}}
 using {{ used_namespace }};
-{{~ end ~}}
-
+{{ end }}
+{{~#-----------------------------------------#~}}
+{{~#----------- Declare namespace -----------#~}}
 {{~ if namespace != "" ~}}
 namespace {{ namespace }}
 {
 {{~ end ~}}
+{{~#-----------------------------------------#~}}
+{{~#---------- Declare outer types ----------#~}}
 {{~ for containing_type in containing_types ~}}
 {{ string.pad_left "" ((ns_offset + for.index) * 4) }}public partial class {{ containing_type }}
 {{ string.pad_left "" ((ns_offset + for.index) * 4) }}{
 {{~ end ~}}
+{{~#-----------------------------------------#~}}
+{{~#-------------------------------------------- MODULE PUBLISHER INTERFACE --------------------------------------------#~}}
 {{ i0 }}public partial class {{ classes.module_class }} : {{ classes.module_base_class }}
 {{ i0 }}{
-{{ i1 }}public interface {{ interfaces.publisher_interface }}
-{{ i1 }}{
+{{   i1   }}public interface {{ interfaces.publisher_interface }}
+{{   i1   }}{
 {{~ for event in events ~}}
-{{ i2 }}{{ classes.task_class }} {{ methods.publish_async_method }}({{ event }} {{ parameters.event_payload_parameter }}, {{ classes.cancellation_token_class }} {{ parameters.cancellation_token_parameter }} = default);
+{{     i2     }}{{ classes.task_class }} {{ methods.publish_async_method }}({{ event }} {{ parameters.event_payload_parameter }}, {{ classes.cancellation_token_class }} {{ parameters.cancellation_token_parameter }} = default);
 {{~ if !for.last ~}}
 
 {{~ end ~}}
 {{~ end ~}}
-{{ i1 }}}
+{{   i1   }}}
 {{ i0 }}}
+{{~#--------------------------------------------------------------------------------------------------------------------#~}}
+{{~#------- Close outer type brackets -------#~}}
 {{~ for containing_type in containing_types ~}}
 {{ string.pad_left "" ((bi - 1 - for.index) * 4) }}}
 {{~ end ~}}
+{{~#-----------------------------------------#~}}
+{{~#-------- Close namespace bracket --------#~}}
 {{~ if namespace != "" ~}}
 }
 {{~ end ~}}
+{{~#-----------------------------------------#~}}

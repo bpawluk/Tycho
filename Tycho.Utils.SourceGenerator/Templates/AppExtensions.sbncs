@@ -1,49 +1,62 @@
-﻿{{~ ns_offset = namespace != "" ? 1 : 0 ~}}
+﻿{{~#--------- Calculate indentation ---------#~}}
+{{~ ns_offset = namespace != "" ? 1 : 0 ~}}
 {{~ ct_count = array.size containing_types ~}}
 {{~ bi = ns_offset + ct_count ~}}
 {{~ i0 = string.pad_left "" (bi * 4) ~}}
 {{~ i1 = string.pad_left "" ((bi + 1) * 4) ~}}
 {{~ i2 = string.pad_left "" ((bi + 2) * 4) ~}}
 {{~ i3 = string.pad_left "" ((bi + 3) * 4) ~}}
+{{~#-----------------------------------------#~}}
+{{~#--------- Write used namespaces ---------#~}}
 {{~ for used_namespace in used_namespaces ~}}
 using {{ used_namespace }};
-{{~ end ~}}
-
+{{ end }}
+{{~#-----------------------------------------#~}}
+{{~#----------- Declare namespace -----------#~}}
 {{~ if namespace != "" ~}}
 namespace {{ namespace }}
 {
 {{~ end ~}}
+{{~#-----------------------------------------#~}}
+{{~#---------- Declare outer types ----------#~}}
 {{~ for containing_type in containing_types ~}}
 {{ string.pad_left "" ((ns_offset + for.index) * 4) }}public partial class {{ containing_type }}
 {{ string.pad_left "" ((ns_offset + for.index) * 4) }}{
 {{~ end ~}}
+{{~#-----------------------------------------#~}}
+{{~#-------------------------------------------------- APP EXTENSIONS --------------------------------------------------#~}}
 {{ i0 }}/// <summary>
 {{ i0 }}/// Extension methods for setting up Tycho applications.
 {{ i0 }}/// </summary>
 {{ i0 }}public static class {{ classes.setup_extensions_class }}
 {{ i0 }}{
-{{ i1 }}/// <summary>
-{{ i1 }}/// Sets up and runs the specified Tycho application and registers it in the host application builder.
-{{ i1 }}/// </summary>
-{{ i1 }}/// <param name="{{ parameters.builder_parameter }}">The host application builder to extend.</param>
-{{ i1 }}/// <param name="{{ parameters.app_parameter }}">An instance of the application to run.</param>
-{{ i1 }}/// <returns>The host application builder.</returns>
-{{ i1 }}public static async {{ classes.task_class }}<{{ interfaces.host_application_builder_interface }}> {{ methods.add_app_method }}(this {{ interfaces.host_application_builder_interface }} {{ parameters.builder_parameter }}, {{ classes.app_class }} {{ parameters.app_parameter }})
-{{ i1 }}{
-{{ i2 }}var appInstance = await {{ parameters.app_parameter }}
-{{ i3 }}.{{ methods.with_configuration_method }}({{ parameters.builder_parameter }}.{{ properties.configuration_property }})
-{{ i3 }}.{{ methods.with_logging_method }}({{ parameters.logging_parameter }} => {{ classes.logging_configuration_class }}.{{ methods.configure_logging_method }}({{ parameters.logging_parameter }}, {{ parameters.builder_parameter }}.{{ properties.configuration_property }}))
-{{ i3 }}.{{ methods.run_async_method }}()
-{{ i3 }}.{{ methods.configure_await_method }}(false);
+{{   i1   }}/// <summary>
+{{   i1   }}/// Sets up and runs the specified Tycho application and registers it in the host application builder.
+{{   i1   }}/// </summary>
+{{   i1   }}/// <param name="{{ parameters.builder_parameter }}">The host application builder to extend.</param>
+{{   i1   }}/// <param name="{{ parameters.app_parameter }}">An instance of the application to run.</param>
+{{   i1   }}/// <returns>The host application builder.</returns>
+{{   i1   }}public static async {{ classes.task_class }}<{{ interfaces.host_application_builder_interface }}> {{ methods.add_app_method }}(this {{ interfaces.host_application_builder_interface }} {{ parameters.builder_parameter }}, {{ classes.app_class }} {{ parameters.app_parameter }})
+{{   i1   }}{
+{{     i2     }}var appInstance = await {{ parameters.app_parameter }}
+{{       i3       }}.{{ methods.with_configuration_method }}({{ parameters.builder_parameter }}.{{ properties.configuration_property }})
+{{       i3       }}.{{ methods.with_logging_method }}({{ parameters.logging_parameter }} => {{ classes.logging_configuration_class }}.{{ methods.configure_logging_method }}({{ parameters.logging_parameter }}, {{ parameters.builder_parameter }}.{{ properties.configuration_property }}))
+{{       i3       }}.{{ methods.run_async_method }}()
+{{       i3       }}.{{ methods.configure_await_method }}(false);
 
-{{ i2 }}{{ classes.service_collection_service_extensions_class }}.{{ methods.add_singleton_method }}({{ parameters.builder_parameter }}.{{ properties.services_property }}, appInstance);
+{{     i2     }}{{ classes.service_collection_service_extensions_class }}.{{ methods.add_singleton_method }}({{ parameters.builder_parameter }}.{{ properties.services_property }}, appInstance);
 
-{{ i2 }}return {{ parameters.builder_parameter }};
-{{ i1 }}}
+{{     i2     }}return {{ parameters.builder_parameter }};
+{{   i1   }}}
 {{ i0 }}}
+{{~#--------------------------------------------------------------------------------------------------------------------#~}}
+{{~#------- Close outer type brackets -------#~}}
 {{~ for containing_type in containing_types ~}}
 {{ string.pad_left "" ((bi - 1 - for.index) * 4) }}}
 {{~ end ~}}
+{{~#-----------------------------------------#~}}
+{{~#-------- Close namespace bracket --------#~}}
 {{~ if namespace != "" ~}}
 }
 {{~ end ~}}
+{{~#-----------------------------------------#~}}
