@@ -16,8 +16,8 @@ internal static class VerifyInitializer
 
             return new PathInfo(
                 directory: directory,
-                typeName: type.Name,
-                methodName: method.Name);
+                typeName: string.Empty,
+                methodName: "Out");
         });
         VerifySourceGenerators.Initialize();
     }
