@@ -13,6 +13,7 @@ namespace Tycho.Events.Serialization
         private readonly Dictionary<EventIdentity, Func<RoutedEvent, SerializedRoutedEvent>> _serializers;
         private readonly Dictionary<EventIdentity, Func<SerializedRoutedEvent, RoutedEvent>> _deserializers;
 
+        [ReferencedBySourceGenerator]
         protected EventSerializerBase(IPayloadSerializer payloadSerializer)
         {
             _payloadSerializer = payloadSerializer;
@@ -38,6 +39,7 @@ namespace Tycho.Events.Serialization
             throw new InvalidOperationException($"Failed to deserialize an unregistered event with ID {serializedEvent.EventId}");
         }
 
+        [ReferencedBySourceGenerator]
         protected void RegisterEvent<TEvent>() where TEvent : class, IEvent
         {
             var eventId = EventIdentity.Create<TEvent>();

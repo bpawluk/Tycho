@@ -27,6 +27,7 @@ namespace Tycho.Apps
         /// </summary>
         /// <typeparam name="TEvent">The type of the event to route.</typeparam>
         /// <returns>An instance of <see cref="IEventRouting{TEvent}"/> to configure event routing.</returns>
+        [ReferencedBySourceGenerator]
         IEventRouting<TEvent> Routes<TEvent>()
             where TEvent : class, IEvent;
     }
