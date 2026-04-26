@@ -7,7 +7,6 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithDownstrea
     {
         public TestModuleEventSerializer(IPayloadSerializer payloadSerializer) : base(payloadSerializer)
         {
-        
         }
     }
 }

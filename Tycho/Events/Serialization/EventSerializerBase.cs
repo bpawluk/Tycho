@@ -10,24 +10,24 @@ namespace Tycho.Events.Serialization
     public abstract class EventSerializerBase : IEventSerializer
     {
         private readonly IPayloadSerializer _payloadSerializer;
-        private readonly Dictionary<EventIdentity, Func<RoutedEvent, SerializedRoutedEvent>> _serializers;
         private readonly Dictionary<EventIdentity, Func<SerializedRoutedEvent, RoutedEvent>> _deserializers;
 
         [ReferencedBySourceGenerator]
         protected EventSerializerBase(IPayloadSerializer payloadSerializer)
         {
             _payloadSerializer = payloadSerializer;
-            _serializers = new Dictionary<EventIdentity, Func<RoutedEvent, SerializedRoutedEvent>>();
             _deserializers = new Dictionary<EventIdentity, Func<SerializedRoutedEvent, RoutedEvent>>();
         }
 
         public SerializedRoutedEvent Serialize(RoutedEvent routedEvent)
         {
-            if (_serializers.TryGetValue(routedEvent.EventId, out var serializer))
-            {
-                return serializer(routedEvent);
-            }
-            throw new InvalidOperationException($"Failed to serialize an unregistered event with ID {routedEvent.EventId}");
+            var serializedPayload = routedEvent.SerializePayloadWith(_payloadSerializer);
+            return new SerializedRoutedEvent(
+                routedEvent.Id,
+                routedEvent.EventId,
+                routedEvent.HandlerId,
+                routedEvent.Route,
+                serializedPayload);
         }
 
         public RoutedEvent Deserialize(SerializedRoutedEvent serializedEvent)
@@ -43,26 +43,7 @@ namespace Tycho.Events.Serialization
         protected void RegisterEvent<TEvent>() where TEvent : class, IEvent
         {
             var eventId = EventIdentity.Create<TEvent>();
-            _serializers[eventId] = routedEvent =>
-            {
-                if (routedEvent is RoutedEvent<TEvent> typedRoutedEvent)
-                {
-                    return Serialize(typedRoutedEvent);
-                }
-                throw new InvalidOperationException($"Failed to serialize event with ID {routedEvent.EventId} because it is not of the expected type {typeof(TEvent).Name}");
-            };
             _deserializers[eventId] = Deserialize<TEvent>;
-        }
-
-        private SerializedRoutedEvent Serialize<TEvent>(RoutedEvent<TEvent> routedEvent) where TEvent : class, IEvent
-        {
-            var payload = _payloadSerializer.Serialize(routedEvent.Payload);
-            return new SerializedRoutedEvent(
-                routedEvent.Id,
-                routedEvent.EventId,
-                routedEvent.HandlerId,
-                routedEvent.Route,
-                payload);
         }
 
         private RoutedEvent<TEvent> Deserialize<TEvent>(SerializedRoutedEvent serializedEvent) where TEvent : class, IEvent

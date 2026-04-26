@@ -11,7 +11,6 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInNamespaceAn
             {
                 public TestModuleEventSerializer(IPayloadSerializer payloadSerializer) : base(payloadSerializer)
                 {
-                
                 }
             }
         }

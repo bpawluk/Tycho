@@ -9,7 +9,6 @@ public partial class Outer
         {
             public TestModuleEventSerializer(IPayloadSerializer payloadSerializer) : base(payloadSerializer)
             {
-            
             }
         }
     }

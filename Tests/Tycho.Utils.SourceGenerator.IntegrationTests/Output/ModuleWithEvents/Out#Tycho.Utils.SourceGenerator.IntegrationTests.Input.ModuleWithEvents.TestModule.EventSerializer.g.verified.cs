@@ -10,8 +10,6 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithEvents
         {
             RegisterEvent<OrderCreatedEvent>();
             RegisterEvent<PaymentProcessedEvent>();
-            RegisterEvent<PaymentFailedEvent>();
-        
         }
     }
 }

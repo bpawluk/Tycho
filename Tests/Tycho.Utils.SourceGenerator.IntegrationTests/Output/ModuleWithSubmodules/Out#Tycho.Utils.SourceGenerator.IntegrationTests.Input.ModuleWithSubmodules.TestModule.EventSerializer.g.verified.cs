@@ -7,7 +7,6 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithSubmodule
     {
         public TestModuleEventSerializer(IPayloadSerializer payloadSerializer) : base(payloadSerializer)
         {
-        
         }
     }
 }

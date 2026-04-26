@@ -5,6 +5,5 @@ internal class TestModuleEventSerializer : EventSerializerBase
 {
     public TestModuleEventSerializer(IPayloadSerializer payloadSerializer) : base(payloadSerializer)
     {
-    
     }
 }
