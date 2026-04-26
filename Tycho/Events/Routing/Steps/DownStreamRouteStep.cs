@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using Tycho.Identity.Modules;
+using Tycho.Modules;
 
 namespace Tycho.Events.Routing.Steps
 {
@@ -18,7 +19,7 @@ namespace Tycho.Events.Routing.Steps
             Destination = destination;
         }
 
-        public static DownStreamRouteStep Create<TModule>()
+        public static DownStreamRouteStep Create<TModule>() where TModule : TychoModule
         {
             var moduleIdentity = ModuleIdentity.Create<TModule>();
             return new DownStreamRouteStep(moduleIdentity);

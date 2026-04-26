@@ -18,16 +18,16 @@ namespace Tycho.Events.Outbox.InMemory
             _entries = new ConcurrentQueue<RoutedEvent>();
         }
 
-        public Task Write(IReadOnlyCollection<RoutedEvent> entries, CancellationToken cancellationToken)
+        public Task Write(IReadOnlyCollection<RoutedEvent> events, CancellationToken cancellationToken)
         {
-            if (entries.Count == 0)
+            if (events.Count == 0)
             {
                 return Task.CompletedTask;
             }
 
-            foreach (var entry in entries)
+            foreach (var @event in events)
             {
-                _entries.Enqueue(entry);
+                _entries.Enqueue(@event);
             }
             _outboxActivity.NotifyNewEntriesAdded();
 
@@ -36,13 +36,13 @@ namespace Tycho.Events.Outbox.InMemory
 
         public Task<IReadOnlyCollection<RoutedEvent>> Read(int count, CancellationToken cancellationToken)
         {
-            var entries = new List<RoutedEvent>();
+            var events = new List<RoutedEvent>();
 
             for (var i = 0; i < count; i++)
             {
                 if (_entries.TryDequeue(out var nextEntry))
                 {
-                    entries.Add(nextEntry);
+                    events.Add(nextEntry);
                 }
                 else
                 {
@@ -50,15 +50,15 @@ namespace Tycho.Events.Outbox.InMemory
                 }
             }
 
-            return Task.FromResult<IReadOnlyCollection<RoutedEvent>>(entries);
+            return Task.FromResult<IReadOnlyCollection<RoutedEvent>>(events);
         }
 
-        public Task MarkAsDelivered(Guid entryId, CancellationToken cancellationToken)
+        public Task MarkAsDelivered(Guid eventId, CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
         }
 
-        public Task MarkAsFailed(Guid entryId, CancellationToken cancellationToken)
+        public Task MarkAsFailed(Guid eventId, CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
         }

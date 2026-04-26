@@ -19,7 +19,7 @@ namespace Tycho.Events.Registrating.Registrations
             Handler = handler;
             HandlerId = Handler is IIdentifiableEventHandler identifiableHandler
                 ? identifiableHandler.Identity
-                : EventHandlerIdentity.Create<TEventHandler, TEvent>();
+                : EventHandlerIdentity.Create<TEventHandler>();
         }
 
         public IReadOnlyCollection<RoutedEvent> Route(Guid eventId, TEvent eventPayload)

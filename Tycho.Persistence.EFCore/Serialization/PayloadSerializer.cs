@@ -6,13 +6,16 @@ namespace Tycho.Persistence.EFCore.Serialization;
 
 internal class PayloadSerializer
 {
+    private readonly JsonSerializerOptions _jsonOptions = new();
+
     public object SerializePayload(IEvent eventData)
     {
         if (eventData is null)
         {
             throw new ArgumentNullException(nameof(eventData), "Cannot serialize null event data");
         }
-        return JsonSerializer.Serialize(eventData, eventData.GetType());
+
+        return JsonSerializer.Serialize(eventData, eventData.GetType(), _jsonOptions);
     }
 
     public IEvent Deserialize(Type eventType, object payload)
@@ -22,7 +25,7 @@ internal class PayloadSerializer
             throw new ArgumentException("Payload must be a non-empty string", nameof(payload));
         }
 
-        if (JsonSerializer.Deserialize(stringPayload, eventType) is not IEvent eventData)
+        if (JsonSerializer.Deserialize(stringPayload, eventType, _jsonOptions) is not IEvent eventData)
         {
             throw new InvalidOperationException($"Failed to deserialize payload to {eventType.Name}");
         }
@@ -32,16 +35,16 @@ internal class PayloadSerializer
 
     public TEvent DeserializePayload<TEvent>(object payload) where TEvent : class, IEvent
     {
-        if (payload is string stringPayload && !string.IsNullOrWhiteSpace(stringPayload))
+        if (payload is not string stringPayload || string.IsNullOrWhiteSpace(stringPayload))
         {
-            var eventData = JsonSerializer.Deserialize<TEvent>(stringPayload);
-            if (eventData is null)
-            {
-                throw new InvalidOperationException(
-                    $"Failed to deserialize payload to {typeof(TEvent).Name}");
-            }
-            return eventData;
+            throw new ArgumentException("Payload must be a non-empty string", nameof(payload));
         }
-        throw new ArgumentException("Payload must be a non-empty string", nameof(payload));
+
+        if (JsonSerializer.Deserialize<TEvent>(stringPayload, _jsonOptions) is not TEvent eventData)
+        {
+            throw new InvalidOperationException($"Failed to deserialize payload to {typeof(TEvent).Name}");
+        }
+
+        return eventData;
     }
 }

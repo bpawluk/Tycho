@@ -25,7 +25,7 @@ namespace Tycho.Identity.Modules
                     return module;
                 }
             }
-            throw new ArgumentException($"Module with identity '{moduleId}' not found.", nameof(moduleId));
+            throw new ArgumentException($"Module with identity '{moduleId}' is not defined.", nameof(moduleId));
         }
 
         public IReadOnlyCollection<IModule> GetAllModules() => _internals.GetServices<IModule>().ToArray();

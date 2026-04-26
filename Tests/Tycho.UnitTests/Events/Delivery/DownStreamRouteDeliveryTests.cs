@@ -176,7 +176,7 @@ public class DownStreamRouteDeliveryTests
         {
             route.Push(nextRouteStep);
         }
-        var handlerId = EventHandlerIdentity.Create<TestEventHandler, TestEvent>();
-        return new RoutedEvent<TestEvent>(Guid.NewGuid(), route, handlerId, new TestEvent());
+        var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
+        return new RoutedEvent<TestEvent>(Guid.NewGuid(), handlerId, route, new TestEvent());
     }
 }

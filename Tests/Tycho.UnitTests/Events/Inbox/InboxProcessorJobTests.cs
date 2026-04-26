@@ -84,7 +84,7 @@ public class InboxProcessorJobTests
 
     private static RoutedEvent<TestEvent> CreateRoutedEvent()
     {
-        var handlerId = EventHandlerIdentity.Create<TestEventHandler, TestEvent>();
+        var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
         return new RoutedEvent<TestEvent>(Guid.NewGuid(), handlerId, new TestEvent());
     }
 }

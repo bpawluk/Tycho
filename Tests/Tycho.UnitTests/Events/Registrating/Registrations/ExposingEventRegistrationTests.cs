@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using Tycho.Events;
 using Tycho.Events.Broker;
 using Tycho.Events.Registrating.Registrations;
@@ -132,7 +132,7 @@ public class ExposingEventRegistrationTests
 	private static RoutedEvent<TEvent> CreateRoutedEvent<TEvent>(TEvent payload)
 		where TEvent : class, IEvent
 	{
-		var handlerId = EventHandlerIdentity.Create<MultiEventHandler, TEvent>();
+		var handlerId = EventHandlerIdentity.Create<MultiEventHandler>();
 		return new RoutedEvent<TEvent>(Guid.NewGuid(), handlerId, payload);
 	}
 

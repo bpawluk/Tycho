@@ -1,69 +1,29 @@
 ﻿using System;
+using Tycho.Modules;
 
 namespace Tycho.Identity.Modules
 {
-    internal class ModuleIdentity : IEquatable<ModuleIdentity>
+    internal sealed class ModuleIdentity : TypeIdentity, IEquatable<ModuleIdentity>
     {
-        public string ModuleId { get; set; } = string.Empty;
+        private ModuleIdentity() { }
 
-        private ModuleIdentity(string moduleId)
-        {
-            ModuleId = moduleId;
-        }
+        private ModuleIdentity(string typeId) : base(typeId) { }
 
-        private ModuleIdentity(Type moduleType)
-        {
-            ModuleId = TypeIdentifier.GetId(moduleType);
-        }
-
-        public static ModuleIdentity Create<TModule>()
-        {
-            return new ModuleIdentity(typeof(TModule));
-        }
+        private ModuleIdentity(Type moduleType) : base(moduleType) { }
 
         public bool Equals(ModuleIdentity? other)
         {
             return this == other;
         }
 
-        public override bool Equals(object? obj)
+        public static ModuleIdentity Create<TModule>() where TModule : TychoModule
         {
-            return this == obj as ModuleIdentity;
-        }
-
-        public override int GetHashCode()
-        {
-            return ModuleId.GetHashCode(StringComparison.InvariantCulture);
-        }
-
-        public override string ToString()
-        {
-            return ModuleId;
+            return new ModuleIdentity(typeof(TModule));
         }
 
         public static ModuleIdentity Parse(string identity)
         {
             return new ModuleIdentity(identity);
-        }
-
-        public static bool operator !=(ModuleIdentity? left, ModuleIdentity? right)
-        {
-            return !(left == right);
-        }
-
-        public static bool operator ==(ModuleIdentity? left, ModuleIdentity? right)
-        {
-            if (ReferenceEquals(left, right))
-            {
-                return true;
-            }
-
-            if (left is null || right is null)
-            {
-                return false;
-            }
-
-            return string.Equals(left.ModuleId, right.ModuleId, StringComparison.InvariantCulture);
         }
     }
 }

@@ -15,8 +15,7 @@ namespace Tycho.Identity.Events
             _internals = internals;
         }
 
-        public IEventHandler<TEvent> GetHandler<TEvent>(EventHandlerIdentity handlerId)
-            where TEvent : class, IEvent
+        public IEventHandler<TEvent> GetHandler<TEvent>(EventHandlerIdentity handlerId) where TEvent : class, IEvent
         {
             foreach (var registration in _internals.GetServices<IFinalEventRegistration<TEvent>>())
             {
@@ -25,7 +24,7 @@ namespace Tycho.Identity.Events
                     return registration.Handler;
                 }
             }
-            throw new ArgumentException($"Event handler with identity '{handlerId}' not found.", nameof(handlerId));
+            throw new ArgumentException($"Event handler with identity '{handlerId}' is not registered for '{typeof(TEvent).Name}' event.", nameof(handlerId));
         }
     }
 }

@@ -18,7 +18,7 @@ namespace Tycho.Events.Handling
         public ScopedEventHandler(Internals internals)
         {
             _internals = internals;
-            Identity = EventHandlerIdentity.Create<THandler, TEvent>();
+            Identity = EventHandlerIdentity.Create<THandler>();
         }
 
         public async Task HandleAsync(EventContext<TEvent> context, CancellationToken cancellationToken)

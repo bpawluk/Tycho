@@ -25,7 +25,7 @@ public class EventHandlerProviderTests
         var firstEventHandlerMock = new Mock<IEventHandler<TestEvent>>();
         var firstEventHandler = firstEventHandlerMock.Object;
         firstEventRegistrationMock.SetupGet(r => r.Handler).Returns(firstEventHandler);
-        var firstEventHandlerId = EventHandlerIdentity.Create<TestEventOtherHandler, TestEvent>();
+        var firstEventHandlerId = EventHandlerIdentity.Create<TestEventOtherHandler>();
         firstEventRegistrationMock.SetupGet(r => r.HandlerId).Returns(firstEventHandlerId);
         internals.GetServiceCollection().AddSingleton(firstEventRegistrationMock.Object);
 
@@ -33,7 +33,7 @@ public class EventHandlerProviderTests
         var secondEventHandlerMock = new Mock<IEventHandler<TestEvent>>();
         _registeredHandler = secondEventHandlerMock.Object;
         secondEventRegistrationMock.SetupGet(r => r.Handler).Returns(_registeredHandler);
-        _registeredHandlerId = EventHandlerIdentity.Create<TestEventHandler, TestEvent>();
+        _registeredHandlerId = EventHandlerIdentity.Create<TestEventHandler>();
         secondEventRegistrationMock.SetupGet(r => r.HandlerId).Returns(_registeredHandlerId);
         internals.GetServiceCollection().AddSingleton(secondEventRegistrationMock.Object);
 
@@ -41,7 +41,7 @@ public class EventHandlerProviderTests
         var thirdEventHandlerMock = new Mock<IEventHandler<OtherEvent>>();
         var thirdEventHandler = thirdEventHandlerMock.Object;
         thirdEventRegistrationMock.SetupGet(r => r.Handler).Returns(thirdEventHandler);
-        var thirdEventHandlerId = EventHandlerIdentity.Create<OtherEventHandler, OtherEvent>();
+        var thirdEventHandlerId = EventHandlerIdentity.Create<OtherEventHandler>();
         thirdEventRegistrationMock.SetupGet(r => r.HandlerId).Returns(thirdEventHandlerId);
         internals.GetServiceCollection().AddSingleton(thirdEventRegistrationMock.Object);
 
@@ -63,7 +63,7 @@ public class EventHandlerProviderTests
     public void GetHandler_WithMissingHandler_ThrowsArgumentException()
     {
         // Arrange
-        var missingHandlerId = EventHandlerIdentity.Create<TestEventAnotherHandler, TestEvent>();
+        var missingHandlerId = EventHandlerIdentity.Create<TestEventAnotherHandler>();
 
         // Act 
         void Act() => _sut.GetHandler<TestEvent>(missingHandlerId);

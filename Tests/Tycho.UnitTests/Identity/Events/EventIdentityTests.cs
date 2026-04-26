@@ -1,39 +1,39 @@
 using Tycho.Identity.Events;
-using Tycho.UnitTests._Data.Handlers;
+using Tycho.UnitTests._Data.Events;
 
 namespace Tycho.UnitTests.Identity.Events;
 
-public class EventHandlerIdentityTests
+public class EventIdentityTests
 {
-    private static readonly EventHandlerIdentity _handlerIdentity = EventHandlerIdentity.Create<TestEventHandler>();
+    private static readonly EventIdentity _eventIdentity = EventIdentity.Create<TestEvent>();
 
     public static readonly IEnumerable<object[]> EqualsTestData =
     [
         // Same instance => Equal
-        [_handlerIdentity, _handlerIdentity, true],
+        [_eventIdentity, _eventIdentity, true],
 
-        // Same handler type => Equal
+        // Same handler => Equal
         [
-            EventHandlerIdentity.Create<TestEventHandler>(),
-            EventHandlerIdentity.Create<TestEventHandler>(), 
+            EventIdentity.Create<TestEvent>(),
+            EventIdentity.Create<TestEvent>(), 
             true
         ],
 
-        // Different handler type => Not Equal
+        // Different handler => Not Equal
         [
-            EventHandlerIdentity.Create<TestEventHandler>(),
-            EventHandlerIdentity.Create<OtherEventHandler>(), 
+            EventIdentity.Create<TestEvent>(),
+            EventIdentity.Create<OtherEvent>(), 
             false
         ],
 
         // Comparing to null => Not Equal
-        [EventHandlerIdentity.Create<TestEventHandler>(), null!, false]
+        [EventIdentity.Create<TestEvent>(), null!, false]
     ];
 
     public static readonly IEnumerable<object[]> EqualsObjectTestData = EqualsTestData.Concat(
     [
         // Comparing to an object of a different type => Not Equal
-        [EventHandlerIdentity.Create<TestEventHandler>(), new object(), false]
+        [EventIdentity.Create<TestEvent>(), new object(), false]
     ]);
 
     public static readonly IEnumerable<object[]> EqualsOperatorTestData = EqualsTestData.Concat(
@@ -42,12 +42,12 @@ public class EventHandlerIdentityTests
         [null!, null!, true],
 
         // Comparing null to an identity => Not Equal
-        [null!, EventHandlerIdentity.Create<TestEventHandler>(), false]
+        [null!, EventIdentity.Create<TestEvent>(), false]
     ]);
 
     [Theory]
     [MemberData(nameof(EqualsTestData))]
-    internal void EventHandlerIdentity_Equals_EvaluatesCorrectly(EventHandlerIdentity left, EventHandlerIdentity? right, bool areEqual)
+    internal void EventIdentity_Equals_EvaluatesCorrectly(EventIdentity left, EventIdentity? right, bool areEqual)
     {
         // Act
         var result = left.Equals(right);
@@ -58,7 +58,7 @@ public class EventHandlerIdentityTests
 
     [Theory]
     [MemberData(nameof(EqualsObjectTestData))]
-    internal void EventHandlerIdentity_EqualsObject_EvaluatesCorrectly(EventHandlerIdentity left, object? right, bool areEqual)
+    internal void EventIdentity_EqualsObject_EvaluatesCorrectly(EventIdentity left, object? right, bool areEqual)
     {
         // Act
         var result = left.Equals(right);
@@ -69,7 +69,7 @@ public class EventHandlerIdentityTests
 
     [Theory]
     [MemberData(nameof(EqualsOperatorTestData))]
-    internal void EventHandlerIdentity_EqualsOperator_EvaluatesCorrectly(EventHandlerIdentity? left, EventHandlerIdentity? right,
+    internal void EventIdentity_EqualsOperator_EvaluatesCorrectly(EventIdentity? left, EventIdentity? right,
         bool areEqual)
     {
         // Act
@@ -81,7 +81,7 @@ public class EventHandlerIdentityTests
 
     [Theory]
     [MemberData(nameof(EqualsOperatorTestData))]
-    internal void EventHandlerIdentity_NotEqualsOperator_EvaluatesCorrectly(EventHandlerIdentity? left, EventHandlerIdentity? right,
+    internal void EventIdentity_NotEqualsOperator_EvaluatesCorrectly(EventIdentity? left, EventIdentity? right,
         bool areEqual)
     {
         // Act

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Tycho.Events.Handling;
 using Tycho.Events.Registrating;
@@ -172,7 +172,7 @@ public class RegistratorTests
         Assert.NotNull(finalEventRegistration.Handler);
         Assert.IsType<ScopedEventHandler<TestEvent, TestEventHandler>>(finalEventRegistration.Handler);
 
-        Assert.Equal(EventHandlerIdentity.Create<TestEventHandler, TestEvent>(), finalEventRegistration.HandlerId);
+        Assert.Equal(EventHandlerIdentity.Create<TestEventHandler>(), finalEventRegistration.HandlerId);
     }
 
     [Fact]

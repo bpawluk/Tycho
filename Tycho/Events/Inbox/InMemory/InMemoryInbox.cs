@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Events.Routing;
+using Tycho.Events.Serialization;
 
 namespace Tycho.Events.Inbox.InMemory
 {
@@ -18,22 +19,22 @@ namespace Tycho.Events.Inbox.InMemory
             _entries = new ConcurrentQueue<RoutedEvent>();
         }
 
-        public Task Write(RoutedEvent entry, CancellationToken cancellationToken = default)
+        public Task Write(RoutedEvent routedEvent, CancellationToken cancellationToken = default)
         {
-            _entries.Enqueue(entry);
+            _entries.Enqueue(routedEvent);
             _inboxActivity.NotifyNewEntriesAdded();
             return Task.CompletedTask;
         }
 
         public Task<IReadOnlyCollection<RoutedEvent>> Read(int count, CancellationToken cancellationToken = default)
         {
-            var entries = new List<RoutedEvent>();
+            var events = new List<RoutedEvent>();
 
             for (var i = 0; i < count; i++)
             {
                 if (_entries.TryDequeue(out var nextEntry))
                 {
-                    entries.Add(nextEntry);
+                    events.Add(nextEntry);
                 }
                 else
                 {
@@ -41,15 +42,15 @@ namespace Tycho.Events.Inbox.InMemory
                 }
             }
 
-            return Task.FromResult<IReadOnlyCollection<RoutedEvent>>(entries);
+            return Task.FromResult<IReadOnlyCollection<RoutedEvent>>(events);
         }
 
-        public Task MarkAsHandled(Guid entryId, CancellationToken cancellationToken = default)
+        public Task MarkAsHandled(Guid eventId, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }
 
-        public Task MarkAsFailed(Guid entryId, CancellationToken cancellationToken = default)
+        public Task MarkAsFailed(Guid eventId, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }

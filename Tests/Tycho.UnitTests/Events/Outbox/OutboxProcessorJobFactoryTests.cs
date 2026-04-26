@@ -3,6 +3,7 @@ using Moq;
 using Tycho.Events.Broker;
 using Tycho.Events.Outbox;
 using Tycho.Events.Routing;
+using Tycho.Events.Serialization;
 using Tycho.Identity.Events;
 using Tycho.Structure;
 using Tycho.UnitTests._Data.Events;
@@ -68,7 +69,7 @@ public class OutboxProcessorJobFactoryTests
 
     private static RoutedEvent<TestEvent> CreateRoutedEvent()
     {
-        var handlerId = EventHandlerIdentity.Create<TestEventHandler, TestEvent>();
+        var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
         return new RoutedEvent<TestEvent>(Guid.NewGuid(), handlerId, new TestEvent());
     }
 }

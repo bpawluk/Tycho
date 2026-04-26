@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Delivery;
 using Tycho.Events.Registrating.Registrations;
 using Tycho.Events.Routing;
+using Tycho.Events.Serialization;
 using Tycho.Structure;
 
 namespace Tycho.Events.Broker

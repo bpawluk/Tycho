@@ -1,8 +1,9 @@
-﻿using Moq;
+using Moq;
 using Tycho.Events.Broker;
 using Tycho.Events.Outbox;
 using Tycho.Events.Publishing;
 using Tycho.Events.Routing;
+using Tycho.Events.Serialization;
 using Tycho.Identity.Events;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
@@ -99,7 +100,7 @@ public class EventPublisherTests
 
     private static RoutedEvent<TestEvent> CreateRoutedEvent(TestEvent? payload = null)
     {
-        var handlerId = EventHandlerIdentity.Create<TestEventHandler, TestEvent>();
+        var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
         return new RoutedEvent<TestEvent>(Guid.NewGuid(), handlerId, payload ?? new TestEvent());
     }
 }

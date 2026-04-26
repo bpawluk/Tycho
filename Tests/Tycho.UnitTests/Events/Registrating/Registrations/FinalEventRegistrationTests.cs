@@ -1,4 +1,4 @@
-﻿using Tycho.Events;
+using Tycho.Events;
 using Tycho.Events.Handling;
 using Tycho.Events.Registrating.Registrations;
 using Tycho.Events.Routing;
@@ -22,7 +22,7 @@ public class FinalEventRegistrationTests
 
 		// Assert
 		Assert.Same(handler, sut.Handler);
-		Assert.Equal(EventHandlerIdentity.Create<TestEventHandler, TestEvent>(), sut.HandlerId);
+		Assert.Equal(EventHandlerIdentity.Create<TestEventHandler>(), sut.HandlerId);
 	}
 
 	[Fact]

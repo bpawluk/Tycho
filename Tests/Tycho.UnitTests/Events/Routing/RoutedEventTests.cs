@@ -16,7 +16,7 @@ public class RoutedEventTests
     {
         // Arrange
         var id = Guid.NewGuid();
-        var handlerId = EventHandlerIdentity.Create<TestEventHandler, TestEvent>();
+        var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
         var payload = new TestEvent();
 
         // Act
@@ -33,13 +33,13 @@ public class RoutedEventTests
     {
         // Arrange
         var id = Guid.NewGuid();
-        var handlerId = EventHandlerIdentity.Create<TestEventHandler, TestEvent>();
+        var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
         var payload = new TestEvent();
         var route = Route.Create();
         route.Push(UpStreamRouteStep.Create());
 
         // Act
-        var result = new RoutedEvent<TestEvent>(id, route, handlerId, payload);
+        var result = new RoutedEvent<TestEvent>(id, handlerId, route, payload);
 
         // Assert
         Assert.Same(route, result.Route);
@@ -51,7 +51,7 @@ public class RoutedEventTests
         // Arrange
         var id = Guid.NewGuid();
         var cancellationToken = new CancellationToken();
-        var handlerId = EventHandlerIdentity.Create<TestEventHandler, TestEvent>();
+        var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
         var payload = new TestEvent();
 
         var sut = new RoutedEvent<TestEvent>(id, handlerId, payload);
@@ -72,7 +72,7 @@ public class RoutedEventTests
         // Arrange
         var id = Guid.NewGuid();
         var cancellationToken = new CancellationToken();
-        var handlerId = EventHandlerIdentity.Create<TestEventHandler, TestEvent>();
+        var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
         var payload = new TestEvent();
 
         var sut = new RoutedEvent<TestEvent>(id, handlerId, payload);

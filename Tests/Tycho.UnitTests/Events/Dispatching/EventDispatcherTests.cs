@@ -62,7 +62,7 @@ public class EventDispatcherTests
 
     private static RoutedEvent<TestEvent> CreateRoutedEvent(TestEvent? payload = null)
     {
-        var handlerId = EventHandlerIdentity.Create<TestEventHandler, TestEvent>();
+        var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
         return new RoutedEvent<TestEvent>(Guid.NewGuid(), handlerId, payload ?? new TestEvent());
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Tycho.Events.Broker;
 using Tycho.Events.Routing;
+using Tycho.Events.Serialization;
 
 namespace Tycho.Events.Registrating.Registrations
 {

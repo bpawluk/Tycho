@@ -10,8 +10,8 @@ namespace Tycho.Events.Inbox
     {
         Task<IReadOnlyCollection<RoutedEvent>> Read(int count, CancellationToken cancellationToken = default);
 
-        Task MarkAsHandled(Guid entryId, CancellationToken cancellationToken = default);
+        Task MarkAsHandled(Guid eventId, CancellationToken cancellationToken = default);
 
-        Task MarkAsFailed(Guid entryId, CancellationToken cancellationToken = default);
+        Task MarkAsFailed(Guid eventId, CancellationToken cancellationToken = default);
     }
 }
