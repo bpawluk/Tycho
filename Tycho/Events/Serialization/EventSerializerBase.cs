@@ -5,15 +5,6 @@ using Tycho.Identity.Events;
 
 namespace Tycho.Events.Serialization
 {
-    //internal class SomeEventSerializer : EventSerializerBase
-    //{
-    //    public SomeEventSerializer(IPayloadSerializer payloadSerializer) : base(payloadSerializer)
-    //    {
-    //        RegisterEvent<SomeEvent>();
-    //        RegisterEvent<OtherEvent>();
-    //    }
-    //}
-
     internal abstract class EventSerializerBase : IEventSerializer
     {
         private readonly IPayloadSerializer _payloadSerializer;
