@@ -1,5 +1,8 @@
-﻿namespace Tycho.Events.Serialization
+﻿using Tycho.Utils;
+
+namespace Tycho.Events.Serialization
 {
+    [ReferencedBySourceGenerator]
     public interface IPayloadSerializer
     {
         object Serialize<TEvent>(TEvent payload) where TEvent : class, IEvent;

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using Tycho.Events.Model;
 using Tycho.Identity.Events;
+using Tycho.Utils;
 
 namespace Tycho.Events.Serialization
 {
+    [ReferencedBySourceGenerator]
     internal abstract class EventSerializerBase : IEventSerializer
     {
         private readonly IPayloadSerializer _payloadSerializer;
