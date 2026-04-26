@@ -12,6 +12,7 @@ using Tycho.Events.Outbox;
 using Tycho.Events.Outbox.InMemory;
 using Tycho.Events.Publishing;
 using Tycho.Events.Registrating;
+using Tycho.Events.Serialization;
 using Tycho.Identity.Events;
 using Tycho.Structure;
 
@@ -55,6 +56,11 @@ namespace Tycho.Modules.Setup
         public Task BuildAsync()
         {
             var services = _internals.GetServiceCollection();
+
+            if (!_internals.HasService<IPayloadSerializer>())
+            {
+                services.AddTransient<IPayloadSerializer, InMemoryPayloadSerializer>();
+            }
 
             if (!_internals.HasService<IOutboxWriter>() || !_internals.HasService<IOutboxConsumer>())
             {

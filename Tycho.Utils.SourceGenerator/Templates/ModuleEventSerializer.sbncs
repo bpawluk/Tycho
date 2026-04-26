@@ -1,0 +1,47 @@
+{{~#--------- Calculate indentation ---------#~}}
+{{~ ns_offset = namespace != "" ? 1 : 0 ~}}
+{{~ ct_count = array.size containing_types ~}}
+{{~ bi = ns_offset + ct_count ~}}
+{{~ i0 = string.pad_left "" (bi * 4) ~}}
+{{~ i1 = string.pad_left "" ((bi + 1) * 4) ~}}
+{{~ i2 = string.pad_left "" ((bi + 2) * 4) ~}}
+{{~#-----------------------------------------#~}}
+{{~#--------- Write used namespaces ---------#~}}
+{{~ for used_namespace in used_namespaces ~}}
+using {{ used_namespace }};
+{{ end }}
+{{~#-----------------------------------------#~}}
+{{~#----------- Declare namespace -----------#~}}
+{{~ if namespace != "" ~}}
+namespace {{ namespace }}
+{
+{{~ end ~}}
+{{~#-----------------------------------------#~}}
+{{~#---------- Declare outer types ----------#~}}
+{{~ for containing_type in containing_types ~}}
+{{ string.pad_left "" ((ns_offset + for.index) * 4) }}public partial class {{ containing_type }}
+{{ string.pad_left "" ((ns_offset + for.index) * 4) }}{
+{{~ end ~}}
+{{~#-----------------------------------------#~}}
+{{~#------------------------------------------- MODULE EVENT SERIALIZER ---------------------------------------------#~}}
+{{ i0 }}internal class {{ classes.event_serializer_class }} : {{ classes.event_serializer_base_class }}
+{{ i0 }}{
+{{   i1   }}public {{ classes.event_serializer_class }}({{ interfaces.payload_serializer_interface }} {{ parameters.payload_serializer_parameter }}) : base({{ parameters.payload_serializer_parameter }})
+{{   i1   }}{
+{{~ for event in events ~}}
+{{     i2     }}{{ methods.register_event_method }}<{{ event }}>();
+{{~ end ~}}
+{{   i1   }}
+{{   i1   }}}
+{{ i0 }}}
+{{~#------------------------------------------------------------------------------------------------------------------#~}}
+{{~#------- Close outer type brackets -------#~}}
+{{~ for containing_type in containing_types ~}}
+{{ string.pad_left "" ((bi - 1 - for.index) * 4) }}}
+{{~ end ~}}
+{{~#-----------------------------------------#~}}
+{{~#-------- Close namespace bracket --------#~}}
+{{~ if namespace != "" ~}}
+}
+{{~ end ~}}
+{{~#-----------------------------------------#~}}

@@ -1,5 +1,6 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithSubmodules.Modules.ModuleA.Setup.g.cs
 using Microsoft.Extensions.DependencyInjection;
+using Tycho.Events.Serialization;
 using Tycho.Modules;
 using Tycho.Modules.Instance;
 
@@ -9,6 +10,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithSubmodules.M
     {
         protected override void __AutoSetup__(IServiceCollection module)
         {
+            ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, ModuleAEventSerializer>(module);
             ServiceCollectionServiceExtensions.AddTransient<IPublisher, ModuleAPublisher>(module);
             ServiceCollectionServiceExtensions.AddTransient<IParent, ModuleAParent>(module);
         }

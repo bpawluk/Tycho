@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using Tycho.Apps;
+using Tycho.Events.Serialization;
 using Tycho.Modules.Instance;
 using Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithSubmodules.Modules;
 
@@ -49,6 +50,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithSubmodules
 
         protected override void __AutoSetup__(IServiceCollection app)
         {
+            ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestAppEventSerializer>(app);
             ServiceCollectionServiceExtensions.AddTransient<IPublisher, TestAppPublisher>(app);
             ServiceCollectionServiceExtensions.AddTransient<IModuleA, ModuleAFacade>(app);
             ServiceCollectionServiceExtensions.AddTransient<IModuleB, ModuleBFacade>(app);

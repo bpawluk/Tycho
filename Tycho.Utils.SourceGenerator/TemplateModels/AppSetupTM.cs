@@ -4,6 +4,7 @@ using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.References.Microsoft;
 using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.References.Tycho.Apps;
+using Tycho.Utils.SourceGenerator.References.Tycho.Events;
 using Tycho.Utils.SourceGenerator.References.Tycho.Modules;
 using Tycho.Utils.SourceGenerator.Symbols;
 
@@ -44,6 +45,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string AppClass { get; }
             public string FacadeClass { get; }
             public string PublisherClass { get; }
+            public string EventSerializerClass { get; }
             public string BaseClass { get; }
             public string TaskClass { get; }
             public string ActionClass { get; }
@@ -55,6 +57,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 AppClass = tychoSetupModel.DefinitionType.Name;
                 FacadeClass = AppFacadeSymbols.GetAppFacadeClass(AppClass);
                 PublisherClass = PublisherSymbols.GetPublisherClass(AppClass);
+                EventSerializerClass = EventSerializerSymbols.GetEventSerializerClass(AppClass);
                 BaseClass = owner.UseType(TychoAppReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 ActionClass = owner.UseType(ActionReference.TypeModel);
@@ -67,6 +70,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         { 
             public string FacadeInterface { get; }
             public string PublisherInterface { get; }
+            public string EventSerializerInterface { get; }
             public string ConfigurationInterface { get; }
             public string LoggingBuilderInterface { get; }
             public string ServiceCollectionInterface { get; }
@@ -76,6 +80,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             {
                 FacadeInterface = AppFacadeSymbols.GetAppFacadeInterface(tychoSetupModel.DefinitionType.Name);
                 PublisherInterface = PublisherSymbols.PublisherInterface;
+                EventSerializerInterface = owner.UseType(IEventSerializerReference.TypeModel);
                 ConfigurationInterface = owner.UseType(IConfigurationReference.TypeModel);
                 LoggingBuilderInterface = owner.UseType(ILoggingBuilderReference.TypeModel);
                 ServiceCollectionInterface = owner.UseType(IServiceCollectionReference.TypeModel);
@@ -89,6 +94,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string WithLoggingBaseMethod { get; }
             public string RunBaseMethod { get; }
             public string AutoSetupMethod { get; }
+            public string AddSingletonMethod { get; }
             public string AddTransientMethod { get; }
             public string ConfigureAwaitMethod { get; }
             public string WithConfigurationMethod { get; }
@@ -102,6 +108,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 WithLoggingBaseMethod = TychoAppReference.WithLoggingBaseMethodSignature.MethodName;
                 RunBaseMethod = TychoAppReference.RunBaseAsyncMethodSignature.MethodName;
                 AutoSetupMethod = TychoAppReference.AutoSetupMethodSignature.MethodName;
+                AddSingletonMethod = ServiceCollectionServiceExtensionsReference.AddSingletonMethodSignature.MethodName;
                 AddTransientMethod = ServiceCollectionServiceExtensionsReference.AddTransientMethodSignature.MethodName;
                 ConfigureAwaitMethod = TaskReference.ConfigureAwaitMethodSignature.MethodName; 
                 WithConfigurationMethod = AppSetupSymbols.WithConfigurationMethod;
