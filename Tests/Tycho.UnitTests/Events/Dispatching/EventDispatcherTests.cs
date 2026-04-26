@@ -1,6 +1,7 @@
 using Moq;
 using Tycho.Events;
 using Tycho.Events.Dispatching;
+using Tycho.Events.Model;
 using Tycho.Events.Routing;
 using Tycho.Identity.Events;
 using Tycho.UnitTests._Data.Events;
@@ -62,7 +63,8 @@ public class EventDispatcherTests
 
     private static RoutedEvent<TestEvent> CreateRoutedEvent(TestEvent? payload = null)
     {
+        var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        return new RoutedEvent<TestEvent>(Guid.NewGuid(), handlerId, payload ?? new TestEvent());
+        return new RoutedEvent<TestEvent>(Guid.NewGuid(), eventId, handlerId, Route.Create(), payload ?? new TestEvent());
     }
 }

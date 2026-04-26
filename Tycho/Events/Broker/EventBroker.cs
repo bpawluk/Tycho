@@ -5,9 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Delivery;
+using Tycho.Events.Model;
 using Tycho.Events.Registrating.Registrations;
-using Tycho.Events.Routing;
-using Tycho.Events.Serialization;
 using Tycho.Structure;
 
 namespace Tycho.Events.Broker
@@ -28,15 +27,14 @@ namespace Tycho.Events.Broker
             return registrations.SelectMany(registration => registration.Route(eventId, eventPayload)).ToArray();
         }
 
-        public async Task DeliverAsync<TEvent>(RoutedEvent<TEvent> routedEvent, CancellationToken cancellationToken)
-            where TEvent : class, IEvent
+        public async Task DeliverAsync(SerializedRoutedEvent routedEvent, CancellationToken cancellationToken)
         {
             var deliveryStrategies = _internals.GetServices<IDeliveryStrategy>();
 
             var deliveryStrategy = deliveryStrategies.SingleOrDefault(s => s.CanDeliver(routedEvent));
             if (deliveryStrategy is null)
             {
-                throw new InvalidOperationException($"No delivery strategy found for {typeof(TEvent).Name} event.");
+                throw new InvalidOperationException($"No delivery strategy found for event with ID {routedEvent.EventId}.");
             }
 
             await deliveryStrategy.DeliverAsync(routedEvent, cancellationToken);

@@ -1,5 +1,6 @@
 using Moq;
 using Tycho.Events.Broker;
+using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Events.Routing;
 using Tycho.Identity.Events;
@@ -32,7 +33,7 @@ public class OutboxProcessorJobTests
         await _sut.ExecuteAsync(cancellationToken);
 
         // Assert
-        _brokerMock.Verify(b => b.DeliverAsync(It.IsAny<RoutedEvent<TestEvent>>(), It.IsAny<CancellationToken>()), Times.Never);
+        _brokerMock.Verify(b => b.DeliverAsync(It.IsAny<SerializedRoutedEvent>(), It.IsAny<CancellationToken>()), Times.Never);
         _outboxConsumerMock.Verify(o => o.MarkAsDelivered(It.IsAny<Guid>(), cancellationToken), Times.Never);
         _outboxConsumerMock.Verify(o => o.MarkAsFailed(It.IsAny<Guid>(), cancellationToken), Times.Never);
     }
@@ -86,9 +87,10 @@ public class OutboxProcessorJobTests
         _outboxConsumerMock.Verify(o => o.MarkAsFailed(routedEvent.Id, cancellationToken), Times.Once);
     }
 
-    private static RoutedEvent<TestEvent> CreateRoutedEvent()
+    private static SerializedRoutedEvent CreateRoutedEvent()
     {
+        var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        return new RoutedEvent<TestEvent>(Guid.NewGuid(), handlerId, new TestEvent());
+        return new SerializedRoutedEvent(Guid.NewGuid(), eventId, handlerId, Route.Create(), new TestEvent());
     }
 }

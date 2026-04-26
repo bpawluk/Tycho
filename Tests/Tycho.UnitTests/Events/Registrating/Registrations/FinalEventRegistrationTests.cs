@@ -1,7 +1,7 @@
 using Tycho.Events;
 using Tycho.Events.Handling;
+using Tycho.Events.Model;
 using Tycho.Events.Registrating.Registrations;
-using Tycho.Events.Routing;
 using Tycho.Events.Routing.Steps;
 using Tycho.Identity.Events;
 using Tycho.UnitTests._Data.Events;

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Tycho.Events.Broker;
+using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Events.Routing;
 using Tycho.Events.Serialization;
@@ -36,7 +37,7 @@ public class OutboxProcessorJobFactoryTests
         // Arrange
         var maxCount = 5;
         var cancellationToken = new CancellationToken();
-        var entries = new List<RoutedEvent> { CreateRoutedEvent(), CreateRoutedEvent(), CreateRoutedEvent() };
+        var entries = new List<SerializedRoutedEvent> { CreateRoutedEvent(), CreateRoutedEvent(), CreateRoutedEvent() };
 
         _outboxConsumerMock.Setup(o => o.Read(It.IsAny<int>(), cancellationToken))
                            .ReturnsAsync(entries);
@@ -67,9 +68,10 @@ public class OutboxProcessorJobFactoryTests
         _outboxConsumerMock.Verify(o => o.Read(maxCount, cancellationToken), Times.Once);
     }
 
-    private static RoutedEvent<TestEvent> CreateRoutedEvent()
+    private static SerializedRoutedEvent CreateRoutedEvent()
     {
+        var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        return new RoutedEvent<TestEvent>(Guid.NewGuid(), handlerId, new TestEvent());
+        return new SerializedRoutedEvent(Guid.NewGuid(), eventId, handlerId, Route.Create(), new TestEvent());
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Tycho.Persistence.EFCore.Common;
 
 namespace Tycho.Persistence.EFCore.Outbox;
 

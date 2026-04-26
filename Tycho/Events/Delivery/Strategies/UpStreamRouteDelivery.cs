@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Tycho.Events.Routing;
+using Tycho.Events.Model;
 using Tycho.Events.Routing.Steps;
 using Tycho.Structure.Parent;
 
@@ -16,14 +16,12 @@ namespace Tycho.Events.Delivery.Strategies
             _parent = parent;
         }
 
-        public bool CanDeliver<TEvent>(RoutedEvent<TEvent> routedEvent)
-            where TEvent : class, IEvent
+        public bool CanDeliver(SerializedRoutedEvent routedEvent)
         {
             return routedEvent.Route.TryPeek(out var routeStep) && routeStep is UpStreamRouteStep;
         }
 
-        public async Task DeliverAsync<TEvent>(RoutedEvent<TEvent> routedEvent, CancellationToken cancellationToken)
-            where TEvent : class, IEvent
+        public async Task DeliverAsync(SerializedRoutedEvent routedEvent, CancellationToken cancellationToken)
         {
             if (!routedEvent.Route.TryPop(out var routeStep) || !(routeStep is UpStreamRouteStep))
             {

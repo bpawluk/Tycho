@@ -1,6 +1,7 @@
 using Moq;
 using Tycho.Events.Broker;
 using Tycho.Events.Delivery.Strategies;
+using Tycho.Events.Model;
 using Tycho.Events.Routing;
 using Tycho.Events.Routing.Steps;
 using Tycho.Identity.Events;
@@ -142,14 +143,15 @@ public class UpStreamRouteDeliveryTests
         await Assert.ThrowsAsync<InvalidOperationException>(Act);
     }
 
-    private static RoutedEvent<TestEvent> CreateRoutedEvent(IRouteStep? nextRouteStep = null)
+    private static SerializedRoutedEvent CreateRoutedEvent(IRouteStep? nextRouteStep = null)
     {
-        var route = new Route();
+        var route = Route.Empty();
         if (nextRouteStep != null)
         {
             route.Push(nextRouteStep);
         }
+        var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        return new RoutedEvent<TestEvent>(Guid.NewGuid(), handlerId, route, new TestEvent());
+        return new SerializedRoutedEvent(Guid.NewGuid(), eventId, handlerId, route, new TestEvent());
     }
 }

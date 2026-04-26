@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Tycho.Events.Model;
 using Tycho.Events.Outbox;
-using Tycho.Events.Routing;
 using Tycho.Events.Serialization;
 
 namespace Tycho.Persistence.EFCore.Outbox;
@@ -24,10 +24,10 @@ internal class OutboxWriter(
             return new OutboxEntry
             {
                 Id = serializedEvent.Id,
-                Event = serializedEvent.EventId,
-                Handler = serializedEvent.HandlerId,
-                Route = serializedEvent.Route,
-                Payload = serializedEvent.Payload
+                Event = serializedEvent.EventId.ToString(),
+                Handler = serializedEvent.HandlerId.ToString(),
+                Route = serializedEvent.Route.ToString(),
+                Payload = serializedEvent.Payload.ToString()!
             };
         });
         _dbContext.Set<OutboxEntry>().AddRange(outboxEntries);

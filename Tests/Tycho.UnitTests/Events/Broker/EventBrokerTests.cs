@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Tycho.Events.Broker;
 using Tycho.Events.Delivery;
+using Tycho.Events.Model;
 using Tycho.Events.Registrating.Registrations;
 using Tycho.Events.Routing;
 using Tycho.Identity.Events;
@@ -74,7 +75,7 @@ public class EventBrokerTests
     public async Task DeliverAsync_WithMatchingStrategy_CallsDeliverAsync()
     {
         // Arrange
-        var routedEvent = CreateRoutedEvent();
+        var routedEvent = CreateSerializedRoutedEvent();
         var cancellationToken = new CancellationToken();
 
         var matchingStrategyMock = new Mock<IDeliveryStrategy>();
@@ -106,7 +107,7 @@ public class EventBrokerTests
     public async Task DeliverAsync_WithNoMatchingStrategies_ThrowsInvalidOperationException()
     {
         // Arrange
-        var routedEvent = CreateRoutedEvent();
+        var routedEvent = CreateSerializedRoutedEvent();
         var cancellationToken = new CancellationToken();
 
         var notMatchingStrategyMock = new Mock<IDeliveryStrategy>();
@@ -128,7 +129,7 @@ public class EventBrokerTests
     public async Task DeliverAsync_WithMoreThanOneMatchingStrategy_ThrowsInvalidOperationException()
     {
         // Arrange
-        var routedEvent = CreateRoutedEvent();
+        var routedEvent = CreateSerializedRoutedEvent();
         var cancellationToken = new CancellationToken();
 
         var matchingStrategyMock = new Mock<IDeliveryStrategy>();
@@ -160,7 +161,15 @@ public class EventBrokerTests
 
     private static RoutedEvent<TestEvent> CreateRoutedEvent()
     {
+        var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        return new RoutedEvent<TestEvent>(Guid.NewGuid(), handlerId, new TestEvent());
+        return new RoutedEvent<TestEvent>(Guid.NewGuid(), eventId, handlerId, Route.Create(), new TestEvent());
+    }
+
+    private static SerializedRoutedEvent CreateSerializedRoutedEvent()
+    {
+        var eventId = EventIdentity.Create<TestEvent>();
+        var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
+        return new SerializedRoutedEvent(Guid.NewGuid(), eventId, handlerId, Route.Create(), new TestEvent());
     }
 }

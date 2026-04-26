@@ -1,3 +1,5 @@
+using Moq;
+using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Events.Outbox.InMemory;
 using Tycho.Events.Routing;
@@ -10,34 +12,41 @@ namespace Tycho.UnitTests.Events.Outbox.InMemory;
 
 public class InMemoryOutboxTests
 {
+    private readonly Mock<IEventSerializer> _eventSerializerMock;
     private readonly OutboxActivity _outboxActivity;
     private readonly InMemoryOutbox _sut;
 
     public InMemoryOutboxTests()
     {
+        _eventSerializerMock = new Mock<IEventSerializer>();
         _outboxActivity = new OutboxActivity();
-        _sut = new InMemoryOutbox(_outboxActivity);
+        _sut = new InMemoryOutbox(_eventSerializerMock.Object, _outboxActivity);
     }
 
     [Fact]
     public async Task Write_WithRoutedEvents_EnqueuesEntries()
     {
         // Arrange
-        var entries = new List<RoutedEvent> { CreateRoutedEvent(), CreateRoutedEvent() };
+        var entries = new List<(SerializedRoutedEvent Serialized, RoutedEvent Routed)> 
+        { 
+            CreateSerializedAndRoutedEventPair(),
+            CreateSerializedAndRoutedEventPair(),
+            CreateSerializedAndRoutedEventPair() 
+        };
         var cancellationToken = new CancellationToken();
 
         var notified = false;
         _outboxActivity.NewEntriesAdded += (_, _) => notified = true;
 
         // Act
-        await _sut.Write(entries, cancellationToken);
+        await _sut.Write([.. entries.Select(e => e.Routed)], cancellationToken);
         var result = await _sut.Read(entries.Count, cancellationToken);
 
         // Assert
         Assert.Equal(entries.Count, result.Count);
-        foreach (var entry in entries)
+        foreach (var (serialized, _) in entries)
         {
-            Assert.Contains(entry, result);
+            Assert.Contains(serialized, result);
         }
         Assert.True(notified);
     }
@@ -139,7 +148,20 @@ public class InMemoryOutboxTests
 
     private static RoutedEvent<TestEvent> CreateRoutedEvent()
     {
+        var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        return new RoutedEvent<TestEvent>(Guid.NewGuid(), handlerId, new TestEvent());
+        return new RoutedEvent<TestEvent>(Guid.NewGuid(), eventId, handlerId, Route.Create(), new TestEvent());
+    }
+
+    private (SerializedRoutedEvent Serialized, RoutedEvent Routed) CreateSerializedAndRoutedEventPair()
+    {
+        var id = Guid.NewGuid();
+        var eventId = EventIdentity.Create<TestEvent>();
+        var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
+        var route = Route.Create();
+        var serialized = new SerializedRoutedEvent(id, eventId, handlerId, route, new TestEvent());
+        var deserialized = new RoutedEvent<TestEvent>(id, eventId, handlerId, route, new TestEvent());
+        _eventSerializerMock.Setup(s => s.Serialize(deserialized)).Returns(serialized);
+        return (serialized, deserialized);
     }
 }

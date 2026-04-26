@@ -2,8 +2,8 @@
 {
     public interface IPayloadSerializer
     {
-        string Serialize<TEvent>(TEvent payload) where TEvent : class, IEvent;
+        object Serialize<TEvent>(TEvent payload) where TEvent : class, IEvent;
 
-        TEvent Deserialize<TEvent>(string serializedPayload) where TEvent : class, IEvent;
+        TEvent Deserialize<TEvent>(object serializedPayload) where TEvent : class, IEvent;
     }
 }

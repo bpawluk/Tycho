@@ -3,23 +3,25 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Tycho.Events.Routing;
+using Tycho.Events.Model;
 using Tycho.Events.Serialization;
 
 namespace Tycho.Events.Inbox.InMemory
 {
     internal class InMemoryInbox : IInboxWriter, IInboxConsumer
     {
+        private readonly IEventSerializer _eventSerializer;
         private readonly InboxActivity _inboxActivity;
-        private readonly ConcurrentQueue<RoutedEvent> _entries;
+        private readonly ConcurrentQueue<SerializedRoutedEvent> _entries;
 
-        public InMemoryInbox(InboxActivity inboxActivity)
+        public InMemoryInbox(IEventSerializer eventSerializer, InboxActivity inboxActivity)
         {
+            _eventSerializer = eventSerializer;
             _inboxActivity = inboxActivity;
-            _entries = new ConcurrentQueue<RoutedEvent>();
+            _entries = new ConcurrentQueue<SerializedRoutedEvent>();
         }
 
-        public Task Write(RoutedEvent routedEvent, CancellationToken cancellationToken = default)
+        public Task Write(SerializedRoutedEvent routedEvent, CancellationToken cancellationToken = default)
         {
             _entries.Enqueue(routedEvent);
             _inboxActivity.NotifyNewEntriesAdded();
@@ -34,7 +36,8 @@ namespace Tycho.Events.Inbox.InMemory
             {
                 if (_entries.TryDequeue(out var nextEntry))
                 {
-                    events.Add(nextEntry);
+                    var deserializedEvent = _eventSerializer.Deserialize(nextEntry);
+                    events.Add(deserializedEvent);
                 }
                 else
                 {

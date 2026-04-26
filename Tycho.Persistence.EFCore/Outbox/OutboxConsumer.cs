@@ -5,9 +5,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Events.Routing;
-using Tycho.Events.Serialization;
+using Tycho.Identity.Events;
+using Tycho.Persistence.EFCore.Common;
 using Tycho.Structure;
 
 namespace Tycho.Persistence.EFCore.Outbox;
@@ -18,12 +20,13 @@ internal class OutboxConsumer(Internals internals, OutboxConsumerSettings? setti
     private readonly OutboxConsumerSettings _settings = settings ?? OutboxConsumerSettings.Default;
 
     // TODO: concurrency handling
+
     // TODO: dead letter handling
-    public async Task<IReadOnlyCollection<RoutedEvent>> Read(int count, CancellationToken cancellationToken)
+
+    public async Task<IReadOnlyCollection<SerializedRoutedEvent>> Read(int count, CancellationToken cancellationToken)
     {
         using var scope = _internals.CreateScope();
         using var dbContext = scope.ServiceProvider.GetRequiredService<TychoDbContext>();
-        var eventSerializer = scope.ServiceProvider.GetRequiredService<IEventSerializer>();
 
         var currentTime = DateTime.UtcNow;
         var validProcessingThreshold = currentTime - _settings.InDeliveryStateExpiration;
@@ -33,7 +36,7 @@ internal class OutboxConsumer(Internals internals, OutboxConsumerSettings? setti
             .Where(entry =>
                 (entry.State == EntryState.New) ||
                 (entry.State == EntryState.Failed && entry.DeliveryAttempts < _settings.MaxDeliveryCount) ||
-                (entry.State == EntryState.InDelivery && entry.DeliveryAttempts < _settings.MaxDeliveryCount && entry.Updated < validProcessingThreshold))
+                (entry.State == EntryState.InProcessing && entry.DeliveryAttempts < _settings.MaxDeliveryCount && entry.Updated < validProcessingThreshold))
             .OrderBy(entry => entry.Created)
             .Take(count)
             .ToArrayAsync(cancellationToken)
@@ -41,7 +44,7 @@ internal class OutboxConsumer(Internals internals, OutboxConsumerSettings? setti
 
         foreach (var entry in entriesToDeliver)
         {
-            entry.State = EntryState.InDelivery;
+            entry.State = EntryState.InProcessing;
             entry.Updated = currentTime;
             entry.DeliveryAttempts++;
         }
@@ -50,8 +53,12 @@ internal class OutboxConsumer(Internals internals, OutboxConsumerSettings? setti
         return
         [
             ..entriesToDeliver
-                .Select(entry => new SerializedEvent(entry.Id, entry.Event, entry.Handler, entry.Route, entry.Payload))
-                .Select(eventSerializer.Deserialize)
+                .Select(entry => new SerializedRoutedEvent(
+                    entry.Id, 
+                    EventIdentity.Parse(entry.Event), 
+                    EventHandlerIdentity.Parse(entry.Handler), 
+                    Route.Parse(entry.Route), 
+                    entry.Payload))
         ];
     }
 

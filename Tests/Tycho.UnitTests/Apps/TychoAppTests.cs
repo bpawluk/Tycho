@@ -1,8 +1,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Moq;
 using Tycho.Apps;
 using Tycho.Apps.Instance;
+using Tycho.Events.Serialization;
 
 namespace Tycho.UnitTests.Apps;
 
@@ -85,7 +87,11 @@ public class TychoAppTests
         protected override void DefineContract(IAppContract app) { }
         protected override void DefineEvents(IAppEvents app) { }
         protected override void IncludeModules(IAppStructure app) { }
-        protected override void RegisterServices(IServiceCollection app) { }
+        protected override void RegisterServices(IServiceCollection app)
+        {
+            var eventSerializerMock = new Mock<IEventSerializer>();
+            app.AddSingleton(eventSerializerMock.Object);
+        }
         public Task<IApp> RunAsync() => RunBaseAsync();
     }
 
@@ -97,7 +103,11 @@ public class TychoAppTests
 
         protected override void IncludeModules(IAppStructure app) { }
 
-        protected override void RegisterServices(IServiceCollection app) { }
+        protected override void RegisterServices(IServiceCollection app) 
+        {
+            var eventSerializerMock = new Mock<IEventSerializer>();
+            app.AddSingleton(eventSerializerMock.Object);
+        }
 
         protected override void __AutoSetup__(IServiceCollection app) { }
 

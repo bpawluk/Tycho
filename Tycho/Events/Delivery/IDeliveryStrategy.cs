@@ -1,15 +1,13 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Tycho.Events.Routing;
+using Tycho.Events.Model;
 
 namespace Tycho.Events.Delivery
 {
     internal interface IDeliveryStrategy
     {
-        bool CanDeliver<TEvent>(RoutedEvent<TEvent> routedEvent) 
-            where TEvent : class, IEvent;
+        bool CanDeliver(SerializedRoutedEvent routedEvent);
 
-        Task DeliverAsync<TEvent>(RoutedEvent<TEvent> routedEvent, CancellationToken cancellationToken) 
-            where TEvent : class, IEvent;
+        Task DeliverAsync(SerializedRoutedEvent routedEvent, CancellationToken cancellationToken);
     }
 }

@@ -1,6 +1,7 @@
 using Moq;
 using Tycho.Events;
 using Tycho.Events.Broker;
+using Tycho.Events.Model;
 using Tycho.Events.Registrating.Registrations;
 using Tycho.Events.Routing;
 using Tycho.Events.Routing.Steps;
@@ -134,8 +135,9 @@ public class ForwardingEventRegistrationTests
 	private static RoutedEvent<TEvent> CreateRoutedEvent<TEvent>(TEvent payload)
 		where TEvent : class, IEvent
 	{
-		var handlerId = EventHandlerIdentity.Create<MultiEventHandler>();
-		return new RoutedEvent<TEvent>(Guid.NewGuid(), handlerId, payload);
+        var eventId = EventIdentity.Create<TEvent>();
+        var handlerId = EventHandlerIdentity.Create<MultiEventHandler>();
+		return new RoutedEvent<TEvent>(Guid.NewGuid(), eventId, handlerId, Route.Create(), payload);
 	}
 
 	private static void AssertRouteStartsWithDownStream(Route route)

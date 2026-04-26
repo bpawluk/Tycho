@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Tycho.Events.Dispatching;
 using Tycho.Events.Inbox;
+using Tycho.Events.Model;
 using Tycho.Events.Routing;
 using Tycho.Identity.Events;
 using Tycho.Structure;
@@ -69,7 +70,8 @@ public class InboxProcessorJobFactoryTests
 
     private static RoutedEvent<TestEvent> CreateRoutedEvent()
     {
+        var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        return new RoutedEvent<TestEvent>(Guid.NewGuid(), handlerId, new TestEvent());
+        return new RoutedEvent<TestEvent>(Guid.NewGuid(), eventId, handlerId, Route.Create(), new TestEvent());
     }
 }

@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Tycho.Events.Routing;
-using Tycho.Events.Serialization;
+using Tycho.Events.Model;
 
 namespace Tycho.Events.Broker
 {
@@ -12,7 +11,6 @@ namespace Tycho.Events.Broker
         IReadOnlyCollection<RoutedEvent> Route<TEvent>(Guid eventId, TEvent eventPayload) 
             where TEvent : class, IEvent;
 
-        Task DeliverAsync<TEvent>(RoutedEvent<TEvent> routedEvent, CancellationToken cancellationToken)
-            where TEvent : class, IEvent;
+        Task DeliverAsync(SerializedRoutedEvent routedEvent, CancellationToken cancellationToken);
     }
 }

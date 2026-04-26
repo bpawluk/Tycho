@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Tycho.Events.Routing;
-using Tycho.Events.Serialization;
+using Tycho.Events.Model;
 
 namespace Tycho.Events.Registrating.Registrations
 {

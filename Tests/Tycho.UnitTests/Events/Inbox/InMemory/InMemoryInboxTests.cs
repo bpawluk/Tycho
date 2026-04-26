@@ -1,6 +1,9 @@
+using Moq;
 using Tycho.Events.Inbox;
 using Tycho.Events.Inbox.InMemory;
+using Tycho.Events.Model;
 using Tycho.Events.Routing;
+using Tycho.Events.Serialization;
 using Tycho.Identity.Events;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
@@ -9,20 +12,22 @@ namespace Tycho.UnitTests.Events.Inbox.InMemory;
 
 public class InMemoryInboxTests
 {
+    private readonly Mock<IEventSerializer> _eventSerializerMock;
     private readonly InboxActivity _inboxActivity;
     private readonly InMemoryInbox _sut;
 
     public InMemoryInboxTests()
     {
+        _eventSerializerMock = new Mock<IEventSerializer>();
         _inboxActivity = new InboxActivity();
-        _sut = new InMemoryInbox(_inboxActivity);
+        _sut = new InMemoryInbox(_eventSerializerMock.Object, _inboxActivity);
     }
 
     [Fact]
     public async Task Write_WithRoutedEvent_EnqueuesEntry()
     {
         // Arrange
-        var entry = CreateRoutedEvent();
+        var (entry, deserializedEntry) = CreateSerializedAndRoutedEventPair();
         var cancelationToken = new CancellationToken();
 
         var notified = false;
@@ -34,7 +39,7 @@ public class InMemoryInboxTests
 
         // Assert
         var returnedEvent = Assert.Single(result);
-        Assert.Same(entry, returnedEvent);
+        Assert.Same(deserializedEntry, returnedEvent);
         Assert.True(notified);
     }
 
@@ -43,9 +48,9 @@ public class InMemoryInboxTests
     {
         // Arrange
         var cancelationToken = new CancellationToken();
-        await _sut.Write(CreateRoutedEvent(), cancelationToken);
-        await _sut.Write(CreateRoutedEvent(), cancelationToken);
-        await _sut.Write(CreateRoutedEvent(), cancelationToken);
+        await _sut.Write(CreateSerializedRoutedEvent(), cancelationToken);
+        await _sut.Write(CreateSerializedRoutedEvent(), cancelationToken);
+        await _sut.Write(CreateSerializedRoutedEvent(), cancelationToken);
 
         // Act
         var result = await _sut.Read(2, cancelationToken);
@@ -59,7 +64,7 @@ public class InMemoryInboxTests
     {
         // Arrange
         var cancelationToken = new CancellationToken();
-        await _sut.Write(CreateRoutedEvent(), cancelationToken);
+        await _sut.Write(CreateSerializedRoutedEvent(), cancelationToken);
 
         // Act
         var result = await _sut.Read(5, cancelationToken);
@@ -86,7 +91,7 @@ public class InMemoryInboxTests
     {
         // Arrange
         var cancellationToken = new CancellationToken();
-        await _sut.Write(CreateRoutedEvent(), cancellationToken);
+        await _sut.Write(CreateSerializedRoutedEvent(), cancellationToken);
 
         // Act
         await _sut.Read(1, cancellationToken);
@@ -118,9 +123,22 @@ public class InMemoryInboxTests
         await _sut.MarkAsFailed(entryId, cancelationToken);
     }
 
-    private static RoutedEvent<TestEvent> CreateRoutedEvent()
+    private static SerializedRoutedEvent CreateSerializedRoutedEvent()
     {
+        var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        return new RoutedEvent<TestEvent>(Guid.NewGuid(), handlerId, new TestEvent());
+        return new SerializedRoutedEvent(Guid.NewGuid(), eventId, handlerId, Route.Create(), new TestEvent());
+    }
+
+    private (SerializedRoutedEvent, RoutedEvent) CreateSerializedAndRoutedEventPair()
+    {
+        var id = Guid.NewGuid();
+        var eventId = EventIdentity.Create<TestEvent>();
+        var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
+        var route = Route.Create();
+        var serialized = new SerializedRoutedEvent(id, eventId, handlerId, route, new TestEvent());
+        var deserialized = new RoutedEvent<TestEvent>(id, eventId, handlerId, route, new TestEvent());
+        _eventSerializerMock.Setup(s => s.Deserialize(serialized)).Returns(deserialized);
+        return (serialized, deserialized);
     }
 }

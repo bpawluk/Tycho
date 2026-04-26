@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Tycho.Events.Dispatching;
-using Tycho.Events.Routing;
+using Tycho.Events.Model;
 using Tycho.Processor;
 
 namespace Tycho.Events.Inbox
@@ -43,7 +43,7 @@ namespace Tycho.Events.Inbox
 
             try
             {
-                await _event!.DispatchAsync(_dispatcher, cancellationToken).ConfigureAwait(false);
+                await _event!.DispatchWithAsync(_dispatcher, cancellationToken).ConfigureAwait(false);
                 // do not call _inbox.MarkAsHandled here as this is a responsibility of ScopedEventHandler
             }
             catch (Exception ex)

@@ -37,7 +37,7 @@ public abstract class TychoDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<InboxMessage>()
+        modelBuilder.Entity<InboxEntry>()
                     .ToTable(InboxTableName, Schema);
 
         modelBuilder.Entity<OutboxEntry>()

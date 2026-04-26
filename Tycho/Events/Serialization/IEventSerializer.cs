@@ -1,11 +1,11 @@
-﻿using Tycho.Events.Routing;
+﻿using Tycho.Events.Model;
 
 namespace Tycho.Events.Serialization
 {
     public interface IEventSerializer
     {
-        SerializedEvent Serialize(RoutedEvent routedEvent);
+        SerializedRoutedEvent Serialize(RoutedEvent routedEvent);
 
-        RoutedEvent Deserialize(SerializedEvent serializedEvent);
+        RoutedEvent Deserialize(SerializedRoutedEvent serializedEvent);
     }
 }

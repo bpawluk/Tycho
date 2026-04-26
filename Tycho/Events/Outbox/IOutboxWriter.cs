@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Tycho.Events.Routing;
+using Tycho.Events.Model;
 
 namespace Tycho.Events.Outbox
 {

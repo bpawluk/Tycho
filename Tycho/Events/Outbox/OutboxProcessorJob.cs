@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Tycho.Events.Broker;
-using Tycho.Events.Routing;
+using Tycho.Events.Model;
 using Tycho.Processor;
 
 namespace Tycho.Events.Outbox
@@ -15,7 +15,7 @@ namespace Tycho.Events.Outbox
         private readonly IEventBroker _broker;
         private readonly ILogger<OutboxProcessorJob> _logger;
 
-        private RoutedEvent? _event;
+        private SerializedRoutedEvent? _event;
 
         public OutboxProcessorJob(
             IOutboxConsumer outbox,
@@ -27,7 +27,7 @@ namespace Tycho.Events.Outbox
             _logger = logger ?? NullLogger<OutboxProcessorJob>.Instance;
         }
 
-        public OutboxProcessorJob ForEvent(RoutedEvent routedEvent)
+        public OutboxProcessorJob ForEvent(SerializedRoutedEvent routedEvent)
         {
             _event = routedEvent;
             return this;
@@ -43,7 +43,7 @@ namespace Tycho.Events.Outbox
 
             try
             {
-                await _event.DeliverAsync(_broker, cancellationToken).ConfigureAwait(false);
+                await _broker.DeliverAsync(_event, cancellationToken).ConfigureAwait(false);
                 await _outbox.MarkAsDelivered(_event.Id, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)

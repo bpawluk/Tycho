@@ -3,19 +3,22 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Tycho.Events.Routing;
+using Tycho.Events.Model;
+using Tycho.Events.Serialization;
 
 namespace Tycho.Events.Outbox.InMemory
 {
     internal class InMemoryOutbox : IOutboxWriter, IOutboxConsumer
     {
+        private readonly IEventSerializer _eventSerializer;
         private readonly OutboxActivity _outboxActivity;
-        private readonly ConcurrentQueue<RoutedEvent> _entries;
+        private readonly ConcurrentQueue<SerializedRoutedEvent> _entries;
 
-        public InMemoryOutbox(OutboxActivity outboxActivity)
+        public InMemoryOutbox(IEventSerializer eventSerializer, OutboxActivity outboxActivity)
         {
+            _eventSerializer = eventSerializer;
             _outboxActivity = outboxActivity;
-            _entries = new ConcurrentQueue<RoutedEvent>();
+            _entries = new ConcurrentQueue<SerializedRoutedEvent>();
         }
 
         public Task Write(IReadOnlyCollection<RoutedEvent> events, CancellationToken cancellationToken)
@@ -27,16 +30,17 @@ namespace Tycho.Events.Outbox.InMemory
 
             foreach (var @event in events)
             {
-                _entries.Enqueue(@event);
+                var serializedEvent = _eventSerializer.Serialize(@event);
+                _entries.Enqueue(serializedEvent);
             }
             _outboxActivity.NotifyNewEntriesAdded();
 
             return Task.CompletedTask;
         }
 
-        public Task<IReadOnlyCollection<RoutedEvent>> Read(int count, CancellationToken cancellationToken)
+        public Task<IReadOnlyCollection<SerializedRoutedEvent>> Read(int count, CancellationToken cancellationToken)
         {
-            var events = new List<RoutedEvent>();
+            var events = new List<SerializedRoutedEvent>();
 
             for (var i = 0; i < count; i++)
             {
@@ -50,7 +54,7 @@ namespace Tycho.Events.Outbox.InMemory
                 }
             }
 
-            return Task.FromResult<IReadOnlyCollection<RoutedEvent>>(events);
+            return Task.FromResult<IReadOnlyCollection<SerializedRoutedEvent>>(events);
         }
 
         public Task MarkAsDelivered(Guid eventId, CancellationToken cancellationToken)

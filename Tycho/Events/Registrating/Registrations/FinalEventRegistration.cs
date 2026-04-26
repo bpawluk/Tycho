@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Tycho.Events.Handling;
-using Tycho.Events.Routing;
+using Tycho.Events.Model;
 using Tycho.Identity.Events;
 
 namespace Tycho.Events.Registrating.Registrations
@@ -22,9 +22,11 @@ namespace Tycho.Events.Registrating.Registrations
                 : EventHandlerIdentity.Create<TEventHandler>();
         }
 
-        public IReadOnlyCollection<RoutedEvent> Route(Guid eventId, TEvent eventPayload)
+        public IReadOnlyCollection<RoutedEvent> Route(Guid id, TEvent eventPayload)
         {
-            return new[] { new RoutedEvent<TEvent>(eventId, HandlerId, eventPayload) };
+            var eventId = EventIdentity.Create<TEvent>();
+            var route = Routing.Route.Create();
+            return new[] { new RoutedEvent<TEvent>(id, eventId, HandlerId, route, eventPayload) };
         }
     }
 }
