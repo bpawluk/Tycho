@@ -12,19 +12,19 @@ namespace Tycho.Events
         /// Begins a transaction that will wrap event handling logic.
         /// </summary>
         /// <param name="cancellationToken">A cancellation token.</param>
-        Task BeginTransactionAsync(CancellationToken cancellationToken);
+        Task BeginTransactionAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Commits the transaction wrapping event handling logic.
         /// </summary>
         /// <param name="cancellationToken">A cancellation token.</param>
-        Task CommitTransactionAsync(CancellationToken cancellationToken);
+        Task CommitTransactionAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Rolls back the transaction wrapping event handling logic.
         /// </summary>
         /// <param name="cancellationToken">A cancellation token.</param>
-        Task RollbackTransactionAsync(CancellationToken cancellationToken);
+        Task RollbackTransactionAsync(CancellationToken cancellationToken = default);
     }
 
     /// <summary>
