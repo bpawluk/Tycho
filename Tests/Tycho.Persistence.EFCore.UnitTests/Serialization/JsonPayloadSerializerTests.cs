@@ -5,11 +5,11 @@ using Tycho.Persistence.EFCore.UnitTests._Data.Events;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Serialization;
 
-public class PayloadSerializerTests
+public class JsonPayloadSerializerTests
 {
-    private readonly PayloadSerializer _sut = new();
+    private readonly JsonPayloadSerializer _sut = new();
 
-    public static IEnumerable<object?[]> NonStringPayloads =>
+    public static IEnumerable<object?[]> NonStrings =>
     [
         [null],
         [123],
@@ -17,16 +17,17 @@ public class PayloadSerializerTests
     ];
 
     [Fact]
-    public void Serialize_WithValidEventData_ReturnsSerializedPayload()
+    public void Serialize_WithValidEventData_ReturnsSerialized()
     {
         // Arrange
         var eventData = new TestEventWithData();
+        var expectedPayload = GetSerializedPayload(eventData)!;
 
         // Act
-        var payload = _sut.SerializePayload(eventData);
+        var payload = _sut.Serialize(eventData);
 
         // Assert
-        Assert.Equal(eventData.GetSerializedPayload(), payload);
+        Assert.Equal(expectedPayload, payload);
     }
 
     [Fact]
@@ -38,7 +39,7 @@ public class PayloadSerializerTests
         // Act
         void Act()
         {
-            _sut.SerializePayload(eventData);
+            _sut.Serialize(eventData);
         }
 
         // Assert
@@ -50,19 +51,19 @@ public class PayloadSerializerTests
     {
         // Arrange
         var expectedEventData = new TestEventWithData();
-        var payload = expectedEventData.GetSerializedPayload();
+        var payload = GetSerializedPayload(expectedEventData)!;
 
         // Act
-        var result = _sut.Deserialize(typeof(TestEventWithData), payload);
+        var result = _sut.Deserialize<TestEventWithData>(payload);
 
         // Assert
-        Assert.True(expectedEventData.EqualsEvent(result as TestEventWithData));
+        Assert.True(expectedEventData.EqualsEvent(result));
     }
 
 
     [Theory]
-    [MemberData(nameof(NonStringPayloads))]
-    public void Deserialize_WithNonStringPayload_ThrowsArgumentException(object? payload)
+    [MemberData(nameof(NonStrings))]
+    public void Deserialize_WithNonString_ThrowsArgumentException(object? payload)
     {
         // Arrange
         // - no arrangement required
@@ -70,7 +71,7 @@ public class PayloadSerializerTests
         // Act
         void Act()
         {
-            _sut.Deserialize(typeof(TestEvent), payload!);
+            _sut.Deserialize<TestEvent>(payload!);
         }
 
         // Assert
@@ -78,23 +79,7 @@ public class PayloadSerializerTests
     }
 
     [Fact]
-    public void Deserialize_WithInvalidPayloadFormat_ThrowsInvalidOperationException()
-    {
-        // Arrange
-        var payload = "{property='invalidFormat'}";
-
-        // Act
-        void Act()
-        {
-            _sut.Deserialize(typeof(TestEvent), payload);
-        }
-
-        // Assert
-        Assert.Throws<JsonException>(Act);
-    }
-
-    [Fact]
-    public void Deserialize_WithIncorrectTargetType_ThrowsInvalidOperationException()
+    public void Deserialize_WithMissingProperties_ThrowsJsonException()
     {
         // Arrange
         var payload = "{}";
@@ -102,10 +87,31 @@ public class PayloadSerializerTests
         // Act
         void Act()
         {
-            _sut.Deserialize(typeof(object), payload);
+            _sut.Deserialize<TestEventWithRequiredData>(payload);
         }
 
         // Assert
-        Assert.Throws<InvalidOperationException>(Act);
+        Assert.Throws<JsonException>(Act);
+    }
+
+    [Fact]
+    public void Deserialize_WithInvalidFormat_ThrowsJsonException()
+    {
+        // Arrange
+        var payload = "{property='invalidFormat'}";
+
+        // Act
+        void Act()
+        {
+            _sut.Deserialize<TestEvent>(payload);
+        }
+
+        // Assert
+        Assert.Throws<JsonException>(Act);
+    }
+
+    private static string GetSerializedPayload(object toSerialize)
+    {
+        return JsonSerializer.Serialize(toSerialize, toSerialize.GetType(), new JsonSerializerOptions());
     }
 }

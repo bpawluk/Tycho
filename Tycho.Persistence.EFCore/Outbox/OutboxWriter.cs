@@ -9,18 +9,19 @@ using Tycho.Events.Serialization;
 namespace Tycho.Persistence.EFCore.Outbox;
 
 internal class OutboxWriter(
-    TychoDbContext dbContext,
     IEventSerializer eventSerializer,
-    OutboxActivity outboxActivity) : IOutboxWriter
+    OutboxActivity outboxActivity,
+    TychoDbContext dbContext) : IOutboxWriter
 {
+    private readonly IEventSerializer _eventSerializer = eventSerializer;
     private readonly TychoDbContext _dbContext = dbContext;
     private readonly OutboxActivity _outboxActivity = outboxActivity;
 
-    public async Task Write(IReadOnlyCollection<RoutedEvent> events, CancellationToken cancellationToken = default)
+    public async Task Write(IReadOnlyCollection<RoutedEvent> routedEvents, CancellationToken cancellationToken)
     {
-        var outboxEntries = events.Select(@event => 
+        var outboxEntries = routedEvents.Select(routedEvent => 
         {
-            var serializedEvent = eventSerializer.Serialize(@event);
+            var serializedEvent = _eventSerializer.Serialize(routedEvent);
             return new OutboxEntry
             {
                 Id = serializedEvent.Id,

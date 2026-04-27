@@ -19,8 +19,8 @@ public class OutboxConsumerSettings
     public uint MaxDeliveryCount { get; set; } = 3;
 
     /// <summary>
-    /// Gets or sets the In Delivery state expiration time for the outbox consumer
+    /// Gets or sets the delivery process expiration time for the outbox consumer
     /// </summary>
     /// <value>The delivery time after which it is considered failed and the message can be redelivered</value>
-    public TimeSpan InDeliveryStateExpiration { get; set; } = TimeSpan.FromMinutes(1);
+    public TimeSpan DeliveryExpiration { get; set; } = TimeSpan.FromMinutes(1);
 }

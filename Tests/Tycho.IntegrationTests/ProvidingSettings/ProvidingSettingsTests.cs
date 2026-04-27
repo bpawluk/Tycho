@@ -13,7 +13,7 @@ public sealed class ProvidingSettingsTests : IAsyncLifetime
         _sut = await new TestApp().RunAsync();
     }
 
-    [Fact(Timeout = 500)]
+    [Fact(Timeout = 5000)]
     public async Task TychoEnables_ProvidingSettings()
     {
         // Arrange

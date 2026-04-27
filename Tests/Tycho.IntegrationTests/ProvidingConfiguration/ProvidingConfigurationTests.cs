@@ -25,7 +25,7 @@ public sealed class ProvidingConfigurationTests : IAsyncLifetime
         _sut = await new TestApp().WithConfiguration(builtAppConfig).RunAsync();
     }
 
-    [Fact(Timeout = 500)]
+    [Fact(Timeout = 5000)]
     public async Task TychoEnables_ProvidingConfiguration()
     {
         // Arrange

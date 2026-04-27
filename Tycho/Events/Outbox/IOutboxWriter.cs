@@ -7,6 +7,6 @@ namespace Tycho.Events.Outbox
 {
     internal interface IOutboxWriter
     {
-        Task Write(IReadOnlyCollection<RoutedEvent> events, CancellationToken cancellationToken = default);
+        Task Write(IReadOnlyCollection<RoutedEvent> routedEvents, CancellationToken cancellationToken = default);
     }
 }

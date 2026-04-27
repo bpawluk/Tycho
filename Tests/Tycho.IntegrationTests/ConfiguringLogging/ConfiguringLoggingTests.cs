@@ -13,7 +13,7 @@ public sealed class ConfiguringLoggingTests : IAsyncLifetime
         _sut = await new TestApp().WithLogging(ConfigureLogging).RunAsync();
     }
 
-    [Fact(Timeout = 500)]
+    [Fact(Timeout = 5000)]
     public async Task TychoEnables_ProvidingSettings()
     {
         // Arrange

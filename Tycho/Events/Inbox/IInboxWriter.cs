@@ -6,6 +6,6 @@ namespace Tycho.Events.Inbox
 {
     internal interface IInboxWriter
     {
-        Task Write(SerializedRoutedEvent routedEvent, CancellationToken cancellationToken = default);
+        Task Write(SerializedRoutedEvent serializedEvent, CancellationToken cancellationToken = default);
     }
 }

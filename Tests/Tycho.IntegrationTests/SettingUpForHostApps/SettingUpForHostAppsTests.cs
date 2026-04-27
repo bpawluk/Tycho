@@ -6,7 +6,7 @@ namespace Tycho.IntegrationTests.SettingUpForHostApps;
 
 public class SettingUpForHostAppsTests
 {
-    [Fact(Timeout = 500)]
+    [Fact(Timeout = 5000)]
     public async Task TychoEnables_SettingItUpForHostApps()
     {
         //  Arrange

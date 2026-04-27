@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Text.Json;
 using Tycho.Events;
+using Tycho.Events.Serialization;
 
 namespace Tycho.Persistence.EFCore.Serialization;
 
-internal class PayloadSerializer
+internal class JsonPayloadSerializer : IPayloadSerializer
 {
     private readonly JsonSerializerOptions _jsonOptions = new();
 
-    public object SerializePayload(IEvent eventData)
+    public object Serialize<TEvent>(TEvent eventData) where TEvent : class, IEvent
     {
         if (eventData is null)
         {
@@ -18,22 +19,7 @@ internal class PayloadSerializer
         return JsonSerializer.Serialize(eventData, eventData.GetType(), _jsonOptions);
     }
 
-    public IEvent Deserialize(Type eventType, object payload)
-    {
-        if (payload is not string stringPayload || string.IsNullOrWhiteSpace(stringPayload))
-        {
-            throw new ArgumentException("Payload must be a non-empty string", nameof(payload));
-        }
-
-        if (JsonSerializer.Deserialize(stringPayload, eventType, _jsonOptions) is not IEvent eventData)
-        {
-            throw new InvalidOperationException($"Failed to deserialize payload to {eventType.Name}");
-        }
-
-        return eventData;
-    }
-
-    public TEvent DeserializePayload<TEvent>(object payload) where TEvent : class, IEvent
+    public TEvent Deserialize<TEvent>(object payload) where TEvent : class, IEvent
     {
         if (payload is not string stringPayload || string.IsNullOrWhiteSpace(stringPayload))
         {

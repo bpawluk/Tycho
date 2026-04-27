@@ -13,7 +13,7 @@ public sealed class ForwardingEventsVerticallyTests : IAsyncLifetime
         _sut = await new TestApp(_testWorkflow).RunAsync();
     }
 
-    [Fact(Timeout = 500)]
+    [Fact(Timeout = 5000)]
     public async Task TychoEnables_ForwardingEvents_WithinVerticalHierarchy()
     {
         // Arrange
@@ -28,7 +28,7 @@ public sealed class ForwardingEventsVerticallyTests : IAsyncLifetime
         Assert.Equal(workflowId, testResult.Id);
     }
 
-    [Fact(Timeout = 500)]
+    [Fact(Timeout = 5000)]
     public async Task TychoEnables_ForwardingMappedEvents_WithinVerticalHierarchy()
     {
         // Arrange

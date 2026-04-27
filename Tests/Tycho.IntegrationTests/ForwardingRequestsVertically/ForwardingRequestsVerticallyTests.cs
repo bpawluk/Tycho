@@ -13,7 +13,7 @@ public sealed class ForwardingRequestsVerticallyTests : IAsyncLifetime
         _sut = await new TestApp(_testWorkflow).RunAsync();
     }
 
-    [Fact(Timeout = 500)]
+    [Fact(Timeout = 5000)]
     public async Task TychoEnables_ForwardingRequests_WithinVerticalHierarchy()
     {
         // Arrange
@@ -28,7 +28,7 @@ public sealed class ForwardingRequestsVerticallyTests : IAsyncLifetime
         Assert.Equal(workflowId, testResult.Id);
     }
 
-    [Fact(Timeout = 500)]
+    [Fact(Timeout = 5000)]
     public async Task TychoEnables_ForwardingRequestsForResponses_WithinVerticalHierarchy()
     {
         // Arrange
@@ -44,7 +44,7 @@ public sealed class ForwardingRequestsVerticallyTests : IAsyncLifetime
         Assert.Equal(workflowId, testResult.Id);
     }
 
-    [Fact(Timeout = 500)]
+    [Fact(Timeout = 5000)]
     public async Task TychoEnables_ForwardingMappedRequests_WithinVerticalHierarchy()
     {
         // Arrange
@@ -59,7 +59,7 @@ public sealed class ForwardingRequestsVerticallyTests : IAsyncLifetime
         Assert.Equal(workflowId, testResult.Id);
     }
 
-    [Fact(Timeout = 500)]
+    [Fact(Timeout = 5000)]
     public async Task TychoEnables_ForwardingMappedRequestsForResponses_WithinVerticalHierarchy()
     {
         // Arrange

@@ -21,16 +21,16 @@ namespace Tycho.Events.Outbox.InMemory
             _entries = new ConcurrentQueue<SerializedRoutedEvent>();
         }
 
-        public Task Write(IReadOnlyCollection<RoutedEvent> events, CancellationToken cancellationToken)
+        public Task Write(IReadOnlyCollection<RoutedEvent> routedEvents, CancellationToken cancellationToken)
         {
-            if (events.Count == 0)
+            if (routedEvents.Count == 0)
             {
                 return Task.CompletedTask;
             }
 
-            foreach (var @event in events)
+            foreach (var routedEvent in routedEvents)
             {
-                var serializedEvent = _eventSerializer.Serialize(@event);
+                var serializedEvent = _eventSerializer.Serialize(routedEvent);
                 _entries.Enqueue(serializedEvent);
             }
             _outboxActivity.NotifyNewEntriesAdded();

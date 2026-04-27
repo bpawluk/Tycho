@@ -28,5 +28,5 @@ internal class InboxEntry
     public DateTime Updated { get; set; } = DateTime.UtcNow;
 
     [Required]
-    public uint HandlingAttempts { get; set; } = 0;
+    public uint ProcessingAttempts { get; set; } = 0;
 }

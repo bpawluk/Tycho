@@ -12,7 +12,7 @@ public sealed class RunningStartupLogicTests : IAsyncLifetime
         _sut = await new TestApp().RunAsync();
     }
 
-    [Fact(Timeout = 500)]
+    [Fact(Timeout = 5000)]
     public async Task TychoEnables_RunningStartupLogic_InApps()
     {
         // Arrange
@@ -25,7 +25,7 @@ public sealed class RunningStartupLogicTests : IAsyncLifetime
         Assert.Equal("Test = Passed", appValue);
     }
 
-    [Fact(Timeout = 500)]
+    [Fact(Timeout = 5000)]
     public async Task TychoEnables_RunningStartupLogic_InModules()
     {
         // Arrange

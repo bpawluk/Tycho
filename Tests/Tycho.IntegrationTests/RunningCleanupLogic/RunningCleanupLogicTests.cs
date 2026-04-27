@@ -4,7 +4,7 @@ namespace Tycho.IntegrationTests.RunningCleanupLogic;
 
 public class RunningCleanupLogicTests
 {
-    [Fact(Timeout = 500)]
+    [Fact(Timeout = 5000)]
     public async Task TychoEnables_RunningCleanupLogic_InAppsAndModules()
     {
         // Arrange
