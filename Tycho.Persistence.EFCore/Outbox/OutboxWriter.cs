@@ -36,7 +36,7 @@ internal class OutboxWriter(
         });
         _dbContext.Set<OutboxEntry>().AddRange(outboxEntries);
 
-        if (_transaction.IsInProgress)
+        if (!_transaction.IsInProgress)
         {
             await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
