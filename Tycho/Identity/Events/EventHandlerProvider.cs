@@ -2,22 +2,21 @@
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events;
 using Tycho.Events.Registrating.Registrations;
-using Tycho.Structure;
 
 namespace Tycho.Identity.Events
 {
     internal class EventHandlerProvider : IEventHandlerProvider
     {
-        private readonly Internals _internals;
+        private readonly IServiceProvider _serviceProvider;
 
-        public EventHandlerProvider(Internals internals)
+        public EventHandlerProvider(IServiceProvider serviceProvider)
         {
-            _internals = internals;
+            _serviceProvider = serviceProvider;
         }
 
         public IEventHandler<TEvent> GetHandler<TEvent>(EventHandlerIdentity handlerId) where TEvent : class, IEvent
         {
-            foreach (var registration in _internals.GetServices<IFinalEventRegistration<TEvent>>())
+            foreach (var registration in _serviceProvider.GetServices<IFinalEventRegistration<TEvent>>())
             {
                 if (registration.HandlerId == handlerId)
                 {

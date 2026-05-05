@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using Tycho.Events.Handling;
 using Tycho.Events.Registrating.Registrations;
 using Tycho.Modules;
 using Tycho.Modules.Instance;
@@ -74,14 +73,13 @@ namespace Tycho.Events.Registrating
             where TEvent : class, IEvent
             where THandler : class, IEventHandler<TEvent>
         {
-            if (!TryAddFinalRegistration<TEvent, FinalEventRegistration<TEvent, ScopedEventHandler<TEvent, THandler>>>())
+            if (!TryAddFinalRegistration<TEvent, FinalEventRegistration<TEvent, THandler>>())
             {
                 throw new ArgumentException(
                     $"Event handler for {typeof(TEvent).Name} is already registered",
                     nameof(THandler));
             }
 
-            Services.AddTransient<ScopedEventHandler<TEvent, THandler>>();
             Services.AddScoped<THandler>();
         }
 

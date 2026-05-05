@@ -3,6 +3,7 @@ using Moq;
 using Tycho.Requests;
 using Tycho.Requests.Handling;
 using Tycho.Structure;
+using Tycho.Transactions;
 using Tycho.UnitTests._Data.Modules;
 using Tycho.UnitTests._Data.Requests;
 

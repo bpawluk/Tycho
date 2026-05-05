@@ -21,7 +21,7 @@ public static class ServiceCollectionExtensions
         where TDbContext : TychoDbContext
     {
         services.AddDbContext<TDbContext>()
-                .AddScoped<TychoDbContext, TDbContext>()
+                .AddScoped<TychoDbContext>(sp => sp.GetRequiredService<TDbContext>())
                 .AddTransient<IPayloadSerializer, JsonPayloadSerializer>()
                 .AddTransient<IOutboxWriter, OutboxWriter>()
                 .AddTransient<IOutboxConsumer, OutboxConsumer>()

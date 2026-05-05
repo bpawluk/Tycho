@@ -5,35 +5,36 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Tycho.Events.Model;
 using Tycho.Events.Inbox;
+using Tycho.Events.Model;
 using Tycho.Events.Routing;
+using Tycho.Events.Serialization;
 using Tycho.Identity.Events;
 using Tycho.Persistence.EFCore.Common;
-using Tycho.Structure;
-using Tycho.Events.Serialization;
+using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.Inbox;
 
-internal class InboxConsumer(Internals internals, InboxConsumerSettings? settings = null) : IInboxConsumer
+internal class InboxConsumer(
+    ITransaction transaction, 
+    IEventSerializer eventSerializer,
+    TychoDbContext dbContext,  
+    InboxConsumerSettings? settings = null) : IInboxConsumer
 {
-    private readonly Internals _internals = internals;
+    private readonly ITransaction _transaction = transaction;
+    private readonly IEventSerializer _eventSerializer = eventSerializer;
+    private readonly TychoDbContext _dbContext = dbContext;
     private readonly InboxConsumerSettings _settings = settings ?? InboxConsumerSettings.Default;
 
     // TODO: concurrency handling
-
     // TODO: dead letter handling
 
     public async Task<IReadOnlyCollection<RoutedEvent>> Read(int count, CancellationToken cancellationToken)
     {
-        using var scope = _internals.CreateScope();
-        using var dbContext = scope.ServiceProvider.GetRequiredService<TychoDbContext>();
-        var eventSerializer = scope.ServiceProvider.GetRequiredService<IEventSerializer>();
-
         var currentTime = DateTime.UtcNow;
         var validProcessingThreshold = currentTime - _settings.ProcessingExpiration;
 
-        var entriesToDeliver = await dbContext
+        var entriesToDeliver = await _dbContext
             .Set<InboxEntry>()
             .Where(entry =>
                 (entry.State == EntryState.New) ||
@@ -50,7 +51,11 @@ internal class InboxConsumer(Internals internals, InboxConsumerSettings? setting
             entry.Updated = currentTime;
             entry.ProcessingAttempts++;
         }
-        await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        if (!_transaction.IsInProgress)
+        {
+            await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        }
 
         var result = new List<RoutedEvent>();
         foreach (var entry in entriesToDeliver)
@@ -62,7 +67,7 @@ internal class InboxConsumer(Internals internals, InboxConsumerSettings? setting
                 Route.Empty(),
                 entry.Payload);
 
-            var routedEvent = await DeserializeWith(eventSerializer, serializedEvent).ConfigureAwait(false);
+            var routedEvent = await TryDeserializeWith(_eventSerializer, serializedEvent).ConfigureAwait(false);
             if (routedEvent is not null)
             {
                 result.Add(routedEvent);
@@ -73,36 +78,38 @@ internal class InboxConsumer(Internals internals, InboxConsumerSettings? setting
 
     public async Task MarkAsHandled(Guid entryId, CancellationToken cancellationToken)
     {
-        using var scope = _internals.CreateScope();
-        using var dbContext = scope.ServiceProvider.GetRequiredService<TychoDbContext>();
-
-        var outboxMessages = dbContext.Set<InboxEntry>();
+        var outboxMessages = _dbContext.Set<InboxEntry>();
         var entry = await outboxMessages.FindAsync([entryId], cancellationToken).ConfigureAwait(false);
 
         if (entry != null)
         {
             outboxMessages.Remove(entry);
-            await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+            if (!_transaction.IsInProgress)
+            {
+                await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            }
         }
     }
 
     public async Task MarkAsFailed(Guid entryId, CancellationToken cancellationToken)
     {
-        using var scope = _internals.CreateScope();
-        using var dbContext = scope.ServiceProvider.GetRequiredService<TychoDbContext>();
-
-        var outboxMessages = dbContext.Set<InboxEntry>();
+        var outboxMessages = _dbContext.Set<InboxEntry>();
         var entry = await outboxMessages.FindAsync([entryId], cancellationToken).ConfigureAwait(false);
 
         if (entry != null)
         {
             entry.State = EntryState.Failed;
             entry.Updated = DateTime.UtcNow;
-            await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+            if (!_transaction.IsInProgress)
+            {
+                await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            }
         }
     }
 
-    private async Task<RoutedEvent?> DeserializeWith(IEventSerializer eventSerializer, SerializedRoutedEvent serializedEvent)
+    private async Task<RoutedEvent?> TryDeserializeWith(IEventSerializer eventSerializer, SerializedRoutedEvent serializedEvent)
     {
         try
         {

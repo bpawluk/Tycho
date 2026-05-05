@@ -5,7 +5,6 @@ using Tycho.Events;
 using Tycho.Events.Broker;
 using Tycho.Events.Delivery;
 using Tycho.Events.Delivery.Strategies;
-using Tycho.Events.Dispatching;
 using Tycho.Events.Inbox;
 using Tycho.Events.Inbox.InMemory;
 using Tycho.Events.Outbox;
@@ -13,8 +12,8 @@ using Tycho.Events.Outbox.InMemory;
 using Tycho.Events.Publishing;
 using Tycho.Events.Registrating;
 using Tycho.Events.Serialization;
-using Tycho.Identity.Events;
 using Tycho.Structure;
+using Tycho.Transactions;
 
 namespace Tycho.Apps.Setup
 {
@@ -61,8 +60,6 @@ namespace Tycho.Apps.Setup
 
             services.AddSingleton<OutboxActivity>();
             services.AddSingleton<OutboxProcessor>();
-            services.AddTransient<OutboxProcessorJob>();
-            services.AddTransient<OutboxProcessorJobFactory>();
 
             if (!_internals.HasService<IInboxWriter>() || !_internals.HasService<IInboxConsumer>())
             {
@@ -73,13 +70,14 @@ namespace Tycho.Apps.Setup
 
             services.AddSingleton<InboxActivity>();
             services.AddSingleton<InboxProcessor>();
-            services.AddTransient<InboxProcessorJob>();
-            services.AddTransient<InboxProcessorJobFactory>();
+
+            if (!_internals.HasService<ITransaction>())
+            {
+                services.AddScoped<ITransaction, EmptyTransaction>();
+            }
 
             services.AddTransient<IEventBroker, EventBroker>();
             services.AddTransient<IEventPublisher, EventPublisher>();
-            services.AddTransient<IEventDispatcher, EventDispatcher>();
-            services.AddTransient<IEventHandlerProvider, EventHandlerProvider>();
             services.AddTransient<IDeliveryStrategy, FinalRouteDelivery>();
             services.AddTransient<IDeliveryStrategy, DownStreamRouteDelivery>();
 

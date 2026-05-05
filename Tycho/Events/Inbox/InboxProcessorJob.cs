@@ -1,30 +1,25 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Tycho.Events.Dispatching;
 using Tycho.Events.Model;
+using Tycho.Identity.Events;
 using Tycho.Processor;
+using Tycho.Structure;
+using Tycho.Transactions;
+using Tycho.Utils;
 
 namespace Tycho.Events.Inbox
 {
     internal class InboxProcessorJob : IJob
     {
-        private readonly IInboxConsumer _inbox;
-        private readonly IEventDispatcher _dispatcher;
-        private readonly ILogger<InboxProcessorJob> _logger;
-
+        private readonly Internals _internals;
         private RoutedEvent? _event;
 
-        public InboxProcessorJob(
-            IInboxConsumer inbox,
-            IEventDispatcher dispatcher,
-            ILogger<InboxProcessorJob>? logger = null)
+        public InboxProcessorJob(Internals internals)
         {
-            _inbox = inbox;
-            _dispatcher = dispatcher;
-            _logger = logger ?? NullLogger<InboxProcessorJob>.Instance;
+            _internals = internals;
         }
 
         public InboxProcessorJob ForEvent(RoutedEvent routedEvent)
@@ -33,23 +28,56 @@ namespace Tycho.Events.Inbox
             return this;
         }
 
+        [EntryPoint]
         public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
+            await using var scope = _internals.CreateAsyncScope();
+            var logger = scope.ServiceProvider.GetService<ILogger<InboxProcessorJob>>();
+
             if (_event is null)
             {
-                _logger.LogWarning("No event assigned for processing. Skipping execution.");
+                logger?.LogWarning("No event assigned for processing. Skipping execution.");
                 return;
             }
 
+            var inbox = scope.ServiceProvider.GetRequiredService<IInboxConsumer>();
+
             try
             {
-                await _event!.DispatchWithAsync(_dispatcher, cancellationToken).ConfigureAwait(false);
-                // do not call _inbox.MarkAsHandled here as this is a responsibility of ScopedEventHandler
+                var handlerProvider = new EventHandlerProvider(scope.ServiceProvider);
+                var eventHandler = _event!.GetHandlerFrom(handlerProvider);
+
+                ITransaction? transaction = null;
+                if (eventHandler is ITransactionalEventHandler)
+                {
+                    transaction = scope.ServiceProvider.GetRequiredService<ITransaction>();
+                    await transaction.BeginAsync(cancellationToken).ConfigureAwait(false);
+                }
+                var isTransactionInProgress = transaction != null;
+
+                try
+                {
+                    await _event!.HandleWith(eventHandler, cancellationToken).ConfigureAwait(false);
+                    await inbox.MarkAsHandled(_event.Id, cancellationToken).ConfigureAwait(false);
+
+                    if (isTransactionInProgress)
+                    {
+                        await transaction!.CommitAsync(cancellationToken).ConfigureAwait(false);
+                    }
+                }
+                catch
+                {
+                    if (isTransactionInProgress)
+                    {
+                        await transaction!.RollbackAsync(cancellationToken).ConfigureAwait(false);
+                    }
+                    throw;
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to process inbox entry with ID {entryId}", _event.Id);
-                await _inbox.MarkAsFailed(_event.Id, cancellationToken).ConfigureAwait(false);
+                logger?.LogError(ex, "Failed to process inbox entry with ID {entryId}", _event.Id);
+                await inbox.MarkAsFailed(_event.Id, cancellationToken).ConfigureAwait(false);
             }
         }
     }

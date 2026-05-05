@@ -1,6 +1,6 @@
 ﻿using System;
-using Tycho.Events.Outbox;
 using Tycho.Processor;
+using Tycho.Structure;
 
 namespace Tycho.Events.Outbox
 {
@@ -10,8 +10,8 @@ namespace Tycho.Events.Outbox
         private readonly JobProcessor _jobProcessor;
 
         public OutboxProcessor(
+            Internals internals,
             OutboxActivity outboxActivity,
-            OutboxProcessorJobFactory outboxJobFactory,
             OutboxSettings? outboxSettings = null)
         {
             _outboxActivity = outboxActivity;
@@ -27,6 +27,7 @@ namespace Tycho.Events.Outbox
                 ScheduleProcessingTimeout = outboxSettings.MessageProcessingTimeout,
             };
 
+            var outboxJobFactory = new OutboxProcessorJobFactory(internals);
             _jobProcessor = new JobProcessor(outboxJobFactory, jobProcessorSettings);
         }
 

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Tycho.Events;
+using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.Transactions;
 

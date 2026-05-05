@@ -1,5 +1,6 @@
 ﻿using System;
 using Tycho.Processor;
+using Tycho.Structure;
 
 namespace Tycho.Events.Inbox
 {
@@ -9,8 +10,8 @@ namespace Tycho.Events.Inbox
         private readonly JobProcessor _jobProcessor;
 
         public InboxProcessor(
+            Internals internals,
             InboxActivity inboxActivity,
-            InboxProcessorJobFactory inboxJobFactory, 
             InboxSettings? inboxSettings = null)
         {
             _inboxActivity = inboxActivity;
@@ -26,6 +27,7 @@ namespace Tycho.Events.Inbox
                 ScheduleProcessingTimeout = inboxSettings.MessageProcessingTimeout,
             };
 
+            var inboxJobFactory = new InboxProcessorJobFactory(internals);
             _jobProcessor = new JobProcessor(inboxJobFactory, jobProcessorSettings);
         }
 

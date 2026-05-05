@@ -4,34 +4,30 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Events.Routing;
 using Tycho.Identity.Events;
 using Tycho.Persistence.EFCore.Common;
-using Tycho.Structure;
+using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.Outbox;
 
-internal class OutboxConsumer(Internals internals, OutboxConsumerSettings? settings = null) : IOutboxConsumer
+internal class OutboxConsumer(ITransaction transaction, TychoDbContext dbContext, OutboxConsumerSettings? settings = null) : IOutboxConsumer
 {
-    private readonly Internals _internals = internals;
+    private readonly ITransaction _transaction = transaction;
+    private readonly TychoDbContext _dbContext = dbContext;
     private readonly OutboxConsumerSettings _settings = settings ?? OutboxConsumerSettings.Default;
 
     // TODO: concurrency handling
-
     // TODO: dead letter handling
 
     public async Task<IReadOnlyCollection<SerializedRoutedEvent>> Read(int count, CancellationToken cancellationToken)
     {
-        using var scope = _internals.CreateScope();
-        using var dbContext = scope.ServiceProvider.GetRequiredService<TychoDbContext>();
-
         var currentTime = DateTime.UtcNow;
         var validProcessingThreshold = currentTime - _settings.DeliveryExpiration;
 
-        var entriesToDeliver = await dbContext
+        var entriesToDeliver = await _dbContext
             .Set<OutboxEntry>()
             .Where(entry =>
                 (entry.State == EntryState.New) ||
@@ -48,48 +44,54 @@ internal class OutboxConsumer(Internals internals, OutboxConsumerSettings? setti
             entry.Updated = currentTime;
             entry.DeliveryAttempts++;
         }
-        await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        if (!_transaction.IsInProgress)
+        {
+            await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        }
 
         return
         [
             ..entriesToDeliver
                 .Select(entry => new SerializedRoutedEvent(
-                    entry.Id, 
-                    EventIdentity.Parse(entry.Event), 
-                    EventHandlerIdentity.Parse(entry.Handler), 
-                    Route.Parse(entry.Route), 
+                    entry.Id,
+                    EventIdentity.Parse(entry.Event),
+                    EventHandlerIdentity.Parse(entry.Handler),
+                    Route.Parse(entry.Route),
                     entry.Payload))
         ];
     }
 
     public async Task MarkAsDelivered(Guid entryId, CancellationToken cancellationToken)
     {
-        using var scope = _internals.CreateScope();
-        using var dbContext = scope.ServiceProvider.GetRequiredService<TychoDbContext>();
-
-        var outboxMessages = dbContext.Set<OutboxEntry>();
+        var outboxMessages = _dbContext.Set<OutboxEntry>();
         var entry = await outboxMessages.FindAsync([entryId], cancellationToken).ConfigureAwait(false);
 
         if (entry != null)
         {
             outboxMessages.Remove(entry);
-            await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+            if (!_transaction.IsInProgress)
+            {
+                await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            }
         }
     }
 
     public async Task MarkAsFailed(Guid entryId, CancellationToken cancellationToken)
     {
-        using var scope = _internals.CreateScope();
-        using var dbContext = scope.ServiceProvider.GetRequiredService<TychoDbContext>();
-
-        var outboxMessages = dbContext.Set<OutboxEntry>();
+        var outboxMessages = _dbContext.Set<OutboxEntry>();
         var entry = await outboxMessages.FindAsync([entryId], cancellationToken).ConfigureAwait(false);
 
         if (entry != null)
         {
             entry.State = EntryState.Failed;
             entry.Updated = DateTime.UtcNow;
-            await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+            if (!_transaction.IsInProgress)
+            {
+                await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            }
         }
     }
 }

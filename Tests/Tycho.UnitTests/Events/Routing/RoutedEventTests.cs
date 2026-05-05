@@ -63,7 +63,7 @@ public class RoutedEventTests
         dispatcherMock.Setup(d => d.DispatchAsync(sut, cancellationToken)).Returns(Task.CompletedTask);
 
         // Act
-        await sut.DispatchWithAsync(dispatcherMock.Object, cancellationToken);
+        await sut.DispatchAsync(dispatcherMock.Object, cancellationToken);
         // Assert
         dispatcherMock.Verify(d => d.DispatchAsync(sut, cancellationToken), Times.Once);
     }

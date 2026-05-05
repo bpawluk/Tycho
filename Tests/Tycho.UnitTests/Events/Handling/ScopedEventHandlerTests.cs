@@ -4,6 +4,7 @@ using Tycho.Events;
 using Tycho.Events.Handling;
 using Tycho.Events.Inbox;
 using Tycho.Structure;
+using Tycho.Transactions;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Modules;
 

@@ -60,8 +60,7 @@ namespace Tycho.Requests.Registrating
             where TRequest : class, IRequest
             where THandler : class, IRequestHandler<TRequest>
         {
-            AddUpStreamRegistration<TRequest, ScopedRequestHandler<TRequest, THandler>>();
-            Services.TryAddTransient<ScopedRequestHandler<TRequest, THandler>>();
+            AddUpStreamRegistration<TRequest, THandler>();
             Services.TryAddScoped<THandler>();
         }
 
@@ -69,8 +68,7 @@ namespace Tycho.Requests.Registrating
             where TRequest : class, IRequest<TResponse>
             where THandler : class, IRequestHandler<TRequest, TResponse>
         {
-            AddUpStreamRegistration<TRequest, TResponse, ScopedRequestHandler<TRequest, TResponse, THandler>>();
-            Services.TryAddTransient<ScopedRequestHandler<TRequest, TResponse, THandler>>();
+            AddUpStreamRegistration<TRequest, TResponse, THandler>();
             Services.TryAddScoped<THandler>();
         }
 

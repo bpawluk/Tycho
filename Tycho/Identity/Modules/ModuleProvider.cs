@@ -1,24 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules.Instance;
-using Tycho.Structure;
 
 namespace Tycho.Identity.Modules
 {
     internal class ModuleProvider : IModuleProvider
     {
-        private readonly Internals _internals;
+        private readonly IReadOnlyCollection<IModule> _modules;
 
-        public ModuleProvider(Internals internals)
+        public ModuleProvider(IEnumerable<IModule> modules)
         {
-            _internals = internals;
+            _modules = modules.ToArray();
         }
 
         public IModule GetModule(ModuleIdentity moduleId)
         {
-            foreach (var module in _internals.GetServices<IModule>())
+            foreach (var module in _modules)
             {
                 if (module.Identity == moduleId)
                 {
@@ -28,6 +26,6 @@ namespace Tycho.Identity.Modules
             throw new ArgumentException($"Module with identity '{moduleId}' is not defined.", nameof(moduleId));
         }
 
-        public IReadOnlyCollection<IModule> GetAllModules() => _internals.GetServices<IModule>().ToArray();
+        public IReadOnlyCollection<IModule> GetAllModules() => _modules;
     }
 }

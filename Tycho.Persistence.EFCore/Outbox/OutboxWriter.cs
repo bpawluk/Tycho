@@ -5,21 +5,24 @@ using System.Threading.Tasks;
 using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Events.Serialization;
+using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.Outbox;
 
 internal class OutboxWriter(
+    ITransaction transaction,
     IEventSerializer eventSerializer,
     OutboxActivity outboxActivity,
     TychoDbContext dbContext) : IOutboxWriter
 {
+    private readonly ITransaction _transaction = transaction;
     private readonly IEventSerializer _eventSerializer = eventSerializer;
-    private readonly TychoDbContext _dbContext = dbContext;
     private readonly OutboxActivity _outboxActivity = outboxActivity;
+    private readonly TychoDbContext _dbContext = dbContext;
 
     public async Task Write(IReadOnlyCollection<RoutedEvent> routedEvents, CancellationToken cancellationToken)
     {
-        var outboxEntries = routedEvents.Select(routedEvent => 
+        var outboxEntries = routedEvents.Select(routedEvent =>
         {
             var serializedEvent = _eventSerializer.Serialize(routedEvent);
             return new OutboxEntry
@@ -32,7 +35,12 @@ internal class OutboxWriter(
             };
         });
         _dbContext.Set<OutboxEntry>().AddRange(outboxEntries);
-        await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        if (_transaction.IsInProgress)
+        {
+            await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        }
+
         _outboxActivity.NotifyNewEntriesAdded();
     }
 }

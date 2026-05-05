@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Tycho.Events.Dispatching;
 using Tycho.Events.Routing;
 using Tycho.Events.Serialization;
 using Tycho.Identity.Events;
@@ -19,7 +18,9 @@ namespace Tycho.Events.Model
 
         internal abstract object SerializePayloadWith(IPayloadSerializer serializer);
 
-        internal abstract Task DispatchWithAsync(IEventDispatcher dispatcher, CancellationToken cancellationToken);
+        internal abstract IEventHandler GetHandlerFrom(IEventHandlerProvider provider);
+
+        internal abstract Task HandleWith(IEventHandler handler, CancellationToken cancellationToken);
     }
 
     public class RoutedEvent<TEvent> : RoutedEvent where TEvent : class, IEvent
@@ -36,9 +37,22 @@ namespace Tycho.Events.Model
             return serializer.Serialize(Payload);
         }
 
-        internal override Task DispatchWithAsync(IEventDispatcher dispatcher, CancellationToken cancellationToken)
+        internal override IEventHandler GetHandlerFrom(IEventHandlerProvider provider)
         {
-            return dispatcher.DispatchAsync(this, cancellationToken);
+            return provider.GetHandler<TEvent>(HandlerId);
+        }
+
+        internal override async Task HandleWith(IEventHandler handler, CancellationToken cancellationToken)
+        {
+            if (handler is IEventHandler<TEvent> typedHandler)
+            {
+                var context = new EventContext<TEvent>(Id, Payload);
+                await typedHandler.HandleAsync(context, cancellationToken).ConfigureAwait(false);
+            }
+            else
+            {
+                throw new ArgumentException($"Handler is not of type IEventHandler<{typeof(TEvent).Name}>");
+            }
         }
     }
 }

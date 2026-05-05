@@ -1,7 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Tycho.Identity.Modules;
-using Tycho.Modules.Instance;
 using Tycho.Structure;
 using Tycho.UnitTests._Data.Modules;
 
@@ -15,31 +13,25 @@ public class ModuleProviderTests
 
     public ModuleProviderTests()
     {
-        var internals = new Internals(typeof(TestModule));
-
         var firstModuleMock = new Mock<IModule>();
         var firstModule = firstModuleMock.Object;
         var firstModuleId = ModuleIdentity.Create<OtherModule>();
         _registeredModules.Add(firstModuleId, firstModule);
         firstModuleMock.SetupGet(m => m.Identity).Returns(firstModuleId);
-        internals.GetServiceCollection().AddSingleton(firstModule);
 
         var secondModuleMock = new Mock<IModule>();
         var secondModule = secondModuleMock.Object;
         var secondModuleId = ModuleIdentity.Create<TestModule>();
         _registeredModules.Add(secondModuleId, secondModule);
         secondModuleMock.SetupGet(m => m.Identity).Returns(secondModuleId);
-        internals.GetServiceCollection().AddSingleton(secondModule);
 
         var thirdModuleMock = new Mock<IModule>();
         var thirdModule = thirdModuleMock.Object;
         var thirdModuleId = ModuleIdentity.Create<AnotherModule>();
         _registeredModules.Add(thirdModuleId, thirdModule);
         thirdModuleMock.SetupGet(m => m.Identity).Returns(thirdModuleId);
-        internals.GetServiceCollection().AddSingleton(thirdModule);
 
-        internals.Build();
-        _sut = new ModuleProvider(internals);
+        _sut = new ModuleProvider(_registeredModules.Values);
     }
 
     [Fact]

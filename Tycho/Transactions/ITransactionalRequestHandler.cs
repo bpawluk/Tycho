@@ -1,30 +1,12 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿using Tycho.Requests;
 
-namespace Tycho.Requests
+namespace Tycho.Transactions
 {
     /// <summary>
-    /// Base interface for request handlers wrapping their logic in transactions.
+    /// Base interface for request handlers that support transactional behavior.
     /// </summary>
     public interface ITransactionalRequestHandler : IRequestHandler
     {
-        /// <summary>
-        /// Begins a transaction that will wrap request handling operations.
-        /// </summary>
-        /// <param name="cancellationToken">A cancellation token.</param>
-        Task BeginTransactionAsync(CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Commits the current transaction.
-        /// </summary>
-        /// <param name="cancellationToken">A cancellation token.</param>
-        Task CommitTransactionAsync(CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Rolls back the current transaction.
-        /// </summary>
-        /// <param name="cancellationToken">A cancellation token.</param>
-        Task RollbackTransactionAsync(CancellationToken cancellationToken = default);
     }
 
     /// <summary>

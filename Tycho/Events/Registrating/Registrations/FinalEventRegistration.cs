@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Tycho.Events.Handling;
 using Tycho.Events.Model;
 using Tycho.Identity.Events;
 
@@ -17,9 +16,7 @@ namespace Tycho.Events.Registrating.Registrations
         public FinalEventRegistration(TEventHandler handler)
         {
             Handler = handler;
-            HandlerId = Handler is IIdentifiableEventHandler identifiableHandler
-                ? identifiableHandler.Identity
-                : EventHandlerIdentity.Create<TEventHandler>();
+            HandlerId = EventHandlerIdentity.Create<TEventHandler>();
         }
 
         public IReadOnlyCollection<RoutedEvent> Route(Guid id, TEvent eventPayload)

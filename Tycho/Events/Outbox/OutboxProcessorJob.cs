@@ -1,30 +1,24 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using Tycho.Events.Broker;
 using Tycho.Events.Model;
 using Tycho.Processor;
+using Tycho.Structure;
+using Tycho.Utils;
 
 namespace Tycho.Events.Outbox
 {
     internal class OutboxProcessorJob : IJob
     {
-        private readonly IOutboxConsumer _outbox;
-        private readonly IEventBroker _broker;
-        private readonly ILogger<OutboxProcessorJob> _logger;
-
+        private readonly Internals _internals;
         private SerializedRoutedEvent? _event;
 
-        public OutboxProcessorJob(
-            IOutboxConsumer outbox,
-            IEventBroker broker,
-            ILogger<OutboxProcessorJob>? logger = null)
+        public OutboxProcessorJob(Internals internals)
         {
-            _outbox = outbox;
-            _broker = broker;
-            _logger = logger ?? NullLogger<OutboxProcessorJob>.Instance;
+            _internals = internals;
         }
 
         public OutboxProcessorJob ForEvent(SerializedRoutedEvent routedEvent)
@@ -33,23 +27,30 @@ namespace Tycho.Events.Outbox
             return this;
         }
 
+        [EntryPoint]
         public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
+            await using var scope = _internals.CreateAsyncScope();
+            var logger = scope.ServiceProvider.GetService<ILogger<OutboxProcessorJob>>();
+
             if (_event is null)
             {
-                _logger.LogWarning("No event assigned for processing. Skipping execution.");
+                logger?.LogWarning("No event assigned for processing. Skipping execution.");
                 return;
             }
 
+            var outbox = scope.ServiceProvider.GetRequiredService<IOutboxConsumer>();
+
             try
             {
-                await _broker.DeliverAsync(_event, cancellationToken).ConfigureAwait(false);
-                await _outbox.MarkAsDelivered(_event.Id, cancellationToken).ConfigureAwait(false);
+                var broker = scope.ServiceProvider.GetRequiredService<IEventBroker>();
+                await broker.DeliverAsync(_event, cancellationToken).ConfigureAwait(false);
+                await outbox.MarkAsDelivered(_event.Id, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to deliver outbox entry with ID {entryId}", _event.Id);
-                await _outbox.MarkAsFailed(_event.Id, cancellationToken).ConfigureAwait(false);
+                logger?.LogError(ex, "Failed to deliver outbox entry with ID {entryId}", _event.Id);
+                await outbox.MarkAsFailed(_event.Id, cancellationToken).ConfigureAwait(false);
             }
         }
     }
