@@ -1,11 +1,14 @@
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Tycho.Events.Broker;
 using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Events.Routing;
 using Tycho.Identity.Events;
+using Tycho.Structure;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
+using Tycho.UnitTests._Data.Modules;
 
 namespace Tycho.UnitTests.Events.Outbox;
 
@@ -18,13 +21,21 @@ public class OutboxProcessorJobTests
 
     public OutboxProcessorJobTests()
     {
+        var internals = new Internals(typeof(TestModule));
+        var serviceCollection = internals.GetServiceCollection();
+
         _outboxConsumerMock = new Mock<IOutboxConsumer>();
+        serviceCollection.AddSingleton(_outboxConsumerMock.Object);
+
         _brokerMock = new Mock<IEventBroker>();
-        _sut = new OutboxProcessorJob(_outboxConsumerMock.Object, _brokerMock.Object);
+        serviceCollection.AddSingleton(_brokerMock.Object);
+
+        internals.Build();
+        _sut = new OutboxProcessorJob(internals);
     }
 
     [Fact]
-    public async Task ExecuteAsync_WithNoEventAssigned_DoesNotCallBroker()
+    public async Task ExecuteAsync_WithNoEventAssigned_ReturnsEarly()
     {
         // Arrange
         var cancellationToken = new CancellationToken();
@@ -33,7 +44,7 @@ public class OutboxProcessorJobTests
         await _sut.ExecuteAsync(cancellationToken);
 
         // Assert
-        _brokerMock.Verify(b => b.DeliverAsync(It.IsAny<SerializedRoutedEvent>(), It.IsAny<CancellationToken>()), Times.Never);
+        _brokerMock.Verify(b => b.DeliverAsync(It.IsAny<SerializedRoutedEvent>(), cancellationToken), Times.Never);
         _outboxConsumerMock.Verify(o => o.MarkAsDelivered(It.IsAny<Guid>(), cancellationToken), Times.Never);
         _outboxConsumerMock.Verify(o => o.MarkAsFailed(It.IsAny<Guid>(), cancellationToken), Times.Never);
     }
@@ -47,10 +58,6 @@ public class OutboxProcessorJobTests
 
         _brokerMock
             .Setup(b => b.DeliverAsync(routedEvent, cancellationToken))
-            .Returns(Task.CompletedTask);
-
-        _outboxConsumerMock
-            .Setup(o => o.MarkAsDelivered(routedEvent.Id, cancellationToken))
             .Returns(Task.CompletedTask);
 
         // Act
@@ -74,16 +81,38 @@ public class OutboxProcessorJobTests
             .Setup(b => b.DeliverAsync(routedEvent, cancellationToken))
             .ThrowsAsync(new Exception("delivery failure"));
 
-        _outboxConsumerMock
-            .Setup(o => o.MarkAsFailed(routedEvent.Id, cancellationToken))
+        // Act
+        _sut.ForEvent(routedEvent);
+        await _sut.ExecuteAsync(cancellationToken);
+
+        // Assert
+        _brokerMock.Verify(b => b.DeliverAsync(routedEvent, cancellationToken), Times.Once);
+        _outboxConsumerMock.Verify(o => o.MarkAsDelivered(routedEvent.Id, cancellationToken), Times.Never);
+        _outboxConsumerMock.Verify(o => o.MarkAsFailed(routedEvent.Id, cancellationToken), Times.Once);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WithAssignedEvent_WhenMarkingAsDeliveredThrows_MarksEventAsFailed()
+    {
+        // Arrange
+        var routedEvent = CreateRoutedEvent();
+        var cancellationToken = new CancellationToken();
+
+        _brokerMock
+            .Setup(b => b.DeliverAsync(routedEvent, cancellationToken))
             .Returns(Task.CompletedTask);
+
+        _outboxConsumerMock
+            .Setup(o => o.MarkAsDelivered(routedEvent.Id, cancellationToken))
+            .ThrowsAsync(new Exception("outbox failure"));
 
         // Act
         _sut.ForEvent(routedEvent);
         await _sut.ExecuteAsync(cancellationToken);
 
         // Assert
-        _outboxConsumerMock.Verify(o => o.MarkAsDelivered(routedEvent.Id, cancellationToken), Times.Never);
+        _brokerMock.Verify(b => b.DeliverAsync(routedEvent, cancellationToken), Times.Once);
+        _outboxConsumerMock.Verify(o => o.MarkAsDelivered(routedEvent.Id, cancellationToken), Times.Once);
         _outboxConsumerMock.Verify(o => o.MarkAsFailed(routedEvent.Id, cancellationToken), Times.Once);
     }
 

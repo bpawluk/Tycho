@@ -47,27 +47,25 @@ namespace Tycho.Events.Inbox
                 var handlerProvider = new EventHandlerProvider(scope.ServiceProvider);
                 var eventHandler = _event!.GetHandlerFrom(handlerProvider);
 
-                ITransaction? transaction = null;
+                var transaction = scope.ServiceProvider.GetRequiredService<ITransaction>();
                 if (eventHandler is ITransactionalEventHandler)
                 {
-                    transaction = scope.ServiceProvider.GetRequiredService<ITransaction>();
                     await transaction.BeginAsync(cancellationToken).ConfigureAwait(false);
                 }
-                var isTransactionInProgress = transaction != null;
 
                 try
                 {
                     await _event!.HandleWith(eventHandler, cancellationToken).ConfigureAwait(false);
                     await inbox.MarkAsHandled(_event.Id, cancellationToken).ConfigureAwait(false);
 
-                    if (isTransactionInProgress)
+                    if (transaction.IsInProgress)
                     {
                         await transaction!.CommitAsync(cancellationToken).ConfigureAwait(false);
                     }
                 }
                 catch
                 {
-                    if (isTransactionInProgress)
+                    if (transaction.IsInProgress)
                     {
                         await transaction!.RollbackAsync(cancellationToken).ConfigureAwait(false);
                     }
