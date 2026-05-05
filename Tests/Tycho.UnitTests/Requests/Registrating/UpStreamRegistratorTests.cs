@@ -182,7 +182,7 @@ public class UpStreamRegistratorTests
         // Assert
         var registration = _internals.GetService<IUpStreamRequestRegistration<TestRequest>>();
         Assert.NotNull(registration);
-        Assert.IsType<ScopedRequestHandler<TestRequest, TestRequestHandler>>(registration.Handler);
+        Assert.IsType<TestRequestHandler>(registration.Handler);
     }
 
     [Fact]
@@ -213,7 +213,7 @@ public class UpStreamRegistratorTests
         // Assert
         var registration = _internals.GetService<IUpStreamRequestRegistration<TestRequestWithResponse, string>>();
         Assert.NotNull(registration);
-        Assert.IsType<ScopedRequestHandler<TestRequestWithResponse, string, TestRequestHandler>>(registration.Handler);
+        Assert.IsType<TestRequestHandler>(registration.Handler);
     }
 
     [Fact]

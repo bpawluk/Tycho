@@ -1,5 +1,3 @@
-using Tycho.Events;
-using Tycho.Events.Handling;
 using Tycho.Events.Model;
 using Tycho.Events.Registrating.Registrations;
 using Tycho.Events.Routing.Steps;
@@ -26,21 +24,6 @@ public class FinalEventRegistrationTests
 	}
 
 	[Fact]
-	public void Constructor_WithIdentifiableHandler_UsesHandlerProvidedIdentity()
-	{
-		// Arrange
-		var handlerIdentity = EventHandlerIdentity.Parse("customHandler-customEvent");
-		var handler = new IdentifiableTestEventHandler(handlerIdentity);
-
-		// Act
-		var sut = new FinalEventRegistration<TestEvent, IdentifiableTestEventHandler>(handler);
-
-		// Assert
-		Assert.Same(handler, sut.Handler);
-		Assert.Equal(handlerIdentity, sut.HandlerId);
-	}
-
-	[Fact]
 	public void Route_WithAnyEvent_ReturnsSingleRoutedEventWithTheHandlerAndFinalRoute()
 	{
 		// Arrange
@@ -62,15 +45,4 @@ public class FinalEventRegistrationTests
 		Assert.IsType<FinalRouteStep>(routedEvent.Route.Peek());
 	}
 
-	private sealed class IdentifiableTestEventHandler(EventHandlerIdentity identity) 
-		: IEventHandler<TestEvent>
-		, IIdentifiableEventHandler
-	{
-        public EventHandlerIdentity Identity { get; } = identity;
-
-        public Task HandleAsync(EventContext<TestEvent> context, CancellationToken cancellationToken)
-		{
-			return Task.CompletedTask;
-		}
-	}
 }

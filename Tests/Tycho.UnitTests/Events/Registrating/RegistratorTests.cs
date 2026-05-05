@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Tycho.Events.Handling;
 using Tycho.Events.Registrating;
 using Tycho.Events.Registrating.Registrations;
 using Tycho.Identity.Events;
@@ -163,14 +162,14 @@ public class RegistratorTests
         // Assert
         var eventRegistration = _internals.GetService<IEventRegistration<TestEvent>>();
         Assert.NotNull(eventRegistration);
-        Assert.IsType<FinalEventRegistration<TestEvent, ScopedEventHandler<TestEvent, TestEventHandler>>>(eventRegistration);
+        Assert.IsType<FinalEventRegistration<TestEvent, TestEventHandler>>(eventRegistration);
 
         var finalEventRegistration = _internals.GetService<IFinalEventRegistration<TestEvent>>();
         Assert.NotNull(finalEventRegistration);
-        Assert.IsType<FinalEventRegistration<TestEvent, ScopedEventHandler<TestEvent, TestEventHandler>>>(finalEventRegistration);
+        Assert.IsType<FinalEventRegistration<TestEvent, TestEventHandler>>(finalEventRegistration);
 
         Assert.NotNull(finalEventRegistration.Handler);
-        Assert.IsType<ScopedEventHandler<TestEvent, TestEventHandler>>(finalEventRegistration.Handler);
+        Assert.IsType<TestEventHandler>(finalEventRegistration.Handler);
 
         Assert.Equal(EventHandlerIdentity.Create<TestEventHandler>(), finalEventRegistration.HandlerId);
     }

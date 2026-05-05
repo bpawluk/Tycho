@@ -1,5 +1,3 @@
-using Moq;
-using Tycho.Events.Dispatching;
 using Tycho.Events.Model;
 using Tycho.Events.Routing;
 using Tycho.Events.Routing.Steps;
@@ -47,24 +45,4 @@ public class RoutedEventTests
         Assert.Same(route, result.Route);
     }
 
-    [Fact]
-    public async Task DispatchAsync_CallsDispatcherDispatchAsync()
-    {
-        // Arrange
-        var id = Guid.NewGuid();
-        var cancellationToken = new CancellationToken();
-        var eventId = EventIdentity.Create<TestEvent>();
-        var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        var payload = new TestEvent();
-
-        var sut = new RoutedEvent<TestEvent>(id, eventId, handlerId, Route.Create(), payload);
-
-        var dispatcherMock = new Mock<IEventDispatcher>();
-        dispatcherMock.Setup(d => d.DispatchAsync(sut, cancellationToken)).Returns(Task.CompletedTask);
-
-        // Act
-        await sut.DispatchAsync(dispatcherMock.Object, cancellationToken);
-        // Assert
-        dispatcherMock.Verify(d => d.DispatchAsync(sut, cancellationToken), Times.Once);
-    }
 }

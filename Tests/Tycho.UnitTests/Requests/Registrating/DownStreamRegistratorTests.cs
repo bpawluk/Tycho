@@ -325,7 +325,7 @@ public class DownStreamRegistratorTests
         // Assert
         var registration = _internals.GetService<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
         Assert.NotNull(registration);
-        Assert.IsType<ScopedRequestHandler<TestRequest, TestRequestHandler>>(registration.Handler);
+        Assert.IsType<TestRequestHandler>(registration.Handler);
     }
 
     [Fact]
@@ -357,7 +357,7 @@ public class DownStreamRegistratorTests
         var registration = _internals.GetService<
             IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
         Assert.NotNull(registration);
-        Assert.IsType<ScopedRequestHandler<TestRequestWithResponse, string, TestRequestHandler>>(registration.Handler);
+        Assert.IsType<TestRequestHandler>(registration.Handler);
     }
 
     [Fact]

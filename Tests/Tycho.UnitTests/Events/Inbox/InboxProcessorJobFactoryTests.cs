@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Tycho.Events.Dispatching;
 using Tycho.Events.Inbox;
 using Tycho.Events.Model;
 using Tycho.Events.Routing;
@@ -19,16 +18,14 @@ public class InboxProcessorJobFactoryTests
 
     public InboxProcessorJobFactoryTests()
     {
-        _inboxConsumerMock = new Mock<IInboxConsumer>();
-        var dispatcherMock = new Mock<IEventDispatcher>();
-
-
         var internals = new Internals(typeof(TestModule));
-        internals.GetServiceCollection()
-                 .AddTransient(_ => new InboxProcessorJob(_inboxConsumerMock.Object, dispatcherMock.Object));
-        internals.Build();
+        var serviceCollection = internals.GetServiceCollection();
 
-        _sut = new InboxProcessorJobFactory(internals, _inboxConsumerMock.Object);
+        _inboxConsumerMock = new Mock<IInboxConsumer>();
+        serviceCollection.AddSingleton(_inboxConsumerMock.Object);
+
+        internals.Build();
+        _sut = new InboxProcessorJobFactory(internals);
     }
 
     [Fact]

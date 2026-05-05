@@ -1,10 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Tycho.Events.Broker;
 using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Events.Routing;
-using Tycho.Events.Serialization;
 using Tycho.Identity.Events;
 using Tycho.Structure;
 using Tycho.UnitTests._Data.Events;
@@ -20,15 +18,14 @@ public class OutboxProcessorJobFactoryTests
 
     public OutboxProcessorJobFactoryTests()
     {
-        _outboxConsumerMock = new Mock<IOutboxConsumer>();
-        var brokerMock = new Mock<IEventBroker>();
-
         var internals = new Internals(typeof(TestModule));
-        internals.GetServiceCollection()
-                 .AddTransient(_ => new OutboxProcessorJob(_outboxConsumerMock.Object, brokerMock.Object));
-        internals.Build();
+        var serviceCollection = internals.GetServiceCollection();
 
-        _sut = new OutboxProcessorJobFactory(internals, _outboxConsumerMock.Object);
+        _outboxConsumerMock = new Mock<IOutboxConsumer>();
+        serviceCollection.AddSingleton(_outboxConsumerMock.Object);
+        
+        internals.Build();
+        _sut = new OutboxProcessorJobFactory(internals);
     }
 
     [Fact]
