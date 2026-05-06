@@ -1,62 +1,97 @@
-﻿//using Microsoft.EntityFrameworkCore;
-//using Moq;
-//using Tycho.Persistence.EFCore.Outbox;
+﻿using Microsoft.EntityFrameworkCore;
+using Moq;
+using Tycho.Events.Model;
+using Tycho.Events.Outbox;
+using Tycho.Events.Routing;
+using Tycho.Events.Serialization;
+using Tycho.Identity.Events;
+using Tycho.Persistence.EFCore.Outbox;
+using Tycho.Persistence.EFCore.UnitTests._Data.Events;
+using Tycho.Transactions;
 
-//namespace Tycho.Persistence.EFCore.UnitTests.Outbox;
+namespace Tycho.Persistence.EFCore.UnitTests.Outbox;
 
-//public class OutboxWriterTests
-//{
-//    private readonly Mock<DbSet<OutboxMessage>> _dbSetMock;
-//    private readonly Mock<TychoDbContext> _dbContextMock;
+public class OutboxWriterTests
+{
+    private readonly Mock<ITransaction> _transactionMock;
+    private readonly Mock<IEventSerializer> _eventSerializerMock;
+    private readonly Mock<TychoDbContext> _dbContextMock;
+    private readonly OutboxActivity _outboxActivity;
 
-//    private readonly OutboxActivity _outboxActivity;
-//    private int _outboxActivityNotiicationCount;
+    private readonly Mock<DbSet<OutboxEntry>> _dbSetMock;
+    private int _outboxActivityNotificationCount;
 
-//    private readonly OutboxWriter _sut;
+    private readonly OutboxWriter _sut;
 
-//    public OutboxWriterTests()
-//    {
-//        _dbSetMock = new Mock<DbSet<OutboxMessage>>();
-//        _dbContextMock = new Mock<TychoDbContext>();
-//        _dbContextMock.Setup(db => db.Set<OutboxMessage>())
-//                      .Returns(_dbSetMock.Object);
+    public OutboxWriterTests()
+    {
+        _transactionMock = new Mock<ITransaction>();
+        _eventSerializerMock = new Mock<IEventSerializer>();
 
-//        _outboxActivity = new();
-//        _outboxActivity.NewEntriesAdded += (_, _) => 
-//        { 
-//            _outboxActivityNotiicationCount++; 
-//        };
+        _dbSetMock = new Mock<DbSet<OutboxEntry>>();
+        _dbSetMock.Setup(dbSet => dbSet.AddRange(It.IsAny<IEnumerable<OutboxEntry>>()))
+                  .Callback<IEnumerable<OutboxEntry>>(entries => entries.ToList());
 
-//        _sut = new(_dbContextMock.Object, _outboxActivity);
-//    }
+        _dbContextMock = new Mock<TychoDbContext>();
+        _dbContextMock
+            .Setup(db => db.Set<OutboxEntry>())
+            .Returns(_dbSetMock.Object);
+        _dbContextMock
+            .Setup(db => db.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(0);
 
-//    [Theory]
-//    [InlineData(true)]
-//    [InlineData(false)]
-//    public async Task Write_WithMultipleEntries_AddsThemToTheOutboxAndNotifiesActivity(bool shouldCommit)
-//    {
-//        // Arrange
-//        var entries = new List<OutboxEntry>
-//        {
-//            new(new("event-1", "handler-1", "module-1"), string.Empty),
-//            new(new("event-2", "handler-2", "module-2"), "{}"),
-//            new(new("event-3", "handler-3", "module-3"), new object())
-//        };
-//        var cancellationToken = new CancellationToken();
+        _outboxActivity = new OutboxActivity();
+        _outboxActivity.NewEntriesAdded += (_, _) => _outboxActivityNotificationCount++;
 
-//        // Act
-//        await _sut.Write(entries, shouldCommit, cancellationToken);
+        _sut = new OutboxWriter(
+            _transactionMock.Object,
+            _eventSerializerMock.Object,
+            _outboxActivity,
+            _dbContextMock.Object);
+    }
 
-//        // Assert
-//        _dbSetMock.Verify(db => db.Add(It.IsAny<OutboxMessage>()), Times.Exactly(entries.Count));
-//        foreach (var entry in entries)
-//        {
-//            _dbSetMock.Verify(db => db.Add(It.Is<OutboxMessage>(m =>
-//                m.Id == entry.Id &&
-//                m.Handler == entry.HandlerIdentity.ToString() &&
-//                m.Payload == (entry.Payload as string)!)), Times.Once);
-//        }
-//        _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), shouldCommit ? Times.Once : Times.Never);
-//        Assert.Equal(1, _outboxActivityNotiicationCount);
-//    }
-//}
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Write_WithMultipleRoutedEvents_AddsThemToTheOutboxAndNotifiesActivity(bool isTransactionInProgress)
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken();
+        _transactionMock.Setup(t => t.IsInProgress).Returns(isTransactionInProgress);
+
+        List<RoutedEvent> routedEvents =
+        [
+            new RoutedEvent<TestEvent>(
+                Guid.NewGuid(), 
+                EventIdentity.Create<TestEvent>(), 
+                EventHandlerIdentity.Parse("handler-1"), 
+                Route.Create(), 
+                new TestEvent()),
+            new RoutedEvent<TestEvent>(
+                Guid.NewGuid(), 
+                EventIdentity.Create<TestEvent>(), 
+                EventHandlerIdentity.Parse("handler-2"), 
+                Route.Create(), 
+                new TestEvent()),
+            new RoutedEvent<TestEvent>(
+                Guid.NewGuid(), 
+                EventIdentity.Create<TestEvent>(), 
+                EventHandlerIdentity.Parse("handler-3"), 
+                Route.Create(), 
+                new TestEvent()),
+        ];
+
+        _eventSerializerMock
+            .Setup(s => s.Serialize(It.IsAny<RoutedEvent>()))
+            .Returns<RoutedEvent>(re => new SerializedRoutedEvent(re.Id, re.EventId, re.HandlerId, re.Route, "{}"));
+
+        // Act
+        await _sut.Write(routedEvents, cancellationToken);
+
+        // Assert
+        _eventSerializerMock.Verify(s => s.Serialize(It.IsAny<RoutedEvent<TestEvent>>()), Times.Exactly(routedEvents.Count));
+        _dbSetMock.Verify(db => db.AddRange(It.IsAny<IEnumerable<OutboxEntry>>()), Times.Once);
+        _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), isTransactionInProgress ? Times.Never() : Times.Once());
+        Assert.Equal(1, _outboxActivityNotificationCount);
+    }
+}

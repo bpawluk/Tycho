@@ -1,299 +1,291 @@
-﻿//using Microsoft.EntityFrameworkCore;
-//using Microsoft.Extensions.DependencyInjection;
-//using Moq;
-//using Moq.EntityFrameworkCore;
-//using Tycho.Events.Routing;
-//using Tycho.Persistence.EFCore.Outbox;
-//using Tycho.Structure.Internal;
+﻿using Microsoft.EntityFrameworkCore;
+using Moq;
+using Moq.EntityFrameworkCore;
+using Tycho.Persistence.EFCore.Common;
+using Tycho.Persistence.EFCore.Outbox;
+using Tycho.Transactions;
 
-//namespace Tycho.Persistence.EFCore.UnitTests.Outbox;
+namespace Tycho.Persistence.EFCore.UnitTests.Outbox;
 
-//public class OutboxConsumerTests
-//{
-//    private readonly OutboxConsumerSettings _settings;
-//    private readonly Mock<DbSet<OutboxMessage>> _dbSetMock;
-//    private readonly Mock<TychoDbContext> _dbContextMock;
+public class OutboxConsumerTests
+{
+    private readonly Mock<ITransaction> _transactionMock;
+    private readonly Mock<TychoDbContext> _dbContextMock;
+    private readonly OutboxConsumerSettings _settings;
 
-//    private readonly OutboxConsumer _sut;
+    private readonly Mock<DbSet<OutboxEntry>> _dbSetMock;
 
-//    public OutboxConsumerTests()
-//    {
-//        _settings = new OutboxConsumerSettings()
-//        {
-//            MaxDeliveryCount = 3,
-//            ProcessingStateExpiration = TimeSpan.FromMinutes(5)
-//        };
+    private readonly OutboxConsumer _sut;
 
-//        _dbSetMock = new Mock<DbSet<OutboxMessage>>();
-//        _dbContextMock = new Mock<TychoDbContext>();
-//        _dbContextMock.Setup(db => db.Set<OutboxMessage>())
-//                      .Returns(() => _dbSetMock.Object);
+    public OutboxConsumerTests()
+    {
+        _transactionMock = new Mock<ITransaction>();
 
-//        var internals = new Internals(GetType());
-//        internals.GetServiceCollection()
-//                 .AddSingleton(_dbContextMock.Object);
-//        internals.Build();
+        _settings = new OutboxConsumerSettings
+        {
+            MaxDeliveryCount = 3,
+            DeliveryExpiration = TimeSpan.FromMinutes(5)
+        };
 
-//        _sut = new OutboxConsumer(internals, _settings);
-//    }
+        _dbSetMock = new Mock<DbSet<OutboxEntry>>();
 
-//    [Fact]
-//    public async Task Read_WithNewMessages_ReadsTheMessages()
-//    {
-//        // Arrange
-//        var cancellationToken = new CancellationToken();
+        _dbContextMock = new Mock<TychoDbContext>();
+        _dbContextMock.Setup(db => db.Set<OutboxEntry>())
+                      .Returns(_dbSetMock.Object);
+        _dbContextMock.Setup(db => db.SaveChangesAsync(It.IsAny<CancellationToken>()))
+                      .ReturnsAsync(0);
 
-//        IReadOnlyCollection<OutboxMessageState> initialMessageStates =
-//        [
-//            new(MessageState.New, DateTime.UtcNow - TimeSpan.FromMinutes(3), 0),
-//            new(MessageState.New, DateTime.UtcNow - TimeSpan.FromMinutes(2), 0),
-//            new(MessageState.New, DateTime.UtcNow - TimeSpan.FromMinutes(1), 0),
-//        ];
-//        IReadOnlyCollection<OutboxMessage> testMessages = GetMessages(initialMessageStates);
+        _sut = new OutboxConsumer(_transactionMock.Object, _dbContextMock.Object, _settings);
+    }
 
-//        SetupOutboxMessages(testMessages);
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Read_WithNewEntries_ReadsTheEntries(bool isTransactionInProgress)
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken();
 
-//        // Act
-//        var result = await _sut.Read(testMessages.Count, cancellationToken);
+        _transactionMock.Setup(t => t.IsInProgress)
+                        .Returns(isTransactionInProgress);
 
-//        // Assert
-//        AssertCorrectEntries(initialMessageStates, testMessages, result);
-//    }
+        List<OutboxEntry> entries =
+        [
+            CreateEntry(Guid.NewGuid(), EntryState.New, 0, DateTime.UtcNow - TimeSpan.FromMinutes(3)),
+            CreateEntry(Guid.NewGuid(), EntryState.New, 0, DateTime.UtcNow - TimeSpan.FromMinutes(2)),
+            CreateEntry(Guid.NewGuid(), EntryState.New, 0, DateTime.UtcNow - TimeSpan.FromMinutes(1)),
+        ];
 
-//    [Fact]
-//    public async Task Read_WithInProcessingMessagesAfterTimeoutBelowMaxDeliveryLimit_ReadsTheMessages()
-//    {
-//        // Arrange
-//        var cancellationToken = new CancellationToken();
+        _dbContextMock.Setup(db => db.Set<OutboxEntry>())
+                      .ReturnsDbSet(entries);
 
-//        IReadOnlyCollection<OutboxMessageState> initialMessageStates =
-//        [
-//            new(MessageState.Processing, DateTime.UtcNow - _settings.ProcessingStateExpiration * 3, 0),
-//            new(MessageState.Processing, DateTime.UtcNow - _settings.ProcessingStateExpiration * 2, 1),
-//            new(MessageState.Processing, DateTime.UtcNow - _settings.ProcessingStateExpiration * 1, 2),
-//        ];
-//        IReadOnlyCollection<OutboxMessage> testMessages = GetMessages(initialMessageStates);
+        // Act
+        var result = await _sut.Read(entries.Count, cancellationToken);
 
-//        SetupOutboxMessages(testMessages);
+        // Assert
+        Assert.Equal(entries.Count, result.Count);
+        Assert.All(entries, e => Assert.Contains(result, r => r.Id == e.Id));
+        Assert.All(entries, e => Assert.Equal(EntryState.InProcessing, e.State));
+        Assert.All(entries, e => Assert.Equal(1u, e.DeliveryAttempts));
+        _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), isTransactionInProgress ? Times.Never() : Times.Once());
+    }
 
-//        // Act
-//        var result = await _sut.Read(testMessages.Count, cancellationToken);
+    [Fact]
+    public async Task Read_WithInProcessingEntriesAfterExpirationBelowMaxDeliveryCount_ReadsTheEntries()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken();
 
-//        // Assert
-//        AssertCorrectEntries(initialMessageStates, testMessages, result);
-//    }
+        List<OutboxEntry> entries =
+        [
+            CreateEntry(Guid.NewGuid(), EntryState.InProcessing, 0, DateTime.UtcNow - _settings.DeliveryExpiration * 3),
+            CreateEntry(Guid.NewGuid(), EntryState.InProcessing, 1, DateTime.UtcNow - _settings.DeliveryExpiration * 2),
+            CreateEntry(Guid.NewGuid(), EntryState.InProcessing, 2, DateTime.UtcNow - _settings.DeliveryExpiration * 1.1),
+        ];
 
-//    [Fact]
-//    public async Task Read_WithInProcessingMessagesBeforeTimeout_IgnoresTheMessages()
-//    {
-//        // Arrange
-//        var cancellationToken = new CancellationToken();
+        _dbContextMock.Setup(db => db.Set<OutboxEntry>())
+                      .ReturnsDbSet(entries);
 
-//        IReadOnlyCollection<OutboxMessageState> initialMessageStates =
-//        [
-//            new(MessageState.Processing, DateTime.UtcNow - _settings.ProcessingStateExpiration * 0.3, 0),
-//            new(MessageState.Processing, DateTime.UtcNow - _settings.ProcessingStateExpiration * 0.2, 1),
-//            new(MessageState.Processing, DateTime.UtcNow - _settings.ProcessingStateExpiration * 0.1, 2),
-//        ];
-//        IReadOnlyCollection<OutboxMessage> testMessages = GetMessages(initialMessageStates);
+        // Act
+        var result = await _sut.Read(entries.Count, cancellationToken);
 
-//        SetupOutboxMessages(testMessages);
+        // Assert
+        Assert.Equal(entries.Count, result.Count);
+        Assert.All(entries, e => Assert.Contains(result, r => r.Id == e.Id));
+        _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), Times.Once);
+    }
 
-//        // Act
-//        var result = await _sut.Read(testMessages.Count, cancellationToken);
+    [Fact]
+    public async Task Read_WithInProcessingEntriesBeforeExpiration_IgnoresTheEntries()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken();
 
-//        // Assert
-//        AssertCorrectEntries([], [], result);
-//    }
+        List<OutboxEntry> entries =
+        [
+            CreateEntry(Guid.NewGuid(), EntryState.InProcessing, 0, DateTime.UtcNow - _settings.DeliveryExpiration * 0.3),
+            CreateEntry(Guid.NewGuid(), EntryState.InProcessing, 1, DateTime.UtcNow - _settings.DeliveryExpiration * 0.2),
+            CreateEntry(Guid.NewGuid(), EntryState.InProcessing, 2, DateTime.UtcNow - _settings.DeliveryExpiration * 0.1),
+        ];
 
-//    [Fact]
-//    public async Task Read_WithInProcessingMessagesAboveMaxDeliveryLimit_IgnoresTheMessages()
-//    {
-//        // Arrange
-//        var cancellationToken = new CancellationToken();
+        _dbContextMock.Setup(db => db.Set<OutboxEntry>())
+                      .ReturnsDbSet(entries);
 
-//        IReadOnlyCollection<OutboxMessageState> initialMessageStates =
-//        [
-//            new(MessageState.Processing, DateTime.UtcNow - _settings.ProcessingStateExpiration * 3, _settings.MaxDeliveryCount),
-//            new(MessageState.Processing, DateTime.UtcNow - _settings.ProcessingStateExpiration * 2, _settings.MaxDeliveryCount),
-//            new(MessageState.Processing, DateTime.UtcNow - _settings.ProcessingStateExpiration * 1, _settings.MaxDeliveryCount),
-//        ];
-//        IReadOnlyCollection<OutboxMessage> testMessages = GetMessages(initialMessageStates);
+        // Act
+        var result = await _sut.Read(entries.Count, cancellationToken);
 
-//        SetupOutboxMessages(testMessages);
+        // Assert
+        Assert.Empty(result);
+        _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), Times.Once);
+    }
 
-//        // Act
-//        var result = await _sut.Read(testMessages.Count, cancellationToken);
+    [Fact]
+    public async Task Read_WithInProcessingEntriesAboveMaxDeliveryCount_IgnoresTheEntries()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken();
 
-//        // Assert
-//        AssertCorrectEntries([], [], result);
-//    }
+        List<OutboxEntry> entries =
+        [
+            CreateEntry(Guid.NewGuid(), EntryState.InProcessing, _settings.MaxDeliveryCount, DateTime.UtcNow - _settings.DeliveryExpiration * 3),
+            CreateEntry(Guid.NewGuid(), EntryState.InProcessing, _settings.MaxDeliveryCount, DateTime.UtcNow - _settings.DeliveryExpiration * 2),
+            CreateEntry(Guid.NewGuid(), EntryState.InProcessing, _settings.MaxDeliveryCount, DateTime.UtcNow - _settings.DeliveryExpiration * 1.1),
+        ];
 
-//    [Fact]
-//    public async Task Read_WithFailedMessagesBelowMaxDeliveryLimit_ReadsTheMessages()
-//    {
-//        // Arrange
-//        var cancellationToken = new CancellationToken();
+        _dbContextMock.Setup(db => db.Set<OutboxEntry>())
+                      .ReturnsDbSet(entries);
 
-//        IReadOnlyCollection<OutboxMessageState> initialMessageStates =
-//        [
-//            new(MessageState.Failed, DateTime.UtcNow - TimeSpan.FromMinutes(3), 0),
-//            new(MessageState.Failed, DateTime.UtcNow - TimeSpan.FromMinutes(2), 0),
-//            new(MessageState.Failed, DateTime.UtcNow - TimeSpan.FromMinutes(1), 0),
-//        ];
-//        IReadOnlyCollection<OutboxMessage> testMessages = GetMessages(initialMessageStates);
+        // Act
+        var result = await _sut.Read(entries.Count, cancellationToken);
 
-//        SetupOutboxMessages(testMessages);
+        // Assert
+        Assert.Empty(result);
+        _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), Times.Once);
+    }
 
-//        // Act
-//        var result = await _sut.Read(testMessages.Count, cancellationToken);
+    [Fact]
+    public async Task Read_WithFailedEntriesBelowMaxDeliveryCount_ReadsTheEntries()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken();
 
-//        // Assert
-//        AssertCorrectEntries(initialMessageStates, testMessages, result);
-//    }
+        List<OutboxEntry> entries =
+        [
+            CreateEntry(Guid.NewGuid(), EntryState.Failed, 0, DateTime.UtcNow - TimeSpan.FromMinutes(3)),
+            CreateEntry(Guid.NewGuid(), EntryState.Failed, 1, DateTime.UtcNow - TimeSpan.FromMinutes(2)),
+            CreateEntry(Guid.NewGuid(), EntryState.Failed, 2, DateTime.UtcNow - TimeSpan.FromMinutes(1)),
+        ];
 
-//    [Fact]
-//    public async Task Read_WithFailedMessagesAboveMaxDeliveryLimit_IgnoresTheMessages()
-//    {
-//        // Arrange
-//        var cancellationToken = new CancellationToken();
+        _dbContextMock.Setup(db => db.Set<OutboxEntry>())
+                      .ReturnsDbSet(entries);
 
-//        IReadOnlyCollection<OutboxMessageState> initialMessageStates =
-//        [
-//            new(MessageState.Failed, DateTime.UtcNow - TimeSpan.FromMinutes(3), _settings.MaxDeliveryCount),
-//            new(MessageState.Failed, DateTime.UtcNow - TimeSpan.FromMinutes(2), _settings.MaxDeliveryCount),
-//            new(MessageState.Failed, DateTime.UtcNow - TimeSpan.FromMinutes(1), _settings.MaxDeliveryCount),
-//        ];
-//        IReadOnlyCollection<OutboxMessage> testMessages = GetMessages(initialMessageStates);
+        // Act
+        var result = await _sut.Read(entries.Count, cancellationToken);
 
-//        SetupOutboxMessages(testMessages);
+        // Assert
+        Assert.Equal(entries.Count, result.Count);
+        Assert.All(entries, e => Assert.Contains(result, r => r.Id == e.Id));
+        _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), Times.Once);
+    }
 
-//        // Act
-//        var result = await _sut.Read(testMessages.Count, cancellationToken);
+    [Fact]
+    public async Task Read_WithFailedEntriesAboveMaxDeliveryCount_IgnoresTheEntries()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken();
 
-//        // Assert
-//        AssertCorrectEntries([], [], result);
-//    }
+        List<OutboxEntry> entries =
+        [
+            CreateEntry(Guid.NewGuid(), EntryState.Failed, _settings.MaxDeliveryCount, DateTime.UtcNow - TimeSpan.FromMinutes(3)),
+            CreateEntry(Guid.NewGuid(), EntryState.Failed, _settings.MaxDeliveryCount, DateTime.UtcNow - TimeSpan.FromMinutes(2)),
+            CreateEntry(Guid.NewGuid(), EntryState.Failed, _settings.MaxDeliveryCount, DateTime.UtcNow - TimeSpan.FromMinutes(1)),
+        ];
 
-//    [Fact]
-//    public async Task MarkAsProcessed_WithExistinMessage_RemovesItFromOutbox()
-//    {
-//        // Arrange
-//        var entry = new OutboxEntry(new("event", "handler", "module"), "{}");
-//        var cancellationToken = new CancellationToken();
+        _dbContextMock.Setup(db => db.Set<OutboxEntry>())
+                      .ReturnsDbSet(entries);
 
-//        var message = new OutboxMessage();
-//        _dbSetMock.Setup(m => m.FindAsync(new object[] { entry.Id }, cancellationToken))
-//                  .ReturnsAsync(message);
+        // Act
+        var result = await _sut.Read(entries.Count, cancellationToken);
 
-//        // Act
-//        await _sut.MarkAsProcessed(entry, cancellationToken);
+        // Assert
+        Assert.Empty(result);
+        _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), Times.Once);
+    }
 
-//        // Assert
-//        _dbSetMock.Verify(m => m.Remove(message), Times.Once);
-//        _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), Times.Once);
-//    }
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task MarkAsDelivered_WithExistingEntry_RemovesItFromOutbox(bool isTransactionInProgress)
+    {
+        // Arrange
+        var entryId = Guid.NewGuid();
+        var entry = CreateEntry(entryId, EntryState.InProcessing, 1, DateTime.UtcNow);
+        var cancellationToken = new CancellationToken();
 
-//    [Fact]
-//    public async Task MarkAsProcessed_WithMissingMessage_IgnoresTheRequest()
-//    {
-//        // Arrange
-//        var entry = new OutboxEntry(new("event", "handler", "module"), "{}");
-//        var cancellationToken = new CancellationToken();
+        _transactionMock.Setup(t => t.IsInProgress)
+                        .Returns(isTransactionInProgress);
 
-//        // Act
-//        await _sut.MarkAsProcessed(entry, cancellationToken);
+        _dbSetMock.Setup(m => m.FindAsync(It.IsAny<object[]>(), It.IsAny<CancellationToken>()))
+                  .Returns(ValueTask.FromResult<OutboxEntry?>(entry));
 
-//        // Assert
-//        _dbSetMock.Verify(m => m.Remove(It.IsAny<OutboxMessage>()), Times.Never);
-//        _dbContextMock.Verify(db => db.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
-//    }
+        // Act
+        await _sut.MarkAsDelivered(entryId, cancellationToken);
 
-//    [Fact]
-//    public async Task MarkAsFailed_WithExistinMessage_UpdatesItsState()
-//    {
-//        // Arrange
-//        var entry = new OutboxEntry(new("event", "handler", "module"), "{}");
-//        var cancellationToken = new CancellationToken();
+        // Assert
+        _dbSetMock.Verify(m => m.Remove(entry), Times.Once);
+        _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), isTransactionInProgress ? Times.Never() : Times.Once());
+    }
 
-//        var message = new OutboxMessage();
-//        _dbSetMock.Setup(m => m.FindAsync(new object[] { entry.Id }, cancellationToken))
-//                  .ReturnsAsync(message);
+    [Fact]
+    public async Task MarkAsDelivered_WithMissingEntry_IgnoresTheRequest()
+    {
+        // Arrange
+        var entryId = Guid.NewGuid();
+        var cancellationToken = new CancellationToken();
 
-//        // Act
-//        await _sut.MarkAsFailed(entry, cancellationToken);
+        _dbSetMock.Setup(m => m.FindAsync(It.IsAny<object[]>(), It.IsAny<CancellationToken>()))
+                  .Returns(ValueTask.FromResult<OutboxEntry?>(null));
 
-//        // Assert
-//        Assert.Equal(MessageState.Failed, message.State);
-//        Assert.Equal(DateTime.UtcNow, message.Updated, TimeSpan.FromSeconds(1));
-//        _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), Times.Once);
-//    }
+        // Act
+        await _sut.MarkAsDelivered(entryId, cancellationToken);
 
-//    [Fact]
-//    public async Task MarkAsFailed_WithMissingMessage_IgnoresTheRequest()
-//    {
-//        // Arrange
-//        var entry = new OutboxEntry(new("event", "handler", "module"), "{}");
-//        var cancellationToken = new CancellationToken();
+        // Assert
+        _dbSetMock.Verify(m => m.Remove(It.IsAny<OutboxEntry>()), Times.Never);
+        _dbContextMock.Verify(db => db.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
 
-//        // Act
-//        await _sut.MarkAsProcessed(entry, cancellationToken);
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task MarkAsFailed_WithExistingEntry_UpdatesItsState(bool isTransactionInProgress)
+    {
+        // Arrange
+        var entryId = Guid.NewGuid();
+        var entry = CreateEntry(entryId, EntryState.InProcessing, 1, DateTime.UtcNow - TimeSpan.FromMinutes(5));
+        var cancellationToken = new CancellationToken();
 
-//        // Assert
-//        _dbContextMock.Verify(db => db.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
-//    }
+        _transactionMock.Setup(t => t.IsInProgress)
+                        .Returns(isTransactionInProgress);
 
-//    private static IReadOnlyCollection<OutboxMessage> GetMessages(IReadOnlyCollection<OutboxMessageState> initialMessageStates)
-//    {
-//        return initialMessageStates.Select((state, index) => new OutboxMessage
-//        {
-//            Id = Guid.NewGuid(),
-//            Handler = $"event@{index}-handler@{index}-module@{index}",
-//            Payload = $"{{\"index\":{index}}}",
-//            State = state.State,
-//            Created = state.Updated - TimeSpan.FromMinutes(state.State is MessageState.New ? 0 : 1),
-//            Updated = state.Updated,
-//            DeliveryCount = state.DeliveryCount
-//        }).ToArray();
-//    }
+        _dbSetMock.Setup(m => m.FindAsync(It.IsAny<object[]>(), It.IsAny<CancellationToken>()))
+                  .Returns(ValueTask.FromResult<OutboxEntry?>(entry));
 
-//    private void SetupOutboxMessages(IReadOnlyCollection<OutboxMessage> testMessages)
-//    {
-//        IReadOnlyCollection<OutboxMessage> additionalMessages =
-//        [
-//            new() { Id = Guid.NewGuid(), State = MessageState.Processing, Created = new DateTime(2020, 12, 30), Updated = DateTime.UtcNow, DeliveryCount = 0 },
-//            new() { Id = Guid.NewGuid(), State = MessageState.Processing, Created = new DateTime(2020, 10, 16), Updated = DateTime.UtcNow, DeliveryCount = 1 },
-//            new() { Id = Guid.NewGuid(), State = MessageState.Processing, Created = new DateTime(2020, 8, 8), Updated = DateTime.UtcNow, DeliveryCount = 2 },
-//            new() { Id = Guid.NewGuid(), State = MessageState.Processing, Created = new DateTime(2020, 6, 4), Updated = new DateTime(2020, 6, 6), DeliveryCount = _settings.MaxDeliveryCount },
-//            new() { Id = Guid.NewGuid(), State = MessageState.Failed, Created = new DateTime(2020, 4, 2), Updated = new DateTime(2020, 4, 4), DeliveryCount = _settings.MaxDeliveryCount },
-//            new() { Id = Guid.NewGuid(), State = MessageState.Failed, Created = new DateTime(2020, 2, 1), Updated = new DateTime(2020, 2, 2), DeliveryCount = _settings.MaxDeliveryCount },
-//        ];
-//        _dbContextMock.SetupSequence(x => x.Set<OutboxMessage>())
-//                      .ReturnsDbSet(testMessages.Concat(additionalMessages));
-//    }
+        // Act
+        await _sut.MarkAsFailed(entryId, cancellationToken);
 
-//    private static void AssertCorrectEntries(
-//        IReadOnlyCollection<OutboxMessageState> initialMessageStates,
-//        IReadOnlyCollection<OutboxMessage> readMessages,
-//        IReadOnlyCollection<OutboxEntry> returnedEntries)
-//    {
-//        Assert.Equal(initialMessageStates.Count, readMessages.Count);
-//        Assert.Equal(readMessages.Count, returnedEntries.Count);
+        // Assert
+        Assert.Equal(EntryState.Failed, entry.State);
+        Assert.Equal(DateTime.UtcNow, entry.Updated, TimeSpan.FromSeconds(1));
+        _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), isTransactionInProgress ? Times.Never() : Times.Once());
+    }
 
-//        for (int i = 0; i < readMessages.Count; i++)
-//        {
-//            var initialState = initialMessageStates.ElementAt(i);
-//            var readMessage = readMessages.ElementAt(i);
-//            Assert.Equal(initialState.DeliveryCount + 1, readMessage.DeliveryCount);
-//            Assert.Equal(MessageState.Processing, readMessage.State);
-//            Assert.Equal(DateTime.UtcNow, readMessage.Updated, TimeSpan.FromMinutes(1));
+    [Fact]
+    public async Task MarkAsFailed_WithMissingEntry_IgnoresTheRequest()
+    {
+        // Arrange
+        var entryId = Guid.NewGuid();
+        var cancellationToken = new CancellationToken();
 
-//            var returnedEntry = returnedEntries.ElementAt(i);
-//            Assert.Equal(readMessage.Id, returnedEntry.Id);
-//            Assert.Equal(HandlerIdentity.FromString(readMessage.Handler), returnedEntry.HandlerIdentity);
-//            Assert.Equal(readMessage.Payload, returnedEntry.Payload);
-//        }
-//    }
+        _dbSetMock.Setup(m => m.FindAsync(It.IsAny<object[]>(), It.IsAny<CancellationToken>()))
+                  .Returns(ValueTask.FromResult<OutboxEntry?>(null));
 
-//    private record OutboxMessageState(MessageState State, DateTime Updated, uint DeliveryCount);
-//}
+        // Act
+        await _sut.MarkAsFailed(entryId, cancellationToken);
+
+        // Assert
+        _dbContextMock.Verify(db => db.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    private static OutboxEntry CreateEntry(Guid id, EntryState state, uint deliveryAttempts, DateTime updated) => new()
+    {
+        Id = id,
+        State = state,
+        DeliveryAttempts = deliveryAttempts,
+        Updated = updated,
+        Created = updated - TimeSpan.FromMinutes(1),
+        Event = "test-event",
+        Handler = "test-handler",
+        Route = "END",
+        Payload = "{}"
+    };
+}
