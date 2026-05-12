@@ -13,6 +13,7 @@ using Tycho.Events.Publishing;
 using Tycho.Events.Registrating;
 using Tycho.Events.Serialization;
 using Tycho.Structure;
+using Tycho.Transactions;
 
 namespace Tycho.Modules.Setup
 {
@@ -79,6 +80,11 @@ namespace Tycho.Modules.Setup
 
             services.AddSingleton<InboxActivity>();
             services.AddSingleton<InboxProcessor>();
+
+            if (!_internals.HasService<ITransaction>())
+            {
+                services.AddScoped<ITransaction, EmptyTransaction>();
+            }
 
             services.AddTransient<IEventBroker, EventBroker>();
             services.AddTransient<IEventPublisher, EventPublisher>();
