@@ -5,6 +5,7 @@ using Tycho.Events.Serialization;
 using Tycho.Persistence.EFCore.Inbox;
 using Tycho.Persistence.EFCore.Outbox;
 using Tycho.Persistence.EFCore.Serialization;
+using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore;
 
@@ -22,11 +23,12 @@ public static class ServiceCollectionExtensions
     {
         services.AddDbContext<TDbContext>()
                 .AddScoped<TychoDbContext>(sp => sp.GetRequiredService<TDbContext>())
-                .AddTransient<IPayloadSerializer, JsonPayloadSerializer>()
+                .AddScoped<ITransaction, Transactions.Transaction>()
                 .AddTransient<IOutboxWriter, OutboxWriter>()
                 .AddTransient<IOutboxConsumer, OutboxConsumer>()
                 .AddTransient<IInboxWriter, InboxWriter>()
-                .AddTransient<IInboxConsumer, InboxConsumer>();
+                .AddTransient<IInboxConsumer, InboxConsumer>()
+                .AddTransient<IPayloadSerializer, JsonPayloadSerializer>();
         return services;
     }
 }
