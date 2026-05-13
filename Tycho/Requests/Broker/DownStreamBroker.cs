@@ -30,20 +30,24 @@ namespace Tycho.Requests.Broker
             return _internals.HasService<IDownStreamRequestRegistration<TRequest, TResponse, TModule>>();
         }
 
-        public Task ExecuteAsync<TRequest>(TRequest requestData, CancellationToken cancellationToken)
+        [EntryPoint]
+        public async Task ExecuteAsync<TRequest>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest
         {
             requestData.ThrowIfNull();
-            var registration = _internals.GetRequiredService<IDownStreamRequestRegistration<TRequest, TModule>>();
-            return registration.Handler.HandleAsync(requestData, cancellationToken);
+            await using var scope = _internals.CreateAsyncScope();
+            var registration = scope.ServiceProvider.GetRequiredService<IDownStreamRequestRegistration<TRequest, TModule>>();
+            await registration.Handler.HandleAsync(requestData, cancellationToken).ConfigureAwait(false);
         }
 
-        public Task<TResponse> ExecuteAsync<TRequest, TResponse>(TRequest requestData, CancellationToken cancellationToken)
+        [EntryPoint]
+        public async Task<TResponse> ExecuteAsync<TRequest, TResponse>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest<TResponse>
         {
             requestData.ThrowIfNull();
-            var registration = _internals.GetRequiredService<IDownStreamRequestRegistration<TRequest, TResponse, TModule>>();
-            return registration.Handler.HandleAsync(requestData, cancellationToken);
+            await using var scope = _internals.CreateAsyncScope();
+            var registration = scope.ServiceProvider.GetRequiredService<IDownStreamRequestRegistration<TRequest, TResponse, TModule>>();
+            return await registration.Handler.HandleAsync(requestData, cancellationToken).ConfigureAwait(false);
         }
     }
 }
