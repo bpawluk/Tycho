@@ -1,18 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Tycho.Requests;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Contract;
+using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Persistence;
 using static Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Contract.GetPostsRequest;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Handlers;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Handlers;
 
-internal class GetPostsRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetPostsRequest, Response>
+internal class GetPostsRequestHandler(PostsDbContext dbContext) : IRequestHandler<GetPostsRequest, Response>
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public async Task<Response> HandleAsync(GetPostsRequest requestData, CancellationToken cancellationToken)
     {
-        var posts = _unitOfWork.Set<Domain.Post>();
-        var responsePosts = await posts
+        var responsePosts = await dbContext.Posts
             .Where(post => requestData.PostIds.Contains(post.Id))
             .Select(post => new Post(
                 post.Id,

@@ -1,20 +1,18 @@
-﻿using Tycho.Requests;
+using Tycho.Requests;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Contract;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Domain;
+using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Persistence;
 using static Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Contract.AddArticleRequest;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Handlers;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Handlers;
 
-internal class AddArticleRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<AddArticleRequest, Response>
+internal class AddArticleRequestHandler(ArticlesDbContext dbContext) : IRequestHandler<AddArticleRequest, Response>
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
     public async Task<Response> HandleAsync(AddArticleRequest requestData, CancellationToken cancellationToken)
     {
-        var articles = _unitOfWork.Set<Article>();
         var newArticle = new Article(requestData.Author, requestData.Content);
-        articles.Add(newArticle);
-        await _unitOfWork.SaveChanges(cancellationToken);
+        dbContext.Articles.Add(newArticle);
+        await dbContext.SaveChangesAsync(cancellationToken);
         return new Response(newArticle.Id);
     }
 }

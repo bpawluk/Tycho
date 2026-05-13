@@ -1,20 +1,19 @@
-﻿using Tycho.Requests;
+using Tycho.Requests;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Contract;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Domain;
+using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Persistence;
 using static Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Contract.AddCommentRequest;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Handlers;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Handlers;
 
-internal class AddCommentRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<AddCommentRequest, Response>
+internal class AddCommentRequestHandler(CommentsDbContext dbContext) : IRequestHandler<AddCommentRequest, Response>
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public async Task<Response> HandleAsync(AddCommentRequest requestData, CancellationToken cancellationToken)
     {
-        var comments = _unitOfWork.Set<Comment>();
         var newComment = new Comment(requestData.Author, requestData.Content);
-        comments.Add(newComment);
-        await _unitOfWork.SaveChanges(cancellationToken);
+        dbContext.Comments.Add(newComment);
+        await dbContext.SaveChangesAsync(cancellationToken);
         return new Response(newComment.Id);
     }
 }

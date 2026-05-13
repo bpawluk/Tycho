@@ -1,21 +1,18 @@
-﻿using Tycho.Events;
+using Tycho.Events;
+using Tycho.Transactions;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
+using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Persistence;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Handlers;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Handlers;
 
-internal class ScoreChangedEventHandler(IUnitOfWork unitOfWork) : IEventHandler<ScoreChangedEvent>
+internal class ScoreChangedEventHandler(FeedsDbContext dbContext) : ITransactionalEventHandler<ScoreChangedEvent>
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
     public async Task HandleAsync(EventContext<ScoreChangedEvent> context, CancellationToken cancellationToken)
     {
-        var entries = _unitOfWork.Set<Entry>();
-        var entry = await entries.FindAsync([context.Payload.EntryId], cancellationToken);
+        var entry = await dbContext.Entries.FindAsync([context.Payload.EntryId], cancellationToken);
         if (entry != null)
         {
             entry.UpdateScore(context.Payload.NewScore);
-            await _unitOfWork.SaveChanges(cancellationToken);
         }
     }
 }

@@ -3,10 +3,10 @@ using Tycho.IntegrationTests._Utils;
 
 namespace Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Handlers;
 
-internal class WorkflowFinishedEventHandler(TestWorkflow<TestResult> testWorkflow, CompoundResult<Type> result)
+internal class WorkflowFinishedEventHandler(TestWorkflow<TestResult> testWorkflow, CompoundResult<string> result)
     : IEventHandler<WorkflowFinishedEvent>
 {
-    private readonly CompoundResult<Type> _compoundResult = result;
+    private readonly CompoundResult<string> _compoundResult = result;
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;
 
     public Task HandleAsync(EventContext<WorkflowFinishedEvent> context, CancellationToken cancellationToken)

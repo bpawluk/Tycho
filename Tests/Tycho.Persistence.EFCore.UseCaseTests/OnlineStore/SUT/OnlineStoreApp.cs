@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tycho.Apps;
-using Tycho.UseCaseTests.OnlineStore.SUT.Handlers;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Handlers;
 using Tycho.UseCaseTests.OnlineStore.SUT.Mappers;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming;

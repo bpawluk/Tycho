@@ -1,24 +1,21 @@
-﻿using Tycho.Persistence.EFCore;
+﻿using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Persistence;
 
 namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
 
-internal class FeedProvider(IUnitOfWork unitOfWork)
+internal class FeedProvider(FeedsDbContext feedsDbContext)
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
     public async Task<Feed> GetFeed(int? id, CancellationToken cancellationToken)
     {
         if (id is null)
         {
-            return new Feed(string.Empty, EntryType.Article, _unitOfWork);
+            return new Feed(string.Empty, EntryType.Article, feedsDbContext);
         }
 
-        var entries = _unitOfWork.Set<Entry>();
-        var feedOwner = await entries.FindAsync([id], cancellationToken);
+        var feedOwner = await feedsDbContext.Entries.FindAsync([id], cancellationToken);
 
         if (feedOwner is not null)
         {
-            return new Feed(feedOwner.SubfeedPath, GetFeedEntriesType(feedOwner.Type), _unitOfWork);
+            return new Feed(feedOwner.SubfeedPath, GetFeedEntriesType(feedOwner.Type), feedsDbContext);
         }
 
         throw new InvalidOperationException("Requested Feed does not exist");

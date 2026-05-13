@@ -8,9 +8,9 @@ namespace Tycho.Events.Model
     {
         internal Route Route { get; }
 
-        internal object Payload { get; }
+        internal string Payload { get; }
 
-        internal SerializedRoutedEvent(Guid id, EventIdentity eventId, EventHandlerIdentity handlerId, Route route, object payload) : base(id, eventId, handlerId)
+        internal SerializedRoutedEvent(Guid id, EventIdentity eventId, EventHandlerIdentity handlerId, Route route, string payload) : base(id, eventId, handlerId)
         {
             Route = route;
             Payload = payload;

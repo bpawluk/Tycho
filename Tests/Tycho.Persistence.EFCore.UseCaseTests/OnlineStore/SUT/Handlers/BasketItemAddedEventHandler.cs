@@ -5,32 +5,26 @@ using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Outgoing;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Incoming;
 
-namespace Tycho.UseCaseTests.OnlineStore.SUT.Handlers;
+namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Handlers;
 
-internal class BasketItemAddedEventHandler(
-    IInventoryModule inventoryModule,
-    IBasketModule basketModule) 
-    : IEventHandler<BasketItemAddedEvent>
+internal class BasketItemAddedEventHandler(IInventoryModule inventoryModule, IBasketModule basketModule) : IEventHandler<BasketItemAddedEvent>
 {
-    private readonly IInventoryModule _inventoryModule = inventoryModule;
-    private readonly IBasketModule _basketModule = basketModule;
-
     public async Task HandleAsync(EventContext<BasketItemAddedEvent> context, CancellationToken cancellationToken)
     {
         var reservationCode = $"{context.Payload.CustomerId}-{context.Payload.ProductId}";
         var reserveItemRequest = new ReserveItemRequest(reservationCode, context.Payload.ProductId, context.Payload.Quantity);
 
-        var response = await _inventoryModule.ExecuteAsync(reserveItemRequest, cancellationToken);
+        var response = await inventoryModule.ExecuteAsync(reserveItemRequest, cancellationToken);
 
         if (response.ReservationCreated)
         {
             var confirmBasketItemRequest = new ConfirmBasketItemRequest(context.Payload.CustomerId, context.Payload.ProductId);
-            await _basketModule.ExecuteAsync(confirmBasketItemRequest, cancellationToken);
+            await basketModule.ExecuteAsync(confirmBasketItemRequest, cancellationToken);
         }
         else
         {
             var declineBasketItemRequest = new DeclineBasketItemRequest(context.Payload.CustomerId, context.Payload.ProductId);
-            await _basketModule.ExecuteAsync(declineBasketItemRequest, cancellationToken);
+            await basketModule.ExecuteAsync(declineBasketItemRequest, cancellationToken);
         }
     }
 }

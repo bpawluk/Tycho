@@ -46,11 +46,6 @@ namespace Tycho.Apps.Setup
         {
             var services = _internals.GetServiceCollection();
 
-            if (!_internals.HasService<IPayloadSerializer>())
-            {
-                services.AddTransient<IPayloadSerializer, InMemoryPayloadSerializer>();
-            }
-
             if (!_internals.HasService<IOutboxWriter>() || !_internals.HasService<IOutboxConsumer>())
             {
                 services.AddSingleton<InMemoryOutbox>()
@@ -80,6 +75,7 @@ namespace Tycho.Apps.Setup
             services.AddTransient<IEventPublisher, EventPublisher>();
             services.AddTransient<IDeliveryStrategy, FinalRouteDelivery>();
             services.AddTransient<IDeliveryStrategy, DownStreamRouteDelivery>();
+            services.AddTransient<IPayloadSerializer, JsonPayloadSerializer>();
 
             _internals.InternalsBuilt += OnInternalsBuilt;
             return Task.CompletedTask;

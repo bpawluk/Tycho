@@ -16,7 +16,7 @@ namespace Tycho.Events.Model
             Route = route;
         }
 
-        internal abstract object SerializePayloadWith(IPayloadSerializer serializer);
+        internal abstract string SerializePayloadWith(IPayloadSerializer serializer);
 
         internal abstract IEventHandler GetHandlerFrom(IEventHandlerProvider provider);
 
@@ -32,7 +32,7 @@ namespace Tycho.Events.Model
             Payload = payload;
         }
 
-        internal override object SerializePayloadWith(IPayloadSerializer serializer)
+        internal override string SerializePayloadWith(IPayloadSerializer serializer)
         {
             return serializer.Serialize(Payload);
         }

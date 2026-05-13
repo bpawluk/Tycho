@@ -9,6 +9,6 @@ internal class WorkflowStartedEventHandler(IPublisher publisher) : IEventHandler
 
     public async Task HandleAsync(EventContext<WorkflowStartedEvent> context, CancellationToken cancellationToken)
     {
-        await _publisher.PublishAsync(new WorkflowFinishedEvent(context.Payload.Result, typeof(GammaModule)), cancellationToken);
+        await _publisher.PublishAsync(new WorkflowFinishedEvent(context.Payload.Result, nameof(GammaModule)), cancellationToken);
     }
 }

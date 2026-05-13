@@ -1,12 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Tycho.Persistence.EFCore;
+using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Persistence;
 
 namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
 
-internal class Feed(string path, EntryType entriesType, IUnitOfWork unitOfWork)
+internal class Feed(string path, EntryType entriesType, FeedsDbContext feedsDbContext)
 {
     private readonly string _path = path;
-    private readonly DbSet<Entry> _entries = unitOfWork.Set<Entry>();
 
     public EntryType EntriesType { get; private set; } = entriesType;
 
@@ -18,14 +17,14 @@ internal class Feed(string path, EntryType entriesType, IUnitOfWork unitOfWork)
         }
 
         var newEntry = new Entry(contentId, _path, entryType);
-        _entries.Add(newEntry);
+        feedsDbContext.Entries.Add(newEntry);
 
         return newEntry;
     }
 
     public async Task<IReadOnlyList<Entry>> GetLatestEntries(CancellationToken cancellationToken)
     {
-        return await _entries
+        return await feedsDbContext.Entries
             .FromSqlRaw(@"
                 SELECT 
                     entry.Id,
@@ -50,7 +49,7 @@ internal class Feed(string path, EntryType entriesType, IUnitOfWork unitOfWork)
 
     public async Task<IReadOnlyList<Entry>> GetMostLikedEntries(CancellationToken cancellationToken)
     {
-        return await _entries
+        return await feedsDbContext.Entries
             .FromSqlRaw(@"
                 SELECT 
                     entry.Id,
@@ -75,7 +74,7 @@ internal class Feed(string path, EntryType entriesType, IUnitOfWork unitOfWork)
 
     public async Task<IReadOnlyList<Entry>> GetMostDiscussedEntries(CancellationToken cancellationToken)
     {
-        return await _entries
+        return await feedsDbContext.Entries
             .FromSqlRaw(@"
                 SELECT 
                     entry.Id,

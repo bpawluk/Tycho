@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
 using Tycho.Persistence.EFCore;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Handlers;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Incoming;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Outgoing;
-using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Handlers;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Persistence;
 
 namespace Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin;

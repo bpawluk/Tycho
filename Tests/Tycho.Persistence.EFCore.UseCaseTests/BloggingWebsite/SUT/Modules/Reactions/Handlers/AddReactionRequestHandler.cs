@@ -1,24 +1,22 @@
-﻿using Tycho.Requests;
+using Tycho.Transactions;
+using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Contract.Incoming;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Contract.Outgoing;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Domain;
+using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Persistence;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Handlers;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Handlers;
 
-internal class AddReactionRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<AddReactionRequest>
+internal class AddReactionRequestHandler(ReactionsDbContext dbContext, ReactionsModule.IPublisher publisher) : ITransactionalRequestHandler<AddReactionRequest>
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
     public async Task HandleAsync(AddReactionRequest requestData, CancellationToken cancellationToken)
     {
-        var targetProvider = new TargetProvider(_unitOfWork);
+        var targetProvider = new TargetProvider(dbContext);
 
         var reactionTarget = await targetProvider.GetTarget(requestData.TargetId, cancellationToken);
         reactionTarget.AddReaction();
 
         var scoreChangedEvent = new ScoreChangedEvent(reactionTarget.Id, reactionTarget.Score);
-        await _unitOfWork.Publish(scoreChangedEvent, cancellationToken);
-
-        await _unitOfWork.SaveChanges(cancellationToken);
+        await publisher.PublishAsync(scoreChangedEvent, cancellationToken);
     }
 }

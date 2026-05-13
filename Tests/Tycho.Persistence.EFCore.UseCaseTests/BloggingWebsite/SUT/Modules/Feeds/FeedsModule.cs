@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
 using Tycho.Persistence.EFCore;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Handlers;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Handlers;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Persistence;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Posts;
 
@@ -35,7 +35,8 @@ public partial class FeedsModule : TychoModule
     protected override void RegisterServices(IServiceCollection module)
     {
         module.AddTychoPersistence<FeedsDbContext>()
-              .AddTransient<ContentRepository>();
+              .AddTransient<ContentRepository>()
+              .AddTransient<FeedProvider>();
     }
 
     protected override async Task Startup(IServiceProvider app)

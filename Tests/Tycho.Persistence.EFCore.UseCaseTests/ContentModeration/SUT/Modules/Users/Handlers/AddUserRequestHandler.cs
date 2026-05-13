@@ -1,20 +1,17 @@
-﻿using Tycho.Requests;
+using Tycho.Requests;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Domain;
+using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Persistence;
 
-namespace Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Handlers;
+namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Handlers;
 
-internal class AddUserRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<AddUserRequest, AddUserRequest.Response>
+internal class AddUserRequestHandler(UsersDbContext dbContext) : IRequestHandler<AddUserRequest, AddUserRequest.Response>
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
     public async Task<AddUserRequest.Response> HandleAsync(AddUserRequest requestData, CancellationToken cancellationToken)
     {
-        await Task.Delay(10, cancellationToken); // Simulate async work
-        var users = _unitOfWork.Set<User>();
         var newUser = new User(requestData.Name);
-        users.Add(newUser);
-        await _unitOfWork.SaveChanges(cancellationToken);
+        dbContext.Users.Add(newUser);
+        await dbContext.SaveChangesAsync(cancellationToken);
         return new(newUser.Id);
     }
 }

@@ -1,23 +1,21 @@
-﻿using Tycho.Requests;
+using Tycho.Transactions;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Outgoing;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Domain;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Persistence;
+using static Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.BasketModule;
 
-namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Handlers;
+namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Handlers;
 
-internal class CheckoutRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<CheckoutRequest>
+internal class CheckoutRequestHandler(BasketDbContext dbContext, IPublisher publisher) : ITransactionalRequestHandler<CheckoutRequest>
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
     public async Task HandleAsync(CheckoutRequest requestData, CancellationToken cancellationToken)
     {
-        var basketProvider = new BasketProvider(_unitOfWork);
+        var basketProvider = new BasketProvider(dbContext);
         var customerBasket = await basketProvider.GetBasket(requestData.CustomerId, cancellationToken);
         customerBasket.Checkout();
 
         var basketCheckedOutEvent = new BasketCheckedOutEvent(customerBasket.CustomerId, customerBasket.TotalAmount);
-        await _unitOfWork.Publish(basketCheckedOutEvent, cancellationToken);
-
-        await _unitOfWork.SaveChanges(cancellationToken);
+        await publisher.PublishAsync(basketCheckedOutEvent, cancellationToken);
     }
 }

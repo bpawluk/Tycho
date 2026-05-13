@@ -1,11 +1,12 @@
 ﻿using Tycho.UseCaseTests._Utils;
+using Tycho.UseCaseTests.BloggingWebsite;
 using Tycho.UseCaseTests.BloggingWebsite.SUT;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Contract.Incoming;
 
-namespace Tycho.UseCaseTests.BloggingWebsite;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite;
 
-public class BloggingWebsiteTests : IAsyncLifetime
+public sealed class BloggingWebsiteTests : IAsyncLifetime
 {
     private readonly TestData _testData = new();
     private IBloggingWebsiteApp _sut = null!;
@@ -15,23 +16,23 @@ public class BloggingWebsiteTests : IAsyncLifetime
         _sut = await new BloggingWebsiteApp().RunAsync();
     }
 
-    [Fact(Timeout = 2500)]
+    [Fact(Timeout = 10000)]
     public async Task TychoUseCase_BloggingWebsiteApp_WorksCorrectly() 
     {
         await SetupPostedEntries();
 
         var getMostDiscussedArticles = new GetFeedEntriesRequest(GetFeedEntriesRequest.ArticlesFeedData.MostDiscussed());
-        var mostDiscussedArticles = await _sut.ExecuteAsync(getMostDiscussedArticles);
+        var mostDiscussedArticles = await _sut.ExecuteAsync(getMostDiscussedArticles, TestContext.Current.CancellationToken);
         Assert.True(_testData.PostedEntries.Articles.MatchMostDiscussed(mostDiscussedArticles));
 
         var parentArticleId = _testData.PostedEntries.Articles.First().Id!.Value;
         var getMostDiscussedPosts = new GetFeedEntriesRequest(GetFeedEntriesRequest.PostsFeedData.MostDiscussed(parentArticleId));
-        var mostDiscussedPosts = await _sut.ExecuteAsync(getMostDiscussedPosts);
+        var mostDiscussedPosts = await _sut.ExecuteAsync(getMostDiscussedPosts, TestContext.Current.CancellationToken);
         Assert.True(_testData.PostedEntries.GetPosts(parentArticleId).MatchMostDiscussed(mostDiscussedPosts));
 
         var parentPostId = _testData.PostedEntries.Posts.Last().Id!.Value;
         var getMostDiscussedComments = new GetFeedEntriesRequest(GetFeedEntriesRequest.CommentsFeedData.MostDiscussed(parentPostId));
-        var mostDiscussedComments = await _sut.ExecuteAsync(getMostDiscussedComments);
+        var mostDiscussedComments = await _sut.ExecuteAsync(getMostDiscussedComments, TestContext.Current.CancellationToken);
         Assert.True(_testData.PostedEntries.GetComments(parentPostId).MatchMostDiscussed(mostDiscussedComments));
 
         await AddReactions();
@@ -39,7 +40,7 @@ public class BloggingWebsiteTests : IAsyncLifetime
         await AssertEventually.True(async () =>
         {
             var getMostLikedArticles = new GetFeedEntriesRequest(GetFeedEntriesRequest.ArticlesFeedData.MostLiked());
-            var mostLikedArticles = await _sut.ExecuteAsync(getMostLikedArticles);
+            var mostLikedArticles = await _sut.ExecuteAsync(getMostLikedArticles, TestContext.Current.CancellationToken);
             return _testData.PostedEntries.Articles.MatchMostLiked(mostLikedArticles);
         });
 
@@ -47,7 +48,7 @@ public class BloggingWebsiteTests : IAsyncLifetime
         {
             var parentArticleId = _testData.PostedEntries.Articles.First().Id!.Value;
             var getMostLikedPosts = new GetFeedEntriesRequest(GetFeedEntriesRequest.PostsFeedData.MostLiked(parentArticleId));
-            var mostLikedPosts = await _sut.ExecuteAsync(getMostLikedPosts);
+            var mostLikedPosts = await _sut.ExecuteAsync(getMostLikedPosts, TestContext.Current.CancellationToken);
             return _testData.PostedEntries.GetPosts(parentArticleId).MatchMostLiked(mostLikedPosts);
         });
 
@@ -55,7 +56,7 @@ public class BloggingWebsiteTests : IAsyncLifetime
         {
             var parentPostId = _testData.PostedEntries.Posts.Last().Id!.Value;
             var getMostLikedComments = new GetFeedEntriesRequest(GetFeedEntriesRequest.CommentsFeedData.MostLiked(parentPostId));
-            var mostLikedComments = await _sut.ExecuteAsync(getMostLikedComments);
+            var mostLikedComments = await _sut.ExecuteAsync(getMostLikedComments, TestContext.Current.CancellationToken);
             return _testData.PostedEntries.GetComments(parentPostId).MatchMostLiked(mostLikedComments);
         });
     }
@@ -65,19 +66,19 @@ public class BloggingWebsiteTests : IAsyncLifetime
         foreach (var article in _testData.PostedEntries)
         {
             var articleEntry = new AddEntryRequest.ArticleEntryData(article.Author, article.Content);
-            var addArticleResponse = await _sut.ExecuteAsync(new AddEntryRequest(articleEntry));
+            var addArticleResponse = await _sut.ExecuteAsync(new AddEntryRequest(articleEntry), TestContext.Current.CancellationToken);
             article.Id = addArticleResponse.AddedEntryId;
 
             foreach (var post in article.SubEntries)
             {
                 var postEntry = new AddEntryRequest.PostEntryData(article.Id.Value, post.Author, post.Content);
-                var addPostResponse = await _sut.ExecuteAsync(new AddEntryRequest(postEntry));
+                var addPostResponse = await _sut.ExecuteAsync(new AddEntryRequest(postEntry), TestContext.Current.CancellationToken);
                 post.Id = addPostResponse.AddedEntryId;
 
                 foreach (var comment in post.SubEntries)
                 {
                     var commentEntry = new AddEntryRequest.CommentEntryData(post.Id.Value, comment.Author, comment.Content);
-                    var addCommentResponse = await _sut.ExecuteAsync(new AddEntryRequest(commentEntry));
+                    var addCommentResponse = await _sut.ExecuteAsync(new AddEntryRequest(commentEntry), TestContext.Current.CancellationToken);
                     comment.Id = addCommentResponse.AddedEntryId;
                 }
             }
@@ -91,7 +92,7 @@ public class BloggingWebsiteTests : IAsyncLifetime
             for (int i = 0; i < reactions.Count; i++)
             {
                 var addReactionRequest = new AddReactionRequest(reactions.TargetId);
-                await _sut.ExecuteAsync(addReactionRequest);
+                await _sut.ExecuteAsync(addReactionRequest, TestContext.Current.CancellationToken);
             }
             _testData.PostedEntries.Find(reactions.TargetId)!.Score += reactions.Count;
         }

@@ -1,22 +1,17 @@
-﻿using Tycho.Persistence.EFCore;
+﻿using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Persistence;
 
 namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Domain;
 
-internal class TargetProvider(IUnitOfWork unitOfWork)
+internal class TargetProvider(ReactionsDbContext dbContext)
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
     public async Task<Target> GetTarget(int targetId, CancellationToken cancellationToken)
     {
-        var targets = _unitOfWork.Set<Target>();
-
-        var target = await targets.FindAsync([targetId], cancellationToken);
+        var target = await dbContext.Targets.FindAsync([targetId], cancellationToken);
         if (target is null)
         {
             target = new Target(targetId);
-            targets.Add(target);
+            dbContext.Targets.Add(target);
         }
-
         return target;
     }
 }

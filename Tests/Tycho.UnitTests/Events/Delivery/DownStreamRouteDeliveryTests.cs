@@ -179,6 +179,6 @@ public class DownStreamRouteDeliveryTests
         }
         var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        return new SerializedRoutedEvent(Guid.NewGuid(), eventId, handlerId, route, new TestEvent());
+        return new SerializedRoutedEvent(Guid.NewGuid(), eventId, handlerId, route, "{}");
     }
 }

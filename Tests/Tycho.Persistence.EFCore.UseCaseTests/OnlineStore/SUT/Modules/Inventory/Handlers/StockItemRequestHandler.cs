@@ -1,23 +1,21 @@
-﻿using Tycho.Requests;
+using Tycho.Transactions;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Incoming;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Outgoing;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Domain;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Persistence;
+using static Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.InventoryModule;
 
-namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Handlers;
+namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Handlers;
 
-internal class StockItemRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<StockItemRequest>
+internal class StockItemRequestHandler(InventoryDbContext dbContext, IPublisher publisher) : ITransactionalRequestHandler<StockItemRequest>
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
     public async Task HandleAsync(StockItemRequest requestData, CancellationToken cancellationToken)
     {
-        var items = _unitOfWork.Set<Item>();
-
-        var item = await items.FindAsync([requestData.ItemId], cancellationToken);
+        var item = await dbContext.Items.FindAsync([requestData.ItemId], cancellationToken);
         if (item is null)
         {
             item = new Item(requestData.ItemId, requestData.Quantity);
-            items.Add(item);
+            dbContext.Items.Add(item);
         }
         else
         {
@@ -25,8 +23,6 @@ internal class StockItemRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler
         }
 
         var itemAvailabilityChanged = new ItemAvailabilityChangedEvent(item.Id, item.Availability.Quantity, item.Availability.Version);
-        await _unitOfWork.Publish(itemAvailabilityChanged, cancellationToken);
-
-        await _unitOfWork.SaveChanges(cancellationToken);
+        await publisher.PublishAsync(itemAvailabilityChanged, cancellationToken);
     }
 }

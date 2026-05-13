@@ -1,18 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Tycho.Requests;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Contract;
+using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Persistence;
 using static Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Contract.GetArticlesRequest;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Handlers;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Handlers;
 
-internal class GetArticlesRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetArticlesRequest, Response>
+internal class GetArticlesRequestHandler(ArticlesDbContext dbContext) : IRequestHandler<GetArticlesRequest, Response>
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
     public async Task<Response> HandleAsync(GetArticlesRequest requestData, CancellationToken cancellationToken)
     {
-        var articles = _unitOfWork.Set<Domain.Article>();
-        var responseArticles = await articles
+        var responseArticles = await dbContext.Articles
             .Where(article => requestData.ArticleIds.Contains(article.Id))
             .Select(article => new Article(
                 article.Id, 

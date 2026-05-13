@@ -1,33 +1,27 @@
-﻿using Tycho.Requests;
+using Tycho.Transactions;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Incoming;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Outgoing;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Domain;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Persistence;
 using static Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Incoming.ReserveItemRequest;
+using static Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.InventoryModule;
 
-namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Handlers;
+namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Handlers;
 
-internal class ReserveItemRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<ReserveItemRequest, Response>
+internal class ReserveItemRequestHandler(InventoryDbContext dbContext, IPublisher publisher) : ITransactionalRequestHandler<ReserveItemRequest, Response>
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
     public async Task<Response> HandleAsync(ReserveItemRequest requestData, CancellationToken cancellationToken)
     {
-        var items = _unitOfWork.Set<Item>();
-
-        var item = await items.FindAsync([requestData.ItemId], cancellationToken);
+        var item = await dbContext.Items.FindAsync([requestData.ItemId], cancellationToken);
         if (item != null)
         {
             var reserved = item.Reserve(requestData.ReservationCode, requestData.Quantity);
             if (reserved)
             {
                 var itemAvailabilityChanged = new ItemAvailabilityChangedEvent(item.Id, item.Availability.Quantity, item.Availability.Version);
-                await _unitOfWork.Publish(itemAvailabilityChanged, cancellationToken);
-
-                await _unitOfWork.SaveChanges(cancellationToken);
+                await publisher.PublishAsync(itemAvailabilityChanged, cancellationToken);
             }
             return new Response(reserved);
         }
-
         return new Response(false);
     }
 }

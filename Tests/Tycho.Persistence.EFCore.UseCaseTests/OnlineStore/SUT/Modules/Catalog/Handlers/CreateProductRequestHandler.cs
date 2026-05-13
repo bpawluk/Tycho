@@ -1,20 +1,18 @@
-﻿using Tycho.Requests;
+using Tycho.Requests;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Domain;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Persistence;
 using static Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming.CreateProductRequest;
 
-namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Handlers;
+namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Handlers;
 
-internal class CreateProductRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateProductRequest, Response>
+internal class CreateProductRequestHandler(CatalogDbContext dbContext) : IRequestHandler<CreateProductRequest, Response>
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
     public async Task<Response> HandleAsync(CreateProductRequest requestData, CancellationToken cancellationToken)
     {
-        var products = _unitOfWork.Set<Product>();
         var newProduct = new Product(requestData.Name, requestData.Price);
-        products.Add(newProduct);
-        await _unitOfWork.SaveChanges(cancellationToken);
+        dbContext.Products.Add(newProduct);
+        await dbContext.SaveChangesAsync(cancellationToken);
         return new Response(newProduct.Id);
     }
 }

@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
 using Tycho.Persistence.EFCore;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Handlers;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Contract;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Handlers;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Persistence;
 
 namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles;

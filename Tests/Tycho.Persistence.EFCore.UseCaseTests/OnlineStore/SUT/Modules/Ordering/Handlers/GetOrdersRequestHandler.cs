@@ -1,18 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Tycho.Requests;
+using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Persistence;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract;
 using static Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract.GetOrdersRequest;
 
-namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Handlers;
+namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Handlers;
 
-internal class GetOrdersRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetOrdersRequest, Response>
+internal class GetOrdersRequestHandler(OrderingDbContext dbContext) : IRequestHandler<GetOrdersRequest, Response>
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
     public async Task<Response> HandleAsync(GetOrdersRequest requestData, CancellationToken cancellationToken)
     {
-        var orders = _unitOfWork.Set<Domain.Order>();
-        var result = await orders
+        var result = await dbContext.Orders
             .Select(order => new Order(order.Id, order.CustomerId, order.Total))
             .ToArrayAsync(cancellationToken);
         return new Response(result);

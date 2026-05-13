@@ -1,20 +1,13 @@
 ﻿using System.Text.Json;
 using Tycho.Events;
-using Tycho.Persistence.EFCore.Serialization;
-using Tycho.Persistence.EFCore.UnitTests._Data.Events;
+using Tycho.Events.Serialization;
+using Tycho.UnitTests._Data.Events;
 
-namespace Tycho.Persistence.EFCore.UnitTests.Serialization;
+namespace Tycho.UnitTests.Events.Serialization;
 
 public class JsonPayloadSerializerTests
 {
     private readonly JsonPayloadSerializer _sut = new();
-
-    public static IEnumerable<object?[]> NonStrings =>
-    [
-        [null],
-        [123],
-        [new object()]
-    ];
 
     [Fact]
     public void Serialize_WithValidEventData_ReturnsSerialized()
@@ -58,24 +51,6 @@ public class JsonPayloadSerializerTests
 
         // Assert
         Assert.True(expectedEventData.EqualsEvent(result));
-    }
-
-
-    [Theory]
-    [MemberData(nameof(NonStrings))]
-    public void Deserialize_WithNonString_ThrowsArgumentException(object? payload)
-    {
-        // Arrange
-        // - no arrangement required
-
-        // Act
-        void Act()
-        {
-            _sut.Deserialize<TestEvent>(payload!);
-        }
-
-        // Assert
-        Assert.Throws<ArgumentException>(Act);
     }
 
     [Fact]

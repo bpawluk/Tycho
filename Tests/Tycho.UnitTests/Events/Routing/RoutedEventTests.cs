@@ -47,7 +47,7 @@ public class RoutedEventTests
     {
         // Arrange
         var payload = new TestEvent();
-        var serializedPayload = new object();
+        var serializedPayload = "{}";
         var routedEvent = CreateRoutedEvent(payload: payload);
 
         var serializerMock = new Mock<IPayloadSerializer>();

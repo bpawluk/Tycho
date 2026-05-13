@@ -15,7 +15,7 @@ public record BeginTestWorkflowRequest(TestResult Result) : IRequest;
 
 // Events
 public record WorkflowStartedEvent(TestResult Result) : IEvent;
-public record WorkflowFinishedEvent(TestResult Result, Type FinalModule) : IEvent;
+public record WorkflowFinishedEvent(TestResult Result, string FinalModule) : IEvent;
 public record WorkflowWithMappingStartedEvent(TestResult Result) : IEvent;
 
 [TychoDefinition]
@@ -60,6 +60,6 @@ public partial class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
     protected override void RegisterServices(IServiceCollection app)
     {
         app.AddSingleton(_testWorkflow)
-           .AddSingleton(new CompoundResult<Type>([typeof(AlphaModule), typeof(BetaModule), typeof(GammaModule)]));
+           .AddSingleton(new CompoundResult<string>([nameof(AlphaModule), nameof(BetaModule), nameof(GammaModule)]));
     }
 }

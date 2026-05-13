@@ -1,26 +1,21 @@
-﻿using Tycho.Events;
+using Tycho.Events;
+using Tycho.Transactions;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Domain;
+using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Persistence;
 
-namespace Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Handlers;
+namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Handlers;
 
-internal class UserStatusChangedEventHandler(IUnitOfWork unitOfWork) : IEventHandler<UserStatusChangedEvent>
+internal class UserStatusChangedEventHandler(UsersDbContext dbContext) : ITransactionalEventHandler<UserStatusChangedEvent>
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
     public async Task HandleAsync(EventContext<UserStatusChangedEvent> context, CancellationToken cancellationToken)
     {
-        await Task.Delay(10, cancellationToken); // Simulate async work
-        var users = _unitOfWork.Set<User>();
-
-        var user = await users.FindAsync([context.Payload.UserId], cancellationToken);
+        var user = await dbContext.Users.FindAsync([context.Payload.UserId], cancellationToken);
         if (user is null)
         {
             throw new ArgumentException($"There is no Users with ID {context.Payload.UserId}");
         }
-
         user.Status = GetStatus(context.Payload.NewStatus);
-        await _unitOfWork.SaveChanges(cancellationToken);
     }
 
     private static User.UserStatus GetStatus(UserStatusChangedEvent.Status status)

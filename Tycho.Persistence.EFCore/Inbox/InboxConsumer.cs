@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Inbox;
 using Tycho.Events.Model;
 using Tycho.Events.Routing;
@@ -78,12 +77,13 @@ internal class InboxConsumer(
 
     public async Task MarkAsHandled(Guid entryId, CancellationToken cancellationToken)
     {
-        var outboxMessages = _dbContext.Set<InboxEntry>();
-        var entry = await outboxMessages.FindAsync([entryId], cancellationToken).ConfigureAwait(false);
+        var inboxMessages = _dbContext.Set<InboxEntry>();
+        var entry = await inboxMessages.FindAsync([entryId], cancellationToken).ConfigureAwait(false);
 
         if (entry != null)
         {
-            outboxMessages.Remove(entry);
+            entry.State = EntryState.Processed;
+            entry.Updated = DateTime.UtcNow;
 
             if (!_transaction.IsInProgress)
             {
@@ -94,8 +94,8 @@ internal class InboxConsumer(
 
     public async Task MarkAsFailed(Guid entryId, CancellationToken cancellationToken)
     {
-        var outboxMessages = _dbContext.Set<InboxEntry>();
-        var entry = await outboxMessages.FindAsync([entryId], cancellationToken).ConfigureAwait(false);
+        var inboxMessages = _dbContext.Set<InboxEntry>();
+        var entry = await inboxMessages.FindAsync([entryId], cancellationToken).ConfigureAwait(false);
 
         if (entry != null)
         {

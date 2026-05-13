@@ -1,19 +1,19 @@
-﻿using Tycho.Requests;
+using Tycho.Requests;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
+using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Persistence;
 using static Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract.GetFeedEntriesRequest;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Handlers;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Handlers;
 
-internal class GetFeedEntriesRequestHandler(IUnitOfWork unitOfWork, ContentRepository contentRepository) : IRequestHandler<GetFeedEntriesRequest, Response>
+internal class GetFeedEntriesRequestHandler(FeedsDbContext dbContext, ContentRepository contentRepository) : IRequestHandler<GetFeedEntriesRequest, Response>
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly ContentRepository _contentRepository = contentRepository;
 
     public async Task<Response> HandleAsync(GetFeedEntriesRequest requestData, CancellationToken cancellationToken)
     {
         var feedId = GetFeedId(requestData);
-        var feedProvider = new FeedProvider(_unitOfWork);
+        var feedProvider = new FeedProvider(dbContext);
         var feed = await feedProvider.GetFeed(feedId, cancellationToken);
 
         var feedEntries = requestData.Feed.Order switch 

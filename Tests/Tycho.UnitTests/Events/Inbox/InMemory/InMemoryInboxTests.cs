@@ -127,7 +127,7 @@ public class InMemoryInboxTests
     {
         var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        return new SerializedRoutedEvent(Guid.NewGuid(), eventId, handlerId, Route.Create(), new TestEvent());
+        return new SerializedRoutedEvent(Guid.NewGuid(), eventId, handlerId, Route.Create(), "{}");
     }
 
     private (SerializedRoutedEvent, RoutedEvent) CreateSerializedAndRoutedEventPair()
@@ -136,7 +136,7 @@ public class InMemoryInboxTests
         var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
         var route = Route.Create();
-        var serialized = new SerializedRoutedEvent(id, eventId, handlerId, route, new TestEvent());
+        var serialized = new SerializedRoutedEvent(id, eventId, handlerId, route, "{}");
         var deserialized = new RoutedEvent<TestEvent>(id, eventId, handlerId, route, new TestEvent());
         _eventSerializerMock.Setup(s => s.Deserialize(serialized)).Returns(deserialized);
         return (serialized, deserialized);

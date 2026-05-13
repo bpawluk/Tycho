@@ -1,26 +1,21 @@
-﻿using Tycho.Events;
+using Tycho.Events;
+using Tycho.Transactions;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Domain;
+using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Persistence;
 
-namespace Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Handlers;
+namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Handlers;
 
-internal class PostStatusChangedEventHandler(IUnitOfWork unitOfWork) : IEventHandler<PostStatusChangedEvent>
+internal class PostStatusChangedEventHandler(PostsDbContext dbContext) : ITransactionalEventHandler<PostStatusChangedEvent>
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
     public async Task HandleAsync(EventContext<PostStatusChangedEvent> context, CancellationToken cancellationToken)
     {
-        await Task.Delay(10, cancellationToken); // Simulate async work
-        var posts = _unitOfWork.Set<Post>();
-
-        var post = await posts.FindAsync([context.Payload.PostId], cancellationToken);
+        var post = await dbContext.Posts.FindAsync([context.Payload.PostId], cancellationToken);
         if (post is null)
         {
             throw new ArgumentException($"There is no Posts with ID {context.Payload.PostId}");
         }
-
         post.Status = GetStatus(context.Payload.NewStatus);
-        await _unitOfWork.SaveChanges(cancellationToken);
     }
 
     private static Post.PostStatus GetStatus(PostStatusChangedEvent.Status status)

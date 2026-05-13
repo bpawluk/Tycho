@@ -1,18 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Tycho.Requests;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Contract;
+using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Persistence;
 using static Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Contract.GetCommentsRequest;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Handlers;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Handlers;
 
-internal class GetCommentsRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetCommentsRequest, Response>
+internal class GetCommentsRequestHandler(CommentsDbContext dbContext) : IRequestHandler<GetCommentsRequest, Response>
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public async Task<Response> HandleAsync(GetCommentsRequest requestData, CancellationToken cancellationToken)
     {
-        var posts = _unitOfWork.Set<Domain.Comment>();
-        var responseComments = await posts
+        var responseComments = await dbContext.Comments
             .Where(post => requestData.CommentIds.Contains(post.Id))
             .Select(post => new Comment(
                 post.Id,

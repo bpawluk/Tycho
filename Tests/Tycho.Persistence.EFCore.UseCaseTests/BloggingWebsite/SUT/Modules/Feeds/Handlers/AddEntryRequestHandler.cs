@@ -1,27 +1,24 @@
-﻿using Tycho.Requests;
+using Tycho.Requests;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
 using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
+using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Persistence;
 using static Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract.AddEntryRequest;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Handlers;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Handlers;
 
-internal class AddEntryRequestHandler(IUnitOfWork unitOfWork, ContentRepository contentRepository) : IRequestHandler<AddEntryRequest, Response>
+internal class AddEntryRequestHandler(FeedsDbContext dbContext, FeedProvider feedProvider, ContentRepository contentRepository) : IRequestHandler<AddEntryRequest, Response>
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-    private readonly ContentRepository _contentRepository = contentRepository;
-
     public async Task<Response> HandleAsync(AddEntryRequest requestData, CancellationToken cancellationToken)
     {
         var entryType = GetEntryType(requestData);
         var entryContent = new Content(requestData.Entry.Author, requestData.Entry.Content);
-        var contentId = await _contentRepository.AddEntryContent(entryType, entryContent);
+        var contentId = await contentRepository.AddEntryContent(entryType, entryContent);
 
         var feedId = GetFeedId(requestData);
-        var feedProvider = new FeedProvider(_unitOfWork);
         var feed = await feedProvider.GetFeed(feedId, cancellationToken);
 
         var newEntry = feed.AddEntry(entryType, contentId);
-        await _unitOfWork.SaveChanges(cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return new Response(newEntry.Id);
     }

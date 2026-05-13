@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
 using Tycho.Persistence.EFCore;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Handlers;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Persistence;
 using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Handlers;
 
 namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering;
 

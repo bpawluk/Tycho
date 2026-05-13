@@ -69,7 +69,8 @@ internal class OutboxConsumer(ITransaction transaction, TychoDbContext dbContext
 
         if (entry != null)
         {
-            outboxMessages.Remove(entry);
+            entry.State = EntryState.Processed;
+            entry.Updated = DateTime.UtcNow;
 
             if (!_transaction.IsInProgress)
             {

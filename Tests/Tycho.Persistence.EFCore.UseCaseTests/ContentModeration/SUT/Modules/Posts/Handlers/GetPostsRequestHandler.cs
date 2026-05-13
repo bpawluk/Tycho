@@ -1,19 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Tycho.Requests;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Domain;
+using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Persistence;
 
-namespace Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Handlers;
+namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Handlers;
 
-internal class GetPostsRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetPostsRequest, GetPostsRequest.Response>
+internal class GetPostsRequestHandler(PostsDbContext dbContext) : IRequestHandler<GetPostsRequest, GetPostsRequest.Response>
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
     public async Task<GetPostsRequest.Response> HandleAsync(GetPostsRequest requestData, CancellationToken cancellationToken)
     {
-        await Task.Delay(10, cancellationToken); // Simulate async work
-        var posts = _unitOfWork.Set<Post>();
-        var responsePosts = await posts
+        var responsePosts = await dbContext.Posts
             .Where(post => post.Status == Post.PostStatus.Published)
             .Select(post => new GetPostsRequest.Post(
                 post.Id,

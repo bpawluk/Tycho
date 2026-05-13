@@ -1,20 +1,17 @@
-﻿using Tycho.Requests;
+using Tycho.Requests;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract;
 using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Domain;
+using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Persistence;
 
-namespace Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Handlers;
+namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Handlers;
 
-internal class AddPostRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<AddPostRequest, AddPostRequest.Response>
+internal class AddPostRequestHandler(PostsDbContext dbContext) : IRequestHandler<AddPostRequest, AddPostRequest.Response>
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
     public async Task<AddPostRequest.Response> HandleAsync(AddPostRequest requestData, CancellationToken cancellationToken)
     {
-        await Task.Delay(10, cancellationToken); // Simulate async work
-        var posts = _unitOfWork.Set<Post>();
         var newPost = new Post(requestData.AuthorId, requestData.Content);
-        posts.Add(newPost);
-        await _unitOfWork.SaveChanges(cancellationToken);
+        dbContext.Posts.Add(newPost);
+        await dbContext.SaveChangesAsync(cancellationToken);
         return new(newPost.Id);
     }
 }

@@ -195,7 +195,7 @@ public class OutboxConsumerTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async Task MarkAsDelivered_WithExistingEntry_RemovesItFromOutbox(bool isTransactionInProgress)
+    public async Task MarkAsDelivered_WithExistingEntry_UpdatesItsState(bool isTransactionInProgress)
     {
         // Arrange
         var entryId = Guid.NewGuid();
@@ -212,7 +212,8 @@ public class OutboxConsumerTests
         await _sut.MarkAsDelivered(entryId, cancellationToken);
 
         // Assert
-        _dbSetMock.Verify(m => m.Remove(entry), Times.Once);
+        Assert.Equal(EntryState.Processed, entry.State);
+        Assert.Equal(DateTime.UtcNow, entry.Updated, TimeSpan.FromSeconds(1));
         _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), isTransactionInProgress ? Times.Never() : Times.Once());
     }
 
