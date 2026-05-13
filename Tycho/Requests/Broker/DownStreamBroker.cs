@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
 using Tycho.Requests.Registrating.Registrations;
 using Tycho.Structure;
+using Tycho.Transactions;
 using Tycho.Utils;
 
 namespace Tycho.Requests.Broker
@@ -35,9 +36,33 @@ namespace Tycho.Requests.Broker
             where TRequest : class, IRequest
         {
             requestData.ThrowIfNull();
+
             await using var scope = _internals.CreateAsyncScope();
+
+            var transaction = scope.ServiceProvider.GetRequiredService<ITransaction>();
             var registration = scope.ServiceProvider.GetRequiredService<IDownStreamRequestRegistration<TRequest, TModule>>();
-            await registration.Handler.HandleAsync(requestData, cancellationToken).ConfigureAwait(false);
+
+            if (registration.Handler is ITransactionalRequestHandler)
+            {
+                await transaction.BeginAsync(cancellationToken).ConfigureAwait(false);
+            }
+
+            try
+            {
+                await registration.Handler.HandleAsync(requestData, cancellationToken).ConfigureAwait(false);
+                if (transaction.IsInProgress)
+                {
+                    await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+                }
+            }
+            catch
+            {
+                if (transaction.IsInProgress)
+                {
+                    await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
+                }
+                throw;
+            }
         }
 
         [EntryPoint]
@@ -45,9 +70,34 @@ namespace Tycho.Requests.Broker
             where TRequest : class, IRequest<TResponse>
         {
             requestData.ThrowIfNull();
+
             await using var scope = _internals.CreateAsyncScope();
+
+            var transaction = scope.ServiceProvider.GetRequiredService<ITransaction>();
             var registration = scope.ServiceProvider.GetRequiredService<IDownStreamRequestRegistration<TRequest, TResponse, TModule>>();
-            return await registration.Handler.HandleAsync(requestData, cancellationToken).ConfigureAwait(false);
+
+            if (registration.Handler is ITransactionalRequestHandler)
+            {
+                await transaction.BeginAsync(cancellationToken).ConfigureAwait(false);
+            }
+
+            try
+            {
+                var response = await registration.Handler.HandleAsync(requestData, cancellationToken).ConfigureAwait(false);
+                if (transaction.IsInProgress)
+                {
+                    await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+                }
+                return response;
+            }
+            catch
+            {
+                if (transaction.IsInProgress)
+                {
+                    await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
+                }
+                throw;
+            }
         }
     }
 }
