@@ -13,7 +13,7 @@ using Tycho.UnitTests._Data.Modules;
 
 namespace Tycho.UnitTests.Events.Broker;
 
-public class EventBrokerTests
+public class ScopedEventBrokerTests
 {
     [Fact]
     public void Route_WithNoRegistrations_ReturnsEmpty()
@@ -151,12 +151,12 @@ public class EventBrokerTests
         await Assert.ThrowsAsync<InvalidOperationException>(Act);
     }
 
-    private static EventBroker CreateSut(Action<IServiceCollection> configure)
+    private static ScopedEventBroker CreateSut(Action<IServiceCollection> configure)
     {
         var internals = new Internals(typeof(TestModule));
         configure(internals.GetServiceCollection());
         internals.Build();
-        return new EventBroker(internals);
+        return new ScopedEventBroker(internals);
     }
 
     private static RoutedEvent<TestEvent> CreateRoutedEvent()

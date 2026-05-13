@@ -86,7 +86,7 @@ namespace Tycho.Modules.Setup
                 services.AddScoped<ITransaction, EmptyTransaction>();
             }
 
-            services.AddTransient<IEventBroker, EventBroker>();
+            services.AddScoped<IEventBroker, ScopedEventBroker>();
             services.AddTransient<IEventPublisher, EventPublisher>();
             services.AddTransient<IDeliveryStrategy, FinalRouteDelivery>();
             services.AddTransient<IDeliveryStrategy, DownStreamRouteDelivery>();
