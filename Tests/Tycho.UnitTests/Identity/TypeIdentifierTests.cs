@@ -7,23 +7,23 @@ namespace Tycho.UnitTests.Identity;
 
 public partial class TypeIdentifierTests
 {
-    public static readonly IEnumerable<object[]> CommonTypes =
+    public static readonly TheoryData<Type> CommonTypes =
     [
-        [typeof(int)],
-        [typeof(string)],
-        [typeof(object)],
-        [typeof(ValueTask)],
-        [typeof(List<int>)]
+        typeof(int),
+        typeof(string),
+        typeof(object),
+        typeof(ValueTask),
+        typeof(List<int>)
     ];
 
-    public static readonly IEnumerable<object[]> DistinctTypePairs =
-    [
-        [typeof(int),         typeof(string)],
-        [typeof(float),       typeof(double)],
-        [typeof(int),         typeof(List<int>)],
-        [typeof(ValueTask),   typeof(Task)],
-        [typeof(TestModule),  typeof(TestEvent)]
-    ];
+    public static readonly TheoryData<Type, Type> DistinctTypePairs = new()
+    {
+        { typeof(int),        typeof(string) },
+        { typeof(float),      typeof(double) },
+        { typeof(int),        typeof(List<int>) },
+        { typeof(ValueTask),  typeof(Task) },
+        { typeof(TestModule), typeof(TestEvent) }
+    };
 
     [Fact]
     public void GenericGetId_ReturnsSameResultAsTypeOverload()

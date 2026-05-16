@@ -45,6 +45,8 @@ public class EventIdentityTests
         [null!, EventIdentity.Create<TestEvent>(), false]
     ]);
 
+#pragma warning disable xUnit1042
+
     [Theory]
     [MemberData(nameof(EqualsTestData))]
     internal void EventIdentity_Equals_EvaluatesCorrectly(EventIdentity left, EventIdentity? right, bool areEqual)
@@ -90,4 +92,6 @@ public class EventIdentityTests
         // Assert
         Assert.Equal(!areEqual, result);
     }
+
+#pragma warning restore xUnit1042
 }

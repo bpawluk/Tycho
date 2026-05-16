@@ -45,6 +45,8 @@ public class EventHandlerIdentityTests
         [null!, EventHandlerIdentity.Create<TestEventHandler>(), false]
     ]);
 
+#pragma warning disable xUnit1042
+
     [Theory]
     [MemberData(nameof(EqualsTestData))]
     internal void EventHandlerIdentity_Equals_EvaluatesCorrectly(EventHandlerIdentity left, EventHandlerIdentity? right, bool areEqual)
@@ -90,4 +92,6 @@ public class EventHandlerIdentityTests
         // Assert
         Assert.Equal(!areEqual, result);
     }
+
+#pragma warning restore xUnit1042
 }

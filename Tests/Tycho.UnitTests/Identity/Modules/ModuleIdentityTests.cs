@@ -45,6 +45,8 @@ public class ModuleIdentityTests
         [null!, ModuleIdentity.Create<TestModule>(), false]
     ]);
 
+#pragma warning disable xUnit1042
+
     [Theory]
     [MemberData(nameof(EqualsTestData))]
     internal void ModuleIdentity_Equals_EvaluatesCorrectly(ModuleIdentity left, ModuleIdentity? right, bool areEqual)
@@ -88,4 +90,6 @@ public class ModuleIdentityTests
         // Assert
         Assert.Equal(!areEqual, result);
     }
+
+#pragma warning restore xUnit1042
 }
