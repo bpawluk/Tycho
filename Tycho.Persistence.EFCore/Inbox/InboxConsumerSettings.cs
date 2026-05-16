@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Tycho.Persistence.EFCore;
+namespace Tycho.Persistence.EFCore.Inbox;
 
 /// <summary>
 /// Settings for Tycho inbox consumer

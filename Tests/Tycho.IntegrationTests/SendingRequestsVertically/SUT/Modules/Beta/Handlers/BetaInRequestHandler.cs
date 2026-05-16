@@ -1,4 +1,4 @@
-﻿using Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Gamma;
+using Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Gamma;
 using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Beta.Handlers;

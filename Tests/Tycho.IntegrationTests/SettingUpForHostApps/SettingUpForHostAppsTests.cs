@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Tycho.IntegrationTests.SettingUpForHostApps.SUT;
 
@@ -12,15 +12,15 @@ public class SettingUpForHostAppsTests
         //  Arrange
         var hostapplicationBuilder = new HostApplicationBuilder();
 
-        var expectedResponse = "Hello World!";
+        string expectedResponse = "Hello World!";
         hostapplicationBuilder.Configuration["Response"] = expectedResponse;
 
         await hostapplicationBuilder.AddTestApp(new());
-        var host = hostapplicationBuilder.Build();
+        IHost host = hostapplicationBuilder.Build();
 
         // Act
-        var app = host.Services.GetRequiredService<ITestApp>();
-        var response = await app.ExecuteAsync(new TestRequest(), TestContext.Current.CancellationToken);
+        ITestApp app = host.Services.GetRequiredService<ITestApp>();
+        string response = await app.ExecuteAsync(new TestRequest(), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(expectedResponse, response);

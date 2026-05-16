@@ -1,7 +1,7 @@
-﻿using Tycho.Requests;
-using static Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Outgoing.GetAuthorRequest;
+using Tycho.Requests;
+using static Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Outgoing.GetAuthorRequest;
 
-namespace Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Outgoing;
+namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Outgoing;
 
 public record GetAuthorRequest(int PostId) : IRequest<Response>
 {

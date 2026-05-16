@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Tycho.Persistence.EFCore;
-using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Domain;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Domain;
 
-namespace Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Persistence;
+namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Persistence;
 
 internal class UsersDbContext : TychoDbContext
 {

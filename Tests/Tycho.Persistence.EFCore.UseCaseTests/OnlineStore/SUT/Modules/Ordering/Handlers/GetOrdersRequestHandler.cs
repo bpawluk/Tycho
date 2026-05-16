@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Persistence;
 using Tycho.Requests;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Persistence;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract;
-using static Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract.GetOrdersRequest;
+using static Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract.GetOrdersRequest;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Handlers;
 

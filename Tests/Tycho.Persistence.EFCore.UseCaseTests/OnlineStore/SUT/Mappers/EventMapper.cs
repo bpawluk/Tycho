@@ -1,9 +1,9 @@
-﻿using BasketOut = Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Outgoing;
-using CatalogIn = Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming;
-using InventoryOut = Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Outgoing;
-using OrderingIn = Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract;
+using BasketOut = Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Outgoing;
+using CatalogIn = Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming;
+using InventoryOut = Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Outgoing;
+using OrderingIn = Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract;
 
-namespace Tycho.UseCaseTests.OnlineStore.SUT.Mappers;
+namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Mappers;
 
 internal static class EventMapper
 {

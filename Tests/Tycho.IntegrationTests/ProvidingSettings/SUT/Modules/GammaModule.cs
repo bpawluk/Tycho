@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.IntegrationTests.ProvidingSettings.SUT.Handlers;
 using Tycho.IntegrationTests.ProvidingSettings.SUT.Settings;
 using Tycho.Modules;
@@ -23,10 +23,10 @@ public partial class GammaModule : TychoModule
 
     protected override void RegisterServices(IServiceCollection module)
     {
-        var moduleSettings = GetSettings<ModuleSettings>();
+        ModuleSettings moduleSettings = GetSettings<ModuleSettings>();
         module.AddSingleton(moduleSettings);
 
-        var otherSettings = GetSettings<OtherSettings>();
+        OtherSettings otherSettings = GetSettings<OtherSettings>();
         module.AddSingleton(otherSettings);
     }
 }

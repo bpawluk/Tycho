@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Persistence;
+using Microsoft.EntityFrameworkCore;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Persistence;
 
-namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Domain;
+namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Domain;
 
 internal class BasketProvider(BasketDbContext dbContext)
 {

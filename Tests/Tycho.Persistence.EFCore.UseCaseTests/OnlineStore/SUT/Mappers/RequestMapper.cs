@@ -1,7 +1,7 @@
-﻿using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Outgoing;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Outgoing;
 
-namespace Tycho.UseCaseTests.OnlineStore.SUT.Mappers;
+namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Mappers;
 
 internal static class RequestMapper
 {

@@ -1,7 +1,7 @@
-﻿using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Outgoing;
-using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Outgoing;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract;
 
-namespace Tycho.UseCaseTests.ContentModeration.SUT.Mappers;
+namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Mappers;
 
 internal static class RequestMapper
 {

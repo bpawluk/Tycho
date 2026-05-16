@@ -30,7 +30,7 @@ public class FinalRouteDeliveryTests
         var routedEvent = CreateRoutedEvent(finalStep);
 
         // Act
-        var result = _sut.CanDeliver(routedEvent);
+        bool result = _sut.CanDeliver(routedEvent);
 
         // Assert
         Assert.True(result);
@@ -44,7 +44,7 @@ public class FinalRouteDeliveryTests
         var routedEvent = CreateRoutedEvent(upStreamStep);
 
         // Act
-        var result = _sut.CanDeliver(routedEvent);
+        bool result = _sut.CanDeliver(routedEvent);
 
         // Assert
         Assert.False(result);
@@ -58,7 +58,7 @@ public class FinalRouteDeliveryTests
         var routedEvent = CreateRoutedEvent(downStreamStep);
 
         // Act
-        var result = _sut.CanDeliver(routedEvent);
+        bool result = _sut.CanDeliver(routedEvent);
 
         // Assert
         Assert.False(result);
@@ -71,7 +71,7 @@ public class FinalRouteDeliveryTests
         var routedEvent = CreateRoutedEvent();
 
         // Act
-        var result = _sut.CanDeliver(routedEvent);
+        bool result = _sut.CanDeliver(routedEvent);
 
         // Assert
         Assert.False(result);

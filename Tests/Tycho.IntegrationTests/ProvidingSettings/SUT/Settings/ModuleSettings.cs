@@ -1,4 +1,4 @@
-﻿using Tycho.Modules;
+using Tycho.Modules;
 
 namespace Tycho.IntegrationTests.ProvidingSettings.SUT.Settings;
 

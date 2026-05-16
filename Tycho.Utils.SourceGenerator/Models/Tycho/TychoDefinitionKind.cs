@@ -1,4 +1,4 @@
-﻿namespace Tycho.Utils.SourceGenerator.Models.Tycho
+namespace Tycho.Utils.SourceGenerator.Models.Tycho
 {
     public enum TychoDefinitionKind
     {

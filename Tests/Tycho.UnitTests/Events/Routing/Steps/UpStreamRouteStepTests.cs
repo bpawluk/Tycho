@@ -11,7 +11,7 @@ public class UpStreamRouteStepTests
         var sut = UpStreamRouteStep.Create();
 
         // Act
-        var result = sut.ToString();
+        string result = sut.ToString();
 
         // Assert
         Assert.Equal("UP", result);
@@ -21,10 +21,10 @@ public class UpStreamRouteStepTests
     public void TryParse_ValidFormat_ReturnsTrueAndUpStreamStep()
     {
         // Arrange
-        var input = "UP";
+        string input = "UP";
 
         // Act
-        var success = UpStreamRouteStep.TryParse(input, out var result);
+        bool success = UpStreamRouteStep.TryParse(input, out var result);
 
         // Assert
         Assert.True(success);
@@ -35,10 +35,10 @@ public class UpStreamRouteStepTests
     public void TryParse_ValidFormatDifferentCasing_ReturnsTrueAndUpStreamStep()
     {
         // Arrange
-        var input = "uP";
+        string input = "uP";
 
         // Act
-        var success = UpStreamRouteStep.TryParse(input, out var result);
+        bool success = UpStreamRouteStep.TryParse(input, out var result);
 
         // Assert
         Assert.True(success);
@@ -49,10 +49,10 @@ public class UpStreamRouteStepTests
     public void TryParse_InvalidFormat_ReturnsFalse()
     {
         // Arrange
-        var input = "BOGUS";
+        string input = "BOGUS";
 
         // Act
-        var success = UpStreamRouteStep.TryParse(input, out var result);
+        bool success = UpStreamRouteStep.TryParse(input, out _);
 
         // Assert
         Assert.False(success);
@@ -62,7 +62,7 @@ public class UpStreamRouteStepTests
     public void Parse_ValidFormat_ReturnsUpStreamStep()
     {
         // Arrange
-        var input = "UP";
+        string input = "UP";
 
         // Act
         var result = UpStreamRouteStep.Parse(input);
@@ -75,7 +75,7 @@ public class UpStreamRouteStepTests
     public void Parse_InvalidFormat_ThrowsFormatException()
     {
         // Arrange
-        var input = "BOGUS";
+        string input = "BOGUS";
 
         // Act & Assert
         Assert.Throws<FormatException>(() => UpStreamRouteStep.Parse(input));

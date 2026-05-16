@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Tycho.Persistence.EFCore;
+namespace Tycho.Persistence.EFCore.Outbox;
 
 /// <summary>
 /// Settings for Tycho outbox consumer

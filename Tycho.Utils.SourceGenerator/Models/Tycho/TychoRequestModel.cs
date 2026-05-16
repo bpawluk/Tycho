@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.Utils;
 
@@ -13,7 +13,7 @@ namespace Tycho.Utils.SourceGenerator.Models.Tycho
         public bool HasResponse => ResponseType.HasValue;
 
         public TychoRequestModel(
-            TypeModel requestType, 
+            TypeModel requestType,
             TypeModel? responseType = default)
         {
             RequestType = requestType;

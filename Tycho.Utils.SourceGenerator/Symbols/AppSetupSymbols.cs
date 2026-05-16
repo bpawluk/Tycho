@@ -1,4 +1,4 @@
-﻿namespace Tycho.Utils.SourceGenerator.Symbols
+namespace Tycho.Utils.SourceGenerator.Symbols
 {
     internal static class AppSetupSymbols
     {

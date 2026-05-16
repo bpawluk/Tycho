@@ -1,4 +1,4 @@
-﻿namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Domain;
+﻿namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Domain;
 
 internal class Reservation(string code, int itemId, uint quantity)
 {

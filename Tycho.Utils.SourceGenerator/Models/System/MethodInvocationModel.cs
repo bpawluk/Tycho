@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.Models.System
@@ -23,7 +23,7 @@ namespace Tycho.Utils.SourceGenerator.Models.System
 
         public bool Equals(MethodInvocationModel other)
         {
-            return Signature.Equals(other.Signature) && 
+            return Signature.Equals(other.Signature) &&
                    ReceiverType.Equals(other.ReceiverType) &&
                    TypeArguments.Equals(other.TypeArguments);
         }

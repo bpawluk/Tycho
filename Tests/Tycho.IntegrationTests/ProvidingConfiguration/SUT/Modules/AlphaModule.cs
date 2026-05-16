@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.IntegrationTests.ProvidingConfiguration.SUT.Handlers;
 using Tycho.Modules;
@@ -21,7 +21,7 @@ public partial class AlphaModule : TychoModule
 
     protected override void IncludeModules(IModuleStructure module) { }
 
-    protected override void RegisterServices(IServiceCollection module) 
+    protected override void RegisterServices(IServiceCollection module)
     {
         module.AddSingleton<IConfiguration>(Configuration.GetSection("Alpha"));
     }

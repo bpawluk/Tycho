@@ -1,8 +1,8 @@
 using Tycho.Events;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Domain;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Persistence;
 using Tycho.Transactions;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Persistence;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Domain;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Handlers;
 

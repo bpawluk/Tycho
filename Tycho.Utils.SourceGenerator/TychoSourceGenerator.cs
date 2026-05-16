@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
@@ -77,8 +77,8 @@ namespace Tycho.Utils.SourceGenerator
         }
 
         private static ImmutableEquatableArray<MethodDefinitionModel> GetMethodDefinitionModels(
-            GeneratorAttributeSyntaxContext context, 
-            TypeModel containingType, 
+            GeneratorAttributeSyntaxContext context,
+            TypeModel containingType,
             CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
@@ -123,7 +123,7 @@ namespace Tycho.Utils.SourceGenerator
 
         private static MethodSignatureModel GetMethodSignatureModel(IMethodSymbol methodSymbol)
         {
-            var methodName = methodSymbol.Name;
+            string methodName = methodSymbol.Name;
             var returnType = GetTypeModel(methodSymbol.ReturnType);
             var parameters = methodSymbol.Parameters
                 .Select(paramSymbol => GetTypeModel(paramSymbol.Type))
@@ -169,7 +169,7 @@ namespace Tycho.Utils.SourceGenerator
 
         private static TypeModel GetTypeModel(ISymbol symbol)
         {
-            var typeNamespace = symbol
+            string typeNamespace = symbol
                 .ContainingNamespace
                 .ToDisplayString(SymbolDisplayFormat
                     .FullyQualifiedFormat

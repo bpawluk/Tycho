@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Tycho.Persistence.EFCore;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Domain;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Domain;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Persistence;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Persistence;
 
 internal class ArticlesDbContext : TychoDbContext
 {

@@ -1,7 +1,7 @@
-﻿using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract;
-using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract;
 
-namespace Tycho.UseCaseTests.ContentModeration;
+namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration;
 
 internal class TestData
 {

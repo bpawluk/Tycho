@@ -47,7 +47,7 @@ public class RoutedEventTests
     {
         // Arrange
         var payload = new TestEvent();
-        var serializedPayload = "{}";
+        string serializedPayload = "{}";
         var routedEvent = CreateRoutedEvent(payload: payload);
 
         var serializerMock = new Mock<IPayloadSerializer>();
@@ -55,7 +55,7 @@ public class RoutedEventTests
                       .Returns(serializedPayload);
 
         // Act
-        var result = routedEvent.SerializePayloadWith(serializerMock.Object);
+        string result = routedEvent.SerializePayloadWith(serializerMock.Object);
 
         // Assert
         Assert.Same(serializedPayload, result);

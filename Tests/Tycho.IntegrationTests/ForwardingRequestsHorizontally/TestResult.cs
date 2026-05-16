@@ -1,4 +1,4 @@
-﻿namespace Tycho.IntegrationTests.ForwardingRequestsHorizontally;
+namespace Tycho.IntegrationTests.ForwardingRequestsHorizontally;
 
 public record TestResult
 {

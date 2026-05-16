@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations;
 using Tycho.Persistence.EFCore.Common;
 
@@ -9,7 +9,7 @@ internal class OutboxEntry
     [Key]
     public Guid Id { get; set; } = Guid.Empty;
 
-    [Required] 
+    [Required]
     public string Event { get; set; } = string.Empty;
 
     [Required]

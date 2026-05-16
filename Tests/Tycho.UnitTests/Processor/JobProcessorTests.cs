@@ -45,7 +45,7 @@ public class JobProcessorTests
     public async Task JobProcessor_WithFullCapacity_CreatesNumberOfJobsEqualToConcurrencyLimit()
     {
         // Arrange
-        var concurrencyLimit = 5;
+        int concurrencyLimit = 5;
         int? capturedMaxCount = null;
         var factoryCalledSignal = new ManualResetEventSlim(false);
 
@@ -72,7 +72,7 @@ public class JobProcessorTests
     public async Task JobProcessor_WithSomeCapacity_CreatesNumberOfJobsEqualToRemainingCapacity()
     {
         // Arrange
-        var concurrencyLimit = 5;
+        int concurrencyLimit = 5;
         var capturedMaxCounts = new List<int>();
         var factoryCalledSignal = new CountdownEvent(3);
 
@@ -99,7 +99,7 @@ public class JobProcessorTests
     public async Task JobProcessor_WithNoCapacity_DoesNotCreateAnyJobsOverCapacity()
     {
         // Arrange
-        var concurrencyLimit = 1;
+        int concurrencyLimit = 1;
 
         _factoryMock
             .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
@@ -119,7 +119,7 @@ public class JobProcessorTests
     public async Task JobProcessor_WithZeroCapacity_DoesNotCreateAnyJobs()
     {
         // Arrange
-        var concurrencyLimit = 0;
+        int concurrencyLimit = 0;
 
         _factoryMock
             .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
@@ -143,10 +143,10 @@ public class JobProcessorTests
     public async Task JobProcessor_WithJobsToProcess_ExecutesAllJobsAndEventuallyStopsPolling()
     {
         // Arrange
-        var concurrencyLimit = 3;
-        var jobsToExecuteCount = 10;
+        int concurrencyLimit = 3;
+        int jobsToExecuteCount = 10;
 
-        var jobsToExecute = Enumerable.Range(0, jobsToExecuteCount).Select(_ => 
+        var jobsToExecute = Enumerable.Range(0, jobsToExecuteCount).Select(_ =>
         {
             var jobCompletedSignal = new ManualResetEventSlim(false);
             var jobMock = CreateActualJob(jobCompletedSignal);
@@ -156,25 +156,25 @@ public class JobProcessorTests
         int factoryCallCount = 0;
         var jobsQueue = new Queue<Mock<IJob>>(jobsToExecute.Select(jobData => jobData.Job));
 
-         _factoryMock
-            .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((int maxCount, CancellationToken _) =>
-            {
-                Interlocked.Increment(ref factoryCallCount);
-                var jobs = new List<IJob>();
-                for (var i = 0; i < maxCount; i++)
-                {
-                    if (jobsQueue.TryDequeue(out var nextJob))
-                    {
-                        jobs.Add(nextJob.Object);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                return jobs;
-            });
+        _factoryMock
+           .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+           .ReturnsAsync((int maxCount, CancellationToken _) =>
+           {
+               Interlocked.Increment(ref factoryCallCount);
+               var jobs = new List<IJob>();
+               for (int i = 0; i < maxCount; i++)
+               {
+                   if (jobsQueue.TryDequeue(out var nextJob))
+                   {
+                       jobs.Add(nextJob.Object);
+                   }
+                   else
+                   {
+                       break;
+                   }
+               }
+               return jobs;
+           });
 
         using var sut = CreateSut(s => s.ConcurrencyLimit = concurrencyLimit);
 
@@ -193,7 +193,7 @@ public class JobProcessorTests
 
         // Act
         await WaitTillProcessorIdles();
-        var finalFactoryCallCount = Volatile.Read(ref factoryCallCount);
+        int finalFactoryCallCount = Volatile.Read(ref factoryCallCount);
         await WaitForPotentialNextIteration();
 
         // Assert
@@ -205,7 +205,7 @@ public class JobProcessorTests
     public async Task JobProcessor_WhenJobCompletes_RestoresCapacity()
     {
         // Arrange
-        var concurrencyLimit = 3;
+        int concurrencyLimit = 3;
 
         var jobMock = new Mock<IJob>();
         var completeJobSignal = new ManualResetEventSlim(false);
@@ -290,7 +290,7 @@ public class JobProcessorTests
         sut.Activate();
         await WaitTillProcessorIdles();
 
-        var finalFactoryCallCount = Volatile.Read(ref factoryCallCount);
+        int finalFactoryCallCount = Volatile.Read(ref factoryCallCount);
         await WaitForPotentialNextIteration();
 
         // Assert
@@ -438,7 +438,7 @@ public class JobProcessorTests
     public async Task JobProcessor_WhenJobThrows_RaisesJobProcessingErrorAndRestoresCapacity()
     {
         // Arrange
-        var concurrencyLimit = 3;
+        int concurrencyLimit = 3;
 
         var jobMock = new Mock<IJob>();
         var completeJobSignal = new ManualResetEventSlim(false);
@@ -446,7 +446,7 @@ public class JobProcessorTests
 
         jobMock
             .Setup(j => j.ExecuteAsync(It.IsAny<CancellationToken>()))
-            .Returns(async () => 
+            .Returns(async () =>
             {
                 completeJobSignal.Wait(_waitingTimeout, CancellationToken.None);
                 throw expectedException;
@@ -595,8 +595,8 @@ public class JobProcessorTests
         factoryCalledSignal.Wait(_waitingTimeout, CancellationToken.None);
 
         sut.Dispose();
-        var callCountAfterDispose = Volatile.Read(ref factoryCallCount);
-        
+        int callCountAfterDispose = Volatile.Read(ref factoryCallCount);
+
         await WaitTillProcessorIdles();
 
         // Assert
@@ -649,8 +649,8 @@ public class JobProcessorTests
         var completeJobSignal = new ManualResetEventSlim(false);
         jobMock
             .Setup(j => j.ExecuteAsync(It.IsAny<CancellationToken>()))
-            .Returns(() => 
-            { 
+            .Returns(() =>
+            {
                 completeJobSignal.Wait(_waitingTimeout, CancellationToken.None);
                 return Task.CompletedTask;
             });

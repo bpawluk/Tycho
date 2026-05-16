@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Apps;
 using Tycho.IntegrationTests.SettingUpForHostApps.SUT.Handlers;
 using Tycho.Requests;
@@ -20,7 +20,7 @@ public partial class TestApp : TychoApp
 
     protected override void IncludeModules(IAppStructure app) { }
 
-    protected override void RegisterServices(IServiceCollection app) 
+    protected override void RegisterServices(IServiceCollection app)
     {
         app.AddSingleton(Configuration);
     }

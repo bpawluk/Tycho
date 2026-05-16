@@ -46,7 +46,7 @@ public class ModuleFacadeBaseTests
             .ReturnsAsync("result");
 
         // Act
-        var result = await _sut.Send<TestRequestWithResponse, string>(request, cancellationToken);
+        string result = await _sut.Send<TestRequestWithResponse, string>(request, cancellationToken);
 
         // Assert
         Assert.Equal("result", result);

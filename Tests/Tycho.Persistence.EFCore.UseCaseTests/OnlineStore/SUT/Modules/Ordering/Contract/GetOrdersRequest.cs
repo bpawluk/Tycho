@@ -1,6 +1,6 @@
 ﻿using Tycho.Requests;
 
-namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract;
+namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract;
 
 public record GetOrdersRequest() : IRequest<GetOrdersRequest.Response>
 {

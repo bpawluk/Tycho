@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Tycho.Persistence.EFCore;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Domain;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Domain;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Persistence;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Persistence;
 
 internal class ReactionsDbContext : TychoDbContext
 {

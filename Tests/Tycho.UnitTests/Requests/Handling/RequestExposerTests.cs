@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using Tycho.Requests.Handling;
 using Tycho.Structure.Parent;
 using Tycho.UnitTests._Data.Requests;
@@ -33,7 +33,7 @@ public class RequestExposerTests
         // Arrange
         var request = new TestRequestWithResponse();
         var cancellationToken = new CancellationToken();
-        var response = "success";
+        string response = "success";
 
         var parentMock = new Mock<IParentReference>();
         parentMock.Setup(p => p.RequestBroker.ExecuteAsync<TestRequestWithResponse, string>(request, cancellationToken))
@@ -42,7 +42,7 @@ public class RequestExposerTests
         var sut = new RequestExposer<TestRequestWithResponse, string>(parentMock.Object);
 
         // Act
-        var result = await sut.HandleAsync(request, cancellationToken);
+        string result = await sut.HandleAsync(request, cancellationToken);
 
         // Assert
         Assert.Equal(response, result);

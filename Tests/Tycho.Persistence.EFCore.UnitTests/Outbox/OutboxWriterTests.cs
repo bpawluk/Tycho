@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using Tycho.Events.Model;
 using Tycho.Events.Outbox;
@@ -62,22 +62,22 @@ public class OutboxWriterTests
         List<RoutedEvent> routedEvents =
         [
             new RoutedEvent<TestEvent>(
-                Guid.NewGuid(), 
-                EventIdentity.Create<TestEvent>(), 
-                EventHandlerIdentity.Parse("handler-1"), 
-                Route.Create(), 
+                Guid.NewGuid(),
+                EventIdentity.Create<TestEvent>(),
+                EventHandlerIdentity.Parse("handler-1"),
+                Route.Create(),
                 new TestEvent()),
             new RoutedEvent<TestEvent>(
-                Guid.NewGuid(), 
-                EventIdentity.Create<TestEvent>(), 
-                EventHandlerIdentity.Parse("handler-2"), 
-                Route.Create(), 
+                Guid.NewGuid(),
+                EventIdentity.Create<TestEvent>(),
+                EventHandlerIdentity.Parse("handler-2"),
+                Route.Create(),
                 new TestEvent()),
             new RoutedEvent<TestEvent>(
-                Guid.NewGuid(), 
-                EventIdentity.Create<TestEvent>(), 
-                EventHandlerIdentity.Parse("handler-3"), 
-                Route.Create(), 
+                Guid.NewGuid(),
+                EventIdentity.Create<TestEvent>(),
+                EventHandlerIdentity.Parse("handler-3"),
+                Route.Create(),
                 new TestEvent()),
         ];
 

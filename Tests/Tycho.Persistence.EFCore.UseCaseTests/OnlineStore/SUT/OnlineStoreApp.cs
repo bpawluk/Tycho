@@ -1,20 +1,20 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Apps;
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Handlers;
-using Tycho.UseCaseTests.OnlineStore.SUT.Mappers;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Outgoing;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Outgoing;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Incoming;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Outgoing;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Mappers;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Outgoing;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Outgoing;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Incoming;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Outgoing;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Ordering;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract;
 
-namespace Tycho.UseCaseTests.OnlineStore.SUT;
+namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT;
 
 [TychoDefinition]
 public partial class OnlineStoreApp : TychoApp
@@ -46,7 +46,7 @@ public partial class OnlineStoreApp : TychoApp
 
     protected override void IncludeModules(IAppStructure app)
     {
-        app.Uses<CatalogModule>(outgoingRequests => 
+        app.Uses<CatalogModule>(outgoingRequests =>
         {
             outgoingRequests.ForwardAs<
                 AddProductToBasketRequest,

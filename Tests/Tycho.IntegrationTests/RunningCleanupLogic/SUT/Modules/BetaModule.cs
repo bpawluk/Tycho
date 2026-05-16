@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
 
 namespace Tycho.IntegrationTests.RunningCleanupLogic.SUT.Modules;
@@ -10,7 +10,7 @@ public partial class BetaModule : TychoModule
 
     protected override void DefineEvents(IModuleEvents module) { }
 
-    protected override void IncludeModules(IModuleStructure module) 
+    protected override void IncludeModules(IModuleStructure module)
     {
         module.Uses<GammaModule>();
     }
@@ -22,7 +22,7 @@ public partial class BetaModule : TychoModule
 
     protected override Task Cleanup(IServiceProvider module)
     {
-        var result = module.GetRequiredService<TestResult>();
+        TestResult result = module.GetRequiredService<TestResult>();
         result.BetaModuleCleanupPerformed = true;
         return base.Cleanup(module);
     }

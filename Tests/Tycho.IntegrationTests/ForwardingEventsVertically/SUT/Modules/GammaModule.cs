@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events;
 using Tycho.IntegrationTests.ForwardingEventsVertically.SUT.Modules.Handlers;
 using Tycho.Modules;

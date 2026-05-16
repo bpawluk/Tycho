@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore;
 using Tycho.Persistence.EFCore.Inbox;
 using Tycho.Persistence.EFCore.Outbox;
@@ -46,10 +46,10 @@ public abstract class TychoDbContext : DbContext
 
     private string GetDbContextName()
     {
-        var suffixesToTrim = new[] { "DbContext", "Db", "Context" };
+        string[] suffixesToTrim = ["DbContext", "Db", "Context"];
 
-        var name = GetType().Name;
-        foreach (var suffix in suffixesToTrim)
+        string name = GetType().Name;
+        foreach (string? suffix in suffixesToTrim)
         {
             name = name.EndsWith(suffix, StringComparison.OrdinalIgnoreCase) ? name[..^suffix.Length] : name;
         }

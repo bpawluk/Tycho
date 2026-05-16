@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Tycho.Requests;
 using Tycho.Requests.Broker;
@@ -50,7 +50,7 @@ public class UpStreamBrokerTests
         }
 
         // Act
-        var canExecute = _sut.CanExecute<TestRequest>();
+        bool canExecute = _sut.CanExecute<TestRequest>();
 
         // Assert
         Assert.True(canExecute);
@@ -71,7 +71,7 @@ public class UpStreamBrokerTests
         }
 
         // Act
-        var canExecute = _sut.CanExecute<TestRequest>();
+        bool canExecute = _sut.CanExecute<TestRequest>();
 
         // Assert
         Assert.False(canExecute);
@@ -89,7 +89,7 @@ public class UpStreamBrokerTests
         }
 
         // Act
-        var canExecute = _sut.CanExecute<TestRequest>();
+        bool canExecute = _sut.CanExecute<TestRequest>();
 
         // Assert
         Assert.False(canExecute);
@@ -110,7 +110,7 @@ public class UpStreamBrokerTests
         }
 
         // Act
-        var canExecute = _sut.CanExecute<TestRequestWithResponse, string>();
+        bool canExecute = _sut.CanExecute<TestRequestWithResponse, string>();
 
         // Assert
         Assert.True(canExecute);
@@ -131,7 +131,7 @@ public class UpStreamBrokerTests
         }
 
         // Act
-        var canExecute = _sut.CanExecute<TestRequestWithResponse, string>();
+        bool canExecute = _sut.CanExecute<TestRequestWithResponse, string>();
 
         // Assert
         Assert.False(canExecute);
@@ -149,7 +149,7 @@ public class UpStreamBrokerTests
         }
 
         // Act
-        var canExecute = _sut.CanExecute<TestRequestWithResponse, string>();
+        bool canExecute = _sut.CanExecute<TestRequestWithResponse, string>();
 
         // Assert
         Assert.False(canExecute);
@@ -316,7 +316,7 @@ public class UpStreamBrokerTests
     {
         // Arrange
         var request = new TestRequestWithResponse();
-        var response = "success";
+        string response = "success";
         var cancellationToken = new CancellationToken();
 
         var handlerMock = new Mock<IRequestHandler<TestRequestWithResponse, string>>();
@@ -331,7 +331,7 @@ public class UpStreamBrokerTests
         _internals.Build();
 
         // Act
-        var result = await _sut.ExecuteAsync<TestRequestWithResponse, string>(request, cancellationToken);
+        string result = await _sut.ExecuteAsync<TestRequestWithResponse, string>(request, cancellationToken);
 
         // Assert
         Assert.Equal(response, result);
@@ -377,7 +377,7 @@ public class UpStreamBrokerTests
     {
         // Arrange
         var request = new TestRequestWithResponse();
-        var response = "success";
+        string response = "success";
         var cancellationToken = new CancellationToken();
 
         _transactionMock.SetupGet(t => t.IsInProgress)
@@ -395,7 +395,7 @@ public class UpStreamBrokerTests
         _internals.Build();
 
         // Act
-        var result = await _sut.ExecuteAsync<TestRequestWithResponse, string>(request, cancellationToken);
+        string result = await _sut.ExecuteAsync<TestRequestWithResponse, string>(request, cancellationToken);
 
         // Assert
         Assert.Equal(response, result);

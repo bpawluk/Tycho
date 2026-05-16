@@ -1,7 +1,7 @@
 using Tycho.Requests;
-using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract;
-using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Domain;
-using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Persistence;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Domain;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Persistence;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Handlers;
 

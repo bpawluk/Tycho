@@ -1,10 +1,10 @@
-﻿using Tycho.UseCaseTests._Utils;
-using Tycho.UseCaseTests.OnlineStore;
-using Tycho.UseCaseTests.OnlineStore.SUT;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Incoming;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests._Utils;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Incoming;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore;
 
@@ -15,14 +15,14 @@ public sealed class OnlineStoreTests : IAsyncLifetime
 
     public async ValueTask InitializeAsync()
     {
-       _sut = await new OnlineStoreApp().RunAsync();
+        _sut = await new OnlineStoreApp().RunAsync();
     }
 
     [Fact(Timeout = 10000)]
     public async Task TychoUseCase_OnlineStoreApp_WorksCorrectly()
     {
         await SetupProductCatalog();
-        await AssertEventually.True(async () => 
+        await AssertEventually.True(async () =>
         {
             var getProductsRequest = new GetProductsRequest();
             var response = await _sut.ExecuteAsync(getProductsRequest, TestContext.Current.CancellationToken);

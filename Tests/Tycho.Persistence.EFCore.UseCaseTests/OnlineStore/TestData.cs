@@ -1,8 +1,8 @@
-﻿using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Contract;
 
-namespace Tycho.UseCaseTests.OnlineStore;
+namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore;
 
 internal class TestData
 {
@@ -28,9 +28,9 @@ internal class TestData
         foreach (var product in InitialProducts)
         {
             var basketItem = basket.FirstOrDefault(item => item.ProductId == product.Id);
-            var updatedProduct = product with 
-            { 
-                Quantity = product.Quantity - basketItem?.Quantity ?? 0 
+            var updatedProduct = product with
+            {
+                Quantity = product.Quantity - basketItem?.Quantity ?? 0
             };
             productsAfterPurchase.Add(product);
         }
@@ -42,8 +42,8 @@ internal class TestData
         new(CustomerId, GetBasket().Sum(item => item.Quantity * item.Price))
     ];
 
-    public class Catalog : List<Product> 
-    { 
+    public class Catalog : List<Product>
+    {
         public bool Match(GetProductsRequest.Response response)
         {
             return Count == response.Products.Count &&
@@ -64,7 +64,7 @@ internal class TestData
         }
     }
 
-    public class Basket : List<BasketItem> 
+    public class Basket : List<BasketItem>
     {
         public bool Match(GetBasketRequest.Response response)
         {

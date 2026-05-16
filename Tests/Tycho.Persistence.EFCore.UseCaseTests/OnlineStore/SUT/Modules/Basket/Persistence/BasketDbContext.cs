@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Tycho.Persistence.EFCore;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Domain;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Domain;
 
-namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Persistence;
+namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Persistence;
 
 internal class BasketDbContext : TychoDbContext
 {
@@ -13,7 +13,7 @@ internal class BasketDbContext : TychoDbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<Domain.Basket>().OwnsMany(
-            basket => basket.Items, 
+            basket => basket.Items,
             basketItem =>
             {
                 basketItem.ToTable($"{typeof(BasketItem).Name}s");

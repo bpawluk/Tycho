@@ -1,9 +1,8 @@
-﻿using Tycho.UseCaseTests._Utils;
-using Tycho.UseCaseTests.ContentModeration;
-using Tycho.UseCaseTests.ContentModeration.SUT;
-using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Incoming;
-using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract;
-using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests._Utils;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Incoming;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration;
 
@@ -67,7 +66,7 @@ public sealed class ContentModerationTests : IAsyncLifetime
 
     private async Task RemoveInappropriatePosts()
     {
-        foreach(var postRemoval in _testData.GetPostRemovals())
+        foreach (var postRemoval in _testData.GetPostRemovals())
         {
             var removePostRequest = new RemovePostRequest(postRemoval.Post.Id!.Value, postRemoval.BanAuthor);
             await _sut.ExecuteAsync(removePostRequest, TestContext.Current.CancellationToken);

@@ -1,4 +1,4 @@
-﻿namespace Tycho.IntegrationTests.SendingRequestsVertically;
+namespace Tycho.IntegrationTests.SendingRequestsVertically;
 
 public record TestResult
 {

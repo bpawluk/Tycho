@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Tycho.Persistence.EFCore;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Persistence;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Persistence;
 
 internal class FeedsDbContext : TychoDbContext
 {

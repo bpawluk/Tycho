@@ -1,4 +1,4 @@
-﻿using Tycho.IntegrationTests.RunningStartupLogic.SUT.Modules;
+using Tycho.IntegrationTests.RunningStartupLogic.SUT.Modules;
 using Tycho.IntegrationTests.RunningStartupLogic.SUT.Services;
 using Tycho.Requests;
 

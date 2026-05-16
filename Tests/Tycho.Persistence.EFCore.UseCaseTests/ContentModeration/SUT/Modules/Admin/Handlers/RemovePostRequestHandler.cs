@@ -1,9 +1,9 @@
 using Tycho.Transactions;
-using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Incoming;
-using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Outgoing;
-using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Domain;
-using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Persistence;
-using static Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.AdminModule;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Incoming;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Outgoing;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Domain;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Persistence;
+using static Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.AdminModule;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Handlers;
 

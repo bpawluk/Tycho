@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Tycho.Modules.Instance;
 using Tycho.Requests.Handling;
@@ -128,7 +128,7 @@ public class DownStreamRegistratorTests
 
         // Act
         _sut.ExposeMappedDownStreamRequest<
-            OtherModule, 
+            OtherModule,
             TestRequestWithResponse, string,
             OtherRequestWithResponse, string>(
                 mapRequestMock.Object, mapResponseMock.Object);
@@ -285,7 +285,7 @@ public class DownStreamRegistratorTests
             .GetService<IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<MappedRequestForwarder<
-            TestRequestWithResponse, string, 
+            TestRequestWithResponse, string,
             OtherRequestWithResponse, string,
             TestModule>>(
                 registration.Handler);
@@ -302,8 +302,8 @@ public class DownStreamRegistratorTests
 
         // Act
         void Act() => _sut.ForwardMappedDownStreamRequest<
-            OtherModule, 
-            TestRequestWithResponse, string, 
+            OtherModule,
+            TestRequestWithResponse, string,
             OtherRequestWithResponse, string,
             TestModule>(
                 mapRequestMock.Object, mapResponseMock.Object);

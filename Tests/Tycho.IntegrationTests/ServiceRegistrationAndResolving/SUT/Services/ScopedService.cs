@@ -1,4 +1,4 @@
-﻿namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Services;
+namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Services;
 
 internal interface IScopedService
 {
@@ -7,7 +7,5 @@ internal interface IScopedService
 
 internal class ScopedService : IScopedService
 {
-    private int _numberOfCalls;
-
-    public int NumberOfCalls => ++_numberOfCalls;
+    public int NumberOfCalls => ++field;
 }

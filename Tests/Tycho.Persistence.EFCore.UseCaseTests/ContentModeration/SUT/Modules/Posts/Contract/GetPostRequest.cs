@@ -1,7 +1,7 @@
-﻿using Tycho.Requests;
-using static Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract.GetPostRequest;
+using Tycho.Requests;
+using static Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract.GetPostRequest;
 
-namespace Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract;
+namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract;
 
 public record GetPostRequest(int PostId) : IRequest<Response>
 {

@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Tycho.Persistence.EFCore;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Domain;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Domain;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Persistence;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Persistence;
 
 internal class CommentsDbContext : TychoDbContext
 {

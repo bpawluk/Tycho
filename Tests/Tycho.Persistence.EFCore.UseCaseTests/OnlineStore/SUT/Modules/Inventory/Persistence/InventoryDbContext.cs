@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Tycho.Persistence.EFCore;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Domain;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Domain;
 
-namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Persistence;
+namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Persistence;
 
 internal class InventoryDbContext : TychoDbContext
 {

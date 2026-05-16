@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Tycho.IntegrationTests.ProvidingConfiguration.SUT;
 using Tycho.IntegrationTests.ProvidingConfiguration.SUT.Modules;
 
@@ -21,7 +21,7 @@ public sealed class ProvidingConfigurationTests : IAsyncLifetime
 
     public async ValueTask InitializeAsync()
     {
-        var builtAppConfig = new ConfigurationBuilder().AddInMemoryCollection(_appConfig).Build();
+        IConfigurationRoot builtAppConfig = new ConfigurationBuilder().AddInMemoryCollection(_appConfig).Build();
         _sut = await new TestApp().WithConfiguration(builtAppConfig).RunAsync();
     }
 
@@ -32,9 +32,9 @@ public sealed class ProvidingConfigurationTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var appValue = await _sut.ExecuteAsync(new GetAppValueRequest(), TestContext.Current.CancellationToken);
-        var alphaValue = await _sut.ExecuteAsync(new GetAlphaValueRequest(), TestContext.Current.CancellationToken);
-        var betaValue = await _sut.ExecuteAsync(new GetBetaValueRequest(), TestContext.Current.CancellationToken);
+        string appValue = await _sut.ExecuteAsync(new GetAppValueRequest(), TestContext.Current.CancellationToken);
+        string alphaValue = await _sut.ExecuteAsync(new GetAlphaValueRequest(), TestContext.Current.CancellationToken);
+        string betaValue = await _sut.ExecuteAsync(new GetBetaValueRequest(), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(_appValue, appValue);

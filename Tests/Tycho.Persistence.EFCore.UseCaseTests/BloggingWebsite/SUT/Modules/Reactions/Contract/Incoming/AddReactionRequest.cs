@@ -1,5 +1,5 @@
 ﻿using Tycho.Requests;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Contract.Incoming;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Contract.Incoming;
 
 public record AddReactionRequest(int TargetId) : IRequest;

@@ -1,4 +1,4 @@
-﻿using Tycho.IntegrationTests.ProvidingSettings.SUT;
+using Tycho.IntegrationTests.ProvidingSettings.SUT;
 using Tycho.IntegrationTests.ProvidingSettings.SUT.Modules;
 using Tycho.IntegrationTests.ProvidingSettings.SUT.Settings;
 
@@ -20,9 +20,9 @@ public sealed class ProvidingSettingsTests : IAsyncLifetime
         // - no arrangement required
 
         // Act
-        var alphaValue = await _sut.ExecuteAsync(new GetAlphaValueRequest(), TestContext.Current.CancellationToken);
-        var betaValue = await _sut.ExecuteAsync(new GetBetaValueRequest(), TestContext.Current.CancellationToken);
-        var gammaValue = await _sut.ExecuteAsync(new GetGammaValueRequest(), TestContext.Current.CancellationToken);
+        string alphaValue = await _sut.ExecuteAsync(new GetAlphaValueRequest(), TestContext.Current.CancellationToken);
+        string betaValue = await _sut.ExecuteAsync(new GetBetaValueRequest(), TestContext.Current.CancellationToken);
+        string gammaValue = await _sut.ExecuteAsync(new GetGammaValueRequest(), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal("Alpha", alphaValue);

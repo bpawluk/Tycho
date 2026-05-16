@@ -1,4 +1,4 @@
-﻿namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
+﻿namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
 
 internal record Content(int Id, string Author, string Value)
 {

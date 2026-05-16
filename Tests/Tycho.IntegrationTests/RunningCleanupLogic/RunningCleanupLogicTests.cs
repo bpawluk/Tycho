@@ -1,4 +1,4 @@
-﻿using Tycho.IntegrationTests.RunningCleanupLogic.SUT;
+using Tycho.IntegrationTests.RunningCleanupLogic.SUT;
 
 namespace Tycho.IntegrationTests.RunningCleanupLogic;
 
@@ -8,8 +8,8 @@ public class RunningCleanupLogicTests
     public async Task TychoEnables_RunningCleanupLogic_InAppsAndModules()
     {
         // Arrange
-        var sut = await new TestApp().RunAsync();
-        var testResult = TestResult.Instance;
+        ITestApp sut = await new TestApp().RunAsync();
+        TestResult testResult = TestResult.Instance;
 
         // Act
         await sut.DisposeAsync();

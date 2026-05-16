@@ -32,7 +32,7 @@ public class InboxProcessorJobFactoryTests
     public async Task CreateJobsAsync_WithReceivedEvents_ReturnsMatchingJobCount()
     {
         // Arrange
-        var maxCount = 5;
+        int maxCount = 5;
         var cancellationToken = new CancellationToken();
         var entries = new List<RoutedEvent> { CreateRoutedEvent(), CreateRoutedEvent(), CreateRoutedEvent() };
 
@@ -51,7 +51,7 @@ public class InboxProcessorJobFactoryTests
     public async Task CreateJobsAsync_WithNoReceivedEvents_ReturnsEmptyCollection()
     {
         // Arrange
-        var maxCount = 5;
+        int maxCount = 5;
         var cancellationToken = new CancellationToken();
 
         _inboxConsumerMock.Setup(i => i.Read(It.IsAny<int>(), cancellationToken))

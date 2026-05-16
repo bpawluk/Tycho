@@ -1,3 +1,3 @@
-﻿namespace Tycho.Persistence.EFCore.UnitTests._Data.Entities;
+namespace Tycho.Persistence.EFCore.UnitTests._Data.Entities;
 
 public record TestEntity();

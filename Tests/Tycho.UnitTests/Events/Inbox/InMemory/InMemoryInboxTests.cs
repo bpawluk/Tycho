@@ -30,7 +30,7 @@ public class InMemoryInboxTests
         var (entry, deserializedEntry) = CreateSerializedAndRoutedEventPair();
         var cancelationToken = new CancellationToken();
 
-        var notified = false;
+        bool notified = false;
         _inboxActivity.NewEntriesAdded += (_, _) => notified = true;
 
         // Act

@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Tycho.Requests;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Contract;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Persistence;
-using static Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Contract.GetCommentsRequest;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Persistence;
+using static Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Contract.GetCommentsRequest;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Handlers;
 

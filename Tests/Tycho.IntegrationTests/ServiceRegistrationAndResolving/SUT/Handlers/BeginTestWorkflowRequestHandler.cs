@@ -1,4 +1,4 @@
-﻿using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules;
+using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules;
 using Tycho.Requests;
 using static Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.TestApp;
 

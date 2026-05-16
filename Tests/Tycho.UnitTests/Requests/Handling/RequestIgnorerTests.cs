@@ -1,4 +1,4 @@
-﻿using Tycho.Requests.Handling;
+using Tycho.Requests.Handling;
 using Tycho.UnitTests._Data.Requests;
 
 namespace Tycho.UnitTests.Requests.Handling;
@@ -27,7 +27,7 @@ public class RequestIgnorerTests
         var cancellationToken = new CancellationToken();
 
         // Act
-        var result = await sut.HandleAsync(new TestRequestWithResponse(), cancellationToken);
+        string result = await sut.HandleAsync(new TestRequestWithResponse(), cancellationToken);
 
         // Assert
         Assert.Equal(default, result);

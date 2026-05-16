@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Apps;
 using Tycho.IntegrationTests.ConfiguringLogging.SUT.Handlers;
 using Tycho.IntegrationTests.ConfiguringLogging.SUT.Modules;
@@ -26,7 +26,7 @@ public partial class TestApp : TychoApp
         app.Uses<AlphaModule>();
     }
 
-    protected override void RegisterServices(IServiceCollection app) 
+    protected override void RegisterServices(IServiceCollection app)
     {
         app.AddTransient<LogAppRequestHandler>();
     }

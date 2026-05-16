@@ -1,6 +1,6 @@
-﻿using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
 
-namespace Tycho.UseCaseTests.BloggingWebsite;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite;
 
 internal class TestData
 {
@@ -20,9 +20,9 @@ internal class TestData
             ]),
         ]),
         new("Adam", "An Article without Posts", []),
-        new("Mike", "An Article with a single Post with a single Comment", 
+        new("Mike", "An Article with a single Post with a single Comment",
         [
-            new("Adam", "A Post with three Comments", 
+            new("Adam", "A Post with three Comments",
             [
                 new("Eric", "A Comment", []),
                 new("Mike", "A Comment", []),

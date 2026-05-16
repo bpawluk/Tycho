@@ -80,7 +80,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 RunAsyncMethod = AppSetupSymbols.RunAsyncMethod;
                 AddSingletonMethod = ServiceCollectionServiceExtensionsReference.AddSingletonMethodSignature.MethodName;
                 ConfigureLoggingMethod = LoggingConfigurationReference.ConfigureLoggingMethodSignature.MethodName;
-                ConfigureAwaitMethod = TaskReference.ConfigureAwaitMethodSignature.MethodName;         
+                ConfigureAwaitMethod = TaskReference.ConfigureAwaitMethodSignature.MethodName;
             }
         }
 

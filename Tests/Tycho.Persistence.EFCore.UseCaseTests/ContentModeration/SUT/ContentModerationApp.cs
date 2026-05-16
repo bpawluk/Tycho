@@ -1,15 +1,15 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Apps;
-using Tycho.UseCaseTests.ContentModeration.SUT.Mappers;
-using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin;
-using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Incoming;
-using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Outgoing;
-using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts;
-using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract;
-using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users;
-using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Mappers;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Incoming;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Outgoing;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract;
 
-namespace Tycho.UseCaseTests.ContentModeration.SUT;
+namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT;
 
 [TychoDefinition]
 public partial class ContentModerationApp : TychoApp
@@ -40,11 +40,11 @@ public partial class ContentModerationApp : TychoApp
         app.Uses<UsersModule>()
            .Uses<PostsModule>();
 
-        app.Uses<AdminModule>(outgoingRequests => 
+        app.Uses<AdminModule>(outgoingRequests =>
         {
             outgoingRequests.ForwardAs<
-                GetAuthorRequest, GetAuthorRequest.Response, 
-                GetPostRequest, GetPostRequest.Response, 
+                GetAuthorRequest, GetAuthorRequest.Response,
+                GetPostRequest, GetPostRequest.Response,
                 PostsModule>(RequestMapper.Map, RequestMapper.Map);
         });
     }

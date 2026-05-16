@@ -1,4 +1,4 @@
-﻿using Tycho.Requests;
+using Tycho.Requests;
 using Tycho.UnitTests._Data.Requests;
 
 namespace Tycho.UnitTests._Data.Handlers;

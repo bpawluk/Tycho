@@ -21,21 +21,21 @@ public class EventHandlerProviderTests
 
         var firstEventRegistrationMock = new Mock<IFinalEventRegistration<TestEvent>>();
         services.AddSingleton(firstEventRegistrationMock.Object);
-        
+
         var firstEventHandlerMock = new Mock<IEventHandler<TestEvent>>();
         var firstEventHandler = firstEventHandlerMock.Object;
         firstEventRegistrationMock.SetupGet(r => r.Handler).Returns(firstEventHandler);
-        
+
         var firstEventHandlerId = EventHandlerIdentity.Create<TestEventOtherHandler>();
         firstEventRegistrationMock.SetupGet(r => r.HandlerId).Returns(firstEventHandlerId);
 
         var secondEventRegistrationMock = new Mock<IFinalEventRegistration<TestEvent>>();
         services.AddSingleton(secondEventRegistrationMock.Object);
-        
+
         var secondEventHandlerMock = new Mock<IEventHandler<TestEvent>>();
         _registeredHandler = secondEventHandlerMock.Object;
         secondEventRegistrationMock.SetupGet(r => r.Handler).Returns(_registeredHandler);
-        
+
         _registeredHandlerId = EventHandlerIdentity.Create<TestEventHandler>();
         secondEventRegistrationMock.SetupGet(r => r.HandlerId).Returns(_registeredHandlerId);
 

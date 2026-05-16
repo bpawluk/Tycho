@@ -1,4 +1,4 @@
-﻿namespace Tycho.UseCaseTests._Utils;
+﻿namespace Tycho.Persistence.EFCore.UseCaseTests._Utils;
 
 public class AssertEventually
 {

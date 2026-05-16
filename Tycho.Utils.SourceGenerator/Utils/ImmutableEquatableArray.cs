@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +34,7 @@ namespace Tycho.Utils.SourceGenerator.Utils
 
         public override int GetHashCode()
         {
-            var hash = 0;
+            int hash = 0;
 
             foreach (T value in _values)
             {
@@ -63,7 +63,7 @@ namespace Tycho.Utils.SourceGenerator.Utils
 
             public bool MoveNext()
             {
-                var newIndex = _index + 1;
+                int newIndex = _index + 1;
 
                 if ((uint)newIndex < (uint)_values.Length)
                 {

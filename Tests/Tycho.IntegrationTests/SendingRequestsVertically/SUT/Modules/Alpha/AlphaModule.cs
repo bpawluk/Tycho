@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Alpha.Handlers;
 using Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Beta;
 using Tycho.Modules;

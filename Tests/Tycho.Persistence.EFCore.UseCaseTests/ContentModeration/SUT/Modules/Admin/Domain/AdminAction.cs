@@ -1,4 +1,4 @@
-﻿namespace Tycho.UseCaseTests.ContentModeration.SUT.Modules.Admin.Domain;
+﻿namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Domain;
 
 internal class AdminAction
 {

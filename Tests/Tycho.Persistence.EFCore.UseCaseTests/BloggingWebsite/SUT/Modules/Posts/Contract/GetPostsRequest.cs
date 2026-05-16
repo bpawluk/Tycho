@@ -1,7 +1,7 @@
-﻿using Tycho.Requests;
-using static Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Contract.GetPostsRequest;
+using Tycho.Requests;
+using static Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Contract.GetPostsRequest;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Contract;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Contract;
 
 public record GetPostsRequest(IReadOnlyList<int> PostIds) : IRequest<Response>
 {

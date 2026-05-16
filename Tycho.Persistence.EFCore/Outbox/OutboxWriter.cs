@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,9 +22,9 @@ internal class OutboxWriter(
 
     public async Task Write(IReadOnlyCollection<RoutedEvent> routedEvents, CancellationToken cancellationToken)
     {
-        var outboxEntries = routedEvents.Select(routedEvent =>
+        IEnumerable<OutboxEntry> outboxEntries = routedEvents.Select(routedEvent =>
         {
-            var serializedEvent = _eventSerializer.Serialize(routedEvent);
+            SerializedRoutedEvent serializedEvent = _eventSerializer.Serialize(routedEvent);
             return new OutboxEntry
             {
                 Id = serializedEvent.Id,

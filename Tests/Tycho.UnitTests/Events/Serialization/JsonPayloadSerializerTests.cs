@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Tycho.Events;
 using Tycho.Events.Serialization;
 using Tycho.UnitTests._Data.Events;
@@ -14,10 +14,10 @@ public class JsonPayloadSerializerTests
     {
         // Arrange
         var eventData = new TestEventWithData();
-        var expectedPayload = GetSerializedPayload(eventData)!;
+        string expectedPayload = GetSerializedPayload(eventData)!;
 
         // Act
-        var payload = _sut.Serialize(eventData);
+        string payload = _sut.Serialize(eventData);
 
         // Assert
         Assert.Equal(expectedPayload, payload);
@@ -44,7 +44,7 @@ public class JsonPayloadSerializerTests
     {
         // Arrange
         var expectedEventData = new TestEventWithData();
-        var payload = GetSerializedPayload(expectedEventData)!;
+        string payload = GetSerializedPayload(expectedEventData)!;
 
         // Act
         var result = _sut.Deserialize<TestEventWithData>(payload);
@@ -57,7 +57,7 @@ public class JsonPayloadSerializerTests
     public void Deserialize_WithMissingProperties_ThrowsJsonException()
     {
         // Arrange
-        var payload = "{}";
+        string payload = "{}";
 
         // Act
         void Act()
@@ -73,7 +73,7 @@ public class JsonPayloadSerializerTests
     public void Deserialize_WithInvalidFormat_ThrowsJsonException()
     {
         // Arrange
-        var payload = "{property='invalidFormat'}";
+        string payload = "{property='invalidFormat'}";
 
         // Act
         void Act()

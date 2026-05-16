@@ -1,6 +1,6 @@
-﻿using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Persistence;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Persistence;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
 
 internal class FeedProvider(FeedsDbContext feedsDbContext)
 {

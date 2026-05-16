@@ -31,7 +31,7 @@ public class AppStructureTests
     public void Uses_WithContractFulfillmentAction_InvokesTheAction()
     {
         // Arrange
-        var actionInvoked = false;
+        bool actionInvoked = false;
 
         // Act
         _sut.Uses<TestModule>(_ => { actionInvoked = true; });

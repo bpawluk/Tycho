@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using Tycho.Modules.Instance;
 using Tycho.Requests.Handling;
 using Tycho.UnitTests._Data.Modules;
@@ -42,7 +42,7 @@ public class MappedRequestForwarderTests
         var request = new TestRequestWithResponse();
         var mappedRequest = new OtherRequestWithResponse();
         var cancellationToken = new CancellationToken();
-        var response = "success";
+        string response = "success";
 
         var targetModuleMock = new Mock<IModule<TestModule>>();
         targetModuleMock.Setup(m => m.RequestBroker.ExecuteAsync<OtherRequestWithResponse, string>(mappedRequest, cancellationToken))
@@ -65,7 +65,7 @@ public class MappedRequestForwarderTests
                 mapResponseMock.Object);
 
         // Act
-        var result = await sut.HandleAsync(request, cancellationToken);
+        string result = await sut.HandleAsync(request, cancellationToken);
 
         // Assert
         Assert.Equal(response, result);

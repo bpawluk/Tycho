@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Tycho.IntegrationTests.ConfiguringLogging.SUT;
 using Tycho.IntegrationTests.ConfiguringLogging.SUT.Modules;
 

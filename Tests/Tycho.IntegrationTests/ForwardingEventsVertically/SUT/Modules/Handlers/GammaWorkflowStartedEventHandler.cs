@@ -1,9 +1,9 @@
-﻿using Tycho.Events;
+using Tycho.Events;
 using static Tycho.IntegrationTests.ForwardingEventsVertically.SUT.Modules.GammaModule;
 
 namespace Tycho.IntegrationTests.ForwardingEventsVertically.SUT.Modules.Handlers;
 
-internal class GammaWorkflowStartedEventHandler(IPublisher publisher) 
+internal class GammaWorkflowStartedEventHandler(IPublisher publisher)
     : IEventHandler<GammaWorkflowStartedEvent>
 {
     private readonly IPublisher _publisher = publisher;

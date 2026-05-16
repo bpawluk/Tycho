@@ -1,4 +1,4 @@
-﻿namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Domain;
+﻿namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Domain;
 
 internal class Product(string name, decimal price)
 {

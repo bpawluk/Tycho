@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Services;
 using Tycho.Requests;
 
@@ -11,11 +11,11 @@ internal class GetAppTransientServiceUsageRequestHandler(IServiceProvider servic
 
     public Task<int> HandleAsync(GetAppTransientServiceUsageRequest requestData, CancellationToken cancellationToken)
     {
-        var firstServiceInstance = _serviceProvider.GetRequiredService<ITransientService>();
+        ITransientService firstServiceInstance = _serviceProvider.GetRequiredService<ITransientService>();
         _ = firstServiceInstance.NumberOfCalls;
 
-        var secondServiceInstance = _serviceProvider.GetRequiredService<ITransientService>();
-        var secondNumberOfCalls = secondServiceInstance.NumberOfCalls;
+        ITransientService secondServiceInstance = _serviceProvider.GetRequiredService<ITransientService>();
+        int secondNumberOfCalls = secondServiceInstance.NumberOfCalls;
 
         return Task.FromResult(secondNumberOfCalls);
     }

@@ -1,6 +1,6 @@
 ﻿using Tycho.Requests;
 
-namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Outgoing;
+namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Outgoing;
 
 public record AddProductToBasketRequest(
     int CustomerId,

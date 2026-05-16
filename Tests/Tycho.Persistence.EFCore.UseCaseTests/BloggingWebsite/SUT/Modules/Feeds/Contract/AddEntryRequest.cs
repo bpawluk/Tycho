@@ -1,7 +1,7 @@
-﻿using Tycho.Requests;
-using static Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract.AddEntryRequest;
+using Tycho.Requests;
+using static Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract.AddEntryRequest;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
 
 public record AddEntryRequest(EntryData Entry) : IRequest<Response>
 {
@@ -18,7 +18,7 @@ public record AddEntryRequest(EntryData Entry) : IRequest<Response>
     {
         public int FeedId { get; init; }
 
-        public PostEntryData(int feedId, string author, string content) : base(author, content) 
+        public PostEntryData(int feedId, string author, string content) : base(author, content)
         {
             FeedId = feedId;
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -15,9 +15,9 @@ using Tycho.Transactions;
 namespace Tycho.Persistence.EFCore.Inbox;
 
 internal class InboxConsumer(
-    ITransaction transaction, 
+    ITransaction transaction,
     IEventSerializer eventSerializer,
-    TychoDbContext dbContext,  
+    TychoDbContext dbContext,
     InboxConsumerSettings? settings = null) : IInboxConsumer
 {
     private readonly ITransaction _transaction = transaction;
@@ -30,10 +30,10 @@ internal class InboxConsumer(
 
     public async Task<IReadOnlyCollection<RoutedEvent>> Read(int count, CancellationToken cancellationToken)
     {
-        var currentTime = DateTime.UtcNow;
-        var validProcessingThreshold = currentTime - _settings.ProcessingExpiration;
+        DateTime currentTime = DateTime.UtcNow;
+        DateTime validProcessingThreshold = currentTime - _settings.ProcessingExpiration;
 
-        var entriesToDeliver = await _dbContext
+        InboxEntry[] entriesToDeliver = await _dbContext
             .Set<InboxEntry>()
             .Where(entry =>
                 (entry.State == EntryState.New) ||
@@ -44,7 +44,7 @@ internal class InboxConsumer(
             .ToArrayAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        foreach (var entry in entriesToDeliver)
+        foreach (InboxEntry? entry in entriesToDeliver)
         {
             entry.State = EntryState.InProcessing;
             entry.Updated = currentTime;
@@ -57,7 +57,7 @@ internal class InboxConsumer(
         }
 
         var result = new List<RoutedEvent>();
-        foreach (var entry in entriesToDeliver)
+        foreach (InboxEntry? entry in entriesToDeliver)
         {
             var serializedEvent = new SerializedRoutedEvent(
                 entry.Id,
@@ -66,7 +66,7 @@ internal class InboxConsumer(
                 Route.Empty(),
                 entry.Payload);
 
-            var routedEvent = await TryDeserializeWith(_eventSerializer, serializedEvent).ConfigureAwait(false);
+            RoutedEvent? routedEvent = await TryDeserializeWith(_eventSerializer, serializedEvent).ConfigureAwait(false);
             if (routedEvent is not null)
             {
                 result.Add(routedEvent);
@@ -77,8 +77,8 @@ internal class InboxConsumer(
 
     public async Task MarkAsHandled(Guid entryId, CancellationToken cancellationToken)
     {
-        var inboxMessages = _dbContext.Set<InboxEntry>();
-        var entry = await inboxMessages.FindAsync([entryId], cancellationToken).ConfigureAwait(false);
+        DbSet<InboxEntry> inboxMessages = _dbContext.Set<InboxEntry>();
+        InboxEntry? entry = await inboxMessages.FindAsync([entryId], cancellationToken).ConfigureAwait(false);
 
         if (entry != null)
         {
@@ -94,8 +94,8 @@ internal class InboxConsumer(
 
     public async Task MarkAsFailed(Guid entryId, CancellationToken cancellationToken)
     {
-        var inboxMessages = _dbContext.Set<InboxEntry>();
-        var entry = await inboxMessages.FindAsync([entryId], cancellationToken).ConfigureAwait(false);
+        DbSet<InboxEntry> inboxMessages = _dbContext.Set<InboxEntry>();
+        InboxEntry? entry = await inboxMessages.FindAsync([entryId], cancellationToken).ConfigureAwait(false);
 
         if (entry != null)
         {

@@ -1,9 +1,9 @@
-﻿using Tycho.Requests;
+using Tycho.Requests;
 using static Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.TestApp;
 
 namespace Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Handlers;
 
-internal class BeginTestWorkflowRequestHandler(IPublisher publisher) 
+internal class BeginTestWorkflowRequestHandler(IPublisher publisher)
     : IRequestHandler<BeginTestWorkflowRequest>
 {
     private readonly IPublisher _publisher = publisher;

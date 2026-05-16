@@ -1,4 +1,4 @@
-﻿using Tycho.Events;
+using Tycho.Events;
 using Tycho.UnitTests._Data.Events;
 
 namespace Tycho.UnitTests._Data.Handlers;

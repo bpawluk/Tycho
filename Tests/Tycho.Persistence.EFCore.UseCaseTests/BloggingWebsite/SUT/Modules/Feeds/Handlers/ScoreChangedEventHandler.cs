@@ -1,7 +1,7 @@
 using Tycho.Events;
 using Tycho.Transactions;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Persistence;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Persistence;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Handlers;
 

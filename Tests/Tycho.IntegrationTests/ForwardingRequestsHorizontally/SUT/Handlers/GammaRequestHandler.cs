@@ -1,10 +1,10 @@
-﻿using Tycho.IntegrationTests._Utils;
+using Tycho.IntegrationTests._Utils;
 using Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Modules.Gamma;
 using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Handlers;
 
-internal class GammaRequestHandler(TestWorkflow<TestResult> testWorkflow) 
+internal class GammaRequestHandler(TestWorkflow<TestResult> testWorkflow)
     : IRequestHandler<GammaRequest>
     , IRequestHandler<GammaRequestWithResponse, string>
 {

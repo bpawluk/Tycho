@@ -29,8 +29,8 @@ public class TypeIdentifierTests
     public void GenericGetId_ReturnsSameResultAsTypeOverload()
     {
         // Act
-        var genericResult = TypeIdentifier.GetId<string>();
-        var typeOverloadResult = TypeIdentifier.GetId(typeof(string));
+        string genericResult = TypeIdentifier.GetId<string>();
+        string typeOverloadResult = TypeIdentifier.GetId(typeof(string));
 
         // Assert
         Assert.Equal(typeOverloadResult, genericResult);
@@ -41,8 +41,8 @@ public class TypeIdentifierTests
     public void GetId_SameType_ReturnsSameId(Type type)
     {
         // Act
-        var firstResult = TypeIdentifier.GetId(type);
-        var secondResult = TypeIdentifier.GetId(type);
+        string firstResult = TypeIdentifier.GetId(type);
+        string secondResult = TypeIdentifier.GetId(type);
 
         // Assert
         Assert.Equal(firstResult, secondResult);
@@ -53,8 +53,8 @@ public class TypeIdentifierTests
     public void GetId_DifferentTypes_ReturnDifferentIds(Type first, Type second)
     {
         // Act
-        var firstResult = TypeIdentifier.GetId(first);
-        var secondResult = TypeIdentifier.GetId(second);
+        string firstResult = TypeIdentifier.GetId(first);
+        string secondResult = TypeIdentifier.GetId(second);
 
         // Assert
         Assert.NotEqual(firstResult, secondResult);
@@ -64,10 +64,10 @@ public class TypeIdentifierTests
     public void GetId_ForNonGenericType_PrefixIsTypeName()
     {
         // Act
-        var result = TypeIdentifier.GetId(typeof(string));
+        string result = TypeIdentifier.GetId(typeof(string));
 
         // Assert
-        var splited = result.Split("+");
+        string[] splited = result.Split("+");
         Assert.Equal(2, splited.Length);
         Assert.Equal("String", splited[0]);
     }
@@ -76,10 +76,10 @@ public class TypeIdentifierTests
     public void GetId_ForGenericType_PrefixIsTypeNameWithoutArity()
     {
         // Act
-        var result = TypeIdentifier.GetId(typeof(List<int>));
+        string result = TypeIdentifier.GetId(typeof(List<int>));
 
         // Assert
-        var splited = result.Split("+");
+        string[] splited = result.Split("+");
         Assert.Equal(2, splited.Length);
         Assert.Equal("List", splited[0]);
     }
@@ -89,13 +89,13 @@ public class TypeIdentifierTests
     public void GetId_SuffixIsEightAlphanumericCharacters(Type type)
     {
         // Act
-        var result = TypeIdentifier.GetId(type);
+        string result = TypeIdentifier.GetId(type);
 
         // Assert
-        var splited = result.Split("+");
+        string[] splited = result.Split("+");
         Assert.Equal(2, splited.Length);
 
-        var suffix = splited[1];
+        string suffix = splited[1];
         Assert.Equal(8, suffix.Length);
         Assert.Matches(new Regex("^[0-9A-F]{8}$"), suffix);
     }

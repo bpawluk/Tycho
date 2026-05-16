@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.IntegrationTests.ProvidingSettings.SUT.Handlers;
 using Tycho.IntegrationTests.ProvidingSettings.SUT.Settings;
 using Tycho.Modules;
@@ -20,18 +20,18 @@ public partial class AlphaModule : TychoModule
 
     protected override void DefineEvents(IModuleEvents module) { }
 
-    protected override void IncludeModules(IModuleStructure module) 
+    protected override void IncludeModules(IModuleStructure module)
     {
-        var moduleSettings = GetSettings<ModuleSettings>();
+        ModuleSettings moduleSettings = GetSettings<ModuleSettings>();
         module.Uses<BetaModule>(moduleSettings);
     }
 
     protected override void RegisterServices(IServiceCollection module)
     {
-        var moduleSettings = GetSettings<ModuleSettings>();
+        ModuleSettings moduleSettings = GetSettings<ModuleSettings>();
         module.AddSingleton(moduleSettings);
 
-        var otherSettings = GetSettings<OtherSettings>();
+        OtherSettings otherSettings = GetSettings<OtherSettings>();
         module.AddSingleton(otherSettings);
     }
 }

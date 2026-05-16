@@ -1,4 +1,4 @@
-﻿namespace Tycho.Persistence.EFCore.Common;
+namespace Tycho.Persistence.EFCore.Common;
 
 internal enum EntryState
 {

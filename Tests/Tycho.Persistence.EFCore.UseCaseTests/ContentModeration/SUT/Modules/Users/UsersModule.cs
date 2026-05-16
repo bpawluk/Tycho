@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
 using Tycho.Persistence.EFCore;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Handlers;
-using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract;
-using Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Persistence;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Persistence;
 
-namespace Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users;
+namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users;
 
 [TychoDefinition]
 public partial class UsersModule : TychoModule

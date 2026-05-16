@@ -44,7 +44,7 @@ public class AppFacadeBaseTests
         _brokerMock.Setup(b => b.ExecuteAsync<TestRequestWithResponse, string>(request, cancellationToken)).ReturnsAsync("result");
 
         // Act
-        var result = await _sut.Send<TestRequestWithResponse, string>(request, cancellationToken);
+        string result = await _sut.Send<TestRequestWithResponse, string>(request, cancellationToken);
 
         // Assert
         Assert.Equal("result", result);

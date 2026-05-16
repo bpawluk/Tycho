@@ -1,9 +1,9 @@
-﻿using Tycho.Events;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Outgoing;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Incoming;
+using Tycho.Events;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Outgoing;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Incoming;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Handlers;
 

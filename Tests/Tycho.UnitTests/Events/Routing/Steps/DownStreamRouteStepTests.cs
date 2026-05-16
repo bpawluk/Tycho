@@ -27,7 +27,7 @@ public class DownStreamRouteStepTests
         var expectedDestination = ModuleIdentity.Create<TestModule>();
 
         // Act
-        var result = sut.ToString();
+        string result = sut.ToString();
 
         // Assert
         Assert.Equal($"DOWN({expectedDestination})", result);
@@ -38,10 +38,10 @@ public class DownStreamRouteStepTests
     {
         // Arrange
         var destination = ModuleIdentity.Create<TestModule>();
-        var input = $"DOWN({destination})";
+        string input = $"DOWN({destination})";
 
         // Act
-        var success = DownStreamRouteStep.TryParse(input, out var result);
+        bool success = DownStreamRouteStep.TryParse(input, out var result);
 
         // Assert
         Assert.True(success);
@@ -54,10 +54,10 @@ public class DownStreamRouteStepTests
     {
         // Arrange
         var destination = ModuleIdentity.Create<TestModule>();
-        var input = $"doWn({destination})";
+        string input = $"doWn({destination})";
 
         // Act
-        var success = DownStreamRouteStep.TryParse(input, out var result);
+        bool success = DownStreamRouteStep.TryParse(input, out var result);
 
         // Assert
         Assert.True(success);
@@ -69,10 +69,10 @@ public class DownStreamRouteStepTests
     public void TryParse_InvalidFormat_ReturnsFalse()
     {
         // Arrange
-        var input = "BOGUS";
+        string input = "BOGUS";
 
         // Act
-        var success = DownStreamRouteStep.TryParse(input, out var result);
+        bool success = DownStreamRouteStep.TryParse(input, out var result);
 
         // Assert
         Assert.False(success);
@@ -84,7 +84,7 @@ public class DownStreamRouteStepTests
     {
         // Arrange
         var destination = ModuleIdentity.Create<TestModule>();
-        var input = $"DOWN({destination})";
+        string input = $"DOWN({destination})";
 
         // Act
         var result = DownStreamRouteStep.Parse(input);
@@ -98,7 +98,7 @@ public class DownStreamRouteStepTests
     public void Parse_InvalidFormat_ThrowsFormatException()
     {
         // Arrange
-        var input = "BOGUS";
+        string input = "BOGUS";
 
         // Act & Assert
         Assert.Throws<FormatException>(() => DownStreamRouteStep.Parse(input));

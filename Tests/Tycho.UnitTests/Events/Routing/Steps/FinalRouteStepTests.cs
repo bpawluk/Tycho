@@ -12,7 +12,7 @@ public class FinalRouteStepTests
         var sut = FinalRouteStep.Create();
 
         // Act
-        var result = sut.ToString();
+        string result = sut.ToString();
 
         // Assert
         Assert.Equal("END", result);
@@ -22,10 +22,10 @@ public class FinalRouteStepTests
     public void TryParse_ValidFormat_ReturnsTrueAndFinalStep()
     {
         // Arrange
-        var input = "END";
+        string input = "END";
 
         // Act
-        var success = FinalRouteStep.TryParse(input, out var result);
+        bool success = FinalRouteStep.TryParse(input, out var result);
 
         // Assert
         Assert.True(success);
@@ -36,10 +36,10 @@ public class FinalRouteStepTests
     public void TryParse_ValidFormatDifferentCasing_ReturnsTrueAndFinalStep()
     {
         // Arrange
-        var input = "eNd";
+        string input = "eNd";
 
         // Act
-        var success = FinalRouteStep.TryParse(input, out var result);
+        bool success = FinalRouteStep.TryParse(input, out var result);
 
         // Assert
         Assert.True(success);
@@ -50,10 +50,10 @@ public class FinalRouteStepTests
     public void TryParse_InvalidFormat_ReturnsFalse()
     {
         // Arrange
-        var input = "BOGUS";
+        string input = "BOGUS";
 
         // Act
-        var success = FinalRouteStep.TryParse(input, out var result);
+        bool success = FinalRouteStep.TryParse(input, out _);
 
         // Assert
         Assert.False(success);
@@ -63,7 +63,7 @@ public class FinalRouteStepTests
     public void Parse_ValidFormat_ReturnsFinalStep()
     {
         // Arrange
-        var input = "END";
+        string input = "END";
 
         // Act
         var result = FinalRouteStep.Parse(input);
@@ -76,7 +76,7 @@ public class FinalRouteStepTests
     public void Parse_InvalidFormat_ThrowsFormatException()
     {
         // Arrange
-        var input = "BOGUS";
+        string input = "BOGUS";
 
         // Act & Assert
         Assert.Throws<FormatException>(() => FinalRouteStep.Parse(input));

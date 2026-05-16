@@ -27,15 +27,15 @@ public class InMemoryOutboxTests
     public async Task Write_WithRoutedEvents_EnqueuesEntries()
     {
         // Arrange
-        var entries = new List<(SerializedRoutedEvent Serialized, RoutedEvent Routed)> 
-        { 
+        var entries = new List<(SerializedRoutedEvent Serialized, RoutedEvent Routed)>
+        {
             CreateSerializedAndRoutedEventPair(),
             CreateSerializedAndRoutedEventPair(),
-            CreateSerializedAndRoutedEventPair() 
+            CreateSerializedAndRoutedEventPair()
         };
         var cancellationToken = new CancellationToken();
 
-        var notified = false;
+        bool notified = false;
         _outboxActivity.NewEntriesAdded += (_, _) => notified = true;
 
         // Act
@@ -57,7 +57,7 @@ public class InMemoryOutboxTests
         // Arrange
         var cancellationToken = new CancellationToken();
 
-        var notified = false;
+        bool notified = false;
         _outboxActivity.NewEntriesAdded += (_, _) => notified = true;
 
         // Act

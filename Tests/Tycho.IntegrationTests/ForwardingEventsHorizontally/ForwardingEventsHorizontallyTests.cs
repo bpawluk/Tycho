@@ -1,4 +1,4 @@
-﻿using Tycho.IntegrationTests._Utils;
+using Tycho.IntegrationTests._Utils;
 using Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT;
 
 namespace Tycho.IntegrationTests.ForwardingEventsHorizontally;
@@ -17,12 +17,12 @@ public sealed class ForwardingEventsHorizontallyTests : IAsyncLifetime
     public async Task TychoEnables_ForwardingEvents_WithinHorizontalHierarchy()
     {
         // Arrange
-        var workflowId = "event-workflow";
+        string workflowId = "event-workflow";
         var request = new BeginTestWorkflowRequest(new TestResult { Id = workflowId });
 
         // Act
         await _sut!.ExecuteAsync(request, TestContext.Current.CancellationToken);
-        var testResult = await _testWorkflow.GetResult();
+        TestResult testResult = await _testWorkflow.GetResult();
 
         // Assert
         Assert.Equal(workflowId, testResult.Id);
@@ -32,12 +32,12 @@ public sealed class ForwardingEventsHorizontallyTests : IAsyncLifetime
     public async Task TychoEnables_ForwardingMappedEvents_WithinHorizontalHierarchy()
     {
         // Arrange
-        var workflowId = "mapped-event-workflow";
+        string workflowId = "mapped-event-workflow";
         var request = new BeginTestWorkflowRequest(new TestResult { Id = workflowId });
 
         // Act
         await _sut!.ExecuteAsync(request, TestContext.Current.CancellationToken);
-        var testResult = await _testWorkflow.GetResult();
+        TestResult testResult = await _testWorkflow.GetResult();
 
         // Assert
         Assert.Equal(workflowId, testResult.Id);

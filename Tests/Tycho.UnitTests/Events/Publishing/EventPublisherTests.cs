@@ -75,7 +75,7 @@ public class EventPublisherTests
 
         // Assert
         _outboxWriterMock.Verify(
-            ow => ow.Write(It.IsAny<IReadOnlyCollection<RoutedEvent>>(), It.IsAny<CancellationToken>()), 
+            ow => ow.Write(It.IsAny<IReadOnlyCollection<RoutedEvent>>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
@@ -94,7 +94,7 @@ public class EventPublisherTests
 
         // Assert
         _outboxWriterMock.Verify(
-            ow => ow.Write(It.IsAny<IReadOnlyCollection<RoutedEvent>>(), It.IsAny<CancellationToken>()), 
+            ow => ow.Write(It.IsAny<IReadOnlyCollection<RoutedEvent>>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 

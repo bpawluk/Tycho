@@ -1,9 +1,9 @@
-﻿using Tycho.IntegrationTests._Utils;
+using Tycho.IntegrationTests._Utils;
 using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Handlers;
 
-internal class RequestHandler(TestWorkflow<TestResult> testWorkflow) 
+internal class RequestHandler(TestWorkflow<TestResult> testWorkflow)
     : IRequestHandler<Request>
     , IRequestHandler<RequestWithResponse, string>
 {

@@ -1,6 +1,6 @@
 ﻿using Tycho.Requests;
 
-namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming;
+namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming;
 
 public record BuyProductRequest(
     int CustomerId,

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -24,10 +24,10 @@ internal class OutboxConsumer(ITransaction transaction, TychoDbContext dbContext
 
     public async Task<IReadOnlyCollection<SerializedRoutedEvent>> Read(int count, CancellationToken cancellationToken)
     {
-        var currentTime = DateTime.UtcNow;
-        var validProcessingThreshold = currentTime - _settings.DeliveryExpiration;
+        DateTime currentTime = DateTime.UtcNow;
+        DateTime validProcessingThreshold = currentTime - _settings.DeliveryExpiration;
 
-        var entriesToDeliver = await _dbContext
+        OutboxEntry[] entriesToDeliver = await _dbContext
             .Set<OutboxEntry>()
             .Where(entry =>
                 (entry.State == EntryState.New) ||
@@ -38,7 +38,7 @@ internal class OutboxConsumer(ITransaction transaction, TychoDbContext dbContext
             .ToArrayAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        foreach (var entry in entriesToDeliver)
+        foreach (OutboxEntry? entry in entriesToDeliver)
         {
             entry.State = EntryState.InProcessing;
             entry.Updated = currentTime;
@@ -64,8 +64,8 @@ internal class OutboxConsumer(ITransaction transaction, TychoDbContext dbContext
 
     public async Task MarkAsDelivered(Guid entryId, CancellationToken cancellationToken)
     {
-        var outboxMessages = _dbContext.Set<OutboxEntry>();
-        var entry = await outboxMessages.FindAsync([entryId], cancellationToken).ConfigureAwait(false);
+        DbSet<OutboxEntry> outboxMessages = _dbContext.Set<OutboxEntry>();
+        OutboxEntry? entry = await outboxMessages.FindAsync([entryId], cancellationToken).ConfigureAwait(false);
 
         if (entry != null)
         {
@@ -81,8 +81,8 @@ internal class OutboxConsumer(ITransaction transaction, TychoDbContext dbContext
 
     public async Task MarkAsFailed(Guid entryId, CancellationToken cancellationToken)
     {
-        var outboxMessages = _dbContext.Set<OutboxEntry>();
-        var entry = await outboxMessages.FindAsync([entryId], cancellationToken).ConfigureAwait(false);
+        DbSet<OutboxEntry> outboxMessages = _dbContext.Set<OutboxEntry>();
+        OutboxEntry? entry = await outboxMessages.FindAsync([entryId], cancellationToken).ConfigureAwait(false);
 
         if (entry != null)
         {

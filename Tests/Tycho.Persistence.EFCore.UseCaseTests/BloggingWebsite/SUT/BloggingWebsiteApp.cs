@@ -1,13 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Apps;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Contract.Incoming;
-using Feeds = Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds;
-using Reactions = Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Contract.Incoming;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions;
+using Feeds = Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds;
+using Reactions = Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT;
 
 [TychoDefinition]
 public partial class BloggingWebsiteApp : TychoApp
@@ -16,7 +16,7 @@ public partial class BloggingWebsiteApp : TychoApp
     {
         app.Forwards<AddEntryRequest, AddEntryRequest.Response, FeedsModule>()
            .Forwards<GetFeedEntriesRequest, GetFeedEntriesRequest.Response, FeedsModule>();
-        
+
         app.Forwards<AddReactionRequest, ReactionsModule>();
     }
 

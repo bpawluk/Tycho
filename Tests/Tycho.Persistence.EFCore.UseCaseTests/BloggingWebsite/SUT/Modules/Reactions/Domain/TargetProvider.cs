@@ -1,6 +1,6 @@
-﻿using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Persistence;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Persistence;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Domain;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Domain;
 
 internal class TargetProvider(ReactionsDbContext dbContext)
 {

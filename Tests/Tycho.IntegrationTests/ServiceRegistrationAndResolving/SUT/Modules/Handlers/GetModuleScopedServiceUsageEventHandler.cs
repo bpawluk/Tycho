@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events;
 using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Services;
 using static Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules.TestModule;
@@ -13,10 +13,10 @@ internal class GetModuleScopedServiceUsageEventHandler(IParent parent, IServiceP
 
     public Task HandleAsync(EventContext<GetModuleScopedServiceUsageEvent> context, CancellationToken cancellationToken)
     {
-        var firstServiceInstance = _serviceProvider.GetRequiredService<IScopedService>();
+        IScopedService firstServiceInstance = _serviceProvider.GetRequiredService<IScopedService>();
         _ = firstServiceInstance.NumberOfCalls;
 
-        var secondServiceInstance = _serviceProvider.GetRequiredService<IScopedService>();
+        IScopedService secondServiceInstance = _serviceProvider.GetRequiredService<IScopedService>();
         context.Payload.Result.NumberOfCalls = secondServiceInstance.NumberOfCalls;
 
         return _parent.ExecuteAsync(new EndTestWorkflowRequest(context.Payload.Result), cancellationToken);

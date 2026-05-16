@@ -1,5 +1,5 @@
 ﻿using Tycho.Events;
 
-namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Outgoing;
+namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Outgoing;
 
 public record ItemAvailabilityChangedEvent(int ItemId, uint NewQuantity, uint Version) : IEvent;

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Apps;
 using Tycho.IntegrationTests.ProvidingSettings.SUT.Modules;
 using Tycho.IntegrationTests.ProvidingSettings.SUT.Settings;
@@ -12,7 +12,7 @@ public partial class TestApp : TychoApp
     {
         app.Forwards<GetAlphaValueRequest, string, AlphaModule>()
            .Forwards<GetBetaValueRequest, string, AlphaModule>()
-           .Forwards<GetGammaValueRequest, string, GammaModule>();     
+           .Forwards<GetGammaValueRequest, string, GammaModule>();
     }
 
     protected override void DefineEvents(IAppEvents app) { }

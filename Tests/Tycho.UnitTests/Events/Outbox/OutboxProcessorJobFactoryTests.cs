@@ -23,7 +23,7 @@ public class OutboxProcessorJobFactoryTests
 
         _outboxConsumerMock = new Mock<IOutboxConsumer>();
         serviceCollection.AddSingleton(_outboxConsumerMock.Object);
-        
+
         internals.Build();
         _sut = new OutboxProcessorJobFactory(internals);
     }
@@ -32,7 +32,7 @@ public class OutboxProcessorJobFactoryTests
     public async Task CreateJobsAsync_WithReceivedEvents_ReturnsMatchingJobCount()
     {
         // Arrange
-        var maxCount = 5;
+        int maxCount = 5;
         var cancellationToken = new CancellationToken();
         var entries = new List<SerializedRoutedEvent> { CreateRoutedEvent(), CreateRoutedEvent(), CreateRoutedEvent() };
 
@@ -51,7 +51,7 @@ public class OutboxProcessorJobFactoryTests
     public async Task CreateJobsAsync_WithNoReceivedEvents_ReturnsEmptyCollection()
     {
         // Arrange
-        var maxCount = 5;
+        int maxCount = 5;
         var cancellationToken = new CancellationToken();
 
         _outboxConsumerMock.Setup(o => o.Read(It.IsAny<int>(), cancellationToken))

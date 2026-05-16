@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.SettingUpForHostApps.SUT.Handlers;

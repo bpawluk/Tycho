@@ -1,7 +1,7 @@
-﻿using Tycho.Requests;
-using static Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract.AddUserRequest;
+using Tycho.Requests;
+using static Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract.AddUserRequest;
 
-namespace Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract;
+namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract;
 
 public record AddUserRequest(string Name) : IRequest<Response>
 {

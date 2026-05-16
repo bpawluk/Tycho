@@ -1,4 +1,4 @@
-﻿using Tycho.IntegrationTests._Utils;
+using Tycho.IntegrationTests._Utils;
 using Tycho.IntegrationTests.SendingRequestsVertically.SUT;
 
 namespace Tycho.IntegrationTests.SendingRequestsVertically;
@@ -17,12 +17,12 @@ public sealed class SendingRequestsVerticallyTests : IAsyncLifetime
     public async Task TychoEnables_SendingRequests_WithinVerticalHierarchy()
     {
         // Arrange
-        var workflowId = "request-workflow";
+        string workflowId = "request-workflow";
         var request = new Request(new TestResult { Id = workflowId });
 
         // Act
         await _sut!.ExecuteAsync(request, TestContext.Current.CancellationToken);
-        var testResult = await _testWorkflow.GetResult();
+        TestResult testResult = await _testWorkflow.GetResult();
 
         // Assert
         Assert.Equal(workflowId, testResult.Id);
@@ -33,12 +33,12 @@ public sealed class SendingRequestsVerticallyTests : IAsyncLifetime
     public async Task TychoEnables_SendingRequestsForResponses_WithinVerticalHierarchy()
     {
         // Arrange
-        var workflowId = "request-with-response-workflow";
+        string workflowId = "request-with-response-workflow";
         var message = new RequestWithResponse(new TestResult { Id = workflowId });
 
         // Act
-        var response = await _sut!.ExecuteAsync(message, TestContext.Current.CancellationToken);
-        var testResult = await _testWorkflow.GetResult();
+        string response = await _sut!.ExecuteAsync(message, TestContext.Current.CancellationToken);
+        TestResult testResult = await _testWorkflow.GetResult();
 
         // Assert
         Assert.Equal("Test = Passed", response);

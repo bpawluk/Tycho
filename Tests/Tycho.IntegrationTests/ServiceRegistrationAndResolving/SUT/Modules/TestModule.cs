@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events;
 using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules.Handlers;
 using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Services;
@@ -32,7 +32,7 @@ public partial class TestModule : TychoModule
         module.Requires<EndTestWorkflowRequest>();
     }
 
-    protected override void DefineEvents(IModuleEvents module) 
+    protected override void DefineEvents(IModuleEvents module)
     {
         module.Handles<GetModuleSingletonServiceUsageEvent, GetModuleSingletonServiceUsageEventHandler>()
               .Handles<GetModuleScopedServiceUsageEvent, GetModuleScopedServiceUsageEventHandler>()

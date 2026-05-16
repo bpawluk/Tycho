@@ -9,7 +9,7 @@ internal static class VerifyInitializer
     {
         DerivePathInfo((sourceFile, projectDirectory, type, method) =>
         {
-            var directory = Path.Combine(
+            string directory = Path.Combine(
                 projectDirectory,
                 "Output",
                 method.Name);

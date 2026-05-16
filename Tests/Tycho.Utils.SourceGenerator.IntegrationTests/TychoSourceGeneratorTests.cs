@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.DependencyInjection;
@@ -236,8 +236,8 @@ public class TychoSourceGeneratorTests : VerifyBase
         var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
         var syntaxTrees = sources.Select(source =>
         {
-            var sourcePath = Path.Combine(AppContext.BaseDirectory, "Input", source);
-            var sourceContent = File.ReadAllText(sourcePath);
+            string sourcePath = Path.Combine(AppContext.BaseDirectory, "Input", source);
+            string sourceContent = File.ReadAllText(sourcePath);
             return CSharpSyntaxTree.ParseText(sourceContent);
         });
         PortableExecutableReference[] references =

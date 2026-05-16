@@ -1,12 +1,12 @@
-﻿using Tycho.Modules.Instance;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Contract;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Contract;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Posts;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Contract;
+using Tycho.Modules.Instance;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Articles;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Posts;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Contract;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
 
 internal class ContentRepository(
     IArticlesModule articlesModule,

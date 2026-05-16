@@ -103,7 +103,7 @@ public class TychoAppTests
 
         protected override void IncludeModules(IAppStructure app) { }
 
-        protected override void RegisterServices(IServiceCollection app) 
+        protected override void RegisterServices(IServiceCollection app)
         {
             var eventSerializerMock = new Mock<IEventSerializer>();
             app.AddSingleton(eventSerializerMock.Object);

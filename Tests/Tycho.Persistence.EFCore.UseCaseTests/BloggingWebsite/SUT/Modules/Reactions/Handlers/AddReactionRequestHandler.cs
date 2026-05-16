@@ -1,9 +1,9 @@
 using Tycho.Transactions;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Contract.Incoming;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Contract.Outgoing;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Domain;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Persistence;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Contract.Incoming;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Contract.Outgoing;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Domain;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Persistence;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Handlers;
 

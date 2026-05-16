@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Tycho.Persistence.EFCore;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Domain;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Domain;
 
-namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Persistence;
+namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Persistence;
 
 internal class OrderingDbContext : TychoDbContext
 {

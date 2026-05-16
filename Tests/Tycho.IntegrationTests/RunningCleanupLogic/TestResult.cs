@@ -1,4 +1,4 @@
-﻿namespace Tycho.IntegrationTests.RunningCleanupLogic;
+namespace Tycho.IntegrationTests.RunningCleanupLogic;
 
 public record TestResult
 {

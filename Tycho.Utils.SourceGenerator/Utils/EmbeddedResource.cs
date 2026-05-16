@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -11,16 +11,16 @@ namespace Tycho.Utils.SourceGenerator.Utils
         {
             var assembly = Assembly.GetExecutingAssembly();
 
-            var baseName = assembly
+            string baseName = assembly
                 .GetName()
                 .Name;
 
-            var resourceName = relativePath
+            string resourceName = relativePath
                 .TrimStart('.')
                 .Replace(Path.DirectorySeparatorChar, '.')
                 .Replace(Path.AltDirectorySeparatorChar, '.');
 
-            var manifestResourceName = assembly
+            string manifestResourceName = assembly
                 .GetManifestResourceNames()
                 .FirstOrDefault(x => x
                     .EndsWith(
@@ -33,13 +33,8 @@ namespace Tycho.Utils.SourceGenerator.Utils
                     $"Did not find required resource ending in '{resourceName}' in assembly '{baseName}'.");
             }
 
-            using var stream = assembly.GetManifestResourceStream(manifestResourceName);
-            if (stream == null)
-            {
-                throw new InvalidOperationException(
+            using var stream = assembly.GetManifestResourceStream(manifestResourceName) ?? throw new InvalidOperationException(
                     $"Did not find required resource '{manifestResourceName}' in assembly '{baseName}'.");
-            }
-
             using var reader = new StreamReader(stream);
             return reader.ReadToEnd();
         }

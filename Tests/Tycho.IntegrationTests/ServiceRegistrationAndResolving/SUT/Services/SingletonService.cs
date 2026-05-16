@@ -1,4 +1,4 @@
-﻿namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Services;
+namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Services;
 
 internal interface ISingletonService
 {
@@ -7,7 +7,5 @@ internal interface ISingletonService
 
 internal class SingletonService : ISingletonService
 {
-    private int _numberOfCalls;
-
-    public int NumberOfCalls => ++_numberOfCalls;
+    public int NumberOfCalls => ++field;
 }

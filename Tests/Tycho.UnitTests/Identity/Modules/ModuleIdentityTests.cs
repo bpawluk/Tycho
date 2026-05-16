@@ -50,7 +50,7 @@ public class ModuleIdentityTests
     internal void ModuleIdentity_Equals_EvaluatesCorrectly(ModuleIdentity left, ModuleIdentity? right, bool areEqual)
     {
         // Act
-        var result = left.Equals(right);
+        bool result = left.Equals(right);
 
         // Assert
         Assert.Equal(areEqual, result);
@@ -61,7 +61,7 @@ public class ModuleIdentityTests
     internal void ModuleIdentity_EqualsObject_EvaluatesCorrectly(ModuleIdentity left, object? right, bool areEqual)
     {
         // Act
-        var result = left.Equals(right);
+        bool result = left.Equals(right);
 
         // Assert
         Assert.Equal(areEqual, result);
@@ -72,7 +72,7 @@ public class ModuleIdentityTests
     internal void ModuleIdentity_EqualsOperator_EvaluatesCorrectly(ModuleIdentity? left, ModuleIdentity? right, bool areEqual)
     {
         // Act
-        var result = left == right;
+        bool result = left == right;
 
         // Assert
         Assert.Equal(areEqual, result);
@@ -83,7 +83,7 @@ public class ModuleIdentityTests
     internal void ModuleIdentity_NotEqualsOperator_EvaluatesCorrectly(ModuleIdentity? left, ModuleIdentity? right, bool areEqual)
     {
         // Act
-        var result = left != right;
+        bool result = left != right;
 
         // Assert
         Assert.Equal(!areEqual, result);

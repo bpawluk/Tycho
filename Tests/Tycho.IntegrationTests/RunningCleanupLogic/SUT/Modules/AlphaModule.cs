@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
 
 namespace Tycho.IntegrationTests.RunningCleanupLogic.SUT.Modules;
@@ -19,7 +19,7 @@ public partial class AlphaModule : TychoModule
 
     protected override Task Cleanup(IServiceProvider module)
     {
-        var result = module.GetRequiredService<TestResult>();
+        TestResult result = module.GetRequiredService<TestResult>();
         result.AlphaModuleCleanupPerformed = true;
         return base.Cleanup(module);
     }

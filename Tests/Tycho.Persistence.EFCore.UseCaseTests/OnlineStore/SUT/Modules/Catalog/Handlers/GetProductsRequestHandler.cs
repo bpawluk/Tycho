@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Tycho.Requests;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Persistence;
-using static Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming.GetProductsRequest;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Persistence;
+using static Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming.GetProductsRequest;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Handlers;
 

@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Tycho.Persistence.EFCore;
-using Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Domain;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Domain;
 
-namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Persistence;
+namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Persistence;
 
 internal class CatalogDbContext : TychoDbContext
 {

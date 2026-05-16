@@ -1,4 +1,4 @@
-﻿namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving;
+namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving;
 
 public record TestResult
 {

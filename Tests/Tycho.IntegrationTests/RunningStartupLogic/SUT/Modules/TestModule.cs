@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.IntegrationTests.RunningStartupLogic.SUT.Handlers;
 using Tycho.IntegrationTests.RunningStartupLogic.SUT.Services;
 using Tycho.Modules;

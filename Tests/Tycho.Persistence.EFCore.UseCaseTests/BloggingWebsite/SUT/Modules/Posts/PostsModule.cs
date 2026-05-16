@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
 using Tycho.Persistence.EFCore;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Handlers;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Contract;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Persistence;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Persistence;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Posts;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Posts;
 
 [TychoDefinition]
 public partial class PostsModule : TychoModule

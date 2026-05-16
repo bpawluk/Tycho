@@ -1,15 +1,15 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
 using Tycho.Persistence.EFCore;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Handlers;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Articles;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Persistence;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Posts;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Articles;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Persistence;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Posts;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds;
 
 [TychoDefinition]
 public partial class FeedsModule : TychoModule
@@ -25,7 +25,7 @@ public partial class FeedsModule : TychoModule
         module.Handles<ScoreChangedEvent, ScoreChangedEventHandler>();
     }
 
-    protected override void IncludeModules(IModuleStructure module) 
+    protected override void IncludeModules(IModuleStructure module)
     {
         module.Uses<ArticlesModule>()
               .Uses<PostsModule>()

@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using Tycho.Modules.Instance;
 using Tycho.Requests.Handling;
 using Tycho.UnitTests._Data.Modules;
@@ -34,7 +34,7 @@ public class RequestForwarderTests
         // Arrange
         var request = new TestRequestWithResponse();
         var cancellationToken = new CancellationToken();
-        var response = "success";
+        string response = "success";
 
         var targetModuleMock = new Mock<IModule<TestModule>>();
         targetModuleMock.Setup(m => m.RequestBroker.ExecuteAsync<TestRequestWithResponse, string>(request, cancellationToken))
@@ -43,7 +43,7 @@ public class RequestForwarderTests
         var sut = new RequestForwarder<TestRequestWithResponse, string, TestModule>(targetModuleMock.Object);
 
         // Act
-        var result = await sut.HandleAsync(request, cancellationToken);
+        string result = await sut.HandleAsync(request, cancellationToken);
 
         // Assert
         Assert.Equal(response, result);

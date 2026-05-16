@@ -1,4 +1,4 @@
-﻿namespace Tycho.Utils.SourceGenerator.Utils
+namespace Tycho.Utils.SourceGenerator.Utils
 {
     internal static class HashCode
     {

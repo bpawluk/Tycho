@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events;
 using Tycho.IntegrationTests._Utils;
 using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Services;
@@ -13,10 +13,10 @@ internal class GetAppSingletonServiceUsageEventHandler(IServiceProvider serviceP
 
     public Task HandleAsync(EventContext<GetAppSingletonServiceUsageEvent> context, CancellationToken cancellationToken)
     {
-        var firstServiceInstance = _serviceProvider.GetRequiredService<ISingletonService>();
+        ISingletonService firstServiceInstance = _serviceProvider.GetRequiredService<ISingletonService>();
         _ = firstServiceInstance.NumberOfCalls;
 
-        var secondServiceInstance = _serviceProvider.GetRequiredService<ISingletonService>();
+        ISingletonService secondServiceInstance = _serviceProvider.GetRequiredService<ISingletonService>();
         context.Payload.Result.NumberOfCalls = secondServiceInstance.NumberOfCalls;
 
         _testWorkflow.SetResult(context.Payload.Result);

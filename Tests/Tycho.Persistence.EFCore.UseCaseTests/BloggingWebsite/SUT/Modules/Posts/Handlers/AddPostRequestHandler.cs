@@ -1,8 +1,8 @@
 using Tycho.Requests;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Contract;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Domain;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Persistence;
-using static Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Contract.AddPostRequest;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Domain;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Persistence;
+using static Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Contract.AddPostRequest;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Handlers;
 

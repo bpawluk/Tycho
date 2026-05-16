@@ -1,7 +1,7 @@
-﻿using Tycho.Requests;
-using static Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Contract.GetCommentsRequest;
+using Tycho.Requests;
+using static Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Contract.GetCommentsRequest;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Contract;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Contract;
 
 public record GetCommentsRequest(IReadOnlyList<int> CommentIds) : IRequest<Response>
 {

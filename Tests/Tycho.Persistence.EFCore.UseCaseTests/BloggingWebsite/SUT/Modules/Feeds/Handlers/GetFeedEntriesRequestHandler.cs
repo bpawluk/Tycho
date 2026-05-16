@@ -1,8 +1,8 @@
 using Tycho.Requests;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Persistence;
-using static Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract.GetFeedEntriesRequest;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Persistence;
+using static Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract.GetFeedEntriesRequest;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Handlers;
 
@@ -16,7 +16,7 @@ internal class GetFeedEntriesRequestHandler(FeedsDbContext dbContext, ContentRep
         var feedProvider = new FeedProvider(dbContext);
         var feed = await feedProvider.GetFeed(feedId, cancellationToken);
 
-        var feedEntries = requestData.Feed.Order switch 
+        var feedEntries = requestData.Feed.Order switch
         {
             FeedOrder.Latest => await feed.GetLatestEntries(cancellationToken),
             FeedOrder.MostLiked => await feed.GetMostLikedEntries(cancellationToken),
@@ -33,7 +33,7 @@ internal class GetFeedEntriesRequestHandler(FeedsDbContext dbContext, ContentRep
                 var content = contents.First(content => content.Id == entry.ContentId);
                 return new EntryData(
                     entry.Id,
-                    content.Author, 
+                    content.Author,
                     content.Value,
                     entry.Created,
                     entry.Score,

@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using Moq.EntityFrameworkCore;
+using Tycho.Events.Model;
 using Tycho.Persistence.EFCore.Common;
 using Tycho.Persistence.EFCore.Outbox;
 using Tycho.Transactions;
@@ -60,7 +61,7 @@ public class OutboxConsumerTests
                       .ReturnsDbSet(entries);
 
         // Act
-        var result = await _sut.Read(entries.Count, cancellationToken);
+        IReadOnlyCollection<SerializedRoutedEvent> result = await _sut.Read(entries.Count, cancellationToken);
 
         // Assert
         Assert.Equal(entries.Count, result.Count);
@@ -87,7 +88,7 @@ public class OutboxConsumerTests
                       .ReturnsDbSet(entries);
 
         // Act
-        var result = await _sut.Read(entries.Count, cancellationToken);
+        IReadOnlyCollection<SerializedRoutedEvent> result = await _sut.Read(entries.Count, cancellationToken);
 
         // Assert
         Assert.Equal(entries.Count, result.Count);
@@ -112,7 +113,7 @@ public class OutboxConsumerTests
                       .ReturnsDbSet(entries);
 
         // Act
-        var result = await _sut.Read(entries.Count, cancellationToken);
+        IReadOnlyCollection<SerializedRoutedEvent> result = await _sut.Read(entries.Count, cancellationToken);
 
         // Assert
         Assert.Empty(result);
@@ -136,7 +137,7 @@ public class OutboxConsumerTests
                       .ReturnsDbSet(entries);
 
         // Act
-        var result = await _sut.Read(entries.Count, cancellationToken);
+        IReadOnlyCollection<SerializedRoutedEvent> result = await _sut.Read(entries.Count, cancellationToken);
 
         // Assert
         Assert.Empty(result);
@@ -160,7 +161,7 @@ public class OutboxConsumerTests
                       .ReturnsDbSet(entries);
 
         // Act
-        var result = await _sut.Read(entries.Count, cancellationToken);
+        IReadOnlyCollection<SerializedRoutedEvent> result = await _sut.Read(entries.Count, cancellationToken);
 
         // Assert
         Assert.Equal(entries.Count, result.Count);
@@ -185,7 +186,7 @@ public class OutboxConsumerTests
                       .ReturnsDbSet(entries);
 
         // Act
-        var result = await _sut.Read(entries.Count, cancellationToken);
+        IReadOnlyCollection<SerializedRoutedEvent> result = await _sut.Read(entries.Count, cancellationToken);
 
         // Assert
         Assert.Empty(result);
@@ -199,7 +200,7 @@ public class OutboxConsumerTests
     {
         // Arrange
         var entryId = Guid.NewGuid();
-        var entry = CreateEntry(entryId, EntryState.InProcessing, 1, DateTime.UtcNow);
+        OutboxEntry entry = CreateEntry(entryId, EntryState.InProcessing, 1, DateTime.UtcNow);
         var cancellationToken = new CancellationToken();
 
         _transactionMock.Setup(t => t.IsInProgress)
@@ -242,7 +243,7 @@ public class OutboxConsumerTests
     {
         // Arrange
         var entryId = Guid.NewGuid();
-        var entry = CreateEntry(entryId, EntryState.InProcessing, 1, DateTime.UtcNow - TimeSpan.FromMinutes(5));
+        OutboxEntry entry = CreateEntry(entryId, EntryState.InProcessing, 1, DateTime.UtcNow - TimeSpan.FromMinutes(5));
         var cancellationToken = new CancellationToken();
 
         _transactionMock.Setup(t => t.IsInProgress)

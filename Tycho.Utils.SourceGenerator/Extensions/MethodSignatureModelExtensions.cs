@@ -1,4 +1,4 @@
-﻿using Tycho.Utils.SourceGenerator.Models.System;
+using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.References.Tycho.Apps;
 using Tycho.Utils.SourceGenerator.References.Tycho.Modules;
 

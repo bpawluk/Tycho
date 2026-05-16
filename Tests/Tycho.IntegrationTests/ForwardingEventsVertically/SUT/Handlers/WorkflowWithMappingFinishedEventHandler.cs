@@ -1,9 +1,9 @@
-﻿using Tycho.Events;
+using Tycho.Events;
 using Tycho.IntegrationTests._Utils;
 
 namespace Tycho.IntegrationTests.ForwardingEventsVertically.SUT.Handlers;
 
-internal class WorkflowWithMappingFinishedEventHandler(TestWorkflow<TestResult> testWorkflow) 
+internal class WorkflowWithMappingFinishedEventHandler(TestWorkflow<TestResult> testWorkflow)
     : IEventHandler<WorkflowWithMappingFinishedEvent>
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Tycho.IntegrationTests.ConfiguringLogging;
 
@@ -17,10 +17,10 @@ internal class TestLogger : ILogger
     }
 
     public void Log<TState>(
-        LogLevel logLevel, 
-        EventId eventId, 
-        TState state, 
-        Exception? exception, 
+        LogLevel logLevel,
+        EventId eventId,
+        TState state,
+        Exception? exception,
         Func<TState, Exception?, string> formatter)
     {
         Logs.Add(formatter(state, exception));

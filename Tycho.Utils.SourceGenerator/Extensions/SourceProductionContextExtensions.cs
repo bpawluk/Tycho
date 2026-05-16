@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using Scriban;
@@ -14,7 +14,7 @@ namespace Tycho.Utils.SourceGenerator.Extensions
             string targetFileName)
         {
             var template = Template.Parse(templateContent);
-            var output = template.Render(model);
+            string output = template.Render(model);
             var sourceText = SourceText.From(output, Encoding.UTF8);
             context.AddSource(targetFileName, sourceText);
             return context;

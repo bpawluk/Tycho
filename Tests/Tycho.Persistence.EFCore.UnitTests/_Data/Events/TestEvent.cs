@@ -1,4 +1,4 @@
-﻿using Tycho.Events;
+using Tycho.Events;
 
 namespace Tycho.Persistence.EFCore.UnitTests._Data.Events;
 

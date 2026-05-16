@@ -1,4 +1,4 @@
-﻿namespace Tycho.UseCaseTests.ContentModeration.SUT.Modules.Posts.Domain;
+﻿namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Domain;
 
 internal class Post(int authorId, string content)
 {

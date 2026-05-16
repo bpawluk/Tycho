@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Tycho.Utils.SourceGenerator.Models.System;
 
 namespace Tycho.Utils.SourceGenerator.Models

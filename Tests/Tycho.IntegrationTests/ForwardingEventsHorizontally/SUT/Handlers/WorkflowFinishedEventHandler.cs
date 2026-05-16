@@ -1,4 +1,4 @@
-﻿using Tycho.Events;
+using Tycho.Events;
 using Tycho.IntegrationTests._Utils;
 
 namespace Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Handlers;

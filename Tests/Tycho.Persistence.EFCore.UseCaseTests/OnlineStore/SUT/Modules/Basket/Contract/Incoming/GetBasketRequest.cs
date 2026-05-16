@@ -1,6 +1,6 @@
 ﻿using Tycho.Requests;
 
-namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming;
+namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming;
 
 public record GetBasketRequest(int CustomerId) : IRequest<GetBasketRequest.Response>
 {

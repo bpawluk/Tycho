@@ -17,7 +17,7 @@ namespace Tycho.UnitTests.Events.Inbox;
 public class InboxProcessorJobTests
 {
     private readonly Mock<IInboxConsumer> _inboxConsumerMock;
-    private readonly Mock<ITransaction> _transactionMock;   
+    private readonly Mock<ITransaction> _transactionMock;
     private readonly Mock<IEventHandler<TestEvent>> _handlerMock;
     private readonly Mock<ITransactionalEventHandler<TestEvent>> _transactionalHandlerMock;
     private readonly Mock<IFinalEventRegistration<TestEvent>> _registrationMock;

@@ -1,7 +1,7 @@
-﻿using Tycho.Requests;
-using static Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract.GetFeedEntriesRequest;
+using Tycho.Requests;
+using static Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract.GetFeedEntriesRequest;
 
-namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
 
 public record GetFeedEntriesRequest(FeedData Feed) : IRequest<Response>
 {
@@ -26,8 +26,8 @@ public record GetFeedEntriesRequest(FeedData Feed) : IRequest<Response>
     {
         public int FeedId { get; init; }
 
-        private PostsFeedData(int feedId, FeedOrder order) : base(order) 
-        { 
+        private PostsFeedData(int feedId, FeedOrder order) : base(order)
+        {
             FeedId = feedId;
         }
 
@@ -42,8 +42,8 @@ public record GetFeedEntriesRequest(FeedData Feed) : IRequest<Response>
     {
         public int FeedId { get; init; }
 
-        private CommentsFeedData(int feedId, FeedOrder order) : base(order) 
-        { 
+        private CommentsFeedData(int feedId, FeedOrder order) : base(order)
+        {
             FeedId = feedId;
         }
 

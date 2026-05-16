@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Apps;
 using Tycho.IntegrationTests.RunningCleanupLogic.SUT.Modules;
 
@@ -24,7 +24,7 @@ public partial class TestApp : TychoApp
 
     protected override Task Cleanup(IServiceProvider app)
     {
-        var result = app.GetRequiredService<TestResult>();
+        TestResult result = app.GetRequiredService<TestResult>();
         result.AppCleanupPerformed = true;
         return base.Cleanup(app);
     }

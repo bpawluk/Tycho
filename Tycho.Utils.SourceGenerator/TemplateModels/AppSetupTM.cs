@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
 using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.References.Microsoft;
@@ -40,7 +40,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             Submodules = tychoSetupModel.Submodules.Select(s => new SubmoduleTM(this, s)).ToArray();
         }
 
-        internal class ClassesTM 
+        internal class ClassesTM
         {
             public string AppClass { get; }
             public string FacadeClass { get; }
@@ -66,8 +66,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             }
         }
 
-        internal class InterfacesTM 
-        { 
+        internal class InterfacesTM
+        {
             public string FacadeInterface { get; }
             public string PublisherInterface { get; }
             public string EventSerializerInterface { get; }
@@ -88,8 +88,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             }
         }
 
-        internal class MethodsTM 
-        { 
+        internal class MethodsTM
+        {
             public string WithConfigurationBaseMethod { get; }
             public string WithLoggingBaseMethod { get; }
             public string RunBaseMethod { get; }
@@ -110,7 +110,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 AutoSetupMethod = TychoAppReference.AutoSetupMethodSignature.MethodName;
                 AddSingletonMethod = ServiceCollectionServiceExtensionsReference.AddSingletonMethodSignature.MethodName;
                 AddTransientMethod = ServiceCollectionServiceExtensionsReference.AddTransientMethodSignature.MethodName;
-                ConfigureAwaitMethod = TaskReference.ConfigureAwaitMethodSignature.MethodName; 
+                ConfigureAwaitMethod = TaskReference.ConfigureAwaitMethodSignature.MethodName;
                 WithConfigurationMethod = AppSetupSymbols.WithConfigurationMethod;
                 WithLoggingMethod = AppSetupSymbols.WithLoggingMethod;
                 RunAsyncMethod = AppSetupSymbols.RunAsyncMethod;

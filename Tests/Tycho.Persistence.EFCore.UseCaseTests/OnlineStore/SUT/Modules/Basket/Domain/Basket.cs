@@ -1,4 +1,4 @@
-﻿namespace Tycho.UseCaseTests.OnlineStore.SUT.Modules.Basket.Domain;
+﻿namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Domain;
 
 internal class Basket(int customerId)
 {

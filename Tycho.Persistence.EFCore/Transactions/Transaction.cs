@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Storage;
 using Tycho.Transactions;
@@ -56,7 +56,7 @@ internal sealed class Transaction(TychoDbContext dbContext) : ITransaction
 
     private async Task DisposeActiveTransactionAsync()
     {
-        var activeTransaction = _activeTransaction;
+        IDbContextTransaction? activeTransaction = _activeTransaction;
         _activeTransaction = null;
 
         if (activeTransaction is not null)

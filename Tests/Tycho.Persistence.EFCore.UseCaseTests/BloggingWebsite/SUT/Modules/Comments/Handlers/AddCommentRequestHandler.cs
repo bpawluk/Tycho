@@ -1,8 +1,8 @@
 using Tycho.Requests;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Contract;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Domain;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Persistence;
-using static Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Contract.AddCommentRequest;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Domain;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Persistence;
+using static Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Contract.AddCommentRequest;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Handlers;
 

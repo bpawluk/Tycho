@@ -1,8 +1,7 @@
-﻿using Tycho.UseCaseTests._Utils;
-using Tycho.UseCaseTests.BloggingWebsite;
-using Tycho.UseCaseTests.BloggingWebsite.SUT;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
-using Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Contract.Incoming;
+using Tycho.Persistence.EFCore.UseCaseTests._Utils;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Contract.Incoming;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite;
 
@@ -17,7 +16,7 @@ public sealed class BloggingWebsiteTests : IAsyncLifetime
     }
 
     [Fact(Timeout = 10000)]
-    public async Task TychoUseCase_BloggingWebsiteApp_WorksCorrectly() 
+    public async Task TychoUseCase_BloggingWebsiteApp_WorksCorrectly()
     {
         await SetupPostedEntries();
 

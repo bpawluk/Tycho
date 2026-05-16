@@ -15,14 +15,14 @@ public class EventHandlerIdentityTests
         // Same handler type => Equal
         [
             EventHandlerIdentity.Create<TestEventHandler>(),
-            EventHandlerIdentity.Create<TestEventHandler>(), 
+            EventHandlerIdentity.Create<TestEventHandler>(),
             true
         ],
 
         // Different handler type => Not Equal
         [
             EventHandlerIdentity.Create<TestEventHandler>(),
-            EventHandlerIdentity.Create<OtherEventHandler>(), 
+            EventHandlerIdentity.Create<OtherEventHandler>(),
             false
         ],
 
@@ -50,7 +50,7 @@ public class EventHandlerIdentityTests
     internal void EventHandlerIdentity_Equals_EvaluatesCorrectly(EventHandlerIdentity left, EventHandlerIdentity? right, bool areEqual)
     {
         // Act
-        var result = left.Equals(right);
+        bool result = left.Equals(right);
 
         // Assert
         Assert.Equal(areEqual, result);
@@ -61,7 +61,7 @@ public class EventHandlerIdentityTests
     internal void EventHandlerIdentity_EqualsObject_EvaluatesCorrectly(EventHandlerIdentity left, object? right, bool areEqual)
     {
         // Act
-        var result = left.Equals(right);
+        bool result = left.Equals(right);
 
         // Assert
         Assert.Equal(areEqual, result);
@@ -73,7 +73,7 @@ public class EventHandlerIdentityTests
         bool areEqual)
     {
         // Act
-        var result = left == right;
+        bool result = left == right;
 
         // Assert
         Assert.Equal(areEqual, result);
@@ -85,7 +85,7 @@ public class EventHandlerIdentityTests
         bool areEqual)
     {
         // Act
-        var result = left != right;
+        bool result = left != right;
 
         // Assert
         Assert.Equal(!areEqual, result);

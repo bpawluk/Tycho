@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Services;
 using Tycho.Requests;
 
@@ -11,11 +11,11 @@ internal class GetModuleSingletonServiceUsageRequestHandler(IServiceProvider ser
 
     public Task<int> HandleAsync(GetModuleSingletonServiceUsageRequest requestData, CancellationToken cancellationToken)
     {
-        var firstServiceInstance = _serviceProvider.GetRequiredService<ISingletonService>();
+        ISingletonService firstServiceInstance = _serviceProvider.GetRequiredService<ISingletonService>();
         _ = firstServiceInstance.NumberOfCalls;
 
-        var secondServiceInstance = _serviceProvider.GetRequiredService<ISingletonService>();
-        var secondNumberOfCalls = secondServiceInstance.NumberOfCalls;
+        ISingletonService secondServiceInstance = _serviceProvider.GetRequiredService<ISingletonService>();
+        int secondNumberOfCalls = secondServiceInstance.NumberOfCalls;
 
         return Task.FromResult(secondNumberOfCalls);
     }

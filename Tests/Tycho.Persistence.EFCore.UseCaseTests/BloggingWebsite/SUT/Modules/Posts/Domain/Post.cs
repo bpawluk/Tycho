@@ -1,4 +1,4 @@
-﻿namespace Tycho.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Domain;
+﻿namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Domain;
 
 internal class Post(string author, string content)
 {

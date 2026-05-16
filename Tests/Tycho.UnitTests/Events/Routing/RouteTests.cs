@@ -25,7 +25,7 @@ public class RouteTests
         var sut = Route.Create();
 
         // Act
-        var result = sut.ToString();
+        string result = sut.ToString();
 
         // Assert
         Assert.Equal("END", result);
@@ -42,7 +42,7 @@ public class RouteTests
         var expectedDestination = ModuleIdentity.Create<TestModule>();
 
         // Act
-        var result = sut.ToString();
+        string result = sut.ToString();
 
         // Assert
         Assert.Equal($"UP/DOWN({expectedDestination})/END", result);
@@ -52,7 +52,7 @@ public class RouteTests
     public void Parse_FinalStepOnly_ReturnsRouteWithFinalStep()
     {
         // Arrange
-        var input = "END";
+        string input = "END";
 
         // Act
         var result = Route.Parse(input);
@@ -67,7 +67,7 @@ public class RouteTests
     {
         // Arrange
         var destination = ModuleIdentity.Create<TestModule>();
-        var input = $"DOWN({destination})/END";
+        string input = $"DOWN({destination})/END";
 
         // Act
         var result = Route.Parse(input);
@@ -83,7 +83,7 @@ public class RouteTests
     public void Parse_WithUpStreamStep_ReturnsCorrectRoute()
     {
         // Arrange
-        var input = "UP/END";
+        string input = "UP/END";
 
         // Act
         var result = Route.Parse(input);
@@ -98,7 +98,7 @@ public class RouteTests
     {
         // Arrange
         var destination = ModuleIdentity.Create<TestModule>();
-        var input = $"UP/DOWN({destination})/END";
+        string input = $"UP/DOWN({destination})/END";
 
         // Act
         var result = Route.Parse(input);
@@ -114,7 +114,7 @@ public class RouteTests
     public void Parse_InvalidStep_ThrowsFormatException()
     {
         // Arrange
-        var input = "UP/BOGUS/END";
+        string input = "UP/BOGUS/END";
 
         // Act
         void Act() => Route.Parse(input);

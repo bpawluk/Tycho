@@ -1,7 +1,7 @@
-﻿using Tycho.Events;
-using static Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract.UserStatusChangedEvent;
+using Tycho.Events;
+using static Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract.UserStatusChangedEvent;
 
-namespace Tycho.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract;
+namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract;
 
 public record UserStatusChangedEvent(int UserId, Status NewStatus) : IEvent
 {
