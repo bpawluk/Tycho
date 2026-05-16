@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,8 +30,8 @@ namespace Tycho.Events.Outbox
         [EntryPoint]
         public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            await using var scope = _internals.CreateAsyncScope();
-            var logger = scope.ServiceProvider.GetService<ILogger<OutboxProcessorJob>>();
+            await using AsyncServiceScope scope = _internals.CreateAsyncScope();
+            ILogger<OutboxProcessorJob>? logger = scope.ServiceProvider.GetService<ILogger<OutboxProcessorJob>>();
 
             if (_event is null)
             {
@@ -39,11 +39,11 @@ namespace Tycho.Events.Outbox
                 return;
             }
 
-            var outbox = scope.ServiceProvider.GetRequiredService<IOutboxConsumer>();
+            IOutboxConsumer outbox = scope.ServiceProvider.GetRequiredService<IOutboxConsumer>();
 
             try
             {
-                var broker = scope.ServiceProvider.GetRequiredService<IEventBroker>();
+                IEventBroker broker = scope.ServiceProvider.GetRequiredService<IEventBroker>();
                 await broker.DeliverAsync(_event, cancellationToken).ConfigureAwait(false);
                 await outbox.MarkAsDelivered(_event.Id, cancellationToken).ConfigureAwait(false);
             }

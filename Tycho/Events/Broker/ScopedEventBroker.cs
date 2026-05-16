@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -19,23 +19,18 @@ namespace Tycho.Events.Broker
             _serviceProvider = serviceProvider;
         }
 
-        public IReadOnlyCollection<RoutedEvent> Route<TEvent>(Guid eventId, TEvent eventPayload) 
+        public IReadOnlyCollection<RoutedEvent> Route<TEvent>(Guid eventId, TEvent eventPayload)
             where TEvent : class, IEvent
         {
-            var registrations = _serviceProvider.GetServices<IEventRegistration<TEvent>>();
+            IEnumerable<IEventRegistration<TEvent>> registrations = _serviceProvider.GetServices<IEventRegistration<TEvent>>();
             return registrations.SelectMany(registration => registration.Route(eventId, eventPayload)).ToArray();
         }
 
         public async Task DeliverAsync(SerializedRoutedEvent routedEvent, CancellationToken cancellationToken)
         {
-            var deliveryStrategies = _serviceProvider.GetServices<IDeliveryStrategy>();
+            IEnumerable<IDeliveryStrategy> deliveryStrategies = _serviceProvider.GetServices<IDeliveryStrategy>();
 
-            var deliveryStrategy = deliveryStrategies.SingleOrDefault(s => s.CanDeliver(routedEvent));
-            if (deliveryStrategy is null)
-            {
-                throw new InvalidOperationException($"No delivery strategy found for event with ID {routedEvent.EventId}.");
-            }
-
+            IDeliveryStrategy? deliveryStrategy = deliveryStrategies.SingleOrDefault(s => s.CanDeliver(routedEvent)) ?? throw new InvalidOperationException($"No delivery strategy found for event with ID {routedEvent.EventId}.");
             await deliveryStrategy.DeliverAsync(routedEvent, cancellationToken);
         }
     }

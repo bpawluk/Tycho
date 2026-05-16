@@ -40,11 +40,11 @@ public class InMemoryOutboxTests
 
         // Act
         await _sut.Write([.. entries.Select(e => e.Routed)], cancellationToken);
-        var result = await _sut.Read(entries.Count, cancellationToken);
+        IReadOnlyCollection<SerializedRoutedEvent> result = await _sut.Read(entries.Count, cancellationToken);
 
         // Assert
         Assert.Equal(entries.Count, result.Count);
-        foreach (var (serialized, _) in entries)
+        foreach ((SerializedRoutedEvent? serialized, RoutedEvent _) in entries)
         {
             Assert.Contains(serialized, result);
         }
@@ -76,7 +76,7 @@ public class InMemoryOutboxTests
         await _sut.Write(entries, cancellationToken);
 
         // Act
-        var result = await _sut.Read(2, cancellationToken);
+        IReadOnlyCollection<SerializedRoutedEvent> result = await _sut.Read(2, cancellationToken);
 
         // Assert
         Assert.Equal(2, result.Count);
@@ -90,7 +90,7 @@ public class InMemoryOutboxTests
         await _sut.Write([CreateRoutedEvent()], cancellationToken);
 
         // Act
-        var result = await _sut.Read(5, cancellationToken);
+        IReadOnlyCollection<SerializedRoutedEvent> result = await _sut.Read(5, cancellationToken);
 
         // Assert
         Assert.Single(result);
@@ -103,7 +103,7 @@ public class InMemoryOutboxTests
         var cancellationToken = new CancellationToken();
 
         // Act
-        var result = await _sut.Read(5, cancellationToken);
+        IReadOnlyCollection<SerializedRoutedEvent> result = await _sut.Read(5, cancellationToken);
 
         // Assert
         Assert.Empty(result);
@@ -118,7 +118,7 @@ public class InMemoryOutboxTests
 
         // Act
         await _sut.Read(1, cancellationToken);
-        var result = await _sut.Read(1, cancellationToken);
+        IReadOnlyCollection<SerializedRoutedEvent> result = await _sut.Read(1, cancellationToken);
 
         // Assert
         Assert.Empty(result);

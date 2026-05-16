@@ -1,4 +1,4 @@
-﻿using Tycho.Requests;
+using Tycho.Requests;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Contract.Incoming;
 

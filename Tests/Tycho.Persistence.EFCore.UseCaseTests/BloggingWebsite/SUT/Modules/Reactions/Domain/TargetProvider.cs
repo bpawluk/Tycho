@@ -6,7 +6,7 @@ internal class TargetProvider(ReactionsDbContext dbContext)
 {
     public async Task<Target> GetTarget(int targetId, CancellationToken cancellationToken)
     {
-        var target = await dbContext.Targets.FindAsync([targetId], cancellationToken);
+        Target? target = await dbContext.Targets.FindAsync([targetId], cancellationToken);
         if (target is null)
         {
             target = new Target(targetId);

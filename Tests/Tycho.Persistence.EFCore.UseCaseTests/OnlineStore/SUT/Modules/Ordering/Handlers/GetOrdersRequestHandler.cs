@@ -10,7 +10,7 @@ internal class GetOrdersRequestHandler(OrderingDbContext dbContext) : IRequestHa
 {
     public async Task<Response> HandleAsync(GetOrdersRequest requestData, CancellationToken cancellationToken)
     {
-        var result = await dbContext.Orders
+        Order[] result = await dbContext.Orders
             .Select(order => new Order(order.Id, order.CustomerId, order.Total))
             .ToArrayAsync(cancellationToken);
         return new Response(result);

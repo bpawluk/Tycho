@@ -1,4 +1,4 @@
-﻿using Tycho.Structure.Parent;
+using Tycho.Structure.Parent;
 
 namespace Tycho.Requests.Handling
 {

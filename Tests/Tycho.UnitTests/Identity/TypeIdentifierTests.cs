@@ -5,7 +5,7 @@ using Tycho.UnitTests._Data.Modules;
 
 namespace Tycho.UnitTests.Identity;
 
-public class TypeIdentifierTests
+public partial class TypeIdentifierTests
 {
     public static readonly IEnumerable<object[]> CommonTypes =
     [
@@ -30,7 +30,7 @@ public class TypeIdentifierTests
     {
         // Act
         string genericResult = TypeIdentifier.GetId<string>();
-        string typeOverloadResult = TypeIdentifier.GetId(typeof(string));
+        string typeOverloadResult = TypeIdentifier.GetId<string>();
 
         // Assert
         Assert.Equal(typeOverloadResult, genericResult);
@@ -64,7 +64,7 @@ public class TypeIdentifierTests
     public void GetId_ForNonGenericType_PrefixIsTypeName()
     {
         // Act
-        string result = TypeIdentifier.GetId(typeof(string));
+        string result = TypeIdentifier.GetId<string>();
 
         // Assert
         string[] splited = result.Split("+");
@@ -76,7 +76,7 @@ public class TypeIdentifierTests
     public void GetId_ForGenericType_PrefixIsTypeNameWithoutArity()
     {
         // Act
-        string result = TypeIdentifier.GetId(typeof(List<int>));
+        string result = TypeIdentifier.GetId<List<int>>();
 
         // Assert
         string[] splited = result.Split("+");
@@ -97,6 +97,9 @@ public class TypeIdentifierTests
 
         string suffix = splited[1];
         Assert.Equal(8, suffix.Length);
-        Assert.Matches(new Regex("^[0-9A-F]{8}$"), suffix);
+        Assert.Matches(MyRegex(), suffix);
     }
+
+    [GeneratedRegex("^[0-9A-F]{8}$")]
+    private static partial Regex MyRegex();
 }

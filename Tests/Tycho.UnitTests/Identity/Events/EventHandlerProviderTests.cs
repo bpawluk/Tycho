@@ -23,7 +23,7 @@ public class EventHandlerProviderTests
         services.AddSingleton(firstEventRegistrationMock.Object);
 
         var firstEventHandlerMock = new Mock<IEventHandler<TestEvent>>();
-        var firstEventHandler = firstEventHandlerMock.Object;
+        IEventHandler<TestEvent> firstEventHandler = firstEventHandlerMock.Object;
         firstEventRegistrationMock.SetupGet(r => r.Handler).Returns(firstEventHandler);
 
         var firstEventHandlerId = EventHandlerIdentity.Create<TestEventOtherHandler>();
@@ -39,7 +39,7 @@ public class EventHandlerProviderTests
         _registeredHandlerId = EventHandlerIdentity.Create<TestEventHandler>();
         secondEventRegistrationMock.SetupGet(r => r.HandlerId).Returns(_registeredHandlerId);
 
-        var serviceProvider = services.BuildServiceProvider();
+        ServiceProvider serviceProvider = services.BuildServiceProvider();
         _sut = new EventHandlerProvider(serviceProvider);
     }
 
@@ -47,7 +47,7 @@ public class EventHandlerProviderTests
     public void GetHandler_WithRegisteredHandler_ReturnsTheHandler()
     {
         // Act
-        var result = _sut.GetHandler<TestEvent>(_registeredHandlerId);
+        IEventHandler<TestEvent> result = _sut.GetHandler<TestEvent>(_registeredHandlerId);
 
         // Assert
         Assert.Same(_registeredHandler, result);

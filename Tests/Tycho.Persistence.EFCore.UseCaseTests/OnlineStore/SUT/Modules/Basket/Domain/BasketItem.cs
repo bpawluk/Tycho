@@ -1,4 +1,4 @@
-﻿
+
 namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Domain;
 
 internal class BasketItem(int productId, uint quantity, decimal price)

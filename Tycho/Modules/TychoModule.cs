@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,21 +40,21 @@ namespace Tycho.Modules
         /// Use this method to define requests handled and required by the module
         /// </summary>
         /// <param name="module">An interface to define requests</param>
-        [ReferencedBySourceGenerator] 
+        [ReferencedBySourceGenerator]
         protected abstract void DefineContract(IModuleContract module);
 
         /// <summary>
         /// Use this method to define events handled and routed by the module
         /// </summary>
         /// <param name="module">An interface to define events</param>
-        [ReferencedBySourceGenerator] 
+        [ReferencedBySourceGenerator]
         protected abstract void DefineEvents(IModuleEvents module);
 
         /// <summary>
         /// Use this method to define submodules used by the module
         /// </summary>
         /// <param name="module">An interface to include submodules</param>
-        [ReferencedBySourceGenerator] 
+        [ReferencedBySourceGenerator]
         protected abstract void IncludeModules(IModuleStructure module);
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace Tycho.Modules
             DefineEvents(_builder.Events);
             IncludeModules(_builder.Structure);
 
-            var module = await _builder.BuildAsync().ConfigureAwait(false);
+            IModule module = await _builder.BuildAsync().ConfigureAwait(false);
             await Startup(module.Internals).ConfigureAwait(false);
 
             return module;

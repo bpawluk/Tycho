@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Tycho.Events.Broker;
 using Tycho.Events.Model;
@@ -18,13 +18,13 @@ namespace Tycho.Events.Registrating.Registrations
 
         public IReadOnlyCollection<RoutedEvent> Route(Guid eventId, TEvent eventPayload)
         {
-            var routeStep = GetRouteStep();
-            var routedEvents = _externalEventBroker.Route(eventId, eventPayload);
+            IRouteStep routeStep = GetRouteStep();
+            IReadOnlyCollection<RoutedEvent> routedEvents = _externalEventBroker.Route(eventId, eventPayload);
 
-            foreach (var routedEvent in routedEvents)
+            foreach (RoutedEvent routedEvent in routedEvents)
             {
                 routedEvent.Route.Push(routeStep);
-            }   
+            }
 
             return routedEvents;
         }

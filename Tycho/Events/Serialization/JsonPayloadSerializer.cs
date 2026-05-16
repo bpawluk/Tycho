@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text.Json;
 
 namespace Tycho.Events.Serialization

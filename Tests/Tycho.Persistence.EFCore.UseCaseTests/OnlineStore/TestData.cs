@@ -23,12 +23,12 @@ internal class TestData
 
     public Catalog GetProductsAfterPurchase()
     {
-        var basket = GetBasket();
+        Basket basket = GetBasket();
         var productsAfterPurchase = new Catalog();
-        foreach (var product in InitialProducts)
+        foreach (Product product in InitialProducts)
         {
-            var basketItem = basket.FirstOrDefault(item => item.ProductId == product.Id);
-            var updatedProduct = product with
+            BasketItem? basketItem = basket.FirstOrDefault(item => item.ProductId == product.Id);
+            Product updatedProduct = product with
             {
                 Quantity = product.Quantity - basketItem?.Quantity ?? 0
             };

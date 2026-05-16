@@ -36,7 +36,7 @@ public class DownStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
+        IDownStreamRequestRegistration<TestRequest, OtherModule>? registration = _internals.GetService<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<RequestExposer<TestRequest>>(registration.Handler);
     }
@@ -66,7 +66,7 @@ public class DownStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<
+        IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>? registration = _internals.GetService<
             IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<RequestExposer<TestRequestWithResponse, string>>(registration.Handler);
@@ -98,7 +98,7 @@ public class DownStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
+        IDownStreamRequestRegistration<TestRequest, OtherModule>? registration = _internals.GetService<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<MappedRequestExposer<TestRequest, OtherRequest>>(registration.Handler);
     }
@@ -135,7 +135,7 @@ public class DownStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<
+        IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>? registration = _internals.GetService<
             IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<MappedRequestExposer<
@@ -176,7 +176,7 @@ public class DownStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
+        IDownStreamRequestRegistration<TestRequest, OtherModule>? registration = _internals.GetService<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<RequestForwarder<TestRequest, TestModule>>(registration.Handler);
     }
@@ -207,7 +207,7 @@ public class DownStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals
+        IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>? registration = _internals
             .GetService<IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<RequestForwarder<TestRequestWithResponse, string, TestModule>>(registration.Handler);
@@ -240,7 +240,7 @@ public class DownStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
+        IDownStreamRequestRegistration<TestRequest, OtherModule>? registration = _internals.GetService<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<MappedRequestForwarder<TestRequest, OtherRequest, TestModule>>(registration.Handler);
     }
@@ -281,7 +281,7 @@ public class DownStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals
+        IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>? registration = _internals
             .GetService<IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<MappedRequestForwarder<
@@ -323,7 +323,7 @@ public class DownStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
+        IDownStreamRequestRegistration<TestRequest, OtherModule>? registration = _internals.GetService<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<TestRequestHandler>(registration.Handler);
     }
@@ -354,7 +354,7 @@ public class DownStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<
+        IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>? registration = _internals.GetService<
             IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<TestRequestHandler>(registration.Handler);
@@ -385,7 +385,7 @@ public class DownStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
+        IDownStreamRequestRegistration<TestRequest, OtherModule>? registration = _internals.GetService<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<RequestIgnorer<TestRequest>>(registration.Handler);
     }
@@ -415,7 +415,7 @@ public class DownStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<
+        IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>? registration = _internals.GetService<
             IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
         Assert.NotNull(registration);
         Assert.IsType<RequestIgnorer<TestRequestWithResponse, string>>(registration.Handler);

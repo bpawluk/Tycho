@@ -22,19 +22,19 @@ internal class ContentRepository(
         if (type is EntryType.Article)
         {
             var addArticleRequest = new AddArticleRequest(content.Author, content.Value);
-            var result = await _articlesModule.ExecuteAsync(addArticleRequest);
+            AddArticleRequest.Response result = await _articlesModule.ExecuteAsync(addArticleRequest);
             return result.ArticleId;
         }
         else if (type is EntryType.Post)
         {
             var addPostRequest = new AddPostRequest(content.Author, content.Value);
-            var result = await _postsModule.ExecuteAsync(addPostRequest);
+            AddPostRequest.Response result = await _postsModule.ExecuteAsync(addPostRequest);
             return result.PostId;
         }
         else if (type is EntryType.Comment)
         {
             var addCommentRequest = new AddCommentRequest(content.Author, content.Value);
-            var result = await _commentsModule.ExecuteAsync(addCommentRequest);
+            AddCommentRequest.Response result = await _commentsModule.ExecuteAsync(addCommentRequest);
             return result.CommentId;
         }
         else
@@ -48,19 +48,19 @@ internal class ContentRepository(
         if (type is EntryType.Article)
         {
             var getArticlesRequest = new GetArticlesRequest(entryIds);
-            var result = await _articlesModule.ExecuteAsync(getArticlesRequest);
+            GetArticlesRequest.Response result = await _articlesModule.ExecuteAsync(getArticlesRequest);
             return result.Articles.Select(article => new Content(article.Id, article.Author, article.Content)).ToArray();
         }
         else if (type is EntryType.Post)
         {
             var getPostsRequest = new GetPostsRequest(entryIds);
-            var result = await _postsModule.ExecuteAsync(getPostsRequest);
+            GetPostsRequest.Response result = await _postsModule.ExecuteAsync(getPostsRequest);
             return result.Posts.Select(post => new Content(post.Id, post.Author, post.Content)).ToArray();
         }
         else if (type is EntryType.Comment)
         {
             var getCommentsRequest = new GetCommentsRequest(entryIds);
-            var result = await _commentsModule.ExecuteAsync(getCommentsRequest);
+            GetCommentsRequest.Response result = await _commentsModule.ExecuteAsync(getCommentsRequest);
             return result.Comments.Select(comment => new Content(comment.Id, comment.Author, comment.Content)).ToArray();
         }
         else

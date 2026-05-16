@@ -1,4 +1,4 @@
-﻿#pragma warning disable IDE0130
+#pragma warning disable IDE0130
 
 #if !NET6_0_OR_GREATER
 namespace System.Runtime.CompilerServices

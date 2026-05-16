@@ -14,19 +14,19 @@ public class ModuleProviderTests
     public ModuleProviderTests()
     {
         var firstModuleMock = new Mock<IModule>();
-        var firstModule = firstModuleMock.Object;
+        IModule firstModule = firstModuleMock.Object;
         var firstModuleId = ModuleIdentity.Create<OtherModule>();
         _registeredModules.Add(firstModuleId, firstModule);
         firstModuleMock.SetupGet(m => m.Identity).Returns(firstModuleId);
 
         var secondModuleMock = new Mock<IModule>();
-        var secondModule = secondModuleMock.Object;
+        IModule secondModule = secondModuleMock.Object;
         var secondModuleId = ModuleIdentity.Create<TestModule>();
         _registeredModules.Add(secondModuleId, secondModule);
         secondModuleMock.SetupGet(m => m.Identity).Returns(secondModuleId);
 
         var thirdModuleMock = new Mock<IModule>();
-        var thirdModule = thirdModuleMock.Object;
+        IModule thirdModule = thirdModuleMock.Object;
         var thirdModuleId = ModuleIdentity.Create<AnotherModule>();
         _registeredModules.Add(thirdModuleId, thirdModule);
         thirdModuleMock.SetupGet(m => m.Identity).Returns(thirdModuleId);
@@ -38,11 +38,11 @@ public class ModuleProviderTests
     public void GetModule_WithRegisteredModule_ReturnsTheModule()
     {
         // Arrange
-        var moduleId = _registeredModules.Keys.ElementAt(1);
-        var module = _registeredModules[moduleId];
+        ModuleIdentity moduleId = _registeredModules.Keys.ElementAt(1);
+        IModule module = _registeredModules[moduleId];
 
         // Act
-        var result = _sut.GetModule(moduleId);
+        IModule result = _sut.GetModule(moduleId);
 
         // Assert
         Assert.Same(module, result);
@@ -68,11 +68,11 @@ public class ModuleProviderTests
         var allModules = _registeredModules.Values.ToList();
 
         // Act
-        var modules = _sut.GetAllModules();
+        IReadOnlyCollection<IModule> modules = _sut.GetAllModules();
 
         // Assert
         Assert.Equal(allModules.Count, modules.Count);
-        foreach (var module in allModules)
+        foreach (IModule? module in allModules)
         {
             Assert.Contains(module, modules);
         }

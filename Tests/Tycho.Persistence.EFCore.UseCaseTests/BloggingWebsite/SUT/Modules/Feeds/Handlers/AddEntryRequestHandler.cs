@@ -1,7 +1,7 @@
-using Tycho.Requests;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Persistence;
+using Tycho.Requests;
 using static Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract.AddEntryRequest;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Handlers;
@@ -10,14 +10,14 @@ internal class AddEntryRequestHandler(FeedsDbContext dbContext, FeedProvider fee
 {
     public async Task<Response> HandleAsync(AddEntryRequest requestData, CancellationToken cancellationToken)
     {
-        var entryType = GetEntryType(requestData);
+        EntryType entryType = GetEntryType(requestData);
         var entryContent = new Content(requestData.Entry.Author, requestData.Entry.Content);
-        var contentId = await contentRepository.AddEntryContent(entryType, entryContent);
+        int contentId = await contentRepository.AddEntryContent(entryType, entryContent);
 
-        var feedId = GetFeedId(requestData);
-        var feed = await feedProvider.GetFeed(feedId, cancellationToken);
+        int? feedId = GetFeedId(requestData);
+        Feed feed = await feedProvider.GetFeed(feedId, cancellationToken);
 
-        var newEntry = feed.AddEntry(entryType, contentId);
+        Entry newEntry = feed.AddEntry(entryType, contentId);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return new Response(newEntry.Id);

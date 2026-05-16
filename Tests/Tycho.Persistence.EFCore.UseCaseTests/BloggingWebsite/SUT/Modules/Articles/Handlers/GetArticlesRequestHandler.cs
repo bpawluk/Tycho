@@ -10,7 +10,7 @@ internal class GetArticlesRequestHandler(ArticlesDbContext dbContext) : IRequest
 {
     public async Task<Response> HandleAsync(GetArticlesRequest requestData, CancellationToken cancellationToken)
     {
-        var responseArticles = await dbContext.Articles
+        Article[] responseArticles = await dbContext.Articles
             .Where(article => requestData.ArticleIds.Contains(article.Id))
             .Select(article => new Article(
                 article.Id,

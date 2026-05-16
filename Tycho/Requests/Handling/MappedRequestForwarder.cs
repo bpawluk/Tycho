@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using Tycho.Modules;
 using Tycho.Modules.Instance;
 
 namespace Tycho.Requests.Handling
 {
-    internal class MappedRequestForwarder<TRequest, TTargetRequest, TModule> 
+    internal class MappedRequestForwarder<TRequest, TTargetRequest, TModule>
         : MappedRequestRelay<TRequest, TTargetRequest>
         where TRequest : class, IRequest
         where TTargetRequest : class, IRequest
@@ -16,7 +16,7 @@ namespace Tycho.Requests.Handling
         }
     }
 
-    internal class MappedRequestForwarder<TRequest, TResponse, TTargetRequest, TTargetResponse, TModule> 
+    internal class MappedRequestForwarder<TRequest, TResponse, TTargetRequest, TTargetResponse, TModule>
         : MappedRequestRelay<TRequest, TResponse, TTargetRequest, TTargetResponse>
         where TRequest : class, IRequest<TResponse>
         where TTargetRequest : class, IRequest<TTargetResponse>

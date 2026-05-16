@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text.RegularExpressions;
 using Tycho.Identity.Modules;
 using Tycho.Modules;
@@ -32,7 +32,7 @@ namespace Tycho.Events.Routing.Steps
 
         public static IRouteStep Parse(string step)
         {
-            if (TryParse(step, out var parsedStep))
+            if (TryParse(step, out IRouteStep? parsedStep))
             {
                 return parsedStep;
             }
@@ -43,10 +43,10 @@ namespace Tycho.Events.Routing.Steps
         {
             result = default!;
 
-            var match = _pattern.Match(step);
+            Match match = _pattern.Match(step);
             if (match.Success)
             {
-                var destinationModuleIdentity = match.Groups[_destinationGroup].Value;
+                string destinationModuleIdentity = match.Groups[_destinationGroup].Value;
                 var destinationModule = ModuleIdentity.Parse(destinationModuleIdentity);
                 result = new DownStreamRouteStep(destinationModule);
                 return true;

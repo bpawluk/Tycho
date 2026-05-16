@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Tycho.Persistence.EFCore.Outbox;
 

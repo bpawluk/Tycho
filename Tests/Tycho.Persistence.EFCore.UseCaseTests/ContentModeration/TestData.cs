@@ -16,9 +16,7 @@ internal class TestData
 
     public Posts GetInitialPosts()
     {
-        if (_initialPosts == null)
-        {
-            _initialPosts =
+        _initialPosts ??=
             [
                 new(InitialUsers[0].Id!.Value, "Alice's Post"),
                 new(InitialUsers[0].Id!.Value, "Alice's Slightly Inappropriate Post"),
@@ -26,13 +24,12 @@ internal class TestData
                 new(InitialUsers[1].Id!.Value, "Bob's Very Inappropriate Post"),
                 new(InitialUsers[2].Id!.Value, "Charlie's Post"),
             ];
-        }
         return _initialPosts;
     }
 
     public PostRemovals GetPostRemovals()
     {
-        var posts = GetInitialPosts();
+        Posts posts = GetInitialPosts();
         return
         [
             new(posts[1], false),
@@ -42,13 +39,13 @@ internal class TestData
 
     public Users GetUsersAfterPostRemovals()
     {
-        var postRemovals = GetPostRemovals();
+        PostRemovals postRemovals = GetPostRemovals();
         return [.. InitialUsers.Where(user => !postRemovals.BannedUsersIds.Contains(user.Id!.Value))];
     }
 
     public Posts GetPostsAfterPostRemovals()
     {
-        var postRemovals = GetPostRemovals();
+        PostRemovals postRemovals = GetPostRemovals();
         return [.. GetInitialPosts().Where(post => !postRemovals.RemovedPosts.Contains(post))];
     }
 

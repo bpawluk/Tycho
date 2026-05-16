@@ -56,7 +56,7 @@ public class InboxProcessorJobTests
     {
         // Arrange
         var cancellationToken = new CancellationToken();
-        var sut = CreateSut();
+        InboxProcessorJob sut = CreateSut();
 
         // Act
         await sut.ExecuteAsync(cancellationToken);
@@ -75,9 +75,9 @@ public class InboxProcessorJobTests
     public async Task ExecuteAsync_WithAssignedEvent_HandlesEventAndMarksAsHandled()
     {
         // Arrange
-        var routedEvent = CreateRoutedEvent();
+        RoutedEvent<TestEvent> routedEvent = CreateRoutedEvent();
         var cancellationToken = new CancellationToken();
-        var sut = CreateSut();
+        InboxProcessorJob sut = CreateSut();
 
         // Act
         sut.ForEvent(routedEvent);
@@ -101,9 +101,9 @@ public class InboxProcessorJobTests
     public async Task ExecuteAsync_WithAssignedEvent_AndTransactionalHandler_HandlesEventAndMarksAsHandledWithinTransaction()
     {
         // Arrange
-        var routedEvent = CreateRoutedEvent();
+        RoutedEvent<TestEvent> routedEvent = CreateRoutedEvent();
         var cancellationToken = new CancellationToken();
-        var sut = CreateSut(useTransactionalHandler: true);
+        InboxProcessorJob sut = CreateSut(useTransactionalHandler: true);
 
         // Act
         sut.ForEvent(routedEvent);
@@ -127,9 +127,9 @@ public class InboxProcessorJobTests
     public async Task ExecuteAsync_WithAssignedEvent_WhenHandlerThrows_MarksEventAsFailed()
     {
         // Arrange
-        var routedEvent = CreateRoutedEvent();
+        RoutedEvent<TestEvent> routedEvent = CreateRoutedEvent();
         var cancellationToken = new CancellationToken();
-        var sut = CreateSut();
+        InboxProcessorJob sut = CreateSut();
 
         _handlerMock.Setup(h => h.HandleAsync(It.IsAny<EventContext<TestEvent>>(), cancellationToken))
                     .ThrowsAsync(new InvalidOperationException("handler failure"));
@@ -151,9 +151,9 @@ public class InboxProcessorJobTests
     public async Task ExecuteAsync_WithAssignedEvent_WhenTransactionalHandlerThrows_RollbacksAndMarksEventAsFailed()
     {
         // Arrange
-        var routedEvent = CreateRoutedEvent();
+        RoutedEvent<TestEvent> routedEvent = CreateRoutedEvent();
         var cancellationToken = new CancellationToken();
-        var sut = CreateSut(useTransactionalHandler: true);
+        InboxProcessorJob sut = CreateSut(useTransactionalHandler: true);
 
         _transactionalHandlerMock.Setup(h => h.HandleAsync(It.IsAny<EventContext<TestEvent>>(), cancellationToken))
                                  .ThrowsAsync(new InvalidOperationException("handler failure"));
@@ -175,9 +175,9 @@ public class InboxProcessorJobTests
     public async Task ExecuteAsync_WithAssignedEvent_WhenHandlerNotFound_MarksEventAsFailed()
     {
         // Arrange
-        var routedEvent = CreateRoutedEvent();
+        RoutedEvent<TestEvent> routedEvent = CreateRoutedEvent();
         var cancellationToken = new CancellationToken();
-        var sut = CreateSut(withHandler: false);
+        InboxProcessorJob sut = CreateSut(withHandler: false);
 
         // Act
         sut.ForEvent(routedEvent);
@@ -191,7 +191,7 @@ public class InboxProcessorJobTests
     private InboxProcessorJob CreateSut(bool withHandler = true, bool useTransactionalHandler = false)
     {
         var internals = new Internals(typeof(TestModule));
-        var serviceCollection = internals.GetServiceCollection();
+        IServiceCollection serviceCollection = internals.GetServiceCollection();
 
         serviceCollection.AddSingleton(_inboxConsumerMock.Object);
         serviceCollection.AddSingleton(_transactionMock.Object);

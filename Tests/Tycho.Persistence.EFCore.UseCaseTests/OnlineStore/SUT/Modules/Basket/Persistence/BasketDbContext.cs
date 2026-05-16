@@ -26,7 +26,7 @@ internal class BasketDbContext : TychoDbContext
     {
         base.OnConfiguring(optionsBuilder);
 
-        var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "OnlineStore.Basket.db");
+        string dbPath = Path.Combine(Directory.GetCurrentDirectory(), "OnlineStore.Basket.db");
         optionsBuilder.UseSqlite($"Data Source={dbPath}");
     }
 

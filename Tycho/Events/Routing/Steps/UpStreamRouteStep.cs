@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Tycho.Events.Routing.Steps
 {
@@ -15,7 +15,7 @@ namespace Tycho.Events.Routing.Steps
 
         public static IRouteStep Parse(string step)
         {
-            if (TryParse(step, out var parsedStep))
+            if (TryParse(step, out IRouteStep? parsedStep))
             {
                 return parsedStep;
             }

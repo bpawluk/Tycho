@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Tycho.Modules;
 
 namespace Tycho.Identity.Modules

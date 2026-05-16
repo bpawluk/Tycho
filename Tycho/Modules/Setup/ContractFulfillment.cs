@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Tycho.Requests;
 using Tycho.Requests.Handling;
 using Tycho.Requests.Registrating;
@@ -127,7 +127,7 @@ namespace Tycho.Modules.Setup
             where TRequest : class, IRequest<TResponse>
         {
             _registrator.HandleDownStreamRequest<
-                TSourceModule, TRequest, TResponse, 
+                TSourceModule, TRequest, TResponse,
                 RequestIgnorer<TRequest, TResponse>>();
             return this;
         }

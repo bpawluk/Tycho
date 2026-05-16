@@ -19,10 +19,10 @@ public class ScopedEventBrokerTests
     public void Route_WithNoRegistrations_ReturnsEmpty()
     {
         // Arrange
-        var sut = CreateSut(_ => { });
+        ScopedEventBroker sut = CreateSut(_ => { });
 
         // Act
-        var result = sut.Route(Guid.NewGuid(), new TestEvent());
+        IReadOnlyCollection<RoutedEvent> result = sut.Route(Guid.NewGuid(), new TestEvent());
 
         // Assert
         Assert.Empty(result);
@@ -39,18 +39,18 @@ public class ScopedEventBrokerTests
         emptyRegistration.Setup(r => r.Route(It.IsAny<Guid>(), It.IsAny<TestEvent>()))
                          .Returns([]);
 
-        var firstRoutedEvent = CreateRoutedEvent();
+        RoutedEvent<TestEvent> firstRoutedEvent = CreateRoutedEvent();
         var firstRegistration = new Mock<IEventRegistration<TestEvent>>();
         firstRegistration.Setup(r => r.Route(It.IsAny<Guid>(), It.IsAny<TestEvent>()))
                          .Returns([firstRoutedEvent]);
 
-        var secondRoutedEvent = CreateRoutedEvent();
-        var thirdRoutedEvent = CreateRoutedEvent();
+        RoutedEvent<TestEvent> secondRoutedEvent = CreateRoutedEvent();
+        RoutedEvent<TestEvent> thirdRoutedEvent = CreateRoutedEvent();
         var secondRegistration = new Mock<IEventRegistration<TestEvent>>();
         secondRegistration.Setup(r => r.Route(It.IsAny<Guid>(), It.IsAny<TestEvent>()))
                           .Returns([secondRoutedEvent, thirdRoutedEvent]);
 
-        var sut = CreateSut(services =>
+        ScopedEventBroker sut = CreateSut(services =>
         {
             services.AddSingleton(emptyRegistration.Object);
             services.AddSingleton(firstRegistration.Object);
@@ -58,7 +58,7 @@ public class ScopedEventBrokerTests
         });
 
         // Act
-        var result = sut.Route(eventId, eventPayload);
+        IReadOnlyCollection<RoutedEvent> result = sut.Route(eventId, eventPayload);
 
         // Assert
         Assert.Equal(3, result.Count);
@@ -75,7 +75,7 @@ public class ScopedEventBrokerTests
     public async Task DeliverAsync_WithMatchingStrategy_CallsDeliverAsync()
     {
         // Arrange
-        var routedEvent = CreateSerializedRoutedEvent();
+        SerializedRoutedEvent routedEvent = CreateSerializedRoutedEvent();
         var cancellationToken = new CancellationToken();
 
         var matchingStrategyMock = new Mock<IDeliveryStrategy>();
@@ -87,7 +87,7 @@ public class ScopedEventBrokerTests
         var anotherStrategyMock = new Mock<IDeliveryStrategy>();
         anotherStrategyMock.Setup(s => s.CanDeliver(routedEvent)).Returns(false);
 
-        var sut = CreateSut(services =>
+        ScopedEventBroker sut = CreateSut(services =>
         {
             services.AddSingleton(matchingStrategyMock.Object);
             services.AddSingleton(otherStrategyMock.Object);
@@ -107,13 +107,13 @@ public class ScopedEventBrokerTests
     public async Task DeliverAsync_WithNoMatchingStrategies_ThrowsInvalidOperationException()
     {
         // Arrange
-        var routedEvent = CreateSerializedRoutedEvent();
+        SerializedRoutedEvent routedEvent = CreateSerializedRoutedEvent();
         var cancellationToken = new CancellationToken();
 
         var notMatchingStrategyMock = new Mock<IDeliveryStrategy>();
         notMatchingStrategyMock.Setup(s => s.CanDeliver(routedEvent)).Returns(false);
 
-        var sut = CreateSut(services =>
+        ScopedEventBroker sut = CreateSut(services =>
         {
             services.AddSingleton(_ => notMatchingStrategyMock.Object);
         });
@@ -129,7 +129,7 @@ public class ScopedEventBrokerTests
     public async Task DeliverAsync_WithMoreThanOneMatchingStrategy_ThrowsInvalidOperationException()
     {
         // Arrange
-        var routedEvent = CreateSerializedRoutedEvent();
+        SerializedRoutedEvent routedEvent = CreateSerializedRoutedEvent();
         var cancellationToken = new CancellationToken();
 
         var matchingStrategyMock = new Mock<IDeliveryStrategy>();
@@ -138,7 +138,7 @@ public class ScopedEventBrokerTests
         var otherStrategyMock = new Mock<IDeliveryStrategy>();
         otherStrategyMock.Setup(s => s.CanDeliver(routedEvent)).Returns(true);
 
-        var sut = CreateSut(services =>
+        ScopedEventBroker sut = CreateSut(services =>
         {
             services.AddSingleton(matchingStrategyMock.Object);
             services.AddSingleton(otherStrategyMock.Object);

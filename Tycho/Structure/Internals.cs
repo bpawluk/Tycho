@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -51,7 +51,7 @@ namespace Tycho.Structure
 
         public bool HasService<TServiceInterface>()
         {
-            var serviceType = typeof(TServiceInterface);
+            Type serviceType = typeof(TServiceInterface);
 
             if (_serviceCollection != null)
             {

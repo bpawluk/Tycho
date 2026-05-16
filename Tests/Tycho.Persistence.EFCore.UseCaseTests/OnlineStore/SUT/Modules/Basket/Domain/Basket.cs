@@ -1,4 +1,4 @@
-﻿namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Domain;
+namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Domain;
 
 internal class Basket(int customerId)
 {
@@ -16,7 +16,7 @@ internal class Basket(int customerId)
 
     public void Add(BasketItem item)
     {
-        var existingItem = _items.FirstOrDefault(i => i.ProductId == item.ProductId);
+        BasketItem? existingItem = _items.FirstOrDefault(i => i.ProductId == item.ProductId);
 
         if (existingItem is null)
         {
@@ -32,20 +32,14 @@ internal class Basket(int customerId)
 
     public void ConfirmItem(int productId)
     {
-        var item = _items.FirstOrDefault(i => i.ProductId == productId);
-        if (item != null)
-        {
-            item.Confirm();
-        }
+        BasketItem? item = _items.FirstOrDefault(i => i.ProductId == productId);
+        item?.Confirm();
     }
 
     public void DeclineItem(int productId)
     {
-        var item = _items.FirstOrDefault(i => i.ProductId == productId);
-        if (item != null)
-        {
-            item.Decline();
-        }
+        BasketItem? item = _items.FirstOrDefault(i => i.ProductId == productId);
+        item?.Decline();
     }
 
     public void Checkout()

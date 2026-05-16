@@ -21,7 +21,7 @@ internal class FeedsDbContext : TychoDbContext
     {
         base.OnConfiguring(optionsBuilder);
 
-        var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "BloggingWebsite.Feeds.db");
+        string dbPath = Path.Combine(Directory.GetCurrentDirectory(), "BloggingWebsite.Feeds.db");
         optionsBuilder.UseSqlite($"Data Source={dbPath}");
     }
 }

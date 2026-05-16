@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Tycho.Modules;
@@ -48,7 +48,7 @@ namespace Tycho.Requests.Registrating
             where TTargetRequest : class, IRequest<TTargetResponse>
         {
             AddDownStreamRegistration<
-                TSourceModule, TRequest, TResponse, 
+                TSourceModule, TRequest, TResponse,
                 MappedRequestExposer<TRequest, TResponse, TTargetRequest, TTargetResponse>>();
             Services.TryAddTransient(sp =>
                 new MappedRequestExposer<TRequest, TResponse, TTargetRequest, TTargetResponse>(
@@ -72,7 +72,7 @@ namespace Tycho.Requests.Registrating
             where TTargetModule : TychoModule
         {
             AddDownStreamRegistration<
-                TSourceModule, TRequest, TResponse, 
+                TSourceModule, TRequest, TResponse,
                 RequestForwarder<TRequest, TResponse, TTargetModule>>();
             Services.TryAddTransient<RequestForwarder<TRequest, TResponse, TTargetModule>>();
         }
@@ -85,7 +85,7 @@ namespace Tycho.Requests.Registrating
             where TTargetModule : TychoModule
         {
             AddDownStreamRegistration<
-                TSourceModule, TRequest, 
+                TSourceModule, TRequest,
                 MappedRequestForwarder<TRequest, TTargetRequest, TTargetModule>>();
             Services.TryAddTransient(sp =>
                 new MappedRequestForwarder<TRequest, TTargetRequest, TTargetModule>(

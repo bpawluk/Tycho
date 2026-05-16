@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Requests.Registrating.Registrations;
 using Tycho.Structure;
 

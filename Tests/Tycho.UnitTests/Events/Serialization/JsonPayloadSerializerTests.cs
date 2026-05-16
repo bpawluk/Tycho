@@ -47,7 +47,7 @@ public class JsonPayloadSerializerTests
         string payload = GetSerializedPayload(expectedEventData)!;
 
         // Act
-        var result = _sut.Deserialize<TestEventWithData>(payload);
+        TestEventWithData result = _sut.Deserialize<TestEventWithData>(payload);
 
         // Assert
         Assert.True(expectedEventData.EqualsEvent(result));

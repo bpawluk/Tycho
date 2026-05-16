@@ -1,8 +1,8 @@
-﻿using Tycho.Modules;
+using Tycho.Modules;
 
 namespace Tycho.Requests.Registrating.Registrations
 {
-    internal class DownStreamRequestRegistration<TRequest, THandler, TModule> 
+    internal class DownStreamRequestRegistration<TRequest, THandler, TModule>
         : IDownStreamRequestRegistration<TRequest, TModule>
         where TRequest : class, IRequest
         where THandler : class, IRequestHandler<TRequest>
@@ -16,7 +16,7 @@ namespace Tycho.Requests.Registrating.Registrations
         }
     }
 
-    internal class DownStreamRequestRegistration<TRequest, TResponse, THandler, TModule> 
+    internal class DownStreamRequestRegistration<TRequest, TResponse, THandler, TModule>
         : IDownStreamRequestRegistration<TRequest, TResponse, TModule>
         where TRequest : class, IRequest<TResponse>
         where THandler : class, IRequestHandler<TRequest, TResponse>

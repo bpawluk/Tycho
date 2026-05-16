@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events;
-using Tycho.IntegrationTests._Utils;
 using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Services;
+using Tycho.IntegrationTests._Utils;
 
 namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Handlers;
 

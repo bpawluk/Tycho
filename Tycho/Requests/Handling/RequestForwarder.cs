@@ -1,4 +1,4 @@
-﻿using Tycho.Modules;
+using Tycho.Modules;
 using Tycho.Modules.Instance;
 
 namespace Tycho.Requests.Handling

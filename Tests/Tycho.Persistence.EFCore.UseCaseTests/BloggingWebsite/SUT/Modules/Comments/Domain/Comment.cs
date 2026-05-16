@@ -1,4 +1,4 @@
-﻿namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Domain;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Domain;
 
 internal class Comment(string author, string content)
 {

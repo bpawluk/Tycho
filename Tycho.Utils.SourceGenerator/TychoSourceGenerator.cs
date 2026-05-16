@@ -18,7 +18,7 @@ namespace Tycho.Utils.SourceGenerator
     {
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            var tychoPipelineBase = context.SyntaxProvider.ForAttributeWithMetadataName(
+            IncrementalValuesProvider<(TychoDefinitionKind, ClassDefinitionModel)> tychoPipelineBase = context.SyntaxProvider.ForAttributeWithMetadataName(
                 fullyQualifiedMetadataName: TychoDefinitionAttributeReference.FullName,
                 predicate: GetTychoPipelineBasePredicate,
                 transform: GetTychoPipelineBaseTransform);
@@ -39,9 +39,9 @@ namespace Tycho.Utils.SourceGenerator
         private static (TychoDefinitionKind, ClassDefinitionModel) GetTychoPipelineBaseTransform(GeneratorAttributeSyntaxContext context, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            var definitionKind = GetDefinitionKind(context, token);
-            var definitionType = GetDefinitionType(context.TargetSymbol, token);
-            var methods = GetMethodDefinitionModels(context, definitionType, token);
+            TychoDefinitionKind definitionKind = GetDefinitionKind(context, token);
+            TypeModel definitionType = GetDefinitionType(context.TargetSymbol, token);
+            ImmutableEquatableArray<MethodDefinitionModel> methods = GetMethodDefinitionModels(context, definitionType, token);
             return (definitionKind, new ClassDefinitionModel(definitionType, methods));
         }
 
@@ -54,14 +54,14 @@ namespace Tycho.Utils.SourceGenerator
                 return TychoDefinitionKind.Unknown;
             }
 
-            var compilation = context.SemanticModel.Compilation;
-            var tychoAppSymbol = compilation.GetTypeByMetadataName(TychoAppReference.FullName);
+            Compilation compilation = context.SemanticModel.Compilation;
+            INamedTypeSymbol tychoAppSymbol = compilation.GetTypeByMetadataName(TychoAppReference.FullName);
             if (tychoAppSymbol != null && TypeInheritsFrom(typeSymbol, tychoAppSymbol))
             {
                 return TychoDefinitionKind.App;
             }
 
-            var tychoModuleSymbol = compilation.GetTypeByMetadataName(TychoModuleReference.FullName);
+            INamedTypeSymbol tychoModuleSymbol = compilation.GetTypeByMetadataName(TychoModuleReference.FullName);
             if (tychoModuleSymbol != null && TypeInheritsFrom(typeSymbol, tychoModuleSymbol))
             {
                 return TychoDefinitionKind.Module;
@@ -90,7 +90,7 @@ namespace Tycho.Utils.SourceGenerator
 
             var methodModels = new HashSet<MethodDefinitionModel>();
 
-            foreach (var methodSymbol in classSymbol.GetMembers().OfType<IMethodSymbol>())
+            foreach (IMethodSymbol methodSymbol in classSymbol.GetMembers().OfType<IMethodSymbol>())
             {
                 token.ThrowIfCancellationRequested();
 
@@ -111,7 +111,7 @@ namespace Tycho.Utils.SourceGenerator
         }
         private static bool TypeInheritsFrom(ITypeSymbol type, ITypeSymbol baseType)
         {
-            for (var current = type; current != null; current = current.BaseType)
+            for (ITypeSymbol current = type; current != null; current = current.BaseType)
             {
                 if (SymbolEqualityComparer.Default.Equals(current, baseType))
                 {
@@ -124,7 +124,7 @@ namespace Tycho.Utils.SourceGenerator
         private static MethodSignatureModel GetMethodSignatureModel(IMethodSymbol methodSymbol)
         {
             string methodName = methodSymbol.Name;
-            var returnType = GetTypeModel(methodSymbol.ReturnType);
+            TypeModel returnType = GetTypeModel(methodSymbol.ReturnType);
             var parameters = methodSymbol.Parameters
                 .Select(paramSymbol => GetTypeModel(paramSymbol.Type))
                 .ToImmutableEquatableArray();
@@ -134,18 +134,18 @@ namespace Tycho.Utils.SourceGenerator
         private static ImmutableEquatableArray<MethodInvocationModel> GetMethodBody(GeneratorAttributeSyntaxContext context, IMethodSymbol methodSymbol, CancellationToken token)
         {
             var methodInvocations = new HashSet<MethodInvocationModel>();
-            foreach (var syntaxRef in methodSymbol.DeclaringSyntaxReferences)
+            foreach (SyntaxReference syntaxRef in methodSymbol.DeclaringSyntaxReferences)
             {
                 if (!(syntaxRef.GetSyntax(token) is MethodDeclarationSyntax methodSyntax) || methodSyntax.Body == null)
                 {
                     continue;
                 }
-                var semanticModel = context.SemanticModel.Compilation.GetSemanticModel(methodSyntax.SyntaxTree);
+                SemanticModel semanticModel = context.SemanticModel.Compilation.GetSemanticModel(methodSyntax.SyntaxTree);
 
-                foreach (var invocationSyntax in methodSyntax.Body.DescendantNodes().OfType<InvocationExpressionSyntax>())
+                foreach (InvocationExpressionSyntax invocationSyntax in methodSyntax.Body.DescendantNodes().OfType<InvocationExpressionSyntax>())
                 {
-                    var symbolInfo = semanticModel.GetSymbolInfo(invocationSyntax, token);
-                    var symbol = symbolInfo.Symbol ?? symbolInfo.CandidateSymbols.FirstOrDefault();
+                    SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(invocationSyntax, token);
+                    ISymbol symbol = symbolInfo.Symbol ?? symbolInfo.CandidateSymbols.FirstOrDefault();
 
                     if (!(symbol is IMethodSymbol invokedMethodSymbol))
                     {
@@ -176,7 +176,7 @@ namespace Tycho.Utils.SourceGenerator
                     .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted));
 
             var containingTypes = new Stack<string>();
-            for (var current = symbol.ContainingType; current != null; current = current.ContainingType)
+            for (INamedTypeSymbol current = symbol.ContainingType; current != null; current = current.ContainingType)
             {
                 containingTypes.Push(current.Name);
             }

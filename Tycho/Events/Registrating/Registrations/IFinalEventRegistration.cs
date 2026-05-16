@@ -1,4 +1,4 @@
-﻿using Tycho.Identity.Events;
+using Tycho.Identity.Events;
 
 namespace Tycho.Events.Registrating.Registrations
 {

@@ -1,8 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
 using Tycho.Persistence.EFCore;
-using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Handlers;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Handlers;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Persistence;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Posts;
@@ -27,7 +27,7 @@ public partial class PostsModule : TychoModule
 
     protected override async Task Startup(IServiceProvider app)
     {
-        using var context = app.GetRequiredService<PostsDbContext>();
+        using PostsDbContext context = app.GetRequiredService<PostsDbContext>();
         await context.Database.EnsureDeletedAsync();
         await context.Database.EnsureCreatedAsync();
     }

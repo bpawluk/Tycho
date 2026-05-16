@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -61,7 +61,7 @@ namespace Tycho.Apps.Setup
             IModuleSettings? settings)
             where TModule : TychoModule, new()
         {
-            var submodule = new TModule().WithGlobals(_globals);
+            TychoModule submodule = new TModule().WithGlobals(_globals);
 
             if (settings != null)
             {
@@ -82,13 +82,13 @@ namespace Tycho.Apps.Setup
 
         public async Task BuildAsync()
         {
-            var services = _internals.GetServiceCollection();
+            IServiceCollection services = _internals.GetServiceCollection();
             services.AddTransient<IModuleProvider, ModuleProvider>();
             await Task.WhenAll(_submodules.Values.Select(async module =>
             {
-                var moduleInterface = typeof(IModule);
-                var genericModuleInterface = typeof(IModule<>).MakeGenericType(module.GetType());
-                var runningModuleInstance = await module.RunAsync().ConfigureAwait(false);
+                Type moduleInterface = typeof(IModule);
+                Type genericModuleInterface = typeof(IModule<>).MakeGenericType(module.GetType());
+                IModule runningModuleInstance = await module.RunAsync().ConfigureAwait(false);
                 services.AddSingleton(moduleInterface, runningModuleInstance);
                 services.AddSingleton(genericModuleInterface, runningModuleInstance);
             })).ConfigureAwait(false);

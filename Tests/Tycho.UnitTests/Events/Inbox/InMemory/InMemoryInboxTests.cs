@@ -27,7 +27,7 @@ public class InMemoryInboxTests
     public async Task Write_WithRoutedEvent_EnqueuesEntry()
     {
         // Arrange
-        var (entry, deserializedEntry) = CreateSerializedAndRoutedEventPair();
+        (SerializedRoutedEvent? entry, RoutedEvent? deserializedEntry) = CreateSerializedAndRoutedEventPair();
         var cancelationToken = new CancellationToken();
 
         bool notified = false;
@@ -35,10 +35,10 @@ public class InMemoryInboxTests
 
         // Act
         await _sut.Write(entry, cancelationToken);
-        var result = await _sut.Read(1, cancelationToken);
+        IReadOnlyCollection<RoutedEvent> result = await _sut.Read(1, cancelationToken);
 
         // Assert
-        var returnedEvent = Assert.Single(result);
+        RoutedEvent returnedEvent = Assert.Single(result);
         Assert.Same(deserializedEntry, returnedEvent);
         Assert.True(notified);
     }
@@ -53,7 +53,7 @@ public class InMemoryInboxTests
         await _sut.Write(CreateSerializedRoutedEvent(), cancelationToken);
 
         // Act
-        var result = await _sut.Read(2, cancelationToken);
+        IReadOnlyCollection<RoutedEvent> result = await _sut.Read(2, cancelationToken);
 
         // Assert
         Assert.Equal(2, result.Count);
@@ -67,7 +67,7 @@ public class InMemoryInboxTests
         await _sut.Write(CreateSerializedRoutedEvent(), cancelationToken);
 
         // Act
-        var result = await _sut.Read(5, cancelationToken);
+        IReadOnlyCollection<RoutedEvent> result = await _sut.Read(5, cancelationToken);
 
         // Assert
         Assert.Single(result);
@@ -80,7 +80,7 @@ public class InMemoryInboxTests
         var cancelationToken = new CancellationToken();
 
         // Act
-        var result = await _sut.Read(5, cancelationToken);
+        IReadOnlyCollection<RoutedEvent> result = await _sut.Read(5, cancelationToken);
 
         // Assert
         Assert.Empty(result);
@@ -95,7 +95,7 @@ public class InMemoryInboxTests
 
         // Act
         await _sut.Read(1, cancellationToken);
-        var result = await _sut.Read(1, cancellationToken);
+        IReadOnlyCollection<RoutedEvent> result = await _sut.Read(1, cancellationToken);
 
         // Assert
         Assert.Empty(result);

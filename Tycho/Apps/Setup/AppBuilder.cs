@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -66,13 +66,7 @@ namespace Tycho.Apps.Setup
 
         public async Task<IApp> BuildAsync()
         {
-            var app = Activator.CreateInstance(_appType, _internals, _cleanup) as IApp;
-
-            if (app is null)
-            {
-                throw new InvalidOperationException($"Failed to create an instance of {_appType.Name}.");
-            }
-
+            IApp app = Activator.CreateInstance(_appType, _internals, _cleanup) as IApp ?? throw new InvalidOperationException($"Failed to create an instance of {_appType.Name}.");
             await Contract.BuildAsync().ConfigureAwait(false);
             await Events.BuildAsync().ConfigureAwait(false);
             await Structure.BuildAsync().ConfigureAwait(false);

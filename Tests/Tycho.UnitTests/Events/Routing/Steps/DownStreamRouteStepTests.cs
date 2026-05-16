@@ -1,3 +1,4 @@
+using Tycho.Events.Routing;
 using Tycho.Events.Routing.Steps;
 using Tycho.Identity.Modules;
 using Tycho.UnitTests._Data.Modules;
@@ -41,7 +42,7 @@ public class DownStreamRouteStepTests
         string input = $"DOWN({destination})";
 
         // Act
-        bool success = DownStreamRouteStep.TryParse(input, out var result);
+        bool success = DownStreamRouteStep.TryParse(input, out IRouteStep? result);
 
         // Assert
         Assert.True(success);
@@ -57,7 +58,7 @@ public class DownStreamRouteStepTests
         string input = $"doWn({destination})";
 
         // Act
-        bool success = DownStreamRouteStep.TryParse(input, out var result);
+        bool success = DownStreamRouteStep.TryParse(input, out IRouteStep? result);
 
         // Assert
         Assert.True(success);
@@ -72,7 +73,7 @@ public class DownStreamRouteStepTests
         string input = "BOGUS";
 
         // Act
-        bool success = DownStreamRouteStep.TryParse(input, out var result);
+        bool success = DownStreamRouteStep.TryParse(input, out IRouteStep? result);
 
         // Assert
         Assert.False(success);
@@ -87,7 +88,7 @@ public class DownStreamRouteStepTests
         string input = $"DOWN({destination})";
 
         // Act
-        var result = DownStreamRouteStep.Parse(input);
+        IRouteStep result = DownStreamRouteStep.Parse(input);
 
         // Assert
         Assert.IsType<DownStreamRouteStep>(result);

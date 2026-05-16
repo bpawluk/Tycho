@@ -4,6 +4,7 @@ using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Events.Routing;
 using Tycho.Identity.Events;
+using Tycho.Processor;
 using Tycho.Structure;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
@@ -19,7 +20,7 @@ public class OutboxProcessorJobFactoryTests
     public OutboxProcessorJobFactoryTests()
     {
         var internals = new Internals(typeof(TestModule));
-        var serviceCollection = internals.GetServiceCollection();
+        IServiceCollection serviceCollection = internals.GetServiceCollection();
 
         _outboxConsumerMock = new Mock<IOutboxConsumer>();
         serviceCollection.AddSingleton(_outboxConsumerMock.Object);
@@ -40,7 +41,7 @@ public class OutboxProcessorJobFactoryTests
                            .ReturnsAsync(entries);
 
         // Act
-        var result = await _sut.CreateJobsAsync(maxCount, cancellationToken);
+        IReadOnlyCollection<IJob> result = await _sut.CreateJobsAsync(maxCount, cancellationToken);
 
         // Assert
         Assert.Equal(entries.Count, result.Count);
@@ -58,7 +59,7 @@ public class OutboxProcessorJobFactoryTests
                            .ReturnsAsync([]);
 
         // Act
-        var result = await _sut.CreateJobsAsync(maxCount, cancellationToken);
+        IReadOnlyCollection<IJob> result = await _sut.CreateJobsAsync(maxCount, cancellationToken);
 
         // Assert
         Assert.Empty(result);

@@ -1,4 +1,4 @@
-﻿using Tycho.Requests;
+using Tycho.Requests;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Incoming;
 

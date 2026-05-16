@@ -41,7 +41,7 @@ public class ForwardingEventRegistrationTests
         var sut = new ForwardingEventRegistration<TestEvent, TestModule>(_moduleMock.Object);
 
         // Act
-        var result = sut.Route(eventId, eventPayload);
+        IReadOnlyCollection<RoutedEvent> result = sut.Route(eventId, eventPayload);
 
         // Assert
         Assert.Empty(result);
@@ -54,8 +54,8 @@ public class ForwardingEventRegistrationTests
         // Arrange
         var eventId = Guid.NewGuid();
         var eventPayload = new TestEvent();
-        var firstRoutedEvent = CreateRoutedEvent(eventPayload);
-        var secondRoutedEvent = CreateRoutedEvent(eventPayload);
+        RoutedEvent<TestEvent> firstRoutedEvent = CreateRoutedEvent(eventPayload);
+        RoutedEvent<TestEvent> secondRoutedEvent = CreateRoutedEvent(eventPayload);
 
         _eventBrokerMock.Setup(eb => eb.Route(eventId, eventPayload))
                         .Returns([firstRoutedEvent, secondRoutedEvent]);
@@ -63,7 +63,7 @@ public class ForwardingEventRegistrationTests
         var sut = new ForwardingEventRegistration<TestEvent, TestModule>(_moduleMock.Object);
 
         // Act
-        var result = sut.Route(eventId, eventPayload);
+        IReadOnlyCollection<RoutedEvent> result = sut.Route(eventId, eventPayload);
 
         // Assert
         Assert.Equal(2, result.Count);
@@ -92,7 +92,7 @@ public class ForwardingEventRegistrationTests
         var sut = new MappedForwardingEventRegistration<TestEvent, OtherEvent, TestModule>(_moduleMock.Object, mapMock.Object);
 
         // Act
-        var result = sut.Route(eventId, eventPayload);
+        IReadOnlyCollection<RoutedEvent> result = sut.Route(eventId, eventPayload);
 
         // Assert
         Assert.Empty(result);
@@ -107,8 +107,8 @@ public class ForwardingEventRegistrationTests
         var eventId = Guid.NewGuid();
         var eventPayload = new TestEvent();
         var mappedPayload = new OtherEvent();
-        var firstRoutedEvent = CreateRoutedEvent(eventPayload);
-        var secondRoutedEvent = CreateRoutedEvent(eventPayload);
+        RoutedEvent<TestEvent> firstRoutedEvent = CreateRoutedEvent(eventPayload);
+        RoutedEvent<TestEvent> secondRoutedEvent = CreateRoutedEvent(eventPayload);
 
         var mapMock = new Mock<Func<TestEvent, OtherEvent>>();
         mapMock.Setup(m => m(eventPayload))
@@ -120,7 +120,7 @@ public class ForwardingEventRegistrationTests
         var sut = new MappedForwardingEventRegistration<TestEvent, OtherEvent, TestModule>(_moduleMock.Object, mapMock.Object);
 
         // Act
-        var result = sut.Route(eventId, eventPayload);
+        IReadOnlyCollection<RoutedEvent> result = sut.Route(eventId, eventPayload);
 
         // Assert
         Assert.Equal(2, result.Count);
@@ -144,8 +144,8 @@ public class ForwardingEventRegistrationTests
     {
         Assert.Equal(2, route.Count);
 
-        var routeSteps = route.ToArray();
-        var downStreamRouteStep = Assert.IsType<DownStreamRouteStep>(routeSteps[0]);
+        IRouteStep[] routeSteps = [.. route];
+        DownStreamRouteStep downStreamRouteStep = Assert.IsType<DownStreamRouteStep>(routeSteps[0]);
 
         Assert.Equal(ModuleIdentity.Create<TestModule>(), downStreamRouteStep.Destination);
         Assert.IsType<FinalRouteStep>(routeSteps[1]);

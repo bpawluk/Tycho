@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Events.Inbox;
 using Tycho.Events.Model;
+using Tycho.Events.Routing;
 using Tycho.Events.Routing.Steps;
 
 namespace Tycho.Events.Delivery.Strategies
@@ -18,12 +19,12 @@ namespace Tycho.Events.Delivery.Strategies
 
         public bool CanDeliver(SerializedRoutedEvent routedEvent)
         {
-            return routedEvent.Route.TryPeek(out var routeStep) && routeStep is FinalRouteStep;
+            return routedEvent.Route.TryPeek(out IRouteStep? routeStep) && routeStep is FinalRouteStep;
         }
 
         public async Task DeliverAsync(SerializedRoutedEvent routedEvent, CancellationToken cancellationToken)
         {
-            if (!routedEvent.Route.TryPop(out var routeStep) || !(routeStep is FinalRouteStep))
+            if (!routedEvent.Route.TryPop(out IRouteStep? routeStep) || !(routeStep is FinalRouteStep))
             {
                 throw new InvalidOperationException($"Invalid route in {GetType().Name}.");
             }

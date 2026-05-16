@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,19 +19,19 @@ namespace Tycho.Events.Broker
         }
 
         [EntryPoint]
-        public IReadOnlyCollection<RoutedEvent> Route<TEvent>(Guid eventId, TEvent eventPayload) 
+        public IReadOnlyCollection<RoutedEvent> Route<TEvent>(Guid eventId, TEvent eventPayload)
             where TEvent : class, IEvent
         {
-            using var scope = _internals.CreateScope();
-            var scopedBroker = scope.ServiceProvider.GetRequiredService<IEventBroker>();
+            using IServiceScope scope = _internals.CreateScope();
+            IEventBroker scopedBroker = scope.ServiceProvider.GetRequiredService<IEventBroker>();
             return scopedBroker.Route(eventId, eventPayload);
         }
 
         [EntryPoint]
         public async Task DeliverAsync(SerializedRoutedEvent routedEvent, CancellationToken cancellationToken)
         {
-            await using var scope = _internals.CreateAsyncScope();
-            var scopedBroker = scope.ServiceProvider.GetRequiredService<IEventBroker>();
+            await using AsyncServiceScope scope = _internals.CreateAsyncScope();
+            IEventBroker scopedBroker = scope.ServiceProvider.GetRequiredService<IEventBroker>();
             await scopedBroker.DeliverAsync(routedEvent, cancellationToken);
         }
     }

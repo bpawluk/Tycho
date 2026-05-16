@@ -1,4 +1,4 @@
-﻿namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Domain;
+namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Domain;
 
 internal class Availability(uint quantity, uint version)
 {

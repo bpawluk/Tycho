@@ -12,7 +12,7 @@ internal class AdminDbContext : TychoDbContext
     {
         base.OnConfiguring(optionsBuilder);
 
-        var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "ContentModeration.Admin.db");
+        string dbPath = Path.Combine(Directory.GetCurrentDirectory(), "ContentModeration.Admin.db");
         optionsBuilder.UseSqlite($"Data Source={dbPath}");
     }
 }

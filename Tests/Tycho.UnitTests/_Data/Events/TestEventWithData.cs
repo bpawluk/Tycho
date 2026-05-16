@@ -39,7 +39,7 @@ public record TestEventWithData : IEvent
         new("789 Maple St", "Gotham", "11223")
     ];
 
-    public string GetSerializedPayload() => "{\"Id\":1,\"Name\":\"Sample Name\",\"IsActive\":true,\"Initial\":\"A\",\"Salary\":1000.5,\"Height\":5.9,\"Population\":1000000000,\"NullableInt\":null,\"NullableDouble\":3.14159,\"CreatedDate\":\"2012-12-21T21:12:00\",\"NullableDate\":null,\"TimeElapsed\":\"01:30:00\",\"Tags\":[\"tag-1\",\"tag-2\",\"tag-3\"],\"Nicknames\":[\"nick-1\",\"nick-2\"],\"Scores\":{\"Math\":90,\"Science\":85},\"Status\":0,\"UniqueId\":\"e9d5fa1c-6f4d-4c89-9783-df28769c8de1\",\"Address\":{\"Street\":\"123 Main St\",\"City\":\"Metropolis\",\"ZipCode\":\"12345\"},\"PreviousAddresses\":[{\"Street\":\"456 Elm St\",\"City\":\"Smallville\",\"ZipCode\":\"67890\"},{\"Street\":\"789 Maple St\",\"City\":\"Gotham\",\"ZipCode\":\"11223\"}]}";
+    public static string GetSerializedPayload() => "{\"Id\":1,\"Name\":\"Sample Name\",\"IsActive\":true,\"Initial\":\"A\",\"Salary\":1000.5,\"Height\":5.9,\"Population\":1000000000,\"NullableInt\":null,\"NullableDouble\":3.14159,\"CreatedDate\":\"2012-12-21T21:12:00\",\"NullableDate\":null,\"TimeElapsed\":\"01:30:00\",\"Tags\":[\"tag-1\",\"tag-2\",\"tag-3\"],\"Nicknames\":[\"nick-1\",\"nick-2\"],\"Scores\":{\"Math\":90,\"Science\":85},\"Status\":0,\"UniqueId\":\"e9d5fa1c-6f4d-4c89-9783-df28769c8de1\",\"Address\":{\"Street\":\"123 Main St\",\"City\":\"Metropolis\",\"ZipCode\":\"12345\"},\"PreviousAddresses\":[{\"Street\":\"456 Elm St\",\"City\":\"Smallville\",\"ZipCode\":\"67890\"},{\"Street\":\"789 Maple St\",\"City\":\"Gotham\",\"ZipCode\":\"11223\"}]}";
 
     public bool EqualsEvent(TestEventWithData? other)
     {

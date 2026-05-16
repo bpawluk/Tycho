@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,8 +31,8 @@ namespace Tycho.Events.Inbox
         [EntryPoint]
         public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            await using var scope = _internals.CreateAsyncScope();
-            var logger = scope.ServiceProvider.GetService<ILogger<InboxProcessorJob>>();
+            await using AsyncServiceScope scope = _internals.CreateAsyncScope();
+            ILogger<InboxProcessorJob>? logger = scope.ServiceProvider.GetService<ILogger<InboxProcessorJob>>();
 
             if (_event is null)
             {
@@ -40,14 +40,14 @@ namespace Tycho.Events.Inbox
                 return;
             }
 
-            var inbox = scope.ServiceProvider.GetRequiredService<IInboxConsumer>();
+            IInboxConsumer inbox = scope.ServiceProvider.GetRequiredService<IInboxConsumer>();
 
             try
             {
                 var handlerProvider = new EventHandlerProvider(scope.ServiceProvider);
-                var eventHandler = _event!.GetHandlerFrom(handlerProvider);
+                IEventHandler eventHandler = _event!.GetHandlerFrom(handlerProvider);
 
-                var transaction = scope.ServiceProvider.GetRequiredService<ITransaction>();
+                ITransaction transaction = scope.ServiceProvider.GetRequiredService<ITransaction>();
                 if (eventHandler is ITransactionalEventHandler)
                 {
                     await transaction.BeginAsync(cancellationToken).ConfigureAwait(false);

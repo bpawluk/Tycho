@@ -1,4 +1,4 @@
-﻿using Tycho.Events;
+using Tycho.Events;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Contract.Outgoing;
 

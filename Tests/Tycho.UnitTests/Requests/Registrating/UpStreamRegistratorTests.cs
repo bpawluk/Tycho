@@ -36,7 +36,7 @@ public class UpStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IUpStreamRequestRegistration<TestRequest>>();
+        IUpStreamRequestRegistration<TestRequest>? registration = _internals.GetService<IUpStreamRequestRegistration<TestRequest>>();
         Assert.NotNull(registration);
         Assert.IsType<RequestForwarder<TestRequest, TestModule>>(registration.Handler);
     }
@@ -67,7 +67,7 @@ public class UpStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IUpStreamRequestRegistration<TestRequestWithResponse, string>>();
+        IUpStreamRequestRegistration<TestRequestWithResponse, string>? registration = _internals.GetService<IUpStreamRequestRegistration<TestRequestWithResponse, string>>();
         Assert.NotNull(registration);
         Assert.IsType<RequestForwarder<TestRequestWithResponse, string, TestModule>>(registration.Handler);
     }
@@ -99,7 +99,7 @@ public class UpStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IUpStreamRequestRegistration<TestRequest>>();
+        IUpStreamRequestRegistration<TestRequest>? registration = _internals.GetService<IUpStreamRequestRegistration<TestRequest>>();
         Assert.NotNull(registration);
         Assert.IsType<MappedRequestForwarder<TestRequest, OtherRequest, TestModule>>(registration.Handler);
     }
@@ -139,7 +139,7 @@ public class UpStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals
+        IUpStreamRequestRegistration<TestRequestWithResponse, string>? registration = _internals
             .GetService<IUpStreamRequestRegistration<TestRequestWithResponse, string>>();
         Assert.NotNull(registration);
         Assert.IsType<MappedRequestForwarder<
@@ -180,7 +180,7 @@ public class UpStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IUpStreamRequestRegistration<TestRequest>>();
+        IUpStreamRequestRegistration<TestRequest>? registration = _internals.GetService<IUpStreamRequestRegistration<TestRequest>>();
         Assert.NotNull(registration);
         Assert.IsType<TestRequestHandler>(registration.Handler);
     }
@@ -211,7 +211,7 @@ public class UpStreamRegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IUpStreamRequestRegistration<TestRequestWithResponse, string>>();
+        IUpStreamRequestRegistration<TestRequestWithResponse, string>? registration = _internals.GetService<IUpStreamRequestRegistration<TestRequestWithResponse, string>>();
         Assert.NotNull(registration);
         Assert.IsType<TestRequestHandler>(registration.Handler);
     }

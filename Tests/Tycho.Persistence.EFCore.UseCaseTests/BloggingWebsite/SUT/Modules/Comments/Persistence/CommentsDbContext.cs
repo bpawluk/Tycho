@@ -12,7 +12,7 @@ internal class CommentsDbContext : TychoDbContext
     {
         base.OnConfiguring(optionsBuilder);
 
-        var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "BloggingWebsite.Comments.db");
+        string dbPath = Path.Combine(Directory.GetCurrentDirectory(), "BloggingWebsite.Comments.db");
         optionsBuilder.UseSqlite($"Data Source={dbPath}");
     }
 }

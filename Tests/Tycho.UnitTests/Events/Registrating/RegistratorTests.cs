@@ -37,7 +37,7 @@ public class RegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IEventRegistration<TestEvent>>();
+        IEventRegistration<TestEvent>? registration = _internals.GetService<IEventRegistration<TestEvent>>();
         Assert.NotNull(registration);
         Assert.IsType<ExposingEventRegistration<TestEvent>>(registration);
     }
@@ -68,7 +68,7 @@ public class RegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IEventRegistration<TestEvent>>();
+        IEventRegistration<TestEvent>? registration = _internals.GetService<IEventRegistration<TestEvent>>();
         Assert.NotNull(registration);
         Assert.IsType<MappedExposingEventRegistration<TestEvent, OtherEvent>>(registration);
     }
@@ -99,7 +99,7 @@ public class RegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IEventRegistration<TestEvent>>();
+        IEventRegistration<TestEvent>? registration = _internals.GetService<IEventRegistration<TestEvent>>();
         Assert.NotNull(registration);
         Assert.IsType<ForwardingEventRegistration<TestEvent, TestModule>>(registration);
     }
@@ -130,7 +130,7 @@ public class RegistratorTests
         _internals.Build();
 
         // Assert
-        var registration = _internals.GetService<IEventRegistration<TestEvent>>();
+        IEventRegistration<TestEvent>? registration = _internals.GetService<IEventRegistration<TestEvent>>();
         Assert.NotNull(registration);
         Assert.IsType<MappedForwardingEventRegistration<TestEvent, OtherEvent, TestModule>>(registration);
     }
@@ -160,11 +160,11 @@ public class RegistratorTests
         _internals.Build();
 
         // Assert
-        var eventRegistration = _internals.GetService<IEventRegistration<TestEvent>>();
+        IEventRegistration<TestEvent>? eventRegistration = _internals.GetService<IEventRegistration<TestEvent>>();
         Assert.NotNull(eventRegistration);
         Assert.IsType<FinalEventRegistration<TestEvent, TestEventHandler>>(eventRegistration);
 
-        var finalEventRegistration = _internals.GetService<IFinalEventRegistration<TestEvent>>();
+        IFinalEventRegistration<TestEvent>? finalEventRegistration = _internals.GetService<IFinalEventRegistration<TestEvent>>();
         Assert.NotNull(finalEventRegistration);
         Assert.IsType<FinalEventRegistration<TestEvent, TestEventHandler>>(finalEventRegistration);
 

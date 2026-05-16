@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Tycho.Events.Routing;
 using Tycho.Events.Routing.Steps;
 using Tycho.Structure.Parent;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events;
 using Tycho.Events.Registrating.Registrations;
@@ -16,7 +16,7 @@ namespace Tycho.Identity.Events
 
         public IEventHandler<TEvent> GetHandler<TEvent>(EventHandlerIdentity handlerId) where TEvent : class, IEvent
         {
-            foreach (var registration in _serviceProvider.GetServices<IFinalEventRegistration<TEvent>>())
+            foreach (IFinalEventRegistration<TEvent> registration in _serviceProvider.GetServices<IFinalEventRegistration<TEvent>>())
             {
                 if (registration.HandlerId == handlerId)
                 {

@@ -14,7 +14,7 @@ public class RouteTests
         var result = Route.Create();
 
         // Assert
-        var step = Assert.Single(result);
+        IRouteStep step = Assert.Single(result);
         Assert.IsType<FinalRouteStep>(step);
     }
 
@@ -58,7 +58,7 @@ public class RouteTests
         var result = Route.Parse(input);
 
         // Assert
-        var step = Assert.Single(result);
+        IRouteStep step = Assert.Single(result);
         Assert.IsType<FinalRouteStep>(step);
     }
 
@@ -74,7 +74,7 @@ public class RouteTests
 
         // Assert
         Assert.Equal(2, result.Count);
-        var nextStep = result.Pop();
+        IRouteStep nextStep = result.Pop();
         Assert.IsType<DownStreamRouteStep>(nextStep);
         Assert.Equal(destination, ((DownStreamRouteStep)nextStep).Destination);
     }

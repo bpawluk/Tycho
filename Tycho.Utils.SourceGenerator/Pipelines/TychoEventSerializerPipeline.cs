@@ -20,13 +20,13 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             this IncrementalGeneratorInitializationContext context,
             IncrementalValuesProvider<(TychoDefinitionKind, ClassDefinitionModel)> pipelineBase)
         {
-            var getDefineEventsMethodDefinitionsStepResult = pipelineBase
+            IncrementalValuesProvider<(TychoDefinitionKind DefinitionKind, MethodDefinitionModel Method)> getDefineEventsMethodDefinitionsStepResult = pipelineBase
                 .Select(GetDefineEventsMethodDefinitionsStepTransform);
 
-            var getSerializableEventMethodInvocationsStepResult = getDefineEventsMethodDefinitionsStepResult
+            IncrementalValuesProvider<(TychoDefinitionKind DefinitionKind, TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations)> getSerializableEventMethodInvocationsStepResult = getDefineEventsMethodDefinitionsStepResult
                 .Select(GetSerializableEventMethodInvocationsStepTransform);
 
-            var getTychoEventSerializerModelStepResult = getSerializableEventMethodInvocationsStepResult
+            IncrementalValuesProvider<TychoEventSerializerModel> getTychoEventSerializerModelStepResult = getSerializableEventMethodInvocationsStepResult
                 .Select(GetTychoEventSerializerModelStepTransform);
 
             context.RegisterSourceOutput(

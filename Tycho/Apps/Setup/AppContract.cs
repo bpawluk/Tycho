@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Tycho.Modules;
 using Tycho.Requests;
@@ -54,8 +54,8 @@ namespace Tycho.Apps.Setup
             mapRequest.ThrowIfNull();
             mapResponse.ThrowIfNull();
             _registrator.ForwardMappedUpStreamRequest<
-                TRequest, TResponse, 
-                TTargetRequest, TTargetResponse, 
+                TRequest, TResponse,
+                TTargetRequest, TTargetResponse,
                 TModule>(mapRequest, mapResponse);
             return this;
         }

@@ -1,8 +1,8 @@
-using Tycho.Transactions;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Incoming;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Outgoing;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Domain;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Persistence;
+using Tycho.Transactions;
 using static Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.AdminModule;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Handlers;
@@ -14,7 +14,7 @@ internal class RemovePostRequestHandler(AdminDbContext dbContext, IParent parent
         AdminAction newAdminAction;
         if (requestData.BanAuthor)
         {
-            var author = await parent.ExecuteAsync(new GetAuthorRequest(requestData.PostId), cancellationToken);
+            GetAuthorRequest.Response author = await parent.ExecuteAsync(new GetAuthorRequest(requestData.PostId), cancellationToken);
             newAdminAction = AdminAction.RemovePostAndBanAuthor(requestData.PostId, author.AuthorId);
             await publisher.PublishAsync(new UserBannedEvent(author.AuthorId), cancellationToken);
         }

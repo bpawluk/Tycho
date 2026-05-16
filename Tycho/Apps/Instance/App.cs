@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Identity.Modules;
+using Tycho.Modules.Instance;
 using Tycho.Requests.Broker;
 using Tycho.Structure;
 using Tycho.Utils;
@@ -30,7 +31,7 @@ namespace Tycho.Apps.Instance
 
         public async ValueTask DisposeAsync()
         {
-            var moduleProvider = _internals.GetRequiredService<IModuleProvider>();
+            IModuleProvider moduleProvider = _internals.GetRequiredService<IModuleProvider>();
 
             try
             {
@@ -38,7 +39,7 @@ namespace Tycho.Apps.Instance
             }
             catch { }
 
-            foreach (var module in moduleProvider.GetAllModules())
+            foreach (IModule module in moduleProvider.GetAllModules())
             {
                 try
                 {

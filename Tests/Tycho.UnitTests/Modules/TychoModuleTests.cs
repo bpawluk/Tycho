@@ -15,7 +15,7 @@ public class TychoModuleTests
         var sut = new ExposedSettingsModule();
 
         // Act
-        var result = sut.GetSettingsPublic();
+        TestSettings result = sut.GetSettingsPublic();
 
         // Assert
         Assert.NotNull(result);
@@ -31,7 +31,7 @@ public class TychoModuleTests
         sut.WithSettingsPublic(expected);
 
         // Act
-        var result = sut.GetSettingsPublic();
+        TestSettings result = sut.GetSettingsPublic();
 
         // Assert
         Assert.Same(expected, result);

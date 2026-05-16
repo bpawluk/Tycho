@@ -11,7 +11,7 @@ internal class FeedProvider(FeedsDbContext feedsDbContext)
             return new Feed(string.Empty, EntryType.Article, feedsDbContext);
         }
 
-        var feedOwner = await feedsDbContext.Entries.FindAsync([id], cancellationToken);
+        Entry? feedOwner = await feedsDbContext.Entries.FindAsync([id], cancellationToken);
 
         if (feedOwner is not null)
         {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Tycho.Events.Model;
 using Tycho.Identity.Events;

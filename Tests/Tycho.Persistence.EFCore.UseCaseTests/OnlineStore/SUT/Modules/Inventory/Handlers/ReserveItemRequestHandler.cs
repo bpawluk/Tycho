@@ -1,7 +1,8 @@
-using Tycho.Transactions;
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Incoming;
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Outgoing;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Domain;
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Persistence;
+using Tycho.Transactions;
 using static Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Incoming.ReserveItemRequest;
 using static Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.InventoryModule;
 
@@ -11,10 +12,10 @@ internal class ReserveItemRequestHandler(InventoryDbContext dbContext, IPublishe
 {
     public async Task<Response> HandleAsync(ReserveItemRequest requestData, CancellationToken cancellationToken)
     {
-        var item = await dbContext.Items.FindAsync([requestData.ItemId], cancellationToken);
+        Item? item = await dbContext.Items.FindAsync([requestData.ItemId], cancellationToken);
         if (item != null)
         {
-            var reserved = item.Reserve(requestData.ReservationCode, requestData.Quantity);
+            bool reserved = item.Reserve(requestData.ReservationCode, requestData.Quantity);
             if (reserved)
             {
                 var itemAvailabilityChanged = new ItemAvailabilityChangedEvent(item.Id, item.Availability.Quantity, item.Availability.Version);

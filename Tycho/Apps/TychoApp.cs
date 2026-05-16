@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -136,7 +136,7 @@ namespace Tycho.Apps
             DefineEvents(_builder.Events);
             IncludeModules(_builder.Structure);
 
-            var app = await _builder.BuildAsync().ConfigureAwait(false);
+            IApp app = await _builder.BuildAsync().ConfigureAwait(false);
             await Startup(app.Internals).ConfigureAwait(false);
 
             return app;

@@ -33,10 +33,10 @@ public class FinalEventRegistrationTests
         var sut = new FinalEventRegistration<TestEvent, TestEventHandler>(handler);
 
         // Act
-        var result = sut.Route(eventId, eventPayload);
+        IReadOnlyCollection<RoutedEvent> result = sut.Route(eventId, eventPayload);
 
         // Assert
-        var routedEvent = Assert.IsType<RoutedEvent<TestEvent>>(Assert.Single(result));
+        RoutedEvent<TestEvent> routedEvent = Assert.IsType<RoutedEvent<TestEvent>>(Assert.Single(result));
 
         Assert.Equal(eventId, routedEvent.Id);
         Assert.Same(eventPayload, routedEvent.Payload);

@@ -1,4 +1,4 @@
-﻿using Tycho.Requests;
+using Tycho.Requests;
 
 namespace Tycho.Transactions
 {

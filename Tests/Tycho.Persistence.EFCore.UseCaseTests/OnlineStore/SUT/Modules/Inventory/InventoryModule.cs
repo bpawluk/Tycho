@@ -1,9 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
 using Tycho.Persistence.EFCore;
-using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Handlers;
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Incoming;
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Outgoing;
+using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Handlers;
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Persistence;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory;
@@ -32,7 +32,7 @@ public partial class InventoryModule : TychoModule
 
     protected override async Task Startup(IServiceProvider app)
     {
-        using var context = app.GetRequiredService<InventoryDbContext>();
+        using InventoryDbContext context = app.GetRequiredService<InventoryDbContext>();
         await context.Database.EnsureDeletedAsync();
         await context.Database.EnsureCreatedAsync();
     }

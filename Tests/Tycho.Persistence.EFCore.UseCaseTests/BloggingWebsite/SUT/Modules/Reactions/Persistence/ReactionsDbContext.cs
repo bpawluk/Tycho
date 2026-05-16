@@ -12,7 +12,7 @@ internal class ReactionsDbContext : TychoDbContext
     {
         base.OnConfiguring(optionsBuilder);
 
-        var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "BloggingWebsite.Reactions.db");
+        string dbPath = Path.Combine(Directory.GetCurrentDirectory(), "BloggingWebsite.Reactions.db");
         optionsBuilder.UseSqlite($"Data Source={dbPath}");
     }
 }

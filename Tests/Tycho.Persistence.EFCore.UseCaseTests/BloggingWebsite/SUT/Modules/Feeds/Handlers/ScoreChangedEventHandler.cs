@@ -1,7 +1,8 @@
 using Tycho.Events;
-using Tycho.Transactions;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Persistence;
+using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Handlers;
 
@@ -9,10 +10,7 @@ internal class ScoreChangedEventHandler(FeedsDbContext dbContext) : ITransaction
 {
     public async Task HandleAsync(EventContext<ScoreChangedEvent> context, CancellationToken cancellationToken)
     {
-        var entry = await dbContext.Entries.FindAsync([context.Payload.EntryId], cancellationToken);
-        if (entry != null)
-        {
-            entry.UpdateScore(context.Payload.NewScore);
-        }
+        Entry? entry = await dbContext.Entries.FindAsync([context.Payload.EntryId], cancellationToken);
+        entry?.UpdateScore(context.Payload.NewScore);
     }
 }

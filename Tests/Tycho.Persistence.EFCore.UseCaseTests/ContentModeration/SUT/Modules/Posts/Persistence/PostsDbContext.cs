@@ -12,7 +12,7 @@ internal class PostsDbContext : TychoDbContext
     {
         base.OnConfiguring(optionsBuilder);
 
-        var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "ContentModeration.Posts.db");
+        string dbPath = Path.Combine(Directory.GetCurrentDirectory(), "ContentModeration.Posts.db");
         optionsBuilder.UseSqlite($"Data Source={dbPath}");
     }
 }

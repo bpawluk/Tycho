@@ -1,4 +1,4 @@
-﻿using Tycho.Events.Broker;
+using Tycho.Events.Broker;
 using Tycho.Requests.Broker;
 using Tycho.Utils;
 

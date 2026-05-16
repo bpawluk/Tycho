@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Tycho.Events.Model;
 using Tycho.Identity.Events;
@@ -21,7 +21,7 @@ namespace Tycho.Events.Serialization
 
         public SerializedRoutedEvent Serialize(RoutedEvent routedEvent)
         {
-            var serializedPayload = routedEvent.SerializePayloadWith(_payloadSerializer);
+            string serializedPayload = routedEvent.SerializePayloadWith(_payloadSerializer);
             return new SerializedRoutedEvent(
                 routedEvent.Id,
                 routedEvent.EventId,
@@ -32,7 +32,7 @@ namespace Tycho.Events.Serialization
 
         public RoutedEvent Deserialize(SerializedRoutedEvent serializedEvent)
         {
-            if (_deserializers.TryGetValue(serializedEvent.EventId, out var deserializer))
+            if (_deserializers.TryGetValue(serializedEvent.EventId, out Func<SerializedRoutedEvent, RoutedEvent>? deserializer))
             {
                 return deserializer(serializedEvent);
             }
@@ -48,7 +48,7 @@ namespace Tycho.Events.Serialization
 
         private RoutedEvent<TEvent> Deserialize<TEvent>(SerializedRoutedEvent serializedEvent) where TEvent : class, IEvent
         {
-            var payload = _payloadSerializer.Deserialize<TEvent>(serializedEvent.Payload);
+            TEvent payload = _payloadSerializer.Deserialize<TEvent>(serializedEvent.Payload);
             return new RoutedEvent<TEvent>(
                 serializedEvent.Id,
                 serializedEvent.EventId,

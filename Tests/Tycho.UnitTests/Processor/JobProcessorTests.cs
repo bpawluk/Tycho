@@ -28,7 +28,7 @@ public class JobProcessorTests
             .ReturnsAsync([])
             .Callback(factoryCalledSignal.Set);
 
-        using var sut = CreateSut();
+        using JobProcessor sut = CreateSut();
 
         // Act
         sut.Activate();
@@ -58,7 +58,7 @@ public class JobProcessorTests
                 factoryCalledSignal.Set();
             });
 
-        using var sut = CreateSut(s => s.ConcurrencyLimit = concurrencyLimit);
+        using JobProcessor sut = CreateSut(s => s.ConcurrencyLimit = concurrencyLimit);
 
         // Act
         sut.Activate();
@@ -85,7 +85,7 @@ public class JobProcessorTests
                 factoryCalledSignal.Signal();
             });
 
-        using var sut = CreateSut(s => s.ConcurrencyLimit = concurrencyLimit);
+        using JobProcessor sut = CreateSut(s => s.ConcurrencyLimit = concurrencyLimit);
 
         // Act
         sut.Activate();
@@ -105,7 +105,7 @@ public class JobProcessorTests
             .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync([CreateInfiniteJob().Object]);
 
-        using var sut = CreateSut(s => s.ConcurrencyLimit = concurrencyLimit);
+        using JobProcessor sut = CreateSut(s => s.ConcurrencyLimit = concurrencyLimit);
 
         // Act
         sut.Activate();
@@ -125,7 +125,7 @@ public class JobProcessorTests
             .Setup(f => f.CreateJobsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync([]);
 
-        using var sut = CreateSut(s => s.ConcurrencyLimit = concurrencyLimit);
+        using JobProcessor sut = CreateSut(s => s.ConcurrencyLimit = concurrencyLimit);
 
         // Act
         sut.Activate();
@@ -146,12 +146,12 @@ public class JobProcessorTests
         int concurrencyLimit = 3;
         int jobsToExecuteCount = 10;
 
-        var jobsToExecute = Enumerable.Range(0, jobsToExecuteCount).Select(_ =>
+        (Mock<IJob> Job, ManualResetEventSlim Signal)[] jobsToExecute = [.. Enumerable.Range(0, jobsToExecuteCount).Select(_ =>
         {
             var jobCompletedSignal = new ManualResetEventSlim(false);
-            var jobMock = CreateActualJob(jobCompletedSignal);
+            Mock<IJob> jobMock = CreateActualJob(jobCompletedSignal);
             return (Job: jobMock, Signal: jobCompletedSignal);
-        }).ToArray();
+        })];
 
         int factoryCallCount = 0;
         var jobsQueue = new Queue<Mock<IJob>>(jobsToExecute.Select(jobData => jobData.Job));
@@ -164,7 +164,7 @@ public class JobProcessorTests
                var jobs = new List<IJob>();
                for (int i = 0; i < maxCount; i++)
                {
-                   if (jobsQueue.TryDequeue(out var nextJob))
+                   if (jobsQueue.TryDequeue(out Mock<IJob>? nextJob))
                    {
                        jobs.Add(nextJob.Object);
                    }
@@ -176,7 +176,7 @@ public class JobProcessorTests
                return jobs;
            });
 
-        using var sut = CreateSut(s => s.ConcurrencyLimit = concurrencyLimit);
+        using JobProcessor sut = CreateSut(s => s.ConcurrencyLimit = concurrencyLimit);
 
         // STAGE 1
 
@@ -184,7 +184,7 @@ public class JobProcessorTests
         sut.Activate();
 
         // Assert
-        foreach (var (_, Signal) in jobsToExecute)
+        foreach ((Mock<IJob> _, ManualResetEventSlim? Signal) in jobsToExecute)
         {
             Assert.True(Signal.Wait(_waitingTimeout, CancellationToken.None));
         }
@@ -249,7 +249,7 @@ public class JobProcessorTests
                 return [];
             });
 
-        using var sut = CreateSut(s => s.ConcurrencyLimit = concurrencyLimit);
+        using JobProcessor sut = CreateSut(s => s.ConcurrencyLimit = concurrencyLimit);
 
         // STAGE 1
 
@@ -284,7 +284,7 @@ public class JobProcessorTests
                 return [];
             });
 
-        using var sut = CreateSut();
+        using JobProcessor sut = CreateSut();
 
         // Act
         sut.Activate();
@@ -326,7 +326,7 @@ public class JobProcessorTests
                 return [];
             });
 
-        using var sut = CreateSut();
+        using JobProcessor sut = CreateSut();
 
         // STAGE 1
 
@@ -374,7 +374,7 @@ public class JobProcessorTests
                 return [];
             });
 
-        using var sut = CreateSut();
+        using JobProcessor sut = CreateSut();
 
         Exception? capturedException = null;
         var onScheduleProcessingErrorCalledSignal = new ManualResetEventSlim(false);
@@ -422,7 +422,7 @@ public class JobProcessorTests
                 return [];
             });
 
-        using var sut = CreateSut();
+        using JobProcessor sut = CreateSut();
 
         sut.OnScheduleProcessingError += (_, _) => throw new Exception("Subscriber error!");
 
@@ -482,7 +482,7 @@ public class JobProcessorTests
                 return [];
             });
 
-        using var sut = CreateSut(s => s.ConcurrencyLimit = concurrencyLimit);
+        using JobProcessor sut = CreateSut(s => s.ConcurrencyLimit = concurrencyLimit);
 
         Exception? capturedException = null;
         var onJobProcessingErrorCalledSignal = new ManualResetEventSlim(false);
@@ -552,7 +552,7 @@ public class JobProcessorTests
                 return [];
             });
 
-        using var sut = CreateSut();
+        using JobProcessor sut = CreateSut();
 
         sut.OnJobProcessingError += (_, ex) =>
         {
@@ -588,7 +588,7 @@ public class JobProcessorTests
                 factoryCalledSignal.Set();
             });
 
-        var sut = CreateSut();
+        JobProcessor sut = CreateSut();
 
         // Act
         sut.Activate();
@@ -624,22 +624,22 @@ public class JobProcessorTests
     {
         // an arbitrary delay long enough to allow for the processor
         // to execute another tick if it was going to
-        var timeToWait = _maxInterval * 2;
+        TimeSpan timeToWait = _maxInterval * 2;
         await Task.Delay(timeToWait);
     }
 
     private static async Task WaitTillProcessorIdles()
     {
-        var timeToWait = _initialInterval;
+        TimeSpan timeToWait = _initialInterval;
 
-        var currentInterval = _initialInterval;
+        TimeSpan currentInterval = _initialInterval;
         while (currentInterval * _intervalMultiplier <= _maxInterval)
         {
             currentInterval *= _intervalMultiplier;
             timeToWait += currentInterval;
         }
 
-        var safetyMargin = _maxInterval;
+        TimeSpan safetyMargin = _maxInterval;
         await Task.Delay(timeToWait + safetyMargin);
     }
 

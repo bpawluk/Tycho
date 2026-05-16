@@ -1,7 +1,7 @@
-using Tycho.Requests;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Persistence;
+using Tycho.Requests;
 using static Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract.GetFeedEntriesRequest;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Handlers;
@@ -12,11 +12,11 @@ internal class GetFeedEntriesRequestHandler(FeedsDbContext dbContext, ContentRep
 
     public async Task<Response> HandleAsync(GetFeedEntriesRequest requestData, CancellationToken cancellationToken)
     {
-        var feedId = GetFeedId(requestData);
+        int? feedId = GetFeedId(requestData);
         var feedProvider = new FeedProvider(dbContext);
-        var feed = await feedProvider.GetFeed(feedId, cancellationToken);
+        Feed feed = await feedProvider.GetFeed(feedId, cancellationToken);
 
-        var feedEntries = requestData.Feed.Order switch
+        IReadOnlyList<Entry> feedEntries = requestData.Feed.Order switch
         {
             FeedOrder.Latest => await feed.GetLatestEntries(cancellationToken),
             FeedOrder.MostLiked => await feed.GetMostLikedEntries(cancellationToken),
@@ -24,13 +24,13 @@ internal class GetFeedEntriesRequestHandler(FeedsDbContext dbContext, ContentRep
             _ => throw new ArgumentException("Invalid feed order")
         };
 
-        var contentIds = feedEntries.Select(entry => entry.ContentId).ToArray();
-        var contents = await _contentRepository.GetEntriesContents(feed.EntriesType, contentIds);
+        int[] contentIds = [.. feedEntries.Select(entry => entry.ContentId)];
+        IReadOnlyList<Content> contents = await _contentRepository.GetEntriesContents(feed.EntriesType, contentIds);
 
-        var responseEntries = feedEntries
+        EntryData[] responseEntries = [.. feedEntries
             .Select((entry) =>
             {
-                var content = contents.First(content => content.Id == entry.ContentId);
+                Content content = contents.First(content => content.Id == entry.ContentId);
                 return new EntryData(
                     entry.Id,
                     content.Author,
@@ -38,8 +38,7 @@ internal class GetFeedEntriesRequestHandler(FeedsDbContext dbContext, ContentRep
                     entry.Created,
                     entry.Score,
                     entry.DiscussionWeight!.Value);
-            })
-            .ToArray();
+            })];
 
         return new Response(responseEntries);
     }

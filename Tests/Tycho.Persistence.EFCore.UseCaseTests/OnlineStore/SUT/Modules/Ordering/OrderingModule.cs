@@ -28,7 +28,7 @@ public partial class OrderingModule : TychoModule
 
     protected override async Task Startup(IServiceProvider app)
     {
-        using var context = app.GetRequiredService<OrderingDbContext>();
+        using OrderingDbContext context = app.GetRequiredService<OrderingDbContext>();
         await context.Database.EnsureDeletedAsync();
         await context.Database.EnsureCreatedAsync();
     }

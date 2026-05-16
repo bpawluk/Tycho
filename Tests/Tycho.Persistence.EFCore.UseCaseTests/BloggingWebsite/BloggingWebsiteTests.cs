@@ -1,7 +1,7 @@
-using Tycho.Persistence.EFCore.UseCaseTests._Utils;
-using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Contract.Incoming;
+using Tycho.Persistence.EFCore.UseCaseTests._Utils;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite;
 
@@ -21,17 +21,17 @@ public sealed class BloggingWebsiteTests : IAsyncLifetime
         await SetupPostedEntries();
 
         var getMostDiscussedArticles = new GetFeedEntriesRequest(GetFeedEntriesRequest.ArticlesFeedData.MostDiscussed());
-        var mostDiscussedArticles = await _sut.ExecuteAsync(getMostDiscussedArticles, TestContext.Current.CancellationToken);
+        GetFeedEntriesRequest.Response mostDiscussedArticles = await _sut.ExecuteAsync(getMostDiscussedArticles, TestContext.Current.CancellationToken);
         Assert.True(_testData.PostedEntries.Articles.MatchMostDiscussed(mostDiscussedArticles));
 
-        var parentArticleId = _testData.PostedEntries.Articles.First().Id!.Value;
+        int parentArticleId = _testData.PostedEntries.Articles.First().Id!.Value;
         var getMostDiscussedPosts = new GetFeedEntriesRequest(GetFeedEntriesRequest.PostsFeedData.MostDiscussed(parentArticleId));
-        var mostDiscussedPosts = await _sut.ExecuteAsync(getMostDiscussedPosts, TestContext.Current.CancellationToken);
+        GetFeedEntriesRequest.Response mostDiscussedPosts = await _sut.ExecuteAsync(getMostDiscussedPosts, TestContext.Current.CancellationToken);
         Assert.True(_testData.PostedEntries.GetPosts(parentArticleId).MatchMostDiscussed(mostDiscussedPosts));
 
-        var parentPostId = _testData.PostedEntries.Posts.Last().Id!.Value;
+        int parentPostId = _testData.PostedEntries.Posts.Last().Id!.Value;
         var getMostDiscussedComments = new GetFeedEntriesRequest(GetFeedEntriesRequest.CommentsFeedData.MostDiscussed(parentPostId));
-        var mostDiscussedComments = await _sut.ExecuteAsync(getMostDiscussedComments, TestContext.Current.CancellationToken);
+        GetFeedEntriesRequest.Response mostDiscussedComments = await _sut.ExecuteAsync(getMostDiscussedComments, TestContext.Current.CancellationToken);
         Assert.True(_testData.PostedEntries.GetComments(parentPostId).MatchMostDiscussed(mostDiscussedComments));
 
         await AddReactions();
@@ -39,45 +39,45 @@ public sealed class BloggingWebsiteTests : IAsyncLifetime
         await AssertEventually.True(async () =>
         {
             var getMostLikedArticles = new GetFeedEntriesRequest(GetFeedEntriesRequest.ArticlesFeedData.MostLiked());
-            var mostLikedArticles = await _sut.ExecuteAsync(getMostLikedArticles, TestContext.Current.CancellationToken);
+            GetFeedEntriesRequest.Response mostLikedArticles = await _sut.ExecuteAsync(getMostLikedArticles, TestContext.Current.CancellationToken);
             return _testData.PostedEntries.Articles.MatchMostLiked(mostLikedArticles);
         });
 
         await AssertEventually.True(async () =>
         {
-            var parentArticleId = _testData.PostedEntries.Articles.First().Id!.Value;
+            int parentArticleId = _testData.PostedEntries.Articles.First().Id!.Value;
             var getMostLikedPosts = new GetFeedEntriesRequest(GetFeedEntriesRequest.PostsFeedData.MostLiked(parentArticleId));
-            var mostLikedPosts = await _sut.ExecuteAsync(getMostLikedPosts, TestContext.Current.CancellationToken);
+            GetFeedEntriesRequest.Response mostLikedPosts = await _sut.ExecuteAsync(getMostLikedPosts, TestContext.Current.CancellationToken);
             return _testData.PostedEntries.GetPosts(parentArticleId).MatchMostLiked(mostLikedPosts);
         });
 
         await AssertEventually.True(async () =>
         {
-            var parentPostId = _testData.PostedEntries.Posts.Last().Id!.Value;
+            int parentPostId = _testData.PostedEntries.Posts.Last().Id!.Value;
             var getMostLikedComments = new GetFeedEntriesRequest(GetFeedEntriesRequest.CommentsFeedData.MostLiked(parentPostId));
-            var mostLikedComments = await _sut.ExecuteAsync(getMostLikedComments, TestContext.Current.CancellationToken);
+            GetFeedEntriesRequest.Response mostLikedComments = await _sut.ExecuteAsync(getMostLikedComments, TestContext.Current.CancellationToken);
             return _testData.PostedEntries.GetComments(parentPostId).MatchMostLiked(mostLikedComments);
         });
     }
 
     private async Task SetupPostedEntries()
     {
-        foreach (var article in _testData.PostedEntries)
+        foreach (TestData.Entry article in _testData.PostedEntries)
         {
             var articleEntry = new AddEntryRequest.ArticleEntryData(article.Author, article.Content);
-            var addArticleResponse = await _sut.ExecuteAsync(new AddEntryRequest(articleEntry), TestContext.Current.CancellationToken);
+            AddEntryRequest.Response addArticleResponse = await _sut.ExecuteAsync(new AddEntryRequest(articleEntry), TestContext.Current.CancellationToken);
             article.Id = addArticleResponse.AddedEntryId;
 
-            foreach (var post in article.SubEntries)
+            foreach (TestData.Entry post in article.SubEntries)
             {
                 var postEntry = new AddEntryRequest.PostEntryData(article.Id.Value, post.Author, post.Content);
-                var addPostResponse = await _sut.ExecuteAsync(new AddEntryRequest(postEntry), TestContext.Current.CancellationToken);
+                AddEntryRequest.Response addPostResponse = await _sut.ExecuteAsync(new AddEntryRequest(postEntry), TestContext.Current.CancellationToken);
                 post.Id = addPostResponse.AddedEntryId;
 
-                foreach (var comment in post.SubEntries)
+                foreach (TestData.Entry comment in post.SubEntries)
                 {
                     var commentEntry = new AddEntryRequest.CommentEntryData(post.Id.Value, comment.Author, comment.Content);
-                    var addCommentResponse = await _sut.ExecuteAsync(new AddEntryRequest(commentEntry), TestContext.Current.CancellationToken);
+                    AddEntryRequest.Response addCommentResponse = await _sut.ExecuteAsync(new AddEntryRequest(commentEntry), TestContext.Current.CancellationToken);
                     comment.Id = addCommentResponse.AddedEntryId;
                 }
             }
@@ -86,7 +86,7 @@ public sealed class BloggingWebsiteTests : IAsyncLifetime
 
     private async Task AddReactions()
     {
-        foreach (var reactions in _testData.GetReactions())
+        foreach (TestData.Reactions reactions in _testData.GetReactions())
         {
             for (int i = 0; i < reactions.Count; i++)
             {

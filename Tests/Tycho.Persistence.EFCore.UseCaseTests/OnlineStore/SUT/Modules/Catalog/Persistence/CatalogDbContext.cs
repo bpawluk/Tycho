@@ -19,7 +19,7 @@ internal class CatalogDbContext : TychoDbContext
     {
         base.OnConfiguring(optionsBuilder);
 
-        var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "OnlineStore.Catalog.db");
+        string dbPath = Path.Combine(Directory.GetCurrentDirectory(), "OnlineStore.Catalog.db");
         optionsBuilder.UseSqlite($"Data Source={dbPath}");
     }
 }

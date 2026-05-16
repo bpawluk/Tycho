@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Tycho.Events.Routing.Steps;
@@ -15,7 +15,7 @@ namespace Tycho.Events.Routing
         {
             return new Route();
         }
-        
+
         public static Route Create()
         {
             var route = new Route();
@@ -32,23 +32,23 @@ namespace Tycho.Events.Routing
         public static Route Parse(string route)
         {
             var result = new Route();
-            var parts = route.Split(_separator).Reverse();
+            IEnumerable<string> parts = route.Split(_separator).Reverse();
 
-            foreach (var part in parts)
+            foreach (string part in parts)
             {
-                if (FinalRouteStep.TryParse(part, out var finalStep))
+                if (FinalRouteStep.TryParse(part, out IRouteStep? finalStep))
                 {
                     result.Push(finalStep);
                     continue;
                 }
 
-                if (DownStreamRouteStep.TryParse(part, out var downStep))
+                if (DownStreamRouteStep.TryParse(part, out IRouteStep? downStep))
                 {
                     result.Push(downStep);
                     continue;
                 }
 
-                if (UpStreamRouteStep.TryParse(part, out var upStep))
+                if (UpStreamRouteStep.TryParse(part, out IRouteStep? upStep))
                 {
                     result.Push(upStep);
                     continue;

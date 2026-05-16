@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
@@ -28,9 +28,9 @@ namespace Tycho.Events.Outbox.InMemory
                 return Task.CompletedTask;
             }
 
-            foreach (var routedEvent in routedEvents)
+            foreach (RoutedEvent routedEvent in routedEvents)
             {
-                var serializedEvent = _eventSerializer.Serialize(routedEvent);
+                SerializedRoutedEvent serializedEvent = _eventSerializer.Serialize(routedEvent);
                 _entries.Enqueue(serializedEvent);
             }
             _outboxActivity.NotifyNewEntriesAdded();
@@ -42,9 +42,9 @@ namespace Tycho.Events.Outbox.InMemory
         {
             var events = new List<SerializedRoutedEvent>();
 
-            for (var i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
-                if (_entries.TryDequeue(out var nextEntry))
+                if (_entries.TryDequeue(out SerializedRoutedEvent? nextEntry))
                 {
                     events.Add(nextEntry);
                 }

@@ -20,11 +20,11 @@ public class RoutedEventTests
         var route = Route.Create();
 
         // Act
-        var result = CreateRoutedEvent(id: id, route: route);
+        RoutedEvent<TestEvent> result = CreateRoutedEvent(id: id, route: route);
 
         // Assert
         Assert.NotNull(result.Route);
-        var step = Assert.Single(result.Route);
+        IRouteStep step = Assert.Single(result.Route);
         Assert.IsType<FinalRouteStep>(step);
     }
 
@@ -36,7 +36,7 @@ public class RoutedEventTests
         route.Push(UpStreamRouteStep.Create());
 
         // Act
-        var result = CreateRoutedEvent(route: route);
+        RoutedEvent<TestEvent> result = CreateRoutedEvent(route: route);
 
         // Assert
         Assert.Same(route, result.Route);
@@ -48,7 +48,7 @@ public class RoutedEventTests
         // Arrange
         var payload = new TestEvent();
         string serializedPayload = "{}";
-        var routedEvent = CreateRoutedEvent(payload: payload);
+        RoutedEvent<TestEvent> routedEvent = CreateRoutedEvent(payload: payload);
 
         var serializerMock = new Mock<IPayloadSerializer>();
         serializerMock.Setup(s => s.Serialize(payload))
@@ -67,7 +67,7 @@ public class RoutedEventTests
     {
         // Arrange
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        var routedEvent = CreateRoutedEvent(handlerId: handlerId);
+        RoutedEvent<TestEvent> routedEvent = CreateRoutedEvent(handlerId: handlerId);
 
         var handlerMock = new Mock<IEventHandler<TestEvent>>();
 
@@ -76,7 +76,7 @@ public class RoutedEventTests
                     .Returns(handlerMock.Object);
 
         // Act
-        var result = routedEvent.GetHandlerFrom(providerMock.Object);
+        IEventHandler result = routedEvent.GetHandlerFrom(providerMock.Object);
 
         // Assert
         Assert.Same(handlerMock.Object, result);
@@ -90,7 +90,7 @@ public class RoutedEventTests
         var id = Guid.NewGuid();
         var payload = new TestEvent();
         var cancellationToken = new CancellationToken();
-        var routedEvent = CreateRoutedEvent(id: id, payload: payload);
+        RoutedEvent<TestEvent> routedEvent = CreateRoutedEvent(id: id, payload: payload);
 
         var handlerMock = new Mock<IEventHandler<TestEvent>>();
         handlerMock.Setup(h => h.HandleAsync(It.IsAny<EventContext<TestEvent>>(), cancellationToken))
@@ -111,14 +111,14 @@ public class RoutedEventTests
     public async Task HandleWith_WithDifferentHandlerType_ThrowsArgumentException()
     {
         // Arrange
-        var routedEvent = CreateRoutedEvent();
+        RoutedEvent<TestEvent> routedEvent = CreateRoutedEvent();
         var otherHandlerMock = new Mock<IEventHandler<OtherEvent>>();
 
         // Act
         Task Act() => routedEvent.HandleWith(otherHandlerMock.Object, new CancellationToken());
 
         // Assert
-        var exception = await Assert.ThrowsAsync<ArgumentException>(Act);
+        ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(Act);
         Assert.Contains("IEventHandler<TestEvent>", exception.Message);
     }
 

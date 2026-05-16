@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Tycho.Events;
 using Tycho.Events.Registrating;
 using Tycho.Utils;

@@ -28,7 +28,7 @@ internal class InventoryDbContext : TychoDbContext
     {
         base.OnConfiguring(optionsBuilder);
 
-        var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "OnlineStore.Inventory.db");
+        string dbPath = Path.Combine(Directory.GetCurrentDirectory(), "OnlineStore.Inventory.db");
         optionsBuilder.UseSqlite($"Data Source={dbPath}");
     }
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Tycho.Identity
 {
@@ -6,8 +6,8 @@ namespace Tycho.Identity
     {
         public string TypeId { get; set; } = string.Empty;
 
-        protected TypeIdentity() 
-        { 
+        protected TypeIdentity()
+        {
             throw new NotImplementedException();
         }
 

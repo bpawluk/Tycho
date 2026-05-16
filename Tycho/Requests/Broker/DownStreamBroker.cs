@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
@@ -37,10 +37,10 @@ namespace Tycho.Requests.Broker
         {
             requestData.ThrowIfNull();
 
-            await using var scope = _internals.CreateAsyncScope();
+            await using AsyncServiceScope scope = _internals.CreateAsyncScope();
 
-            var transaction = scope.ServiceProvider.GetRequiredService<ITransaction>();
-            var registration = scope.ServiceProvider.GetRequiredService<IDownStreamRequestRegistration<TRequest, TModule>>();
+            ITransaction transaction = scope.ServiceProvider.GetRequiredService<ITransaction>();
+            IDownStreamRequestRegistration<TRequest, TModule> registration = scope.ServiceProvider.GetRequiredService<IDownStreamRequestRegistration<TRequest, TModule>>();
 
             if (registration.Handler is ITransactionalRequestHandler)
             {
@@ -71,10 +71,10 @@ namespace Tycho.Requests.Broker
         {
             requestData.ThrowIfNull();
 
-            await using var scope = _internals.CreateAsyncScope();
+            await using AsyncServiceScope scope = _internals.CreateAsyncScope();
 
-            var transaction = scope.ServiceProvider.GetRequiredService<ITransaction>();
-            var registration = scope.ServiceProvider.GetRequiredService<IDownStreamRequestRegistration<TRequest, TResponse, TModule>>();
+            ITransaction transaction = scope.ServiceProvider.GetRequiredService<ITransaction>();
+            IDownStreamRequestRegistration<TRequest, TResponse, TModule> registration = scope.ServiceProvider.GetRequiredService<IDownStreamRequestRegistration<TRequest, TResponse, TModule>>();
 
             if (registration.Handler is ITransactionalRequestHandler)
             {
@@ -83,7 +83,7 @@ namespace Tycho.Requests.Broker
 
             try
             {
-                var response = await registration.Handler.HandleAsync(requestData, cancellationToken).ConfigureAwait(false);
+                TResponse response = await registration.Handler.HandleAsync(requestData, cancellationToken).ConfigureAwait(false);
                 if (transaction.IsInProgress)
                 {
                     await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);

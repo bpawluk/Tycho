@@ -1,7 +1,9 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Events.Broker;
+using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Utils;
 
@@ -22,7 +24,7 @@ namespace Tycho.Events.Publishing
         {
             eventPayload.ThrowIfNull();
             var eventId = Guid.NewGuid();
-            var routedEvents = _broker.Route(eventId, eventPayload);
+            IReadOnlyCollection<RoutedEvent> routedEvents = _broker.Route(eventId, eventPayload);
             if (routedEvents != null && routedEvents.Count > 0)
             {
                 await _outbox.Write(routedEvents, cancellationToken).ConfigureAwait(false);

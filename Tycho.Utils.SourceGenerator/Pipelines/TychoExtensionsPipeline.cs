@@ -17,7 +17,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             this IncrementalGeneratorInitializationContext context,
             IncrementalValuesProvider<(TychoDefinitionKind, ClassDefinitionModel)> pipelineBase)
         {
-            var getTychoExtensionsModelStepResult = pipelineBase
+            IncrementalValuesProvider<TychoExtensionsModel> getTychoExtensionsModelStepResult = pipelineBase
                 .Where(GetTychoExtensionsModelStepPredicate)
                 .Select(GetTychoExtensionsModelStepTransform);
 

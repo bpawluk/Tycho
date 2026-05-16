@@ -33,7 +33,7 @@ namespace Tycho.Utils.SourceGenerator.Utils
                     $"Did not find required resource ending in '{resourceName}' in assembly '{baseName}'.");
             }
 
-            using var stream = assembly.GetManifestResourceStream(manifestResourceName) ?? throw new InvalidOperationException(
+            using Stream stream = assembly.GetManifestResourceStream(manifestResourceName) ?? throw new InvalidOperationException(
                     $"Did not find required resource '{manifestResourceName}' in assembly '{baseName}'.");
             using var reader = new StreamReader(stream);
             return reader.ReadToEnd();

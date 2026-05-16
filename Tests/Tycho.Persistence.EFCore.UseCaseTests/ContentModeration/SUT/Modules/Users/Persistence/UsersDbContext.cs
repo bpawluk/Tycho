@@ -12,7 +12,7 @@ internal class UsersDbContext : TychoDbContext
     {
         base.OnConfiguring(optionsBuilder);
 
-        var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "ContentModeration.Users.db");
+        string dbPath = Path.Combine(Directory.GetCurrentDirectory(), "ContentModeration.Users.db");
         optionsBuilder.UseSqlite($"Data Source={dbPath}");
     }
 }

@@ -1,4 +1,4 @@
-﻿using Tycho.Events;
+using Tycho.Events;
 
 namespace Tycho.Transactions
 {

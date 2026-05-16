@@ -19,14 +19,14 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             this IncrementalGeneratorInitializationContext context,
             IncrementalValuesProvider<(TychoDefinitionKind, ClassDefinitionModel)> pipelineBase)
         {
-            var getDefineContractMethodDefinitionsStepResult = pipelineBase
+            IncrementalValuesProvider<MethodDefinitionModel> getDefineContractMethodDefinitionsStepResult = pipelineBase
                 .Where(GetDefineContractMethodDefinitionsStepPredicate)
                 .Select(GetDefineContractMethodDefinitionsStepTransform);
 
-            var getRequirementMethodInvocationsStepResult = getDefineContractMethodDefinitionsStepResult
+            IncrementalValuesProvider<(TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations)> getRequirementMethodInvocationsStepResult = getDefineContractMethodDefinitionsStepResult
                 .Select(GetRequirementMethodInvocationsStepTransform);
 
-            var getTychoParentModelStepResult = getRequirementMethodInvocationsStepResult
+            IncrementalValuesProvider<TychoParentModel> getTychoParentModelStepResult = getRequirementMethodInvocationsStepResult
                 .Select(GetTychoParentModelStepTransform);
 
             context.RegisterSourceOutput(
@@ -86,10 +86,10 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
 
         private static TychoRequestModel GetTychoRequestModel(MethodInvocationModel model)
         {
-            var requestType = model.TypeArguments.Single(argument => argument.IsRequestType()).Value;
+            TypeModel requestType = model.TypeArguments.Single(argument => argument.IsRequestType()).Value;
             if (model.TypeArguments.Any(argument => argument.IsResponseType()))
             {
-                var responseType = model.TypeArguments.Single(argument => argument.IsResponseType()).Value;
+                TypeModel responseType = model.TypeArguments.Single(argument => argument.IsResponseType()).Value;
                 return new TychoRequestModel(requestType, responseType);
             }
             return new TychoRequestModel(requestType);

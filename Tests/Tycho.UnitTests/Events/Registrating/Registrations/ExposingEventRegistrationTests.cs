@@ -39,7 +39,7 @@ public class ExposingEventRegistrationTests
         var sut = new ExposingEventRegistration<TestEvent>(_parentReferenceMock.Object);
 
         // Act
-        var result = sut.Route(eventId, eventPayload);
+        IReadOnlyCollection<RoutedEvent> result = sut.Route(eventId, eventPayload);
 
         // Assert
         Assert.Empty(result);
@@ -52,8 +52,8 @@ public class ExposingEventRegistrationTests
         // Arrange
         var eventId = Guid.NewGuid();
         var eventPayload = new TestEvent();
-        var firstRoutedEvent = CreateRoutedEvent(eventPayload);
-        var secondRoutedEvent = CreateRoutedEvent(eventPayload);
+        RoutedEvent<TestEvent> firstRoutedEvent = CreateRoutedEvent(eventPayload);
+        RoutedEvent<TestEvent> secondRoutedEvent = CreateRoutedEvent(eventPayload);
 
         _eventBrokerMock.Setup(eb => eb.Route(eventId, eventPayload))
                         .Returns([firstRoutedEvent, secondRoutedEvent]);
@@ -61,7 +61,7 @@ public class ExposingEventRegistrationTests
         var sut = new ExposingEventRegistration<TestEvent>(_parentReferenceMock.Object);
 
         // Act
-        var result = sut.Route(eventId, eventPayload);
+        IReadOnlyCollection<RoutedEvent> result = sut.Route(eventId, eventPayload);
 
         // Assert
         Assert.Equal(2, result.Count);
@@ -90,7 +90,7 @@ public class ExposingEventRegistrationTests
         var sut = new MappedExposingEventRegistration<TestEvent, OtherEvent>(_parentReferenceMock.Object, mapMock.Object);
 
         // Act
-        var result = sut.Route(eventId, eventPayload);
+        IReadOnlyCollection<RoutedEvent> result = sut.Route(eventId, eventPayload);
 
         // Assert
         Assert.Empty(result);
@@ -105,8 +105,8 @@ public class ExposingEventRegistrationTests
         var eventId = Guid.NewGuid();
         var eventPayload = new TestEvent();
         var mappedPayload = new OtherEvent();
-        var firstRoutedEvent = CreateRoutedEvent(eventPayload);
-        var secondRoutedEvent = CreateRoutedEvent(eventPayload);
+        RoutedEvent<TestEvent> firstRoutedEvent = CreateRoutedEvent(eventPayload);
+        RoutedEvent<TestEvent> secondRoutedEvent = CreateRoutedEvent(eventPayload);
 
         var mapMock = new Mock<Func<TestEvent, OtherEvent>>();
         mapMock.Setup(m => m(eventPayload))
@@ -118,7 +118,7 @@ public class ExposingEventRegistrationTests
         var sut = new MappedExposingEventRegistration<TestEvent, OtherEvent>(_parentReferenceMock.Object, mapMock.Object);
 
         // Act
-        var result = sut.Route(eventId, eventPayload);
+        IReadOnlyCollection<RoutedEvent> result = sut.Route(eventId, eventPayload);
 
         // Assert
         Assert.Equal(2, result.Count);
@@ -142,7 +142,7 @@ public class ExposingEventRegistrationTests
     {
         Assert.Equal(2, route.Count);
 
-        var routeSteps = route.ToArray();
+        IRouteStep[] routeSteps = [.. route];
 
         Assert.IsType<UpStreamRouteStep>(routeSteps[0]);
         Assert.IsType<FinalRouteStep>(routeSteps[1]);

@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,7 +36,7 @@ namespace Tycho.Processor
             {
                 try
                 {
-                    var capacity = _settings.ConcurrencyLimit - Volatile.Read(ref _jobsInProgress);
+                    int capacity = _settings.ConcurrencyLimit - Volatile.Read(ref _jobsInProgress);
                     if (capacity > 0)
                     {
                         await StartJobsAsync(capacity).ConfigureAwait(false);
@@ -59,11 +60,11 @@ namespace Tycho.Processor
         private async Task StartJobsAsync(int amount)
         {
             using var cts = new CancellationTokenSource(_settings.ScheduleProcessingTimeout);
-            var newJobs = await _jobFactory.CreateJobsAsync(amount, cts.Token).ConfigureAwait(false);
+            IReadOnlyCollection<IJob> newJobs = await _jobFactory.CreateJobsAsync(amount, cts.Token).ConfigureAwait(false);
 
             if (newJobs.Count > 0)
             {
-                foreach (var job in newJobs)
+                foreach (IJob job in newJobs)
                 {
                     cts.Token.ThrowIfCancellationRequested();
                     Interlocked.Increment(ref _jobsInProgress);
@@ -127,7 +128,7 @@ namespace Tycho.Processor
                     return;
                 }
 
-                var newInterval = _currentInterval * _settings.IntervalMultiplier;
+                TimeSpan newInterval = _currentInterval * _settings.IntervalMultiplier;
 
                 if (newInterval > _settings.MaxInterval)
                 {

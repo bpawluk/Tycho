@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Tycho.Modules.Instance;
@@ -16,7 +16,7 @@ namespace Tycho.Identity.Modules
 
         public IModule GetModule(ModuleIdentity moduleId)
         {
-            foreach (var module in _modules)
+            foreach (IModule module in _modules)
             {
                 if (module.Identity == moduleId)
                 {

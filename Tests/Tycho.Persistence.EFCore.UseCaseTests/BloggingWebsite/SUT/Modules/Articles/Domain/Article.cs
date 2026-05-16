@@ -1,4 +1,4 @@
-﻿namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Domain;
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Domain;
 
 internal class Article(string author, string content)
 {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events;
@@ -44,7 +44,7 @@ namespace Tycho.Apps.Setup
 
         public Task BuildAsync()
         {
-            var services = _internals.GetServiceCollection();
+            IServiceCollection services = _internals.GetServiceCollection();
 
             if (!_internals.HasService<IOutboxWriter>() || !_internals.HasService<IOutboxConsumer>())
             {

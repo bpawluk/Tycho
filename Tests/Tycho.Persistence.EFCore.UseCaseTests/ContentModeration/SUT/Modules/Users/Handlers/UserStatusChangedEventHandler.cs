@@ -1,8 +1,8 @@
 using Tycho.Events;
-using Tycho.Transactions;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Domain;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Persistence;
+using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Handlers;
 
@@ -10,11 +10,7 @@ internal class UserStatusChangedEventHandler(UsersDbContext dbContext) : ITransa
 {
     public async Task HandleAsync(EventContext<UserStatusChangedEvent> context, CancellationToken cancellationToken)
     {
-        var user = await dbContext.Users.FindAsync([context.Payload.UserId], cancellationToken);
-        if (user is null)
-        {
-            throw new ArgumentException($"There is no Users with ID {context.Payload.UserId}");
-        }
+        User? user = await dbContext.Users.FindAsync([context.Payload.UserId], cancellationToken) ?? throw new ArgumentException($"There is no Users with ID {context.Payload.UserId}");
         user.Status = GetStatus(context.Payload.NewStatus);
     }
 

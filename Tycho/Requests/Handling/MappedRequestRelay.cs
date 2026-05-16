@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Requests.Broker;
@@ -21,7 +21,7 @@ namespace Tycho.Requests.Handling
 
         public Task HandleAsync(TRequest requestData, CancellationToken cancellationToken)
         {
-            var targetRequestData = _map(requestData);
+            TTargetRequest targetRequestData = _map(requestData);
             return _targetBroker.ExecuteAsync(targetRequestData, cancellationToken);
         }
     }
@@ -47,10 +47,10 @@ namespace Tycho.Requests.Handling
 
         public async Task<TResponse> HandleAsync(TRequest requestData, CancellationToken cancellationToken)
         {
-            var targetRequestData = _mapRequest(requestData);
-            var targetRequestResponse = await _targetBroker
+            TTargetRequest targetRequestData = _mapRequest(requestData);
+            TTargetResponse targetRequestResponse = await _targetBroker
                 .ExecuteAsync<TTargetRequest, TTargetResponse>(
-                    targetRequestData, 
+                    targetRequestData,
                     cancellationToken)
                 .ConfigureAwait(false);
             return _mapResponse(targetRequestResponse);

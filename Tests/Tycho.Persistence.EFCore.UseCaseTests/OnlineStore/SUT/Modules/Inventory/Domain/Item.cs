@@ -1,4 +1,4 @@
-﻿namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Domain;
+namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Domain;
 
 internal class Item(int id, uint stockLevel)
 {
@@ -38,7 +38,7 @@ internal class Item(int id, uint stockLevel)
 
     private void RecalculateAvailability()
     {
-        var newQuantity = (uint)(StockLevel - Reservations.Sum(r => (int)r.Quantity));
+        uint newQuantity = (uint)(StockLevel - Reservations.Sum(r => (int)r.Quantity));
         if (newQuantity != Availability.Quantity)
         {
             Availability = new(newQuantity, ++Availability.Version);

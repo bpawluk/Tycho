@@ -11,10 +11,10 @@ internal class BasketItemAddedEventHandler(IInventoryModule inventoryModule, IBa
 {
     public async Task HandleAsync(EventContext<BasketItemAddedEvent> context, CancellationToken cancellationToken)
     {
-        var reservationCode = $"{context.Payload.CustomerId}-{context.Payload.ProductId}";
+        string reservationCode = $"{context.Payload.CustomerId}-{context.Payload.ProductId}";
         var reserveItemRequest = new ReserveItemRequest(reservationCode, context.Payload.ProductId, context.Payload.Quantity);
 
-        var response = await inventoryModule.ExecuteAsync(reserveItemRequest, cancellationToken);
+        ReserveItemRequest.Response response = await inventoryModule.ExecuteAsync(reserveItemRequest, cancellationToken);
 
         if (response.ReservationCreated)
         {

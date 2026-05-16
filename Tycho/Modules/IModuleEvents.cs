@@ -1,4 +1,4 @@
-﻿using Tycho.Events;
+using Tycho.Events;
 using Tycho.Utils;
 
 namespace Tycho.Modules

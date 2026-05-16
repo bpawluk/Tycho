@@ -1,4 +1,4 @@
-﻿namespace Tycho.Requests.Registrating.Registrations
+namespace Tycho.Requests.Registrating.Registrations
 {
     internal interface IRequestRegistration
     {

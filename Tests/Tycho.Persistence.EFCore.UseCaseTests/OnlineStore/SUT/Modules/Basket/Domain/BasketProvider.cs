@@ -7,7 +7,7 @@ internal class BasketProvider(BasketDbContext dbContext)
 {
     public async Task<Basket> GetBasket(int customerId, CancellationToken cancellationToken)
     {
-        var customerBasket = await dbContext.Baskets.SingleOrDefaultAsync(
+        Basket? customerBasket = await dbContext.Baskets.SingleOrDefaultAsync(
             basket => basket.CustomerId == customerId && !basket.CheckedOut,
             cancellationToken);
 

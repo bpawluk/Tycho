@@ -1,4 +1,4 @@
-﻿using Tycho.Utils;
+using Tycho.Utils;
 
 namespace Tycho.Events.Serialization
 {

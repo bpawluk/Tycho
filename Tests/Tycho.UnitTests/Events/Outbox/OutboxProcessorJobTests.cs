@@ -22,7 +22,7 @@ public class OutboxProcessorJobTests
     public OutboxProcessorJobTests()
     {
         var internals = new Internals(typeof(TestModule));
-        var serviceCollection = internals.GetServiceCollection();
+        IServiceCollection serviceCollection = internals.GetServiceCollection();
 
         _outboxConsumerMock = new Mock<IOutboxConsumer>();
         serviceCollection.AddSingleton(_outboxConsumerMock.Object);
@@ -53,7 +53,7 @@ public class OutboxProcessorJobTests
     public async Task ExecuteAsync_WithAssignedEvent_DeliversEvent()
     {
         // Arrange
-        var routedEvent = CreateRoutedEvent();
+        SerializedRoutedEvent routedEvent = CreateRoutedEvent();
         var cancellationToken = new CancellationToken();
 
         _brokerMock
@@ -74,7 +74,7 @@ public class OutboxProcessorJobTests
     public async Task ExecuteAsync_WithAssignedEvent_WhenBrokerThrows_MarksEventAsFailed()
     {
         // Arrange
-        var routedEvent = CreateRoutedEvent();
+        SerializedRoutedEvent routedEvent = CreateRoutedEvent();
         var cancellationToken = new CancellationToken();
 
         _brokerMock
@@ -95,7 +95,7 @@ public class OutboxProcessorJobTests
     public async Task ExecuteAsync_WithAssignedEvent_WhenMarkingAsDeliveredThrows_MarksEventAsFailed()
     {
         // Arrange
-        var routedEvent = CreateRoutedEvent();
+        SerializedRoutedEvent routedEvent = CreateRoutedEvent();
         var cancellationToken = new CancellationToken();
 
         _brokerMock

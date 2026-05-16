@@ -52,14 +52,14 @@ internal class TestData
 
         public Entry? Find(int id)
         {
-            foreach (var entry in this)
+            foreach (Entry entry in this)
             {
                 if (entry.Id == id)
                 {
                     return entry;
                 }
 
-                var found = entry.SubEntries.Find(id);
+                Entry? found = entry.SubEntries.Find(id);
                 if (found != null)
                 {
                     return found;
@@ -97,7 +97,7 @@ internal class TestData
                 return false;
             }
 
-            foreach (var (entry, responseEntry) in entries.Zip(response.Entries))
+            foreach ((Entry? entry, GetFeedEntriesRequest.EntryData? responseEntry) in entries.Zip(response.Entries))
             {
                 if (!entry.Matches(responseEntry))
                 {

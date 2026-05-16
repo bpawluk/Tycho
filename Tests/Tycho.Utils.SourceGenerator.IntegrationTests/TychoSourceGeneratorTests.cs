@@ -16,7 +16,7 @@ public class TychoSourceGeneratorTests : VerifyBase
         [
             "AppInGlobalNamespace/TestApp.cs"
         ];
-        var driver = RunGenerator(sources);
+        GeneratorDriver driver = RunGenerator(sources);
         return Verify(driver);
     }
 
@@ -27,7 +27,7 @@ public class TychoSourceGeneratorTests : VerifyBase
         [
             "AppInGlobalNamespaceAndOuterTypes/TestApp.cs"
         ];
-        var driver = RunGenerator(sources);
+        GeneratorDriver driver = RunGenerator(sources);
         return Verify(driver);
     }
 
@@ -38,7 +38,7 @@ public class TychoSourceGeneratorTests : VerifyBase
         [
             "AppInNamespace/TestApp.cs"
         ];
-        var driver = RunGenerator(sources);
+        GeneratorDriver driver = RunGenerator(sources);
         return Verify(driver);
     }
 
@@ -49,7 +49,7 @@ public class TychoSourceGeneratorTests : VerifyBase
         [
             "AppInNamespaceAndOuterTypes/TestApp.cs"
         ];
-        var driver = RunGenerator(sources);
+        GeneratorDriver driver = RunGenerator(sources);
         return Verify(driver);
     }
 
@@ -64,7 +64,7 @@ public class TychoSourceGeneratorTests : VerifyBase
             "AppWithDownstreamContract/Requests/DeleteItemCommand.cs",
             "AppWithDownstreamContract/Requests/GetItemQuery.cs"
         ];
-        var driver = RunGenerator(sources);
+        GeneratorDriver driver = RunGenerator(sources);
         return Verify(driver);
     }
 
@@ -81,7 +81,7 @@ public class TychoSourceGeneratorTests : VerifyBase
             "AppWithEvents/Handlers/PaymentProcessedEventHandler.cs",
             "AppWithEvents/Modules/ModuleA.cs"
         ];
-        var driver = RunGenerator(sources);
+        GeneratorDriver driver = RunGenerator(sources);
         return Verify(driver);
     }
 
@@ -92,7 +92,7 @@ public class TychoSourceGeneratorTests : VerifyBase
         [
             "AppWithoutAttribute/TestApp.cs"
         ];
-        var driver = RunGenerator(sources);
+        GeneratorDriver driver = RunGenerator(sources);
         return Verify(driver);
     }
 
@@ -105,7 +105,7 @@ public class TychoSourceGeneratorTests : VerifyBase
             "AppWithSubmodules/Modules/ModuleA.cs",
             "AppWithSubmodules/Modules/ModuleB.cs"
         ];
-        var driver = RunGenerator(sources);
+        GeneratorDriver driver = RunGenerator(sources);
         return Verify(driver);
     }
 
@@ -116,7 +116,7 @@ public class TychoSourceGeneratorTests : VerifyBase
         [
             "ModuleInGlobalNamespace/TestModule.cs"
         ];
-        var driver = RunGenerator(sources);
+        GeneratorDriver driver = RunGenerator(sources);
         return Verify(driver);
     }
 
@@ -127,7 +127,7 @@ public class TychoSourceGeneratorTests : VerifyBase
         [
             "ModuleInGlobalNamespaceAndOuterTypes/TestModule.cs"
         ];
-        var driver = RunGenerator(sources);
+        GeneratorDriver driver = RunGenerator(sources);
         return Verify(driver);
     }
 
@@ -138,7 +138,7 @@ public class TychoSourceGeneratorTests : VerifyBase
         [
             "ModuleInNamespace/TestModule.cs"
         ];
-        var driver = RunGenerator(sources);
+        GeneratorDriver driver = RunGenerator(sources);
         return Verify(driver);
     }
 
@@ -149,7 +149,7 @@ public class TychoSourceGeneratorTests : VerifyBase
         [
             "ModuleInNamespaceAndOuterTypes/TestModule.cs"
         ];
-        var driver = RunGenerator(sources);
+        GeneratorDriver driver = RunGenerator(sources);
         return Verify(driver);
     }
 
@@ -164,7 +164,7 @@ public class TychoSourceGeneratorTests : VerifyBase
             "ModuleWithDownstreamContract/Requests/DeleteItemCommand.cs",
             "ModuleWithDownstreamContract/Requests/GetItemQuery.cs"
         ];
-        var driver = RunGenerator(sources);
+        GeneratorDriver driver = RunGenerator(sources);
         return Verify(driver);
     }
 
@@ -181,7 +181,7 @@ public class TychoSourceGeneratorTests : VerifyBase
             "ModuleWithEvents/Handlers/PaymentProcessedEventHandler.cs",
             "ModuleWithEvents/Modules/ModuleA.cs"
         ];
-        var driver = RunGenerator(sources);
+        GeneratorDriver driver = RunGenerator(sources);
         return Verify(driver);
     }
 
@@ -194,7 +194,7 @@ public class TychoSourceGeneratorTests : VerifyBase
             "ModuleWithSubmodules/Modules/ModuleA.cs",
             "ModuleWithSubmodules/Modules/ModuleB.cs"
         ];
-        var driver = RunGenerator(sources);
+        GeneratorDriver driver = RunGenerator(sources);
         return Verify(driver);
     }
 
@@ -207,7 +207,7 @@ public class TychoSourceGeneratorTests : VerifyBase
             "ModuleWithUpstreamContract/Requests/GetParentDataQuery.cs",
             "ModuleWithUpstreamContract/Requests/NotifyParentCommand.cs"
         ];
-        var driver = RunGenerator(sources);
+        GeneratorDriver driver = RunGenerator(sources);
         return Verify(driver);
     }
 
@@ -219,13 +219,13 @@ public class TychoSourceGeneratorTests : VerifyBase
             "NonClassTypes/TestInterface.cs",
             "NonClassTypes/TestStruct.cs"
         ];
-        var driver = RunGenerator(sources);
+        GeneratorDriver driver = RunGenerator(sources);
         return Verify(driver);
     }
 
     private static GeneratorDriver RunGenerator(string[] sources)
     {
-        var compilation = CreateCompilation(sources);
+        CSharpCompilation compilation = CreateCompilation(sources);
         var generator = new TychoSourceGenerator();
         GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
         return driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out _);
@@ -234,7 +234,7 @@ public class TychoSourceGeneratorTests : VerifyBase
     private static CSharpCompilation CreateCompilation(string[] sources)
     {
         var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
-        var syntaxTrees = sources.Select(source =>
+        IEnumerable<SyntaxTree> syntaxTrees = sources.Select(source =>
         {
             string sourcePath = Path.Combine(AppContext.BaseDirectory, "Input", source);
             string sourceContent = File.ReadAllText(sourcePath);

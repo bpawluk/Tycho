@@ -1,3 +1,4 @@
+using Tycho.Events.Routing;
 using Tycho.Events.Routing.Steps;
 
 namespace Tycho.UnitTests.Events.Routing.Steps;
@@ -24,7 +25,7 @@ public class UpStreamRouteStepTests
         string input = "UP";
 
         // Act
-        bool success = UpStreamRouteStep.TryParse(input, out var result);
+        bool success = UpStreamRouteStep.TryParse(input, out IRouteStep? result);
 
         // Assert
         Assert.True(success);
@@ -38,7 +39,7 @@ public class UpStreamRouteStepTests
         string input = "uP";
 
         // Act
-        bool success = UpStreamRouteStep.TryParse(input, out var result);
+        bool success = UpStreamRouteStep.TryParse(input, out IRouteStep? result);
 
         // Assert
         Assert.True(success);
@@ -65,7 +66,7 @@ public class UpStreamRouteStepTests
         string input = "UP";
 
         // Act
-        var result = UpStreamRouteStep.Parse(input);
+        IRouteStep result = UpStreamRouteStep.Parse(input);
 
         // Assert
         Assert.IsType<UpStreamRouteStep>(result);

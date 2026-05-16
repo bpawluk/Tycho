@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Tycho.Modules.Instance;
 
 namespace Tycho.Identity.Modules

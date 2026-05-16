@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Tycho.Requests.Broker;
 using Tycho.Structure;
 using Tycho.Utils;

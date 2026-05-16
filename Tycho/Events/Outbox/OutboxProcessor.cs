@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Tycho.Processor;
 using Tycho.Structure;
 

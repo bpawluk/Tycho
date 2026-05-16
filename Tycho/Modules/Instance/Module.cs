@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Broker;
@@ -37,7 +37,7 @@ namespace Tycho.Modules.Instance
 
         public async ValueTask DisposeAsync()
         {
-            var moduleProvider = _internals.GetRequiredService<IModuleProvider>();
+            IModuleProvider moduleProvider = _internals.GetRequiredService<IModuleProvider>();
 
             try
             {
@@ -45,7 +45,7 @@ namespace Tycho.Modules.Instance
             }
             catch { }
 
-            foreach (var module in moduleProvider.GetAllModules())
+            foreach (IModule module in moduleProvider.GetAllModules())
             {
                 try
                 {

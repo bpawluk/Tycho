@@ -57,11 +57,11 @@ public class TychoAppTests
         var sut = new ExposedInternalsApp();
 
         // Act
-        var tasks = Enumerable.Range(0, 2).Select((_) =>
+        IEnumerable<Task<Exception?>> tasks = Enumerable.Range(0, 2).Select((_) =>
         {
             return sut.RunAsync().ContinueWith(t => t.IsFaulted ? t.Exception!.InnerException : null);
         });
-        var results = await Task.WhenAll(tasks);
+        Exception?[] results = await Task.WhenAll(tasks);
 
         // Assert
         Assert.Equal(2, results.Length);

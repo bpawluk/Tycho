@@ -4,15 +4,15 @@
 param(
   [string]$Solution = "Tycho.slnx",
   [string]$CoverageSettings = "coverage.runsettings",
-  [string]$ResultsDirectory = "TestResults/CoverageResults",
-  [string]$ReportDirectory = "TestResults/CoverageReport",
+  [string]$ResultsDirectory = "Artifacts/TestCoverage/Results",
+  [string]$ReportDirectory = "Artifacts/TestCoverage/Report",
   [string]$ReportTypes = "Html;HtmlSummary;Cobertura"
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$env:DOTNET_CLI_UI_LANGUAGE = "en-US"
+$env:DOTNET_SYSTEM_GLOBALIZATION_INVARIANT="1"
 
 $scriptDirectory = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
 $repoRoot = Split-Path -Path $scriptDirectory -Parent

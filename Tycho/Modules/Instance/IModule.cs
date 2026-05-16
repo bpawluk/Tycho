@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Tycho.Events.Broker;
 using Tycho.Identity.Modules;
 using Tycho.Requests.Broker;

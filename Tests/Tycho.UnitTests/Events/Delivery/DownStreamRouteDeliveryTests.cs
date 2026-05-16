@@ -43,7 +43,7 @@ public class DownStreamRouteDeliveryTests
     {
         // Arrange 
         var downStreamStep = DownStreamRouteStep.Create<TestModule>();
-        var routedEvent = CreateRoutedEvent(downStreamStep);
+        SerializedRoutedEvent routedEvent = CreateRoutedEvent(downStreamStep);
 
         // Act
         bool result = _sut.CanDeliver(routedEvent);
@@ -57,7 +57,7 @@ public class DownStreamRouteDeliveryTests
     {
         // Arrange
         var upStreamStep = UpStreamRouteStep.Create();
-        var routedEvent = CreateRoutedEvent(upStreamStep);
+        SerializedRoutedEvent routedEvent = CreateRoutedEvent(upStreamStep);
 
         // Act
         bool result = _sut.CanDeliver(routedEvent);
@@ -71,7 +71,7 @@ public class DownStreamRouteDeliveryTests
     {
         // Arrange
         var finalStep = FinalRouteStep.Create();
-        var routedEvent = CreateRoutedEvent(finalStep);
+        SerializedRoutedEvent routedEvent = CreateRoutedEvent(finalStep);
 
         // Act
         bool result = _sut.CanDeliver(routedEvent);
@@ -84,7 +84,7 @@ public class DownStreamRouteDeliveryTests
     public void CanDeliver_WithEmptyRoute_ReturnsFalse()
     {
         // Arrange
-        var routedEvent = CreateRoutedEvent();
+        SerializedRoutedEvent routedEvent = CreateRoutedEvent();
 
         // Act 
         bool result = _sut.CanDeliver(routedEvent);
@@ -98,7 +98,7 @@ public class DownStreamRouteDeliveryTests
     {
         // Arrange 
         var downStreamStep = DownStreamRouteStep.Create<TestModule>();
-        var routedEvent = CreateRoutedEvent(downStreamStep);
+        SerializedRoutedEvent routedEvent = CreateRoutedEvent(downStreamStep);
         var cancellationToken = new CancellationToken();
 
         // Act
@@ -113,7 +113,7 @@ public class DownStreamRouteDeliveryTests
     {
         // Arrange
         var downStreamStep = DownStreamRouteStep.Create<TestModule>();
-        var routedEvent = CreateRoutedEvent(downStreamStep);
+        SerializedRoutedEvent routedEvent = CreateRoutedEvent(downStreamStep);
         var cancellationToken = new CancellationToken();
 
         _moduleProviderMock.Setup(mp => mp.GetModule(_testModuleIdentity))
@@ -131,7 +131,7 @@ public class DownStreamRouteDeliveryTests
     {
         // Arrange
         var upStreamStep = UpStreamRouteStep.Create();
-        var routedEvent = CreateRoutedEvent(upStreamStep);
+        SerializedRoutedEvent routedEvent = CreateRoutedEvent(upStreamStep);
         var cancellationToken = new CancellationToken();
 
         // Act
@@ -146,7 +146,7 @@ public class DownStreamRouteDeliveryTests
     {
         // Arrange
         var finalStep = FinalRouteStep.Create();
-        var routedEvent = CreateRoutedEvent(finalStep);
+        SerializedRoutedEvent routedEvent = CreateRoutedEvent(finalStep);
         var cancellationToken = new CancellationToken();
 
         // Act
@@ -160,7 +160,7 @@ public class DownStreamRouteDeliveryTests
     public async Task DeliverAsync_WithEmptyRoute_ThrowsInvalidOperationException()
     {
         // Arrange
-        var routedEvent = CreateRoutedEvent();
+        SerializedRoutedEvent routedEvent = CreateRoutedEvent();
         var cancellationToken = new CancellationToken();
 
         // Act

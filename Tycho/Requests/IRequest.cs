@@ -1,4 +1,4 @@
-﻿namespace Tycho.Requests
+namespace Tycho.Requests
 {
     /// <summary>
     /// An interface that represents a request.

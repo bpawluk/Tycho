@@ -25,7 +25,7 @@ public class FinalRouteStepTests
         string input = "END";
 
         // Act
-        bool success = FinalRouteStep.TryParse(input, out var result);
+        bool success = FinalRouteStep.TryParse(input, out IRouteStep? result);
 
         // Assert
         Assert.True(success);
@@ -39,7 +39,7 @@ public class FinalRouteStepTests
         string input = "eNd";
 
         // Act
-        bool success = FinalRouteStep.TryParse(input, out var result);
+        bool success = FinalRouteStep.TryParse(input, out IRouteStep? result);
 
         // Assert
         Assert.True(success);
@@ -66,7 +66,7 @@ public class FinalRouteStepTests
         string input = "END";
 
         // Act
-        var result = FinalRouteStep.Parse(input);
+        IRouteStep result = FinalRouteStep.Parse(input);
 
         // Assert
         Assert.IsType<FinalRouteStep>(result);
