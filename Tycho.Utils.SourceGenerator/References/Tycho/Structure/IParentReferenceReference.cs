@@ -5,9 +5,9 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Structure
 {
     internal static class IParentReferenceReference
     {
-        private const string _namespace = "Tycho.Structure.Parent";
-        private const string _typeName = "IParentReference";
+        private const string Namespace = "Tycho.Structure.Parent";
+        private const string TypeName = "IParentReference";
 
-        public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
     }
 }

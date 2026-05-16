@@ -7,10 +7,10 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Logging
 {
     internal static class LoggingConfigurationReference
     {
-        private const string _namespace = "Tycho.Logging";
-        private const string _typeName = "LoggingConfiguration";
+        private const string Namespace = "Tycho.Logging";
+        private const string TypeName = "LoggingConfiguration";
 
-        public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
 
         public static MethodSignatureModel ConfigureLoggingMethodSignature => new MethodSignatureModel(
             methodName: "ConfigureLogging",

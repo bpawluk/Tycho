@@ -7,10 +7,10 @@ namespace Tycho.Events.Routing.Steps
 {
     internal class DownStreamRouteStep : IRouteStep
     {
-        private const string _key = "DOWN";
-        private const string _destinationGroup = "destination";
+        private const string Key = "DOWN";
+        private const string DestinationGroup = "destination";
 
-        private static readonly Regex _pattern = new Regex(@$"^{_key}\((?<{_destinationGroup}>.+)\)$", RegexOptions.IgnoreCase);
+        private static readonly Regex s_pattern = new Regex(@$"^{Key}\((?<{DestinationGroup}>.+)\)$", RegexOptions.IgnoreCase);
 
         public ModuleIdentity Destination { get; }
 
@@ -27,7 +27,7 @@ namespace Tycho.Events.Routing.Steps
 
         public override string ToString()
         {
-            return $"{_key}({Destination})";
+            return $"{Key}({Destination})";
         }
 
         public static IRouteStep Parse(string step)
@@ -43,10 +43,10 @@ namespace Tycho.Events.Routing.Steps
         {
             result = default!;
 
-            Match match = _pattern.Match(step);
+            Match match = s_pattern.Match(step);
             if (match.Success)
             {
-                string destinationModuleIdentity = match.Groups[_destinationGroup].Value;
+                string destinationModuleIdentity = match.Groups[DestinationGroup].Value;
                 var destinationModule = ModuleIdentity.Parse(destinationModuleIdentity);
                 result = new DownStreamRouteStep(destinationModule);
                 return true;

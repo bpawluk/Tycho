@@ -27,8 +27,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         {
             Namespace = tychoFacadeModel.DefinitionType.Namespace;
             ContainingTypes = tychoFacadeModel.DefinitionType.ContainingTypes.ToArray();
-            Classes = new ClassesTM(this, tychoFacadeModel);
-            Interfaces = new InterfacesTM(this, tychoFacadeModel);
+            Classes = new ClassesTM(this);
+            Interfaces = new InterfacesTM(tychoFacadeModel);
             Methods = new MethodsTM();
             Parameters = new ParametersTM();
             Requests = tychoFacadeModel.Requests.Select(r => new RequestTM(this, r)).ToArray();
@@ -39,7 +39,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string TaskClass { get; }
             public string CancellationTokenClass { get; }
 
-            public ClassesTM(ModuleFacadeInterfaceTM owner, TychoFacadeModel tychoFacadeModel)
+            public ClassesTM(ModuleFacadeInterfaceTM owner)
             {
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);
@@ -50,7 +50,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         {
             public string ModuleInterface { get; }
 
-            public InterfacesTM(ModuleFacadeInterfaceTM owner, TychoFacadeModel tychoFacadeModel)
+            public InterfacesTM(TychoFacadeModel tychoFacadeModel)
             {
                 ModuleInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(tychoFacadeModel.DefinitionType.Name);
             }

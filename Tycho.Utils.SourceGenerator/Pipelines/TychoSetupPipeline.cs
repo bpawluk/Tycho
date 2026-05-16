@@ -13,8 +13,8 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
 {
     internal static class TychoSetupPipeline
     {
-        private static readonly string AppSetupTemplate = EmbeddedResource.GetContent("Templates/AppSetup.sbncs");
-        private static readonly string ModuleSetupTemplate = EmbeddedResource.GetContent("Templates/ModuleSetup.sbncs");
+        private static readonly string s_appSetupTemplate = EmbeddedResource.GetContent("Templates/AppSetup.sbncs");
+        private static readonly string s_moduleSetupTemplate = EmbeddedResource.GetContent("Templates/ModuleSetup.sbncs");
 
         public static IncrementalGeneratorInitializationContext AddTychoSetupPipeline(
             this IncrementalGeneratorInitializationContext context,
@@ -93,8 +93,8 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
         {
             return model.DefinitionKind switch
             {
-                TychoDefinitionKind.App => AppSetupTemplate,
-                TychoDefinitionKind.Module => ModuleSetupTemplate,
+                TychoDefinitionKind.App => s_appSetupTemplate,
+                TychoDefinitionKind.Module => s_moduleSetupTemplate,
                 _ => throw new ArgumentOutOfRangeException(nameof(model.DefinitionKind), $"Unsupported definition kind: {model.DefinitionKind}"),
             };
         }

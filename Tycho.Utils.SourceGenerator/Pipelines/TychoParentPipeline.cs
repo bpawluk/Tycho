@@ -12,8 +12,8 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
 {
     internal static class TychoParentPipeline
     {
-        private static readonly string ModuleParentTemplate = EmbeddedResource.GetContent("Templates/ModuleParent.sbncs");
-        private static readonly string ModuleParentInterfaceTemplate = EmbeddedResource.GetContent("Templates/ModuleParentInterface.sbncs");
+        private static readonly string s_moduleParentTemplate = EmbeddedResource.GetContent("Templates/ModuleParent.sbncs");
+        private static readonly string s_moduleParentInterfaceTemplate = EmbeddedResource.GetContent("Templates/ModuleParentInterface.sbncs");
 
         public static IncrementalGeneratorInitializationContext AddTychoParentPipeline(
             this IncrementalGeneratorInitializationContext context,
@@ -35,12 +35,12 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                 {
                     outputContext.GenerateSourceFromTemplate(
                         new ModuleParentInterfaceTM(model),
-                        ModuleParentInterfaceTemplate,
+                        s_moduleParentInterfaceTemplate,
                         $"{model.DefinitionType}.Parent.Interface.g.cs");
 
                     outputContext.GenerateSourceFromTemplate(
                         new ModuleParentTM(model),
-                        ModuleParentTemplate,
+                        s_moduleParentTemplate,
                         $"{model.DefinitionType}.Parent.g.cs");
                 });
 

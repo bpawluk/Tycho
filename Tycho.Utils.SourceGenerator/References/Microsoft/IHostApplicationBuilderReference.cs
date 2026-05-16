@@ -5,12 +5,12 @@ namespace Tycho.Utils.SourceGenerator.References.Microsoft
 {
     internal static class IHostApplicationBuilderReference
     {
-        private const string _namespace = "Microsoft.Extensions.Hosting";
-        private const string _typeName = "IHostApplicationBuilder";
+        private const string Namespace = "Microsoft.Extensions.Hosting";
+        private const string TypeName = "IHostApplicationBuilder";
 
         public const string ConfigurationPropertyName = "Configuration";
         public const string ServicesPropertyName = "Services";
 
-        public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
     }
 }

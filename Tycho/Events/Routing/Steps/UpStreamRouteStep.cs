@@ -4,13 +4,13 @@ namespace Tycho.Events.Routing.Steps
 {
     internal class UpStreamRouteStep : IRouteStep
     {
-        private const string _key = "UP";
+        private const string Key = "UP";
 
         public static UpStreamRouteStep Create() => new UpStreamRouteStep();
 
         public override string ToString()
         {
-            return _key;
+            return Key;
         }
 
         public static IRouteStep Parse(string step)
@@ -26,7 +26,7 @@ namespace Tycho.Events.Routing.Steps
         {
             result = default!;
 
-            if (_key.Equals(step, StringComparison.InvariantCultureIgnoreCase))
+            if (Key.Equals(step, StringComparison.InvariantCultureIgnoreCase))
             {
                 result = new UpStreamRouteStep();
                 return true;

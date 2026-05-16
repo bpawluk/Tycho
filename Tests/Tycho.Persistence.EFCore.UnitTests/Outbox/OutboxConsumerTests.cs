@@ -207,7 +207,7 @@ public class OutboxConsumerTests
                         .Returns(isTransactionInProgress);
 
         _dbSetMock.Setup(m => m.FindAsync(It.IsAny<object[]>(), It.IsAny<CancellationToken>()))
-                  .Returns(ValueTask.FromResult<OutboxEntry?>(entry));
+                  .ReturnsAsync(entry);
 
         // Act
         await _sut.MarkAsDelivered(entryId, cancellationToken);
@@ -226,7 +226,7 @@ public class OutboxConsumerTests
         var cancellationToken = new CancellationToken();
 
         _dbSetMock.Setup(m => m.FindAsync(It.IsAny<object[]>(), It.IsAny<CancellationToken>()))
-                  .Returns(ValueTask.FromResult<OutboxEntry?>(null));
+                  .ReturnsAsync((OutboxEntry?)null);
 
         // Act
         await _sut.MarkAsDelivered(entryId, cancellationToken);
@@ -250,7 +250,7 @@ public class OutboxConsumerTests
                         .Returns(isTransactionInProgress);
 
         _dbSetMock.Setup(m => m.FindAsync(It.IsAny<object[]>(), It.IsAny<CancellationToken>()))
-                  .Returns(ValueTask.FromResult<OutboxEntry?>(entry));
+                  .ReturnsAsync(entry);
 
         // Act
         await _sut.MarkAsFailed(entryId, cancellationToken);
@@ -269,7 +269,7 @@ public class OutboxConsumerTests
         var cancellationToken = new CancellationToken();
 
         _dbSetMock.Setup(m => m.FindAsync(It.IsAny<object[]>(), It.IsAny<CancellationToken>()))
-                  .Returns(ValueTask.FromResult<OutboxEntry?>(null));
+                  .ReturnsAsync((OutboxEntry?)null);
 
         // Act
         await _sut.MarkAsFailed(entryId, cancellationToken);

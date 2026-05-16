@@ -5,11 +5,11 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho
 {
     internal static class TychoDefinitionAttributeReference
     {
-        private const string _namespace = "Tycho";
-        private const string _typeName = "TychoDefinitionAttribute";
+        private const string Namespace = "Tycho";
+        private const string TypeName = "TychoDefinitionAttribute";
 
-        public static string FullName => $"{_namespace}.{_typeName}";
+        public static string FullName => $"{Namespace}.{TypeName}";
 
-        public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
     }
 }

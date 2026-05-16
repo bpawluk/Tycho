@@ -6,10 +6,10 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
 {
     internal static class AppFacadeBaseReference
     {
-        private const string _namespace = "Tycho.Apps.Instance";
-        private const string _typeName = "AppFacadeBase";
+        private const string Namespace = "Tycho.Apps.Instance";
+        private const string TypeName = "AppFacadeBase";
 
-        public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
 
         public static MethodSignatureModel ExecuteAsyncMethodSignature => new MethodSignatureModel(
             methodName: "ExecuteAsync",

@@ -13,10 +13,10 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
 {
     internal static class TychoPublisherPipeline
     {
-        private static readonly string AppPublisherTemplate = EmbeddedResource.GetContent("Templates/AppPublisher.sbncs");
-        private static readonly string AppPublisherInterfaceTemplate = EmbeddedResource.GetContent("Templates/AppPublisherInterface.sbncs");
-        private static readonly string ModulePublisherTemplate = EmbeddedResource.GetContent("Templates/ModulePublisher.sbncs");
-        private static readonly string ModulePublisherInterfaceTemplate = EmbeddedResource.GetContent("Templates/ModulePublisherInterface.sbncs");
+        private static readonly string s_appPublisherTemplate = EmbeddedResource.GetContent("Templates/AppPublisher.sbncs");
+        private static readonly string s_appPublisherInterfaceTemplate = EmbeddedResource.GetContent("Templates/AppPublisherInterface.sbncs");
+        private static readonly string s_modulePublisherTemplate = EmbeddedResource.GetContent("Templates/ModulePublisher.sbncs");
+        private static readonly string s_modulePublisherInterfaceTemplate = EmbeddedResource.GetContent("Templates/ModulePublisherInterface.sbncs");
 
         public static IncrementalGeneratorInitializationContext AddTychoPublisherPipeline(
             this IncrementalGeneratorInitializationContext context,
@@ -110,8 +110,8 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
         {
             return kind switch
             {
-                TychoDefinitionKind.App => AppPublisherInterfaceTemplate,
-                TychoDefinitionKind.Module => ModulePublisherInterfaceTemplate,
+                TychoDefinitionKind.App => s_appPublisherInterfaceTemplate,
+                TychoDefinitionKind.Module => s_modulePublisherInterfaceTemplate,
                 _ => throw new ArgumentOutOfRangeException(nameof(kind), $"Unsupported definition kind: {kind}"),
             };
         }
@@ -120,8 +120,8 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
         {
             return kind switch
             {
-                TychoDefinitionKind.App => AppPublisherTemplate,
-                TychoDefinitionKind.Module => ModulePublisherTemplate,
+                TychoDefinitionKind.App => s_appPublisherTemplate,
+                TychoDefinitionKind.Module => s_modulePublisherTemplate,
                 _ => throw new ArgumentOutOfRangeException(nameof(kind), $"Unsupported definition kind: {kind}"),
             };
         }

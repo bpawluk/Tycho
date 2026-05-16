@@ -5,10 +5,10 @@ namespace Tycho.Utils.SourceGenerator.References.Microsoft
 {
     internal static class ServiceProviderServiceExtensionsReference
     {
-        private const string _namespace = "Microsoft.Extensions.DependencyInjection";
-        private const string _typeName = "ServiceProviderServiceExtensions";
+        private const string Namespace = "Microsoft.Extensions.DependencyInjection";
+        private const string TypeName = "ServiceProviderServiceExtensions";
 
-        public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
 
         public static MethodSignatureModel GetRequiredServiceMethodSignature => new MethodSignatureModel(
             methodName: "GetRequiredService",

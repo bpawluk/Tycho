@@ -30,7 +30,12 @@ public class OutboxWriterTests
 
         _dbSetMock = new Mock<DbSet<OutboxEntry>>();
         _dbSetMock.Setup(dbSet => dbSet.AddRange(It.IsAny<IEnumerable<OutboxEntry>>()))
-                  .Callback<IEnumerable<OutboxEntry>>(entries => entries.ToList());
+                  .Callback<IEnumerable<OutboxEntry>>(entries =>
+                  {
+                      foreach (OutboxEntry _ in entries)
+                      {
+                      }
+                  });
 
         _dbContextMock = new Mock<TychoDbContext>();
         _dbContextMock

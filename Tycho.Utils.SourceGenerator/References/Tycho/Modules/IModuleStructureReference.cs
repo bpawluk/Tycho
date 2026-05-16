@@ -7,8 +7,8 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
 {
     internal static class IModuleStructureReference
     {
-        private const string _namespace = "Tycho.Modules";
-        private const string _typeName = "IModuleStructure";
+        private const string Namespace = "Tycho.Modules";
+        private const string TypeName = "IModuleStructure";
 
         public static HashSet<MethodSignatureModel> SubmoduleDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
         {
@@ -20,7 +20,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
 
         public static string ModuleTypeParameterName => "TModule";
 
-        public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
 
         public static MethodSignatureModel UsesMethodSignature => new MethodSignatureModel(
             methodName: "Uses",

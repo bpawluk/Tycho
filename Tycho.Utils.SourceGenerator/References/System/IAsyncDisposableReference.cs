@@ -5,10 +5,10 @@ namespace Tycho.Utils.SourceGenerator.References.System
 {
     internal static class IAsyncDisposableReference
     {
-        private const string _namespace = "System";
-        private const string _typeName = "IAsyncDisposable";
+        private const string Namespace = "System";
+        private const string TypeName = "IAsyncDisposable";
 
-        public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
 
         public static MethodSignatureModel DisposeAsyncMethodSignature => new MethodSignatureModel(
             methodName: "DisposeAsync",

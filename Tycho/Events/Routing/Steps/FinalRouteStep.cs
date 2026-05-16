@@ -4,13 +4,13 @@ namespace Tycho.Events.Routing.Steps
 {
     internal class FinalRouteStep : IRouteStep
     {
-        private const string _key = "END";
+        private const string Key = "END";
 
         public static FinalRouteStep Create() => new FinalRouteStep();
 
         public override string ToString()
         {
-            return _key;
+            return Key;
         }
 
         public static IRouteStep Parse(string step)
@@ -26,7 +26,7 @@ namespace Tycho.Events.Routing.Steps
         {
             result = default!;
 
-            if (_key.Equals(step, StringComparison.InvariantCultureIgnoreCase))
+            if (Key.Equals(step, StringComparison.InvariantCultureIgnoreCase))
             {
                 result = new FinalRouteStep();
                 return true;

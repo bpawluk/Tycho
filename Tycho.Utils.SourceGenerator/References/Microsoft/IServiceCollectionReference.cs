@@ -5,9 +5,9 @@ namespace Tycho.Utils.SourceGenerator.References.Microsoft
 {
     internal static class IServiceCollectionReference
     {
-        private const string _namespace = "Microsoft.Extensions.DependencyInjection";
-        private const string _typeName = "IServiceCollection";
+        private const string Namespace = "Microsoft.Extensions.DependencyInjection";
+        private const string TypeName = "IServiceCollection";
 
-        public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
     }
 }

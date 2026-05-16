@@ -7,12 +7,12 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
 {
     internal static class TychoModuleReference
     {
-        private const string _namespace = "Tycho.Modules";
-        private const string _typeName = "TychoModule";
+        private const string Namespace = "Tycho.Modules";
+        private const string TypeName = "TychoModule";
 
-        public static string FullName => $"{_namespace}.{_typeName}";
+        public static string FullName => $"{Namespace}.{TypeName}";
 
-        public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
 
         public static MethodSignatureModel DefineContractMethodSignature => new MethodSignatureModel(
             methodName: "DefineContract",

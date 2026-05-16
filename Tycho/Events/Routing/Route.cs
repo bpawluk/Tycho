@@ -7,7 +7,7 @@ namespace Tycho.Events.Routing
 {
     internal class Route : Stack<IRouteStep>
     {
-        private const string _separator = "/";
+        private const string Separator = "/";
 
         private Route() : base() { }
 
@@ -26,13 +26,13 @@ namespace Tycho.Events.Routing
 
         public override string ToString()
         {
-            return string.Join(_separator, this);
+            return string.Join(Separator, this);
         }
 
         public static Route Parse(string route)
         {
             var result = new Route();
-            IEnumerable<string> parts = route.Split(_separator).Reverse();
+            IEnumerable<string> parts = route.Split(Separator).Reverse();
 
             foreach (string part in parts)
             {

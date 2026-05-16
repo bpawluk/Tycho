@@ -6,15 +6,15 @@ namespace Tycho.IntegrationTests.ProvidingConfiguration;
 
 public sealed class ProvidingConfigurationTests : IAsyncLifetime
 {
-    private const string _appValue = "App";
-    private const string _alphaValue = "Alpha";
-    private const string _betaValue = "Beta";
+    private const string AppValue = "App";
+    private const string AlphaValue = "Alpha";
+    private const string BetaValue = "Beta";
 
     private readonly Dictionary<string, string?> _appConfig = new()
     {
-        ["App:Value"] = _appValue,
-        ["Alpha:Value"] = _alphaValue,
-        ["Beta:Value"] = _betaValue
+        ["App:Value"] = AppValue,
+        ["Alpha:Value"] = AlphaValue,
+        ["Beta:Value"] = BetaValue
     };
 
     private ITestApp _sut = null!;
@@ -37,9 +37,9 @@ public sealed class ProvidingConfigurationTests : IAsyncLifetime
         string betaValue = await _sut.ExecuteAsync(new GetBetaValueRequest(), TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.Equal(_appValue, appValue);
-        Assert.Equal(_alphaValue, alphaValue);
-        Assert.Equal(_betaValue, betaValue);
+        Assert.Equal(AppValue, appValue);
+        Assert.Equal(AlphaValue, alphaValue);
+        Assert.Equal(BetaValue, betaValue);
     }
 
     public async ValueTask DisposeAsync()

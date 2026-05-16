@@ -13,10 +13,10 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
 {
     internal static class TychoFacadePipeline
     {
-        private static readonly string AppFacadeTemplate = EmbeddedResource.GetContent("Templates/AppFacade.sbncs");
-        private static readonly string AppInterfaceTemplate = EmbeddedResource.GetContent("Templates/AppFacadeInterface.sbncs");
-        private static readonly string ModuleFacadeTemplate = EmbeddedResource.GetContent("Templates/ModuleFacade.sbncs");
-        private static readonly string ModuleInterfaceTemplate = EmbeddedResource.GetContent("Templates/ModuleFacadeInterface.sbncs");
+        private static readonly string s_appFacadeTemplate = EmbeddedResource.GetContent("Templates/AppFacade.sbncs");
+        private static readonly string s_appInterfaceTemplate = EmbeddedResource.GetContent("Templates/AppFacadeInterface.sbncs");
+        private static readonly string s_moduleFacadeTemplate = EmbeddedResource.GetContent("Templates/ModuleFacade.sbncs");
+        private static readonly string s_moduleInterfaceTemplate = EmbeddedResource.GetContent("Templates/ModuleFacadeInterface.sbncs");
 
         public static IncrementalGeneratorInitializationContext AddTychoFacadePipeline(
             this IncrementalGeneratorInitializationContext context,
@@ -119,8 +119,8 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
         {
             return kind switch
             {
-                TychoDefinitionKind.App => AppInterfaceTemplate,
-                TychoDefinitionKind.Module => ModuleInterfaceTemplate,
+                TychoDefinitionKind.App => s_appInterfaceTemplate,
+                TychoDefinitionKind.Module => s_moduleInterfaceTemplate,
                 _ => throw new ArgumentOutOfRangeException(nameof(kind), $"Unsupported definition kind: {kind}"),
             };
         }
@@ -129,8 +129,8 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
         {
             return kind switch
             {
-                TychoDefinitionKind.App => AppFacadeTemplate,
-                TychoDefinitionKind.Module => ModuleFacadeTemplate,
+                TychoDefinitionKind.App => s_appFacadeTemplate,
+                TychoDefinitionKind.Module => s_moduleFacadeTemplate,
                 _ => throw new ArgumentOutOfRangeException(nameof(kind), $"Unsupported definition kind: {kind}"),
             };
         }

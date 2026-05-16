@@ -7,11 +7,11 @@ namespace Tycho.UnitTests.Processor;
 
 public class JobProcessorTests
 {
-    private static readonly TimeSpan _waitingTimeout = TimeSpan.FromSeconds(10);
+    private static readonly TimeSpan s_waitingTimeout = TimeSpan.FromSeconds(10);
 
-    private static readonly TimeSpan _initialInterval = TimeSpan.FromMilliseconds(5);
-    private static readonly TimeSpan _maxInterval = TimeSpan.FromMilliseconds(50);
-    private static readonly double _intervalMultiplier = 2;
+    private static readonly TimeSpan s_initialInterval = TimeSpan.FromMilliseconds(5);
+    private static readonly TimeSpan s_maxInterval = TimeSpan.FromMilliseconds(50);
+    private static readonly double s_intervalMultiplier = 2;
 
     private readonly Mock<IJobFactory> _factoryMock = new();
 
@@ -34,7 +34,7 @@ public class JobProcessorTests
         sut.Activate();
 
         // Assert
-        Assert.True(factoryCalledSignal.Wait(_waitingTimeout, CancellationToken.None));
+        Assert.True(factoryCalledSignal.Wait(s_waitingTimeout, CancellationToken.None));
     }
 
     #endregion ACTIVATION
@@ -64,7 +64,7 @@ public class JobProcessorTests
         sut.Activate();
 
         // Assert
-        Assert.True(factoryCalledSignal.Wait(_waitingTimeout, CancellationToken.None));
+        Assert.True(factoryCalledSignal.Wait(s_waitingTimeout, CancellationToken.None));
         Assert.Equal(concurrencyLimit, capturedMaxCount);
     }
 
@@ -91,7 +91,7 @@ public class JobProcessorTests
         sut.Activate();
 
         // Assert
-        Assert.True(factoryCalledSignal.Wait(_waitingTimeout, CancellationToken.None));
+        Assert.True(factoryCalledSignal.Wait(s_waitingTimeout, CancellationToken.None));
         Assert.Equal([5, 3, 1], capturedMaxCounts);
     }
 
@@ -186,7 +186,7 @@ public class JobProcessorTests
         // Assert
         foreach ((Mock<IJob> _, ManualResetEventSlim? Signal) in jobsToExecute)
         {
-            Assert.True(Signal.Wait(_waitingTimeout, CancellationToken.None));
+            Assert.True(Signal.Wait(s_waitingTimeout, CancellationToken.None));
         }
 
         // STAGE 2
@@ -215,7 +215,7 @@ public class JobProcessorTests
             .Setup(j => j.ExecuteAsync(It.IsAny<CancellationToken>()))
             .Returns(() =>
             {
-                completeJobSignal.Wait(_waitingTimeout, CancellationToken.None);
+                completeJobSignal.Wait(s_waitingTimeout, CancellationToken.None);
                 Volatile.Write(ref jobCompleted, true);
                 return Task.CompletedTask;
             });
@@ -255,7 +255,7 @@ public class JobProcessorTests
 
         // Act
         sut.Activate();
-        factoryCalledBeforeCompletionSignal.Wait(_waitingTimeout, CancellationToken.None);
+        factoryCalledBeforeCompletionSignal.Wait(s_waitingTimeout, CancellationToken.None);
 
         // Assert
         Assert.Equal(concurrencyLimit - 1, Volatile.Read(ref capturedCapacity));
@@ -264,7 +264,7 @@ public class JobProcessorTests
 
         // Act
         completeJobSignal.Set();
-        factoryCalledAfterCompletionSignal.Wait(_waitingTimeout, CancellationToken.None);
+        factoryCalledAfterCompletionSignal.Wait(s_waitingTimeout, CancellationToken.None);
 
         // Assert
         Assert.Equal(concurrencyLimit, Volatile.Read(ref capturedCapacity));
@@ -322,7 +322,7 @@ public class JobProcessorTests
                 {
                     factoryCalledAgainSignal.Set();
                 }
-                completeFactoryMethodSignal.Wait(_waitingTimeout, CancellationToken.None);
+                completeFactoryMethodSignal.Wait(s_waitingTimeout, CancellationToken.None);
                 return [];
             });
 
@@ -333,7 +333,7 @@ public class JobProcessorTests
         // Act
         sut.Activate();
 
-        factoryCalledForTheFirstTimeSignal.Wait(_waitingTimeout, CancellationToken.None);
+        factoryCalledForTheFirstTimeSignal.Wait(s_waitingTimeout, CancellationToken.None);
         await WaitForPotentialNextIteration();
 
         // Assert
@@ -343,7 +343,7 @@ public class JobProcessorTests
 
         // Act
         completeFactoryMethodSignal.Set();
-        factoryCalledAgainSignal.Wait(_waitingTimeout, CancellationToken.None);
+        factoryCalledAgainSignal.Wait(s_waitingTimeout, CancellationToken.None);
 
         // Assert
         Assert.True(Volatile.Read(ref factoryCallCount) >= 2);
@@ -389,7 +389,7 @@ public class JobProcessorTests
 
         // Act
         sut.Activate();
-        onScheduleProcessingErrorCalledSignal.Wait(_waitingTimeout, CancellationToken.None);
+        onScheduleProcessingErrorCalledSignal.Wait(s_waitingTimeout, CancellationToken.None);
 
         // Assert
         Assert.Same(expectedException, capturedException);
@@ -397,7 +397,7 @@ public class JobProcessorTests
         // STAGE 2
 
         // Act
-        factoryCalledAfterExceptionSignal.Wait(_waitingTimeout, CancellationToken.None);
+        factoryCalledAfterExceptionSignal.Wait(s_waitingTimeout, CancellationToken.None);
 
         // Assert
         Assert.True(Volatile.Read(ref factoryCallCount) >= 2);
@@ -428,7 +428,7 @@ public class JobProcessorTests
 
         // Act
         sut.Activate();
-        factoryCalledAfterExceptionSignal.Wait(_waitingTimeout, CancellationToken.None);
+        factoryCalledAfterExceptionSignal.Wait(s_waitingTimeout, CancellationToken.None);
 
         // Assert
         Assert.True(Volatile.Read(ref factoryCallCount) >= 2);
@@ -448,7 +448,7 @@ public class JobProcessorTests
             .Setup(j => j.ExecuteAsync(It.IsAny<CancellationToken>()))
             .Returns(async () =>
             {
-                completeJobSignal.Wait(_waitingTimeout, CancellationToken.None);
+                completeJobSignal.Wait(s_waitingTimeout, CancellationToken.None);
                 throw expectedException;
             });
 
@@ -498,7 +498,7 @@ public class JobProcessorTests
 
         // Act
         sut.Activate();
-        factoryCalledBeforeTheExceptionSignal.Wait(_waitingTimeout, CancellationToken.None);
+        factoryCalledBeforeTheExceptionSignal.Wait(s_waitingTimeout, CancellationToken.None);
 
         // Assert
         Assert.Equal(concurrencyLimit - 1, Volatile.Read(ref capturedCapacity));
@@ -507,7 +507,7 @@ public class JobProcessorTests
 
         // Act
         completeJobSignal.Set();
-        onJobProcessingErrorCalledSignal.Wait(_waitingTimeout, CancellationToken.None);
+        onJobProcessingErrorCalledSignal.Wait(s_waitingTimeout, CancellationToken.None);
 
         // Assert
         Assert.True(Volatile.Read(ref exceptionCaptured));
@@ -516,7 +516,7 @@ public class JobProcessorTests
         // STAGE 3
 
         // Act
-        factoryCalledAfterExceptionSignal.Wait(_waitingTimeout, CancellationToken.None);
+        factoryCalledAfterExceptionSignal.Wait(s_waitingTimeout, CancellationToken.None);
 
         // Assert
         Assert.Equal(concurrencyLimit, Volatile.Read(ref capturedCapacity));
@@ -562,7 +562,7 @@ public class JobProcessorTests
 
         // Act
         sut.Activate();
-        factoryCalledAfterExceptionSignal.Wait(_waitingTimeout, CancellationToken.None);
+        factoryCalledAfterExceptionSignal.Wait(s_waitingTimeout, CancellationToken.None);
 
         // Assert
         Assert.True(Volatile.Read(ref factoryCallCount) >= 2);
@@ -592,7 +592,7 @@ public class JobProcessorTests
 
         // Act
         sut.Activate();
-        factoryCalledSignal.Wait(_waitingTimeout, CancellationToken.None);
+        factoryCalledSignal.Wait(s_waitingTimeout, CancellationToken.None);
 
         sut.Dispose();
         int callCountAfterDispose = Volatile.Read(ref factoryCallCount);
@@ -610,9 +610,9 @@ public class JobProcessorTests
         var settings = new JobProcessorSettings
         {
             ConcurrencyLimit = 100,
-            InitialInterval = _initialInterval,
-            IntervalMultiplier = _intervalMultiplier,
-            MaxInterval = _maxInterval,
+            InitialInterval = s_initialInterval,
+            IntervalMultiplier = s_intervalMultiplier,
+            MaxInterval = s_maxInterval,
             ScheduleProcessingTimeout = TimeSpan.FromSeconds(5),
             JobProcessingTimeout = TimeSpan.FromSeconds(5),
         };
@@ -624,22 +624,22 @@ public class JobProcessorTests
     {
         // an arbitrary delay long enough to allow for the processor
         // to execute another tick if it was going to
-        TimeSpan timeToWait = _maxInterval * 2;
+        TimeSpan timeToWait = s_maxInterval * 2;
         await Task.Delay(timeToWait);
     }
 
     private static async Task WaitTillProcessorIdles()
     {
-        TimeSpan timeToWait = _initialInterval;
+        TimeSpan timeToWait = s_initialInterval;
 
-        TimeSpan currentInterval = _initialInterval;
-        while (currentInterval * _intervalMultiplier <= _maxInterval)
+        TimeSpan currentInterval = s_initialInterval;
+        while (currentInterval * s_intervalMultiplier <= s_maxInterval)
         {
-            currentInterval *= _intervalMultiplier;
+            currentInterval *= s_intervalMultiplier;
             timeToWait += currentInterval;
         }
 
-        TimeSpan safetyMargin = _maxInterval;
+        TimeSpan safetyMargin = s_maxInterval;
         await Task.Delay(timeToWait + safetyMargin);
     }
 
@@ -651,7 +651,7 @@ public class JobProcessorTests
             .Setup(j => j.ExecuteAsync(It.IsAny<CancellationToken>()))
             .Returns(() =>
             {
-                completeJobSignal.Wait(_waitingTimeout, CancellationToken.None);
+                completeJobSignal.Wait(s_waitingTimeout, CancellationToken.None);
                 return Task.CompletedTask;
             });
         return jobMock;
@@ -675,3 +675,4 @@ public class JobProcessorTests
         return jobMock;
     }
 }
+

@@ -5,9 +5,9 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Events
 {
     internal static class IPayloadSerializerReference
     {
-        private const string _namespace = "Tycho.Events.Serialization";
-        private const string _typeName = "IPayloadSerializer";
+        private const string Namespace = "Tycho.Events.Serialization";
+        private const string TypeName = "IPayloadSerializer";
 
-        public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
     }
 }

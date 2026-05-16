@@ -5,12 +5,12 @@ namespace Tycho.UnitTests.Identity.Modules;
 
 public class ModuleIdentityTests
 {
-    private static readonly ModuleIdentity _moduleIdentity = ModuleIdentity.Create<TestModule>();
+    private static readonly ModuleIdentity s_moduleIdentity = ModuleIdentity.Create<TestModule>();
 
     public static readonly IEnumerable<object[]> EqualsTestData =
     [
         // Same instance => Equal
-        [_moduleIdentity, _moduleIdentity, true],
+        [s_moduleIdentity, s_moduleIdentity, true],
 
         // Same module type => Equal
         [

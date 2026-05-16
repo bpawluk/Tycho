@@ -13,8 +13,8 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
 {
     internal static class TychoEventSerializerPipeline
     {
-        private static readonly string AppEventSerializerTemplate = EmbeddedResource.GetContent("Templates/AppEventSerializer.sbncs");
-        private static readonly string ModuleEventSerializerTemplate = EmbeddedResource.GetContent("Templates/ModuleEventSerializer.sbncs");
+        private static readonly string s_appEventSerializerTemplate = EmbeddedResource.GetContent("Templates/AppEventSerializer.sbncs");
+        private static readonly string s_moduleEventSerializerTemplate = EmbeddedResource.GetContent("Templates/ModuleEventSerializer.sbncs");
 
         public static IncrementalGeneratorInitializationContext AddTychoEventSerializerPipeline(
             this IncrementalGeneratorInitializationContext context,
@@ -93,8 +93,8 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
         {
             return kind switch
             {
-                TychoDefinitionKind.App => AppEventSerializerTemplate,
-                TychoDefinitionKind.Module => ModuleEventSerializerTemplate,
+                TychoDefinitionKind.App => s_appEventSerializerTemplate,
+                TychoDefinitionKind.Module => s_moduleEventSerializerTemplate,
                 _ => throw new ArgumentOutOfRangeException(nameof(kind), $"Unsupported definition kind: {kind}"),
             };
         }

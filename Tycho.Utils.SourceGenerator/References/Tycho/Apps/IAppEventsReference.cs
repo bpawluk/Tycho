@@ -6,9 +6,9 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
 {
     internal static class IAppEventsReference
     {
-        private const string _namespace = "Tycho.Apps";
-        private const string _typeName = "IAppEvents";
-        private const string _eventRoutingTypeName = "IEventRouting";
+        private const string Namespace = "Tycho.Apps";
+        private const string TypeName = "IAppEvents";
+        private const string EventRoutingTypeName = "IEventRouting";
 
         public static HashSet<MethodSignatureModel> HandledEventDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
         {
@@ -23,9 +23,9 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
 
         public static string EventTypeParameterName => "TEvent";
 
-        public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
 
-        public static TypeModel EventRoutingTypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _eventRoutingTypeName);
+        public static TypeModel EventRoutingTypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, EventRoutingTypeName);
 
         public static MethodSignatureModel HandlesMethodSignature => new MethodSignatureModel(
             methodName: "Handles",

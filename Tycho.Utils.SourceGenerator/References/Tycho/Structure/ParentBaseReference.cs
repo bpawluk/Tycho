@@ -6,10 +6,10 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Structure
 {
     internal static class ParentBaseReference
     {
-        private const string _namespace = "Tycho.Structure.Parent";
-        private const string _typeName = "ParentBase";
+        private const string Namespace = "Tycho.Structure.Parent";
+        private const string TypeName = "ParentBase";
 
-        public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
 
         public static MethodSignatureModel ExecuteAsyncMethodSignature => new MethodSignatureModel(
             methodName: "ExecuteAsync",

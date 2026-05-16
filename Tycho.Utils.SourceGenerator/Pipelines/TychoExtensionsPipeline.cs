@@ -11,7 +11,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
 {
     internal static class TychoExtensionsPipeline
     {
-        private static readonly string AppExtensionsTemplate = EmbeddedResource.GetContent("Templates/AppExtensions.sbncs");
+        private static readonly string s_appExtensionsTemplate = EmbeddedResource.GetContent("Templates/AppExtensions.sbncs");
 
         public static IncrementalGeneratorInitializationContext AddTychoExtensionsPipeline(
             this IncrementalGeneratorInitializationContext context,
@@ -27,7 +27,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                 {
                     outputContext.GenerateSourceFromTemplate(
                         new AppExtensionsTM(model),
-                        AppExtensionsTemplate,
+                        s_appExtensionsTemplate,
                         $"{model.DefinitionType}.Extensions.g.cs");
                 });
 

@@ -34,11 +34,11 @@ internal class Scope : IDisposable
 
 internal class TestLoggerProvider : ILoggerProvider
 {
-    private static readonly TestLogger _logger = new();
+    private static readonly TestLogger s_logger = new();
 
     public ILogger CreateLogger(string categoryName)
     {
-        return _logger;
+        return s_logger;
     }
 
     public void Dispose() { }

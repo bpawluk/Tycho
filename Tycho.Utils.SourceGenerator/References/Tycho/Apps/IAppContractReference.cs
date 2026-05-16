@@ -7,8 +7,8 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
 {
     internal static class IAppContractReference
     {
-        private const string _namespace = "Tycho.Apps";
-        private const string _typeName = "IAppContract";
+        private const string Namespace = "Tycho.Apps";
+        private const string TypeName = "IAppContract";
 
         public static HashSet<MethodSignatureModel> DownstreamContractDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
         {
@@ -23,7 +23,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
         public static string RequestTypeParameterName => "TRequest";
         public static string ResponseTypeParameterName => "TResponse";
 
-        public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
 
         public static MethodSignatureModel ForwardsMethodSignature => new MethodSignatureModel(
             methodName: "Forwards",

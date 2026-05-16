@@ -6,10 +6,10 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Events
 {
     internal static class PublisherBaseReference
     {
-        private const string _namespace = "Tycho.Events.Publishing";
-        private const string _typeName = "PublisherBase";
+        private const string Namespace = "Tycho.Events.Publishing";
+        private const string TypeName = "PublisherBase";
 
-        public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
 
         public static MethodSignatureModel PublishAsyncMethodSignature => new MethodSignatureModel(
             methodName: "PublishAsync",

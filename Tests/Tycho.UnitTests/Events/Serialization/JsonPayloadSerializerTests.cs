@@ -7,6 +7,8 @@ namespace Tycho.UnitTests.Events.Serialization;
 
 public class JsonPayloadSerializerTests
 {
+    private static readonly JsonSerializerOptions s_jsonSerializerOptions = new();
+
     private readonly JsonPayloadSerializer _sut = new();
 
     [Fact]
@@ -87,6 +89,6 @@ public class JsonPayloadSerializerTests
 
     private static string GetSerializedPayload(object toSerialize)
     {
-        return JsonSerializer.Serialize(toSerialize, toSerialize.GetType(), new JsonSerializerOptions());
+        return JsonSerializer.Serialize(toSerialize, toSerialize.GetType(), s_jsonSerializerOptions);
     }
 }

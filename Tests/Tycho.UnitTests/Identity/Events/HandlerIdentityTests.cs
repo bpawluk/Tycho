@@ -5,12 +5,12 @@ namespace Tycho.UnitTests.Identity.Events;
 
 public class EventHandlerIdentityTests
 {
-    private static readonly EventHandlerIdentity _handlerIdentity = EventHandlerIdentity.Create<TestEventHandler>();
+    private static readonly EventHandlerIdentity s_handlerIdentity = EventHandlerIdentity.Create<TestEventHandler>();
 
     public static readonly IEnumerable<object[]> EqualsTestData =
     [
         // Same instance => Equal
-        [_handlerIdentity, _handlerIdentity, true],
+        [s_handlerIdentity, s_handlerIdentity, true],
 
         // Same handler type => Equal
         [

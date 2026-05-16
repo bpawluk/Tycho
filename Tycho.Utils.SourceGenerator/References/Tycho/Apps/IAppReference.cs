@@ -5,9 +5,9 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
 {
     internal static class IAppReference
     {
-        private const string _namespace = "Tycho.Apps.Instance";
-        private const string _typeName = "IApp";
+        private const string Namespace = "Tycho.Apps.Instance";
+        private const string TypeName = "IApp";
 
-        public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
     }
 }

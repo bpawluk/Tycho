@@ -5,9 +5,9 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
 {
     internal static class IModuleReference
     {
-        private const string _namespace = "Tycho.Modules.Instance";
-        private const string _typeName = "IModule";
+        private const string Namespace = "Tycho.Modules.Instance";
+        private const string TypeName = "IModule";
 
-        public static TypeModel TypeModel => new TypeModel(_namespace, ImmutableEquatableArray<string>.Empty, _typeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
     }
 }
