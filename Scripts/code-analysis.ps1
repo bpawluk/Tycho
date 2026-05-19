@@ -3,7 +3,7 @@
 
 param(
   [string]$Solution = "Tycho.slnx",
-  [string]$ReportDirectory = "Artifacts/CodeAnalysis/Report"
+  [string]$ReportDirectory = "Artifacts/CodeAnalysis"
 )
 
 Set-StrictMode -Version Latest
