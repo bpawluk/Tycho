@@ -9,5 +9,6 @@
   ],
   "RespectGitIgnore": true,
   "OutputFileFormat": "sarif",
+  "DisableConsoleOutput": false,
   "ConsoleVerbosityLevel": "Verbose"
 }
