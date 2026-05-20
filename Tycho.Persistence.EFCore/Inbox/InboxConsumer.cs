@@ -25,9 +25,6 @@ internal class InboxConsumer(
     private readonly TychoDbContext _dbContext = dbContext;
     private readonly InboxConsumerSettings _settings = settings ?? InboxConsumerSettings.Default;
 
-    // TODO: concurrency handling
-    // TODO: dead letter handling
-
     public async Task<IReadOnlyCollection<RoutedEvent>> Read(int count, CancellationToken cancellationToken)
     {
         DateTime currentTime = DateTime.UtcNow;

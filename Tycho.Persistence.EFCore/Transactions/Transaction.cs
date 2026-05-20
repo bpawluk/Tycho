@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -8,9 +10,16 @@ namespace Tycho.Persistence.EFCore.Transactions;
 internal sealed class Transaction(TychoDbContext dbContext) : ITransaction
 {
     private readonly TychoDbContext _dbContext = dbContext;
+    private readonly List<Action> _afterCommitActions = [];
     private IDbContextTransaction? _activeTransaction;
 
-    public bool IsInProgress => _activeTransaction is not null;
+    public bool IsInProgress { get; private set; }
+
+    public void ExecuteAfterCommit(Action action)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+        _afterCommitActions.Add(action);
+    }
 
     public async Task BeginAsync(CancellationToken cancellationToken = default)
     {
@@ -22,6 +31,8 @@ internal sealed class Transaction(TychoDbContext dbContext) : ITransaction
         _activeTransaction = await _dbContext.Database
             .BeginTransactionAsync(cancellationToken)
             .ConfigureAwait(false);
+
+        IsInProgress = true;
     }
 
     public async Task CommitAsync(CancellationToken cancellationToken = default)
@@ -33,8 +44,12 @@ internal sealed class Transaction(TychoDbContext dbContext) : ITransaction
 
         await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         await _activeTransaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+        IsInProgress = false;
 
-        await DisposeActiveTransactionAsync().ConfigureAwait(false);
+        foreach (Action afterCommitAction in _afterCommitActions)
+        {
+            afterCommitAction();
+        }
     }
 
     public async Task RollbackAsync(CancellationToken cancellationToken = default)
@@ -44,24 +59,22 @@ internal sealed class Transaction(TychoDbContext dbContext) : ITransaction
             return;
         }
 
-        try
+        await _activeTransaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
+        IsInProgress = false;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _afterCommitActions.Clear();
+        if (_activeTransaction is not null)
         {
-            await _activeTransaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-        }
-        finally
-        {
-            await DisposeActiveTransactionAsync().ConfigureAwait(false);
+            await _activeTransaction.DisposeAsync().ConfigureAwait(false);
         }
     }
 
-    private async Task DisposeActiveTransactionAsync()
+    public void Dispose()
     {
-        IDbContextTransaction? activeTransaction = _activeTransaction;
-        _activeTransaction = null;
-
-        if (activeTransaction is not null)
-        {
-            await activeTransaction.DisposeAsync().ConfigureAwait(false);
-        }
+        _afterCommitActions.Clear();
+        _activeTransaction?.Dispose();
     }
 }

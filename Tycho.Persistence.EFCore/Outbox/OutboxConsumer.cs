@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -9,90 +10,102 @@ using Tycho.Events.Outbox;
 using Tycho.Events.Routing;
 using Tycho.Identity.Events;
 using Tycho.Persistence.EFCore.Common;
-using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.Outbox;
 
-internal class OutboxConsumer(ITransaction transaction, TychoDbContext dbContext, OutboxConsumerSettings? settings = null) : IOutboxConsumer
+internal class OutboxConsumer(TychoDbContext dbContext, OutboxConsumerSettings? settings = null) : IOutboxConsumer
 {
-    private readonly ITransaction _transaction = transaction;
     private readonly TychoDbContext _dbContext = dbContext;
     private readonly OutboxConsumerSettings _settings = settings ?? OutboxConsumerSettings.Default;
 
-    // TODO: concurrency handling
-    // TODO: dead letter handling
-
     public async Task<IReadOnlyCollection<SerializedRoutedEvent>> Read(int count, CancellationToken cancellationToken)
     {
+        if (count <= 0)
+        {
+            return [];
+        }
+
         DateTime currentTime = DateTime.UtcNow;
         DateTime validProcessingThreshold = currentTime - _settings.DeliveryExpiration;
 
-        OutboxEntry[] entriesToDeliver = await _dbContext
+        Expression<Func<OutboxEntry, bool>> canBeClaimed = entry =>
+            (entry.State == EntryState.New) ||
+            (entry.State == EntryState.Failed && entry.DeliveryAttempts < _settings.MaxDeliveryCount) ||
+            (entry.State == EntryState.InProcessing && entry.DeliveryAttempts < _settings.MaxDeliveryCount && entry.Updated < validProcessingThreshold);
+
+        Guid[] entriesToClaimIds = await _dbContext
             .Set<OutboxEntry>()
-            .Where(entry =>
-                (entry.State == EntryState.New) ||
-                (entry.State == EntryState.Failed && entry.DeliveryAttempts < _settings.MaxDeliveryCount) ||
-                (entry.State == EntryState.InProcessing && entry.DeliveryAttempts < _settings.MaxDeliveryCount && entry.Updated < validProcessingThreshold))
+            .Where(canBeClaimed)
             .OrderBy(entry => entry.Created)
+            .Select(entry => entry.Id)
             .Take(count)
             .ToArrayAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        foreach (OutboxEntry? entry in entriesToDeliver)
+        if (entriesToClaimIds.Length == 0)
         {
-            entry.State = EntryState.InProcessing;
-            entry.Updated = currentTime;
-            entry.DeliveryAttempts++;
+            return [];
         }
 
-        if (!_transaction.IsInProgress)
-        {
-            await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        }
+        Guid claimId = Guid.NewGuid();
+
+        await _dbContext
+            .Set<OutboxEntry>()
+            .Where(canBeClaimed)
+            .Where(entry => entriesToClaimIds.Contains(entry.Id))
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(entry => entry.State, EntryState.InProcessing)
+                .SetProperty(entry => entry.Updated, currentTime)
+                .SetProperty(entry => entry.DeliveryAttempts, entry => entry.DeliveryAttempts + 1)
+                .SetProperty(entry => entry.ClaimId, claimId), cancellationToken)
+            .ConfigureAwait(false);
 
         return
         [
-            ..entriesToDeliver
+            ..await _dbContext
+                .Set<OutboxEntry>()
+                .Where(entry => entry.ClaimId == claimId)
+                .OrderBy(entry => entry.Created)
                 .Select(entry => new SerializedRoutedEvent(
                     entry.Id,
                     EventIdentity.Parse(entry.Event),
                     EventHandlerIdentity.Parse(entry.Handler),
                     Route.Parse(entry.Route),
                     entry.Payload))
+                .ToArrayAsync(cancellationToken)
+                .ConfigureAwait(false)
         ];
     }
 
     public async Task MarkAsDelivered(Guid entryId, CancellationToken cancellationToken)
     {
-        DbSet<OutboxEntry> outboxMessages = _dbContext.Set<OutboxEntry>();
-        OutboxEntry? entry = await outboxMessages.FindAsync([entryId], cancellationToken).ConfigureAwait(false);
+        DateTime currentTime = DateTime.UtcNow;
 
-        if (entry != null)
-        {
-            entry.State = EntryState.Processed;
-            entry.Updated = DateTime.UtcNow;
-
-            if (!_transaction.IsInProgress)
-            {
-                await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-            }
-        }
+        await _dbContext
+            .Set<OutboxEntry>()
+            .Where(entry => 
+                entry.Id == entryId && 
+                entry.State == EntryState.InProcessing)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(entry => entry.State, EntryState.Processed)
+                .SetProperty(entry => entry.Updated, currentTime)
+                .SetProperty(entry => entry.ClaimId, (Guid?)null), cancellationToken)
+            .ConfigureAwait(false);
     }
 
     public async Task MarkAsFailed(Guid entryId, CancellationToken cancellationToken)
     {
-        DbSet<OutboxEntry> outboxMessages = _dbContext.Set<OutboxEntry>();
-        OutboxEntry? entry = await outboxMessages.FindAsync([entryId], cancellationToken).ConfigureAwait(false);
+        DateTime currentTime = DateTime.UtcNow;
 
-        if (entry != null)
-        {
-            entry.State = EntryState.Failed;
-            entry.Updated = DateTime.UtcNow;
-
-            if (!_transaction.IsInProgress)
-            {
-                await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-            }
-        }
+        await _dbContext
+            .Set<OutboxEntry>()
+            .Where(entry => 
+                entry.Id == entryId && 
+                entry.State == EntryState.InProcessing)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(entry => entry.State, EntryState.Failed)
+                .SetProperty(entry => entry.Updated, currentTime)
+                .SetProperty(entry => entry.ClaimId, (Guid?)null), cancellationToken)
+            .ConfigureAwait(false);
     }
 }

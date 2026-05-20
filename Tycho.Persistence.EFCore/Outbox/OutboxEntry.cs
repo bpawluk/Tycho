@@ -32,4 +32,6 @@ internal class OutboxEntry
 
     [Required]
     public uint DeliveryAttempts { get; set; } = 0;
+
+    public Guid? ClaimId { get; set; } = null;
 }

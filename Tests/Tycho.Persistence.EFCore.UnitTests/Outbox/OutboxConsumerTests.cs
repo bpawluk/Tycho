@@ -36,7 +36,7 @@ public class OutboxConsumerTests
         _dbContextMock.Setup(db => db.SaveChangesAsync(It.IsAny<CancellationToken>()))
                       .ReturnsAsync(0);
 
-        _sut = new OutboxConsumer(_transactionMock.Object, _dbContextMock.Object, _settings);
+        _sut = new OutboxConsumer(_dbContextMock.Object, _settings);
     }
 
     [Theory]

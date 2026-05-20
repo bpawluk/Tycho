@@ -34,13 +34,17 @@ internal class OutboxWriter(
                 Payload = serializedEvent.Payload.ToString()!
             };
         });
+
         _dbContext.Set<OutboxEntry>().AddRange(outboxEntries);
 
-        if (!_transaction.IsInProgress)
+        if (_transaction.IsInProgress)
+        {
+            _transaction.ExecuteAfterCommit(_outboxActivity.NotifyNewEntriesAdded);
+        }
+        else
         {
             await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            _outboxActivity.NotifyNewEntriesAdded();
         }
-
-        _outboxActivity.NotifyNewEntriesAdded();
     }
 }

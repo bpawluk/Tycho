@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -7,19 +8,16 @@ namespace Tycho.Transactions
     {
         public bool IsInProgress => false;
 
-        public Task BeginAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
+        public void ExecuteAfterCommit(Action action) { }
 
-        public Task CommitAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
+        public Task BeginAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
-        public Task RollbackAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
+        public Task CommitAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+        public Task RollbackAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+        public ValueTask DisposeAsync() => default;
+
+        public void Dispose() { }
     }
 }

@@ -19,13 +19,19 @@ public class OutboxWriterTests
     private readonly OutboxActivity _outboxActivity;
 
     private readonly Mock<DbSet<OutboxEntry>> _dbSetMock;
+
     private int _outboxActivityNotificationCount;
+    private Action? _deferredOutboxActivityNotification;
 
     private readonly OutboxWriter _sut;
 
     public OutboxWriterTests()
     {
         _transactionMock = new Mock<ITransaction>();
+        _transactionMock
+            .Setup(t => t.ExecuteAfterCommit(It.IsAny<Action>()))
+            .Callback<Action>(action => _deferredOutboxActivityNotification = action);
+
         _eventSerializerMock = new Mock<IEventSerializer>();
 
         _dbSetMock = new Mock<DbSet<OutboxEntry>>();
@@ -96,7 +102,21 @@ public class OutboxWriterTests
         // Assert
         _eventSerializerMock.Verify(s => s.Serialize(It.IsAny<RoutedEvent<TestEvent>>()), Times.Exactly(routedEvents.Count));
         _dbSetMock.Verify(db => db.AddRange(It.IsAny<IEnumerable<OutboxEntry>>()), Times.Once);
+        
         _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), isTransactionInProgress ? Times.Never() : Times.Once());
-        Assert.Equal(1, _outboxActivityNotificationCount);
+        _transactionMock.Verify(t => t.ExecuteAfterCommit(It.IsAny<Action>()), isTransactionInProgress ? Times.Once() : Times.Never());
+
+        if (isTransactionInProgress)
+        {
+            Assert.Equal(0, _outboxActivityNotificationCount);
+            Assert.NotNull(_deferredOutboxActivityNotification);
+            _deferredOutboxActivityNotification!();
+            Assert.Equal(1, _outboxActivityNotificationCount);
+        }
+        else
+        {
+            Assert.Equal(1, _outboxActivityNotificationCount);
+            Assert.Null(_deferredOutboxActivityNotification);
+        }
     }
 }
