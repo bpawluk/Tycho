@@ -35,7 +35,7 @@ public class OutboxProcessorJobFactoryTests
         // Arrange
         int maxCount = 5;
         var cancellationToken = new CancellationToken();
-        var entries = new List<SerializedRoutedEvent> { CreateRoutedEvent(), CreateRoutedEvent(), CreateRoutedEvent() };
+        var entries = new List<OutboxEvent> { CreateOutboxEvent(), CreateOutboxEvent(), CreateOutboxEvent() };
 
         _outboxConsumerMock.Setup(o => o.Read(It.IsAny<int>(), cancellationToken))
                            .ReturnsAsync(entries);
@@ -66,10 +66,11 @@ public class OutboxProcessorJobFactoryTests
         _outboxConsumerMock.Verify(o => o.Read(maxCount, cancellationToken), Times.Once);
     }
 
-    private static SerializedRoutedEvent CreateRoutedEvent()
+    private static OutboxEvent CreateOutboxEvent()
     {
         var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        return new SerializedRoutedEvent(Guid.NewGuid(), eventId, handlerId, Route.Create(), "{}");
+        var routedEvent = new SerializedRoutedEvent(Guid.NewGuid(), eventId, handlerId, Route.Create(), "{}");
+        return new OutboxEvent(Guid.NewGuid(), routedEvent);
     }
 }

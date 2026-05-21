@@ -40,13 +40,14 @@ public class InMemoryOutboxTests
 
         // Act
         await _sut.Write([.. entries.Select(e => e.Routed)], cancellationToken);
-        IReadOnlyCollection<SerializedRoutedEvent> result = await _sut.Read(entries.Count, cancellationToken);
+        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(entries.Count, cancellationToken);
 
         // Assert
         Assert.Equal(entries.Count, result.Count);
+        SerializedRoutedEvent[] deliveredEvents = [.. result.Select(outboxEvent => outboxEvent.RoutedEvent)];
         foreach ((SerializedRoutedEvent? serialized, RoutedEvent _) in entries)
         {
-            Assert.Contains(serialized, result);
+            Assert.Contains(serialized, deliveredEvents);
         }
         Assert.True(notified);
     }
@@ -76,7 +77,7 @@ public class InMemoryOutboxTests
         await _sut.Write(entries, cancellationToken);
 
         // Act
-        IReadOnlyCollection<SerializedRoutedEvent> result = await _sut.Read(2, cancellationToken);
+        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(2, cancellationToken);
 
         // Assert
         Assert.Equal(2, result.Count);
@@ -90,7 +91,7 @@ public class InMemoryOutboxTests
         await _sut.Write([CreateRoutedEvent()], cancellationToken);
 
         // Act
-        IReadOnlyCollection<SerializedRoutedEvent> result = await _sut.Read(5, cancellationToken);
+        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(5, cancellationToken);
 
         // Assert
         Assert.Single(result);
@@ -103,7 +104,7 @@ public class InMemoryOutboxTests
         var cancellationToken = new CancellationToken();
 
         // Act
-        IReadOnlyCollection<SerializedRoutedEvent> result = await _sut.Read(5, cancellationToken);
+        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(5, cancellationToken);
 
         // Assert
         Assert.Empty(result);
@@ -118,7 +119,7 @@ public class InMemoryOutboxTests
 
         // Act
         await _sut.Read(1, cancellationToken);
-        IReadOnlyCollection<SerializedRoutedEvent> result = await _sut.Read(1, cancellationToken);
+        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(1, cancellationToken);
 
         // Assert
         Assert.Empty(result);
@@ -129,10 +130,11 @@ public class InMemoryOutboxTests
     {
         // Arrange
         var entryId = Guid.NewGuid();
+        var claimId = Guid.NewGuid();
         var cancellationToken = new CancellationToken();
 
         // Act & Assert
-        await _sut.MarkAsDelivered(entryId, cancellationToken);
+        await _sut.MarkAsDelivered(entryId, claimId, cancellationToken);
     }
 
     [Fact]
@@ -140,10 +142,11 @@ public class InMemoryOutboxTests
     {
         // Arrange
         var entryId = Guid.NewGuid();
+        var claimId = Guid.NewGuid();
         var cancellationToken = new CancellationToken();
 
         // Act & Assert
-        await _sut.MarkAsFailed(entryId, cancellationToken);
+        await _sut.MarkAsFailed(entryId, claimId, cancellationToken);
     }
 
     private static RoutedEvent<TestEvent> CreateRoutedEvent()

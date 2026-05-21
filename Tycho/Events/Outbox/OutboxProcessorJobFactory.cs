@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Tycho.Events.Model;
 using Tycho.Processor;
 using Tycho.Structure;
 using Tycho.Utils;
@@ -25,7 +24,7 @@ namespace Tycho.Events.Outbox
             await using AsyncServiceScope scope = _internals.CreateAsyncScope();
 
             IOutboxConsumer outbox = scope.ServiceProvider.GetRequiredService<IOutboxConsumer>();
-            IReadOnlyCollection<SerializedRoutedEvent> eventsToDeliver = await outbox.Read(maxCount, cancellationToken).ConfigureAwait(false);
+            IReadOnlyCollection<OutboxEvent> eventsToDeliver = await outbox.Read(maxCount, cancellationToken).ConfigureAwait(false);
 
             return eventsToDeliver.Select(eventToDeliver => new OutboxProcessorJob(_internals).ForEvent(eventToDeliver)).ToArray();
         }

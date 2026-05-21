@@ -1,293 +1,404 @@
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Moq;
-using Moq.EntityFrameworkCore;
-using Tycho.Events.Model;
+using Tycho.Events.Outbox;
+using Tycho.Events.Routing;
 using Tycho.Persistence.EFCore.Common;
 using Tycho.Persistence.EFCore.Outbox;
-using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Outbox;
 
-public class OutboxConsumerTests
+public sealed class OutboxConsumerTests : IAsyncLifetime
 {
-    private readonly Mock<ITransaction> _transactionMock;
-    private readonly Mock<TychoDbContext> _dbContextMock;
-    private readonly OutboxConsumerSettings _settings;
-
-    private readonly Mock<DbSet<OutboxEntry>> _dbSetMock;
-
-    private readonly OutboxConsumer _sut;
-
-    public OutboxConsumerTests()
+    private readonly OutboxConsumerSettings _settings = new()
     {
-        _transactionMock = new Mock<ITransaction>();
-
-        _settings = new OutboxConsumerSettings
-        {
-            MaxDeliveryCount = 3,
-            DeliveryExpiration = TimeSpan.FromMinutes(5)
-        };
-
-        _dbSetMock = new Mock<DbSet<OutboxEntry>>();
-
-        _dbContextMock = new Mock<TychoDbContext>();
-        _dbContextMock.Setup(db => db.Set<OutboxEntry>())
-                      .Returns(_dbSetMock.Object);
-        _dbContextMock.Setup(db => db.SaveChangesAsync(It.IsAny<CancellationToken>()))
-                      .ReturnsAsync(0);
-
-        _sut = new OutboxConsumer(_dbContextMock.Object, _settings);
-    }
-
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task Read_WithNewEntries_ReadsTheEntries(bool isTransactionInProgress)
-    {
-        // Arrange
-        var cancellationToken = new CancellationToken();
-
-        _transactionMock.Setup(t => t.IsInProgress)
-                        .Returns(isTransactionInProgress);
-
-        List<OutboxEntry> entries =
-        [
-            CreateEntry(Guid.NewGuid(), EntryState.New, 0, DateTime.UtcNow - TimeSpan.FromMinutes(3)),
-            CreateEntry(Guid.NewGuid(), EntryState.New, 0, DateTime.UtcNow - TimeSpan.FromMinutes(2)),
-            CreateEntry(Guid.NewGuid(), EntryState.New, 0, DateTime.UtcNow - TimeSpan.FromMinutes(1)),
-        ];
-
-        _dbContextMock.Setup(db => db.Set<OutboxEntry>())
-                      .ReturnsDbSet(entries);
-
-        // Act
-        IReadOnlyCollection<SerializedRoutedEvent> result = await _sut.Read(entries.Count, cancellationToken);
-
-        // Assert
-        Assert.Equal(entries.Count, result.Count);
-        Assert.All(entries, e => Assert.Contains(result, r => r.Id == e.Id));
-        Assert.All(entries, e => Assert.Equal(EntryState.InProcessing, e.State));
-        Assert.All(entries, e => Assert.Equal(1u, e.DeliveryAttempts));
-        _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), isTransactionInProgress ? Times.Never() : Times.Once());
-    }
-
-    [Fact]
-    public async Task Read_WithInProcessingEntriesAfterExpirationBelowMaxDeliveryCount_ReadsTheEntries()
-    {
-        // Arrange
-        var cancellationToken = new CancellationToken();
-
-        List<OutboxEntry> entries =
-        [
-            CreateEntry(Guid.NewGuid(), EntryState.InProcessing, 0, DateTime.UtcNow - _settings.DeliveryExpiration * 3),
-            CreateEntry(Guid.NewGuid(), EntryState.InProcessing, 1, DateTime.UtcNow - _settings.DeliveryExpiration * 2),
-            CreateEntry(Guid.NewGuid(), EntryState.InProcessing, 2, DateTime.UtcNow - _settings.DeliveryExpiration * 1.1),
-        ];
-
-        _dbContextMock.Setup(db => db.Set<OutboxEntry>())
-                      .ReturnsDbSet(entries);
-
-        // Act
-        IReadOnlyCollection<SerializedRoutedEvent> result = await _sut.Read(entries.Count, cancellationToken);
-
-        // Assert
-        Assert.Equal(entries.Count, result.Count);
-        Assert.All(entries, e => Assert.Contains(result, r => r.Id == e.Id));
-        _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), Times.Once);
-    }
-
-    [Fact]
-    public async Task Read_WithInProcessingEntriesBeforeExpiration_IgnoresTheEntries()
-    {
-        // Arrange
-        var cancellationToken = new CancellationToken();
-
-        List<OutboxEntry> entries =
-        [
-            CreateEntry(Guid.NewGuid(), EntryState.InProcessing, 0, DateTime.UtcNow - _settings.DeliveryExpiration * 0.3),
-            CreateEntry(Guid.NewGuid(), EntryState.InProcessing, 1, DateTime.UtcNow - _settings.DeliveryExpiration * 0.2),
-            CreateEntry(Guid.NewGuid(), EntryState.InProcessing, 2, DateTime.UtcNow - _settings.DeliveryExpiration * 0.1),
-        ];
-
-        _dbContextMock.Setup(db => db.Set<OutboxEntry>())
-                      .ReturnsDbSet(entries);
-
-        // Act
-        IReadOnlyCollection<SerializedRoutedEvent> result = await _sut.Read(entries.Count, cancellationToken);
-
-        // Assert
-        Assert.Empty(result);
-        _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), Times.Once);
-    }
-
-    [Fact]
-    public async Task Read_WithInProcessingEntriesAboveMaxDeliveryCount_IgnoresTheEntries()
-    {
-        // Arrange
-        var cancellationToken = new CancellationToken();
-
-        List<OutboxEntry> entries =
-        [
-            CreateEntry(Guid.NewGuid(), EntryState.InProcessing, _settings.MaxDeliveryCount, DateTime.UtcNow - _settings.DeliveryExpiration * 3),
-            CreateEntry(Guid.NewGuid(), EntryState.InProcessing, _settings.MaxDeliveryCount, DateTime.UtcNow - _settings.DeliveryExpiration * 2),
-            CreateEntry(Guid.NewGuid(), EntryState.InProcessing, _settings.MaxDeliveryCount, DateTime.UtcNow - _settings.DeliveryExpiration * 1.1),
-        ];
-
-        _dbContextMock.Setup(db => db.Set<OutboxEntry>())
-                      .ReturnsDbSet(entries);
-
-        // Act
-        IReadOnlyCollection<SerializedRoutedEvent> result = await _sut.Read(entries.Count, cancellationToken);
-
-        // Assert
-        Assert.Empty(result);
-        _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), Times.Once);
-    }
-
-    [Fact]
-    public async Task Read_WithFailedEntriesBelowMaxDeliveryCount_ReadsTheEntries()
-    {
-        // Arrange
-        var cancellationToken = new CancellationToken();
-
-        List<OutboxEntry> entries =
-        [
-            CreateEntry(Guid.NewGuid(), EntryState.Failed, 0, DateTime.UtcNow - TimeSpan.FromMinutes(3)),
-            CreateEntry(Guid.NewGuid(), EntryState.Failed, 1, DateTime.UtcNow - TimeSpan.FromMinutes(2)),
-            CreateEntry(Guid.NewGuid(), EntryState.Failed, 2, DateTime.UtcNow - TimeSpan.FromMinutes(1)),
-        ];
-
-        _dbContextMock.Setup(db => db.Set<OutboxEntry>())
-                      .ReturnsDbSet(entries);
-
-        // Act
-        IReadOnlyCollection<SerializedRoutedEvent> result = await _sut.Read(entries.Count, cancellationToken);
-
-        // Assert
-        Assert.Equal(entries.Count, result.Count);
-        Assert.All(entries, e => Assert.Contains(result, r => r.Id == e.Id));
-        _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), Times.Once);
-    }
-
-    [Fact]
-    public async Task Read_WithFailedEntriesAboveMaxDeliveryCount_IgnoresTheEntries()
-    {
-        // Arrange
-        var cancellationToken = new CancellationToken();
-
-        List<OutboxEntry> entries =
-        [
-            CreateEntry(Guid.NewGuid(), EntryState.Failed, _settings.MaxDeliveryCount, DateTime.UtcNow - TimeSpan.FromMinutes(3)),
-            CreateEntry(Guid.NewGuid(), EntryState.Failed, _settings.MaxDeliveryCount, DateTime.UtcNow - TimeSpan.FromMinutes(2)),
-            CreateEntry(Guid.NewGuid(), EntryState.Failed, _settings.MaxDeliveryCount, DateTime.UtcNow - TimeSpan.FromMinutes(1)),
-        ];
-
-        _dbContextMock.Setup(db => db.Set<OutboxEntry>())
-                      .ReturnsDbSet(entries);
-
-        // Act
-        IReadOnlyCollection<SerializedRoutedEvent> result = await _sut.Read(entries.Count, cancellationToken);
-
-        // Assert
-        Assert.Empty(result);
-        _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), Times.Once);
-    }
-
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task MarkAsDelivered_WithExistingEntry_UpdatesItsState(bool isTransactionInProgress)
-    {
-        // Arrange
-        var entryId = Guid.NewGuid();
-        OutboxEntry entry = CreateEntry(entryId, EntryState.InProcessing, 1, DateTime.UtcNow);
-        var cancellationToken = new CancellationToken();
-
-        _transactionMock.Setup(t => t.IsInProgress)
-                        .Returns(isTransactionInProgress);
-
-        _dbSetMock.Setup(m => m.FindAsync(It.IsAny<object[]>(), It.IsAny<CancellationToken>()))
-                  .ReturnsAsync(entry);
-
-        // Act
-        await _sut.MarkAsDelivered(entryId, cancellationToken);
-
-        // Assert
-        Assert.Equal(EntryState.Processed, entry.State);
-        Assert.Equal(DateTime.UtcNow, entry.Updated, TimeSpan.FromSeconds(1));
-        _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), isTransactionInProgress ? Times.Never() : Times.Once());
-    }
-
-    [Fact]
-    public async Task MarkAsDelivered_WithMissingEntry_IgnoresTheRequest()
-    {
-        // Arrange
-        var entryId = Guid.NewGuid();
-        var cancellationToken = new CancellationToken();
-
-        _dbSetMock.Setup(m => m.FindAsync(It.IsAny<object[]>(), It.IsAny<CancellationToken>()))
-                  .ReturnsAsync((OutboxEntry?)null);
-
-        // Act
-        await _sut.MarkAsDelivered(entryId, cancellationToken);
-
-        // Assert
-        _dbSetMock.Verify(m => m.Remove(It.IsAny<OutboxEntry>()), Times.Never);
-        _dbContextMock.Verify(db => db.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task MarkAsFailed_WithExistingEntry_UpdatesItsState(bool isTransactionInProgress)
-    {
-        // Arrange
-        var entryId = Guid.NewGuid();
-        OutboxEntry entry = CreateEntry(entryId, EntryState.InProcessing, 1, DateTime.UtcNow - TimeSpan.FromMinutes(5));
-        var cancellationToken = new CancellationToken();
-
-        _transactionMock.Setup(t => t.IsInProgress)
-                        .Returns(isTransactionInProgress);
-
-        _dbSetMock.Setup(m => m.FindAsync(It.IsAny<object[]>(), It.IsAny<CancellationToken>()))
-                  .ReturnsAsync(entry);
-
-        // Act
-        await _sut.MarkAsFailed(entryId, cancellationToken);
-
-        // Assert
-        Assert.Equal(EntryState.Failed, entry.State);
-        Assert.Equal(DateTime.UtcNow, entry.Updated, TimeSpan.FromSeconds(1));
-        _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), isTransactionInProgress ? Times.Never() : Times.Once());
-    }
-
-    [Fact]
-    public async Task MarkAsFailed_WithMissingEntry_IgnoresTheRequest()
-    {
-        // Arrange
-        var entryId = Guid.NewGuid();
-        var cancellationToken = new CancellationToken();
-
-        _dbSetMock.Setup(m => m.FindAsync(It.IsAny<object[]>(), It.IsAny<CancellationToken>()))
-                  .ReturnsAsync((OutboxEntry?)null);
-
-        // Act
-        await _sut.MarkAsFailed(entryId, cancellationToken);
-
-        // Assert
-        _dbContextMock.Verify(db => db.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    private static OutboxEntry CreateEntry(Guid id, EntryState state, uint deliveryAttempts, DateTime updated) => new()
-    {
-        Id = id,
-        State = state,
-        DeliveryAttempts = deliveryAttempts,
-        Updated = updated,
-        Created = updated - TimeSpan.FromMinutes(1),
-        Event = "test-event",
-        Handler = "test-handler",
-        Route = "END",
-        Payload = "{}"
+        MaxDeliveryCount = 3,
+        DeliveryExpiration = TimeSpan.FromMinutes(5)
     };
+
+    private TestDbContext _dbContext = default!;
+    private SqliteConnection _connection = default!;
+
+    private OutboxConsumer _sut = default!;
+
+    public async ValueTask InitializeAsync()
+    {
+        _connection = new SqliteConnection("Data Source=:memory:");
+        await _connection.OpenAsync();
+
+        DbContextOptionsBuilder<TestDbContext> optionsBuilder = new();
+        DbContextOptions<TestDbContext> options = optionsBuilder.UseSqlite(_connection).Options;
+
+        _dbContext = new TestDbContext(options);
+        await _dbContext.Database.EnsureCreatedAsync();
+
+        _sut = new OutboxConsumer(_dbContext, _settings);
+    }
+
+    [Fact]
+    public async Task Read_WithNewEntries_ClaimsAndReadsTheEntries()
+    {
+        // Arrange
+        Guid firstEntryId = Guid.NewGuid();
+        Guid secondEntryId = Guid.NewGuid();
+        OutboxEntry firstEntry = CreateEntry(firstEntryId, EntryState.New, 0, Guid.Empty, DateTime.MinValue);
+        OutboxEntry secondEntry = CreateEntry(secondEntryId, EntryState.New, 0, Guid.Empty, DateTime.MinValue);
+
+        await SeedEntries(firstEntry, secondEntry);
+
+        DateTime readStartedAt = DateTime.UtcNow;
+
+        // Act
+        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(2, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(2, result.Count);
+        Guid[] returnedIds = [.. result.Select(outboxEvent => outboxEvent.EventId)];
+        Assert.Contains(firstEntryId, returnedIds);
+        Assert.Contains(secondEntryId, returnedIds);
+
+        Guid claimId = Assert.Single(result.Select(outboxEvent => outboxEvent.ClaimId).Distinct());
+        Assert.NotEqual(Guid.Empty, claimId);
+
+        OutboxEntry persistedFirstEntry = await LoadEntry(firstEntryId);
+        OutboxEntry persistedSecondEntry = await LoadEntry(secondEntryId);
+
+        AssertClaimedEntry(persistedFirstEntry, claimId, 1u, readStartedAt);
+        AssertClaimedEntry(persistedSecondEntry, claimId, 1u, readStartedAt);
+    }
+
+    [Fact]
+    public async Task Read_WithFailedEntriesBelowMaxDeliveryCount_ClaimsAndReadsTheEntries()
+    {
+        // Arrange
+        Guid entryId = Guid.NewGuid();
+        OutboxEntry entry = CreateEntry(entryId, EntryState.Failed, _settings.MaxDeliveryCount - 1, Guid.Empty, DateTime.MinValue);
+
+        await SeedEntries(entry);
+
+        DateTime readStartedAt = DateTime.UtcNow;
+
+        // Act
+        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(1, CancellationToken.None);
+
+        // Assert
+        OutboxEvent outboxEvent = Assert.Single(result);
+        Assert.Equal(entryId, outboxEvent.EventId);
+        Assert.NotEqual(Guid.Empty, outboxEvent.ClaimId);
+
+        OutboxEntry persistedEntry = await LoadEntry(entryId);
+        AssertClaimedEntry(persistedEntry, outboxEvent.ClaimId, _settings.MaxDeliveryCount, readStartedAt);
+    }
+
+    [Fact]
+    public async Task Read_WithInProcessingEntriesBelowMaxDeliveryCountAndExpiredClaim_ReclaimsAndReadsTheEntries()
+    {
+        // Arrange
+        Guid entryId = Guid.NewGuid();
+        Guid previousClaimId = Guid.NewGuid();
+        DateTime previousClaimExpiration = DateTime.UtcNow.AddMinutes(-2);
+
+        OutboxEntry entry = CreateEntry(
+            entryId,
+            EntryState.InProcessing,
+            _settings.MaxDeliveryCount - 1,
+            previousClaimId,
+            previousClaimExpiration);
+
+        await SeedEntries(entry);
+
+        DateTime readStartedAt = DateTime.UtcNow;
+
+        // Act
+        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(1, CancellationToken.None);
+
+        // Assert
+        OutboxEvent outboxEvent = Assert.Single(result);
+        Assert.Equal(entryId, outboxEvent.EventId);
+        Assert.NotEqual(Guid.Empty, outboxEvent.ClaimId);
+        Assert.NotEqual(previousClaimId, outboxEvent.ClaimId);
+
+        OutboxEntry persistedEntry = await LoadEntry(entryId);
+        AssertClaimedEntry(persistedEntry, outboxEvent.ClaimId, _settings.MaxDeliveryCount, readStartedAt);
+        Assert.True(persistedEntry.ClaimExpiration > previousClaimExpiration);
+    }
+
+    [Fact]
+    public async Task Read_WithProcessedEntries_DoesNotReadTheEntries()
+    {
+        // Arrange
+        Guid entryId = Guid.NewGuid();
+        OutboxEntry entry = CreateEntry(entryId, EntryState.Processed, 1, Guid.Empty, DateTime.MinValue);
+
+        await SeedEntries(entry);
+
+        // Act
+        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(1, CancellationToken.None);
+
+        // Assert
+        Assert.Empty(result);
+
+        OutboxEntry persistedEntry = await LoadEntry(entryId);
+        AssertEntryUnchanged(entry, persistedEntry);
+    }
+
+    [Fact]
+    public async Task Read_WithFailedEntriesAboveMaxDeliveryCount_DoesNotReadTheEntries()
+    {
+        // Arrange
+        Guid entryId = Guid.NewGuid();
+        OutboxEntry entry = CreateEntry(entryId, EntryState.Failed, _settings.MaxDeliveryCount + 1u, Guid.Empty, DateTime.MinValue);
+
+        await SeedEntries(entry);
+
+        // Act
+        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(1, CancellationToken.None);
+
+        // Assert
+        Assert.Empty(result);
+
+        OutboxEntry persistedEntry = await LoadEntry(entryId);
+        AssertEntryUnchanged(entry, persistedEntry);
+    }
+
+    [Fact]
+    public async Task Read_WithInProcessingEntriesAboveMaxDeliveryCountAndExpiredClaim_DoesNotReadTheEntries()
+    {
+        // Arrange
+        Guid entryId = Guid.NewGuid();
+        OutboxEntry entry = CreateEntry(
+            entryId,
+            EntryState.InProcessing,
+            _settings.MaxDeliveryCount + 1u,
+            Guid.NewGuid(),
+            DateTime.UtcNow.AddMinutes(-2));
+
+        await SeedEntries(entry);
+
+        // Act
+        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(1, CancellationToken.None);
+
+        // Assert
+        Assert.Empty(result);
+
+        OutboxEntry persistedEntry = await LoadEntry(entryId);
+        AssertEntryUnchanged(entry, persistedEntry);
+    }
+
+    [Fact]
+    public async Task Read_WithInProcessingEntriesBelowMaxDeliveryCountAndActiveClaim_DoesNotReadTheEntries()
+    {
+        // Arrange
+        Guid entryId = Guid.NewGuid();
+        OutboxEntry entry = CreateEntry(
+            entryId,
+            EntryState.InProcessing,
+            _settings.MaxDeliveryCount - 1,
+            Guid.NewGuid(),
+            DateTime.UtcNow.AddMinutes(2));
+
+        await SeedEntries(entry);
+
+        // Act
+        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(1, CancellationToken.None);
+
+        // Assert
+        Assert.Empty(result);
+
+        OutboxEntry persistedEntry = await LoadEntry(entryId);
+        AssertEntryUnchanged(entry, persistedEntry);
+    }
+
+    [Fact]
+    public async Task MarkAsDelivered_WithEntryInProcessingAndValidClaim_MarksTheEntryAsProcessed()
+    {
+        // Arrange
+        Guid entryId = Guid.NewGuid();
+        Guid claimId = Guid.NewGuid();
+        OutboxEntry entry = CreateEntry(entryId, EntryState.InProcessing, 1, claimId, DateTime.UtcNow.AddMinutes(1));
+
+        await SeedEntries(entry);
+
+        // Act
+        bool result = await _sut.MarkAsDelivered(entryId, claimId, CancellationToken.None);
+
+        // Assert
+        Assert.True(result);
+
+        OutboxEntry persistedEntry = await LoadEntry(entryId);
+        Assert.Equal(EntryState.Processed, persistedEntry.State);
+        Assert.Equal(entry.DeliveryAttempts, persistedEntry.DeliveryAttempts);
+        Assert.Equal(Guid.Empty, persistedEntry.ClaimId);
+        Assert.Equal(DateTime.MinValue, persistedEntry.ClaimExpiration);
+    }
+
+    [Fact]
+    public async Task MarkAsDelivered_WithEntryNotInProcessing_DoesNotMarkTheEntryAsProcessed()
+    {
+        // Arrange
+        Guid entryId = Guid.NewGuid();
+        Guid claimId = Guid.NewGuid();
+        OutboxEntry entry = CreateEntry(entryId, EntryState.New, 1, claimId, DateTime.UtcNow.AddMinutes(1));
+
+        await SeedEntries(entry);
+
+        // Act
+        bool result = await _sut.MarkAsDelivered(entryId, claimId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result);
+
+        OutboxEntry persistedEntry = await LoadEntry(entryId);
+        AssertEntryUnchanged(entry, persistedEntry);
+    }
+
+    [Fact]
+    public async Task MarkAsDelivered_WithEntryInProcessingAndInvalidClaim_DoesNotMarkTheEntryAsProcessed()
+    {
+        // Arrange
+        Guid entryId = Guid.NewGuid();
+        Guid actualClaimId = Guid.NewGuid();
+        Guid invalidClaimId = Guid.NewGuid();
+        OutboxEntry entry = CreateEntry(entryId, EntryState.InProcessing, 1, actualClaimId, DateTime.UtcNow.AddMinutes(1));
+
+        await SeedEntries(entry);
+
+        // Act
+        bool result = await _sut.MarkAsDelivered(entryId, invalidClaimId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result);
+
+        OutboxEntry persistedEntry = await LoadEntry(entryId);
+        AssertEntryUnchanged(entry, persistedEntry);
+    }
+
+    [Fact]
+    public async Task MarkAsFailed_WithEntryInProcessingAndValidClaim_MarksTheEntryAsFailed()
+    {
+        // Arrange
+        Guid entryId = Guid.NewGuid();
+        Guid claimId = Guid.NewGuid();
+        OutboxEntry entry = CreateEntry(entryId, EntryState.InProcessing, 1, claimId, DateTime.UtcNow.AddMinutes(1));
+
+        await SeedEntries(entry);
+
+        // Act
+        bool result = await _sut.MarkAsFailed(entryId, claimId, CancellationToken.None);
+
+        // Assert
+        Assert.True(result);
+
+        OutboxEntry persistedEntry = await LoadEntry(entryId);
+        Assert.Equal(EntryState.Failed, persistedEntry.State);
+        Assert.Equal(entry.DeliveryAttempts, persistedEntry.DeliveryAttempts);
+        Assert.Equal(Guid.Empty, persistedEntry.ClaimId);
+        Assert.Equal(DateTime.MinValue, persistedEntry.ClaimExpiration);
+    }
+
+    [Fact]
+    public async Task MarkAsFailed_WithEntryNotInProcessing_DoesNotMarkTheEntryAsFailed()
+    {
+        // Arrange
+        Guid entryId = Guid.NewGuid();
+        Guid claimId = Guid.NewGuid();
+        OutboxEntry entry = CreateEntry(entryId, EntryState.New, 1, claimId, DateTime.UtcNow.AddMinutes(1));
+
+        await SeedEntries(entry);
+
+        // Act
+        bool result = await _sut.MarkAsFailed(entryId, claimId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result);
+
+        OutboxEntry persistedEntry = await LoadEntry(entryId);
+        AssertEntryUnchanged(entry, persistedEntry);
+    }
+
+    [Fact]
+    public async Task MarkAsFailed_WithEntryInProcessingAndInvalidClaim_DoesNotMarkTheEntryAsFailed()
+    {
+        // Arrange
+        Guid entryId = Guid.NewGuid();
+        Guid actualClaimId = Guid.NewGuid();
+        Guid invalidClaimId = Guid.NewGuid();
+        OutboxEntry entry = CreateEntry(entryId, EntryState.InProcessing, 1, actualClaimId, DateTime.UtcNow.AddMinutes(1));
+
+        await SeedEntries(entry);
+
+        // Act
+        bool result = await _sut.MarkAsFailed(entryId, invalidClaimId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result);
+
+        OutboxEntry persistedEntry = await LoadEntry(entryId);
+        AssertEntryUnchanged(entry, persistedEntry);
+    }
+
+    private async Task SeedEntries(params OutboxEntry[] entries)
+    {
+        _dbContext.Set<OutboxEntry>().AddRange(entries);
+        await _dbContext.SaveChangesAsync();
+    }
+
+    private async Task<OutboxEntry> LoadEntry(Guid id)
+    {
+        _dbContext.ChangeTracker.Clear();
+
+        OutboxEntry? entry = await _dbContext
+            .Set<OutboxEntry>()
+            .AsNoTracking()
+            .SingleOrDefaultAsync(outboxEntry => outboxEntry.Id == id);
+
+        Assert.NotNull(entry);
+        return entry!;
+    }
+
+    private static void AssertClaimedEntry(OutboxEntry entry, Guid claimId, uint expectedDeliveryAttempts, DateTime readStartedAt)
+    {
+        Assert.Equal(EntryState.InProcessing, entry.State);
+        Assert.Equal(expectedDeliveryAttempts, entry.DeliveryAttempts);
+        Assert.Equal(claimId, entry.ClaimId);
+        Assert.True(entry.ClaimExpiration > readStartedAt);
+    }
+
+    private static void AssertEntryUnchanged(OutboxEntry expected, OutboxEntry actual)
+    {
+        Assert.Equal(expected.State, actual.State);
+        Assert.Equal(expected.DeliveryAttempts, actual.DeliveryAttempts);
+        Assert.Equal(expected.ClaimId, actual.ClaimId);
+    }
+
+    private static OutboxEntry CreateEntry(
+        Guid id,
+        EntryState state,
+        uint deliveryAttempts,
+        Guid claimId,
+        DateTime claimExpiration)
+    {
+        DateTime now = DateTime.UtcNow;
+        return new OutboxEntry
+        {
+            Id = id,
+            Event = "TestEvent",
+            Handler = "TestHandler",
+            Route = Route.Create().ToString(),
+            Payload = "{}",
+            State = state,
+            Created = now.AddMinutes(-1),
+            Updated = now,
+            DeliveryAttempts = deliveryAttempts,
+            ClaimId = claimId,
+            ClaimExpiration = claimExpiration
+        };
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _dbContext.DisposeAsync();
+        await _connection.DisposeAsync();
+    }
+
+    private sealed class TestDbContext(DbContextOptions<TestDbContext> options) : TychoDbContext(options);
 }

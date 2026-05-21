@@ -33,5 +33,9 @@ internal class OutboxEntry
     [Required]
     public uint DeliveryAttempts { get; set; } = 0;
 
-    public Guid? ClaimId { get; set; } = null;
+    [Required]
+    public Guid ClaimId { get; set; } = Guid.Empty;
+
+    [Required]
+    public DateTime ClaimExpiration { get; set; } = DateTime.MinValue;
 }

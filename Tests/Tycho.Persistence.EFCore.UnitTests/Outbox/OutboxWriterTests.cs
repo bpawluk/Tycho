@@ -102,7 +102,7 @@ public class OutboxWriterTests
         // Assert
         _eventSerializerMock.Verify(s => s.Serialize(It.IsAny<RoutedEvent<TestEvent>>()), Times.Exactly(routedEvents.Count));
         _dbSetMock.Verify(db => db.AddRange(It.IsAny<IEnumerable<OutboxEntry>>()), Times.Once);
-        
+
         _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), isTransactionInProgress ? Times.Never() : Times.Once());
         _transactionMock.Verify(t => t.ExecuteAfterCommit(It.IsAny<Action>()), isTransactionInProgress ? Times.Once() : Times.Never());
 

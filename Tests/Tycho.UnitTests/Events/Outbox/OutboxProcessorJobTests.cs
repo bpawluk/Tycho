@@ -45,81 +45,82 @@ public class OutboxProcessorJobTests
 
         // Assert
         _brokerMock.Verify(b => b.DeliverAsync(It.IsAny<SerializedRoutedEvent>(), cancellationToken), Times.Never);
-        _outboxConsumerMock.Verify(o => o.MarkAsDelivered(It.IsAny<Guid>(), cancellationToken), Times.Never);
-        _outboxConsumerMock.Verify(o => o.MarkAsFailed(It.IsAny<Guid>(), cancellationToken), Times.Never);
+        _outboxConsumerMock.Verify(o => o.MarkAsDelivered(It.IsAny<Guid>(), It.IsAny<Guid>(), cancellationToken), Times.Never);
+        _outboxConsumerMock.Verify(o => o.MarkAsFailed(It.IsAny<Guid>(), It.IsAny<Guid>(), cancellationToken), Times.Never);
     }
 
     [Fact]
     public async Task ExecuteAsync_WithAssignedEvent_DeliversEvent()
     {
         // Arrange
-        SerializedRoutedEvent routedEvent = CreateRoutedEvent();
+        OutboxEvent outboxEvent = CreateOutboxEvent();
         var cancellationToken = new CancellationToken();
 
         _brokerMock
-            .Setup(b => b.DeliverAsync(routedEvent, cancellationToken))
+            .Setup(b => b.DeliverAsync(outboxEvent.RoutedEvent, cancellationToken))
             .Returns(Task.CompletedTask);
 
         // Act
-        _sut.ForEvent(routedEvent);
+        _sut.ForEvent(outboxEvent);
         await _sut.ExecuteAsync(cancellationToken);
 
         // Assert
-        _brokerMock.Verify(b => b.DeliverAsync(routedEvent, cancellationToken), Times.Once);
-        _outboxConsumerMock.Verify(o => o.MarkAsDelivered(routedEvent.Id, cancellationToken), Times.Once);
-        _outboxConsumerMock.Verify(o => o.MarkAsFailed(routedEvent.Id, cancellationToken), Times.Never);
+        _brokerMock.Verify(b => b.DeliverAsync(outboxEvent.RoutedEvent, cancellationToken), Times.Once);
+        _outboxConsumerMock.Verify(o => o.MarkAsDelivered(outboxEvent.EventId, outboxEvent.ClaimId, cancellationToken), Times.Once);
+        _outboxConsumerMock.Verify(o => o.MarkAsFailed(outboxEvent.EventId, outboxEvent.ClaimId, cancellationToken), Times.Never);
     }
 
     [Fact]
     public async Task ExecuteAsync_WithAssignedEvent_WhenBrokerThrows_MarksEventAsFailed()
     {
         // Arrange
-        SerializedRoutedEvent routedEvent = CreateRoutedEvent();
+        OutboxEvent outboxEvent = CreateOutboxEvent();
         var cancellationToken = new CancellationToken();
 
         _brokerMock
-            .Setup(b => b.DeliverAsync(routedEvent, cancellationToken))
+            .Setup(b => b.DeliverAsync(outboxEvent.RoutedEvent, cancellationToken))
             .ThrowsAsync(new Exception("delivery failure"));
 
         // Act
-        _sut.ForEvent(routedEvent);
+        _sut.ForEvent(outboxEvent);
         await _sut.ExecuteAsync(cancellationToken);
 
         // Assert
-        _brokerMock.Verify(b => b.DeliverAsync(routedEvent, cancellationToken), Times.Once);
-        _outboxConsumerMock.Verify(o => o.MarkAsDelivered(routedEvent.Id, cancellationToken), Times.Never);
-        _outboxConsumerMock.Verify(o => o.MarkAsFailed(routedEvent.Id, cancellationToken), Times.Once);
+        _brokerMock.Verify(b => b.DeliverAsync(outboxEvent.RoutedEvent, cancellationToken), Times.Once);
+        _outboxConsumerMock.Verify(o => o.MarkAsDelivered(outboxEvent.EventId, outboxEvent.ClaimId, cancellationToken), Times.Never);
+        _outboxConsumerMock.Verify(o => o.MarkAsFailed(outboxEvent.EventId, outboxEvent.ClaimId, cancellationToken), Times.Once);
     }
 
     [Fact]
     public async Task ExecuteAsync_WithAssignedEvent_WhenMarkingAsDeliveredThrows_MarksEventAsFailed()
     {
         // Arrange
-        SerializedRoutedEvent routedEvent = CreateRoutedEvent();
+        OutboxEvent outboxEvent = CreateOutboxEvent();
         var cancellationToken = new CancellationToken();
 
         _brokerMock
-            .Setup(b => b.DeliverAsync(routedEvent, cancellationToken))
+            .Setup(b => b.DeliverAsync(outboxEvent.RoutedEvent, cancellationToken))
             .Returns(Task.CompletedTask);
 
         _outboxConsumerMock
-            .Setup(o => o.MarkAsDelivered(routedEvent.Id, cancellationToken))
+            .Setup(o => o.MarkAsDelivered(outboxEvent.EventId, outboxEvent.ClaimId, cancellationToken))
             .ThrowsAsync(new Exception("outbox failure"));
 
         // Act
-        _sut.ForEvent(routedEvent);
+        _sut.ForEvent(outboxEvent);
         await _sut.ExecuteAsync(cancellationToken);
 
         // Assert
-        _brokerMock.Verify(b => b.DeliverAsync(routedEvent, cancellationToken), Times.Once);
-        _outboxConsumerMock.Verify(o => o.MarkAsDelivered(routedEvent.Id, cancellationToken), Times.Once);
-        _outboxConsumerMock.Verify(o => o.MarkAsFailed(routedEvent.Id, cancellationToken), Times.Once);
+        _brokerMock.Verify(b => b.DeliverAsync(outboxEvent.RoutedEvent, cancellationToken), Times.Once);
+        _outboxConsumerMock.Verify(o => o.MarkAsDelivered(outboxEvent.EventId, outboxEvent.ClaimId, cancellationToken), Times.Once);
+        _outboxConsumerMock.Verify(o => o.MarkAsFailed(outboxEvent.EventId, outboxEvent.ClaimId, cancellationToken), Times.Once);
     }
 
-    private static SerializedRoutedEvent CreateRoutedEvent()
+    private static OutboxEvent CreateOutboxEvent()
     {
         var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        return new SerializedRoutedEvent(Guid.NewGuid(), eventId, handlerId, Route.Create(), "{}");
+        var routedEvent = new SerializedRoutedEvent(Guid.NewGuid(), eventId, handlerId, Route.Create(), "{}");
+        return new OutboxEvent(Guid.NewGuid(), routedEvent);
     }
 }
