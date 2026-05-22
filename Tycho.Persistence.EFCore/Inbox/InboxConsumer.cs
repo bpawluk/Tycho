@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -10,51 +11,70 @@ using Tycho.Events.Routing;
 using Tycho.Events.Serialization;
 using Tycho.Identity.Events;
 using Tycho.Persistence.EFCore.Common;
-using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.Inbox;
 
 internal class InboxConsumer(
-    ITransaction transaction,
     IEventSerializer eventSerializer,
     TychoDbContext dbContext,
     InboxConsumerSettings? settings = null) : IInboxConsumer
 {
-    private readonly ITransaction _transaction = transaction;
     private readonly IEventSerializer _eventSerializer = eventSerializer;
     private readonly TychoDbContext _dbContext = dbContext;
     private readonly InboxConsumerSettings _settings = settings ?? InboxConsumerSettings.Default;
 
-    public async Task<IReadOnlyCollection<RoutedEvent>> Read(int count, CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<InboxEvent>> Read(int count, CancellationToken cancellationToken)
     {
-        DateTime currentTime = DateTime.UtcNow;
-        DateTime validProcessingThreshold = currentTime - _settings.ProcessingExpiration;
+        if (count <= 0)
+        {
+            return [];
+        }
+
+        DateTime claimCheckTime = DateTime.UtcNow;
+        Expression<Func<InboxEntry, bool>> canBeProcessed = entry =>
+            (entry.State == EntryState.New) ||
+            (entry.State == EntryState.Failed && entry.ProcessingAttempts < _settings.MaxProcessingCount) ||
+            (entry.State == EntryState.InProcessing && entry.ProcessingAttempts < _settings.MaxProcessingCount && entry.ClaimExpiration < claimCheckTime);
+
+        Guid[] entriesToClaimIds = await _dbContext
+            .Set<InboxEntry>()
+            .Where(canBeProcessed)
+            .OrderBy(entry => entry.Created)
+            .Select(entry => entry.Id)
+            .Take(count)
+            .ToArrayAsync(cancellationToken).ConfigureAwait(false);
+
+        if (entriesToClaimIds.Length == 0)
+        {
+            return [];
+        }
+
+        Guid claimId = Guid.NewGuid();
+        DateTime claimWriteTime = DateTime.UtcNow;
+
+        // Known flaw: relying on system clock for claiming is vulnerable to clock skew when running the app on multiple machines
+        // Recommendation: set ProcessingExpiration to values significantly higher than the potential clock skew to mitigate this issue
+        await _dbContext
+            .Set<InboxEntry>()
+            .Where(canBeProcessed)
+            .Where(entry => entriesToClaimIds.Contains(entry.Id))
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(entry => entry.Updated, claimWriteTime)
+                .SetProperty(entry => entry.State, EntryState.InProcessing)
+                .SetProperty(entry => entry.ProcessingAttempts, entry => entry.ProcessingAttempts + 1)
+                .SetProperty(entry => entry.ClaimId, claimId)
+                .SetProperty(entry => entry.ClaimExpiration, claimWriteTime + _settings.ProcessingExpiration), cancellationToken)
+            .ConfigureAwait(false);
 
         InboxEntry[] entriesToDeliver = await _dbContext
             .Set<InboxEntry>()
-            .Where(entry =>
-                (entry.State == EntryState.New) ||
-                (entry.State == EntryState.Failed && entry.ProcessingAttempts < _settings.MaxProcessingCount) ||
-                (entry.State == EntryState.InProcessing && entry.ProcessingAttempts < _settings.MaxProcessingCount && entry.Updated < validProcessingThreshold))
+            .Where(entry => entry.ClaimId == claimId)
             .OrderBy(entry => entry.Created)
-            .Take(count)
             .ToArrayAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        foreach (InboxEntry? entry in entriesToDeliver)
-        {
-            entry.State = EntryState.InProcessing;
-            entry.Updated = currentTime;
-            entry.ProcessingAttempts++;
-        }
-
-        if (!_transaction.IsInProgress)
-        {
-            await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        }
-
-        var result = new List<RoutedEvent>();
-        foreach (InboxEntry? entry in entriesToDeliver)
+        var result = new List<InboxEvent>();
+        foreach (InboxEntry entry in entriesToDeliver)
         {
             var serializedEvent = new SerializedRoutedEvent(
                 entry.Id,
@@ -63,50 +83,61 @@ internal class InboxConsumer(
                 Route.Empty(),
                 entry.Payload);
 
-            RoutedEvent? routedEvent = await TryDeserializeWith(_eventSerializer, serializedEvent).ConfigureAwait(false);
+            RoutedEvent? routedEvent = await TryDeserializeWith(_eventSerializer, serializedEvent, claimId, cancellationToken).ConfigureAwait(false);
             if (routedEvent is not null)
             {
-                result.Add(routedEvent);
+                result.Add(new InboxEvent(claimId, routedEvent));
             }
         }
+
         return result;
     }
 
-    public async Task MarkAsHandled(Guid entryId, CancellationToken cancellationToken)
+    public async Task<bool> MarkAsHandled(Guid entryId, Guid claimId, CancellationToken cancellationToken)
     {
-        DbSet<InboxEntry> inboxMessages = _dbContext.Set<InboxEntry>();
-        InboxEntry? entry = await inboxMessages.FindAsync([entryId], cancellationToken).ConfigureAwait(false);
+        DateTime currentTime = DateTime.UtcNow;
 
-        if (entry != null)
-        {
-            entry.State = EntryState.Processed;
-            entry.Updated = DateTime.UtcNow;
+        int updatedRows = await _dbContext
+            .Set<InboxEntry>()
+            .Where(entry =>
+                entry.Id == entryId &&
+                entry.State == EntryState.InProcessing &&
+                entry.ClaimId == claimId)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(entry => entry.Updated, currentTime)
+                .SetProperty(entry => entry.State, EntryState.Processed)
+                .SetProperty(entry => entry.ClaimId, Guid.Empty)
+                .SetProperty(entry => entry.ClaimExpiration, DateTime.MinValue), cancellationToken)
+            .ConfigureAwait(false);
 
-            if (!_transaction.IsInProgress)
-            {
-                await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-            }
-        }
+        return updatedRows == 1;
     }
 
-    public async Task MarkAsFailed(Guid entryId, CancellationToken cancellationToken)
+    public async Task<bool> MarkAsFailed(Guid entryId, Guid claimId, CancellationToken cancellationToken)
     {
-        DbSet<InboxEntry> inboxMessages = _dbContext.Set<InboxEntry>();
-        InboxEntry? entry = await inboxMessages.FindAsync([entryId], cancellationToken).ConfigureAwait(false);
+        DateTime currentTime = DateTime.UtcNow;
 
-        if (entry != null)
-        {
-            entry.State = EntryState.Failed;
-            entry.Updated = DateTime.UtcNow;
+        int updatedRows = await _dbContext
+            .Set<InboxEntry>()
+            .Where(entry =>
+                entry.Id == entryId &&
+                entry.State == EntryState.InProcessing &&
+                entry.ClaimId == claimId)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(entry => entry.Updated, currentTime)
+                .SetProperty(entry => entry.State, EntryState.Failed)
+                .SetProperty(entry => entry.ClaimId, Guid.Empty)
+                .SetProperty(entry => entry.ClaimExpiration, DateTime.MinValue), cancellationToken)
+            .ConfigureAwait(false);
 
-            if (!_transaction.IsInProgress)
-            {
-                await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-            }
-        }
+        return updatedRows == 1;
     }
 
-    private async Task<RoutedEvent?> TryDeserializeWith(IEventSerializer eventSerializer, SerializedRoutedEvent serializedEvent)
+    private async Task<RoutedEvent?> TryDeserializeWith(
+        IEventSerializer eventSerializer,
+        SerializedRoutedEvent serializedEvent,
+        Guid claimId,
+        CancellationToken cancellationToken)
     {
         try
         {
@@ -114,7 +145,7 @@ internal class InboxConsumer(
         }
         catch
         {
-            await MarkAsFailed(serializedEvent.Id, CancellationToken.None).ConfigureAwait(false);
+            await MarkAsFailed(serializedEvent.Id, claimId, cancellationToken).ConfigureAwait(false);
             return null;
         }
     }

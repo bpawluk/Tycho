@@ -25,10 +25,10 @@ public class InboxProcessorJobTests
     public InboxProcessorJobTests()
     {
         _inboxConsumerMock = new Mock<IInboxConsumer>();
-        _inboxConsumerMock.Setup(i => i.MarkAsHandled(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-                          .Returns(Task.CompletedTask);
-        _inboxConsumerMock.Setup(i => i.MarkAsFailed(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-                          .Returns(Task.CompletedTask);
+        _inboxConsumerMock.Setup(i => i.MarkAsHandled(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+                          .ReturnsAsync(true);
+        _inboxConsumerMock.Setup(i => i.MarkAsFailed(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+                          .ReturnsAsync(true);
 
         _transactionMock = new Mock<ITransaction>();
         _transactionMock.Setup(t => t.BeginAsync(It.IsAny<CancellationToken>()))
@@ -65,22 +65,22 @@ public class InboxProcessorJobTests
         _registrationMock.VerifyGet(r => r.Handler, Times.Never);
         _transactionMock.Verify(t => t.BeginAsync(cancellationToken), Times.Never);
         _handlerMock.Verify(h => h.HandleAsync(It.IsAny<EventContext<TestEvent>>(), cancellationToken), Times.Never);
-        _inboxConsumerMock.Verify(i => i.MarkAsHandled(It.IsAny<Guid>(), cancellationToken), Times.Never);
+        _inboxConsumerMock.Verify(i => i.MarkAsHandled(It.IsAny<Guid>(), It.IsAny<Guid>(), cancellationToken), Times.Never);
         _transactionMock.Verify(t => t.CommitAsync(cancellationToken), Times.Never);
         _transactionMock.Verify(t => t.RollbackAsync(cancellationToken), Times.Never);
-        _inboxConsumerMock.Verify(i => i.MarkAsFailed(It.IsAny<Guid>(), cancellationToken), Times.Never);
+        _inboxConsumerMock.Verify(i => i.MarkAsFailed(It.IsAny<Guid>(), It.IsAny<Guid>(), cancellationToken), Times.Never);
     }
 
     [Fact]
     public async Task ExecuteAsync_WithAssignedEvent_HandlesEventAndMarksAsHandled()
     {
         // Arrange
-        RoutedEvent<TestEvent> routedEvent = CreateRoutedEvent();
+        InboxEvent inboxEvent = CreateInboxEvent(out RoutedEvent<TestEvent> routedEvent);
         var cancellationToken = new CancellationToken();
         InboxProcessorJob sut = CreateSut();
 
         // Act
-        sut.ForEvent(routedEvent);
+        sut.ForEvent(inboxEvent);
         await sut.ExecuteAsync(cancellationToken);
 
         // Assert
@@ -91,22 +91,22 @@ public class InboxProcessorJobTests
                 It.Is<EventContext<TestEvent>>(c => c.Id == routedEvent.Id && c.Payload == routedEvent.Payload),
                 cancellationToken),
             Times.Once);
-        _inboxConsumerMock.Verify(i => i.MarkAsHandled(routedEvent.Id, cancellationToken), Times.Once);
+        _inboxConsumerMock.Verify(i => i.MarkAsHandled(inboxEvent.EventId, inboxEvent.ClaimId, cancellationToken), Times.Once);
         _transactionMock.Verify(t => t.CommitAsync(cancellationToken), Times.Never);
         _transactionMock.Verify(t => t.RollbackAsync(cancellationToken), Times.Never);
-        _inboxConsumerMock.Verify(i => i.MarkAsFailed(routedEvent.Id, cancellationToken), Times.Never);
+        _inboxConsumerMock.Verify(i => i.MarkAsFailed(inboxEvent.EventId, inboxEvent.ClaimId, cancellationToken), Times.Never);
     }
 
     [Fact]
     public async Task ExecuteAsync_WithAssignedEvent_AndTransactionalHandler_HandlesEventAndMarksAsHandledWithinTransaction()
     {
         // Arrange
-        RoutedEvent<TestEvent> routedEvent = CreateRoutedEvent();
+        InboxEvent inboxEvent = CreateInboxEvent(out RoutedEvent<TestEvent> routedEvent);
         var cancellationToken = new CancellationToken();
         InboxProcessorJob sut = CreateSut(useTransactionalHandler: true);
 
         // Act
-        sut.ForEvent(routedEvent);
+        sut.ForEvent(inboxEvent);
         await sut.ExecuteAsync(cancellationToken);
 
         // Assert
@@ -117,17 +117,17 @@ public class InboxProcessorJobTests
                 It.Is<EventContext<TestEvent>>(c => c.Id == routedEvent.Id && c.Payload == routedEvent.Payload),
                 cancellationToken),
             Times.Once);
-        _inboxConsumerMock.Verify(i => i.MarkAsHandled(routedEvent.Id, cancellationToken), Times.Once);
+        _inboxConsumerMock.Verify(i => i.MarkAsHandled(inboxEvent.EventId, inboxEvent.ClaimId, cancellationToken), Times.Once);
         _transactionMock.Verify(t => t.CommitAsync(cancellationToken), Times.Once);
         _transactionMock.Verify(t => t.RollbackAsync(cancellationToken), Times.Never);
-        _inboxConsumerMock.Verify(i => i.MarkAsFailed(routedEvent.Id, cancellationToken), Times.Never);
+        _inboxConsumerMock.Verify(i => i.MarkAsFailed(inboxEvent.EventId, inboxEvent.ClaimId, cancellationToken), Times.Never);
     }
 
     [Fact]
     public async Task ExecuteAsync_WithAssignedEvent_WhenHandlerThrows_MarksEventAsFailed()
     {
         // Arrange
-        RoutedEvent<TestEvent> routedEvent = CreateRoutedEvent();
+        InboxEvent inboxEvent = CreateInboxEvent(out _);
         var cancellationToken = new CancellationToken();
         InboxProcessorJob sut = CreateSut();
 
@@ -135,23 +135,23 @@ public class InboxProcessorJobTests
                     .ThrowsAsync(new InvalidOperationException("handler failure"));
 
         // Act
-        sut.ForEvent(routedEvent);
+        sut.ForEvent(inboxEvent);
         await sut.ExecuteAsync(cancellationToken);
 
         // Assert
         _registrationMock.Verify(r => r.Handler, Times.Once);
         _transactionMock.Verify(t => t.BeginAsync(cancellationToken), Times.Never);
-        _inboxConsumerMock.Verify(i => i.MarkAsHandled(routedEvent.Id, cancellationToken), Times.Never);
+        _inboxConsumerMock.Verify(i => i.MarkAsHandled(inboxEvent.EventId, inboxEvent.ClaimId, cancellationToken), Times.Never);
         _transactionMock.Verify(t => t.CommitAsync(cancellationToken), Times.Never);
         _transactionMock.Verify(t => t.RollbackAsync(cancellationToken), Times.Never);
-        _inboxConsumerMock.Verify(i => i.MarkAsFailed(routedEvent.Id, cancellationToken), Times.Once);
+        _inboxConsumerMock.Verify(i => i.MarkAsFailed(inboxEvent.EventId, inboxEvent.ClaimId, cancellationToken), Times.Once);
     }
 
     [Fact]
     public async Task ExecuteAsync_WithAssignedEvent_WhenTransactionalHandlerThrows_RollbacksAndMarksEventAsFailed()
     {
         // Arrange
-        RoutedEvent<TestEvent> routedEvent = CreateRoutedEvent();
+        InboxEvent inboxEvent = CreateInboxEvent(out _);
         var cancellationToken = new CancellationToken();
         InboxProcessorJob sut = CreateSut(useTransactionalHandler: true);
 
@@ -159,33 +159,33 @@ public class InboxProcessorJobTests
                                  .ThrowsAsync(new InvalidOperationException("handler failure"));
 
         // Act
-        sut.ForEvent(routedEvent);
+        sut.ForEvent(inboxEvent);
         await sut.ExecuteAsync(cancellationToken);
 
         // Assert
         _registrationMock.Verify(r => r.Handler, Times.Once);
         _transactionMock.Verify(t => t.BeginAsync(cancellationToken), Times.Once);
-        _inboxConsumerMock.Verify(i => i.MarkAsHandled(routedEvent.Id, cancellationToken), Times.Never);
+        _inboxConsumerMock.Verify(i => i.MarkAsHandled(inboxEvent.EventId, inboxEvent.ClaimId, cancellationToken), Times.Never);
         _transactionMock.Verify(t => t.CommitAsync(cancellationToken), Times.Never);
         _transactionMock.Verify(t => t.RollbackAsync(cancellationToken), Times.Once);
-        _inboxConsumerMock.Verify(i => i.MarkAsFailed(routedEvent.Id, cancellationToken), Times.Once);
+        _inboxConsumerMock.Verify(i => i.MarkAsFailed(inboxEvent.EventId, inboxEvent.ClaimId, cancellationToken), Times.Once);
     }
 
     [Fact]
     public async Task ExecuteAsync_WithAssignedEvent_WhenHandlerNotFound_MarksEventAsFailed()
     {
         // Arrange
-        RoutedEvent<TestEvent> routedEvent = CreateRoutedEvent();
+        InboxEvent inboxEvent = CreateInboxEvent(out _);
         var cancellationToken = new CancellationToken();
         InboxProcessorJob sut = CreateSut(withHandler: false);
 
         // Act
-        sut.ForEvent(routedEvent);
+        sut.ForEvent(inboxEvent);
         await sut.ExecuteAsync(cancellationToken);
 
         // Assert
-        _inboxConsumerMock.Verify(i => i.MarkAsHandled(routedEvent.Id, cancellationToken), Times.Never);
-        _inboxConsumerMock.Verify(i => i.MarkAsFailed(routedEvent.Id, cancellationToken), Times.Once);
+        _inboxConsumerMock.Verify(i => i.MarkAsHandled(inboxEvent.EventId, inboxEvent.ClaimId, cancellationToken), Times.Never);
+        _inboxConsumerMock.Verify(i => i.MarkAsFailed(inboxEvent.EventId, inboxEvent.ClaimId, cancellationToken), Times.Once);
     }
 
     private InboxProcessorJob CreateSut(bool withHandler = true, bool useTransactionalHandler = false)
@@ -218,10 +218,11 @@ public class InboxProcessorJobTests
         return new InboxProcessorJob(internals);
     }
 
-    private static RoutedEvent<TestEvent> CreateRoutedEvent()
+    private static InboxEvent CreateInboxEvent(out RoutedEvent<TestEvent> routedEvent)
     {
         var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        return new RoutedEvent<TestEvent>(Guid.NewGuid(), eventId, handlerId, Route.Create(), new TestEvent());
+        routedEvent = new RoutedEvent<TestEvent>(Guid.NewGuid(), eventId, handlerId, Route.Create(), new TestEvent());
+        return new InboxEvent(Guid.NewGuid(), routedEvent);
     }
 }

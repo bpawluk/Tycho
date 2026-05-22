@@ -35,7 +35,7 @@ public class InboxProcessorJobFactoryTests
         // Arrange
         int maxCount = 5;
         var cancellationToken = new CancellationToken();
-        var entries = new List<RoutedEvent> { CreateRoutedEvent(), CreateRoutedEvent(), CreateRoutedEvent() };
+        var entries = new List<InboxEvent> { CreateInboxEvent(), CreateInboxEvent(), CreateInboxEvent() };
 
         _inboxConsumerMock.Setup(i => i.Read(It.IsAny<int>(), cancellationToken))
                           .ReturnsAsync(entries);
@@ -66,10 +66,11 @@ public class InboxProcessorJobFactoryTests
         _inboxConsumerMock.Verify(i => i.Read(maxCount, cancellationToken), Times.Once);
     }
 
-    private static RoutedEvent<TestEvent> CreateRoutedEvent()
+    private static InboxEvent CreateInboxEvent()
     {
         var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        return new RoutedEvent<TestEvent>(Guid.NewGuid(), eventId, handlerId, Route.Create(), new TestEvent());
+        var routedEvent = new RoutedEvent<TestEvent>(Guid.NewGuid(), eventId, handlerId, Route.Create(), new TestEvent());
+        return new InboxEvent(Guid.NewGuid(), routedEvent);
     }
 }

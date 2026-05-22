@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Tycho.Events.Model;
 using Tycho.Identity.Events;
 using Tycho.Processor;
 using Tycho.Structure;
@@ -15,16 +14,16 @@ namespace Tycho.Events.Inbox
     internal class InboxProcessorJob : IJob
     {
         private readonly Internals _internals;
-        private RoutedEvent? _event;
+        private InboxEvent? _event;
 
         public InboxProcessorJob(Internals internals)
         {
             _internals = internals;
         }
 
-        public InboxProcessorJob ForEvent(RoutedEvent routedEvent)
+        public InboxProcessorJob ForEvent(InboxEvent inboxEvent)
         {
-            _event = routedEvent;
+            _event = inboxEvent;
             return this;
         }
 
@@ -45,7 +44,7 @@ namespace Tycho.Events.Inbox
             try
             {
                 var handlerProvider = new EventHandlerProvider(scope.ServiceProvider);
-                IEventHandler eventHandler = _event!.GetHandlerFrom(handlerProvider);
+                IEventHandler eventHandler = _event.RoutedEvent.GetHandlerFrom(handlerProvider);
 
                 ITransaction transaction = scope.ServiceProvider.GetRequiredService<ITransaction>();
                 if (eventHandler is ITransactionalEventHandler)
@@ -55,27 +54,43 @@ namespace Tycho.Events.Inbox
 
                 try
                 {
-                    await _event!.HandleWith(eventHandler, cancellationToken).ConfigureAwait(false);
-                    await inbox.MarkAsHandled(_event.Id, cancellationToken).ConfigureAwait(false);
+                    await _event.RoutedEvent.HandleWith(eventHandler, cancellationToken).ConfigureAwait(false);
+
+                    bool markedAsHandled = await inbox
+                        .MarkAsHandled(_event.EventId, _event.ClaimId, cancellationToken)
+                        .ConfigureAwait(false);
+
+                    if (!markedAsHandled)
+                    {
+                        logger?.LogWarning("Failed to mark inbox entry with ID {entryId} as handled for claim {claimId}", _event.EventId, _event.ClaimId);
+                    }
 
                     if (transaction.IsInProgress)
                     {
-                        await transaction!.CommitAsync(cancellationToken).ConfigureAwait(false);
+                        await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
                     }
                 }
                 catch
                 {
                     if (transaction.IsInProgress)
                     {
-                        await transaction!.RollbackAsync(cancellationToken).ConfigureAwait(false);
+                        await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
                     }
                     throw;
                 }
             }
             catch (Exception ex)
             {
-                logger?.LogError(ex, "Failed to process inbox entry with ID {entryId}", _event.Id);
-                await inbox.MarkAsFailed(_event.Id, cancellationToken).ConfigureAwait(false);
+                logger?.LogError(ex, "Failed to process inbox entry with ID {entryId}", _event.EventId);
+
+                bool markedAsFailed = await inbox
+                    .MarkAsFailed(_event.EventId, _event.ClaimId, cancellationToken)
+                    .ConfigureAwait(false);
+
+                if (!markedAsFailed)
+                {
+                    logger?.LogWarning("Failed to mark inbox entry with ID {entryId} as failed for claim {claimId}", _event.EventId, _event.ClaimId);
+                }
             }
         }
     }

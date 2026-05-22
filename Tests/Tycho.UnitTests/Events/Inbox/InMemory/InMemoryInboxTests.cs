@@ -35,11 +35,12 @@ public class InMemoryInboxTests
 
         // Act
         await _sut.Write(entry, cancelationToken);
-        IReadOnlyCollection<RoutedEvent> result = await _sut.Read(1, cancelationToken);
+        IReadOnlyCollection<InboxEvent> result = await _sut.Read(1, cancelationToken);
 
         // Assert
-        RoutedEvent returnedEvent = Assert.Single(result);
-        Assert.Same(deserializedEntry, returnedEvent);
+        InboxEvent returnedEvent = Assert.Single(result);
+        Assert.Same(deserializedEntry, returnedEvent.RoutedEvent);
+        Assert.Equal(Guid.Empty, returnedEvent.ClaimId);
         Assert.True(notified);
     }
 
@@ -53,7 +54,7 @@ public class InMemoryInboxTests
         await _sut.Write(CreateSerializedRoutedEvent(), cancelationToken);
 
         // Act
-        IReadOnlyCollection<RoutedEvent> result = await _sut.Read(2, cancelationToken);
+        IReadOnlyCollection<InboxEvent> result = await _sut.Read(2, cancelationToken);
 
         // Assert
         Assert.Equal(2, result.Count);
@@ -67,7 +68,7 @@ public class InMemoryInboxTests
         await _sut.Write(CreateSerializedRoutedEvent(), cancelationToken);
 
         // Act
-        IReadOnlyCollection<RoutedEvent> result = await _sut.Read(5, cancelationToken);
+        IReadOnlyCollection<InboxEvent> result = await _sut.Read(5, cancelationToken);
 
         // Assert
         Assert.Single(result);
@@ -80,7 +81,7 @@ public class InMemoryInboxTests
         var cancelationToken = new CancellationToken();
 
         // Act
-        IReadOnlyCollection<RoutedEvent> result = await _sut.Read(5, cancelationToken);
+        IReadOnlyCollection<InboxEvent> result = await _sut.Read(5, cancelationToken);
 
         // Assert
         Assert.Empty(result);
@@ -95,7 +96,7 @@ public class InMemoryInboxTests
 
         // Act
         await _sut.Read(1, cancellationToken);
-        IReadOnlyCollection<RoutedEvent> result = await _sut.Read(1, cancellationToken);
+        IReadOnlyCollection<InboxEvent> result = await _sut.Read(1, cancellationToken);
 
         // Assert
         Assert.Empty(result);
@@ -106,10 +107,14 @@ public class InMemoryInboxTests
     {
         // Arrange
         var entryId = Guid.NewGuid();
+        var claimId = Guid.NewGuid();
         var cancelationToken = new CancellationToken();
 
-        // Act & Assert
-        await _sut.MarkAsHandled(entryId, cancelationToken);
+        // Act
+        bool result = await _sut.MarkAsHandled(entryId, claimId, cancelationToken);
+
+        // Assert
+        Assert.True(result);
     }
 
     [Fact]
@@ -117,10 +122,14 @@ public class InMemoryInboxTests
     {
         // Arrange
         var entryId = Guid.NewGuid();
+        var claimId = Guid.NewGuid();
         var cancelationToken = new CancellationToken();
 
-        // Act & Assert
-        await _sut.MarkAsFailed(entryId, cancelationToken);
+        // Act
+        bool result = await _sut.MarkAsFailed(entryId, claimId, cancelationToken);
+
+        // Assert
+        Assert.True(result);
     }
 
     private static SerializedRoutedEvent CreateSerializedRoutedEvent()

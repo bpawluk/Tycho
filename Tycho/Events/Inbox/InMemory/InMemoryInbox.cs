@@ -28,16 +28,16 @@ namespace Tycho.Events.Inbox.InMemory
             return Task.CompletedTask;
         }
 
-        public Task<IReadOnlyCollection<RoutedEvent>> Read(int count, CancellationToken cancellationToken = default)
+        public Task<IReadOnlyCollection<InboxEvent>> Read(int count, CancellationToken cancellationToken = default)
         {
-            var events = new List<RoutedEvent>();
+            var events = new List<InboxEvent>();
 
             for (int i = 0; i < count; i++)
             {
                 if (_entries.TryDequeue(out SerializedRoutedEvent? nextEntry))
                 {
                     RoutedEvent deserializedEvent = _eventSerializer.Deserialize(nextEntry);
-                    events.Add(deserializedEvent);
+                    events.Add(new InboxEvent(Guid.Empty, deserializedEvent));
                 }
                 else
                 {
@@ -45,17 +45,17 @@ namespace Tycho.Events.Inbox.InMemory
                 }
             }
 
-            return Task.FromResult<IReadOnlyCollection<RoutedEvent>>(events);
+            return Task.FromResult<IReadOnlyCollection<InboxEvent>>(events);
         }
 
-        public Task MarkAsHandled(Guid eventId, CancellationToken cancellationToken = default)
+        public Task<bool> MarkAsHandled(Guid eventId, Guid claimId, CancellationToken cancellationToken = default)
         {
-            return Task.CompletedTask;
+            return Task.FromResult(true);
         }
 
-        public Task MarkAsFailed(Guid eventId, CancellationToken cancellationToken = default)
+        public Task<bool> MarkAsFailed(Guid eventId, Guid claimId, CancellationToken cancellationToken = default)
         {
-            return Task.CompletedTask;
+            return Task.FromResult(true);
         }
     }
 }

@@ -29,4 +29,10 @@ internal class InboxEntry
 
     [Required]
     public uint ProcessingAttempts { get; set; } = 0;
+
+    [Required]
+    public Guid ClaimId { get; set; } = Guid.Empty;
+
+    [Required]
+    public DateTime ClaimExpiration { get; set; } = DateTime.MinValue;
 }
