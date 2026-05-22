@@ -3,6 +3,7 @@ using Tycho.Apps;
 using Tycho.Events;
 using Tycho.IntegrationTests.UsingIndirectDefinitions.SUT.Handlers;
 using Tycho.IntegrationTests.UsingIndirectDefinitions.SUT.Helpers;
+using Tycho.IntegrationTests.UsingIndirectDefinitions.SUT.Modules;
 using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.UsingIndirectDefinitions.SUT;
@@ -13,6 +14,11 @@ public record TestRequestFromLocalStaticHelper : IRequest<string>;
 public record TestRequestFromHelperClass : IRequest<string>;
 public record TestRequestFromHelperStaticClass : IRequest<string>;
 public record TestRequestFromHelperExtension : IRequest<string>;
+public record TestRequestUsingLocalStructureModule : IRequest<string>;
+public record TestRequestUsingLocalStaticStructureModule : IRequest<string>;
+public record TestRequestUsingHelperClassStructureModule : IRequest<string>;
+public record TestRequestUsingHelperStaticStructureModule : IRequest<string>;
+public record TestRequestUsingHelperExtensionStructureModule : IRequest<string>;
 
 // Events
 public record TestEventFromLocalHelper() : IEvent;
@@ -32,6 +38,12 @@ public partial class TestApp : TychoApp
         helperClass.IAppContractHelperMethod(app);
         HelperStaticClass.IAppContractHelperStaticMethod(app);
         app.IAppContractHelperExtension();
+
+        app.Handles<TestRequestUsingLocalStructureModule, string, TestRequestUsingLocalStructureModuleHandler>();
+        app.Handles<TestRequestUsingLocalStaticStructureModule, string, TestRequestUsingLocalStaticStructureModuleHandler>();
+        app.Handles<TestRequestUsingHelperClassStructureModule, string, TestRequestUsingHelperClassStructureModuleHandler>();
+        app.Handles<TestRequestUsingHelperStaticStructureModule, string, TestRequestUsingHelperStaticStructureModuleHandler>();
+        app.Handles<TestRequestUsingHelperExtensionStructureModule, string, TestRequestUsingHelperExtensionStructureModuleHandler>();
     }
 
     protected override void DefineEvents(IAppEvents app)
@@ -44,7 +56,15 @@ public partial class TestApp : TychoApp
         app.IAppEventsHelperExtension();
     }
 
-    protected override void IncludeModules(IAppStructure app) { }
+    protected override void IncludeModules(IAppStructure app)
+    {
+        IAppStructureHelperLocalMethod(app);
+        IAppStructureHelperLocalStaticMethod(app);
+        var helperClass = new HelperClass();
+        helperClass.IAppStructureHelperMethod(app);
+        HelperStaticClass.IAppStructureHelperStaticMethod(app);
+        app.IAppStructureHelperExtension();
+    }
 
     protected override void RegisterServices(IServiceCollection app)
     {
@@ -63,6 +83,11 @@ public partial class TestApp : TychoApp
         app.Handles<TestEventFromLocalHelper, TestEventHandler>();
     }
 
+    private void IAppStructureHelperLocalMethod(IAppStructure app)
+    {
+        app.Uses<LocalHelperModule>();
+    }
+
 #pragma warning restore CA1822
 
     private static void IAppContractHelperLocalStaticMethod(IAppContract app)
@@ -73,5 +98,10 @@ public partial class TestApp : TychoApp
     private static void IAppEventsHelperLocalStaticMethod(IAppEvents app)
     {
         app.Handles<TestEventFromLocalStaticHelper, TestEventHandler>();
+    }
+
+    private static void IAppStructureHelperLocalStaticMethod(IAppStructure app)
+    {
+        app.Uses<LocalStaticHelperModule>();
     }
 }

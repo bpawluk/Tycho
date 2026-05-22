@@ -1,5 +1,6 @@
 using Tycho.Apps;
 using Tycho.IntegrationTests.UsingIndirectDefinitions.SUT.Handlers;
+using Tycho.IntegrationTests.UsingIndirectDefinitions.SUT.Modules;
 
 namespace Tycho.IntegrationTests.UsingIndirectDefinitions.SUT.Helpers;
 
@@ -16,6 +17,11 @@ internal class HelperClass
     public void IAppEventsHelperMethod(IAppEvents app)
     {
         app.Handles<TestEventFromHelperClass, TestEventHandler>();
+    }
+
+    public void IAppStructureHelperMethod(IAppStructure app)
+    {
+        app.Uses<HelperClassModule>();
     }
 
 #pragma warning restore CA1822
