@@ -31,7 +31,7 @@ public sealed class ConfiguringLoggingTests : IAsyncLifetime
         Assert.Contains("Beta", logger.Logs);
     }
 
-    private void ConfigureLogging(ILoggingBuilder builder)
+    private static void ConfigureLogging(ILoggingBuilder builder)
     {
         builder.ClearProviders();
         builder.AddProvider(new TestLoggerProvider());

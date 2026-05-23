@@ -110,6 +110,26 @@ public class TychoSourceGeneratorTests : VerifyBase
     }
 
     [Fact]
+    public Task AppWithIndirectDefinitions()
+    {
+        string[] sources =
+        [
+            "AppWithIndirectDefinitions/TestApp.cs",
+            "AppWithIndirectDefinitions/Helpers/HelperClass.cs",
+            "AppWithIndirectDefinitions/Helpers/HelperStaticClass.cs",
+            "AppWithIndirectDefinitions/Handlers/TestRequestHandler.cs",
+            "AppWithIndirectDefinitions/Handlers/TestEventHandler.cs",
+            "AppWithIndirectDefinitions/Modules/LocalHelperModule.cs",
+            "AppWithIndirectDefinitions/Modules/LocalStaticHelperModule.cs",
+            "AppWithIndirectDefinitions/Modules/HelperClassModule.cs",
+            "AppWithIndirectDefinitions/Modules/HelperStaticClassModule.cs",
+            "AppWithIndirectDefinitions/Modules/HelperExtensionModule.cs"
+        ];
+        GeneratorDriver driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    [Fact]
     public Task ModuleInGlobalNamespace()
     {
         string[] sources =

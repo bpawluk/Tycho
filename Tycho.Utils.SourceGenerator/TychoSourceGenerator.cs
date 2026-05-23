@@ -134,16 +134,48 @@ namespace Tycho.Utils.SourceGenerator
         private static ImmutableEquatableArray<MethodInvocationModel> GetMethodBody(GeneratorAttributeSyntaxContext context, IMethodSymbol methodSymbol, CancellationToken token)
         {
             var methodInvocations = new HashSet<MethodInvocationModel>();
-            foreach (SyntaxReference syntaxRef in methodSymbol.DeclaringSyntaxReferences)
+            var visitedMethods = new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default);
+            CollectMethodInvocations(
+                context.SemanticModel.Compilation,
+                methodSymbol,
+                methodInvocations,
+                visitedMethods,
+                token);
+            return methodInvocations.ToImmutableEquatableArray();
+        }
+
+        private static void CollectMethodInvocations(
+            Compilation compilation,
+            IMethodSymbol methodSymbol,
+            HashSet<MethodInvocationModel> methodInvocations,
+            HashSet<IMethodSymbol> visitedMethods,
+            CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+
+            IMethodSymbol traversedMethodSymbol = methodSymbol.ReducedFrom ?? methodSymbol;
+            if (!visitedMethods.Add(traversedMethodSymbol))
             {
-                if (!(syntaxRef.GetSyntax(token) is MethodDeclarationSyntax methodSyntax) || methodSyntax.Body == null)
+                return;
+            }
+
+            foreach (SyntaxReference syntaxRef in traversedMethodSymbol.DeclaringSyntaxReferences)
+            {
+                token.ThrowIfCancellationRequested();
+                if (!(syntaxRef.GetSyntax(token) is MethodDeclarationSyntax methodSyntax))
                 {
                     continue;
                 }
-                SemanticModel semanticModel = context.SemanticModel.Compilation.GetSemanticModel(methodSyntax.SyntaxTree);
 
-                foreach (InvocationExpressionSyntax invocationSyntax in methodSyntax.Body.DescendantNodes().OfType<InvocationExpressionSyntax>())
+                SemanticModel semanticModel = compilation.GetSemanticModel(methodSyntax.SyntaxTree);
+
+                IEnumerable<InvocationExpressionSyntax> invocationExpressions =
+                    (methodSyntax.Body?.DescendantNodes().OfType<InvocationExpressionSyntax>() ?? Enumerable.Empty<InvocationExpressionSyntax>())
+                        .Concat(methodSyntax.ExpressionBody?.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>() ?? Enumerable.Empty<InvocationExpressionSyntax>());
+
+                foreach (InvocationExpressionSyntax invocationSyntax in invocationExpressions)
                 {
+                    token.ThrowIfCancellationRequested();
                     SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(invocationSyntax, token);
                     ISymbol symbol = symbolInfo.Symbol ?? symbolInfo.CandidateSymbols.FirstOrDefault();
 
@@ -152,19 +184,28 @@ namespace Tycho.Utils.SourceGenerator
                         continue;
                     }
 
+                    IMethodSymbol methodInvocationSymbol = invokedMethodSymbol.ReducedFrom ?? invokedMethodSymbol;
                     methodInvocations.Add(
                         new MethodInvocationModel(
-                            GetMethodSignatureModel(invokedMethodSymbol),
+                            GetMethodSignatureModel(methodInvocationSymbol),
                             invokedMethodSymbol.ReceiverType is ISymbol receiverSymbol
                                 ? GetTypeModel(receiverSymbol)
                                 : default,
                             invokedMethodSymbol.TypeParameters
                                 .Zip(invokedMethodSymbol.TypeArguments, GetTypeArgumentModel)
                                 .ToImmutableEquatableArray()));
+
+                    if (methodInvocationSymbol.DeclaringSyntaxReferences.Length > 0)
+                    {
+                        CollectMethodInvocations(
+                            compilation,
+                            methodInvocationSymbol,
+                            methodInvocations,
+                            visitedMethods,
+                            token);
+                    }
                 }
             }
-
-            return methodInvocations.ToImmutableEquatableArray();
         }
 
         private static TypeModel GetTypeModel(ISymbol symbol)

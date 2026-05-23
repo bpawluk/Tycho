@@ -1,0 +1,23 @@
+using Tycho.Apps;
+using Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefinitions.Handlers;
+using Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefinitions.Modules;
+
+namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefinitions.Helpers;
+
+internal class HelperClass
+{
+    public void DefineContract(IAppContract app)
+    {
+        app.Handles<TestRequestFromHelperClass, string, TestRequestHandler>();
+    }
+
+    public void DefineEvents(IAppEvents app)
+    {
+        app.Handles<TestEventFromHelperClass, TestEventHandler>();
+    }
+
+    public void IncludeModules(IAppStructure app)
+    {
+        app.Uses<HelperClassModule>();
+    }
+}
