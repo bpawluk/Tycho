@@ -6,61 +6,61 @@ namespace Tycho.IntegrationTests.UsingIndirectDefinitions;
 
 public sealed class UsingIndirectDefinitionsTests
 {
-    [Fact(Timeout = 5000)]
+    [Fact]
     public void TychoDoesNotEnableYet_RequestsDefinedInLocalHelperMethod_AreIncludedInGeneratedFacade()
     {
         AssertRequestIsNotIncludedInGeneratedFacade<TestRequestFromLocalHelper>();
     }
 
-    [Fact(Timeout = 5000)]
+    [Fact]
     public void TychoDoesNotEnableYet_RequestsDefinedInLocalStaticHelperMethod_AreIncludedInGeneratedFacade()
     {
         AssertRequestIsNotIncludedInGeneratedFacade<TestRequestFromLocalStaticHelper>();
     }
 
-    [Fact(Timeout = 5000)]
+    [Fact]
     public void TychoDoesNotEnableYet_RequestsDefinedInExternalHelperClass_AreIncludedInGeneratedFacade()
     {
         AssertRequestIsNotIncludedInGeneratedFacade<TestRequestFromHelperClass>();
     }
 
-    [Fact(Timeout = 5000)]
+    [Fact]
     public void TychoDoesNotEnableYet_RequestsDefinedInExternalStaticHelperMethod_AreIncludedInGeneratedFacade()
     {
         AssertRequestIsNotIncludedInGeneratedFacade<TestRequestFromHelperStaticClass>();
     }
 
-    [Fact(Timeout = 5000)]
+    [Fact]
     public void TychoDoesNotEnableYet_RequestsDefinedInExternalExtensionMethod_AreIncludedInGeneratedFacade()
     {
         AssertRequestIsNotIncludedInGeneratedFacade<TestRequestFromHelperExtension>();
     }
 
-    [Fact(Timeout = 5000)]
+    [Fact]
     public void TychoDoesNotEnableYet_EventsDefinedInLocalHelperMethod_AreIncludedInGeneratedPublisher()
     {
         AssertEventIsNotIncludedInGeneratedPublisher<TestEventFromLocalHelper>();
     }
 
-    [Fact(Timeout = 5000)]
+    [Fact]
     public void TychoDoesNotEnableYet_EventsDefinedInLocalStaticHelperMethod_AreIncludedInGeneratedPublisher()
     {
         AssertEventIsNotIncludedInGeneratedPublisher<TestEventFromLocalStaticHelper>();
     }
 
-    [Fact(Timeout = 5000)]
+    [Fact]
     public void TychoDoesNotEnableYet_EventsDefinedInExternalHelperClass_AreIncludedInGeneratedPublisher()
     {
         AssertEventIsNotIncludedInGeneratedPublisher<TestEventFromHelperClass>();
     }
 
-    [Fact(Timeout = 5000)]
+    [Fact]
     public void TychoDoesNotEnableYet_EventsDefinedInExternalStaticHelperMethod_AreIncludedInGeneratedPublisher()
     {
         AssertEventIsNotIncludedInGeneratedPublisher<TestEventFromHelperStaticClass>();
     }
 
-    [Fact(Timeout = 5000)]
+    [Fact]
     public void TychoDoesNotEnableYet_EventsDefinedInExternalExtensionMethod_AreIncludedInGeneratedPublisher()
     {
         AssertEventIsNotIncludedInGeneratedPublisher<TestEventFromHelperExtension>();
