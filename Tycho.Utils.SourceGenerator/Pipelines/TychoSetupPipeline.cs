@@ -38,7 +38,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                     outputContext.GenerateSourceFromTemplate(
                         CreateTemplateModel(model),
                         ChooseTemplate(model),
-                        $"{model.DefinitionType.HintName}.Setup.g.cs");
+                        $"{model.DefinitionType.FullMetadataName}.Setup.g.cs");
                 });
 
             return context;

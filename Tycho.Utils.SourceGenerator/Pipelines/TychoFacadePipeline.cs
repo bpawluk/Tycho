@@ -40,12 +40,12 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                     outputContext.GenerateSourceFromTemplate(
                         CreateInterfaceTemplateModel(model),
                         ChooseInterfaceTemplate(model.DefinitionKind),
-                        $"{model.DefinitionType.HintName}.Facade.Interface.g.cs");
+                        $"{model.DefinitionType.FullMetadataName}.Facade.Interface.g.cs");
 
                     outputContext.GenerateSourceFromTemplate(
                         CreateFacadeTemplateModel(model),
                         ChooseFacadeTemplate(model.DefinitionKind),
-                        $"{model.DefinitionType.HintName}.Facade.g.cs");
+                        $"{model.DefinitionType.FullMetadataName}.Facade.g.cs");
                 });
 
             return context;

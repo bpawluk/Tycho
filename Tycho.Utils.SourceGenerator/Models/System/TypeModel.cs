@@ -32,11 +32,11 @@ namespace Tycho.Utils.SourceGenerator.Models.System
             .Select(type => type.DeclarationSignature)
             .ToImmutableEquatableArray();
 
-        public string PathName => BuildPath(
+        public string FullReferenceName => BuildPath(
             ContainingTypes.Select(type => type.ReferenceName).ToImmutableEquatableArray(),
             ReferenceName);
 
-        public string HintName => BuildPath(
+        public string FullMetadataName => BuildPath(
             ContainingTypes.Select(type => type.MetadataName).ToImmutableEquatableArray(),
             MetadataName,
             Namespace);
@@ -94,7 +94,7 @@ namespace Tycho.Utils.SourceGenerator.Models.System
                 TypeArguments.GetHashCode());
         }
 
-        public override string ToString() => string.IsNullOrEmpty(Namespace) ? PathName : $"{Namespace}.{PathName}";
+        public override string ToString() => string.IsNullOrEmpty(Namespace) ? FullReferenceName : $"{Namespace}.{FullReferenceName}";
 
         public static bool operator ==(TypeModel left, TypeModel right) => left.Equals(right);
 
@@ -105,14 +105,11 @@ namespace Tycho.Utils.SourceGenerator.Models.System
             return values.Count == 0 ? string.Empty : $"<{string.Join(", ", values)}>";
         }
 
-        private static string BuildPath(ImmutableEquatableArray<string> containingSegments, string leafSegment, string prefix = null)
+        private static string BuildPath(ImmutableEquatableArray<string> containingTypes, string typeName, string namespaceName = null)
         {
-            string containingPath = containingSegments.Count == 0
-                ? string.Empty
-                : string.Join(".", containingSegments.Where(segment => !string.IsNullOrWhiteSpace(segment)));
-
-            string path = string.IsNullOrEmpty(containingPath) ? leafSegment : $"{containingPath}.{leafSegment}";
-            return string.IsNullOrEmpty(prefix) ? path : $"{prefix}.{path}";
+            string containingPart = containingTypes.Count == 0 ? string.Empty : string.Join(".", containingTypes.Where(segment => !string.IsNullOrWhiteSpace(segment)));
+            string containingAndNamePart = string.IsNullOrEmpty(containingPart) ? typeName : $"{containingPart}.{typeName}";
+            return string.IsNullOrEmpty(namespaceName) ? containingAndNamePart : $"{namespaceName}.{containingAndNamePart}";
         }
     }
 }

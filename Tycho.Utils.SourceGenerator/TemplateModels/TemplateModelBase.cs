@@ -17,7 +17,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             {
                 _namespaces.Add(typeModel.Namespace);
             }
-            return typeModel.PathName;
+            return typeModel.FullReferenceName;
         }
     }
 }

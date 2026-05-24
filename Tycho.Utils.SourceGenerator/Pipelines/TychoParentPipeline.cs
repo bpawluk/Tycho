@@ -36,12 +36,12 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                     outputContext.GenerateSourceFromTemplate(
                         new ModuleParentInterfaceTM(model),
                         s_moduleParentInterfaceTemplate,
-                        $"{model.DefinitionType.HintName}.Parent.Interface.g.cs");
+                        $"{model.DefinitionType.FullMetadataName}.Parent.Interface.g.cs");
 
                     outputContext.GenerateSourceFromTemplate(
                         new ModuleParentTM(model),
                         s_moduleParentTemplate,
-                        $"{model.DefinitionType.HintName}.Parent.g.cs");
+                        $"{model.DefinitionType.FullMetadataName}.Parent.g.cs");
                 });
 
             return context;
