@@ -157,6 +157,10 @@ namespace Tycho.Utils.SourceGenerator
                     continue;
                 }
 
+                if (!compilation.ContainsSyntaxTree(methodSyntax.SyntaxTree))
+                {
+                    continue;
+                }
                 SemanticModel semanticModel = compilation.GetSemanticModel(methodSyntax.SyntaxTree);
 
                 IEnumerable<InvocationExpressionSyntax> invocationExpressions =
@@ -185,7 +189,7 @@ namespace Tycho.Utils.SourceGenerator
                                 .Zip(invokedMethodSymbol.TypeArguments, GetTypeArgumentModel)
                                 .ToImmutableEquatableArray()));
 
-                    if (methodInvocationSymbol.DeclaringSyntaxReferences.Length > 0)
+                    if (methodInvocationSymbol.DeclaringSyntaxReferences.Any(syntaxReference => compilation.ContainsSyntaxTree(syntaxReference.SyntaxTree)))
                     {
                         CollectMethodInvocations(
                             compilation,
