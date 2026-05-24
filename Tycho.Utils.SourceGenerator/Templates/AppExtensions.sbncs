@@ -1,7 +1,6 @@
 {{~#--------- Calculate indentation ---------#~}}
 {{~ ns_offset = namespace != "" ? 1 : 0 ~}}
-{{~ ct_count = array.size containing_types ~}}
-{{~ bi = ns_offset + ct_count ~}}
+{{~ bi = ns_offset ~}}
 {{~ i0 = string.pad_left "" (bi * 4) ~}}
 {{~ i1 = string.pad_left "" ((bi + 1) * 4) ~}}
 {{~ i2 = string.pad_left "" ((bi + 2) * 4) ~}}
@@ -16,12 +15,6 @@ using {{ used_namespace }};
 {{~ if namespace != "" ~}}
 namespace {{ namespace }}
 {
-{{~ end ~}}
-{{~#-----------------------------------------#~}}
-{{~#---------- Declare outer types ----------#~}}
-{{~ for containing_type in containing_types ~}}
-{{ string.pad_left "" ((ns_offset + for.index) * 4) }}public partial class {{ containing_type }}
-{{ string.pad_left "" ((ns_offset + for.index) * 4) }}{
 {{~ end ~}}
 {{~#-----------------------------------------#~}}
 {{~#-------------------------------------------------- APP EXTENSIONS --------------------------------------------------#~}}
@@ -53,11 +46,6 @@ namespace {{ namespace }}
 {{   i1   }}}
 {{ i0 }}}
 {{~#--------------------------------------------------------------------------------------------------------------------#~}}
-{{~#------- Close outer type brackets -------#~}}
-{{~ for containing_type in containing_types ~}}
-{{ string.pad_left "" ((bi - 1 - for.index) * 4) }}}
-{{~ end ~}}
-{{~#-----------------------------------------#~}}
 {{~#-------- Close namespace bracket --------#~}}
 {{~ if namespace != "" ~}}
 }

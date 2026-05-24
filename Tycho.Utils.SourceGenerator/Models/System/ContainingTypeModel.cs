@@ -6,6 +6,10 @@ namespace Tycho.Utils.SourceGenerator.Models.System
 {
     public readonly struct ContainingTypeModel : IEquatable<ContainingTypeModel>
     {
+        public TypeKind Kind { get; }
+
+        public ImmutableEquatableArray<string> Modifiers { get; }
+
         public string Name { get; }
 
         public ImmutableEquatableArray<string> TypeParameters { get; }
@@ -24,26 +28,18 @@ namespace Tycho.Utils.SourceGenerator.Models.System
 
         public string MetadataName => TypeParameters.Count > 0 ? $"{Name}`{TypeParameters.Count}" : Name;
 
-        public string DeclarationSignature
-        {
-            get
-            {
-                ImmutableEquatableArray<string> constraints = TypeParameterConstraintClauses;
-                if (constraints.Count == 0)
-                {
-                    return DeclarationName;
-                }
-
-                return $"{DeclarationName} {string.Join(" ", constraints.Where(clause => !string.IsNullOrWhiteSpace(clause)))}";
-            }
-        }
+        public string DeclarationSignature => BuildTypeDeclaration();
 
         public ContainingTypeModel(
+            TypeKind kind,
+            ImmutableEquatableArray<string> modifiers,
             string typeName,
             ImmutableEquatableArray<string> typeParameters,
             ImmutableEquatableArray<string> typeParameterConstraintClauses,
             ImmutableEquatableArray<string> typeArguments)
         {
+            Kind = kind;
+            Modifiers = modifiers ?? ImmutableEquatableArray<string>.Empty;
             Name = typeName;
             TypeParameters = typeParameters ?? ImmutableEquatableArray<string>.Empty;
             TypeParameterConstraintClauses = typeParameterConstraintClauses ?? ImmutableEquatableArray<string>.Empty;
@@ -52,7 +48,9 @@ namespace Tycho.Utils.SourceGenerator.Models.System
 
         public bool Equals(ContainingTypeModel other)
         {
-            return string.Equals(Name, other.Name, StringComparison.Ordinal)
+            return Kind == other.Kind
+                && Modifiers.Equals(other.Modifiers)
+                && string.Equals(Name, other.Name, StringComparison.Ordinal)
                 && TypeParameters.Equals(other.TypeParameters)
                 && TypeParameterConstraintClauses.Equals(other.TypeParameterConstraintClauses)
                 && TypeArguments.Equals(other.TypeArguments);
@@ -66,6 +64,8 @@ namespace Tycho.Utils.SourceGenerator.Models.System
         public override int GetHashCode()
         {
             return HashCode.Combine(
+                Kind.GetHashCode(),
+                Modifiers.GetHashCode(),
                 StringComparer.Ordinal.GetHashCode(Name ?? string.Empty),
                 TypeParameters.GetHashCode(),
                 TypeParameterConstraintClauses.GetHashCode(),
@@ -79,6 +79,26 @@ namespace Tycho.Utils.SourceGenerator.Models.System
         private static string BuildTypeSuffix(ImmutableEquatableArray<string> values)
         {
             return values.Count == 0 ? string.Empty : $"<{string.Join(", ", values)}>";
+        }
+
+        private string BuildTypeDeclaration()
+        {
+            string kindKeyword = Kind switch
+            {
+                TypeKind.Interface => "interface",
+                TypeKind.Struct => "struct",
+                TypeKind.RecordClass => "record class",
+                TypeKind.RecordStruct => "record struct",
+                _ => "class"
+            };
+
+            string modifiersPart = string.Join(" ", Modifiers.Where(modifier => !string.IsNullOrWhiteSpace(modifier)));
+            string prefix = string.IsNullOrEmpty(modifiersPart) ? kindKeyword : $"{modifiersPart} {kindKeyword}";
+
+            string constraintsPart = string.Join(" ", TypeParameterConstraintClauses.Where(clause => !string.IsNullOrWhiteSpace(clause)));
+            string declaration = $"{prefix} {DeclarationName}".Trim();
+
+            return string.IsNullOrEmpty(constraintsPart) ? declaration : $"{declaration} {constraintsPart}";
         }
     }
 }

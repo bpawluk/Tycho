@@ -29,11 +29,20 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public AppExtensionsTM(TychoExtensionsModel tychoExtensionsModel)
         {
+            string[] allTypeParameters = tychoExtensionsModel.DefinitionType.ContainingTypes
+                .SelectMany(containingType => containingType.TypeParameters)
+                .Concat(tychoExtensionsModel.DefinitionType.TypeParameters)
+                .Distinct()
+                .ToArray();
             Namespace = tychoExtensionsModel.DefinitionType.Namespace;
             ContainingTypes = tychoExtensionsModel.DefinitionType.ContainingTypeDeclarationSignatures.ToArray();
-            OwnerConstraints = tychoExtensionsModel.DefinitionType.TypeParameterConstraintClauses.ToArray();
+            OwnerConstraints = tychoExtensionsModel.DefinitionType.ContainingTypes
+                .SelectMany(containingType => containingType.TypeParameterConstraintClauses)
+                .Concat(tychoExtensionsModel.DefinitionType.TypeParameterConstraintClauses)
+                .Distinct()
+                .ToArray();
             Classes = new ClassesTM(this, tychoExtensionsModel);
-            TypeParametersSuffix = tychoExtensionsModel.DefinitionType.TypeParametersSuffix;
+            TypeParametersSuffix = allTypeParameters.Length == 0 ? string.Empty : $"<{string.Join(", ", allTypeParameters)}>";
             Interfaces = new InterfacesTM(this);
             Methods = new MethodsTM(tychoExtensionsModel);
             Properties = new PropertiesTM();
@@ -51,7 +60,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public ClassesTM(AppExtensionsTM owner, TychoExtensionsModel tychoExtensionsModel)
             {
                 string appNameStem = tychoExtensionsModel.DefinitionType.Name;
-                AppClass = tychoExtensionsModel.DefinitionType.ReferenceName;
+                AppClass = tychoExtensionsModel.DefinitionType.FullReferenceName;
                 SetupExtensionsClass = AppExtensionsSymbols.GetAppSetupExtensionsClass(appNameStem);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 LoggingConfigurationClass = owner.UseType(LoggingConfigurationReference.TypeModel);

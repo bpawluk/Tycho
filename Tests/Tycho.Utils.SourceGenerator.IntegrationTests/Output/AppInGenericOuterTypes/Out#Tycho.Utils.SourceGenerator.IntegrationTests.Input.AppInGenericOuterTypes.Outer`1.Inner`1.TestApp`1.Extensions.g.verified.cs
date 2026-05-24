@@ -1,10 +1,10 @@
-﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInNamespaceAndOuterTypes.Outer.Inner.TestApp.Extensions.g.cs
+﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInGenericOuterTypes.Outer`1.Inner`1.TestApp`1.Extensions.g.cs
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Threading.Tasks;
 using Tycho.Logging;
 
-namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInNamespaceAndOuterTypes
+namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInGenericOuterTypes
 {
     /// <summary>
     /// Extension methods for setting up Tycho applications.
@@ -17,7 +17,10 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInNamespaceAndOu
         /// <param name="builder">The host application builder to extend.</param>
         /// <param name="app">An instance of the application to run.</param>
         /// <returns>The host application builder.</returns>
-        public static async Task<IHostApplicationBuilder> AddTestApp(this IHostApplicationBuilder builder, Outer.Inner.TestApp app)
+        public static async Task<IHostApplicationBuilder> AddTestApp<TOuter, TInner, TApp>(this IHostApplicationBuilder builder, Outer<TOuter>.Inner<TInner>.TestApp<TApp> app)
+            where TOuter : class
+            where TInner : notnull
+            where TApp : new()
         {
             var appInstance = await app
                 .WithConfiguration(builder.Configuration)

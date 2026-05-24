@@ -54,6 +54,17 @@ public class TychoSourceGeneratorTests : VerifyBase
     }
 
     [Fact]
+    public Task AppInGenericOuterTypes()
+    {
+        string[] sources =
+        [
+            "AppInGenericOuterTypes/TestApp.cs"
+        ];
+        GeneratorDriver driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    [Fact]
     public Task AppWithGenericDefinition()
     {
         string[] sources =
@@ -190,6 +201,17 @@ public class TychoSourceGeneratorTests : VerifyBase
         string[] sources =
         [
             "ModuleInNamespaceAndOuterTypes/TestModule.cs"
+        ];
+        GeneratorDriver driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    [Fact]
+    public Task ModuleInGenericOuterTypes()
+    {
+        string[] sources =
+        [
+            "ModuleInGenericOuterTypes/TestModule.cs"
         ];
         GeneratorDriver driver = RunGenerator(sources);
         return Verify(driver);

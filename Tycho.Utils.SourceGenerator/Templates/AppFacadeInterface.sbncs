@@ -18,7 +18,7 @@ namespace {{ namespace }}
 {{~#-----------------------------------------#~}}
 {{~#---------- Declare outer types ----------#~}}
 {{~ for containing_type in containing_types ~}}
-{{ string.pad_left "" ((ns_offset + for.index) * 4) }}public partial class {{ containing_type }}
+{{ string.pad_left "" ((ns_offset + for.index) * 4) }}{{ containing_type }}
 {{ string.pad_left "" ((ns_offset + for.index) * 4) }}{
 {{~ end ~}}
 {{~#-----------------------------------------#~}}
