@@ -8,6 +8,6 @@ namespace Tycho.Utils.SourceGenerator.References.Microsoft
         private const string Namespace = "Microsoft.Extensions.Logging";
         private const string TypeName = "ILoggingBuilder";
 
-        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace,TypeName);
     }
 }

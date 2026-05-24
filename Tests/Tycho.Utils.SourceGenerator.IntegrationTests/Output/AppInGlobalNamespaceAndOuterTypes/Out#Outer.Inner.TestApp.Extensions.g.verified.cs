@@ -11,7 +11,7 @@ public partial class Outer
         /// <summary>
         /// Extension methods for setting up Tycho applications.
         /// </summary>
-        public static class TestAppSetupExtensions
+        public static partial class TestAppSetupExtensions
         {
             /// <summary>
             /// Sets up and runs the specified Tycho application and registers it in the host application builder.

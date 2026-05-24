@@ -16,8 +16,6 @@ namespace Tycho.Utils.SourceGenerator
     [Generator]
     public sealed class TychoSourceGenerator : IIncrementalGenerator
     {
-        private static readonly SymbolDisplayFormat s_minimallyQualifiedDisplayFormat = SymbolDisplayFormat.MinimallyQualifiedFormat;
-
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             IncrementalValuesProvider<(TychoDefinitionKind, ClassDefinitionModel)> tychoPipelineBase = context.SyntaxProvider.ForAttributeWithMetadataName(
@@ -218,93 +216,62 @@ namespace Tycho.Utils.SourceGenerator
                     .FullyQualifiedFormat
                     .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted));
 
-            var containingTypes = new Stack<string>();
-            var containingMetadataNames = new Stack<string>();
-            var containingTypeDeclarations = new Stack<string>();
-            var containingTypeDeclarationSignatures = new Stack<string>();
-            var containingTypeReferences = new Stack<string>();
-            for (INamedTypeSymbol current = symbol.ContainingType; current != null; current = current.ContainingType)
-            {
-                containingTypes.Push(current.Name);
-                containingMetadataNames.Push(current.MetadataName);
-                containingTypeDeclarations.Push(GetTypeDeclarationName(current));
-                containingTypeDeclarationSignatures.Push(GetTypeDeclarationSignature(current));
-                containingTypeReferences.Push(GetTypeReferenceName(current));
-            }
-
             if (symbol is INamedTypeSymbol namedSymbol)
             {
+                var containingTypes = new Stack<ContainingTypeModel>();
+
+                for (INamedTypeSymbol containingTypeSymbol = symbol.ContainingType;
+                    containingTypeSymbol != null;
+                    containingTypeSymbol = containingTypeSymbol.ContainingType)
+                {
+                    containingTypes.Push(new ContainingTypeModel(
+                        containingTypeSymbol.Name,
+                        GetTypeParameters(containingTypeSymbol),
+                        GetTypeParameterConstraintClauses(containingTypeSymbol),
+                        GetTypeArguments(containingTypeSymbol)));
+                }
+
                 return new TypeModel(
                     typeNamespace,
                     containingTypes.ToImmutableEquatableArray(),
-                    containingMetadataNames.ToImmutableEquatableArray(),
-                    containingTypeDeclarations.ToImmutableEquatableArray(),
-                    containingTypeDeclarationSignatures.ToImmutableEquatableArray(),
-                    containingTypeReferences.ToImmutableEquatableArray(),
                     namedSymbol.Name,
-                    namedSymbol.MetadataName,
-                    namedSymbol.Arity,
-                    GetTypeParametersSuffix(namedSymbol),
-                    GetTypeArgumentsSuffix(namedSymbol),
-                    GetTypeParameterConstraintClauses(namedSymbol));
+                    GetTypeParameters(namedSymbol),
+                    GetTypeParameterConstraintClauses(namedSymbol),
+                    GetTypeArguments(namedSymbol));
             }
 
-            string symbolName = symbol.ToDisplayString(s_minimallyQualifiedDisplayFormat);
+            string typeName = symbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
             return new TypeModel(
                 typeNamespace,
-                containingTypes.ToImmutableEquatableArray(),
-                containingMetadataNames.ToImmutableEquatableArray(),
-                containingTypeDeclarations.ToImmutableEquatableArray(),
-                containingTypeDeclarationSignatures.ToImmutableEquatableArray(),
-                containingTypeReferences.ToImmutableEquatableArray(),
-                symbolName,
-                symbolName,
-                0,
-                string.Empty,
-                string.Empty,
+                ImmutableEquatableArray<ContainingTypeModel>.Empty,
+                typeName,
+                ImmutableEquatableArray<string>.Empty,
+                ImmutableEquatableArray<string>.Empty,
                 ImmutableEquatableArray<string>.Empty);
         }
 
-        private static string GetTypeDeclarationName(INamedTypeSymbol typeSymbol)
-        {
-            return $"{typeSymbol.Name}{GetTypeParametersSuffix(typeSymbol)}";
-        }
-
-        private static string GetTypeDeclarationSignature(INamedTypeSymbol typeSymbol)
-        {
-            string declarationName = GetTypeDeclarationName(typeSymbol);
-            ImmutableEquatableArray<string> constraintClauses = GetTypeParameterConstraintClauses(typeSymbol);
-            if (constraintClauses.Count == 0)
-            {
-                return declarationName;
-            }
-
-            return $"{declarationName} {string.Join(" ", constraintClauses)}";
-        }
-
-        private static string GetTypeReferenceName(INamedTypeSymbol typeSymbol)
-        {
-            return $"{typeSymbol.Name}{GetTypeArgumentsSuffix(typeSymbol)}";
-        }
-
-        private static string GetTypeParametersSuffix(INamedTypeSymbol typeSymbol)
+        private static ImmutableEquatableArray<string> GetTypeParameters(INamedTypeSymbol typeSymbol)
         {
             if (typeSymbol.TypeParameters.Length == 0)
             {
-                return string.Empty;
+                return ImmutableEquatableArray<string>.Empty;
             }
 
-            return $"<{string.Join(", ", typeSymbol.TypeParameters.Select(parameter => parameter.Name))}>";
+            return typeSymbol.TypeParameters
+                .Select(parameter => parameter.Name)
+                .ToImmutableEquatableArray();
         }
 
-        private static string GetTypeArgumentsSuffix(INamedTypeSymbol typeSymbol)
+        private static ImmutableEquatableArray<string> GetTypeArguments(INamedTypeSymbol typeSymbol)
         {
             if (typeSymbol.TypeArguments.Length == 0)
             {
-                return string.Empty;
+                return ImmutableEquatableArray<string>.Empty;
             }
 
-            return $"<{string.Join(", ", typeSymbol.TypeArguments.Select(GetTypeArgumentReferenceName))}>";
+            return typeSymbol.TypeArguments
+                .Select(GetTypeArgumentReferenceName)
+                .ToImmutableEquatableArray();
         }
 
         private static string GetTypeArgumentReferenceName(ITypeSymbol typeArgument)
@@ -314,7 +281,7 @@ namespace Tycho.Utils.SourceGenerator
                 return typeParameter.Name;
             }
 
-            return typeArgument.ToDisplayString(s_minimallyQualifiedDisplayFormat);
+            return typeArgument.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
         }
 
         private static ImmutableEquatableArray<string> GetTypeParameterConstraintClauses(INamedTypeSymbol typeSymbol)
@@ -344,8 +311,8 @@ namespace Tycho.Utils.SourceGenerator
             }
             else if (typeParameter.HasReferenceTypeConstraint)
             {
-                string nullableConstraint = typeParameter.ReferenceTypeConstraintNullableAnnotation == NullableAnnotation.Annotated ? "class?" : "class";
-                constraints.Add(nullableConstraint);
+                string referenceTypeConstraint = typeParameter.ReferenceTypeConstraintNullableAnnotation == NullableAnnotation.Annotated ? "class?" : "class";
+                constraints.Add(referenceTypeConstraint);
             }
 
             if (typeParameter.HasNotNullConstraint && !constraints.Contains("notnull"))
@@ -355,13 +322,7 @@ namespace Tycho.Utils.SourceGenerator
 
             foreach (ITypeSymbol constraintType in typeParameter.ConstraintTypes)
             {
-                string typeConstraint = constraintType.ToDisplayString(s_minimallyQualifiedDisplayFormat);
-                if (string.Equals(typeConstraint, nameof(System.ValueType), System.StringComparison.Ordinal) || string.Equals(typeConstraint, "System.ValueType", System.StringComparison.Ordinal))
-                {
-                    continue;
-                }
-
-                constraints.Add(typeConstraint);
+                constraints.Add(constraintType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat));
             }
 
             if (typeParameter.HasConstructorConstraint)

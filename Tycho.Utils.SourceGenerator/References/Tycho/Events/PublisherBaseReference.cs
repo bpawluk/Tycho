@@ -9,7 +9,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Events
         private const string Namespace = "Tycho.Events.Publishing";
         private const string TypeName = "PublisherBase";
 
-        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace,TypeName);
 
         public static MethodSignatureModel PublishAsyncMethodSignature => new MethodSignatureModel(
             methodName: "PublishAsync",

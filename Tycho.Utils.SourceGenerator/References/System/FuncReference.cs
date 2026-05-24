@@ -6,6 +6,6 @@ namespace Tycho.Utils.SourceGenerator.References.System
 {
     internal static class FuncReference
     {
-        public static TypeModel TypeModel { get; } = new TypeModel(typeof(Func<object>).Namespace, ImmutableEquatableArray<string>.Empty, nameof(Func<object>));
+        public static TypeModel TypeModel { get; } = new TypeModel(typeof(Func<object>).Namespace,nameof(Func<object>));
     }
 }

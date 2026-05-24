@@ -23,7 +23,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
         public static string RequestTypeParameterName => "TRequest";
         public static string ResponseTypeParameterName => "TResponse";
 
-        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace,TypeName);
 
         public static MethodSignatureModel ForwardsMethodSignature => new MethodSignatureModel(
             methodName: "Forwards",

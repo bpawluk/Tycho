@@ -6,6 +6,6 @@ namespace Tycho.Utils.SourceGenerator.References.System
 {
     internal static class ActionReference
     {
-        public static TypeModel TypeModel { get; } = new TypeModel(typeof(Action).Namespace, ImmutableEquatableArray<string>.Empty, nameof(Action));
+        public static TypeModel TypeModel { get; } = new TypeModel(typeof(Action).Namespace,nameof(Action));
     }
 }

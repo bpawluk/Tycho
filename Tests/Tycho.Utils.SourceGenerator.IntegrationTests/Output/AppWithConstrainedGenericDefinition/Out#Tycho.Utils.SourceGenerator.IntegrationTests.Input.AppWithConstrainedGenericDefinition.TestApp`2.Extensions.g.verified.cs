@@ -9,7 +9,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithConstrainedG
     /// <summary>
     /// Extension methods for setting up Tycho applications.
     /// </summary>
-    public static class TestApp2SetupExtensions
+    public static partial class TestAppSetupExtensions
     {
         /// <summary>
         /// Sets up and runs the specified Tycho application and registers it in the host application builder.

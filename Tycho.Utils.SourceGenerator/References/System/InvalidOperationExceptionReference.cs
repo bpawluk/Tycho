@@ -6,6 +6,6 @@ namespace Tycho.Utils.SourceGenerator.References.System
 {
     internal static class InvalidOperationExceptionReference
     {
-        public static TypeModel TypeModel { get; } = new TypeModel(typeof(InvalidOperationException).Namespace, ImmutableEquatableArray<string>.Empty, nameof(InvalidOperationException));
+        public static TypeModel TypeModel { get; } = new TypeModel(typeof(InvalidOperationException).Namespace,nameof(InvalidOperationException));
     }
 }

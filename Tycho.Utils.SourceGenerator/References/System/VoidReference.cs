@@ -5,6 +5,6 @@ namespace Tycho.Utils.SourceGenerator.References.System
 {
     internal static class VoidReference
     {
-        public static TypeModel TypeModel { get; } = new TypeModel(typeof(void).Namespace, ImmutableEquatableArray<string>.Empty, typeof(void).Name);
+        public static TypeModel TypeModel { get; } = new TypeModel(typeof(void).Namespace,typeof(void).Name);
     }
 }

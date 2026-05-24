@@ -8,7 +8,7 @@ namespace Tycho.Utils.SourceGenerator.References.Microsoft
         private const string Namespace = "Microsoft.Extensions.DependencyInjection";
         private const string TypeName = "ServiceCollectionServiceExtensions";
 
-        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace,TypeName);
 
         public static MethodSignatureModel AddSingletonMethodSignature => new MethodSignatureModel(
             methodName: "AddSingleton",

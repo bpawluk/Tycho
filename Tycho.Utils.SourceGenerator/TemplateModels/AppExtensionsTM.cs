@@ -50,7 +50,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public ClassesTM(AppExtensionsTM owner, TychoExtensionsModel tychoExtensionsModel)
             {
-                string appNameStem = tychoExtensionsModel.DefinitionType.NameWithArity;
+                string appNameStem = tychoExtensionsModel.DefinitionType.Name;
                 AppClass = tychoExtensionsModel.DefinitionType.ReferenceName;
                 SetupExtensionsClass = AppExtensionsSymbols.GetAppSetupExtensionsClass(appNameStem);
                 TaskClass = owner.UseType(TaskReference.TypeModel);

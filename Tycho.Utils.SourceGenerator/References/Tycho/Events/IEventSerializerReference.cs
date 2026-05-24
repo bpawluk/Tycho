@@ -8,6 +8,6 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Events
         private const string Namespace = "Tycho.Events.Serialization";
         private const string TypeName = "IEventSerializer";
 
-        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace,TypeName);
     }
 }

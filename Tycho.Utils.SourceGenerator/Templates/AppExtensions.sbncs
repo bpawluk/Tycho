@@ -28,7 +28,7 @@ namespace {{ namespace }}
 {{ i0 }}/// <summary>
 {{ i0 }}/// Extension methods for setting up Tycho applications.
 {{ i0 }}/// </summary>
-{{ i0 }}public static class {{ classes.setup_extensions_class }}
+{{ i0 }}public static partial class {{ classes.setup_extensions_class }}
 {{ i0 }}{
 {{   i1   }}/// <summary>
 {{   i1   }}/// Sets up and runs the specified Tycho application and registers it in the host application builder.

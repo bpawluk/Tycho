@@ -10,6 +10,6 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho
 
         public static string FullName => $"{Namespace}.{TypeName}";
 
-        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace,TypeName);
     }
 }

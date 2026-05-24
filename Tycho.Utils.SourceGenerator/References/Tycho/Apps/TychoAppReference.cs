@@ -12,7 +12,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
 
         public static string FullName => $"{Namespace}.{TypeName}";
 
-        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace,TypeName);
 
         public static MethodSignatureModel DefineContractMethodSignature => new MethodSignatureModel(
             methodName: "DefineContract",

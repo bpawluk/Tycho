@@ -21,7 +21,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
 
         public static string ModuleTypeParameterName => "TModule";
 
-        public static TypeModel TypeModel => new TypeModel(Namespace, ImmutableEquatableArray<string>.Empty, TypeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace,TypeName);
 
         public static MethodSignatureModel UsesMethodSignature => new MethodSignatureModel(
             methodName: "Uses",

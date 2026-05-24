@@ -8,6 +8,6 @@ namespace Tycho.Utils.SourceGenerator.References.System
     {
         public const string FullNamePropertyName = nameof(Type.FullName);
 
-        public static TypeModel TypeModel { get; } = new TypeModel(typeof(Type).Namespace, ImmutableEquatableArray<string>.Empty, nameof(Type));
+        public static TypeModel TypeModel { get; } = new TypeModel(typeof(Type).Namespace,nameof(Type));
     }
 }
