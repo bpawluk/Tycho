@@ -24,6 +24,9 @@ namespace {{ namespace }}
 {{~#-----------------------------------------#~}}
 {{~#--------------------------------------------- MODULE FACADE INTERFACE ---------------------------------------------#~}}
 {{ i0 }}public interface {{ interfaces.module_interface }}
+{{~ for owner_constraint in owner_constraints ~}}
+{{   i1   }}{{ owner_constraint }}
+{{~ end ~}}
 {{ i0 }}{
 {{~ for request in requests ~}}
 {{   i1   }}{{ classes.task_class }}{{ if request.has_response }}<{{ request.response_type }}>{{ end }} {{ methods.execute_async_method }}({{ request.request_type }} {{ parameters.request_data_parameter }}, {{ classes.cancellation_token_class }} {{ parameters.cancellation_token_parameter }} = default);

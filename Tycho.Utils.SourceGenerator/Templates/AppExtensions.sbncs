@@ -1,4 +1,4 @@
-﻿{{~#--------- Calculate indentation ---------#~}}
+{{~#--------- Calculate indentation ---------#~}}
 {{~ ns_offset = namespace != "" ? 1 : 0 ~}}
 {{~ ct_count = array.size containing_types ~}}
 {{~ bi = ns_offset + ct_count ~}}
@@ -36,7 +36,10 @@ namespace {{ namespace }}
 {{   i1   }}/// <param name="{{ parameters.builder_parameter }}">The host application builder to extend.</param>
 {{   i1   }}/// <param name="{{ parameters.app_parameter }}">An instance of the application to run.</param>
 {{   i1   }}/// <returns>The host application builder.</returns>
-{{   i1   }}public static async {{ classes.task_class }}<{{ interfaces.host_application_builder_interface }}> {{ methods.add_app_method }}(this {{ interfaces.host_application_builder_interface }} {{ parameters.builder_parameter }}, {{ classes.app_class }} {{ parameters.app_parameter }})
+{{   i1   }}public static async {{ classes.task_class }}<{{ interfaces.host_application_builder_interface }}> {{ methods.add_app_method }}{{ type_parameters_suffix }}(this {{ interfaces.host_application_builder_interface }} {{ parameters.builder_parameter }}, {{ classes.app_class }} {{ parameters.app_parameter }})
+{{~ for owner_constraint in owner_constraints ~}}
+{{     i2     }}{{ owner_constraint }}
+{{~ end ~}}
 {{   i1   }}{
 {{     i2     }}var appInstance = await {{ parameters.app_parameter }}
 {{       i3       }}.{{ methods.with_configuration_method }}({{ parameters.builder_parameter }}.{{ properties.configuration_property }})

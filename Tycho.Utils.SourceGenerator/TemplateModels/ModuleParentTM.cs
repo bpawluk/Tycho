@@ -14,6 +14,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public string[] ContainingTypes { get; }
 
+        public string[] OwnerConstraints { get; }
+
         public ClassesTM Classes { get; }
 
         public InterfacesTM Interfaces { get; }
@@ -27,7 +29,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public ModuleParentTM(TychoParentModel tychoParentModel)
         {
             Namespace = tychoParentModel.DefinitionType.Namespace;
-            ContainingTypes = tychoParentModel.DefinitionType.ContainingTypes.ToArray();
+            ContainingTypes = tychoParentModel.DefinitionType.ContainingTypeDeclarationSignatures.ToArray();
+            OwnerConstraints = tychoParentModel.DefinitionType.TypeParameterConstraintClauses.ToArray();
             Classes = new ClassesTM(this, tychoParentModel);
             Interfaces = new InterfacesTM();
             Methods = new MethodsTM();
@@ -38,6 +41,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         internal class ClassesTM
         {
             public string ModuleClass { get; }
+            public string ParentClassName { get; }
             public string ParentClass { get; }
             public string ParentBaseClass { get; }
             public string TaskClass { get; }
@@ -46,8 +50,11 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public ClassesTM(ModuleParentTM owner, TychoParentModel tychoParentModel)
             {
-                ModuleClass = tychoParentModel.DefinitionType.Name;
-                ParentClass = ModuleParentSymbols.GetParentClass(ModuleClass);
+                string moduleNameStem = tychoParentModel.DefinitionType.Name;
+                string moduleTypeSuffix = tychoParentModel.DefinitionType.TypeParametersSuffix;
+                ModuleClass = tychoParentModel.DefinitionType.ReferenceName;
+                ParentClassName = ModuleParentSymbols.GetParentClass(moduleNameStem);
+                ParentClass = $"{ParentClassName}{moduleTypeSuffix}";
                 ParentBaseClass = owner.UseType(ParentBaseReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);

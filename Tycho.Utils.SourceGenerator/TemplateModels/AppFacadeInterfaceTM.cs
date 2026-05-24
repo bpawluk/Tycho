@@ -13,6 +13,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public string[] ContainingTypes { get; }
 
+        public string[] OwnerConstraints { get; }
+
         public ClassesTM Classes { get; }
 
         public InterfacesTM Interfaces { get; }
@@ -26,7 +28,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public AppFacadeInterfaceTM(TychoFacadeModel tychoFacadeModel)
         {
             Namespace = tychoFacadeModel.DefinitionType.Namespace;
-            ContainingTypes = tychoFacadeModel.DefinitionType.ContainingTypes.ToArray();
+            ContainingTypes = tychoFacadeModel.DefinitionType.ContainingTypeDeclarationSignatures.ToArray();
+            OwnerConstraints = tychoFacadeModel.DefinitionType.TypeParameterConstraintClauses.ToArray();
             Classes = new ClassesTM(this);
             Interfaces = new InterfacesTM(this, tychoFacadeModel);
             Methods = new MethodsTM();
@@ -53,7 +56,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(AppFacadeInterfaceTM owner, TychoFacadeModel tychoFacadeModel)
             {
-                FacadeInterface = AppFacadeSymbols.GetAppFacadeInterface(tychoFacadeModel.DefinitionType.Name);
+                FacadeInterface = $"{AppFacadeSymbols.GetAppFacadeInterface(tychoFacadeModel.DefinitionType.Name)}{tychoFacadeModel.DefinitionType.TypeParametersSuffix}";
                 AsyncDisposableInterface = owner.UseType(IAsyncDisposableReference.TypeModel);
             }
         }

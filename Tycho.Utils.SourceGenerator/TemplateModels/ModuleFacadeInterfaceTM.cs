@@ -13,6 +13,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public string[] ContainingTypes { get; }
 
+        public string[] OwnerConstraints { get; }
+
         public ClassesTM Classes { get; }
 
         public InterfacesTM Interfaces { get; }
@@ -26,7 +28,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public ModuleFacadeInterfaceTM(TychoFacadeModel tychoFacadeModel)
         {
             Namespace = tychoFacadeModel.DefinitionType.Namespace;
-            ContainingTypes = tychoFacadeModel.DefinitionType.ContainingTypes.ToArray();
+            ContainingTypes = tychoFacadeModel.DefinitionType.ContainingTypeDeclarationSignatures.ToArray();
+            OwnerConstraints = tychoFacadeModel.DefinitionType.TypeParameterConstraintClauses.ToArray();
             Classes = new ClassesTM(this);
             Interfaces = new InterfacesTM(tychoFacadeModel);
             Methods = new MethodsTM();
@@ -52,7 +55,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(TychoFacadeModel tychoFacadeModel)
             {
-                ModuleInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(tychoFacadeModel.DefinitionType.Name);
+                ModuleInterface = $"{ModuleFacadeSymbols.GetModuleFacadeInterface(tychoFacadeModel.DefinitionType.Name)}{tychoFacadeModel.DefinitionType.TypeParametersSuffix}";
             }
         }
 

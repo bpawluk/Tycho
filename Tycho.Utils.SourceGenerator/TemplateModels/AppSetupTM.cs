@@ -16,6 +16,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public string[] ContainingTypes { get; }
 
+        public string[] OwnerConstraints { get; }
+
         public ClassesTM Classes { get; }
 
         public InterfacesTM Interfaces { get; }
@@ -31,7 +33,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public AppSetupTM(TychoSetupModel tychoSetupModel)
         {
             Namespace = tychoSetupModel.DefinitionType.Namespace;
-            ContainingTypes = tychoSetupModel.DefinitionType.ContainingTypes.ToArray();
+            ContainingTypes = tychoSetupModel.DefinitionType.ContainingTypeDeclarationSignatures.ToArray();
+            OwnerConstraints = tychoSetupModel.DefinitionType.TypeParameterConstraintClauses.ToArray();
             Classes = new ClassesTM(this, tychoSetupModel);
             Interfaces = new InterfacesTM(this, tychoSetupModel);
             Methods = new MethodsTM();
@@ -54,10 +57,13 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public ClassesTM(AppSetupTM owner, TychoSetupModel tychoSetupModel)
             {
-                AppClass = tychoSetupModel.DefinitionType.Name;
-                FacadeClass = AppFacadeSymbols.GetAppFacadeClass(AppClass);
-                PublisherClass = PublisherSymbols.GetPublisherClass(AppClass);
-                EventSerializerClass = EventSerializerSymbols.GetEventSerializerClass(AppClass);
+                string appNameStem = tychoSetupModel.DefinitionType.Name;
+                string appTypeSuffix = tychoSetupModel.DefinitionType.TypeParametersSuffix;
+
+                AppClass = tychoSetupModel.DefinitionType.DeclarationName;
+                FacadeClass = $"{AppFacadeSymbols.GetAppFacadeClass(appNameStem)}{appTypeSuffix}";
+                PublisherClass = $"{PublisherSymbols.GetPublisherClass(appNameStem)}{appTypeSuffix}";
+                EventSerializerClass = $"{EventSerializerSymbols.GetEventSerializerClass(appNameStem)}{appTypeSuffix}";
                 BaseClass = owner.UseType(TychoAppReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 ActionClass = owner.UseType(ActionReference.TypeModel);
@@ -78,7 +84,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(AppSetupTM owner, TychoSetupModel tychoSetupModel)
             {
-                FacadeInterface = AppFacadeSymbols.GetAppFacadeInterface(tychoSetupModel.DefinitionType.Name);
+                FacadeInterface = $"{AppFacadeSymbols.GetAppFacadeInterface(tychoSetupModel.DefinitionType.Name)}{tychoSetupModel.DefinitionType.TypeParametersSuffix}";
                 PublisherInterface = PublisherSymbols.PublisherInterface;
                 EventSerializerInterface = owner.UseType(IEventSerializerReference.TypeModel);
                 ConfigurationInterface = owner.UseType(IConfigurationReference.TypeModel);
@@ -155,8 +161,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public SubmoduleTM(AppSetupTM owner, TypeModel moduleType)
             {
                 ModuleClass = owner.UseType(moduleType);
-                FacadeInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(ModuleClass);
-                FacadeClass = ModuleFacadeSymbols.GetModuleFacadeClass(ModuleClass);
+                string moduleNameStem = moduleType.Name;
+                string moduleTypeSuffix = moduleType.TypeArgumentsSuffix;
+                FacadeInterface = $"{ModuleFacadeSymbols.GetModuleFacadeInterface(moduleNameStem)}{moduleTypeSuffix}";
+                FacadeClass = $"{ModuleFacadeSymbols.GetModuleFacadeClass(moduleNameStem)}{moduleTypeSuffix}";
             }
         }
     }

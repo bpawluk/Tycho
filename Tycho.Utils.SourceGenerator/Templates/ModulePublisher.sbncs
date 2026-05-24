@@ -25,8 +25,11 @@ namespace {{ namespace }}
 {{~#-----------------------------------------#~}}
 {{~#------------------------------------------------- MODULE PUBLISHER -------------------------------------------------#~}}
 {{ i0 }}internal class {{ classes.publisher_class }} : {{ classes.publisher_base_class }}, {{ classes.module_class }}.{{ interfaces.publisher_interface }}
+{{~ for owner_constraint in owner_constraints ~}}
+{{   i1   }}{{ owner_constraint }}
+{{~ end ~}}
 {{ i0 }}{
-{{   i1   }}public {{ classes.publisher_class }}({{ classes.generic_publisher_class }} {{ parameters.generic_publisher_parameter }}) : base({{ parameters.generic_publisher_parameter }}) { }
+{{   i1   }}public {{ classes.publisher_class_name }}({{ classes.generic_publisher_class }} {{ parameters.generic_publisher_parameter }}) : base({{ parameters.generic_publisher_parameter }}) { }
 {{~ for event in events ~}}
 
 {{   i1   }}public {{ classes.task_class }} {{ methods.publish_async_method }}({{ event }} {{ parameters.event_payload_parameter }}, {{ classes.cancellation_token_class }} {{ parameters.cancellation_token_parameter }})

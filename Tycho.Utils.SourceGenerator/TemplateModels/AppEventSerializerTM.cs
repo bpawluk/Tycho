@@ -1,5 +1,6 @@
 using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
+using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.References.Tycho.Events;
 using Tycho.Utils.SourceGenerator.Symbols;
 
@@ -10,6 +11,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public string Namespace { get; }
 
         public string[] ContainingTypes { get; }
+
+        public string[] OwnerConstraints { get; }
 
         public ClassesTM Classes { get; }
 
@@ -24,8 +27,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public AppEventSerializerTM(TychoEventSerializerModel tychoEventSerializerModel)
         {
             Namespace = tychoEventSerializerModel.DefinitionType.Namespace;
-            ContainingTypes = tychoEventSerializerModel.DefinitionType.ContainingTypes.ToArray();
-            Classes = new ClassesTM(this, tychoEventSerializerModel.DefinitionType.Name);
+            ContainingTypes = tychoEventSerializerModel.DefinitionType.ContainingTypeDeclarationSignatures.ToArray();
+            OwnerConstraints = tychoEventSerializerModel.DefinitionType.TypeParameterConstraintClauses.ToArray();
+            Classes = new ClassesTM(this, tychoEventSerializerModel.DefinitionType);
             Interfaces = new InterfacesTM(this);
             Methods = new MethodsTM();
             Parameters = new ParametersTM();
@@ -34,12 +38,14 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         internal class ClassesTM
         {
+            public string EventSerializerClassName { get; }
             public string EventSerializerClass { get; }
             public string EventSerializerBaseClass { get; }
 
-            public ClassesTM(AppEventSerializerTM owner, string appClass)
+            public ClassesTM(AppEventSerializerTM owner, TypeModel appType)
             {
-                EventSerializerClass = EventSerializerSymbols.GetEventSerializerClass(appClass);
+                EventSerializerClassName = EventSerializerSymbols.GetEventSerializerClass(appType.Name);
+                EventSerializerClass = $"{EventSerializerClassName}{appType.TypeParametersSuffix}";
                 EventSerializerBaseClass = owner.UseType(EventSerializerBaseReference.TypeModel);
             }
         }

@@ -13,7 +13,11 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public string[] ContainingTypes { get; }
 
+        public string[] OwnerConstraints { get; }
+
         public ClassesTM Classes { get; }
+
+        public string TypeParametersSuffix { get; }
 
         public InterfacesTM Interfaces { get; }
 
@@ -26,8 +30,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public AppExtensionsTM(TychoExtensionsModel tychoExtensionsModel)
         {
             Namespace = tychoExtensionsModel.DefinitionType.Namespace;
-            ContainingTypes = tychoExtensionsModel.DefinitionType.ContainingTypes.ToArray();
+            ContainingTypes = tychoExtensionsModel.DefinitionType.ContainingTypeDeclarationSignatures.ToArray();
+            OwnerConstraints = tychoExtensionsModel.DefinitionType.TypeParameterConstraintClauses.ToArray();
             Classes = new ClassesTM(this, tychoExtensionsModel);
+            TypeParametersSuffix = tychoExtensionsModel.DefinitionType.TypeParametersSuffix;
             Interfaces = new InterfacesTM(this);
             Methods = new MethodsTM(tychoExtensionsModel);
             Properties = new PropertiesTM();
@@ -44,8 +50,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public ClassesTM(AppExtensionsTM owner, TychoExtensionsModel tychoExtensionsModel)
             {
-                AppClass = tychoExtensionsModel.DefinitionType.Name;
-                SetupExtensionsClass = AppExtensionsSymbols.GetAppSetupExtensionsClass(AppClass);
+                string appNameStem = tychoExtensionsModel.DefinitionType.NameWithArity;
+                AppClass = tychoExtensionsModel.DefinitionType.ReferenceName;
+                SetupExtensionsClass = AppExtensionsSymbols.GetAppSetupExtensionsClass(appNameStem);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 LoggingConfigurationClass = owner.UseType(LoggingConfigurationReference.TypeModel);
                 ServiceCollectionServiceExtensionsClass = owner.UseType(ServiceCollectionServiceExtensionsReference.TypeModel);

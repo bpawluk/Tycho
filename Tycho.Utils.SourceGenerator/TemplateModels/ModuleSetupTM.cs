@@ -14,6 +14,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public string[] ContainingTypes { get; }
 
+        public string[] OwnerConstraints { get; }
+
         public ClassesTM Classes { get; }
 
         public InterfacesTM Interfaces { get; }
@@ -27,7 +29,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public ModuleSetupTM(TychoSetupModel tychoDefinitionModel)
         {
             Namespace = tychoDefinitionModel.DefinitionType.Namespace;
-            ContainingTypes = tychoDefinitionModel.DefinitionType.ContainingTypes.ToArray();
+            ContainingTypes = tychoDefinitionModel.DefinitionType.ContainingTypeDeclarationSignatures.ToArray();
+            OwnerConstraints = tychoDefinitionModel.DefinitionType.TypeParameterConstraintClauses.ToArray();
             Classes = new ClassesTM(this, tychoDefinitionModel);
             Interfaces = new InterfacesTM(this);
             Methods = new MethodsTM();
@@ -47,10 +50,13 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public ClassesTM(ModuleSetupTM owner, TychoSetupModel tychoDefinitionModel)
             {
-                ModuleClass = tychoDefinitionModel.DefinitionType.Name;
-                ModuleParentClass = ModuleParentSymbols.GetParentClass(ModuleClass);
-                PublisherClass = PublisherSymbols.GetPublisherClass(ModuleClass);
-                EventSerializerClass = EventSerializerSymbols.GetEventSerializerClass(ModuleClass);
+                string moduleNameStem = tychoDefinitionModel.DefinitionType.Name;
+                string moduleTypeSuffix = tychoDefinitionModel.DefinitionType.TypeParametersSuffix;
+
+                ModuleClass = tychoDefinitionModel.DefinitionType.DeclarationName;
+                ModuleParentClass = $"{ModuleParentSymbols.GetParentClass(moduleNameStem)}{moduleTypeSuffix}";
+                PublisherClass = $"{PublisherSymbols.GetPublisherClass(moduleNameStem)}{moduleTypeSuffix}";
+                EventSerializerClass = $"{EventSerializerSymbols.GetEventSerializerClass(moduleNameStem)}{moduleTypeSuffix}";
                 BaseClass = owner.UseType(TychoModuleReference.TypeModel);
                 ServiceCollectionServiceExtensionsClass = owner.UseType(ServiceCollectionServiceExtensionsReference.TypeModel);
                 ServiceProviderServiceExtensionsClass = owner.UseType(ServiceProviderServiceExtensionsReference.TypeModel);
@@ -112,8 +118,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public SubmoduleTM(ModuleSetupTM owner, TypeModel moduleType)
             {
                 ModuleClass = owner.UseType(moduleType);
-                FacadeInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(ModuleClass);
-                FacadeClass = ModuleFacadeSymbols.GetModuleFacadeClass(ModuleClass);
+                string moduleNameStem = moduleType.Name;
+                string moduleTypeSuffix = moduleType.TypeArgumentsSuffix;
+                FacadeInterface = $"{ModuleFacadeSymbols.GetModuleFacadeInterface(moduleNameStem)}{moduleTypeSuffix}";
+                FacadeClass = $"{ModuleFacadeSymbols.GetModuleFacadeClass(moduleNameStem)}{moduleTypeSuffix}";
             }
         }
     }

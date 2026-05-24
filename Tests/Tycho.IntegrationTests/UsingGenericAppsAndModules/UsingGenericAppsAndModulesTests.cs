@@ -6,7 +6,7 @@ namespace Tycho.IntegrationTests.UsingGenericAppsAndModules;
 public sealed class UsingGenericAppsAndModulesTests
 {
     [Fact]
-    public void TychoDoesNotEnableYet_GenericAppDefinitions()
+    public void TychoEnables_GenericAppDefinitions()
     {
         // Arrange
         string genericApp =
@@ -30,23 +30,12 @@ public sealed class UsingGenericAppsAndModulesTests
         IReadOnlyCollection<Diagnostic> result = CompilationHelpers.CompileWithTychoGenerator(genericApp);
 
         // Assert
-        static bool IsGenericAppCausedError(Diagnostic diagnostic)
-        {
-            return diagnostic.GetMessage().Contains("'TestApp' does not implement inherited abstract member");
-        }
-
         var compilationErrors = result.Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
-        Assert.NotEmpty(compilationErrors);
-
-        var genericAppErrors = compilationErrors.Where(IsGenericAppCausedError).ToList();
-        Assert.NotEmpty(genericAppErrors);
-
-        var otherErrors = compilationErrors.Where(d => !IsGenericAppCausedError(d)).ToList();
-        Assert.Empty(otherErrors);
+        Assert.Empty(compilationErrors);
     }
 
     [Fact]
-    public void TychoDoesNotEnableYet_GenericModuleDefinitions()
+    public void TychoEnables_GenericModuleDefinitions()
     {
         // Arrange
         string genericApp =
@@ -70,18 +59,121 @@ public sealed class UsingGenericAppsAndModulesTests
         IReadOnlyCollection<Diagnostic> result = CompilationHelpers.CompileWithTychoGenerator(genericApp);
 
         // Assert
-        static bool IsGenericModuleCausedError(Diagnostic diagnostic)
-        {
-            return diagnostic.GetMessage().Contains("'TestModule' does not implement inherited abstract member");
-        }
-
         var compilationErrors = result.Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
-        Assert.NotEmpty(compilationErrors);
+        Assert.Empty(compilationErrors);
+    }
 
-        var genericModuleErrors = compilationErrors.Where(IsGenericModuleCausedError).ToList();
-        Assert.NotEmpty(genericModuleErrors);
+    [Fact]
+    public void TychoEnables_GenericAppDefinitionsWithConstraints()
+    {
+        // Arrange
+        string constrainedGenericApp =
+            """
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Microsoft.Extensions.DependencyInjection;
+            using Tycho.Apps;
+            using Tycho.Requests;
 
-        var otherErrors = compilationErrors.Where(d => !IsGenericModuleCausedError(d)).ToList();
-        Assert.Empty(otherErrors);
+            namespace Tycho.IntegrationTests.UsingGenericAppsAndModules.SUT;
+
+            public abstract class PayloadBase { }
+
+            public interface IMarker { }
+
+            public sealed class TestRequest<TPayload, TKey> : IRequest
+                where TPayload : PayloadBase, IMarker, new()
+                where TKey : notnull
+            { }
+
+            public sealed class TestRequestHandler<TPayload, TKey> : IRequestHandler<TestRequest<TPayload, TKey>>
+                where TPayload : PayloadBase, IMarker, new()
+                where TKey : notnull
+            {
+                public Task HandleAsync(TestRequest<TPayload, TKey> requestData, CancellationToken cancellationToken)
+                {
+                    return Task.CompletedTask;
+                }
+            }
+
+            [TychoDefinition]
+            public partial class TestApp<TPayload, TKey> : TychoApp
+                where TPayload : PayloadBase, IMarker, new()
+                where TKey : notnull
+            {
+                protected override void DefineContract(IAppContract app)
+                {
+                    app.Handles<TestRequest<TPayload, TKey>, TestRequestHandler<TPayload, TKey>>();
+                }
+
+                protected override void DefineEvents(IAppEvents app) { }
+                protected override void IncludeModules(IAppStructure app) { }
+                protected override void RegisterServices(IServiceCollection app) { }
+            }
+            """;
+
+        // Act
+        IReadOnlyCollection<Diagnostic> result = CompilationHelpers.CompileWithTychoGenerator(constrainedGenericApp);
+
+        // Assert
+        var compilationErrors = result.Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
+        Assert.Empty(compilationErrors);
+    }
+
+    [Fact]
+    public void TychoEnables_GenericModuleDefinitionsWithConstraints()
+    {
+        // Arrange
+        string constrainedGenericModule =
+            """
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Microsoft.Extensions.DependencyInjection;
+            using Tycho.Modules;
+            using Tycho.Requests;
+
+            namespace Tycho.IntegrationTests.UsingGenericAppsAndModules.SUT;
+
+            public abstract class PayloadBase { }
+
+            public interface IMarker { }
+
+            public sealed class TestRequest<TPayload, TKey> : IRequest
+                where TPayload : PayloadBase, IMarker, new()
+                where TKey : notnull
+            { }
+
+            public sealed class TestRequestHandler<TPayload, TKey> : IRequestHandler<TestRequest<TPayload, TKey>>
+                where TPayload : PayloadBase, IMarker, new()
+                where TKey : notnull
+            {
+                public Task HandleAsync(TestRequest<TPayload, TKey> requestData, CancellationToken cancellationToken)
+                {
+                    return Task.CompletedTask;
+                }
+            }
+
+            [TychoDefinition]
+            public partial class TestModule<TPayload, TKey> : TychoModule
+                where TPayload : PayloadBase, IMarker, new()
+                where TKey : notnull
+            {
+                protected override void DefineContract(IModuleContract module)
+                {
+                    module.Handles<TestRequest<TPayload, TKey>, TestRequestHandler<TPayload, TKey>>();
+                }
+
+                protected override void DefineEvents(IModuleEvents module) { }
+                protected override void IncludeModules(IModuleStructure module) { }
+                protected override void RegisterServices(IServiceCollection module) { }
+            }
+            """;
+
+        // Act
+        IReadOnlyCollection<Diagnostic> result = CompilationHelpers.CompileWithTychoGenerator(constrainedGenericModule);
+
+        // Assert
+        var compilationErrors = result.Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
+        Assert.Empty(compilationErrors);
     }
 }

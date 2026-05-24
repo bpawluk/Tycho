@@ -28,7 +28,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                     outputContext.GenerateSourceFromTemplate(
                         new AppExtensionsTM(model),
                         s_appExtensionsTemplate,
-                        $"{model.DefinitionType}.Extensions.g.cs");
+                        $"{model.DefinitionType.HintName}.Extensions.g.cs");
                 });
 
             return context;

@@ -14,6 +14,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public string[] ContainingTypes { get; }
 
+        public string[] OwnerConstraints { get; }
+
         public ClassesTM Classes { get; }
 
         public InterfacesTM Interfaces { get; }
@@ -27,7 +29,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public ModuleParentInterfaceTM(TychoParentModel tychoParentModel)
         {
             Namespace = tychoParentModel.DefinitionType.Namespace;
-            ContainingTypes = tychoParentModel.DefinitionType.ContainingTypes.ToArray();
+            ContainingTypes = tychoParentModel.DefinitionType.ContainingTypeDeclarationSignatures.ToArray();
+            OwnerConstraints = tychoParentModel.DefinitionType.TypeParameterConstraintClauses.ToArray();
             Classes = new ClassesTM(this, tychoParentModel);
             Interfaces = new InterfacesTM();
             Methods = new MethodsTM();
@@ -44,7 +47,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public ClassesTM(ModuleParentInterfaceTM owner, TychoParentModel tychoParentModel)
             {
-                ModuleClass = tychoParentModel.DefinitionType.Name;
+                ModuleClass = tychoParentModel.DefinitionType.DeclarationName;
                 ModuleBaseClass = owner.UseType(TychoModuleReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);

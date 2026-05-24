@@ -6,7 +6,7 @@ namespace Tycho.IntegrationTests.UsingGenericEvents;
 public sealed class UsingGenericEventsTests
 {
     [Fact]
-    public void TychoDoesNotEnableYet_GenericAppDefinitions()
+    public void TychoEnables_GenericAppDefinitions()
     {
         // Arrange
         string genericApp =
@@ -48,18 +48,7 @@ public sealed class UsingGenericEventsTests
         IReadOnlyCollection<Diagnostic> result = CompilationHelpers.CompileWithTychoGenerator(genericApp);
 
         // Assert
-        static bool IsGenericEventCausedError(Diagnostic diagnostic)
-        {
-            return diagnostic.GetMessage().Contains("Using the generic type 'TestEvent<T>' requires 1 type arguments");
-        }
-
         var compilationErrors = result.Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
-        Assert.NotEmpty(compilationErrors);
-
-        var genericEventErrors = compilationErrors.Where(IsGenericEventCausedError).ToList();
-        Assert.NotEmpty(genericEventErrors);
-
-        var otherErrors = compilationErrors.Where(d => !IsGenericEventCausedError(d)).ToList();
-        Assert.Empty(otherErrors);
+        Assert.Empty(compilationErrors);
     }
 }

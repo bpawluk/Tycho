@@ -13,6 +13,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public string[] ContainingTypes { get; }
 
+        public string[] OwnerConstraints { get; }
+
         public ClassesTM Classes { get; }
 
         public InterfacesTM Interfaces { get; }
@@ -26,7 +28,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public AppPublisherTM(TychoPublisherModel tychoPublisherModel)
         {
             Namespace = tychoPublisherModel.DefinitionType.Namespace;
-            ContainingTypes = tychoPublisherModel.DefinitionType.ContainingTypes.ToArray();
+            ContainingTypes = tychoPublisherModel.DefinitionType.ContainingTypeDeclarationSignatures.ToArray();
+            OwnerConstraints = tychoPublisherModel.DefinitionType.TypeParameterConstraintClauses.ToArray();
             Classes = new ClassesTM(this, tychoPublisherModel);
             Interfaces = new InterfacesTM();
             Methods = new MethodsTM();
@@ -37,6 +40,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         internal class ClassesTM
         {
             public string AppClass { get; }
+            public string PublisherClassName { get; }
             public string PublisherClass { get; }
             public string PublisherBaseClass { get; }
             public string TaskClass { get; }
@@ -45,8 +49,11 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public ClassesTM(AppPublisherTM owner, TychoPublisherModel tychoPublisherModel)
             {
-                AppClass = tychoPublisherModel.DefinitionType.Name;
-                PublisherClass = PublisherSymbols.GetPublisherClass(AppClass);
+                string appNameStem = tychoPublisherModel.DefinitionType.Name;
+                string appTypeSuffix = tychoPublisherModel.DefinitionType.TypeParametersSuffix;
+                AppClass = tychoPublisherModel.DefinitionType.ReferenceName;
+                PublisherClassName = PublisherSymbols.GetPublisherClass(appNameStem);
+                PublisherClass = $"{PublisherClassName}{appTypeSuffix}";
                 PublisherBaseClass = owner.UseType(PublisherBaseReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);

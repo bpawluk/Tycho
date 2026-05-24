@@ -54,6 +54,28 @@ public class TychoSourceGeneratorTests : VerifyBase
     }
 
     [Fact]
+    public Task AppWithGenericDefinition()
+    {
+        string[] sources =
+        [
+            "AppWithGenericDefinition/TestApp.cs"
+        ];
+        GeneratorDriver driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    [Fact]
+    public Task AppWithConstrainedGenericDefinition()
+    {
+        string[] sources =
+        [
+            "AppWithConstrainedGenericDefinition/TestApp.cs"
+        ];
+        GeneratorDriver driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    [Fact]
     public Task AppWithDownstreamContract()
     {
         string[] sources =
@@ -168,6 +190,28 @@ public class TychoSourceGeneratorTests : VerifyBase
         string[] sources =
         [
             "ModuleInNamespaceAndOuterTypes/TestModule.cs"
+        ];
+        GeneratorDriver driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    [Fact]
+    public Task ModuleWithGenericDefinition()
+    {
+        string[] sources =
+        [
+            "ModuleWithGenericDefinition/TestModule.cs"
+        ];
+        GeneratorDriver driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    [Fact]
+    public Task ModuleWithConstrainedGenericDefinition()
+    {
+        string[] sources =
+        [
+            "ModuleWithConstrainedGenericDefinition/TestModule.cs"
         ];
         GeneratorDriver driver = RunGenerator(sources);
         return Verify(driver);

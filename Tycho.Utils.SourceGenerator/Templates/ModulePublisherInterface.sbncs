@@ -25,6 +25,9 @@ namespace {{ namespace }}
 {{~#-----------------------------------------#~}}
 {{~#-------------------------------------------- MODULE PUBLISHER INTERFACE --------------------------------------------#~}}
 {{ i0 }}public partial class {{ classes.module_class }} : {{ classes.module_base_class }}
+{{~ for owner_constraint in owner_constraints ~}}
+{{   i1   }}{{ owner_constraint }}
+{{~ end ~}}
 {{ i0 }}{
 {{   i1   }}public interface {{ interfaces.publisher_interface }}
 {{   i1   }}{

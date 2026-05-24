@@ -13,6 +13,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public string[] ContainingTypes { get; }
 
+        public string[] OwnerConstraints { get; }
+
         public ClassesTM Classes { get; }
 
         public InterfacesTM Interfaces { get; }
@@ -26,7 +28,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public ModuleFacadeTM(TychoFacadeModel tychoFacadeModel)
         {
             Namespace = tychoFacadeModel.DefinitionType.Namespace;
-            ContainingTypes = tychoFacadeModel.DefinitionType.ContainingTypes.ToArray();
+            ContainingTypes = tychoFacadeModel.DefinitionType.ContainingTypeDeclarationSignatures.ToArray();
+            OwnerConstraints = tychoFacadeModel.DefinitionType.TypeParameterConstraintClauses.ToArray();
             Classes = new ClassesTM(this, tychoFacadeModel);
             Interfaces = new InterfacesTM(this, tychoFacadeModel);
             Methods = new MethodsTM();
@@ -37,6 +40,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         internal class ClassesTM
         {
             public string ModuleClass { get; }
+            public string FacadeClassName { get; }
             public string FacadeClass { get; }
             public string FacadeBaseClass { get; }
             public string TaskClass { get; }
@@ -45,8 +49,11 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public ClassesTM(ModuleFacadeTM owner, TychoFacadeModel tychoFacadeModel)
             {
-                ModuleClass = tychoFacadeModel.DefinitionType.Name;
-                FacadeClass = ModuleFacadeSymbols.GetModuleFacadeClass(ModuleClass);
+                string moduleNameStem = tychoFacadeModel.DefinitionType.Name;
+                string moduleTypeSuffix = tychoFacadeModel.DefinitionType.TypeParametersSuffix;
+                ModuleClass = tychoFacadeModel.DefinitionType.ReferenceName;
+                FacadeClassName = ModuleFacadeSymbols.GetModuleFacadeClass(moduleNameStem);
+                FacadeClass = $"{FacadeClassName}{moduleTypeSuffix}";
                 FacadeBaseClass = owner.UseType(ModuleFacadeBaseReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 ValueTaskClass = owner.UseType(ValueTaskReference.TypeModel);
@@ -61,7 +68,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(ModuleFacadeTM owner, TychoFacadeModel tychoFacadeModel)
             {
-                ModuleInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(tychoFacadeModel.DefinitionType.Name);
+                ModuleInterface = $"{ModuleFacadeSymbols.GetModuleFacadeInterface(tychoFacadeModel.DefinitionType.Name)}{tychoFacadeModel.DefinitionType.TypeParametersSuffix}";
                 InstanceInterface = owner.UseType(IModuleReference.TypeModel);
             }
         }

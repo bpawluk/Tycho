@@ -1,4 +1,4 @@
-﻿{{~#--------- Calculate indentation ---------#~}}
+{{~#--------- Calculate indentation ---------#~}}
 {{~ ns_offset = namespace != "" ? 1 : 0 ~}}
 {{~ ct_count = array.size containing_types ~}}
 {{~ bi = ns_offset + ct_count ~}}
@@ -25,6 +25,9 @@ namespace {{ namespace }}
 {{~#-----------------------------------------#~}}
 {{~#--------------------------------------------------- MODULE SETUP ---------------------------------------------------#~}}
 {{ i0 }}public partial class {{ classes.module_class }} : {{ classes.base_class }}
+{{~ for owner_constraint in owner_constraints ~}}
+{{   i1   }}{{ owner_constraint }}
+{{~ end ~}}
 {{ i0 }}{
 {{   i1   }}protected override void {{ methods.auto_setup_method }}({{ interfaces.service_collection_interface }} {{ parameters.module_parameter }})
 {{   i1   }}{

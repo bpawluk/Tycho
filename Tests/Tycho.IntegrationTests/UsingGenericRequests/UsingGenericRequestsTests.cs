@@ -6,7 +6,7 @@ namespace Tycho.IntegrationTests.UsingGenericRequests;
 public sealed class UsingGenericRequestsTests
 {
     [Fact]
-    public void TychoDoesNotEnableYet_GenericRequestDefinitions()
+    public void TychoEnables_GenericRequestDefinitions()
     {
         // Arrange
         string genericApp =
@@ -47,23 +47,12 @@ public sealed class UsingGenericRequestsTests
         IReadOnlyCollection<Diagnostic> result = CompilationHelpers.CompileWithTychoGenerator(genericApp);
 
         // Assert
-        static bool IsGenericRequestCausedError(Diagnostic diagnostic)
-        {
-            return diagnostic.GetMessage().Contains("Using the generic type 'TestRequest<T>' requires 1 type arguments");
-        }
-
         var compilationErrors = result.Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
-        Assert.NotEmpty(compilationErrors);
-
-        var genericRequestErrors = compilationErrors.Where(IsGenericRequestCausedError).ToList();
-        Assert.NotEmpty(genericRequestErrors);
-
-        var otherErrors = compilationErrors.Where(d => !IsGenericRequestCausedError(d)).ToList();
-        Assert.Empty(otherErrors);
+        Assert.Empty(compilationErrors);
     }
 
     [Fact]
-    public void TychoDoesNotEnableYet_GenericResponseDefinitions()
+    public void TychoEnables_GenericResponseDefinitions()
     {
         // Arrange
         string genericApp =
@@ -106,23 +95,7 @@ public sealed class UsingGenericRequestsTests
         IReadOnlyCollection<Diagnostic> result = CompilationHelpers.CompileWithTychoGenerator(genericApp);
 
         // Assert
-        static bool IsGenericResponseCausedError(Diagnostic diagnostic)
-        {
-            string message = diagnostic.GetMessage();
-            return message.Contains("Using the generic type 'TestResponse<T>' requires 1 type arguments") ||
-                   message.Contains(
-                       "There is no implicit reference conversion from " +
-                       "'Tycho.IntegrationTests.UsingGenericRequests.SUT.TestRequest' to " +
-                       "'Tycho.Requests.IRequest<Tycho.IntegrationTests.UsingGenericRequests.SUT.TestResponse>'");
-        }
-
         var compilationErrors = result.Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
-        Assert.NotEmpty(compilationErrors);
-
-        var genericResponseErrors = compilationErrors.Where(IsGenericResponseCausedError).ToList();
-        Assert.NotEmpty(genericResponseErrors);
-
-        var otherErrors = compilationErrors.Where(d => !IsGenericResponseCausedError(d)).ToList();
-        Assert.Empty(otherErrors);
+        Assert.Empty(compilationErrors);
     }
 }
