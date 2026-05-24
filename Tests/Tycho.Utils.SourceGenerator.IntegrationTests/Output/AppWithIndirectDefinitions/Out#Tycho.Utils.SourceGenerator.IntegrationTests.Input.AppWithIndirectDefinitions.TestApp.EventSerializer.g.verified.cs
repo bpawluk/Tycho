@@ -8,11 +8,11 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefi
     {
         public TestAppEventSerializer(IPayloadSerializer payloadSerializer) : base(payloadSerializer)
         {
-            RegisterEvent<TestEventFromLocalHelper>();
-            RegisterEvent<TestEventFromLocalStaticHelper>();
-            RegisterEvent<TestEventFromHelperClass>();
-            RegisterEvent<TestEventFromHelperStaticClass>();
             RegisterEvent<TestEventFromHelperExtension>();
+            RegisterEvent<TestEventFromHelperStaticClass>();
+            RegisterEvent<TestEventFromHelperClass>();
+            RegisterEvent<TestEventFromLocalStaticHelper>();
+            RegisterEvent<TestEventFromLocalHelper>();
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
 using Tycho.Utils.SourceGenerator.Extensions;
 using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.Models.Tycho;
@@ -125,11 +126,13 @@ namespace Tycho.Utils.SourceGenerator
         {
             var methodInvocations = new HashSet<MethodInvocationModel>();
             var visitedMethods = new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default);
+            var semanticModels = new Dictionary<SyntaxTree, SemanticModel>();
             CollectMethodInvocations(
                 context.SemanticModel.Compilation,
                 methodSymbol,
                 methodInvocations,
                 visitedMethods,
+                semanticModels,
                 token);
             return methodInvocations.ToImmutableEquatableArray();
         }
@@ -139,64 +142,98 @@ namespace Tycho.Utils.SourceGenerator
             IMethodSymbol methodSymbol,
             HashSet<MethodInvocationModel> methodInvocations,
             HashSet<IMethodSymbol> visitedMethods,
+            Dictionary<SyntaxTree, SemanticModel> semanticModels,
             CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
 
-            IMethodSymbol traversedMethodSymbol = methodSymbol.ReducedFrom ?? methodSymbol;
-            if (!visitedMethods.Add(traversedMethodSymbol))
-            {
-                return;
-            }
+            var pendingMethods = new Stack<IMethodSymbol>();
+            pendingMethods.Push(methodSymbol);
 
-            foreach (SyntaxReference syntaxRef in traversedMethodSymbol.DeclaringSyntaxReferences)
+            while (pendingMethods.Count > 0)
             {
                 token.ThrowIfCancellationRequested();
-                if (!(syntaxRef.GetSyntax(token) is MethodDeclarationSyntax methodSyntax))
+                IMethodSymbol pendingMethodSymbol = pendingMethods.Pop();
+                IMethodSymbol traversedMethodSymbol = (pendingMethodSymbol.ReducedFrom ?? pendingMethodSymbol).OriginalDefinition;
+                if (!visitedMethods.Add(traversedMethodSymbol))
                 {
                     continue;
                 }
 
-                if (!compilation.ContainsSyntaxTree(methodSyntax.SyntaxTree))
-                {
-                    continue;
-                }
-                SemanticModel semanticModel = compilation.GetSemanticModel(methodSyntax.SyntaxTree);
-
-                IEnumerable<InvocationExpressionSyntax> invocationExpressions =
-                    (methodSyntax.Body?.DescendantNodes().OfType<InvocationExpressionSyntax>() ?? Enumerable.Empty<InvocationExpressionSyntax>())
-                        .Concat(methodSyntax.ExpressionBody?.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>() ?? Enumerable.Empty<InvocationExpressionSyntax>());
-
-                foreach (InvocationExpressionSyntax invocationSyntax in invocationExpressions)
+                foreach (SyntaxReference syntaxRef in traversedMethodSymbol.DeclaringSyntaxReferences)
                 {
                     token.ThrowIfCancellationRequested();
-                    SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(invocationSyntax, token);
-                    ISymbol symbol = symbolInfo.Symbol ?? symbolInfo.CandidateSymbols.FirstOrDefault();
+                    SyntaxNode declarationSyntax = syntaxRef.GetSyntax(token);
+                    SyntaxTree declarationSyntaxTree;
+                    IEnumerable<InvocationExpressionSyntax> invocationExpressions;
 
-                    if (!(symbol is IMethodSymbol invokedMethodSymbol))
+                    if (declarationSyntax is MethodDeclarationSyntax methodSyntax)
+                    {
+                        declarationSyntaxTree = methodSyntax.SyntaxTree;
+                        invocationExpressions =
+                            (methodSyntax.Body?.DescendantNodes().OfType<InvocationExpressionSyntax>() ?? Enumerable.Empty<InvocationExpressionSyntax>())
+                                .Concat(methodSyntax.ExpressionBody?.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>() ?? Enumerable.Empty<InvocationExpressionSyntax>());
+                    }
+                    else if (declarationSyntax is LocalFunctionStatementSyntax localFunctionSyntax)
+                    {
+                        declarationSyntaxTree = localFunctionSyntax.SyntaxTree;
+                        invocationExpressions =
+                            (localFunctionSyntax.Body?.DescendantNodes().OfType<InvocationExpressionSyntax>() ?? Enumerable.Empty<InvocationExpressionSyntax>())
+                                .Concat(localFunctionSyntax.ExpressionBody?.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>() ?? Enumerable.Empty<InvocationExpressionSyntax>());
+                    }
+                    else
                     {
                         continue;
                     }
 
-                    IMethodSymbol methodInvocationSymbol = invokedMethodSymbol.ReducedFrom ?? invokedMethodSymbol;
-                    methodInvocations.Add(
-                        new MethodInvocationModel(
-                            GetMethodSignatureModel(methodInvocationSymbol),
-                            invokedMethodSymbol.ReceiverType is ISymbol receiverSymbol
-                                ? GetTypeModel(receiverSymbol)
-                                : default,
-                            invokedMethodSymbol.TypeParameters
-                                .Zip(invokedMethodSymbol.TypeArguments, GetTypeArgumentModel)
-                                .ToImmutableEquatableArray()));
-
-                    if (methodInvocationSymbol.DeclaringSyntaxReferences.Any(syntaxReference => compilation.ContainsSyntaxTree(syntaxReference.SyntaxTree)))
+                    if (!compilation.ContainsSyntaxTree(declarationSyntaxTree))
                     {
-                        CollectMethodInvocations(
-                            compilation,
-                            methodInvocationSymbol,
-                            methodInvocations,
-                            visitedMethods,
-                            token);
+                        continue;
+                    }
+
+                    if (!semanticModels.TryGetValue(declarationSyntaxTree, out SemanticModel semanticModel))
+                    {
+                        semanticModel = compilation.GetSemanticModel(declarationSyntaxTree);
+                        semanticModels[declarationSyntaxTree] = semanticModel;
+                    }
+
+                    foreach (InvocationExpressionSyntax invocationSyntax in invocationExpressions)
+                    {
+                        token.ThrowIfCancellationRequested();
+                        IMethodSymbol invokedMethodSymbol = (semanticModel.GetOperation(invocationSyntax, token) as IInvocationOperation)?.TargetMethod;
+                        if (invokedMethodSymbol == null)
+                        {
+                            SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(invocationSyntax, token);
+                            if (symbolInfo.Symbol is IMethodSymbol resolvedMethodSymbol)
+                            {
+                                invokedMethodSymbol = resolvedMethodSymbol;
+                            }
+                            else if (symbolInfo.CandidateSymbols.Length == 1 && symbolInfo.CandidateSymbols[0] is IMethodSymbol candidateMethodSymbol)
+                            {
+                                invokedMethodSymbol = candidateMethodSymbol;
+                            }
+                        }
+
+                        if (invokedMethodSymbol == null)
+                        {
+                            continue;
+                        }
+
+                        IMethodSymbol methodInvocationSymbol = (invokedMethodSymbol.ReducedFrom ?? invokedMethodSymbol).OriginalDefinition;
+                        methodInvocations.Add(
+                            new MethodInvocationModel(
+                                GetMethodSignatureModel(methodInvocationSymbol),
+                                invokedMethodSymbol.ReceiverType is ISymbol receiverSymbol
+                                    ? GetTypeModel(receiverSymbol)
+                                    : default,
+                                invokedMethodSymbol.TypeParameters
+                                    .Zip(invokedMethodSymbol.TypeArguments, GetTypeArgumentModel)
+                                    .ToImmutableEquatableArray()));
+
+                        if (methodInvocationSymbol.DeclaringSyntaxReferences.Any(syntaxReference => compilation.ContainsSyntaxTree(syntaxReference.SyntaxTree)))
+                        {
+                            pendingMethods.Push(methodInvocationSymbol);
+                        }
                     }
                 }
             }

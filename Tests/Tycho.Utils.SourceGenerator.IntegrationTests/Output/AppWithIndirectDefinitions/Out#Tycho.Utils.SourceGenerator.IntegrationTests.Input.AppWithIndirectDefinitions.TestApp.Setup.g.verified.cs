@@ -52,11 +52,11 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefi
         {
             ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestAppEventSerializer>(app);
             ServiceCollectionServiceExtensions.AddTransient<IPublisher, TestAppPublisher>(app);
-            ServiceCollectionServiceExtensions.AddTransient<ILocalHelperModule, LocalHelperModuleFacade>(app);
-            ServiceCollectionServiceExtensions.AddTransient<ILocalStaticHelperModule, LocalStaticHelperModuleFacade>(app);
-            ServiceCollectionServiceExtensions.AddTransient<IHelperClassModule, HelperClassModuleFacade>(app);
-            ServiceCollectionServiceExtensions.AddTransient<IHelperStaticClassModule, HelperStaticClassModuleFacade>(app);
             ServiceCollectionServiceExtensions.AddTransient<IHelperExtensionModule, HelperExtensionModuleFacade>(app);
+            ServiceCollectionServiceExtensions.AddTransient<IHelperStaticClassModule, HelperStaticClassModuleFacade>(app);
+            ServiceCollectionServiceExtensions.AddTransient<IHelperClassModule, HelperClassModuleFacade>(app);
+            ServiceCollectionServiceExtensions.AddTransient<ILocalStaticHelperModule, LocalStaticHelperModuleFacade>(app);
+            ServiceCollectionServiceExtensions.AddTransient<ILocalHelperModule, LocalHelperModuleFacade>(app);
         }
     }
 }

@@ -8,14 +8,14 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefi
 {
     public interface ITestApp : IAsyncDisposable
     {
-        Task<String> ExecuteAsync(TestRequestFromLocalHelper requestData, CancellationToken cancellationToken = default);
-
-        Task<String> ExecuteAsync(TestRequestFromLocalStaticHelper requestData, CancellationToken cancellationToken = default);
-
-        Task<String> ExecuteAsync(TestRequestFromHelperClass requestData, CancellationToken cancellationToken = default);
+        Task<String> ExecuteAsync(TestRequestFromHelperExtension requestData, CancellationToken cancellationToken = default);
 
         Task<String> ExecuteAsync(TestRequestFromHelperStaticClass requestData, CancellationToken cancellationToken = default);
 
-        Task<String> ExecuteAsync(TestRequestFromHelperExtension requestData, CancellationToken cancellationToken = default);
+        Task<String> ExecuteAsync(TestRequestFromHelperClass requestData, CancellationToken cancellationToken = default);
+
+        Task<String> ExecuteAsync(TestRequestFromLocalStaticHelper requestData, CancellationToken cancellationToken = default);
+
+        Task<String> ExecuteAsync(TestRequestFromLocalHelper requestData, CancellationToken cancellationToken = default);
     }
 }

@@ -10,19 +10,9 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefi
     {
         public TestAppPublisher(IEventPublisher genericPublisher) : base(genericPublisher) { }
 
-        public Task PublishAsync(TestEventFromLocalHelper eventPayload, CancellationToken cancellationToken)
+        public Task PublishAsync(TestEventFromHelperExtension eventPayload, CancellationToken cancellationToken)
         {
-            return PublishAsync<TestEventFromLocalHelper>(eventPayload, cancellationToken);
-        }
-
-        public Task PublishAsync(TestEventFromLocalStaticHelper eventPayload, CancellationToken cancellationToken)
-        {
-            return PublishAsync<TestEventFromLocalStaticHelper>(eventPayload, cancellationToken);
-        }
-
-        public Task PublishAsync(TestEventFromHelperClass eventPayload, CancellationToken cancellationToken)
-        {
-            return PublishAsync<TestEventFromHelperClass>(eventPayload, cancellationToken);
+            return PublishAsync<TestEventFromHelperExtension>(eventPayload, cancellationToken);
         }
 
         public Task PublishAsync(TestEventFromHelperStaticClass eventPayload, CancellationToken cancellationToken)
@@ -30,9 +20,19 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefi
             return PublishAsync<TestEventFromHelperStaticClass>(eventPayload, cancellationToken);
         }
 
-        public Task PublishAsync(TestEventFromHelperExtension eventPayload, CancellationToken cancellationToken)
+        public Task PublishAsync(TestEventFromHelperClass eventPayload, CancellationToken cancellationToken)
         {
-            return PublishAsync<TestEventFromHelperExtension>(eventPayload, cancellationToken);
+            return PublishAsync<TestEventFromHelperClass>(eventPayload, cancellationToken);
+        }
+
+        public Task PublishAsync(TestEventFromLocalStaticHelper eventPayload, CancellationToken cancellationToken)
+        {
+            return PublishAsync<TestEventFromLocalStaticHelper>(eventPayload, cancellationToken);
+        }
+
+        public Task PublishAsync(TestEventFromLocalHelper eventPayload, CancellationToken cancellationToken)
+        {
+            return PublishAsync<TestEventFromLocalHelper>(eventPayload, cancellationToken);
         }
     }
 }
