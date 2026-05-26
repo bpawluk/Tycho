@@ -1,14 +1,16 @@
 using Tycho.IntegrationTests.UsingGenericAppsAndModules.SUT;
+using Tycho.IntegrationTests.UsingGenericAppsAndModules.SUT.Contract;
+using Tycho.IntegrationTests.UsingGenericAppsAndModules.SUT.Modules;
 
 namespace Tycho.IntegrationTests.UsingGenericAppsAndModules;
 
 public sealed class UsingGenericAppsAndModulesTests : IAsyncLifetime
 {
-    private ITestApp<SamplePayload, Guid> _sut = null!;
+    private ITestApp<AppInput, AppOutput> _sut = null!;
 
     public async ValueTask InitializeAsync()
     {
-        _sut = await new TestApp<SamplePayload, Guid>().RunAsync();
+        _sut = await new TestApp<AppInput, AppOutput>().RunAsync();
     }
 
     [Fact(Timeout = 5000)]
@@ -21,9 +23,7 @@ public sealed class UsingGenericAppsAndModulesTests : IAsyncLifetime
         string response = await _sut.ExecuteAsync(new AppWorkflowRequest(result), TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.Equal("Test = Passed", response);
-        Assert.Equal(3, result.HandlingCount);
-        Assert.Equal("module-parent-chain", result.LastHandledBy);
+        Assert.Equal("Test = Passed in App<AppInput, AppOutput>", response);
     }
 
     [Fact(Timeout = 5000)]
@@ -36,9 +36,7 @@ public sealed class UsingGenericAppsAndModulesTests : IAsyncLifetime
         string response = await _sut.ExecuteAsync(new ModuleWorkflowRequest(result), TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.Equal("Test = Passed", response);
-        Assert.Equal(2, result.HandlingCount);
-        Assert.Equal("module-parent-chain", result.LastHandledBy);
+        Assert.Equal("Test = Passed in Module<ModuleInput, ModuleOutput>", response);
     }
 
     public async ValueTask DisposeAsync()

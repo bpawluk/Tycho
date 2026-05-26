@@ -1,18 +1,22 @@
 using Microsoft.Extensions.DependencyInjection;
+using Tycho.IntegrationTests.UsingGenericAppsAndModules.SUT.Contract;
 using Tycho.IntegrationTests.UsingGenericAppsAndModules.SUT.Modules.Handlers;
 using Tycho.Modules;
+using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.UsingGenericAppsAndModules.SUT.Modules;
 
+// Handles
+public sealed record ModuleWorkflowRequest(TestResult Result) : IRequest<string>;
+
 [TychoDefinition]
-public partial class TestModule<TPayload, TKey> : TychoModule
-    where TPayload : PayloadBase, IMarker, new()
-    where TKey : notnull
+public partial class TestModule<TInput, TOutput> : TychoModule
+    where TInput : IInput, new()
+    where TOutput : IOutput, new()
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<ModuleWorkflowRequest, string, ModuleWorkflowRequestHandler<TPayload, TKey>>()
-              .Requires<CompleteWorkflowRequest, string>();
+        module.Handles<ModuleWorkflowRequest, string, ModuleWorkflowRequestHandler<TInput, TOutput>>();
     }
 
     protected override void DefineEvents(IModuleEvents module) { }
