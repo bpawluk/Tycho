@@ -9,7 +9,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Structure
         private const string Namespace = "Tycho.Structure.Parent";
         private const string TypeName = "ParentBase";
 
-        public static TypeModel TypeModel => new TypeModel(Namespace,TypeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace, TypeName);
 
         public static MethodSignatureModel ExecuteAsyncMethodSignature => new MethodSignatureModel(
             methodName: "ExecuteAsync",

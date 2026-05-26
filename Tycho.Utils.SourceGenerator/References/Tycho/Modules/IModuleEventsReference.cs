@@ -23,9 +23,9 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
 
         public static string EventTypeParameterName => "TEvent";
 
-        public static TypeModel TypeModel => new TypeModel(Namespace,TypeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace, TypeName);
 
-        public static TypeModel EventRoutingTypeModel => new TypeModel(Namespace,EventRoutingTypeName);
+        public static TypeModel EventRoutingTypeModel => new TypeModel(Namespace, EventRoutingTypeName);
 
         public static MethodSignatureModel HandlesMethodSignature => new MethodSignatureModel(
             methodName: "Handles",

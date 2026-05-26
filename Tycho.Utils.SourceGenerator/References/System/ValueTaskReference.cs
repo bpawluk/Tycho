@@ -6,7 +6,7 @@ namespace Tycho.Utils.SourceGenerator.References.System
 {
     internal static class ValueTaskReference
     {
-        public static TypeModel TypeModel => new TypeModel(typeof(ValueTask).Namespace,nameof(ValueTask));
+        public static TypeModel TypeModel => new TypeModel(typeof(ValueTask).Namespace, nameof(ValueTask));
 
         public static MethodSignatureModel ConfigureAwaitMethodSignature => new MethodSignatureModel(
             methodName: "ConfigureAwait",

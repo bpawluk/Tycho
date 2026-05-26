@@ -10,7 +10,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Logging
         private const string Namespace = "Tycho.Logging";
         private const string TypeName = "LoggingConfiguration";
 
-        public static TypeModel TypeModel => new TypeModel(Namespace,TypeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace, TypeName);
 
         public static MethodSignatureModel ConfigureLoggingMethodSignature => new MethodSignatureModel(
             methodName: "ConfigureLogging",

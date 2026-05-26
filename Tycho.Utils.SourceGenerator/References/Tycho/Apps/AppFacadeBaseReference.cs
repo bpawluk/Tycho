@@ -9,7 +9,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
         private const string Namespace = "Tycho.Apps.Instance";
         private const string TypeName = "AppFacadeBase";
 
-        public static TypeModel TypeModel => new TypeModel(Namespace,TypeName);
+        public static TypeModel TypeModel => new TypeModel(Namespace, TypeName);
 
         public static MethodSignatureModel ExecuteAsyncMethodSignature => new MethodSignatureModel(
             methodName: "ExecuteAsync",
