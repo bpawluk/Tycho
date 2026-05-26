@@ -1,40 +1,87 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.Utils;
 
-namespace Tycho.Utils.SourceGenerator.Extensions
+namespace Tycho.Utils.SourceGenerator.Extractors
 {
-    internal static class NamedTypeSymbolExtensions
+    internal static class TypeModelExtractor
     {
-        public static ImmutableEquatableArray<string> GetTypeParameters(this INamedTypeSymbol typeSymbol)
+        public static TypeModel Extract(ITypeSymbol typeSymbol, ExtractorContext context)
         {
-            if (typeSymbol.TypeParameters.Length == 0)
-            {
-                return ImmutableEquatableArray<string>.Empty;
-            }
-            return typeSymbol.TypeParameters.Select(parameter => parameter.Name).ToImmutableEquatableArray();
+            context.CancellationToken.ThrowIfCancellationRequested();
+            return new TypeModel(
+                GetNamespace(typeSymbol),
+                GetContainingTypes(typeSymbol),
+                typeSymbol.Name,
+                GetTypeParameters(typeSymbol),
+                GetTypeParameterConstraintClauses(typeSymbol),
+                GetTypeArguments(typeSymbol));
         }
 
-        public static ImmutableEquatableArray<string> GetTypeArguments(this INamedTypeSymbol typeSymbol)
+        private static string GetNamespace(ITypeSymbol typeSymbol)
         {
-            if (typeSymbol.TypeArguments.Length == 0)
-            {
-                return ImmutableEquatableArray<string>.Empty;
-            }
-            return typeSymbol.TypeArguments.Select(GetTypeArgumentReferenceName).ToImmutableEquatableArray();
+            return typeSymbol.ContainingNamespace
+                .ToDisplayString(SymbolDisplayFormat
+                .FullyQualifiedFormat
+                .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted));
         }
 
-        public static ImmutableEquatableArray<string> GetTypeParameterConstraintClauses(this INamedTypeSymbol typeSymbol)
+        private static ImmutableEquatableArray<ContainingTypeModel> GetContainingTypes(ITypeSymbol typeSymbol)
         {
-            if (typeSymbol.TypeParameters.Length == 0)
+            var containingTypes = new Stack<ContainingTypeModel>();
+            for (INamedTypeSymbol containingTypeSymbol = typeSymbol.ContainingType;
+                containingTypeSymbol != null;
+                containingTypeSymbol = containingTypeSymbol.ContainingType)
             {
-                return ImmutableEquatableArray<string>.Empty;
+                Models.System.TypeKind kind = GetContainingTypeKind(containingTypeSymbol);
+                containingTypes.Push(new ContainingTypeModel(
+                    kind,
+                    GetContainingTypeModifiers(containingTypeSymbol, kind),
+                    containingTypeSymbol.Name,
+                    GetTypeParameters(containingTypeSymbol),
+                    GetTypeParameterConstraintClauses(containingTypeSymbol),
+                    GetTypeArguments(containingTypeSymbol)));
             }
-            return typeSymbol.TypeParameters.Select(GetTypeParameterConstraintClause).Where(clause => !string.IsNullOrWhiteSpace(clause)).ToImmutableEquatableArray();
+            return containingTypes.ToImmutableEquatableArray();
         }
 
-        public static Models.System.TypeKind GetContainingTypeKind(this INamedTypeSymbol typeSymbol)
+        private static ImmutableEquatableArray<string> GetTypeParameters(ITypeSymbol typeSymbol)
+        {
+            if (typeSymbol is INamedTypeSymbol namedTypeSymbol && namedTypeSymbol.TypeParameters.Length > 0)
+            {
+                return namedTypeSymbol.TypeParameters
+                    .Select(parameter => parameter.Name)
+                    .ToImmutableEquatableArray();
+            }
+            return ImmutableEquatableArray<string>.Empty;
+        }
+
+        private static ImmutableEquatableArray<string> GetTypeArguments(ITypeSymbol typeSymbol)
+        {
+            if (typeSymbol is INamedTypeSymbol namedTypeSymbol && namedTypeSymbol.TypeArguments.Length > 0)
+            {
+                return namedTypeSymbol.TypeArguments
+                    .Select(GetTypeArgumentReferenceName)
+                    .ToImmutableEquatableArray();
+            }
+            return ImmutableEquatableArray<string>.Empty;
+        }
+
+        private static ImmutableEquatableArray<string> GetTypeParameterConstraintClauses(ITypeSymbol typeSymbol)
+        {
+            if (typeSymbol is INamedTypeSymbol namedTypeSymbol && namedTypeSymbol.TypeParameters.Length > 0)
+            {
+                return namedTypeSymbol.TypeParameters
+                    .Select(GetTypeParameterConstraintClause)
+                    .Where(clause => !string.IsNullOrWhiteSpace(clause))
+                    .ToImmutableEquatableArray();
+            }
+            return ImmutableEquatableArray<string>.Empty;
+        }
+
+        private static Models.System.TypeKind GetContainingTypeKind(ITypeSymbol typeSymbol)
         {
             if (typeSymbol.IsRecord)
             {
@@ -45,13 +92,13 @@ namespace Tycho.Utils.SourceGenerator.Extensions
 
             return typeSymbol.TypeKind switch
             {
-                TypeKind.Interface => Models.System.TypeKind.Interface,
-                TypeKind.Struct => Models.System.TypeKind.Struct,
+                Microsoft.CodeAnalysis.TypeKind.Interface => Models.System.TypeKind.Interface,
+                Microsoft.CodeAnalysis.TypeKind.Struct => Models.System.TypeKind.Struct,
                 _ => Models.System.TypeKind.Class,
             };
         }
 
-        public static ImmutableEquatableArray<string> GetContainingTypeModifiers(this INamedTypeSymbol typeSymbol, Models.System.TypeKind kind)
+        private static ImmutableEquatableArray<string> GetContainingTypeModifiers(ITypeSymbol typeSymbol, Models.System.TypeKind kind)
         {
             var declarationTokens = new List<string>();
 

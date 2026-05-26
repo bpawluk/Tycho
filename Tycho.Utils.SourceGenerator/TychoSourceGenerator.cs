@@ -1,16 +1,12 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Operations;
-using Tycho.Utils.SourceGenerator.Extensions;
+using Tycho.Utils.SourceGenerator.Extractors;
 using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.Models.Tycho;
 using Tycho.Utils.SourceGenerator.Pipelines;
 using Tycho.Utils.SourceGenerator.References.Tycho;
-using Tycho.Utils.SourceGenerator.References.Tycho.Apps;
-using Tycho.Utils.SourceGenerator.References.Tycho.Modules;
 using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator
@@ -38,255 +34,30 @@ namespace Tycho.Utils.SourceGenerator
             return node is ClassDeclarationSyntax;
         }
 
-        private static (TychoDefinitionKind, ClassDefinitionModel) GetTychoPipelineBaseTransform(GeneratorAttributeSyntaxContext context, CancellationToken token)
+        private static (TychoDefinitionKind, ClassDefinitionModel) GetTychoPipelineBaseTransform(GeneratorAttributeSyntaxContext context, CancellationToken cancellationToken)
         {
-            token.ThrowIfCancellationRequested();
-            TychoDefinitionKind definitionKind = GetDefinitionKind(context, token);
-            TypeModel definitionType = GetDefinitionType(context.TargetSymbol, token);
-            ImmutableEquatableArray<MethodDefinitionModel> methods = GetMethodDefinitionModels(context, definitionType, token);
-            return (definitionKind, new ClassDefinitionModel(definitionType, methods));
-        }
+            cancellationToken.ThrowIfCancellationRequested();
 
-        private static TychoDefinitionKind GetDefinitionKind(GeneratorAttributeSyntaxContext context, CancellationToken token)
-        {
-            token.ThrowIfCancellationRequested();
-
-            if (!(context.TargetSymbol is ITypeSymbol typeSymbol))
+            if (context.TargetSymbol is ITypeSymbol targetTypeSymbol)
             {
-                return TychoDefinitionKind.Unknown;
+                Compilation compilation = context.SemanticModel.Compilation;
+                SemanticModelProvider semanticModelProvider = new SemanticModelProvider(compilation);
+                ExtractorContext extractorContext = new ExtractorContext(compilation, semanticModelProvider, cancellationToken);
+
+                TychoDefinitionKind definitionKind = TychoDefinitionKindExtractor.Extract(targetTypeSymbol, extractorContext);
+                TypeModel definitionType = TypeModelExtractor.Extract(targetTypeSymbol, extractorContext);
+
+                ImmutableEquatableArray<MethodDefinitionModel> methodDefinitions = targetTypeSymbol
+                    .GetMembers()
+                    .OfType<IMethodSymbol>()
+                    .Where(methodSymbol => methodSymbol.IsOverride)
+                    .Select(methodSymbol => MethodDefinitionExtractor.Extract(definitionType, methodSymbol, extractorContext))
+                    .ToImmutableEquatableArray();
+
+                return (definitionKind, new ClassDefinitionModel(definitionType, methodDefinitions));
             }
 
-            Compilation compilation = context.SemanticModel.Compilation;
-            INamedTypeSymbol tychoAppSymbol = compilation.GetTypeByMetadataName(TychoAppReference.FullName);
-            if (tychoAppSymbol != null && typeSymbol.InheritsFrom(tychoAppSymbol))
-            {
-                return TychoDefinitionKind.App;
-            }
-
-            INamedTypeSymbol tychoModuleSymbol = compilation.GetTypeByMetadataName(TychoModuleReference.FullName);
-            if (tychoModuleSymbol != null && typeSymbol.InheritsFrom(tychoModuleSymbol))
-            {
-                return TychoDefinitionKind.Module;
-            }
-
-            return TychoDefinitionKind.Unknown;
-        }
-
-        private static TypeModel GetDefinitionType(ISymbol symbol, CancellationToken token)
-        {
-            token.ThrowIfCancellationRequested();
-            return GetTypeModel(symbol);
-        }
-
-        private static ImmutableEquatableArray<MethodDefinitionModel> GetMethodDefinitionModels(
-            GeneratorAttributeSyntaxContext context,
-            TypeModel containingType,
-            CancellationToken token)
-        {
-            token.ThrowIfCancellationRequested();
-
-            if (!(context.TargetSymbol is ITypeSymbol classSymbol))
-            {
-                return ImmutableEquatableArray<MethodDefinitionModel>.Empty;
-            }
-
-            var methodModels = new HashSet<MethodDefinitionModel>();
-
-            foreach (IMethodSymbol methodSymbol in classSymbol.GetMembers().OfType<IMethodSymbol>())
-            {
-                token.ThrowIfCancellationRequested();
-
-                if (!methodSymbol.IsOverride)
-                {
-                    continue;
-                }
-
-                var methodModel = new MethodDefinitionModel(
-                    containingType,
-                    GetMethodSignatureModel(methodSymbol),
-                    GetMethodBody(context, methodSymbol, token));
-
-                methodModels.Add(methodModel);
-            }
-
-            return methodModels.ToImmutableEquatableArray();
-        }
-
-        private static MethodSignatureModel GetMethodSignatureModel(IMethodSymbol methodSymbol)
-        {
-            string methodName = methodSymbol.Name;
-            TypeModel returnType = GetTypeModel(methodSymbol.ReturnType);
-            var parameters = methodSymbol.Parameters
-                .Select(paramSymbol => GetTypeModel(paramSymbol.Type))
-                .ToImmutableEquatableArray();
-            return new MethodSignatureModel(methodName, parameters, returnType);
-        }
-
-        private static ImmutableEquatableArray<MethodInvocationModel> GetMethodBody(GeneratorAttributeSyntaxContext context, IMethodSymbol methodSymbol, CancellationToken token)
-        {
-            var methodInvocations = new HashSet<MethodInvocationModel>();
-            var visitedMethods = new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default);
-            var semanticModels = new Dictionary<SyntaxTree, SemanticModel>();
-            CollectMethodInvocations(
-                context.SemanticModel.Compilation,
-                methodSymbol,
-                methodInvocations,
-                visitedMethods,
-                semanticModels,
-                token);
-            return methodInvocations.ToImmutableEquatableArray();
-        }
-
-        private static void CollectMethodInvocations(
-            Compilation compilation,
-            IMethodSymbol methodSymbol,
-            HashSet<MethodInvocationModel> methodInvocations,
-            HashSet<IMethodSymbol> visitedMethods,
-            Dictionary<SyntaxTree, SemanticModel> semanticModels,
-            CancellationToken token)
-        {
-            token.ThrowIfCancellationRequested();
-
-            var pendingMethods = new Stack<IMethodSymbol>();
-            pendingMethods.Push(methodSymbol);
-
-            while (pendingMethods.Count > 0)
-            {
-                token.ThrowIfCancellationRequested();
-                IMethodSymbol pendingMethodSymbol = pendingMethods.Pop();
-                IMethodSymbol traversedMethodSymbol = (pendingMethodSymbol.ReducedFrom ?? pendingMethodSymbol).OriginalDefinition;
-                if (!visitedMethods.Add(traversedMethodSymbol))
-                {
-                    continue;
-                }
-
-                foreach (SyntaxReference syntaxRef in traversedMethodSymbol.DeclaringSyntaxReferences)
-                {
-                    token.ThrowIfCancellationRequested();
-                    SyntaxNode declarationSyntax = syntaxRef.GetSyntax(token);
-                    SyntaxTree declarationSyntaxTree;
-                    IEnumerable<InvocationExpressionSyntax> invocationExpressions;
-
-                    if (declarationSyntax is MethodDeclarationSyntax methodSyntax)
-                    {
-                        declarationSyntaxTree = methodSyntax.SyntaxTree;
-                        invocationExpressions =
-                            (methodSyntax.Body?.DescendantNodes().OfType<InvocationExpressionSyntax>() ?? Enumerable.Empty<InvocationExpressionSyntax>())
-                                .Concat(methodSyntax.ExpressionBody?.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>() ?? Enumerable.Empty<InvocationExpressionSyntax>());
-                    }
-                    else if (declarationSyntax is LocalFunctionStatementSyntax localFunctionSyntax)
-                    {
-                        declarationSyntaxTree = localFunctionSyntax.SyntaxTree;
-                        invocationExpressions =
-                            (localFunctionSyntax.Body?.DescendantNodes().OfType<InvocationExpressionSyntax>() ?? Enumerable.Empty<InvocationExpressionSyntax>())
-                                .Concat(localFunctionSyntax.ExpressionBody?.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>() ?? Enumerable.Empty<InvocationExpressionSyntax>());
-                    }
-                    else
-                    {
-                        continue;
-                    }
-
-                    if (!compilation.ContainsSyntaxTree(declarationSyntaxTree))
-                    {
-                        continue;
-                    }
-
-                    if (!semanticModels.TryGetValue(declarationSyntaxTree, out SemanticModel semanticModel))
-                    {
-                        semanticModel = compilation.GetSemanticModel(declarationSyntaxTree);
-                        semanticModels[declarationSyntaxTree] = semanticModel;
-                    }
-
-                    foreach (InvocationExpressionSyntax invocationSyntax in invocationExpressions)
-                    {
-                        token.ThrowIfCancellationRequested();
-                        IMethodSymbol invokedMethodSymbol = (semanticModel.GetOperation(invocationSyntax, token) as IInvocationOperation)?.TargetMethod;
-                        if (invokedMethodSymbol == null)
-                        {
-                            SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(invocationSyntax, token);
-                            if (symbolInfo.Symbol is IMethodSymbol resolvedMethodSymbol)
-                            {
-                                invokedMethodSymbol = resolvedMethodSymbol;
-                            }
-                            else if (symbolInfo.CandidateSymbols.Length == 1 && symbolInfo.CandidateSymbols[0] is IMethodSymbol candidateMethodSymbol)
-                            {
-                                invokedMethodSymbol = candidateMethodSymbol;
-                            }
-                        }
-
-                        if (invokedMethodSymbol == null)
-                        {
-                            continue;
-                        }
-
-                        IMethodSymbol methodInvocationSymbol = (invokedMethodSymbol.ReducedFrom ?? invokedMethodSymbol).OriginalDefinition;
-                        methodInvocations.Add(
-                            new MethodInvocationModel(
-                                GetMethodSignatureModel(methodInvocationSymbol),
-                                invokedMethodSymbol.ReceiverType is ISymbol receiverSymbol
-                                    ? GetTypeModel(receiverSymbol)
-                                    : default,
-                                invokedMethodSymbol.TypeParameters
-                                    .Zip(invokedMethodSymbol.TypeArguments, GetTypeArgumentModel)
-                                    .ToImmutableEquatableArray()));
-
-                        if (methodInvocationSymbol.DeclaringSyntaxReferences.Any(syntaxReference => compilation.ContainsSyntaxTree(syntaxReference.SyntaxTree)))
-                        {
-                            pendingMethods.Push(methodInvocationSymbol);
-                        }
-                    }
-                }
-            }
-        }
-
-        private static TypeModel GetTypeModel(ISymbol symbol)
-        {
-            string typeNamespace = symbol
-                .ContainingNamespace
-                .ToDisplayString(SymbolDisplayFormat
-                    .FullyQualifiedFormat
-                    .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted));
-
-            if (symbol is INamedTypeSymbol namedSymbol)
-            {
-                var containingTypes = new Stack<ContainingTypeModel>();
-
-                for (INamedTypeSymbol containingTypeSymbol = symbol.ContainingType;
-                    containingTypeSymbol != null;
-                    containingTypeSymbol = containingTypeSymbol.ContainingType)
-                {
-                    Models.System.TypeKind kind = containingTypeSymbol.GetContainingTypeKind();
-                    containingTypes.Push(new ContainingTypeModel(
-                        kind,
-                        containingTypeSymbol.GetContainingTypeModifiers(kind),
-                        containingTypeSymbol.Name,
-                        containingTypeSymbol.GetTypeParameters(),
-                        containingTypeSymbol.GetTypeParameterConstraintClauses(),
-                        containingTypeSymbol.GetTypeArguments()));
-                }
-
-                return new TypeModel(
-                    typeNamespace,
-                    containingTypes.ToImmutableEquatableArray(),
-                    namedSymbol.Name,
-                    namedSymbol.GetTypeParameters(),
-                    namedSymbol.GetTypeParameterConstraintClauses(),
-                    namedSymbol.GetTypeArguments());
-            }
-
-            string typeName = symbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
-            return new TypeModel(
-                typeNamespace,
-                ImmutableEquatableArray<ContainingTypeModel>.Empty,
-                typeName,
-                ImmutableEquatableArray<string>.Empty,
-                ImmutableEquatableArray<string>.Empty,
-                ImmutableEquatableArray<string>.Empty);
-        }
-
-        private static TypeArgument GetTypeArgumentModel(ITypeParameterSymbol typeParameter, ITypeSymbol typeArgument)
-        {
-            return new TypeArgument(typeParameter.Name, GetTypeModel(typeArgument));
+            return (TychoDefinitionKind.Unknown, default);
         }
     }
 }
