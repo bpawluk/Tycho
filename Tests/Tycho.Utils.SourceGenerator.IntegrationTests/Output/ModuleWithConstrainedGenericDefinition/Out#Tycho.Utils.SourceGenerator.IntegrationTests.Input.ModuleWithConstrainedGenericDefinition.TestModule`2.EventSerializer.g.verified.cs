@@ -1,5 +1,6 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithConstrainedGenericDefinition.TestModule`2.EventSerializer.g.cs
 using Tycho.Events.Serialization;
+using Tycho.Utils.SourceGenerator.IntegrationTests.Input.SharedConstraints;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithConstrainedGenericDefinition
 {

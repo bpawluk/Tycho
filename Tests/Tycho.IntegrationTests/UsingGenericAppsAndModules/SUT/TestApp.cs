@@ -32,5 +32,3 @@ public partial class TestApp<TInput, TOutput> : TychoApp
 
     protected override void RegisterServices(IServiceCollection app) { }
 }
-
-// 

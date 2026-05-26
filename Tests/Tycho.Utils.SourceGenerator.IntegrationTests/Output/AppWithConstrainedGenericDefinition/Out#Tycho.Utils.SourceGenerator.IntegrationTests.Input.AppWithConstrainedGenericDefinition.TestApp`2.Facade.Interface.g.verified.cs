@@ -2,6 +2,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Tycho.Utils.SourceGenerator.IntegrationTests.Input.SharedConstraints;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithConstrainedGenericDefinition
 {

@@ -1,9 +1,14 @@
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
 
-namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithConstrainedGenericDefinition
+namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.SharedConstraints
 {
     public abstract class PayloadBase { }
+}
+
+namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithConstrainedGenericDefinition
+{
+    using Tycho.Utils.SourceGenerator.IntegrationTests.Input.SharedConstraints;
 
     public interface IMarker { }
 

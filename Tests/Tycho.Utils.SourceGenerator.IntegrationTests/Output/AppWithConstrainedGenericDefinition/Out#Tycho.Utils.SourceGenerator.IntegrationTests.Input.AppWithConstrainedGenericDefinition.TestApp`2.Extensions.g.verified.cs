@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Threading.Tasks;
 using Tycho.Logging;
+using Tycho.Utils.SourceGenerator.IntegrationTests.Input.SharedConstraints;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithConstrainedGenericDefinition
 {

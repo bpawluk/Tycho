@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Tycho.Apps;
 using Tycho.Events.Serialization;
 using Tycho.Modules.Instance;
+using Tycho.Utils.SourceGenerator.IntegrationTests.Input.SharedConstraints;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithConstrainedGenericDefinition
 {

@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Events.Publishing;
-using Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefinitions;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefinitions
 {

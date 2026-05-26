@@ -3,7 +3,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Apps.Instance;
-using Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefinitions;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefinitions
 {
