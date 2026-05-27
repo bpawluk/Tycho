@@ -5,10 +5,12 @@ namespace Tycho.Utils.SourceGenerator.Models.System
     public readonly struct TypeKind : IEquatable<TypeKind>
     {
         public static TypeKind Class { get; } = new TypeKind("class");
-        public static TypeKind Interface { get; } = new TypeKind("interface");
-        public static TypeKind Struct { get; } = new TypeKind("struct");
         public static TypeKind RecordClass { get; } = new TypeKind("record class");
+        public static TypeKind Struct { get; } = new TypeKind("struct");
         public static TypeKind RecordStruct { get; } = new TypeKind("record struct");
+        public static TypeKind Interface { get; } = new TypeKind("interface");
+        public static TypeKind Enum { get; } = new TypeKind("enum");
+        public static TypeKind Other { get; } = new TypeKind("other");
 
         public string Keyword { get; }
 

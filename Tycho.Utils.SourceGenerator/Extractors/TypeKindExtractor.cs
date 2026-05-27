@@ -17,9 +17,11 @@ namespace Tycho.Utils.SourceGenerator.Extractors
 
             return typeSymbol.TypeKind switch
             {
-                TypeKind.Interface => Models.System.TypeKind.Interface,
+                TypeKind.Class => Models.System.TypeKind.Class,
                 TypeKind.Struct => Models.System.TypeKind.Struct,
-                _ => Models.System.TypeKind.Class,
+                TypeKind.Interface => Models.System.TypeKind.Interface,
+                TypeKind.Enum => Models.System.TypeKind.Enum,
+                _ => Models.System.TypeKind.Other,
             };
         }
     }

@@ -11,12 +11,11 @@ namespace Tycho.Utils.SourceGenerator.Extractors
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
-            Models.System.TypeKind typeKind = TypeKindExtractor.Extract(typeSymbol, context);
             return new TypeModel(
                 GetNamespace(typeSymbol),
                 GetContainingTypes(typeSymbol, context),
-                typeKind,
-                TypeModifiersExtractor.Extract(typeSymbol, typeKind, context),
+                TypeKindExtractor.Extract(typeSymbol, context),
+                TypeModifiersExtractor.Extract(typeSymbol, context),
                 typeSymbol.Name,
                 TypeParametersExtractor.Extract(typeSymbol, context),
                 TypeArgumentsModelExtractor.Extract(typeSymbol, context));
@@ -37,12 +36,11 @@ namespace Tycho.Utils.SourceGenerator.Extractors
                 containingTypeSymbol != null;
                 containingTypeSymbol = containingTypeSymbol.ContainingType)
             {
-                Models.System.TypeKind typeKind = TypeKindExtractor.Extract(containingTypeSymbol, context);
                 containingTypes.Push(new TypeModel(
                     GetNamespace(containingTypeSymbol),
                     ImmutableEquatableArray<TypeModel>.Empty,
-                    typeKind,
-                    TypeModifiersExtractor.Extract(containingTypeSymbol, typeKind, context),
+                    TypeKindExtractor.Extract(containingTypeSymbol, context),
+                    TypeModifiersExtractor.Extract(containingTypeSymbol, context),
                     containingTypeSymbol.Name,
                     TypeParametersExtractor.Extract(containingTypeSymbol, context),
                     TypeArgumentsModelExtractor.Extract(containingTypeSymbol, context)));
