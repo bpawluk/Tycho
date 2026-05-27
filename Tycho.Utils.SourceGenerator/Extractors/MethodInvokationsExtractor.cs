@@ -14,16 +14,22 @@ namespace Tycho.Utils.SourceGenerator.Extractors
     {
         public static ImmutableEquatableArray<MethodInvocationModel> Extract(IMethodSymbol methodSymbol, ExtractorContext context)
         {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
             var methodInvocations = new HashSet<MethodInvocationModel>();
             var visitTracker = new VisitTracker<IMethodSymbol>(SymbolEqualityComparer.Default);
-            var traversalState = new TraversalState<IMethodSymbol>();
 
-            traversalState.SaveToVisit(methodSymbol);
-            visitTracker.TryVisit(methodSymbol.GetOriginalDefinition());
+            var traversalState = new TraversalState<IMethodSymbol>();
+            traversalState.SaveToVisit(methodSymbol.GetOriginalDefinition());
 
             while (traversalState.GetNextToVisit(out IMethodSymbol currentMethodSymbol))
             {
                 context.CancellationToken.ThrowIfCancellationRequested();
+
+                if (!visitTracker.TryVisit(currentMethodSymbol))
+                {
+                    continue;
+                }
 
                 foreach (SyntaxReference syntaxReference in currentMethodSymbol.DeclaringSyntaxReferences)
                 {
@@ -49,7 +55,8 @@ namespace Tycho.Utils.SourceGenerator.Extractors
 
                         if (TryGetInvokedMethodSymbol(semanticModel, invocationSyntax, context.CancellationToken, out IMethodSymbol invokedMethodSymbol))
                         {
-                            traversalState.SaveToVisit(invokedMethodSymbol.GetOriginalDefinition());
+                            IMethodSymbol originalInvokedMethodSymbol = invokedMethodSymbol.GetOriginalDefinition();
+                            traversalState.SaveToVisit(originalInvokedMethodSymbol);
                             methodInvocations.Add(MethodInvokationExtractor.Extract(invokedMethodSymbol, context));
                         }
                     }

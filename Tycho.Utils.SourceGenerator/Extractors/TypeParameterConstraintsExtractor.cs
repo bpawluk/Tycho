@@ -17,13 +17,11 @@ namespace Tycho.Utils.SourceGenerator.Extractors
             {
                 constraints.Add(TypeParameterConstraintModel.Unmanaged);
             }
-
-            if (typeParameterSymbol.HasValueTypeConstraint)
+            else if (typeParameterSymbol.HasValueTypeConstraint)
             {
                 constraints.Add(TypeParameterConstraintModel.ValueType);
             }
-
-            if (typeParameterSymbol.HasReferenceTypeConstraint)
+            else if (typeParameterSymbol.HasReferenceTypeConstraint)
             {
                 TypeParameterConstraintModel referenceTypeConstraint = typeParameterSymbol.ReferenceTypeConstraintNullableAnnotation == NullableAnnotation.Annotated
                     ? TypeParameterConstraintModel.NullableReferenceType
@@ -36,6 +34,12 @@ namespace Tycho.Utils.SourceGenerator.Extractors
                 constraints.Add(TypeParameterConstraintModel.NotNull);
             }
 
+            foreach (ITypeSymbol constraintType in typeParameterSymbol.ConstraintTypes)
+            {
+                constraints.Add(TypeParameterConstraintModel.TypeConstraint(
+                    TypeModelExtractor.Extract(constraintType, context)));
+            }
+
             if (typeParameterSymbol.HasConstructorConstraint)
             {
                 constraints.Add(TypeParameterConstraintModel.Constructor);
@@ -44,12 +48,6 @@ namespace Tycho.Utils.SourceGenerator.Extractors
             if (typeParameterSymbol.AllowsRefLikeType)
             {
                 constraints.Add(TypeParameterConstraintModel.AllowsRefStruct);
-            }
-
-            foreach (ITypeSymbol constraintType in typeParameterSymbol.ConstraintTypes)
-            {
-                constraints.Add(TypeParameterConstraintModel.TypeConstraint(
-                    TypeModelExtractor.Extract(constraintType, context)));
             }
 
             return constraints.ToImmutableEquatableArray();
