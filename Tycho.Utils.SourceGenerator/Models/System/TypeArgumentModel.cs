@@ -15,6 +15,12 @@ namespace Tycho.Utils.SourceGenerator.Models.System
             Value = value;
         }
 
+        public bool Matches(TypeArgumentModel other)
+        {
+            return string.Equals(Name, other.Name, StringComparison.Ordinal)
+                && Value.Matches(other.Value);
+        }
+
         public bool Equals(TypeArgumentModel other)
         {
             return string.Equals(Name, other.Name, StringComparison.Ordinal)

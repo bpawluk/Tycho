@@ -2,9 +2,9 @@ using Tycho;
 using Tycho.Apps;
 using Microsoft.Extensions.DependencyInjection;
 
-public class Outer
+public partial class Outer
 {
-    public class Inner
+    public partial class Inner
     {
 
         [TychoDefinition]

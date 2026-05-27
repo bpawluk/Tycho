@@ -42,6 +42,14 @@ namespace Tycho.Utils.SourceGenerator.Models.System
             TypeArguments = typeArguments ?? ImmutableEquatableArray<TypeArgumentModel>.Empty;
         }
 
+        public bool Matches(TypeReferenceModel other)
+        {
+            return string.Equals(Namespace, other.Namespace, StringComparison.Ordinal)
+                && string.Equals(Name, other.Name, StringComparison.Ordinal)
+                && TypeArguments.Count == other.TypeArguments.Count
+                && TypeArguments.Zip(other.TypeArguments, (a, b) => a.Matches(b)).All(match => match);
+        }
+
         public bool Equals(TypeReferenceModel other)
         {
             return string.Equals(Namespace, other.Namespace, StringComparison.Ordinal)

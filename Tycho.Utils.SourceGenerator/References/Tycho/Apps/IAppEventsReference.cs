@@ -25,7 +25,16 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
 
         public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
 
-        public static TypeReferenceModel EventRoutingTypeModel => new TypeReferenceModel(Namespace, EventRoutingTypeName);
+        public static TypeReferenceModel EventRoutingTypeModel => new TypeReferenceModel(
+            Namespace,
+            ImmutableEquatableArray<TypeReferenceModel>.Empty,
+            EventRoutingTypeName,
+            new ImmutableEquatableArray<TypeArgumentModel>(new[]
+            {
+                new TypeArgumentModel(
+                    EventTypeParameterName,
+                    new TypeReferenceModel(Namespace, EventTypeParameterName)),
+            }));
 
         public static MethodSignatureModel HandlesMethodSignature => new MethodSignatureModel(
             methodName: "Handles",

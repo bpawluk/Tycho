@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.Models.System
@@ -19,6 +20,14 @@ namespace Tycho.Utils.SourceGenerator.Models.System
             MethodName = methodName ?? string.Empty;
             Parameters = parameters ?? ImmutableEquatableArray<TypeReferenceModel>.Empty;
             Result = result;
+        }
+
+        public bool Matches(MethodSignatureModel other)
+        {
+            return string.Equals(MethodName, other.MethodName, StringComparison.Ordinal) &&
+                   Parameters.Count == other.Parameters.Count &&
+                   Parameters.Zip(other.Parameters, (a, b) => a.Matches(b)).All(match => match) &&
+                   Result.Matches(other.Result);
         }
 
         public bool Equals(MethodSignatureModel other)

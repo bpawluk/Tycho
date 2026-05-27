@@ -3,9 +3,9 @@ using Tycho.Modules;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInNamespaceAndOuterTypes
 {
-    public class Outer
+    public partial class Outer
     {
-        public class Inner
+        public partial class Inner
         {
             [TychoDefinition]
             public partial class TestModule : TychoModule

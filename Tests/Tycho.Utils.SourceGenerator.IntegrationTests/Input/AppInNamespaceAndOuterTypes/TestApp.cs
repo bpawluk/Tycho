@@ -3,9 +3,9 @@ using Tycho.Apps;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInNamespaceAndOuterTypes
 {
-    public class Outer
+    public partial class Outer
     {
-        public class Inner
+        public partial class Inner
         {
             [TychoDefinition]
             public partial class TestApp : TychoApp
