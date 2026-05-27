@@ -9,8 +9,6 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 {
     internal class ModuleFacadeTM : TemplateModelBase
     {
-        public string Namespace { get; }
-
         public string[] ContainingTypes { get; }
 
         public string[] OwnerConstraints { get; }

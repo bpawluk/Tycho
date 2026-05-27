@@ -9,8 +9,6 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 {
     internal class AppExtensionsTM : TemplateModelBase
     {
-        public string Namespace { get; }
-
         public string[] ContainingTypes { get; }
 
         public string[] OwnerConstraints { get; }
@@ -30,8 +28,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public AppExtensionsTM(TychoExtensionsModel tychoExtensionsModel)
         {
             string[] allTypeParameters = tychoExtensionsModel.DefinitionType.ContainingTypes
-                .SelectMany(containingType => containingType.TypeParameters)
-                .Concat(tychoExtensionsModel.DefinitionType.TypeParameters)
+                .SelectMany(containingType => containingType.TypeParameters.Select(typeParameter => typeParameter.Name))
+                .Concat(tychoExtensionsModel.DefinitionType.TypeParameters.Select(typeParameter => typeParameter.Name))
                 .Distinct()
                 .ToArray();
             Namespace = tychoExtensionsModel.DefinitionType.Namespace;

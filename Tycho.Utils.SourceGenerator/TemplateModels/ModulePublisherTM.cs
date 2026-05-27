@@ -2,15 +2,12 @@ using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
 using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.References.Tycho.Events;
-using Tycho.Utils.SourceGenerator.References.Tycho.Modules;
 using Tycho.Utils.SourceGenerator.Symbols;
 
 namespace Tycho.Utils.SourceGenerator.TemplateModels
 {
     internal class ModulePublisherTM : TemplateModelBase
     {
-        public string Namespace { get; }
-
         public string[] ContainingTypes { get; }
 
         public string[] OwnerConstraints { get; }

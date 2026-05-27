@@ -10,8 +10,6 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 {
     internal class ModuleParentInterfaceTM : TemplateModelBase
     {
-        public string Namespace { get; }
-
         public string[] ContainingTypes { get; }
 
         public string[] OwnerConstraints { get; }
