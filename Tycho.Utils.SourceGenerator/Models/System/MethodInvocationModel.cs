@@ -9,12 +9,12 @@ namespace Tycho.Utils.SourceGenerator.Models.System
 
         public TypeModel? ReceiverType { get; }
 
-        public ImmutableEquatableArray<TypeArgument> TypeArguments { get; }
+        public ImmutableEquatableArray<TypeArgumentModel> TypeArguments { get; }
 
         public MethodInvocationModel(
             MethodSignatureModel signature,
             TypeModel? receiverType,
-            ImmutableEquatableArray<TypeArgument> typeArguments)
+            ImmutableEquatableArray<TypeArgumentModel> typeArguments)
         {
             Signature = signature;
             ReceiverType = receiverType;

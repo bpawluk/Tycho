@@ -25,11 +25,11 @@ namespace Tycho.Utils.SourceGenerator.Extractors
             return default;
         }
 
-        private static ImmutableEquatableArray<TypeArgument> GetTypeArguments(IMethodSymbol methodSymbol, ExtractorContext context)
+        private static ImmutableEquatableArray<TypeArgumentModel> GetTypeArguments(IMethodSymbol methodSymbol, ExtractorContext context)
         {
             return methodSymbol.TypeParameters
                 .Zip(methodSymbol.TypeArguments, (typeParameter, typeArgument) =>
-                    new TypeArgument(
+                    new TypeArgumentModel(
                         typeParameter.Name,
                         TypeModelExtractor.Extract(typeArgument, context)))
                 .ToImmutableEquatableArray();

@@ -12,11 +12,9 @@ namespace Tycho.Utils.SourceGenerator.Models.System
 
         public string Name { get; }
 
-        public ImmutableEquatableArray<string> TypeParameters { get; }
+        public ImmutableEquatableArray<TypeParameterModel> TypeParameters { get; }
 
-        public ImmutableEquatableArray<string> TypeParameterConstraintClauses { get; }
-
-        public ImmutableEquatableArray<string> TypeArguments { get; }
+        public ImmutableEquatableArray<TypeArgumentModel> TypeArguments { get; }
 
         public string TypeParametersSuffix => BuildTypeSuffix(TypeParameters);
 
@@ -46,9 +44,8 @@ namespace Tycho.Utils.SourceGenerator.Models.System
                 typeNamespace,
                 ImmutableEquatableArray<ContainingTypeModel>.Empty,
                 typeName,
-                ImmutableEquatableArray<string>.Empty,
-                ImmutableEquatableArray<string>.Empty,
-                ImmutableEquatableArray<string>.Empty)
+                ImmutableEquatableArray<TypeParameterModel>.Empty,
+                ImmutableEquatableArray<TypeArgumentModel>.Empty)
         {
         }
 
@@ -56,16 +53,14 @@ namespace Tycho.Utils.SourceGenerator.Models.System
             string typeNamespace,
             ImmutableEquatableArray<ContainingTypeModel> containingTypes,
             string typeName,
-            ImmutableEquatableArray<string> typeParameters,
-            ImmutableEquatableArray<string> typeParameterConstraintClauses,
-            ImmutableEquatableArray<string> typeArguments)
+            ImmutableEquatableArray<TypeParameterModel> typeParameters,
+            ImmutableEquatableArray<TypeArgumentModel> typeArguments)
         {
             Namespace = typeNamespace ?? string.Empty;
             ContainingTypes = containingTypes ?? ImmutableEquatableArray<ContainingTypeModel>.Empty;
             Name = typeName;
-            TypeParameters = typeParameters ?? ImmutableEquatableArray<string>.Empty;
-            TypeParameterConstraintClauses = typeParameterConstraintClauses ?? ImmutableEquatableArray<string>.Empty;
-            TypeArguments = typeArguments ?? ImmutableEquatableArray<string>.Empty;
+            TypeParameters = typeParameters ?? ImmutableEquatableArray<TypeParameterModel>.Empty;
+            TypeArguments = typeArguments ?? ImmutableEquatableArray<TypeArgumentModel>.Empty;
         }
 
         public bool Equals(TypeModel other)
@@ -74,7 +69,6 @@ namespace Tycho.Utils.SourceGenerator.Models.System
                 && ContainingTypes.Equals(other.ContainingTypes)
                 && string.Equals(Name, other.Name, StringComparison.Ordinal)
                 && TypeParameters.Equals(other.TypeParameters)
-                && TypeParameterConstraintClauses.Equals(other.TypeParameterConstraintClauses)
                 && TypeArguments.Equals(other.TypeArguments);
         }
 
@@ -90,7 +84,6 @@ namespace Tycho.Utils.SourceGenerator.Models.System
                 ContainingTypes.GetHashCode(),
                 StringComparer.Ordinal.GetHashCode(Name ?? string.Empty),
                 TypeParameters.GetHashCode(),
-                TypeParameterConstraintClauses.GetHashCode(),
                 TypeArguments.GetHashCode());
         }
 
