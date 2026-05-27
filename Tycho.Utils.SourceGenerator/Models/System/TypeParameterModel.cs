@@ -11,7 +11,7 @@ namespace Tycho.Utils.SourceGenerator.Models.System
 
         public TypeParameterModel(string name, ImmutableEquatableArray<TypeParameterConstraintModel> constraints)
         {
-            Name = name;
+            Name = name ?? string.Empty;
             Constraints = constraints ?? ImmutableEquatableArray<TypeParameterConstraintModel>.Empty;
         }
 
@@ -29,7 +29,7 @@ namespace Tycho.Utils.SourceGenerator.Models.System
         public override int GetHashCode()
         {
             return HashCode.Combine(
-                StringComparer.Ordinal.GetHashCode(Name ?? string.Empty),
+                StringComparer.Ordinal.GetHashCode(Name),
                 Constraints.GetHashCode());
         }
 

@@ -14,7 +14,7 @@ namespace Tycho.Utils.SourceGenerator.Models.System
             ImmutableEquatableArray<MethodDefinitionModel> methods)
         {
             ClassType = classType;
-            Methods = methods;
+            Methods = methods ?? ImmutableEquatableArray<MethodDefinitionModel>.Empty;
         }
 
         public bool Equals(ClassDefinitionModel other)

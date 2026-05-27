@@ -11,7 +11,7 @@ namespace Tycho.Utils.SourceGenerator.Models.System
 
         public TypeArgumentModel(string name, TypeModel value)
         {
-            Name = name;
+            Name = name ?? string.Empty;
             Value = value;
         }
 
@@ -29,7 +29,7 @@ namespace Tycho.Utils.SourceGenerator.Models.System
         public override int GetHashCode()
         {
             return HashCode.Combine(
-                StringComparer.Ordinal.GetHashCode(Name ?? string.Empty),
+                StringComparer.Ordinal.GetHashCode(Name),
                 Value.GetHashCode());
         }
 

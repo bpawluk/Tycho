@@ -18,13 +18,14 @@ namespace Tycho.Utils.SourceGenerator.Models.System
         {
             Signature = signature;
             ReceiverType = receiverType;
-            TypeArguments = typeArguments;
+            TypeArguments = typeArguments ?? ImmutableEquatableArray<TypeArgumentModel>.Empty;
         }
 
         public bool Equals(MethodInvocationModel other)
         {
+            bool bothReceiversNull = ReceiverType is null && other.ReceiverType is null;
             return Signature.Equals(other.Signature) &&
-                   ReceiverType.Equals(other.ReceiverType) &&
+                   (bothReceiversNull || ReceiverType?.Equals(other.ReceiverType) == true) &&
                    TypeArguments.Equals(other.TypeArguments);
         }
 
@@ -37,7 +38,7 @@ namespace Tycho.Utils.SourceGenerator.Models.System
         {
             return HashCode.Combine(
                 Signature.GetHashCode(),
-                ReceiverType.GetHashCode(),
+                ReceiverType?.GetHashCode() ?? 0,
                 TypeArguments.GetHashCode());
         }
 

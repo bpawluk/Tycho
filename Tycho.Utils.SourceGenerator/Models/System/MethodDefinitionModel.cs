@@ -18,7 +18,7 @@ namespace Tycho.Utils.SourceGenerator.Models.System
         {
             ContainingType = containingType;
             Signature = signature;
-            Body = body;
+            Body = body ?? ImmutableEquatableArray<MethodInvocationModel>.Empty;
         }
 
         public bool Equals(MethodDefinitionModel other)

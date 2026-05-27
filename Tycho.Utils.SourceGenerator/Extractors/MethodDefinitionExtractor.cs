@@ -8,6 +8,7 @@ namespace Tycho.Utils.SourceGenerator.Extractors
         public static MethodDefinitionModel Extract(TypeModel containingType, IMethodSymbol methodSymbol, ExtractorContext context)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
+
             return new MethodDefinitionModel(
                 containingType,
                 MethodSignatureExtractor.Extract(methodSymbol, context),

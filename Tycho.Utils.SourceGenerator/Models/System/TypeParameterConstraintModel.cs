@@ -5,20 +5,37 @@ namespace Tycho.Utils.SourceGenerator.Models.System
 {
     public readonly struct TypeParameterConstraintModel : IEquatable<TypeParameterConstraintModel>
     {
-        public TypeParameterConstraintKind Kind { get; }
+        public static TypeParameterConstraintModel ReferenceType { get; } = new TypeParameterConstraintModel("class", type: null);
+
+        public static TypeParameterConstraintModel NullableReferenceType { get; } = new TypeParameterConstraintModel("class?", type: null);
+
+        public static TypeParameterConstraintModel ValueType { get; } = new TypeParameterConstraintModel("struct", type: null);
+
+        public static TypeParameterConstraintModel Unmanaged { get; } = new TypeParameterConstraintModel("unmanaged", type: null);
+
+        public static TypeParameterConstraintModel NotNull { get; } = new TypeParameterConstraintModel("notnull", type: null);
+
+        public static TypeParameterConstraintModel Constructor { get; } = new TypeParameterConstraintModel("new()", type: null);
+
+        public static TypeParameterConstraintModel AllowsRefStruct { get; } = new TypeParameterConstraintModel("allows ref struct", type: null);
+
+        public static TypeParameterConstraintModel TypeConstraint(TypeModel type) => new TypeParameterConstraintModel(type.ReferenceName, type);
+
+        public string Keyword { get; }
 
         public TypeModel? Type { get; }
 
-        public TypeParameterConstraintModel(TypeParameterConstraintKind kind, TypeModel? type)
+        private TypeParameterConstraintModel(string keyword, TypeModel? type)
         {
-            Kind = kind;
+            Keyword = keyword ?? string.Empty;
             Type = type;
         }
 
         public bool Equals(TypeParameterConstraintModel other)
         {
             bool bothTypesNull = Type is null && other.Type is null;
-            return Kind == other.Kind && (bothTypesNull || Type?.Equals(other.Type) == true);
+            return string.Equals(Keyword, other.Keyword, StringComparison.Ordinal)
+                && (bothTypesNull || Type?.Equals(other.Type) == true);
         }
 
         public override bool Equals(object obj)
@@ -28,8 +45,12 @@ namespace Tycho.Utils.SourceGenerator.Models.System
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Kind.GetHashCode(), Type?.GetHashCode() ?? 0);
+            return HashCode.Combine(
+                StringComparer.Ordinal.GetHashCode(Keyword),
+                Type?.GetHashCode() ?? 0);
         }
+
+        public override string ToString() => Keyword;
 
         public static bool operator ==(TypeParameterConstraintModel left, TypeParameterConstraintModel right) => left.Equals(right);
 
