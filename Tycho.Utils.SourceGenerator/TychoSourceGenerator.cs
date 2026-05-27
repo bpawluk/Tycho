@@ -45,7 +45,7 @@ namespace Tycho.Utils.SourceGenerator
                 ExtractorContext extractorContext = new ExtractorContext(compilation, semanticModelProvider, cancellationToken);
 
                 TychoDefinitionKind definitionKind = TychoDefinitionKindExtractor.Extract(targetTypeSymbol, extractorContext);
-                TypeModel definitionType = TypeModelExtractor.Extract(targetTypeSymbol, extractorContext);
+                TypeDefinitionModel definitionType = TypeDefinitionModelExtractor.Extract(targetTypeSymbol, extractorContext);
 
                 ImmutableEquatableArray<MethodDefinitionModel> methodDefinitions = targetTypeSymbol
                     .GetMembers()

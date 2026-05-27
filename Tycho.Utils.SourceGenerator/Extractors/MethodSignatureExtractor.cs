@@ -16,16 +16,16 @@ namespace Tycho.Utils.SourceGenerator.Extractors
                 GetResultType(methodSymbol, context));
         }
 
-        private static ImmutableEquatableArray<TypeModel> GetParameterTypes(IMethodSymbol methodSymbol, ExtractorContext context)
+        private static ImmutableEquatableArray<TypeReferenceModel> GetParameterTypes(IMethodSymbol methodSymbol, ExtractorContext context)
         {
             return methodSymbol.Parameters
-                .Select(paramSymbol => TypeModelExtractor.Extract(paramSymbol.Type, context))
+                .Select(paramSymbol => TypeReferenceModelExtractor.Extract(paramSymbol.Type, context))
                 .ToImmutableEquatableArray();
         }
 
-        private static TypeModel GetResultType(IMethodSymbol methodSymbol, ExtractorContext context)
+        private static TypeReferenceModel GetResultType(IMethodSymbol methodSymbol, ExtractorContext context)
         {
-            return TypeModelExtractor.Extract(methodSymbol.ReturnType, context);
+            return TypeReferenceModelExtractor.Extract(methodSymbol.ReturnType, context);
         }
     }
 }

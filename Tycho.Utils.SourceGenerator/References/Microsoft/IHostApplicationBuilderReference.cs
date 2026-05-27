@@ -10,6 +10,6 @@ namespace Tycho.Utils.SourceGenerator.References.Microsoft
         public const string ConfigurationPropertyName = "Configuration";
         public const string ServicesPropertyName = "Services";
 
-        public static TypeModel TypeModel => new TypeModel(Namespace, TypeName);
+        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
     }
 }

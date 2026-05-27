@@ -8,6 +8,6 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Structure
         private const string Namespace = "Tycho.Structure.Parent";
         private const string TypeName = "IParentReference";
 
-        public static TypeModel TypeModel => new TypeModel(Namespace, TypeName);
+        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
     }
 }

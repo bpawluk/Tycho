@@ -7,6 +7,6 @@ namespace Tycho.Utils.SourceGenerator.References.Microsoft
         private const string Namespace = "Microsoft.Extensions.Configuration";
         private const string TypeName = "IConfiguration";
 
-        public static TypeModel TypeModel => new TypeModel(Namespace, TypeName);
+        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
     }
 }

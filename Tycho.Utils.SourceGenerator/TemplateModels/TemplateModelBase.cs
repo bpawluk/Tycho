@@ -17,22 +17,13 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             .OrderBy(ns => ns, StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
-        public string UseType(TypeModel typeModel)
-        {
-            if (!string.IsNullOrEmpty(typeModel.Namespace))
-            {
-                _namespaces.Add(typeModel.Namespace);
-            }
-            return typeModel.FullReferenceName;
-        }
-
         public string UseType(TypeReferenceModel typeReference)
         {
             if (!string.IsNullOrEmpty(typeReference.Namespace))
             {
                 _namespaces.Add(typeReference.Namespace);
             }
-            return typeReference.Name;
+            return typeReference.FullReferenceName;
         }
     }
 }

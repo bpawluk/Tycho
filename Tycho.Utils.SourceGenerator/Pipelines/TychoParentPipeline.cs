@@ -23,7 +23,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                 .Where(GetDefineContractMethodDefinitionsStepPredicate)
                 .Select(GetDefineContractMethodDefinitionsStepTransform);
 
-            IncrementalValuesProvider<(TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations)> getRequirementMethodInvocationsStepResult = getDefineContractMethodDefinitionsStepResult
+            IncrementalValuesProvider<(TypeDefinitionModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations)> getRequirementMethodInvocationsStepResult = getDefineContractMethodDefinitionsStepResult
                 .Select(GetRequirementMethodInvocationsStepTransform);
 
             IncrementalValuesProvider<TychoParentModel> getTychoParentModelStepResult = getRequirementMethodInvocationsStepResult
@@ -60,7 +60,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             return input.Model.Methods.Single(method => method.Signature.IsDefineContractMethod());
         }
 
-        private static (TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) GetRequirementMethodInvocationsStepTransform(
+        private static (TypeDefinitionModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) GetRequirementMethodInvocationsStepTransform(
             MethodDefinitionModel input,
             CancellationToken token)
         {
@@ -72,7 +72,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
         }
 
         private static TychoParentModel GetTychoParentModelStepTransform(
-            (TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) input,
+            (TypeDefinitionModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) input,
             CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
@@ -86,10 +86,10 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
 
         private static TychoRequestModel GetTychoRequestModel(MethodInvocationModel model)
         {
-            TypeModel requestType = model.TypeArguments.Single(argument => argument.IsRequestType()).Value;
+            TypeReferenceModel requestType = model.TypeArguments.Single(argument => argument.IsRequestType()).Value;
             if (model.TypeArguments.Any(argument => argument.IsResponseType()))
             {
-                TypeModel responseType = model.TypeArguments.Single(argument => argument.IsResponseType()).Value;
+                TypeReferenceModel responseType = model.TypeArguments.Single(argument => argument.IsResponseType()).Value;
                 return new TychoRequestModel(requestType, responseType);
             }
             return new TychoRequestModel(requestType);

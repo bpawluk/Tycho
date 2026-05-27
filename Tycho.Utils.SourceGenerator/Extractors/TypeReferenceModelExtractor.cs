@@ -5,19 +5,16 @@ using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.Extractors
 {
-    internal static class TypeModelExtractor
+    internal static class TypeReferenceModelExtractor
     {
-        public static TypeModel Extract(ITypeSymbol typeSymbol, ExtractorContext context)
+        public static TypeReferenceModel Extract(ITypeSymbol typeSymbol, ExtractorContext context)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
-            return new TypeModel(
+            return new TypeReferenceModel(
                 GetNamespace(typeSymbol),
                 GetContainingTypes(typeSymbol, context),
-                TypeKindExtractor.Extract(typeSymbol, context),
-                TypeModifiersExtractor.Extract(typeSymbol, context),
                 typeSymbol.Name,
-                TypeParametersExtractor.Extract(typeSymbol, context),
                 TypeArgumentsModelExtractor.Extract(typeSymbol, context));
         }
 
@@ -29,20 +26,17 @@ namespace Tycho.Utils.SourceGenerator.Extractors
                 .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted));
         }
 
-        private static ImmutableEquatableArray<TypeModel> GetContainingTypes(ITypeSymbol typeSymbol, ExtractorContext context)
+        private static ImmutableEquatableArray<TypeReferenceModel> GetContainingTypes(ITypeSymbol typeSymbol, ExtractorContext context)
         {
-            var containingTypes = new Stack<TypeModel>();
+            var containingTypes = new Stack<TypeReferenceModel>();
             for (INamedTypeSymbol containingTypeSymbol = typeSymbol.ContainingType;
                 containingTypeSymbol != null;
                 containingTypeSymbol = containingTypeSymbol.ContainingType)
             {
-                containingTypes.Push(new TypeModel(
+                containingTypes.Push(new TypeReferenceModel(
                     GetNamespace(containingTypeSymbol),
-                    ImmutableEquatableArray<TypeModel>.Empty,
-                    TypeKindExtractor.Extract(containingTypeSymbol, context),
-                    TypeModifiersExtractor.Extract(containingTypeSymbol, context),
+                    ImmutableEquatableArray<TypeReferenceModel>.Empty,
                     containingTypeSymbol.Name,
-                    TypeParametersExtractor.Extract(containingTypeSymbol, context),
                     TypeArgumentsModelExtractor.Extract(containingTypeSymbol, context)));
             }
             return containingTypes.ToImmutableEquatableArray();

@@ -37,7 +37,7 @@ namespace Tycho.Utils.SourceGenerator.Extractors
             foreach (ITypeSymbol constraintType in typeParameterSymbol.ConstraintTypes)
             {
                 constraints.Add(TypeParameterConstraintModel.TypeConstraint(
-                    TypeModelExtractor.Extract(constraintType, context)));
+                    TypeReferenceModelExtractor.Extract(constraintType, context)));
             }
 
             if (typeParameterSymbol.HasConstructorConstraint)

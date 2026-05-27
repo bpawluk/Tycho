@@ -23,7 +23,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             IncrementalValuesProvider<(TychoDefinitionKind DefinitionKind, MethodDefinitionModel Method)> getDefineEventsMethodDefinitionsStepResult = pipelineBase
                 .Select(GetDefineEventsMethodDefinitionsStepTransform);
 
-            IncrementalValuesProvider<(TychoDefinitionKind DefinitionKind, TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations)> getSerializableEventMethodInvocationsStepResult = getDefineEventsMethodDefinitionsStepResult
+            IncrementalValuesProvider<(TychoDefinitionKind DefinitionKind, TypeDefinitionModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations)> getSerializableEventMethodInvocationsStepResult = getDefineEventsMethodDefinitionsStepResult
                 .Select(GetSerializableEventMethodInvocationsStepTransform);
 
             IncrementalValuesProvider<TychoEventSerializerModel> getTychoEventSerializerModelStepResult = getSerializableEventMethodInvocationsStepResult
@@ -52,7 +52,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             return (input.DefinitionKind, input.Model.Methods.Single(method => method.Signature.IsDefineEventsMethod()));
         }
 
-        private static (TychoDefinitionKind DefinitionKind, TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) GetSerializableEventMethodInvocationsStepTransform(
+        private static (TychoDefinitionKind DefinitionKind, TypeDefinitionModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) GetSerializableEventMethodInvocationsStepTransform(
             (TychoDefinitionKind DefinitionKind, MethodDefinitionModel Method) input,
             CancellationToken token)
         {
@@ -64,7 +64,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
         }
 
         private static TychoEventSerializerModel GetTychoEventSerializerModelStepTransform(
-            (TychoDefinitionKind DefinitionKind, TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) input,
+            (TychoDefinitionKind DefinitionKind, TypeDefinitionModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) input,
             CancellationToken token)
         {
             token.ThrowIfCancellationRequested();

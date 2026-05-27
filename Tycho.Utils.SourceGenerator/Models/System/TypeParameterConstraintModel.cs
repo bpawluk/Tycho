@@ -19,13 +19,13 @@ namespace Tycho.Utils.SourceGenerator.Models.System
 
         public static TypeParameterConstraintModel AllowsRefStruct { get; } = new TypeParameterConstraintModel("allows ref struct", type: null);
 
-        public static TypeParameterConstraintModel TypeConstraint(TypeModel type) => new TypeParameterConstraintModel(type.ReferenceName, type);
+        public static TypeParameterConstraintModel TypeConstraint(TypeReferenceModel type) => new TypeParameterConstraintModel(type.ReferenceName, type);
 
         public string Keyword { get; }
 
-        public TypeModel? Type { get; }
+        public TypeReferenceModel? Type { get; }
 
-        private TypeParameterConstraintModel(string keyword, TypeModel? type)
+        private TypeParameterConstraintModel(string keyword, TypeReferenceModel? type)
         {
             Keyword = keyword ?? string.Empty;
             Type = type;

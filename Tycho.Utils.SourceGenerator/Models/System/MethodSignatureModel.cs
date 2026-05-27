@@ -7,17 +7,17 @@ namespace Tycho.Utils.SourceGenerator.Models.System
     {
         public string MethodName { get; }
 
-        public ImmutableEquatableArray<TypeModel> Parameters { get; }
+        public ImmutableEquatableArray<TypeReferenceModel> Parameters { get; }
 
-        public TypeModel Result { get; }
+        public TypeReferenceModel Result { get; }
 
         public MethodSignatureModel(
             string methodName,
-            ImmutableEquatableArray<TypeModel> parameters,
-            TypeModel result)
+            ImmutableEquatableArray<TypeReferenceModel> parameters,
+            TypeReferenceModel result)
         {
             MethodName = methodName ?? string.Empty;
-            Parameters = parameters ?? ImmutableEquatableArray<TypeModel>.Empty;
+            Parameters = parameters ?? ImmutableEquatableArray<TypeReferenceModel>.Empty;
             Result = result;
         }
 

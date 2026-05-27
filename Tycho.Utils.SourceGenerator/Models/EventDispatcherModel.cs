@@ -6,13 +6,13 @@ namespace Tycho.Utils.SourceGenerator.Models
 {
     public readonly struct EventDispatcherModel : IEquatable<EventDispatcherModel>
     {
-        public TypeModel DefinitionType { get; }
+        public TypeDefinitionModel DefinitionType { get; }
 
-        public ImmutableEquatableArray<TypeModel> Events { get; }
+        public ImmutableEquatableArray<TypeReferenceModel> Events { get; }
 
         public EventDispatcherModel(
-            TypeModel definitionType,
-            ImmutableEquatableArray<TypeModel> events)
+            TypeDefinitionModel definitionType,
+            ImmutableEquatableArray<TypeReferenceModel> events)
         {
             DefinitionType = definitionType;
             Events = events;

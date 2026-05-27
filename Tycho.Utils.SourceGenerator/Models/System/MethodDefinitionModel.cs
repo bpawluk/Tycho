@@ -5,14 +5,14 @@ namespace Tycho.Utils.SourceGenerator.Models.System
 {
     public readonly struct MethodDefinitionModel : IEquatable<MethodDefinitionModel>
     {
-        public TypeModel ContainingType { get; }
+        public TypeDefinitionModel ContainingType { get; }
 
         public MethodSignatureModel Signature { get; }
 
         public ImmutableEquatableArray<MethodInvocationModel> Body { get; }
 
         public MethodDefinitionModel(
-            TypeModel containingType,
+            TypeDefinitionModel containingType,
             MethodSignatureModel signature,
             ImmutableEquatableArray<MethodInvocationModel> body)
         {

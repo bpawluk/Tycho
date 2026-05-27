@@ -7,12 +7,12 @@ namespace Tycho.Utils.SourceGenerator.Models
 {
     public readonly struct TychoParentModel : IEquatable<TychoParentModel>
     {
-        public TypeModel DefinitionType { get; }
+        public TypeDefinitionModel DefinitionType { get; }
 
         public ImmutableEquatableArray<TychoRequestModel> Requests { get; }
 
         public TychoParentModel(
-            TypeModel definitionType,
+            TypeDefinitionModel definitionType,
             ImmutableEquatableArray<TychoRequestModel> requests)
         {
             DefinitionType = definitionType;

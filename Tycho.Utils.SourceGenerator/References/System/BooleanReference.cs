@@ -5,6 +5,6 @@ namespace Tycho.Utils.SourceGenerator.References.System
 {
     internal static class BooleanReference
     {
-        public static TypeModel TypeModel { get; } = new TypeModel(typeof(bool).Namespace, nameof(Boolean));
+        public static TypeReferenceModel TypeModel { get; } = new TypeReferenceModel(typeof(bool).Namespace, nameof(Boolean));
     }
 }

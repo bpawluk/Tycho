@@ -23,7 +23,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             IncrementalValuesProvider<(TychoDefinitionKind SetupKind, MethodDefinitionModel Method)> getIncludeModulesMethodSetupStepResult = pipelineBase
                 .Select(GetIncludeModulesMethodSetupStepTransform);
 
-            IncrementalValuesProvider<(TychoDefinitionKind SetupKind, TypeModel SetupType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations)> getSubmoduleMethodInvocationsStepResult = getIncludeModulesMethodSetupStepResult
+            IncrementalValuesProvider<(TychoDefinitionKind SetupKind, TypeDefinitionModel SetupType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations)> getSubmoduleMethodInvocationsStepResult = getIncludeModulesMethodSetupStepResult
                 .Select(GetSubmoduleMethodInvocationsStepTransform);
 
             IncrementalValuesProvider<TychoSetupModel> getTychoSetupModelStepResult = getSubmoduleMethodInvocationsStepResult
@@ -52,7 +52,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             return (input.SetupKind, input.Model.Methods.FirstOrDefault(method => method.Signature.IsIncludeModulesMethod()));
         }
 
-        private static (TychoDefinitionKind SetupKind, TypeModel SetupType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) GetSubmoduleMethodInvocationsStepTransform(
+        private static (TychoDefinitionKind SetupKind, TypeDefinitionModel SetupType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) GetSubmoduleMethodInvocationsStepTransform(
             (TychoDefinitionKind SetupKind, MethodDefinitionModel Method) input,
             CancellationToken token)
         {
@@ -64,7 +64,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
         }
 
         private static TychoSetupModel GetTychoSetupModelStepTransform(
-            (TychoDefinitionKind SetupKind, TypeModel SetupType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) input,
+            (TychoDefinitionKind SetupKind, TypeDefinitionModel SetupType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) input,
             CancellationToken token)
         {
             token.ThrowIfCancellationRequested();

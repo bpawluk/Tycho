@@ -5,13 +5,13 @@ using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.Models.System
 {
-    public readonly struct TypeModel : IEquatable<TypeModel>
+    public readonly struct TypeDefinitionModel : IEquatable<TypeDefinitionModel>
     {
         public TypeKind Kind { get; }
 
         public string Namespace { get; }
 
-        public ImmutableEquatableArray<TypeModel> ContainingTypes { get; }
+        public ImmutableEquatableArray<TypeDefinitionModel> ContainingTypes { get; }
 
         public string Name { get; }
 
@@ -19,28 +19,16 @@ namespace Tycho.Utils.SourceGenerator.Models.System
 
         public ImmutableEquatableArray<TypeParameterModel> TypeParameters { get; }
 
-        public ImmutableEquatableArray<TypeArgumentModel> TypeArguments { get; }
-
         public string TypeParametersSuffix => BuildTypeSuffix(TypeParameters);
-
-        public string TypeArgumentsSuffix => TypeArguments.Count == 0 ? BuildTypeSuffix(TypeParameters) : BuildTypeSuffix(TypeArguments);
 
         public string DeclarationName => $"{Name}{TypeParametersSuffix}";
 
-        public string ReferenceName => $"{Name}{TypeArgumentsSuffix}";
-
         public string MetadataName => TypeParameters.Count > 0 ? $"{Name}`{TypeParameters.Count}" : Name;
-
-        public string FullReferenceName => BuildPath(
-            ContainingTypes.Select(type => type.ReferenceName).ToImmutableEquatableArray(),
-            ReferenceName);
 
         public string FullMetadataName => BuildPath(
             ContainingTypes.Select(type => type.MetadataName).ToImmutableEquatableArray(),
             MetadataName,
             Namespace);
-
-        // TODO START
 
         public ImmutableEquatableArray<string> TypeParameterConstraintClauses => TypeParameters
             .Select(BuildTypeParameterConstraintClause)
@@ -53,52 +41,35 @@ namespace Tycho.Utils.SourceGenerator.Models.System
             .Select(type => type.DeclarationSignature)
             .ToImmutableEquatableArray();
 
-        // TODO END
-
-        public TypeModel(string typeNamespace, string typeName)
-            : this(
-                typeNamespace,
-                ImmutableEquatableArray<TypeModel>.Empty,
-                TypeKind.Class,
-                ImmutableEquatableArray<TypeModifier>.Empty,
-                typeName,
-                ImmutableEquatableArray<TypeParameterModel>.Empty,
-                ImmutableEquatableArray<TypeArgumentModel>.Empty)
-        {
-        }
-
-        public TypeModel(
+        public TypeDefinitionModel(
             string typeNamespace,
-            ImmutableEquatableArray<TypeModel> containingTypes,
+            ImmutableEquatableArray<TypeDefinitionModel> containingTypes,
             TypeKind kind,
             ImmutableEquatableArray<TypeModifier> modifiers,
             string typeName,
-            ImmutableEquatableArray<TypeParameterModel> typeParameters,
-            ImmutableEquatableArray<TypeArgumentModel> typeArguments)
+            ImmutableEquatableArray<TypeParameterModel> typeParameters)
         {
             Kind = kind;
             Modifiers = modifiers ?? ImmutableEquatableArray<TypeModifier>.Empty;
             Namespace = typeNamespace ?? string.Empty;
-            ContainingTypes = containingTypes ?? ImmutableEquatableArray<TypeModel>.Empty;
+            ContainingTypes = containingTypes ?? ImmutableEquatableArray<TypeDefinitionModel>.Empty;
             Name = typeName ?? string.Empty;
             TypeParameters = typeParameters ?? ImmutableEquatableArray<TypeParameterModel>.Empty;
-            TypeArguments = typeArguments ?? ImmutableEquatableArray<TypeArgumentModel>.Empty;
         }
 
-        public bool Equals(TypeModel other)
+        public bool Equals(TypeDefinitionModel other)
         {
             return Kind == other.Kind
                 && string.Equals(Namespace, other.Namespace, StringComparison.Ordinal)
-                && (ContainingTypes ?? ImmutableEquatableArray<TypeModel>.Empty).Equals(other.ContainingTypes ?? ImmutableEquatableArray<TypeModel>.Empty)
+                && (ContainingTypes ?? ImmutableEquatableArray<TypeDefinitionModel>.Empty).Equals(other.ContainingTypes ?? ImmutableEquatableArray<TypeDefinitionModel>.Empty)
                 && string.Equals(Name, other.Name, StringComparison.Ordinal)
                 && (Modifiers ?? ImmutableEquatableArray<TypeModifier>.Empty).Equals(other.Modifiers ?? ImmutableEquatableArray<TypeModifier>.Empty)
-                && (TypeParameters ?? ImmutableEquatableArray<TypeParameterModel>.Empty).Equals(other.TypeParameters ?? ImmutableEquatableArray<TypeParameterModel>.Empty)
-                && (TypeArguments ?? ImmutableEquatableArray<TypeArgumentModel>.Empty).Equals(other.TypeArguments ?? ImmutableEquatableArray<TypeArgumentModel>.Empty);
+                && (TypeParameters ?? ImmutableEquatableArray<TypeParameterModel>.Empty).Equals(other.TypeParameters ?? ImmutableEquatableArray<TypeParameterModel>.Empty);
         }
 
         public override bool Equals(object obj)
         {
-            return obj is TypeModel other && Equals(other);
+            return obj is TypeDefinitionModel other && Equals(other);
         }
 
         public override int GetHashCode()
@@ -109,24 +80,18 @@ namespace Tycho.Utils.SourceGenerator.Models.System
                 ContainingTypes.GetHashCode(),
                 StringComparer.Ordinal.GetHashCode(Name),
                 Modifiers.GetHashCode(),
-                TypeParameters.GetHashCode(),
-                TypeArguments.GetHashCode());
+                TypeParameters.GetHashCode());
         }
 
-        public override string ToString() => string.IsNullOrEmpty(Namespace) ? FullReferenceName : $"{Namespace}.{FullReferenceName}";
+        public override string ToString() => string.IsNullOrEmpty(Namespace) ? FullMetadataName : $"{Namespace}.{FullMetadataName}";
 
-        public static bool operator ==(TypeModel left, TypeModel right) => left.Equals(right);
+        public static bool operator ==(TypeDefinitionModel left, TypeDefinitionModel right) => left.Equals(right);
 
-        public static bool operator !=(TypeModel left, TypeModel right) => !left.Equals(right);
+        public static bool operator !=(TypeDefinitionModel left, TypeDefinitionModel right) => !left.Equals(right);
 
         private static string BuildTypeSuffix(ImmutableEquatableArray<TypeParameterModel> values)
         {
             return values.Count == 0 ? string.Empty : $"<{string.Join(", ", values.Select(value => value.Name))}>";
-        }
-
-        private static string BuildTypeSuffix(ImmutableEquatableArray<TypeArgumentModel> values)
-        {
-            return values.Count == 0 ? string.Empty : $"<{string.Join(", ", values.Select(value => value.Value.ReferenceName))}>";
         }
 
         private static string BuildTypeParameterConstraintClause(TypeParameterModel typeParameter)
@@ -149,7 +114,7 @@ namespace Tycho.Utils.SourceGenerator.Models.System
             return $"where {typeParameter.Name} : {string.Join(", ", constraints)}";
         }
 
-        private static string BuildPath(ImmutableEquatableArray<string> containingTypes, string typeName, string namespaceName = null)
+        private static string BuildPath(ImmutableEquatableArray<string> containingTypes, string typeName, string namespaceName)
         {
             string containingPart = containingTypes.Count == 0 ? string.Empty : string.Join(".", containingTypes.Where(segment => !string.IsNullOrWhiteSpace(segment)));
             string containingAndNamePart = string.IsNullOrEmpty(containingPart) ? typeName : $"{containingPart}.{typeName}";

@@ -25,7 +25,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             IncrementalValuesProvider<(TychoDefinitionKind DefinitionKind, MethodDefinitionModel Method)> getDefineContractMethodDefinitionsStepResult = pipelineBase
                 .Select(GetDefineContractMethodDefinitionsStepTransform);
 
-            IncrementalValuesProvider<(TychoDefinitionKind DefinitionKind, TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations)> getContractMethodInvocationsStepResult = getDefineContractMethodDefinitionsStepResult
+            IncrementalValuesProvider<(TychoDefinitionKind DefinitionKind, TypeDefinitionModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations)> getContractMethodInvocationsStepResult = getDefineContractMethodDefinitionsStepResult
                 .Select(GetContractMethodInvocationsStepTransform);
 
             IncrementalValuesProvider<TychoFacadeModel> getTychoFacadeModelStepResult = getContractMethodInvocationsStepResult
@@ -59,7 +59,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             return (input.DefinitionKind, input.Model.Methods.Single(method => method.Signature.IsDefineContractMethod()));
         }
 
-        private static (TychoDefinitionKind DefinitionKind, TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) GetContractMethodInvocationsStepTransform(
+        private static (TychoDefinitionKind DefinitionKind, TypeDefinitionModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) GetContractMethodInvocationsStepTransform(
             (TychoDefinitionKind DefinitionKind, MethodDefinitionModel Method) input,
             CancellationToken token)
         {
@@ -71,7 +71,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
         }
 
         private static TychoFacadeModel GetTychoFacadeModelStepTransform(
-            (TychoDefinitionKind DefinitionKind, TypeModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) input,
+            (TychoDefinitionKind DefinitionKind, TypeDefinitionModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) input,
             CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
@@ -86,10 +86,10 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
 
         private static TychoRequestModel GetTychoRequestModel(MethodInvocationModel model)
         {
-            TypeModel requestType = model.TypeArguments.Single(argument => argument.IsRequestType()).Value;
+            TypeReferenceModel requestType = model.TypeArguments.Single(argument => argument.IsRequestType()).Value;
             if (model.TypeArguments.Any(argument => argument.IsResponseType()))
             {
-                TypeModel responseType = model.TypeArguments.Single(argument => argument.IsResponseType()).Value;
+                TypeReferenceModel responseType = model.TypeArguments.Single(argument => argument.IsResponseType()).Value;
                 return new TychoRequestModel(requestType, responseType);
             }
             return new TychoRequestModel(requestType);

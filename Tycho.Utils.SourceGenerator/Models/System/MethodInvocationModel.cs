@@ -7,13 +7,13 @@ namespace Tycho.Utils.SourceGenerator.Models.System
     {
         public MethodSignatureModel Signature { get; }
 
-        public TypeModel? ReceiverType { get; }
+        public TypeReferenceModel? ReceiverType { get; }
 
         public ImmutableEquatableArray<TypeArgumentModel> TypeArguments { get; }
 
         public MethodInvocationModel(
             MethodSignatureModel signature,
-            TypeModel? receiverType,
+            TypeReferenceModel? receiverType,
             ImmutableEquatableArray<TypeArgumentModel> typeArguments)
         {
             Signature = signature;

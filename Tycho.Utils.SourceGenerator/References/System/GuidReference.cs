@@ -5,6 +5,6 @@ namespace Tycho.Utils.SourceGenerator.References.System
 {
     internal static class GuidReference
     {
-        public static TypeModel TypeModel { get; } = new TypeModel(typeof(Guid).Namespace, nameof(Guid));
+        public static TypeReferenceModel TypeModel { get; } = new TypeReferenceModel(typeof(Guid).Namespace, nameof(Guid));
     }
 }

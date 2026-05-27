@@ -9,14 +9,14 @@ namespace Tycho.Utils.SourceGenerator.Models
     {
         public TychoDefinitionKind DefinitionKind { get; }
 
-        public TypeModel DefinitionType { get; }
+        public TypeDefinitionModel DefinitionType { get; }
 
-        public ImmutableEquatableArray<TypeModel> Submodules { get; }
+        public ImmutableEquatableArray<TypeReferenceModel> Submodules { get; }
 
         public TychoSetupModel(
             TychoDefinitionKind definitionKind,
-            TypeModel definitionType,
-            ImmutableEquatableArray<TypeModel> submodules)
+            TypeDefinitionModel definitionType,
+            ImmutableEquatableArray<TypeReferenceModel> submodules)
         {
             DefinitionKind = definitionKind;
             DefinitionType = definitionType;

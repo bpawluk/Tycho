@@ -9,13 +9,13 @@ namespace Tycho.Utils.SourceGenerator.Models
     {
         public TychoDefinitionKind DefinitionKind { get; }
 
-        public TypeModel DefinitionType { get; }
+        public TypeDefinitionModel DefinitionType { get; }
 
         public ImmutableEquatableArray<TychoRequestModel> Requests { get; }
 
         public TychoFacadeModel(
             TychoDefinitionKind definitionKind,
-            TypeModel definitionType,
+            TypeDefinitionModel definitionType,
             ImmutableEquatableArray<TychoRequestModel> requests)
         {
             DefinitionKind = definitionKind;

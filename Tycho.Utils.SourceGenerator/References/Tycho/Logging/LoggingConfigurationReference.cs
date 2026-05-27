@@ -10,11 +10,11 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Logging
         private const string Namespace = "Tycho.Logging";
         private const string TypeName = "LoggingConfiguration";
 
-        public static TypeModel TypeModel => new TypeModel(Namespace, TypeName);
+        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
 
         public static MethodSignatureModel ConfigureLoggingMethodSignature => new MethodSignatureModel(
             methodName: "ConfigureLogging",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
+            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
             {
                 ILoggingBuilderReference.TypeModel,
                 IConfigurationReference.TypeModel,

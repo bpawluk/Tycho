@@ -5,10 +5,10 @@ namespace Tycho.Utils.SourceGenerator.Models
 {
     public readonly struct TychoExtensionsModel : IEquatable<TychoExtensionsModel>
     {
-        public TypeModel DefinitionType { get; }
+        public TypeDefinitionModel DefinitionType { get; }
 
         public TychoExtensionsModel(
-            TypeModel definitionType)
+            TypeDefinitionModel definitionType)
         {
             DefinitionType = definitionType;
         }

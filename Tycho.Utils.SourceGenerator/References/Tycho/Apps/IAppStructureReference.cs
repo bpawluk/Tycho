@@ -21,16 +21,16 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
 
         public static string ModuleTypeParameterName => "TModule";
 
-        public static TypeModel TypeModel => new TypeModel(Namespace, TypeName);
+        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
 
         public static MethodSignatureModel UsesMethodSignature => new MethodSignatureModel(
             methodName: "Uses",
-            parameters: ImmutableEquatableArray<TypeModel>.Empty,
+            parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
             result: TypeModel);
 
         public static MethodSignatureModel UsesWithContractFulfillmentMethodSignature => new MethodSignatureModel(
             methodName: "Uses",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
+            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
             {
                 ActionReference.TypeModel,
             }),
@@ -38,7 +38,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
 
         public static MethodSignatureModel UsesWithSettingsMethodSignature => new MethodSignatureModel(
             methodName: "Uses",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
+            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
             {
                 IModuleSettingsReference.TypeModel,
             }),
@@ -46,7 +46,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
 
         public static MethodSignatureModel UsesWithContractFulfillmentAndSettingsMethodSignature => new MethodSignatureModel(
             methodName: "Uses",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
+            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
             {
                 ActionReference.TypeModel,
                 IModuleSettingsReference.TypeModel,

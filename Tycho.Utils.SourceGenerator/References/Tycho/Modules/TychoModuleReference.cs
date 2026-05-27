@@ -12,11 +12,11 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
 
         public static string FullName => $"{Namespace}.{TypeName}";
 
-        public static TypeModel TypeModel => new TypeModel(Namespace, TypeName);
+        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
 
         public static MethodSignatureModel DefineContractMethodSignature => new MethodSignatureModel(
             methodName: "DefineContract",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
+            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
             {
                 IModuleContractReference.TypeModel,
             }),
@@ -24,7 +24,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
 
         public static MethodSignatureModel DefineEventsMethodSignature => new MethodSignatureModel(
             methodName: "DefineEvents",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
+            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
             {
                 IModuleEventsReference.TypeModel,
             }),
@@ -32,7 +32,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
 
         public static MethodSignatureModel IncludeModulesMethodSignature => new MethodSignatureModel(
             methodName: "IncludeModules",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
+            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
             {
                 IModuleStructureReference.TypeModel,
             }),
@@ -40,7 +40,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
 
         public static MethodSignatureModel AutoSetupMethodSignature => new MethodSignatureModel(
             methodName: "__AutoSetup__",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
+            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
             {
                 IServiceCollectionReference.TypeModel,
             }),

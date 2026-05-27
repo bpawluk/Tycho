@@ -9,11 +9,11 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
         private const string Namespace = "Tycho.Modules.Instance";
         private const string TypeName = "ModuleFacadeBase";
 
-        public static TypeModel TypeModel => new TypeModel(Namespace, TypeName);
+        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
 
         public static MethodSignatureModel ExecuteAsyncMethodSignature => new MethodSignatureModel(
             methodName: "ExecuteAsync",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
+            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
             {
                 ObjectReference.TypeModel,
                 CancellationTokenReference.TypeModel,

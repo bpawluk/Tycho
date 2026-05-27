@@ -29,21 +29,21 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
         public static string RequestTypeParameterName => "TRequest";
         public static string ResponseTypeParameterName => "TResponse";
 
-        public static TypeModel TypeModel => new TypeModel(Namespace, TypeName);
+        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
 
         public static MethodSignatureModel ForwardsMethodSignature => new MethodSignatureModel(
             methodName: "Forwards",
-            parameters: ImmutableEquatableArray<TypeModel>.Empty,
+            parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
             result: TypeModel);
 
         public static MethodSignatureModel ForwardsWithResponseMethodSignature => new MethodSignatureModel(
             methodName: "Forwards",
-            parameters: ImmutableEquatableArray<TypeModel>.Empty,
+            parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
             result: TypeModel);
 
         public static MethodSignatureModel ForwardsAsMethodSignature => new MethodSignatureModel(
             methodName: "ForwardsAs",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
+            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
             {
                 FuncReference.TypeModel,
             }),
@@ -51,7 +51,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
 
         public static MethodSignatureModel ForwardsAsWithResponseMethodSignature => new MethodSignatureModel(
             methodName: "ForwardsAs",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
+            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
             {
                 FuncReference.TypeModel,
                 FuncReference.TypeModel,
@@ -60,22 +60,22 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
 
         public static MethodSignatureModel HandlesMethodSignature => new MethodSignatureModel(
             methodName: "Handles",
-            parameters: ImmutableEquatableArray<TypeModel>.Empty,
+            parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
             result: TypeModel);
 
         public static MethodSignatureModel HandlesWithResponseMethodSignature => new MethodSignatureModel(
             methodName: "Handles",
-            parameters: ImmutableEquatableArray<TypeModel>.Empty,
+            parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
             result: TypeModel);
 
         public static MethodSignatureModel RequiresMethodSignature => new MethodSignatureModel(
             methodName: "Requires",
-            parameters: ImmutableEquatableArray<TypeModel>.Empty,
+            parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
             result: TypeModel);
 
         public static MethodSignatureModel RequiresWithResponseMethodSignature => new MethodSignatureModel(
             methodName: "Requires",
-            parameters: ImmutableEquatableArray<TypeModel>.Empty,
+            parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
             result: TypeModel);
     }
 }

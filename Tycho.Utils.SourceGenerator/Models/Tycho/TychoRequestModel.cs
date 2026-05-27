@@ -6,15 +6,15 @@ namespace Tycho.Utils.SourceGenerator.Models.Tycho
 {
     public readonly struct TychoRequestModel : IEquatable<TychoRequestModel>
     {
-        public TypeModel RequestType { get; }
+        public TypeReferenceModel RequestType { get; }
 
-        public TypeModel? ResponseType { get; }
+        public TypeReferenceModel? ResponseType { get; }
 
         public bool HasResponse => ResponseType.HasValue;
 
         public TychoRequestModel(
-            TypeModel requestType,
-            TypeModel? responseType = default)
+            TypeReferenceModel requestType,
+            TypeReferenceModel? responseType = default)
         {
             RequestType = requestType;
             ResponseType = responseType;

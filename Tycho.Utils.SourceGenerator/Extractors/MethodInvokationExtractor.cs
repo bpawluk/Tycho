@@ -15,11 +15,11 @@ namespace Tycho.Utils.SourceGenerator.Extractors
                 TypeArgumentsModelExtractor.Extract(methodSymbol, context));
         }
 
-        private static TypeModel? GetReceiverType(IMethodSymbol methodSymbol, ExtractorContext context)
+        private static TypeReferenceModel? GetReceiverType(IMethodSymbol methodSymbol, ExtractorContext context)
         {
             if (methodSymbol.ReceiverType is ITypeSymbol receiverTypeSymbol)
             {
-                return TypeModelExtractor.Extract(receiverTypeSymbol, context);
+                return TypeReferenceModelExtractor.Extract(receiverTypeSymbol, context);
             }
             return null;
         }

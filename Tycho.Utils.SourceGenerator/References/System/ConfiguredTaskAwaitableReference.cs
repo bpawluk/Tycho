@@ -5,6 +5,6 @@ namespace Tycho.Utils.SourceGenerator.References.System
 {
     internal static class ConfiguredTaskAwaitableReference
     {
-        public static TypeModel TypeModel { get; } = new TypeModel(typeof(ConfiguredTaskAwaitable).Namespace, nameof(ConfiguredTaskAwaitable));
+        public static TypeReferenceModel TypeModel { get; } = new TypeReferenceModel(typeof(ConfiguredTaskAwaitable).Namespace, nameof(ConfiguredTaskAwaitable));
     }
 }

@@ -7,9 +7,9 @@ namespace Tycho.Utils.SourceGenerator.Models.System
     {
         public string Name { get; }
 
-        public TypeModel Value { get; }
+        public TypeReferenceModel Value { get; }
 
-        public TypeArgumentModel(string name, TypeModel value)
+        public TypeArgumentModel(string name, TypeReferenceModel value)
         {
             Name = name ?? string.Empty;
             Value = value;

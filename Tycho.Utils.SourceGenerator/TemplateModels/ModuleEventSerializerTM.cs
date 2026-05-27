@@ -40,7 +40,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string EventSerializerClass { get; }
             public string EventSerializerBaseClass { get; }
 
-            public ClassesTM(ModuleEventSerializerTM owner, TypeModel moduleType)
+            public ClassesTM(ModuleEventSerializerTM owner, TypeDefinitionModel moduleType)
             {
                 EventSerializerClassName = EventSerializerSymbols.GetEventSerializerClass(moduleType.Name);
                 EventSerializerClass = $"{EventSerializerClassName}{moduleType.TypeParametersSuffix}";

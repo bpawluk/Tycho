@@ -8,11 +8,11 @@ namespace Tycho.Utils.SourceGenerator.References.System
         private const string Namespace = "System";
         private const string TypeName = "IAsyncDisposable";
 
-        public static TypeModel TypeModel => new TypeModel(Namespace, TypeName);
+        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
 
         public static MethodSignatureModel DisposeAsyncMethodSignature => new MethodSignatureModel(
             methodName: "DisposeAsync",
-            parameters: ImmutableEquatableArray<TypeModel>.Empty,
+            parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
             result: ValueTaskReference.TypeModel);
     }
 }

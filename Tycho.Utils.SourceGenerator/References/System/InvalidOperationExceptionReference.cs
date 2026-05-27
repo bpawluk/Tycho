@@ -5,6 +5,6 @@ namespace Tycho.Utils.SourceGenerator.References.System
 {
     internal static class InvalidOperationExceptionReference
     {
-        public static TypeModel TypeModel { get; } = new TypeModel(typeof(InvalidOperationException).Namespace, nameof(InvalidOperationException));
+        public static TypeReferenceModel TypeModel { get; } = new TypeReferenceModel(typeof(InvalidOperationException).Namespace, nameof(InvalidOperationException));
     }
 }

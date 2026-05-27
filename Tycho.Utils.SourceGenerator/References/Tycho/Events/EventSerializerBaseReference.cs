@@ -9,11 +9,11 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Events
         private const string Namespace = "Tycho.Events.Serialization";
         private const string TypeName = "EventSerializerBase";
 
-        public static TypeModel TypeModel => new TypeModel(Namespace, TypeName);
+        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
 
         public static MethodSignatureModel RegisterEventMethodSignature => new MethodSignatureModel(
             methodName: "RegisterEvent",
-            parameters: ImmutableEquatableArray<TypeModel>.Empty,
+            parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
             result: VoidReference.TypeModel);
     }
 }

@@ -5,12 +5,12 @@ namespace Tycho.Utils.SourceGenerator.Models.System
 {
     public readonly struct ClassDefinitionModel : IEquatable<ClassDefinitionModel>
     {
-        public TypeModel ClassType { get; }
+        public TypeDefinitionModel ClassType { get; }
 
         public ImmutableEquatableArray<MethodDefinitionModel> Methods { get; }
 
         public ClassDefinitionModel(
-            TypeModel classType,
+            TypeDefinitionModel classType,
             ImmutableEquatableArray<MethodDefinitionModel> methods)
         {
             ClassType = classType;

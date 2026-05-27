@@ -12,11 +12,11 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
 
         public static string FullName => $"{Namespace}.{TypeName}";
 
-        public static TypeModel TypeModel => new TypeModel(Namespace, TypeName);
+        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
 
         public static MethodSignatureModel DefineContractMethodSignature => new MethodSignatureModel(
             methodName: "DefineContract",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
+            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
             {
                 IAppContractReference.TypeModel,
             }),
@@ -24,7 +24,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
 
         public static MethodSignatureModel DefineEventsMethodSignature => new MethodSignatureModel(
             methodName: "DefineEvents",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
+            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
             {
                 IAppEventsReference.TypeModel,
             }),
@@ -32,7 +32,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
 
         public static MethodSignatureModel IncludeModulesMethodSignature => new MethodSignatureModel(
             methodName: "IncludeModules",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
+            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
             {
                 IAppStructureReference.TypeModel,
             }),
@@ -40,7 +40,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
 
         public static MethodSignatureModel WithConfigurationBaseMethodSignature => new MethodSignatureModel(
             methodName: "WithConfigurationBase",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
+            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
             {
                 IConfigurationReference.TypeModel,
             }),
@@ -48,7 +48,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
 
         public static MethodSignatureModel WithLoggingBaseMethodSignature => new MethodSignatureModel(
             methodName: "WithLoggingBase",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
+            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
             {
                 ActionReference.TypeModel,
             }),
@@ -56,12 +56,12 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
 
         public static MethodSignatureModel RunBaseAsyncMethodSignature => new MethodSignatureModel(
             methodName: "RunBaseAsync",
-            parameters: ImmutableEquatableArray<TypeModel>.Empty,
+            parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
             result: TaskReference.TypeModel);
 
         public static MethodSignatureModel AutoSetupMethodSignature => new MethodSignatureModel(
             methodName: "__AutoSetup__",
-            parameters: new ImmutableEquatableArray<TypeModel>(new[]
+            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
             {
                 IServiceCollectionReference.TypeModel,
             }),

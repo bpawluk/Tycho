@@ -41,7 +41,7 @@ namespace Tycho.Utils.SourceGenerator.Extractors
                 .Zip(typeArguments, (typeParameter, typeArgument) =>
                     new TypeArgumentModel(
                         typeParameter.Name,
-                        TypeModelExtractor.Extract(typeArgument, context)))
+                        TypeReferenceModelExtractor.Extract(typeArgument, context)))
                 .ToImmutableEquatableArray();
         }
     }

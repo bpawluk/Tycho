@@ -9,14 +9,14 @@ namespace Tycho.Utils.SourceGenerator.Models
     {
         public TychoDefinitionKind DefinitionKind { get; }
 
-        public TypeModel DefinitionType { get; }
+        public TypeDefinitionModel DefinitionType { get; }
 
-        public ImmutableEquatableArray<TypeModel> Events { get; }
+        public ImmutableEquatableArray<TypeReferenceModel> Events { get; }
 
         public TychoPublisherModel(
             TychoDefinitionKind definitionKind,
-            TypeModel definitionType,
-            ImmutableEquatableArray<TypeModel> events)
+            TypeDefinitionModel definitionType,
+            ImmutableEquatableArray<TypeReferenceModel> events)
         {
             DefinitionKind = definitionKind;
             DefinitionType = definitionType;

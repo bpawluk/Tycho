@@ -113,7 +113,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string FacadeInterface { get; }
             public string FacadeClass { get; }
 
-            public SubmoduleTM(ModuleSetupTM owner, TypeModel moduleType)
+            public SubmoduleTM(ModuleSetupTM owner, TypeReferenceModel moduleType)
             {
                 ModuleClass = owner.UseType(moduleType);
                 string moduleNameStem = moduleType.Name;
