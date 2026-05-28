@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Tycho.Utils.SourceGenerator.Models.System;
+using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.TemplateModels
 {
@@ -18,24 +19,22 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public string UseType(TypeReferenceModel typeReference)
         {
-            AddUsedNamespaces(typeReference);
+            UseTypeDeep(typeReference);
             return typeReference.FullReferenceName;
         }
 
-        protected string[] UseContainingTypeDeclarations(TypeDefinitionModel typeDefinition)
+        protected ContainingTypeTM[] UseContainingTypes(ImmutableEquatableArray<TypeDefinitionModel> containingTypes)
         {
-            if (typeDefinition.ContainingTypes.Count == 0)
+            ContainingTypeTM[] result = new ContainingTypeTM[containingTypes.Count];
+            for (int i = 0; i < containingTypes.Count; i++)
             {
-                return Array.Empty<string>();
+                TypeDefinitionModel containingType = containingTypes[i];
+                string[] constraints = UseConstraintClauses(containingType.TypeParameters).ToArray();
+                result[i] = new ContainingTypeTM(containingType.DeclarationSignature, constraints);
             }
-
-            foreach (TypeDefinitionModel containingType in typeDefinition.ContainingTypes)
-            {
-                _ = UseConstraintClauses(containingType.TypeParameters).ToArray();
-            }
-
-            return typeDefinition.ContainingTypeDeclarationSignatures.ToArray();
+            return result;
         }
+
 
         protected IEnumerable<string> UseConstraintClauses(IEnumerable<TypeParameterModel> typeParameters)
         {
@@ -61,7 +60,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             }
         }
 
-        private void AddUsedNamespaces(TypeReferenceModel typeReference)
+        private void UseTypeDeep(TypeReferenceModel typeReference)
         {
             if (!string.IsNullOrEmpty(typeReference.Namespace))
             {
@@ -70,12 +69,12 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             foreach (TypeReferenceModel containingType in typeReference.ContainingTypes)
             {
-                AddUsedNamespaces(containingType);
+                UseTypeDeep(containingType);
             }
 
             foreach (TypeArgumentModel typeArgument in typeReference.TypeArguments)
             {
-                AddUsedNamespaces(typeArgument.Value);
+                UseTypeDeep(typeArgument.Value);
             }
         }
     }

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Tycho.Utils.SourceGenerator.Utils;
 
@@ -34,16 +33,7 @@ namespace Tycho.Utils.SourceGenerator.Models.System
             MetadataName,
             Namespace);
 
-        public ImmutableEquatableArray<string> TypeParameterConstraintClauses => TypeParameters
-            .Select(BuildTypeParameterConstraintClause)
-            .Where(clause => !string.IsNullOrWhiteSpace(clause))
-            .ToImmutableEquatableArray();
-
         public string DeclarationSignature => BuildTypeDeclaration();
-
-        public ImmutableEquatableArray<string> ContainingTypeDeclarationSignatures => ContainingTypes
-            .Select(type => type.DeclarationSignature)
-            .ToImmutableEquatableArray();
 
         public TypeDefinitionModel(
             string typeNamespace,
@@ -98,26 +88,6 @@ namespace Tycho.Utils.SourceGenerator.Models.System
             return values.Count == 0 ? string.Empty : $"<{string.Join(", ", values.Select(value => value.Name))}>";
         }
 
-        private static string BuildTypeParameterConstraintClause(TypeParameterModel typeParameter)
-        {
-            var constraints = new List<string>();
-            foreach (TypeParameterConstraintModel constraint in typeParameter.Constraints)
-            {
-                string constraintText = constraint.ToString();
-                if (!string.IsNullOrWhiteSpace(constraintText))
-                {
-                    constraints.Add(constraintText);
-                }
-            }
-
-            if (constraints.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            return $"where {typeParameter.Name} : {string.Join(", ", constraints)}";
-        }
-
         private static string BuildPath(ImmutableEquatableArray<string> containingTypes, string typeName, string namespaceName = null)
         {
             string containingPart = containingTypes.Count == 0 ? string.Empty : string.Join(".", containingTypes.Where(segment => !string.IsNullOrWhiteSpace(segment)));
@@ -127,17 +97,9 @@ namespace Tycho.Utils.SourceGenerator.Models.System
 
         private string BuildTypeDeclaration()
         {
-            string kindKeyword = Kind.Keyword;
-
-            string modifiersPart = string.Join(" ", Modifiers
-                .Select(modifier => modifier.ToString())
-                .Where(modifier => !string.IsNullOrWhiteSpace(modifier)));
-            string prefix = string.IsNullOrEmpty(modifiersPart) ? kindKeyword : $"{modifiersPart} {kindKeyword}";
-
-            string constraintsPart = string.Join(" ", TypeParameterConstraintClauses.Where(clause => !string.IsNullOrWhiteSpace(clause)));
-            string declaration = $"{prefix} {DeclarationName}".Trim();
-
-            return string.IsNullOrEmpty(constraintsPart) ? declaration : $"{declaration} {constraintsPart}";
+            string modifiersPart = string.Join(" ", Modifiers.Select(modifier => modifier.ToString()).Where(modifier => !string.IsNullOrWhiteSpace(modifier)));
+            string modifiersAndKindPart = string.IsNullOrEmpty(modifiersPart) ? Kind.Keyword : $"{modifiersPart} {Kind.Keyword}";
+            return $"{modifiersAndKindPart} {DeclarationName}".Trim();
         }
     }
 }
