@@ -11,9 +11,18 @@ namespace Tycho.Utils.SourceGenerator.Extractors
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
+            if (typeSymbol is INamedTypeSymbol)
+            {
+                return new TypeReferenceModel(
+                    GetNamespace(typeSymbol),
+                    GetContainingTypes(typeSymbol, context),
+                    typeSymbol.Name,
+                    TypeArgumentsModelExtractor.Extract(typeSymbol, context));
+            }
+
             return new TypeReferenceModel(
                 GetNamespace(typeSymbol),
-                GetContainingTypes(typeSymbol, context),
+                ImmutableEquatableArray<TypeReferenceModel>.Empty,
                 typeSymbol.Name,
                 TypeArgumentsModelExtractor.Extract(typeSymbol, context));
         }
@@ -40,6 +49,6 @@ namespace Tycho.Utils.SourceGenerator.Extractors
                     TypeArgumentsModelExtractor.Extract(containingTypeSymbol, context)));
             }
             return containingTypes.ToImmutableEquatableArray();
-        }       
+        }
     }
 }
