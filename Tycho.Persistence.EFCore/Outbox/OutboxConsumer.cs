@@ -50,6 +50,7 @@ internal class OutboxConsumer(TychoDbContext dbContext, OutboxConsumerSettings? 
 
         // Known flaw: relying on system clock for claiming is vulnerable to clock skew when running the app on multiple machines
         // Recommendation: set DeliveryExpiration to values significantly higher than the potential clock skew to mitigate this issue
+
         await _dbContext
             .Set<OutboxEntry>()
             .Where(canBeProcessed)

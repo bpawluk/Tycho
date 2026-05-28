@@ -1,5 +1,6 @@
 using System;
 using System.IO.Hashing;
+using System.Linq;
 using System.Text;
 
 namespace Tycho.Identity
@@ -12,6 +13,22 @@ namespace Tycho.Identity
         }
 
         public static string GetId(Type type)
+        {
+            if (type.IsGenericParameter)
+            {
+                return type.Name;
+            }
+
+            if (type.IsGenericType)
+            {
+                string[] genericArguments = type.GetGenericArguments().Select(GetId).ToArray();
+                return $"{GetFlatId(type.GetGenericTypeDefinition())}<{string.Join(",", genericArguments)}>";
+            }
+
+            return GetFlatId(type);
+        }
+
+        private static string GetFlatId(Type type)
         {
             return $"{GetShortName(type)}+{GetShortId(type)}";
         }

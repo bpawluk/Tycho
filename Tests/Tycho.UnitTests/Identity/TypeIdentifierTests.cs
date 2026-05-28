@@ -7,14 +7,17 @@ namespace Tycho.UnitTests.Identity;
 
 public partial class TypeIdentifierTests
 {
-    public static readonly TheoryData<Type> CommonTypes =
-    [
-        typeof(int),
-        typeof(string),
-        typeof(object),
-        typeof(ValueTask),
-        typeof(List<int>)
-    ];
+    public static readonly TheoryData<Type, string> TypesWithTemplates = new()
+    {
+        { typeof(int), "Int32+HASH" },
+        { typeof(string), "String+HASH" },
+        { typeof(object), "Object+HASH" },
+        { typeof(List<int>), "List+HASH<Int32+HASH>" },
+        { typeof(ValueTask<int?>), "ValueTask+HASH<Nullable+HASH<Int32+HASH>>" },
+        { typeof(Dictionary<string, int>), "Dictionary+HASH<String+HASH,Int32+HASH>" },
+        { typeof(GenericModule<Tuple<int, DateTime?>, string>), "GenericModule+HASH<Tuple+HASH<Int32+HASH,Nullable+HASH<DateTime+HASH>>,String+HASH>" },
+        { typeof(GenericModule<,>), "GenericModule+HASH<T,Q>" }
+    };
 
     public static readonly TheoryData<Type, Type> DistinctTypePairs = new()
     {
@@ -30,27 +33,29 @@ public partial class TypeIdentifierTests
     {
         // Act
         string genericResult = TypeIdentifier.GetId<string>();
-        string typeOverloadResult = TypeIdentifier.GetId<string>();
+#pragma warning disable CA2263
+        string typeOverloadResult = TypeIdentifier.GetId(typeof(string));
+#pragma warning restore CA2263
 
         // Assert
         Assert.Equal(typeOverloadResult, genericResult);
     }
 
     [Theory]
-    [MemberData(nameof(CommonTypes))]
-    public void GetId_SameType_ReturnsSameId(Type type)
+    [MemberData(nameof(TypesWithTemplates))]
+    public void GetId_ReturnsGeneratedId(Type type, string template)
     {
         // Act
-        string firstResult = TypeIdentifier.GetId(type);
-        string secondResult = TypeIdentifier.GetId(type);
+        string result = TypeIdentifier.GetId(type);
+        string pattern = "^" + Regex.Escape(template).Replace("HASH", "[0-9A-F]{8}") + "$";
 
         // Assert
-        Assert.Equal(firstResult, secondResult);
+        Assert.Matches(pattern, result);
     }
 
     [Theory]
     [MemberData(nameof(DistinctTypePairs))]
-    public void GetId_DifferentTypes_ReturnDifferentIds(Type first, Type second)
+    public void GetId_DifferentTypes_ReturnsDifferentIds(Type first, Type second)
     {
         // Act
         string firstResult = TypeIdentifier.GetId(first);
@@ -59,47 +64,4 @@ public partial class TypeIdentifierTests
         // Assert
         Assert.NotEqual(firstResult, secondResult);
     }
-
-    [Fact]
-    public void GetId_ForNonGenericType_PrefixIsTypeName()
-    {
-        // Act
-        string result = TypeIdentifier.GetId<string>();
-
-        // Assert
-        string[] splited = result.Split("+");
-        Assert.Equal(2, splited.Length);
-        Assert.Equal("String", splited[0]);
-    }
-
-    [Fact]
-    public void GetId_ForGenericType_PrefixIsTypeNameWithoutArity()
-    {
-        // Act
-        string result = TypeIdentifier.GetId<List<int>>();
-
-        // Assert
-        string[] splited = result.Split("+");
-        Assert.Equal(2, splited.Length);
-        Assert.Equal("List", splited[0]);
-    }
-
-    [Theory]
-    [MemberData(nameof(CommonTypes))]
-    public void GetId_SuffixIsEightAlphanumericCharacters(Type type)
-    {
-        // Act
-        string result = TypeIdentifier.GetId(type);
-
-        // Assert
-        string[] splited = result.Split("+");
-        Assert.Equal(2, splited.Length);
-
-        string suffix = splited[1];
-        Assert.Equal(8, suffix.Length);
-        Assert.Matches(MyRegex(), suffix);
-    }
-
-    [GeneratedRegex("^[0-9A-F]{8}$")]
-    private static partial Regex MyRegex();
 }
