@@ -31,7 +31,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public AppSetupTM(TychoSetupModel tychoSetupModel)
         {
             Namespace = tychoSetupModel.DefinitionType.Namespace;
-            ContainingTypes = tychoSetupModel.DefinitionType.ContainingTypeDeclarationSignatures.ToArray();
+            ContainingTypes = UseContainingTypeDeclarations(tychoSetupModel.DefinitionType);
             OwnerConstraints = UseConstraintClauses(tychoSetupModel.DefinitionType.TypeParameters).ToArray();
             Classes = new ClassesTM(this, tychoSetupModel);
             Interfaces = new InterfacesTM(this, tychoSetupModel);

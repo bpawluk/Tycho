@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.Models.System

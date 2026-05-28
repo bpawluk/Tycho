@@ -26,7 +26,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public AppPublisherInterfaceTM(TychoPublisherModel tychoPublisherModel)
         {
             Namespace = tychoPublisherModel.DefinitionType.Namespace;
-            ContainingTypes = tychoPublisherModel.DefinitionType.ContainingTypeDeclarationSignatures.ToArray();
+            ContainingTypes = UseContainingTypeDeclarations(tychoPublisherModel.DefinitionType);
             OwnerConstraints = UseConstraintClauses(tychoPublisherModel.DefinitionType.TypeParameters).ToArray();
             Classes = new ClassesTM(this, tychoPublisherModel);
             Interfaces = new InterfacesTM();

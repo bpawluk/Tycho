@@ -33,7 +33,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 .Distinct()
                 .ToArray();
             Namespace = tychoExtensionsModel.DefinitionType.Namespace;
-            ContainingTypes = tychoExtensionsModel.DefinitionType.ContainingTypeDeclarationSignatures.ToArray();
+            ContainingTypes = UseContainingTypeDeclarations(tychoExtensionsModel.DefinitionType);
             OwnerConstraints = UseConstraintClauses(tychoExtensionsModel.DefinitionType.ContainingTypes
                     .SelectMany(containingType => containingType.TypeParameters)
                     .Concat(tychoExtensionsModel.DefinitionType.TypeParameters))

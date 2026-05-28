@@ -26,7 +26,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public ModuleParentTM(TychoParentModel tychoParentModel)
         {
             Namespace = tychoParentModel.DefinitionType.Namespace;
-            ContainingTypes = tychoParentModel.DefinitionType.ContainingTypeDeclarationSignatures.ToArray();
+            ContainingTypes = UseContainingTypeDeclarations(tychoParentModel.DefinitionType);
             OwnerConstraints = UseConstraintClauses(tychoParentModel.DefinitionType.TypeParameters).ToArray();
             Classes = new ClassesTM(this, tychoParentModel);
             Interfaces = new InterfacesTM();

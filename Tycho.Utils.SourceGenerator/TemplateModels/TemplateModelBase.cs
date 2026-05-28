@@ -18,11 +18,23 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public string UseType(TypeReferenceModel typeReference)
         {
-            if (!string.IsNullOrEmpty(typeReference.Namespace))
-            {
-                _namespaces.Add(typeReference.Namespace);
-            }
+            AddUsedNamespaces(typeReference);
             return typeReference.FullReferenceName;
+        }
+
+        protected string[] UseContainingTypeDeclarations(TypeDefinitionModel typeDefinition)
+        {
+            if (typeDefinition.ContainingTypes.Count == 0)
+            {
+                return Array.Empty<string>();
+            }
+
+            foreach (TypeDefinitionModel containingType in typeDefinition.ContainingTypes)
+            {
+                _ = UseConstraintClauses(containingType.TypeParameters).ToArray();
+            }
+
+            return typeDefinition.ContainingTypeDeclarationSignatures.ToArray();
         }
 
         protected IEnumerable<string> UseConstraintClauses(IEnumerable<TypeParameterModel> typeParameters)
@@ -46,6 +58,24 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 {
                     yield return typeParameter.ConstraintsClause;
                 }
+            }
+        }
+
+        private void AddUsedNamespaces(TypeReferenceModel typeReference)
+        {
+            if (!string.IsNullOrEmpty(typeReference.Namespace))
+            {
+                _namespaces.Add(typeReference.Namespace);
+            }
+
+            foreach (TypeReferenceModel containingType in typeReference.ContainingTypes)
+            {
+                AddUsedNamespaces(containingType);
+            }
+
+            foreach (TypeArgumentModel typeArgument in typeReference.TypeArguments)
+            {
+                AddUsedNamespaces(typeArgument.Value);
             }
         }
     }

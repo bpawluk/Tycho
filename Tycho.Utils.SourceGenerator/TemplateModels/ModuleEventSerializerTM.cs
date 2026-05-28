@@ -25,7 +25,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public ModuleEventSerializerTM(TychoEventSerializerModel tychoEventSerializerModel)
         {
             Namespace = tychoEventSerializerModel.DefinitionType.Namespace;
-            ContainingTypes = tychoEventSerializerModel.DefinitionType.ContainingTypeDeclarationSignatures.ToArray();
+            ContainingTypes = UseContainingTypeDeclarations(tychoEventSerializerModel.DefinitionType);
             OwnerConstraints = UseConstraintClauses(tychoEventSerializerModel.DefinitionType.TypeParameters).ToArray();
             Classes = new ClassesTM(this, tychoEventSerializerModel.DefinitionType);
             Interfaces = new InterfacesTM(this);
