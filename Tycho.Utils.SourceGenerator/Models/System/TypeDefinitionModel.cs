@@ -23,6 +23,10 @@ namespace Tycho.Utils.SourceGenerator.Models.System
 
         public string DeclarationName => $"{Name}{TypeParametersSuffix}";
 
+        public string FullDeclarationName => BuildPath(
+            ContainingTypes.Select(type => type.DeclarationName).ToImmutableEquatableArray(),
+            DeclarationName);
+
         public string MetadataName => TypeParameters.Count > 0 ? $"{Name}`{TypeParameters.Count}" : Name;
 
         public string FullMetadataName => BuildPath(
@@ -114,7 +118,7 @@ namespace Tycho.Utils.SourceGenerator.Models.System
             return $"where {typeParameter.Name} : {string.Join(", ", constraints)}";
         }
 
-        private static string BuildPath(ImmutableEquatableArray<string> containingTypes, string typeName, string namespaceName)
+        private static string BuildPath(ImmutableEquatableArray<string> containingTypes, string typeName, string namespaceName = null)
         {
             string containingPart = containingTypes.Count == 0 ? string.Empty : string.Join(".", containingTypes.Where(segment => !string.IsNullOrWhiteSpace(segment)));
             string containingAndNamePart = string.IsNullOrEmpty(containingPart) ? typeName : $"{containingPart}.{typeName}";

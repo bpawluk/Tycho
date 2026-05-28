@@ -27,7 +27,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         {
             Namespace = tychoFacadeModel.DefinitionType.Namespace;
             ContainingTypes = tychoFacadeModel.DefinitionType.ContainingTypeDeclarationSignatures.ToArray();
-            OwnerConstraints = tychoFacadeModel.DefinitionType.TypeParameterConstraintClauses.ToArray();
+            OwnerConstraints = UseConstraintClauses(tychoFacadeModel.DefinitionType.TypeParameters).ToArray();
             Classes = new ClassesTM(this);
             Interfaces = new InterfacesTM(tychoFacadeModel);
             Methods = new MethodsTM();

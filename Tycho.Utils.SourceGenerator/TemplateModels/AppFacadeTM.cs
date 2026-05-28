@@ -27,7 +27,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         {
             Namespace = tychoFacadeModel.DefinitionType.Namespace;
             ContainingTypes = tychoFacadeModel.DefinitionType.ContainingTypeDeclarationSignatures.ToArray();
-            OwnerConstraints = tychoFacadeModel.DefinitionType.TypeParameterConstraintClauses.ToArray();
+            OwnerConstraints = UseConstraintClauses(tychoFacadeModel.DefinitionType.TypeParameters).ToArray();
             Classes = new ClassesTM(this, tychoFacadeModel);
             Interfaces = new InterfacesTM(this, tychoFacadeModel);
             Methods = new MethodsTM();
@@ -49,7 +49,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             {
                 string appNameStem = tychoFacadeModel.DefinitionType.Name;
                 string appTypeSuffix = tychoFacadeModel.DefinitionType.TypeParametersSuffix;
-                AppClass = tychoFacadeModel.DefinitionType.ReferenceName;
+                AppClass = tychoFacadeModel.DefinitionType.DeclarationName;
                 FacadeClassName = AppFacadeSymbols.GetAppFacadeClass(appNameStem);
                 FacadeClass = $"{FacadeClassName}{appTypeSuffix}";
                 FacadeBaseClass = owner.UseType(AppFacadeBaseReference.TypeModel);

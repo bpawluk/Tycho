@@ -34,9 +34,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 .ToArray();
             Namespace = tychoExtensionsModel.DefinitionType.Namespace;
             ContainingTypes = tychoExtensionsModel.DefinitionType.ContainingTypeDeclarationSignatures.ToArray();
-            OwnerConstraints = tychoExtensionsModel.DefinitionType.ContainingTypes
-                .SelectMany(containingType => containingType.TypeParameterConstraintClauses)
-                .Concat(tychoExtensionsModel.DefinitionType.TypeParameterConstraintClauses)
+            OwnerConstraints = UseConstraintClauses(tychoExtensionsModel.DefinitionType.ContainingTypes
+                    .SelectMany(containingType => containingType.TypeParameters)
+                    .Concat(tychoExtensionsModel.DefinitionType.TypeParameters))
                 .Distinct()
                 .ToArray();
             Classes = new ClassesTM(this, tychoExtensionsModel);
@@ -58,7 +58,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public ClassesTM(AppExtensionsTM owner, TychoExtensionsModel tychoExtensionsModel)
             {
                 string appNameStem = tychoExtensionsModel.DefinitionType.Name;
-                AppClass = tychoExtensionsModel.DefinitionType.FullReferenceName;
+                AppClass = tychoExtensionsModel.DefinitionType.FullDeclarationName;
                 SetupExtensionsClass = AppExtensionsSymbols.GetAppSetupExtensionsClass(appNameStem);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 LoggingConfigurationClass = owner.UseType(LoggingConfigurationReference.TypeModel);

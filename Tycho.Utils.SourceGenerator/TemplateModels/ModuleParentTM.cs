@@ -27,7 +27,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         {
             Namespace = tychoParentModel.DefinitionType.Namespace;
             ContainingTypes = tychoParentModel.DefinitionType.ContainingTypeDeclarationSignatures.ToArray();
-            OwnerConstraints = tychoParentModel.DefinitionType.TypeParameterConstraintClauses.ToArray();
+            OwnerConstraints = UseConstraintClauses(tychoParentModel.DefinitionType.TypeParameters).ToArray();
             Classes = new ClassesTM(this, tychoParentModel);
             Interfaces = new InterfacesTM();
             Methods = new MethodsTM();
@@ -49,7 +49,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             {
                 string moduleNameStem = tychoParentModel.DefinitionType.Name;
                 string moduleTypeSuffix = tychoParentModel.DefinitionType.TypeParametersSuffix;
-                ModuleClass = tychoParentModel.DefinitionType.ReferenceName;
+                ModuleClass = tychoParentModel.DefinitionType.DeclarationName;
                 ParentClassName = ModuleParentSymbols.GetParentClass(moduleNameStem);
                 ParentClass = $"{ParentClassName}{moduleTypeSuffix}";
                 ParentBaseClass = owner.UseType(ParentBaseReference.TypeModel);

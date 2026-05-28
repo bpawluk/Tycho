@@ -26,7 +26,6 @@ namespace Tycho.Utils.SourceGenerator.Models.System
         {
             return string.Equals(MethodName, other.MethodName, StringComparison.Ordinal) &&
                    Parameters.Count == other.Parameters.Count &&
-                   Parameters.Zip(other.Parameters, (a, b) => a.Matches(b)).All(match => match) &&
                    Result.Matches(other.Result);
         }
 

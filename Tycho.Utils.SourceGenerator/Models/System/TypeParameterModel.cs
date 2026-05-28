@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.Models.System
@@ -8,6 +9,10 @@ namespace Tycho.Utils.SourceGenerator.Models.System
         public string Name { get; }
 
         public ImmutableEquatableArray<TypeParameterConstraintModel> Constraints { get; }
+
+        public string ConstraintsClause => Constraints.Count == 0
+                ? string.Empty
+                : $"where {Name} : {string.Join(", ", Constraints.Select(constraint => constraint.ToString()))}";
 
         public TypeParameterModel(string name, ImmutableEquatableArray<TypeParameterConstraintModel> constraints)
         {

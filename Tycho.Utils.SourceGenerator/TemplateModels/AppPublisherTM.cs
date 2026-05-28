@@ -26,7 +26,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         {
             Namespace = tychoPublisherModel.DefinitionType.Namespace;
             ContainingTypes = tychoPublisherModel.DefinitionType.ContainingTypeDeclarationSignatures.ToArray();
-            OwnerConstraints = tychoPublisherModel.DefinitionType.TypeParameterConstraintClauses.ToArray();
+            OwnerConstraints = UseConstraintClauses(tychoPublisherModel.DefinitionType.TypeParameters).ToArray();
             Classes = new ClassesTM(this, tychoPublisherModel);
             Interfaces = new InterfacesTM();
             Methods = new MethodsTM();
@@ -48,7 +48,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             {
                 string appNameStem = tychoPublisherModel.DefinitionType.Name;
                 string appTypeSuffix = tychoPublisherModel.DefinitionType.TypeParametersSuffix;
-                AppClass = tychoPublisherModel.DefinitionType.ReferenceName;
+                AppClass = tychoPublisherModel.DefinitionType.DeclarationName;
                 PublisherClassName = PublisherSymbols.GetPublisherClass(appNameStem);
                 PublisherClass = $"{PublisherClassName}{appTypeSuffix}";
                 PublisherBaseClass = owner.UseType(PublisherBaseReference.TypeModel);
