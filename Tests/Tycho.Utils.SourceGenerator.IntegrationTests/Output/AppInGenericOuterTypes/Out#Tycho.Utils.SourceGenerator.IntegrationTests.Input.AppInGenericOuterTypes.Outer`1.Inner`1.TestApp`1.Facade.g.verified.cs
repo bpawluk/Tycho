@@ -5,9 +5,11 @@ using Tycho.Apps.Instance;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInGenericOuterTypes
 {
-    public partial class Outer<TOuter> where TOuter : class
+    public partial class Outer<TOuter>
+        where TOuter : class
     {
-        public partial class Inner<TInner> where TInner : notnull
+        public partial class Inner<TInner>
+            where TInner : notnull
         {
             internal class TestAppFacade<TApp> : AppFacadeBase, ITestApp<TApp>
                 where TApp : new()

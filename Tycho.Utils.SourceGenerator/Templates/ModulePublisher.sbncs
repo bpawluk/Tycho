@@ -19,11 +19,12 @@ namespace {{ namespace }}
 {{~#-----------------------------------------#~}}
 {{~#---------- Declare outer types ----------#~}}
 {{~ for containing_type in containing_types ~}}
-{{ string.pad_left "" ((ns_offset + for.index) * 4) }}{{ containing_type.declaration }}
+{{~ containing_type_indent = (ns_offset + for.index) * 4 ~}}
+{{ string.pad_left "" containing_type_indent }}{{ containing_type.declaration }}
 {{~ for constraint in containing_type.constraints ~}}
-{{ string.pad_left "" ((ns_offset + for.index + 1) * 4) }}{{ constraint }}
+{{ string.pad_left "" (containing_type_indent + 4) }}{{ constraint }}
 {{~ end ~}}
-{{ string.pad_left "" ((ns_offset + for.index) * 4) }}{
+{{ string.pad_left "" containing_type_indent }}{
 {{~ end ~}}
 {{~#-----------------------------------------#~}}
 {{~#------------------------------------------------- MODULE PUBLISHER -------------------------------------------------#~}}

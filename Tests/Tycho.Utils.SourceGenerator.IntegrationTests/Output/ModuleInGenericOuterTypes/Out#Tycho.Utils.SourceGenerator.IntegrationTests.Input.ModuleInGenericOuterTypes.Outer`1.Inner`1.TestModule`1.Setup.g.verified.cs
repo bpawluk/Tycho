@@ -6,9 +6,11 @@ using Tycho.Modules.Instance;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInGenericOuterTypes
 {
-    public partial class Outer<TOuter> where TOuter : class
+    public partial class Outer<TOuter>
+        where TOuter : class
     {
-        public partial class Inner<TInner> where TInner : notnull
+        public partial class Inner<TInner>
+            where TInner : notnull
         {
             public partial class TestModule<TModule> : TychoModule
                 where TModule : notnull
