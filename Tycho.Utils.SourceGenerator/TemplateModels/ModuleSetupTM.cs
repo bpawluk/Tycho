@@ -10,7 +10,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 {
     internal class ModuleSetupTM : TemplateModelBase
     {
-        public string[] ContainingTypes { get; }
+        public ContainingTypeTM[] ContainingTypes { get; }
 
         public string[] OwnerConstraints { get; }
 
@@ -27,7 +27,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public ModuleSetupTM(TychoSetupModel tychoDefinitionModel)
         {
             Namespace = tychoDefinitionModel.DefinitionType.Namespace;
-            ContainingTypes = UseContainingTypeDeclarations(tychoDefinitionModel.DefinitionType);
+            ContainingTypes = UseContainingTypes(tychoDefinitionModel.DefinitionType.ContainingTypes);
             OwnerConstraints = UseConstraintClauses(tychoDefinitionModel.DefinitionType.TypeParameters).ToArray();
             Classes = new ClassesTM(this, tychoDefinitionModel);
             Interfaces = new InterfacesTM(this);

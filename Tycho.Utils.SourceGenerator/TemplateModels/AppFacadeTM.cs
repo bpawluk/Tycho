@@ -9,7 +9,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 {
     internal class AppFacadeTM : TemplateModelBase
     {
-        public string[] ContainingTypes { get; }
+        public ContainingTypeTM[] ContainingTypes { get; }
 
         public string[] OwnerConstraints { get; }
 
@@ -26,7 +26,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public AppFacadeTM(TychoFacadeModel tychoFacadeModel)
         {
             Namespace = tychoFacadeModel.DefinitionType.Namespace;
-            ContainingTypes = UseContainingTypeDeclarations(tychoFacadeModel.DefinitionType);
+            ContainingTypes = UseContainingTypes(tychoFacadeModel.DefinitionType.ContainingTypes);
             OwnerConstraints = UseConstraintClauses(tychoFacadeModel.DefinitionType.TypeParameters).ToArray();
             Classes = new ClassesTM(this, tychoFacadeModel);
             Interfaces = new InterfacesTM(this, tychoFacadeModel);

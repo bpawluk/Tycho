@@ -8,7 +8,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 {
     internal class ModuleEventSerializerTM : TemplateModelBase
     {
-        public string[] ContainingTypes { get; }
+        public ContainingTypeTM[] ContainingTypes { get; }
 
         public string[] OwnerConstraints { get; }
 
@@ -25,7 +25,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public ModuleEventSerializerTM(TychoEventSerializerModel tychoEventSerializerModel)
         {
             Namespace = tychoEventSerializerModel.DefinitionType.Namespace;
-            ContainingTypes = UseContainingTypeDeclarations(tychoEventSerializerModel.DefinitionType);
+            ContainingTypes = UseContainingTypes(tychoEventSerializerModel.DefinitionType.ContainingTypes);
             OwnerConstraints = UseConstraintClauses(tychoEventSerializerModel.DefinitionType.TypeParameters).ToArray();
             Classes = new ClassesTM(this, tychoEventSerializerModel.DefinitionType);
             Interfaces = new InterfacesTM(this);

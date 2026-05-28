@@ -8,7 +8,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 {
     internal class ModulePublisherTM : TemplateModelBase
     {
-        public string[] ContainingTypes { get; }
+        public ContainingTypeTM[] ContainingTypes { get; }
 
         public string[] OwnerConstraints { get; }
 
@@ -25,7 +25,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public ModulePublisherTM(TychoPublisherModel tychoPublisherModel)
         {
             Namespace = tychoPublisherModel.DefinitionType.Namespace;
-            ContainingTypes = UseContainingTypeDeclarations(tychoPublisherModel.DefinitionType);
+            ContainingTypes = UseContainingTypes(tychoPublisherModel.DefinitionType.ContainingTypes);
             OwnerConstraints = UseConstraintClauses(tychoPublisherModel.DefinitionType.TypeParameters).ToArray();
             Classes = new ClassesTM(this, tychoPublisherModel);
             Interfaces = new InterfacesTM();
