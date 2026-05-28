@@ -9,13 +9,13 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 {
     internal class AppExtensionsTM : TemplateModelBase
     {
-        public ContainingTypeTM[] ContainingTypes { get; }
-
-        public string[] OwnerConstraints { get; }
-
-        public ClassesTM Classes { get; }
+        public string[] TypeParameters { get; }
 
         public string TypeParametersSuffix { get; }
+
+        public string[] TypeParametersConstraints { get; }
+
+        public ClassesTM Classes { get; }
 
         public InterfacesTM Interfaces { get; }
 
@@ -27,20 +27,20 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public AppExtensionsTM(TychoExtensionsModel tychoExtensionsModel)
         {
-            string[] allTypeParameters = tychoExtensionsModel.DefinitionType.ContainingTypes
+            Namespace = tychoExtensionsModel.DefinitionType.Namespace;
+            TypeParameters = tychoExtensionsModel.DefinitionType.ContainingTypes
                 .SelectMany(containingType => containingType.TypeParameters.Select(typeParameter => typeParameter.Name))
                 .Concat(tychoExtensionsModel.DefinitionType.TypeParameters.Select(typeParameter => typeParameter.Name))
                 .Distinct()
                 .ToArray();
-            Namespace = tychoExtensionsModel.DefinitionType.Namespace;
-            ContainingTypes = UseContainingTypes(tychoExtensionsModel.DefinitionType.ContainingTypes);
-            OwnerConstraints = UseConstraintClauses(tychoExtensionsModel.DefinitionType.ContainingTypes
+            TypeParametersSuffix = TypeParameters.Length == 0 ? string.Empty : $"<{string.Join(", ", TypeParameters)}>";
+            TypeParametersConstraints = UseConstraintClauses(
+                tychoExtensionsModel.DefinitionType.ContainingTypes
                     .SelectMany(containingType => containingType.TypeParameters)
                     .Concat(tychoExtensionsModel.DefinitionType.TypeParameters))
                 .Distinct()
                 .ToArray();
             Classes = new ClassesTM(this, tychoExtensionsModel);
-            TypeParametersSuffix = allTypeParameters.Length == 0 ? string.Empty : $"<{string.Join(", ", allTypeParameters)}>";
             Interfaces = new InterfacesTM(this);
             Methods = new MethodsTM(tychoExtensionsModel);
             Properties = new PropertiesTM();
