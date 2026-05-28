@@ -4,6 +4,6 @@ namespace Tycho.Utils.SourceGenerator.Symbols
     {
         public const string PayloadSerializerParameter = "payloadSerializer";
 
-        public static string GetEventSerializerClass(string ownerClass) => $"{ownerClass}EventSerializer";
+        public static string GetEventSerializerClass(string ownerClass, string ownerTypeParametersSuffix = null) => $"{ownerClass}EventSerializer{ownerTypeParametersSuffix ?? string.Empty}";
     }
 }

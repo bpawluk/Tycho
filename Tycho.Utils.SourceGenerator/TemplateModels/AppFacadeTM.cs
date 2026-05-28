@@ -38,8 +38,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         internal class ClassesTM
         {
             public string AppClass { get; }
-            public string FacadeClassName { get; }
             public string FacadeClass { get; }
+            public string FacadeClassWithTypeParams { get; }
             public string FacadeBaseClass { get; }
             public string TaskClass { get; }
             public string ValueTaskClass { get; }
@@ -48,10 +48,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public ClassesTM(AppFacadeTM owner, TychoFacadeModel tychoFacadeModel)
             {
                 string appNameStem = tychoFacadeModel.DefinitionType.Name;
-                string appTypeSuffix = tychoFacadeModel.DefinitionType.TypeParametersSuffix;
                 AppClass = tychoFacadeModel.DefinitionType.DeclarationName;
-                FacadeClassName = AppFacadeSymbols.GetAppFacadeClass(appNameStem);
-                FacadeClass = $"{FacadeClassName}{appTypeSuffix}";
+                FacadeClass = AppFacadeSymbols.GetAppFacadeClass(appNameStem);
+                FacadeClassWithTypeParams = AppFacadeSymbols.GetAppFacadeClass(appNameStem, tychoFacadeModel.DefinitionType.TypeParametersSuffix);
                 FacadeBaseClass = owner.UseType(AppFacadeBaseReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 ValueTaskClass = owner.UseType(ValueTaskReference.TypeModel);

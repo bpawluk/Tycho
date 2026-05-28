@@ -24,12 +24,12 @@ namespace {{ namespace }}
 {{~ end ~}}
 {{~#-----------------------------------------#~}}
 {{~#------------------------------------------- MODULE EVENT SERIALIZER ---------------------------------------------#~}}
-{{ i0 }}internal class {{ classes.event_serializer_class }} : {{ classes.event_serializer_base_class }}
+{{ i0 }}internal class {{ classes.event_serializer_class_with_type_params }} : {{ classes.event_serializer_base_class }}
 {{~ for owner_constraint in owner_constraints ~}}
 {{   i1   }}{{ owner_constraint }}
 {{~ end ~}}
 {{ i0 }}{
-{{   i1   }}public {{ classes.event_serializer_class_name }}({{ interfaces.payload_serializer_interface }} {{ parameters.payload_serializer_parameter }}) : base({{ parameters.payload_serializer_parameter }})
+{{   i1   }}public {{ classes.event_serializer_class }}({{ interfaces.payload_serializer_interface }} {{ parameters.payload_serializer_parameter }}) : base({{ parameters.payload_serializer_parameter }})
 {{   i1   }}{
 {{~ for event in events ~}}
 {{     i2     }}{{ methods.register_event_method }}<{{ event }}>();

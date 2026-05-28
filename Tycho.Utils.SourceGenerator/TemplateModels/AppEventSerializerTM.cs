@@ -36,14 +36,14 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         internal class ClassesTM
         {
-            public string EventSerializerClassName { get; }
+            public string EventSerializerClassWithTypeParams { get; }
             public string EventSerializerClass { get; }
             public string EventSerializerBaseClass { get; }
 
             public ClassesTM(AppEventSerializerTM owner, TypeDefinitionModel appType)
             {
-                EventSerializerClassName = EventSerializerSymbols.GetEventSerializerClass(appType.Name);
-                EventSerializerClass = $"{EventSerializerClassName}{appType.TypeParametersSuffix}";
+                EventSerializerClass = EventSerializerSymbols.GetEventSerializerClass(appType.Name);
+                EventSerializerClassWithTypeParams = EventSerializerSymbols.GetEventSerializerClass(appType.Name, appType.TypeParametersSuffix);
                 EventSerializerBaseClass = owner.UseType(EventSerializerBaseReference.TypeModel);
             }
         }

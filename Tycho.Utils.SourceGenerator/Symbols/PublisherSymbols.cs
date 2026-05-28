@@ -7,6 +7,6 @@ namespace Tycho.Utils.SourceGenerator.Symbols
         public const string EventPayloadParameter = "eventPayload";
         public const string CancellationTokenParameter = "cancellationToken";
 
-        public static string GetPublisherClass(string ownerClass) => $"{ownerClass}Publisher";
+        public static string GetPublisherClass(string ownerClass, string ownerTypeParametersSuffix = null) => $"{ownerClass}Publisher{ownerTypeParametersSuffix ?? string.Empty}";
     }
 }

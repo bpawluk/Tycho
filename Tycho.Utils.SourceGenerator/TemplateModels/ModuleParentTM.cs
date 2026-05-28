@@ -38,8 +38,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         internal class ClassesTM
         {
             public string ModuleClass { get; }
-            public string ParentClassName { get; }
             public string ParentClass { get; }
+            public string ParentClassWithTypeParams { get; }
             public string ParentBaseClass { get; }
             public string TaskClass { get; }
             public string CancellationTokenClass { get; }
@@ -48,10 +48,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public ClassesTM(ModuleParentTM owner, TychoParentModel tychoParentModel)
             {
                 string moduleNameStem = tychoParentModel.DefinitionType.Name;
-                string moduleTypeSuffix = tychoParentModel.DefinitionType.TypeParametersSuffix;
                 ModuleClass = tychoParentModel.DefinitionType.DeclarationName;
-                ParentClassName = ModuleParentSymbols.GetParentClass(moduleNameStem);
-                ParentClass = $"{ParentClassName}{moduleTypeSuffix}";
+                ParentClass = ModuleParentSymbols.GetParentClass(moduleNameStem);
+                ParentClassWithTypeParams = ModuleParentSymbols.GetParentClass(moduleNameStem, tychoParentModel.DefinitionType.TypeParametersSuffix);
                 ParentBaseClass = owner.UseType(ParentBaseReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);
