@@ -1,101 +1,58 @@
-using Microsoft.CodeAnalysis;
-using Tycho.IntegrationTests._Utils;
+using Tycho.IntegrationTests.UsingGenericRequests.SUT;
 
 namespace Tycho.IntegrationTests.UsingGenericRequests;
 
-public sealed class UsingGenericRequestsTests
+public sealed class UsingGenericRequestsTests : IAsyncLifetime
 {
-    [Fact]
-    public void TychoEnables_GenericRequestDefinitions()
+    private ITestApp _sut = null!;
+
+    public async ValueTask InitializeAsync()
     {
-        // Arrange
-        string genericApp =
-            """
-            using System.Threading;
-            using System.Threading.Tasks;
-            using Microsoft.Extensions.DependencyInjection;
-            using Tycho.Apps;
-            using Tycho.Requests;
-
-            namespace Tycho.IntegrationTests.UsingGenericRequests.SUT;
-
-            public sealed class TestRequest<T> : IRequest { }
-
-            public sealed class TestRequestHandler : IRequestHandler<TestRequest<int>>
-            {
-                public Task HandleAsync(TestRequest<int> requestData, CancellationToken cancellationToken)
-                {
-                    return Task.CompletedTask;
-                }
-            }
-
-            [TychoDefinition]
-            public partial class TestApp : TychoApp
-            {
-                protected override void DefineContract(IAppContract app)
-                {
-                    app.Handles<TestRequest<int>, TestRequestHandler>();
-                }
-
-                protected override void DefineEvents(IAppEvents app) { }
-                protected override void IncludeModules(IAppStructure app) { }
-                protected override void RegisterServices(IServiceCollection app) { }
-            }
-            """;
-
-        // Act
-        IReadOnlyCollection<Diagnostic> result = CompilationHelpers.CompileWithTychoGenerator(genericApp);
-
-        // Assert
-        var compilationErrors = result.Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
-        Assert.Empty(compilationErrors);
+        _sut = await new TestApp().RunAsync();
     }
 
-    [Fact]
-    public void TychoEnables_GenericResponseDefinitions()
+    [Fact(Timeout = 5000)]
+    public async Task TychoEnables_SendingClosedGenericRequests()
     {
-        // Arrange
-        string genericApp =
-            """
-            using System.Threading;
-            using System.Threading.Tasks;
-            using Microsoft.Extensions.DependencyInjection;
-            using Tycho.Apps;
-            using Tycho.Requests;
-
-            namespace Tycho.IntegrationTests.UsingGenericRequests.SUT;
-
-            public sealed class TestResponse<T> { }
-
-            public sealed class TestRequest : IRequest<TestResponse<int>> { }
-
-            public sealed class TestRequestHandler : IRequestHandler<TestRequest, TestResponse<int>>
-            {
-                public Task<TestResponse<int>> HandleAsync(TestRequest requestData, CancellationToken cancellationToken)
-                {
-                    return Task.FromResult(new TestResponse<int>());
-                }
-            }
-
-            [TychoDefinition]
-            public partial class TestApp : TychoApp
-            {
-                protected override void DefineContract(IAppContract app)
-                {
-                    app.Handles<TestRequest, TestResponse<int>, TestRequestHandler>();
-                }
-
-                protected override void DefineEvents(IAppEvents app) { }
-                protected override void IncludeModules(IAppStructure app) { }
-                protected override void RegisterServices(IServiceCollection app) { }
-            }
-            """;
-
         // Act
-        IReadOnlyCollection<Diagnostic> result = CompilationHelpers.CompileWithTychoGenerator(genericApp);
+        GenericAppRequest<int>.Response<int> intResponse = await _sut.ExecuteAsync(
+            new GenericAppRequest<int>(123),
+            TestContext.Current.CancellationToken);
 
         // Assert
-        var compilationErrors = result.Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
-        Assert.Empty(compilationErrors);
+        Assert.Equal(123, intResponse.Data);
+
+        // Act
+        GenericAppRequest<string>.Response<string> stringResponse = await _sut.ExecuteAsync(
+            new GenericAppRequest<string>("generic-app-request"),
+            TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal("generic-app-request", stringResponse.Data);
+    }
+
+    [Fact(Timeout = 5000)]
+    public async Task TychoEnables_ForwardingClosedGenericRequests()
+    {
+        // Act
+        GenericAppRequestToForward<int>.Response<int> intResponse = await _sut.ExecuteAsync(
+            new GenericAppRequestToForward<int>(456),
+            TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(456, intResponse.Data);
+
+        // Act
+        GenericAppRequestToForward<string>.Response<string> stringResponse = await _sut.ExecuteAsync(
+            new GenericAppRequestToForward<string>("generic-forwarded-request"),
+            TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal("generic-forwarded-request", stringResponse.Data);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _sut.DisposeAsync();
     }
 }
