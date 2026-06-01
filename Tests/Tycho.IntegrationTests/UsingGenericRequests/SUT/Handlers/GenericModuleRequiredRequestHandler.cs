@@ -3,8 +3,7 @@ using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.UsingGenericRequests.SUT.Handlers;
 
-internal class GenericModuleRequiredRequestHandler<T>
-    : IRequestHandler<GenericModuleRequiredRequest<T>, GenericModuleRequiredRequest<T>.Response<T>>
+internal class GenericModuleRequiredRequestHandler<T> : IRequestHandler<GenericModuleRequiredRequest<T>, GenericModuleRequiredRequest<T>.Response<T>>
 {
     public Task<GenericModuleRequiredRequest<T>.Response<T>> HandleAsync(GenericModuleRequiredRequest<T> requestData, CancellationToken cancellationToken)
     {

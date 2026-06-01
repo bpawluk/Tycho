@@ -1,54 +1,61 @@
-using Microsoft.CodeAnalysis;
 using Tycho.IntegrationTests._Utils;
+using Tycho.IntegrationTests.UsingGenericEvents.SUT;
 
 namespace Tycho.IntegrationTests.UsingGenericEvents;
 
-public sealed class UsingGenericEventsTests
+public sealed class UsingGenericEventsTests : IAsyncLifetime
 {
-    [Fact]
-    public void TychoEnables_GenericAppDefinitions()
+    private readonly TestWorkflow<GenericEventResult<int>> _intWorkflow = new();
+    private readonly TestWorkflow<GenericEventResult<string>> _stringWorkflow = new();
+    private ITestApp _sut = null!;
+
+    public async ValueTask InitializeAsync()
     {
-        // Arrange
-        string genericApp =
-            """
-            using System.Threading;
-            using System.Threading.Tasks;
-            using Microsoft.Extensions.DependencyInjection;
-            using Tycho.Apps;
-            using Tycho.Events;
+        _sut = await new TestApp(_intWorkflow, _stringWorkflow).RunAsync();
+    }
 
-            namespace Tycho.IntegrationTests.UsingGenericEvents.SUT;
-
-            public sealed class TestEvent<T> : IEvent { }
-
-            public sealed class TestEventHandler : IEventHandler<TestEvent<int>>
-            {
-                public Task HandleAsync(EventContext<TestEvent<int>> context, CancellationToken cancellationToken)
-                {
-                    return Task.CompletedTask;
-                }
-            }
-
-            [TychoDefinition]
-            public partial class TestApp : TychoApp
-            {
-                protected override void DefineContract(IAppContract app) { }
-
-                protected override void DefineEvents(IAppEvents app)
-                {
-                    app.Handles<TestEvent<int>, TestEventHandler>();
-                }
-
-                protected override void IncludeModules(IAppStructure app) { }
-                protected override void RegisterServices(IServiceCollection app) { }
-            }
-            """;
-
+    [Fact(Timeout = 5000)]
+    public async Task TychoEnables_SendingClosedGenericEvents()
+    {
         // Act
-        IReadOnlyCollection<Diagnostic> result = CompilationHelpers.CompileWithTychoGenerator(genericApp);
+        await _sut.ExecuteAsync(new PublishGenericAppIntEventRequest(123), TestContext.Current.CancellationToken);
+        GenericEventResult<int> intResult = await _intWorkflow.GetResult();
 
         // Assert
-        var compilationErrors = result.Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
-        Assert.Empty(compilationErrors);
+        Assert.Equal("app", intResult.Path);
+        Assert.Equal(123, intResult.Data);
+
+        // Act
+        await _sut.ExecuteAsync(new PublishGenericAppStringEventRequest("generic-app-event"), TestContext.Current.CancellationToken);
+        GenericEventResult<string> stringResult = await _stringWorkflow.GetResult();
+
+        // Assert
+        Assert.Equal("app", stringResult.Path);
+        Assert.Equal("generic-app-event", stringResult.Data);
+    }
+
+    [Fact(Timeout = 5000)]
+    public async Task TychoEnables_ForwardingClosedGenericEvents()
+    {
+        // Act
+        await _sut.ExecuteAsync(new PublishGenericForwardedIntEventRequest(456), TestContext.Current.CancellationToken);
+        GenericEventResult<int> intResult = await _intWorkflow.GetResult();
+
+        // Assert
+        Assert.Equal("forwarded", intResult.Path);
+        Assert.Equal(456, intResult.Data);
+
+        // Act
+        await _sut.ExecuteAsync(new PublishGenericForwardedStringEventRequest("generic-forwarded-event"), TestContext.Current.CancellationToken);
+        GenericEventResult<string> stringResult = await _stringWorkflow.GetResult();
+
+        // Assert
+        Assert.Equal("forwarded", stringResult.Path);
+        Assert.Equal("generic-forwarded-event", stringResult.Data);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _sut.DisposeAsync();
     }
 }
