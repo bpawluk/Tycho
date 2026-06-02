@@ -1,0 +1,61 @@
+using Microsoft.Extensions.DependencyInjection;
+using Tycho.Apps;
+using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Contract.Readings;
+using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Handlers;
+using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Climate;
+using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Climate.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Security;
+using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Security.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Ventilation;
+using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Ventilation.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Persistence;
+
+namespace Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT;
+
+[TychoDefinition]
+public partial class HomeDashboardApp : TychoApp
+{
+    protected override void DefineContract(IAppContract app)
+    {
+        app.Handles<SetReadingRequest, SetReadingRequestHandler>();
+
+        app.Forwards<GetTemperatureReadingsRequest, GetTemperatureReadingsRequest.Response, ClimateModule>()
+           .Forwards<GetAirQualityReadingsRequest, GetAirQualityReadingsRequest.Response, VentilationModule>()
+           .Forwards<GetSecurityEventsRequest, GetSecurityEventsRequest.Response, SecurityModule>();
+    }
+
+    protected override void DefineEvents(IAppEvents app)
+    {
+        app.Routes<SensorEvent<TemperatureReading>>()
+           .Forwards<ClimateModule>();
+
+        app.Routes<SensorEvent<AirQualityReading>>()
+           .Forwards<VentilationModule>();
+
+        app.Routes<SensorEvent<MotionDetected>>()
+           .Forwards<SecurityModule>();
+
+        app.Routes<SensorEvent<DoorOpened>>()
+           .Forwards<SecurityModule>();
+    }
+
+    protected override void IncludeModules(IAppStructure app)
+    {
+        app.Uses<ClimateModule>()
+           .Uses<VentilationModule>()
+           .Uses<SecurityModule>();
+    }
+
+    protected override void RegisterServices(IServiceCollection app)
+    {
+        app.AddTychoPersistence<HomeDashboardDbContext>();
+    }
+
+    protected override async Task Startup(IServiceProvider app)
+    {
+        using HomeDashboardDbContext context = app.GetRequiredService<HomeDashboardDbContext>();
+        await context.Database.EnsureDeletedAsync();
+        await context.Database.EnsureCreatedAsync();
+    }
+}
