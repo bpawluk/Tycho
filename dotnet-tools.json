@@ -2,13 +2,6 @@
   "version": 1,
   "isRoot": true,
   "tools": {
-    "microsoft.cst.devskim.cli": {
-      "version": "1.0.70",
-      "commands": [
-        "devskim"
-      ],
-      "rollForward": false
-    },
     "dotnet-reportgenerator-globaltool": {
       "version": "5.5.10",
       "commands": [

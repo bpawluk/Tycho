@@ -1,5 +1,5 @@
-using Tycho.IntegrationTests._Utils;
 using Tycho.IntegrationTests.UsingGenericEvents.SUT;
+using Tycho.IntegrationTests._Utils;
 
 namespace Tycho.IntegrationTests.UsingGenericEvents;
 

@@ -1,9 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Apps;
 using Tycho.Events;
-using Tycho.IntegrationTests._Utils;
 using Tycho.IntegrationTests.UsingGenericEvents.SUT.Handlers;
 using Tycho.IntegrationTests.UsingGenericEvents.SUT.Modules;
+using Tycho.IntegrationTests._Utils;
 using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.UsingGenericEvents.SUT;

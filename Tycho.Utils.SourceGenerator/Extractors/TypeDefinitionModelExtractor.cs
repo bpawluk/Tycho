@@ -44,6 +44,6 @@ namespace Tycho.Utils.SourceGenerator.Extractors
                     TypeParametersExtractor.Extract(containingTypeSymbol, context)));
             }
             return containingTypes.ToImmutableEquatableArray();
-        }       
+        }
     }
 }
