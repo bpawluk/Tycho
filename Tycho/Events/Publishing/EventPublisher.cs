@@ -23,8 +23,8 @@ namespace Tycho.Events.Publishing
         async Task IEventPublisher.PublishAsync<TEvent>(TEvent eventPayload, CancellationToken cancellationToken)
         {
             eventPayload.ThrowIfNull();
-            var eventId = Guid.NewGuid();
-            IReadOnlyCollection<RoutedEvent> routedEvents = _broker.Route(eventId, eventPayload);
+            var publishId = Guid.NewGuid();
+            IReadOnlyCollection<RoutedEvent> routedEvents = _broker.Route(publishId, eventPayload);
             if (routedEvents != null && routedEvents.Count > 0)
             {
                 await _outbox.Write(routedEvents, cancellationToken).ConfigureAwait(false);

@@ -6,6 +6,6 @@ namespace Tycho.Events.Registrating.Registrations
 {
     internal interface IEventRegistration<TEvent> where TEvent : class, IEvent
     {
-        IReadOnlyCollection<RoutedEvent> Route(Guid eventId, TEvent eventPayload);
+        IReadOnlyCollection<RoutedEvent> Route(Guid publishId, TEvent eventPayload);
     }
 }

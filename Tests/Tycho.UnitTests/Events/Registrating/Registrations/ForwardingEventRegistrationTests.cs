@@ -32,38 +32,38 @@ public class ForwardingEventRegistrationTests
     public void Route_WithBrokerReturningNoEvents_ReturnsEmpty()
     {
         // Arrange
-        var eventId = Guid.NewGuid();
+        var publishId = Guid.NewGuid();
         var eventPayload = new TestEvent();
 
-        _eventBrokerMock.Setup(eb => eb.Route(eventId, eventPayload))
+        _eventBrokerMock.Setup(eb => eb.Route(publishId, eventPayload))
                         .Returns([]);
 
         var sut = new ForwardingEventRegistration<TestEvent, TestModule>(_moduleMock.Object);
 
         // Act
-        IReadOnlyCollection<RoutedEvent> result = sut.Route(eventId, eventPayload);
+        IReadOnlyCollection<RoutedEvent> result = sut.Route(publishId, eventPayload);
 
         // Assert
         Assert.Empty(result);
-        _eventBrokerMock.Verify(eb => eb.Route(eventId, eventPayload), Times.Once);
+        _eventBrokerMock.Verify(eb => eb.Route(publishId, eventPayload), Times.Once);
     }
 
     [Fact]
     public void Route_WithBrokerReturningMultipleEvents_PushesDownStreamStepForTargetModuleOntoEachRoute()
     {
         // Arrange
-        var eventId = Guid.NewGuid();
+        var publishId = Guid.NewGuid();
         var eventPayload = new TestEvent();
         RoutedEvent<TestEvent> firstRoutedEvent = CreateRoutedEvent(eventPayload);
         RoutedEvent<TestEvent> secondRoutedEvent = CreateRoutedEvent(eventPayload);
 
-        _eventBrokerMock.Setup(eb => eb.Route(eventId, eventPayload))
+        _eventBrokerMock.Setup(eb => eb.Route(publishId, eventPayload))
                         .Returns([firstRoutedEvent, secondRoutedEvent]);
 
         var sut = new ForwardingEventRegistration<TestEvent, TestModule>(_moduleMock.Object);
 
         // Act
-        IReadOnlyCollection<RoutedEvent> result = sut.Route(eventId, eventPayload);
+        IReadOnlyCollection<RoutedEvent> result = sut.Route(publishId, eventPayload);
 
         // Assert
         Assert.Equal(2, result.Count);
@@ -71,14 +71,14 @@ public class ForwardingEventRegistrationTests
         Assert.Contains(secondRoutedEvent, result);
         AssertRouteStartsWithDownStream(firstRoutedEvent.Route);
         AssertRouteStartsWithDownStream(secondRoutedEvent.Route);
-        _eventBrokerMock.Verify(eb => eb.Route(eventId, eventPayload), Times.Once);
+        _eventBrokerMock.Verify(eb => eb.Route(publishId, eventPayload), Times.Once);
     }
 
     [Fact]
     public void Route_WithMappedRegistration_AndBrokerReturningNoEvents_ReturnsEmpty()
     {
         // Arrange
-        var eventId = Guid.NewGuid();
+        var publishId = Guid.NewGuid();
         var eventPayload = new TestEvent();
         var mappedPayload = new OtherEvent();
 
@@ -86,25 +86,25 @@ public class ForwardingEventRegistrationTests
         mapMock.Setup(m => m(eventPayload))
                .Returns(mappedPayload);
 
-        _eventBrokerMock.Setup(eb => eb.Route(eventId, mappedPayload))
+        _eventBrokerMock.Setup(eb => eb.Route(publishId, mappedPayload))
                         .Returns([]);
 
         var sut = new MappedForwardingEventRegistration<TestEvent, OtherEvent, TestModule>(_moduleMock.Object, mapMock.Object);
 
         // Act
-        IReadOnlyCollection<RoutedEvent> result = sut.Route(eventId, eventPayload);
+        IReadOnlyCollection<RoutedEvent> result = sut.Route(publishId, eventPayload);
 
         // Assert
         Assert.Empty(result);
         mapMock.Verify(m => m(eventPayload), Times.Once);
-        _eventBrokerMock.Verify(eb => eb.Route(eventId, mappedPayload), Times.Once);
+        _eventBrokerMock.Verify(eb => eb.Route(publishId, mappedPayload), Times.Once);
     }
 
     [Fact]
     public void Route_WithMappedRegistration_AndBrokerReturningMultipleEvents_PushesDownStreamStepForTargetModuleOntoEachRoute()
     {
         // Arrange
-        var eventId = Guid.NewGuid();
+        var publishId = Guid.NewGuid();
         var eventPayload = new TestEvent();
         var mappedPayload = new OtherEvent();
         RoutedEvent<TestEvent> firstRoutedEvent = CreateRoutedEvent(eventPayload);
@@ -114,13 +114,13 @@ public class ForwardingEventRegistrationTests
         mapMock.Setup(m => m(eventPayload))
                .Returns(mappedPayload);
 
-        _eventBrokerMock.Setup(eb => eb.Route(eventId, mappedPayload))
+        _eventBrokerMock.Setup(eb => eb.Route(publishId, mappedPayload))
                         .Returns([firstRoutedEvent, secondRoutedEvent]);
 
         var sut = new MappedForwardingEventRegistration<TestEvent, OtherEvent, TestModule>(_moduleMock.Object, mapMock.Object);
 
         // Act
-        IReadOnlyCollection<RoutedEvent> result = sut.Route(eventId, eventPayload);
+        IReadOnlyCollection<RoutedEvent> result = sut.Route(publishId, eventPayload);
 
         // Assert
         Assert.Equal(2, result.Count);
@@ -129,15 +129,15 @@ public class ForwardingEventRegistrationTests
         AssertRouteStartsWithDownStream(firstRoutedEvent.Route);
         AssertRouteStartsWithDownStream(secondRoutedEvent.Route);
         mapMock.Verify(m => m(eventPayload), Times.Once);
-        _eventBrokerMock.Verify(eb => eb.Route(eventId, mappedPayload), Times.Once);
+        _eventBrokerMock.Verify(eb => eb.Route(publishId, mappedPayload), Times.Once);
     }
 
     private static RoutedEvent<TEvent> CreateRoutedEvent<TEvent>(TEvent payload)
         where TEvent : class, IEvent
     {
-        var eventId = EventIdentity.Create<TEvent>();
+        var publishId = EventIdentity.Create<TEvent>();
         var handlerId = EventHandlerIdentity.Create<MultiEventHandler>();
-        return new RoutedEvent<TEvent>(Guid.NewGuid(), eventId, handlerId, Route.Create(), payload);
+        return new RoutedEvent<TEvent>(Guid.NewGuid(), publishId, handlerId, Route.Create(), payload);
     }
 
     private static void AssertRouteStartsWithDownStream(Route route)

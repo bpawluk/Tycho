@@ -19,12 +19,12 @@ namespace Tycho.Events.Broker
         }
 
         [EntryPoint]
-        public IReadOnlyCollection<RoutedEvent> Route<TEvent>(Guid eventId, TEvent eventPayload)
+        public IReadOnlyCollection<RoutedEvent> Route<TEvent>(Guid publishId, TEvent eventPayload)
             where TEvent : class, IEvent
         {
             using IServiceScope scope = _internals.CreateScope();
             IEventBroker scopedBroker = scope.ServiceProvider.GetRequiredService<IEventBroker>();
-            return scopedBroker.Route(eventId, eventPayload);
+            return scopedBroker.Route(publishId, eventPayload);
         }
 
         [EntryPoint]

@@ -19,11 +19,11 @@ namespace Tycho.Events.Registrating.Registrations
             HandlerId = EventHandlerIdentity.Create<TEventHandler>();
         }
 
-        public IReadOnlyCollection<RoutedEvent> Route(Guid id, TEvent eventPayload)
+        public IReadOnlyCollection<RoutedEvent> Route(Guid publishId, TEvent eventPayload)
         {
             var eventId = EventIdentity.Create<TEvent>();
             var route = Routing.Route.Create();
-            return new[] { new RoutedEvent<TEvent>(id, eventId, HandlerId, route, eventPayload) };
+            return new[] { new RoutedEvent<TEvent>(Guid.NewGuid(), /*publishId, TODO*/ eventId, HandlerId, route, eventPayload) };
         }
     }
 }

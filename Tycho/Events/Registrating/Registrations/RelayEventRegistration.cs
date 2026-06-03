@@ -16,10 +16,10 @@ namespace Tycho.Events.Registrating.Registrations
             _externalEventBroker = externalEventBroker;
         }
 
-        public IReadOnlyCollection<RoutedEvent> Route(Guid eventId, TEvent eventPayload)
+        public IReadOnlyCollection<RoutedEvent> Route(Guid publishId, TEvent eventPayload)
         {
             IRouteStep routeStep = GetRouteStep();
-            IReadOnlyCollection<RoutedEvent> routedEvents = _externalEventBroker.Route(eventId, eventPayload);
+            IReadOnlyCollection<RoutedEvent> routedEvents = _externalEventBroker.Route(publishId, eventPayload);
 
             foreach (RoutedEvent routedEvent in routedEvents)
             {

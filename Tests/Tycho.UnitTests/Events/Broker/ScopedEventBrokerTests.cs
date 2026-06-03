@@ -32,7 +32,7 @@ public class ScopedEventBrokerTests
     public void Route_WithMultipleRegistrations_ReturnsAllRoutedEvents()
     {
         // Arrange
-        var eventId = Guid.NewGuid();
+        var publishId = Guid.NewGuid();
         var eventPayload = new TestEvent();
 
         var emptyRegistration = new Mock<IEventRegistration<TestEvent>>();
@@ -58,7 +58,7 @@ public class ScopedEventBrokerTests
         });
 
         // Act
-        IReadOnlyCollection<RoutedEvent> result = sut.Route(eventId, eventPayload);
+        IReadOnlyCollection<RoutedEvent> result = sut.Route(publishId, eventPayload);
 
         // Assert
         Assert.Equal(3, result.Count);
@@ -66,9 +66,9 @@ public class ScopedEventBrokerTests
         Assert.Contains(secondRoutedEvent, result);
         Assert.Contains(thirdRoutedEvent, result);
 
-        emptyRegistration.Verify(r => r.Route(eventId, eventPayload), Times.Once);
-        firstRegistration.Verify(r => r.Route(eventId, eventPayload), Times.Once);
-        secondRegistration.Verify(r => r.Route(eventId, eventPayload), Times.Once);
+        emptyRegistration.Verify(r => r.Route(publishId, eventPayload), Times.Once);
+        firstRegistration.Verify(r => r.Route(publishId, eventPayload), Times.Once);
+        secondRegistration.Verify(r => r.Route(publishId, eventPayload), Times.Once);
     }
 
     [Fact]
