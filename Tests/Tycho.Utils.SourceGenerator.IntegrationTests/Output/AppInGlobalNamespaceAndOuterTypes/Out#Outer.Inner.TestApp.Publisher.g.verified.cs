@@ -7,7 +7,7 @@ public partial class Outer
 {
     public partial class Inner
     {
-        internal class TestAppPublisher : PublisherBase, ITestApp.IPublisher
+        internal class TestAppPublisher : PublisherBase, IITestApp.IPublisher
         {
             public TestAppPublisher(IEventPublisher genericPublisher) : base(genericPublisher) { }
         }

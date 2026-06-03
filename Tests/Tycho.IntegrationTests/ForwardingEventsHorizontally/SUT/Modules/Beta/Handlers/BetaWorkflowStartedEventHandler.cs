@@ -1,11 +1,10 @@
 using Tycho.Events;
-using static Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Beta.BetaModule;
 
 namespace Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Beta.Handlers;
 
-internal class BetaWorkflowStartedEventHandler(IPublisher publisher) : IEventHandler<BetaWorkflowStartedEvent>
+internal class BetaWorkflowStartedEventHandler(IBetaModule.IPublisher publisher) : IEventHandler<BetaWorkflowStartedEvent>
 {
-    private readonly IPublisher _publisher = publisher;
+    private readonly IBetaModule.IPublisher _publisher = publisher;
 
     public async Task HandleAsync(EventContext<BetaWorkflowStartedEvent> context, CancellationToken cancellationToken)
     {

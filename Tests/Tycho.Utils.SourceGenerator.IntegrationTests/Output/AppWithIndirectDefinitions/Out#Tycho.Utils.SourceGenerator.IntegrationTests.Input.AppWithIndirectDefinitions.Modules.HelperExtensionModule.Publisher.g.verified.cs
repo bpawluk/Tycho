@@ -1,11 +1,11 @@
-﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefinitions.Modules.HelperExtensionModule.Publisher.g.cs
+//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefinitions.Modules.HelperExtensionModule.Publisher.g.cs
 using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Events.Publishing;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefinitions.Modules
 {
-    internal class HelperExtensionModulePublisher : PublisherBase, HelperExtensionModule.IPublisher
+    internal class HelperExtensionModulePublisher : PublisherBase, IHelperExtensionModule.IPublisher
     {
         public HelperExtensionModulePublisher(IEventPublisher genericPublisher) : base(genericPublisher) { }
     }

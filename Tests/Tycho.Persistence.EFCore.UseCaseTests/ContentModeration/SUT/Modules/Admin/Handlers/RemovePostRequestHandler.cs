@@ -3,11 +3,10 @@ using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Domain;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Persistence;
 using Tycho.Transactions;
-using static Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.AdminModule;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Handlers;
 
-internal class RemovePostRequestHandler(AdminDbContext dbContext, IParent parent, IPublisher publisher) : ITransactionalRequestHandler<RemovePostRequest>
+internal class RemovePostRequestHandler(AdminDbContext dbContext, AdminModule.IParent parent, IAdminModule.IPublisher publisher) : ITransactionalRequestHandler<RemovePostRequest>
 {
     public async Task HandleAsync(RemovePostRequest requestData, CancellationToken cancellationToken)
     {

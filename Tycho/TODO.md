@@ -19,7 +19,7 @@ This includes:
 
 ## Tasks
 - [x] Move Publisher from <AppName> to I<AppName> generated partial interface
-- [ ] Move Publisher from <ModuleName> to I<ModuleName> generated partial interface
+- [x] Move Publisher from <ModuleName> to I<ModuleName> generated partial interface
 - [ ] Move IParent from <ModuleName> to I<ModuleName> generated partial interface
 - [ ] Move Setup from <AppName> to a new dedicated partial class AppSetup
 - [ ] Move Setup from <ModuleName> to a new dedicated partial class ModuleSetup

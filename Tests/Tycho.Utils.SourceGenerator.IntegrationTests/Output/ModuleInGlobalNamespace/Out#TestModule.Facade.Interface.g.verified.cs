@@ -1,7 +1,7 @@
-﻿//HintName: TestModule.Facade.Interface.g.cs
+//HintName: TestModule.Facade.Interface.g.cs
 using System.Threading;
 using System.Threading.Tasks;
 
-public interface ITestModule
+public partial interface ITestModule
 {
 }

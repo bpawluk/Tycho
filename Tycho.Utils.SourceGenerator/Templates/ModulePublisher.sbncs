@@ -28,7 +28,7 @@ namespace {{ namespace }}
 {{~ end ~}}
 {{~#-----------------------------------------#~}}
 {{~#------------------------------------------------- MODULE PUBLISHER -------------------------------------------------#~}}
-{{ i0 }}internal class {{ classes.publisher_class_with_type_params }} : {{ classes.publisher_base_class }}, {{ classes.module_class }}.{{ interfaces.publisher_interface }}
+{{ i0 }}internal class {{ classes.publisher_class_with_type_params }} : {{ classes.publisher_base_class }}, {{ interfaces.publisher_interface }}
 {{~ for owner_constraint in owner_constraints ~}}
 {{   i1   }}{{ owner_constraint }}
 {{~ end ~}}

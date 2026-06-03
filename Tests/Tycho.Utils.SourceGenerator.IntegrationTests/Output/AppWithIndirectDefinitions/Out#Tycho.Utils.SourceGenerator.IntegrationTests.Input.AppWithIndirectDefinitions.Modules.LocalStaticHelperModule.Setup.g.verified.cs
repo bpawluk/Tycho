@@ -1,4 +1,4 @@
-﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefinitions.Modules.LocalStaticHelperModule.Setup.g.cs
+//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefinitions.Modules.LocalStaticHelperModule.Setup.g.cs
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Serialization;
 using Tycho.Modules;
@@ -11,7 +11,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefi
         protected override void __AutoSetup__(IServiceCollection module)
         {
             ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, LocalStaticHelperModuleEventSerializer>(module);
-            ServiceCollectionServiceExtensions.AddTransient<IPublisher, LocalStaticHelperModulePublisher>(module);
+            ServiceCollectionServiceExtensions.AddTransient<ILocalStaticHelperModule.IPublisher, LocalStaticHelperModulePublisher>(module);
             ServiceCollectionServiceExtensions.AddTransient<IParent, LocalStaticHelperModuleParent>(module);
         }
     }

@@ -28,7 +28,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             ContainingTypes = UseContainingTypes(tychoPublisherModel.DefinitionType.ContainingTypes);
             OwnerConstraints = UseConstraintClauses(tychoPublisherModel.DefinitionType.TypeParameters).ToArray();
             Classes = new ClassesTM(this, tychoPublisherModel);
-            Interfaces = new InterfacesTM();
+            Interfaces = new InterfacesTM(tychoPublisherModel);
             Methods = new MethodsTM();
             Parameters = new ParametersTM();
             Events = tychoPublisherModel.Events.Select(e => UseType(e)).ToArray();
@@ -61,9 +61,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         {
             public string PublisherInterface { get; }
 
-            public InterfacesTM()
+            public InterfacesTM(TychoPublisherModel tychoPublisherModel)
             {
-                PublisherInterface = PublisherSymbols.PublisherInterface;
+                PublisherInterface = $"{ModuleFacadeSymbols.GetModuleFacadeInterface(tychoPublisherModel.DefinitionType.Name)}{tychoPublisherModel.DefinitionType.TypeParametersSuffix}.{PublisherSymbols.PublisherInterface}";
             }
         }
 

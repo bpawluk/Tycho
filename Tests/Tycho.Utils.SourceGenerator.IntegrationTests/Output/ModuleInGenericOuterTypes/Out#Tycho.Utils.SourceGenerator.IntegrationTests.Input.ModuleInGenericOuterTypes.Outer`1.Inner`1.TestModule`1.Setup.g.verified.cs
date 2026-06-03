@@ -1,4 +1,4 @@
-﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInGenericOuterTypes.Outer`1.Inner`1.TestModule`1.Setup.g.cs
+//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInGenericOuterTypes.Outer`1.Inner`1.TestModule`1.Setup.g.cs
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Serialization;
 using Tycho.Modules;
@@ -18,7 +18,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInGenericOute
                 protected override void __AutoSetup__(IServiceCollection module)
                 {
                     ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestModuleEventSerializer<TModule>>(module);
-                    ServiceCollectionServiceExtensions.AddTransient<IPublisher, TestModulePublisher<TModule>>(module);
+                    ServiceCollectionServiceExtensions.AddTransient<ITestModule<TModule>.IPublisher, TestModulePublisher<TModule>>(module);
                     ServiceCollectionServiceExtensions.AddTransient<IParent, TestModuleParent<TModule>>(module);
                 }
             }

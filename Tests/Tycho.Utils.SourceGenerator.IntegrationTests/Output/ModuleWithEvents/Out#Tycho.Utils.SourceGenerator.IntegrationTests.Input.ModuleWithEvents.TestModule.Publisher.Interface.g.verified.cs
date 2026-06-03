@@ -1,12 +1,11 @@
-﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithEvents.TestModule.Publisher.Interface.g.cs
+//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithEvents.TestModule.Publisher.Interface.g.cs
 using System.Threading;
 using System.Threading.Tasks;
-using Tycho.Modules;
 using Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithEvents.Events;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithEvents
 {
-    public partial class TestModule : TychoModule
+    public partial interface ITestModule
     {
         public interface IPublisher
         {

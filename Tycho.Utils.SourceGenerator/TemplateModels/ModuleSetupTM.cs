@@ -30,7 +30,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             ContainingTypes = UseContainingTypes(tychoDefinitionModel.DefinitionType.ContainingTypes);
             OwnerConstraints = UseConstraintClauses(tychoDefinitionModel.DefinitionType.TypeParameters).ToArray();
             Classes = new ClassesTM(this, tychoDefinitionModel);
-            Interfaces = new InterfacesTM(this);
+            Interfaces = new InterfacesTM(this, tychoDefinitionModel);
             Methods = new MethodsTM();
             Parameters = new ParametersTM();
             Submodules = tychoDefinitionModel.Submodules.Select(s => new SubmoduleTM(this, s)).ToArray();
@@ -69,10 +69,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string ServiceCollectionInterface { get; }
             public string ModuleInstanceInterface { get; }
 
-            public InterfacesTM(ModuleSetupTM owner)
+            public InterfacesTM(ModuleSetupTM owner, TychoSetupModel tychoDefinitionModel)
             {
                 ModuleParentInterface = ModuleParentSymbols.ParentInterface;
-                PublisherInterface = PublisherSymbols.PublisherInterface;
+                PublisherInterface = $"{ModuleFacadeSymbols.GetModuleFacadeInterface(tychoDefinitionModel.DefinitionType.Name)}{tychoDefinitionModel.DefinitionType.TypeParametersSuffix}.{PublisherSymbols.PublisherInterface}";
                 EventSerializerInterface = owner.UseType(IEventSerializerReference.TypeModel);
                 ServiceCollectionInterface = owner.UseType(IServiceCollectionReference.TypeModel);
                 ModuleInstanceInterface = owner.UseType(IModuleReference.TypeModel);

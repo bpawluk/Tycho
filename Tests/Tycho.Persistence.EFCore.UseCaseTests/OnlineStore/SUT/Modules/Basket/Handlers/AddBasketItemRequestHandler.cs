@@ -3,11 +3,10 @@ using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contr
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Domain;
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Persistence;
 using Tycho.Transactions;
-using static Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.BasketModule;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Handlers;
 
-internal class AddBasketItemRequestHandler(BasketDbContext dbContext, IPublisher publisher) : ITransactionalRequestHandler<AddBasketItemRequest>
+internal class AddBasketItemRequestHandler(BasketDbContext dbContext, IBasketModule.IPublisher publisher) : ITransactionalRequestHandler<AddBasketItemRequest>
 {
     public async Task HandleAsync(AddBasketItemRequest requestData, CancellationToken cancellationToken)
     {

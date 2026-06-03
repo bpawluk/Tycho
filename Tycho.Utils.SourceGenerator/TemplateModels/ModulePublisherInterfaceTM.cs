@@ -2,7 +2,6 @@ using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
 using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.References.Tycho.Events;
-using Tycho.Utils.SourceGenerator.References.Tycho.Modules;
 using Tycho.Utils.SourceGenerator.Symbols;
 
 namespace Tycho.Utils.SourceGenerator.TemplateModels
@@ -28,8 +27,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             Namespace = tychoPublisherModel.DefinitionType.Namespace;
             ContainingTypes = UseContainingTypes(tychoPublisherModel.DefinitionType.ContainingTypes);
             OwnerConstraints = UseConstraintClauses(tychoPublisherModel.DefinitionType.TypeParameters).ToArray();
-            Classes = new ClassesTM(this, tychoPublisherModel);
-            Interfaces = new InterfacesTM();
+            Classes = new ClassesTM(this);
+            Interfaces = new InterfacesTM(tychoPublisherModel);
             Methods = new MethodsTM();
             Parameters = new ParametersTM();
             Events = tychoPublisherModel.Events.Select(e => UseType(e)).ToArray();
@@ -37,15 +36,11 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         internal class ClassesTM
         {
-            public string ModuleClass { get; }
-            public string ModuleBaseClass { get; }
             public string TaskClass { get; }
             public string CancellationTokenClass { get; }
 
-            public ClassesTM(ModulePublisherInterfaceTM owner, TychoPublisherModel tychoPublisherModel)
+            public ClassesTM(ModulePublisherInterfaceTM owner)
             {
-                ModuleClass = tychoPublisherModel.DefinitionType.DeclarationName;
-                ModuleBaseClass = owner.UseType(TychoModuleReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);
             }
@@ -53,10 +48,12 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         internal class InterfacesTM
         {
+            public string FacadeInterface { get; }
             public string PublisherInterface { get; }
 
-            public InterfacesTM()
+            public InterfacesTM(TychoPublisherModel tychoPublisherModel)
             {
+                FacadeInterface = $"{ModuleFacadeSymbols.GetModuleFacadeInterface(tychoPublisherModel.DefinitionType.Name)}{tychoPublisherModel.DefinitionType.TypeParametersSuffix}";
                 PublisherInterface = PublisherSymbols.PublisherInterface;
             }
         }

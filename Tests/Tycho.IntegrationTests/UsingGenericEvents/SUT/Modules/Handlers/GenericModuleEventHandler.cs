@@ -2,7 +2,7 @@ using Tycho.Events;
 
 namespace Tycho.IntegrationTests.UsingGenericEvents.SUT.Modules.Handlers;
 
-internal class GenericModuleEventHandler<T>(TestModule.IPublisher publisher) : IEventHandler<GenericModuleEvent<T>>
+internal class GenericModuleEventHandler<T>(ITestModule.IPublisher publisher) : IEventHandler<GenericModuleEvent<T>>
 {
     public async Task HandleAsync(EventContext<GenericModuleEvent<T>> context, CancellationToken cancellationToken)
     {

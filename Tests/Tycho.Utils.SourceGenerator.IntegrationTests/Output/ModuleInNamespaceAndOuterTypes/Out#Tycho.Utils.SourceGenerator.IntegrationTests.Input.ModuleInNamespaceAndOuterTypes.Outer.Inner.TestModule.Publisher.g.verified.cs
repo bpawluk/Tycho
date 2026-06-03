@@ -1,4 +1,4 @@
-﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInNamespaceAndOuterTypes.Outer.Inner.TestModule.Publisher.g.cs
+//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInNamespaceAndOuterTypes.Outer.Inner.TestModule.Publisher.g.cs
 using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Events.Publishing;
@@ -9,7 +9,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInNamespaceAn
     {
         public partial class Inner
         {
-            internal class TestModulePublisher : PublisherBase, TestModule.IPublisher
+            internal class TestModulePublisher : PublisherBase, ITestModule.IPublisher
             {
                 public TestModulePublisher(IEventPublisher genericPublisher) : base(genericPublisher) { }
             }

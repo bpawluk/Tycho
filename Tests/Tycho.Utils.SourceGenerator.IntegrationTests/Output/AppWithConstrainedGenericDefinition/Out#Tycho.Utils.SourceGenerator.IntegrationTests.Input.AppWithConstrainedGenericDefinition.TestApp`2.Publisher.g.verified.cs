@@ -6,7 +6,7 @@ using Tycho.Utils.SourceGenerator.IntegrationTests.Input.SharedConstraints;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithConstrainedGenericDefinition
 {
-    internal class TestAppPublisher<TPayload, TKey> : PublisherBase, ITestApp<TPayload, TKey>.IPublisher
+    internal class TestAppPublisher<TPayload, TKey> : PublisherBase, IITestApp<TPayload, TKey>.IPublisher
         where TPayload : PayloadBase, IMarker, new()
         where TKey : notnull
     {

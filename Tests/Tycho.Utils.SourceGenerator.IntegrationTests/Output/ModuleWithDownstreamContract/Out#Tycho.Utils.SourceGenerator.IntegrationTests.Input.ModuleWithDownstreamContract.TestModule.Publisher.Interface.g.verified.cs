@@ -1,11 +1,10 @@
-﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithDownstreamContract.TestModule.Publisher.Interface.g.cs
+//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithDownstreamContract.TestModule.Publisher.Interface.g.cs
 using System.Threading;
 using System.Threading.Tasks;
-using Tycho.Modules;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithDownstreamContract
 {
-    public partial class TestModule : TychoModule
+    public partial interface ITestModule
     {
         public interface IPublisher
         {
