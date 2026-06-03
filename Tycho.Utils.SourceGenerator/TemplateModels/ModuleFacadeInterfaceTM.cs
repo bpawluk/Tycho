@@ -53,7 +53,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(TychoFacadeModel tychoFacadeModel)
             {
-                ModuleInterface = $"{ModuleFacadeSymbols.GetModuleFacadeInterface(tychoFacadeModel.DefinitionType.Name)}{tychoFacadeModel.DefinitionType.TypeParametersSuffix}";
+                ModuleInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(tychoFacadeModel.DefinitionType.Name, tychoFacadeModel.DefinitionType.TypeParametersSuffix);
             }
         }
 

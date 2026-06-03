@@ -65,7 +65,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(ModuleFacadeTM owner, TychoFacadeModel tychoFacadeModel)
             {
-                ModuleInterface = $"{ModuleFacadeSymbols.GetModuleFacadeInterface(tychoFacadeModel.DefinitionType.Name)}{tychoFacadeModel.DefinitionType.TypeParametersSuffix}";
+                ModuleInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(tychoFacadeModel.DefinitionType.Name, tychoFacadeModel.DefinitionType.TypeParametersSuffix);
                 InstanceInterface = owner.UseType(IModuleReference.TypeModel);
             }
         }

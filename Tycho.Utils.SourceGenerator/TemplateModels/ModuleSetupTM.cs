@@ -52,9 +52,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 string moduleTypeSuffix = tychoDefinitionModel.DefinitionType.TypeParametersSuffix;
 
                 ModuleClass = tychoDefinitionModel.DefinitionType.DeclarationName;
-                ModuleParentClass = $"{ModuleParentSymbols.GetParentClass(moduleNameStem)}{moduleTypeSuffix}";
-                PublisherClass = $"{PublisherSymbols.GetPublisherClass(moduleNameStem)}{moduleTypeSuffix}";
-                EventSerializerClass = $"{EventSerializerSymbols.GetEventSerializerClass(moduleNameStem)}{moduleTypeSuffix}";
+                ModuleParentClass = ModuleParentSymbols.GetParentClass(moduleNameStem, moduleTypeSuffix);
+                PublisherClass = PublisherSymbols.GetPublisherClass(moduleNameStem, moduleTypeSuffix);
+                EventSerializerClass = EventSerializerSymbols.GetEventSerializerClass(moduleNameStem, moduleTypeSuffix);
                 BaseClass = owner.UseType(TychoModuleReference.TypeModel);
                 ServiceCollectionServiceExtensionsClass = owner.UseType(ServiceCollectionServiceExtensionsReference.TypeModel);
                 ServiceProviderServiceExtensionsClass = owner.UseType(ServiceProviderServiceExtensionsReference.TypeModel);
@@ -118,8 +118,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 ModuleClass = owner.UseType(moduleType);
                 string moduleNameStem = moduleType.Name;
                 string moduleTypeSuffix = moduleType.TypeArgumentsSuffix;
-                FacadeInterface = $"{ModuleFacadeSymbols.GetModuleFacadeInterface(moduleNameStem)}{moduleTypeSuffix}";
-                FacadeClass = $"{ModuleFacadeSymbols.GetModuleFacadeClass(moduleNameStem)}{moduleTypeSuffix}";
+                FacadeInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(moduleNameStem, moduleTypeSuffix);
+                FacadeClass = ModuleFacadeSymbols.GetModuleFacadeClass(moduleNameStem, moduleTypeSuffix);
             }
         }
     }

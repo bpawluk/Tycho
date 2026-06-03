@@ -59,9 +59,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 string appTypeSuffix = tychoSetupModel.DefinitionType.TypeParametersSuffix;
 
                 AppClass = tychoSetupModel.DefinitionType.DeclarationName;
-                FacadeClass = $"{AppFacadeSymbols.GetAppFacadeClass(appNameStem)}{appTypeSuffix}";
-                PublisherClass = $"{PublisherSymbols.GetPublisherClass(appNameStem)}{appTypeSuffix}";
-                EventSerializerClass = $"{EventSerializerSymbols.GetEventSerializerClass(appNameStem)}{appTypeSuffix}";
+                FacadeClass = AppFacadeSymbols.GetAppFacadeClass(appNameStem, appTypeSuffix);
+                PublisherClass = PublisherSymbols.GetPublisherClass(appNameStem, appTypeSuffix);
+                EventSerializerClass = EventSerializerSymbols.GetEventSerializerClass(appNameStem, appTypeSuffix);
                 BaseClass = owner.UseType(TychoAppReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 ActionClass = owner.UseType(ActionReference.TypeModel);
@@ -82,7 +82,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(AppSetupTM owner, TychoSetupModel tychoSetupModel)
             {
-                FacadeInterface = $"{AppFacadeSymbols.GetAppFacadeInterface(tychoSetupModel.DefinitionType.Name)}{tychoSetupModel.DefinitionType.TypeParametersSuffix}";
+                FacadeInterface = AppFacadeSymbols.GetAppFacadeInterface(tychoSetupModel.DefinitionType.Name, tychoSetupModel.DefinitionType.TypeParametersSuffix);
                 PublisherInterface = PublisherSymbols.GetPublisherInterface(tychoSetupModel.DefinitionType.Name, tychoSetupModel.DefinitionType.TypeParametersSuffix);
                 EventSerializerInterface = owner.UseType(IEventSerializerReference.TypeModel);
                 ConfigurationInterface = owner.UseType(IConfigurationReference.TypeModel);
@@ -161,8 +161,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 ModuleClass = owner.UseType(moduleType);
                 string moduleNameStem = moduleType.Name;
                 string moduleTypeSuffix = moduleType.TypeArgumentsSuffix;
-                FacadeInterface = $"{ModuleFacadeSymbols.GetModuleFacadeInterface(moduleNameStem)}{moduleTypeSuffix}";
-                FacadeClass = $"{ModuleFacadeSymbols.GetModuleFacadeClass(moduleNameStem)}{moduleTypeSuffix}";
+                FacadeInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(moduleNameStem, moduleTypeSuffix);
+                FacadeClass = ModuleFacadeSymbols.GetModuleFacadeClass(moduleNameStem, moduleTypeSuffix);
             }
         }
     }

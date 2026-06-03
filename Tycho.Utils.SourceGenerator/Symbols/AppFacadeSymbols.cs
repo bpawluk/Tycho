@@ -6,8 +6,8 @@ namespace Tycho.Utils.SourceGenerator.Symbols
         public const string RequestDataParameter = "requestData";
         public const string CancellationTokenParameter = "cancellationToken";
 
-        public static string GetAppFacadeClass(string appClass, string appTypeParametersSuffix = null) => $"{appClass}Facade{appTypeParametersSuffix ?? string.Empty}";
+        public static string GetAppFacadeInterface(string ownerClass, string ownerTypeParametersSuffix = null) => $"I{ownerClass}{ownerTypeParametersSuffix ?? string.Empty}";
 
-        public static string GetAppFacadeInterface(string appClass) => $"I{appClass}";
+        public static string GetAppFacadeClass(string ownerClass, string ownerTypeParametersSuffix = null) => $"{ownerClass}Facade{ownerTypeParametersSuffix ?? string.Empty}";
     }
 }

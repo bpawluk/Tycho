@@ -54,7 +54,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(AppFacadeInterfaceTM owner, TychoFacadeModel tychoFacadeModel)
             {
-                FacadeInterface = $"{AppFacadeSymbols.GetAppFacadeInterface(tychoFacadeModel.DefinitionType.Name)}{tychoFacadeModel.DefinitionType.TypeParametersSuffix}";
+                FacadeInterface = AppFacadeSymbols.GetAppFacadeInterface(tychoFacadeModel.DefinitionType.Name, tychoFacadeModel.DefinitionType.TypeParametersSuffix);
                 AsyncDisposableInterface = owner.UseType(IAsyncDisposableReference.TypeModel);
             }
         }
