@@ -9,5 +9,7 @@ namespace Tycho.Utils.SourceGenerator.Symbols
         public const string LoggingSetupParameter = "loggingSetup";
         public const string AppParameter = "app";
         public const string ProviderParameter = "provider";
+
+        public static string GetSetupClass(string ownerClass, string ownerTypeParametersSuffix = null) => $"{ownerClass}Setup{ownerTypeParametersSuffix ?? string.Empty}";
     }
 }

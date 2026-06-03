@@ -3,7 +3,6 @@ using Tycho.Utils.SourceGenerator.Models;
 using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.References.Microsoft;
 using Tycho.Utils.SourceGenerator.References.Tycho.Events;
-using Tycho.Utils.SourceGenerator.References.Tycho.Modules;
 using Tycho.Utils.SourceGenerator.Symbols;
 
 namespace Tycho.Utils.SourceGenerator.TemplateModels
@@ -38,11 +37,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         internal class ClassesTM
         {
-            public string ModuleClass { get; }
+            public string SetupClass { get; }
             public string ModuleParentClass { get; }
             public string PublisherClass { get; }
             public string EventSerializerClass { get; }
-            public string BaseClass { get; }
             public string ServiceCollectionServiceExtensionsClass { get; }
             public string ServiceProviderServiceExtensionsClass { get; }
 
@@ -51,11 +49,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 string moduleNameStem = tychoDefinitionModel.DefinitionType.Name;
                 string moduleTypeSuffix = tychoDefinitionModel.DefinitionType.TypeParametersSuffix;
 
-                ModuleClass = tychoDefinitionModel.DefinitionType.DeclarationName;
+                SetupClass = ModuleDefinitionSymbols.GetSetupClass(moduleNameStem, moduleTypeSuffix);
                 ModuleParentClass = ModuleParentSymbols.GetParentClass(moduleNameStem, moduleTypeSuffix);
                 PublisherClass = PublisherSymbols.GetPublisherClass(moduleNameStem, moduleTypeSuffix);
                 EventSerializerClass = EventSerializerSymbols.GetEventSerializerClass(moduleNameStem, moduleTypeSuffix);
-                BaseClass = owner.UseType(TychoModuleReference.TypeModel);
                 ServiceCollectionServiceExtensionsClass = owner.UseType(ServiceCollectionServiceExtensionsReference.TypeModel);
                 ServiceProviderServiceExtensionsClass = owner.UseType(ServiceProviderServiceExtensionsReference.TypeModel);
             }
@@ -67,7 +64,6 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string PublisherInterface { get; }
             public string EventSerializerInterface { get; }
             public string ServiceCollectionInterface { get; }
-            public string ModuleInstanceInterface { get; }
 
             public InterfacesTM(ModuleSetupTM owner, TychoSetupModel tychoDefinitionModel)
             {
@@ -75,20 +71,19 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 PublisherInterface = PublisherSymbols.GetPublisherInterface(tychoDefinitionModel.DefinitionType.Name, tychoDefinitionModel.DefinitionType.TypeParametersSuffix);
                 EventSerializerInterface = owner.UseType(IEventSerializerReference.TypeModel);
                 ServiceCollectionInterface = owner.UseType(IServiceCollectionReference.TypeModel);
-                ModuleInstanceInterface = owner.UseType(IModuleReference.TypeModel);
             }
         }
 
         internal class MethodsTM
         {
-            public string AutoSetupMethod { get; }
+            public string SetupMethod { get; }
             public string AddSingletonMethod { get; }
             public string AddTransientMethod { get; }
             public string GetRequiredServiceMethod { get; }
 
             public MethodsTM()
             {
-                AutoSetupMethod = TychoModuleReference.AutoSetupMethodSignature.MethodName;
+                SetupMethod = ModuleDefinitionSymbols.SetupMethod;
                 AddSingletonMethod = ServiceCollectionServiceExtensionsReference.AddSingletonMethodSignature.MethodName;
                 AddTransientMethod = ServiceCollectionServiceExtensionsReference.AddTransientMethodSignature.MethodName;
                 GetRequiredServiceMethod = ServiceProviderServiceExtensionsReference.GetRequiredServiceMethodSignature.MethodName;

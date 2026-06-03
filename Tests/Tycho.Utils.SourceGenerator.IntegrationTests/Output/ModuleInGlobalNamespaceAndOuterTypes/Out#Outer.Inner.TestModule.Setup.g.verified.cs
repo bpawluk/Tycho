@@ -1,16 +1,14 @@
 //HintName: Outer.Inner.TestModule.Setup.g.cs
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Serialization;
-using Tycho.Modules;
-using Tycho.Modules.Instance;
 
 public partial class Outer
 {
     public partial class Inner
     {
-        public partial class TestModule : TychoModule
+        public class TestModuleSetup
         {
-            protected override void __AutoSetup__(IServiceCollection module)
+            public static void Setup(IServiceCollection module)
             {
                 ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestModuleEventSerializer>(module);
                 ServiceCollectionServiceExtensions.AddTransient<ITestModulePublisher, TestModulePublisher>(module);

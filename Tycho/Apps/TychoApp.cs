@@ -131,6 +131,7 @@ namespace Tycho.Apps
 
             _builder.WithCleanup(Cleanup).Init();
             __AutoSetup__(_builder.Services);
+
             RegisterServices(_builder.Services);
             DefineContract(_builder.Contract);
             DefineEvents(_builder.Events);

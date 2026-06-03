@@ -21,5 +21,5 @@ This includes:
 - [x] Move IPublisher out of <AppName> partial class and rename from IPublisher to I<AppName>Publisher
 - [x] Move IPublisher out of <ModuleName> partial class and rename from IPublisher to I<ModuleName>Publisher
 - [x] Move IParent out of <ModuleName> partial class and rename from IParent to I<ModuleName>Parent
-- [ ] Move Setup from <ModuleName> to a new dedicated partial class ModuleSetup
+- [x] Move Setup from <ModuleName> to a new dedicated partial class ModuleSetup
 - [ ] Move Setup from <AppName> to a new dedicated partial class AppSetup

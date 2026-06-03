@@ -1,8 +1,6 @@
 //HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInGenericOuterTypes.Outer`1.Inner`1.TestModule`1.Setup.g.cs
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Serialization;
-using Tycho.Modules;
-using Tycho.Modules.Instance;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInGenericOuterTypes
 {
@@ -12,10 +10,10 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInGenericOute
         public partial class Inner<TInner>
             where TInner : notnull
         {
-            public partial class TestModule<TModule> : TychoModule
+            public class TestModuleSetup<TModule>
                 where TModule : notnull
             {
-                protected override void __AutoSetup__(IServiceCollection module)
+                public static void Setup(IServiceCollection module)
                 {
                     ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestModuleEventSerializer<TModule>>(module);
                     ServiceCollectionServiceExtensions.AddTransient<ITestModulePublisher<TModule>, TestModulePublisher<TModule>>(module);
