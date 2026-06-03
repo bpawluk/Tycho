@@ -28,47 +28,6 @@ namespace {{ namespace }}
 {{~ end ~}}
 {{~#-----------------------------------------#~}}
 {{~#---------------------------------------------------- APP SETUP ----------------------------------------------------#~}}
-{{ i0 }}public partial class {{ classes.app_class }} : {{ classes.base_class }}
-{{~ for owner_constraint in owner_constraints ~}}
-{{   i1   }}{{ owner_constraint }}
-{{~ end ~}}
-{{ i0 }}{
-{{   i1   }}/// <summary>
-{{   i1   }}/// Supplies global configuration for the application and its modules.
-{{   i1   }}/// </summary>
-{{   i1   }}/// <param name="{{ parameters.global_configuration_parameter }}">Configuration to be used</param>
-{{   i1   }}/// <returns>The current <see cref="{{ classes.app_class }}"/> instance.</returns>
-{{   i1   }}/// <exception cref="{{ exceptions.argument_null_exception }}"/>
-{{   i1   }}public {{ classes.app_class }} {{ methods.with_configuration_method }}({{ interfaces.configuration_interface }} {{ parameters.global_configuration_parameter }})
-{{   i1   }}{
-{{     i2     }}{{ methods.with_configuration_base_method }}({{ parameters.global_configuration_parameter }});
-{{     i2     }}return this;
-{{   i1   }}}
-
-{{   i1   }}/// <summary>
-{{   i1   }}/// Supplies logging setup for the application and its modules.
-{{   i1   }}/// </summary>
-{{   i1   }}/// <param name="{{ parameters.logging_setup_parameter }}">Logging setup to be used</param>
-{{   i1   }}/// <returns>The current <see cref="{{ classes.app_class }}"/> instance.</returns>
-{{   i1   }}/// <exception cref="{{ exceptions.argument_null_exception }}"/>
-{{   i1   }}public {{ classes.app_class }} {{ methods.with_logging_method }}({{ classes.action_class }}<{{ interfaces.logging_builder_interface }}> {{ parameters.logging_setup_parameter }})
-{{   i1   }}{
-{{     i2     }}{{ methods.with_logging_base_method }}({{ parameters.logging_setup_parameter }});
-{{     i2     }}return this;
-{{   i1   }}}
-
-{{   i1   }}/// <summary>
-{{   i1   }}/// Builds and runs the application according to the definition.
-{{   i1   }}/// </summary>
-{{   i1   }}/// <returns>A fresh and ready to use instance of the application</returns>
-{{   i1   }}/// <exception cref="{{ exceptions.invalid_operation_exception }}"/>
-{{   i1   }}public async {{ classes.task_class }}<{{ interfaces.facade_interface }}> {{ methods.run_async_method }}()
-{{   i1   }}{
-{{     i2     }}var appInstance = await {{ methods.run_base_method }}().{{ methods.configure_await_method }}(false);
-{{     i2     }}return new {{ classes.facade_class }}(appInstance);
-{{   i1   }}}
-{{ i0 }}}
-
 {{ i0 }}public class {{ classes.setup_class }}
 {{~ for owner_constraint in owner_constraints ~}}
 {{   i1   }}{{ owner_constraint }}

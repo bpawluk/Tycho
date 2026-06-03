@@ -101,7 +101,7 @@ namespace Tycho.Apps
         /// <param name="globalConfiguration">Configuration to be used</param>
         /// <exception cref="ArgumentNullException"/>"
         [ReferencedBySourceGenerator]
-        protected void WithConfigurationBase(IConfiguration globalConfiguration)
+        public void WithConfigurationBase(IConfiguration globalConfiguration)
         {
             globalConfiguration.ThrowIfNull();
             _builder.WithConfiguration(globalConfiguration);
@@ -113,7 +113,7 @@ namespace Tycho.Apps
         /// <param name="loggingSetup">Logging setup to be used</param>
         /// <exception cref="ArgumentNullException"/>"
         [ReferencedBySourceGenerator]
-        protected void WithLoggingBase(Action<ILoggingBuilder> loggingSetup)
+        public void WithLoggingBase(Action<ILoggingBuilder> loggingSetup)
         {
             loggingSetup.ThrowIfNull();
             _builder.WithLogging(loggingSetup);
@@ -125,7 +125,7 @@ namespace Tycho.Apps
         /// <returns>A fresh and ready to use instance of the application</returns>
         /// <exception cref="InvalidOperationException"/>
         [ReferencedBySourceGenerator]
-        protected async Task<IApp> RunBaseAsync()
+        public async Task<IApp> RunBaseAsync()
         {
             EnsureItIsRunOnlyOnce();
 

@@ -24,6 +24,53 @@ namespace {{ namespace }}
 {{ i0 }}public static partial class {{ classes.setup_extensions_class }}
 {{ i0 }}{
 {{   i1   }}/// <summary>
+{{   i1   }}/// Supplies global configuration for the application and its modules.
+{{   i1   }}/// </summary>
+{{   i1   }}/// <param name="{{ parameters.app_parameter }}">An instance of the application to configure.</param>
+{{   i1   }}/// <param name="{{ parameters.global_configuration_parameter }}">Configuration to be used</param>
+{{   i1   }}/// <returns>The current application instance.</returns>
+{{   i1   }}/// <exception cref="ArgumentNullException"/>
+{{   i1   }}public static {{ classes.app_class }} {{ methods.with_configuration_method }}{{ type_parameters_suffix }}(this {{ classes.app_class }} {{ parameters.app_parameter }}, {{ interfaces.configuration_interface }} {{ parameters.global_configuration_parameter }})
+{{~ for type_parameters_constraint in type_parameters_constraints ~}}
+{{     i2     }}{{ type_parameters_constraint }}
+{{~ end ~}}
+{{   i1   }}{
+{{     i2     }}{{ parameters.app_parameter }}.{{ methods.with_configuration_base_method }}({{ parameters.global_configuration_parameter }});
+{{     i2     }}return {{ parameters.app_parameter }};
+{{   i1   }}}
+
+{{   i1   }}/// <summary>
+{{   i1   }}/// Supplies logging setup for the application and its modules.
+{{   i1   }}/// </summary>
+{{   i1   }}/// <param name="{{ parameters.app_parameter }}">An instance of the application to configure.</param>
+{{   i1   }}/// <param name="{{ parameters.logging_setup_parameter }}">Logging setup to be used</param>
+{{   i1   }}/// <returns>The current application instance.</returns>
+{{   i1   }}/// <exception cref="ArgumentNullException"/>
+{{   i1   }}public static {{ classes.app_class }} {{ methods.with_logging_method }}{{ type_parameters_suffix }}(this {{ classes.app_class }} {{ parameters.app_parameter }}, {{ classes.action_class }}<{{ interfaces.logging_builder_interface }}> {{ parameters.logging_setup_parameter }})
+{{~ for type_parameters_constraint in type_parameters_constraints ~}}
+{{     i2     }}{{ type_parameters_constraint }}
+{{~ end ~}}
+{{   i1   }}{
+{{     i2     }}{{ parameters.app_parameter }}.{{ methods.with_logging_base_method }}({{ parameters.logging_setup_parameter }});
+{{     i2     }}return {{ parameters.app_parameter }};
+{{   i1   }}}
+
+{{   i1   }}/// <summary>
+{{   i1   }}/// Builds and runs the application according to the definition.
+{{   i1   }}/// </summary>
+{{   i1   }}/// <param name="{{ parameters.app_parameter }}">An instance of the application to run.</param>
+{{   i1   }}/// <returns>A fresh and ready to use instance of the application facade.</returns>
+{{   i1   }}/// <exception cref="InvalidOperationException"/>
+{{   i1   }}public static async {{ classes.task_class }}<{{ interfaces.facade_interface }}> {{ methods.run_async_method }}{{ type_parameters_suffix }}(this {{ classes.app_class }} {{ parameters.app_parameter }})
+{{~ for type_parameters_constraint in type_parameters_constraints ~}}
+{{     i2     }}{{ type_parameters_constraint }}
+{{~ end ~}}
+{{   i1   }}{
+{{     i2     }}var appInstance = await {{ parameters.app_parameter }}.{{ methods.run_base_method }}().{{ methods.configure_await_method }}(false);
+{{     i2     }}return new {{ classes.facade_class }}(appInstance);
+{{   i1   }}}
+
+{{   i1   }}/// <summary>
 {{   i1   }}/// Sets up and runs the specified Tycho application and registers it in the host application builder.
 {{   i1   }}/// </summary>
 {{   i1   }}/// <param name="{{ parameters.builder_parameter }}">The host application builder to extend.</param>

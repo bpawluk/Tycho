@@ -1,6 +1,9 @@
 ﻿//HintName: Outer.Inner.TestApp.Extensions.g.cs
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
 using Tycho.Logging;
 
@@ -9,6 +12,44 @@ using Tycho.Logging;
 /// </summary>
 public static partial class TestAppSetupExtensions
 {
+    /// <summary>
+    /// Supplies global configuration for the application and its modules.
+    /// </summary>
+    /// <param name="app">An instance of the application to configure.</param>
+    /// <param name="globalConfiguration">Configuration to be used</param>
+    /// <returns>The current application instance.</returns>
+    /// <exception cref="ArgumentNullException"/>
+    public static Outer.Inner.TestApp WithConfiguration(this Outer.Inner.TestApp app, IConfiguration globalConfiguration)
+    {
+        app.WithConfigurationBase(globalConfiguration);
+        return app;
+    }
+
+    /// <summary>
+    /// Supplies logging setup for the application and its modules.
+    /// </summary>
+    /// <param name="app">An instance of the application to configure.</param>
+    /// <param name="loggingSetup">Logging setup to be used</param>
+    /// <returns>The current application instance.</returns>
+    /// <exception cref="ArgumentNullException"/>
+    public static Outer.Inner.TestApp WithLogging(this Outer.Inner.TestApp app, Action<ILoggingBuilder> loggingSetup)
+    {
+        app.WithLoggingBase(loggingSetup);
+        return app;
+    }
+
+    /// <summary>
+    /// Builds and runs the application according to the definition.
+    /// </summary>
+    /// <param name="app">An instance of the application to run.</param>
+    /// <returns>A fresh and ready to use instance of the application facade.</returns>
+    /// <exception cref="InvalidOperationException"/>
+    public static async Task<ITestApp> RunAsync(this Outer.Inner.TestApp app)
+    {
+        var appInstance = await app.RunBaseAsync().ConfigureAwait(false);
+        return new TestAppFacade(appInstance);
+    }
+
     /// <summary>
     /// Sets up and runs the specified Tycho application and registers it in the host application builder.
     /// </summary>

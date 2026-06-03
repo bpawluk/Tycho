@@ -8,44 +8,6 @@ using Tycho.Apps;
 using Tycho.Events.Serialization;
 using Tycho.Modules.Instance;
 
-public partial class TestApp : TychoApp
-{
-    /// <summary>
-    /// Supplies global configuration for the application and its modules.
-    /// </summary>
-    /// <param name="globalConfiguration">Configuration to be used</param>
-    /// <returns>The current <see cref="TestApp"/> instance.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    public TestApp WithConfiguration(IConfiguration globalConfiguration)
-    {
-        WithConfigurationBase(globalConfiguration);
-        return this;
-    }
-
-    /// <summary>
-    /// Supplies logging setup for the application and its modules.
-    /// </summary>
-    /// <param name="loggingSetup">Logging setup to be used</param>
-    /// <returns>The current <see cref="TestApp"/> instance.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    public TestApp WithLogging(Action<ILoggingBuilder> loggingSetup)
-    {
-        WithLoggingBase(loggingSetup);
-        return this;
-    }
-
-    /// <summary>
-    /// Builds and runs the application according to the definition.
-    /// </summary>
-    /// <returns>A fresh and ready to use instance of the application</returns>
-    /// <exception cref="InvalidOperationException"/>
-    public async Task<ITestApp> RunAsync()
-    {
-        var appInstance = await RunBaseAsync().ConfigureAwait(false);
-        return new TestAppFacade(appInstance);
-    }
-}
-
 public class TestAppSetup
 {
     public static void Setup(IServiceCollection app)
