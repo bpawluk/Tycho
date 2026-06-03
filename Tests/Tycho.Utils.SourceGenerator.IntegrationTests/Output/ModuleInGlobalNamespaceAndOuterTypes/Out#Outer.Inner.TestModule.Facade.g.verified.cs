@@ -7,7 +7,7 @@ public partial class Outer
 {
     public partial class Inner
     {
-        internal class TestModuleFacade : ModuleFacadeBase, ITestModule
+        public class TestModuleFacade : ModuleFacadeBase, ITestModule
         {
             public TestModuleFacade(IModule<TestModule> module) : base(module) { }
         }

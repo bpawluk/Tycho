@@ -9,7 +9,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInNamespaceAn
     {
         public partial class Inner
         {
-            internal class TestModuleFacade : ModuleFacadeBase, ITestModule
+            public class TestModuleFacade : ModuleFacadeBase, ITestModule
             {
                 public TestModuleFacade(IModule<TestModule> module) : base(module) { }
             }

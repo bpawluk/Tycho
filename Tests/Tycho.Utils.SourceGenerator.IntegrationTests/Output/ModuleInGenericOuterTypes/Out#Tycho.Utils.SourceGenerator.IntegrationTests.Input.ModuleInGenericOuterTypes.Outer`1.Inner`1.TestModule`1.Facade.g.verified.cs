@@ -11,7 +11,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInGenericOute
         public partial class Inner<TInner>
             where TInner : notnull
         {
-            internal class TestModuleFacade<TModule> : ModuleFacadeBase, ITestModule<TModule>
+            public class TestModuleFacade<TModule> : ModuleFacadeBase, ITestModule<TModule>
                 where TModule : notnull
             {
                 public TestModuleFacade(IModule<TestModule<TModule>> module) : base(module) { }
