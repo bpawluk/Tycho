@@ -4,7 +4,7 @@
     <Major>6</Major>
     <Minor>0</Minor>
     <Patch>0</Patch>
-    <VersionPrefix>$(Major).$(Minor).$(Patch)-rc.2</VersionPrefix>
+    <VersionPrefix>$(Major).$(Minor).$(Patch)-rc.3</VersionPrefix>
     <AssemblyVersion>$(Major).0.0.0</AssemblyVersion>
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>

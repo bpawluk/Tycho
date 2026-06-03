@@ -42,19 +42,17 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string PublisherClass { get; }
             public string EventSerializerClass { get; }
             public string ServiceCollectionServiceExtensionsClass { get; }
-            public string ServiceProviderServiceExtensionsClass { get; }
 
             public ClassesTM(ModuleSetupTM owner, TychoSetupModel tychoDefinitionModel)
             {
                 string moduleNameStem = tychoDefinitionModel.DefinitionType.Name;
                 string moduleTypeSuffix = tychoDefinitionModel.DefinitionType.TypeParametersSuffix;
 
-                SetupClass = ModuleDefinitionSymbols.GetSetupClass(moduleNameStem, moduleTypeSuffix);
+                SetupClass = ModuleSetupSymbols.GetSetupClass(moduleNameStem, moduleTypeSuffix);
                 ModuleParentClass = ModuleParentSymbols.GetParentClass(moduleNameStem, moduleTypeSuffix);
                 PublisherClass = PublisherSymbols.GetPublisherClass(moduleNameStem, moduleTypeSuffix);
                 EventSerializerClass = EventSerializerSymbols.GetEventSerializerClass(moduleNameStem, moduleTypeSuffix);
                 ServiceCollectionServiceExtensionsClass = owner.UseType(ServiceCollectionServiceExtensionsReference.TypeModel);
-                ServiceProviderServiceExtensionsClass = owner.UseType(ServiceProviderServiceExtensionsReference.TypeModel);
             }
         }
 
@@ -79,38 +77,33 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string SetupMethod { get; }
             public string AddSingletonMethod { get; }
             public string AddTransientMethod { get; }
-            public string GetRequiredServiceMethod { get; }
 
             public MethodsTM()
             {
-                SetupMethod = ModuleDefinitionSymbols.SetupMethod;
+                SetupMethod = ModuleSetupSymbols.SetupMethod;
                 AddSingletonMethod = ServiceCollectionServiceExtensionsReference.AddSingletonMethodSignature.MethodName;
                 AddTransientMethod = ServiceCollectionServiceExtensionsReference.AddTransientMethodSignature.MethodName;
-                GetRequiredServiceMethod = ServiceProviderServiceExtensionsReference.GetRequiredServiceMethodSignature.MethodName;
             }
         }
 
         internal class ParametersTM
         {
             public string ModuleParameter { get; }
-            public string ProviderParameter { get; }
 
             public ParametersTM()
             {
-                ModuleParameter = ModuleDefinitionSymbols.ModuleParameter;
-                ProviderParameter = ModuleDefinitionSymbols.ProviderParameter;
+                ModuleParameter = ModuleSetupSymbols.ModuleParameter;
             }
         }
 
         internal class SubmoduleTM
         {
-            public string ModuleClass { get; }
             public string FacadeInterface { get; }
             public string FacadeClass { get; }
 
             public SubmoduleTM(ModuleSetupTM owner, TypeReferenceModel moduleType)
             {
-                ModuleClass = owner.UseType(moduleType);
+                owner.UseType(moduleType);
                 string moduleNameStem = moduleType.Name;
                 string moduleTypeSuffix = moduleType.TypeArgumentsSuffix;
                 FacadeInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(moduleNameStem, moduleTypeSuffix);

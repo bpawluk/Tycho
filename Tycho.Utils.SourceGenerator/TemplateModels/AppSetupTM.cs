@@ -2,10 +2,7 @@ using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
 using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.References.Microsoft;
-using Tycho.Utils.SourceGenerator.References.System;
-using Tycho.Utils.SourceGenerator.References.Tycho.Apps;
 using Tycho.Utils.SourceGenerator.References.Tycho.Events;
-using Tycho.Utils.SourceGenerator.References.Tycho.Modules;
 using Tycho.Utils.SourceGenerator.Symbols;
 
 namespace Tycho.Utils.SourceGenerator.TemplateModels
@@ -22,9 +19,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         public MethodsTM Methods { get; }
 
-        public ParametersVM Parameters { get; }
-
-        public ExceptionsTM Exceptions { get; }
+        public ParametersTM Parameters { get; }
 
         public SubmoduleTM[] Submodules { get; }
 
@@ -36,133 +31,76 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             Classes = new ClassesTM(this, tychoSetupModel);
             Interfaces = new InterfacesTM(this, tychoSetupModel);
             Methods = new MethodsTM();
-            Parameters = new ParametersVM();
-            Exceptions = new ExceptionsTM(this);
+            Parameters = new ParametersTM();
             Submodules = tychoSetupModel.Submodules.Select(s => new SubmoduleTM(this, s)).ToArray();
         }
 
         internal class ClassesTM
         {
-            public string AppClass { get; }
             public string SetupClass { get; }
-            public string FacadeClass { get; }
             public string PublisherClass { get; }
             public string EventSerializerClass { get; }
-            public string BaseClass { get; }
-            public string TaskClass { get; }
-            public string ActionClass { get; }
             public string ServiceCollectionServiceExtensionsClass { get; }
-            public string ServiceProviderServiceExtensionsClass { get; }
 
             public ClassesTM(AppSetupTM owner, TychoSetupModel tychoSetupModel)
             {
                 string appNameStem = tychoSetupModel.DefinitionType.Name;
                 string appTypeSuffix = tychoSetupModel.DefinitionType.TypeParametersSuffix;
 
-                AppClass = tychoSetupModel.DefinitionType.DeclarationName;
                 SetupClass = AppSetupSymbols.GetSetupClass(appNameStem, appTypeSuffix);
-                FacadeClass = AppFacadeSymbols.GetAppFacadeClass(appNameStem, appTypeSuffix);
                 PublisherClass = PublisherSymbols.GetPublisherClass(appNameStem, appTypeSuffix);
                 EventSerializerClass = EventSerializerSymbols.GetEventSerializerClass(appNameStem, appTypeSuffix);
-                BaseClass = owner.UseType(TychoAppReference.TypeModel);
-                TaskClass = owner.UseType(TaskReference.TypeModel);
-                ActionClass = owner.UseType(ActionReference.TypeModel);
                 ServiceCollectionServiceExtensionsClass = owner.UseType(ServiceCollectionServiceExtensionsReference.TypeModel);
-                ServiceProviderServiceExtensionsClass = owner.UseType(ServiceProviderServiceExtensionsReference.TypeModel);
             }
         }
 
         internal class InterfacesTM
         {
-            public string FacadeInterface { get; }
             public string PublisherInterface { get; }
             public string EventSerializerInterface { get; }
-            public string ConfigurationInterface { get; }
-            public string LoggingBuilderInterface { get; }
             public string ServiceCollectionInterface { get; }
-            public string ModuleInstanceInterface { get; }
 
             public InterfacesTM(AppSetupTM owner, TychoSetupModel tychoSetupModel)
             {
-                FacadeInterface = AppFacadeSymbols.GetAppFacadeInterface(tychoSetupModel.DefinitionType.Name, tychoSetupModel.DefinitionType.TypeParametersSuffix);
                 PublisherInterface = PublisherSymbols.GetPublisherInterface(tychoSetupModel.DefinitionType.Name, tychoSetupModel.DefinitionType.TypeParametersSuffix);
                 EventSerializerInterface = owner.UseType(IEventSerializerReference.TypeModel);
-                ConfigurationInterface = owner.UseType(IConfigurationReference.TypeModel);
-                LoggingBuilderInterface = owner.UseType(ILoggingBuilderReference.TypeModel);
                 ServiceCollectionInterface = owner.UseType(IServiceCollectionReference.TypeModel);
-                ModuleInstanceInterface = owner.UseType(IModuleReference.TypeModel);
             }
         }
 
         internal class MethodsTM
         {
             public string SetupMethod { get; }
-            public string WithConfigurationBaseMethod { get; }
-            public string WithLoggingBaseMethod { get; }
-            public string RunBaseMethod { get; }
-            public string AutoSetupMethod { get; }
             public string AddSingletonMethod { get; }
             public string AddTransientMethod { get; }
-            public string ConfigureAwaitMethod { get; }
-            public string WithConfigurationMethod { get; }
-            public string WithLoggingMethod { get; }
-            public string RunAsyncMethod { get; }
-            public string GetRequiredServiceMethod { get; }
 
             public MethodsTM()
             {
                 SetupMethod = AppSetupSymbols.SetupMethod;
-                WithConfigurationBaseMethod = TychoAppReference.WithConfigurationBaseMethodSignature.MethodName;
-                WithLoggingBaseMethod = TychoAppReference.WithLoggingBaseMethodSignature.MethodName;
-                RunBaseMethod = TychoAppReference.RunBaseAsyncMethodSignature.MethodName;
-                AutoSetupMethod = TychoAppReference.AutoSetupMethodSignature.MethodName;
                 AddSingletonMethod = ServiceCollectionServiceExtensionsReference.AddSingletonMethodSignature.MethodName;
                 AddTransientMethod = ServiceCollectionServiceExtensionsReference.AddTransientMethodSignature.MethodName;
-                ConfigureAwaitMethod = TaskReference.ConfigureAwaitMethodSignature.MethodName;
-                WithConfigurationMethod = AppSetupSymbols.WithConfigurationMethod;
-                WithLoggingMethod = AppSetupSymbols.WithLoggingMethod;
-                RunAsyncMethod = AppSetupSymbols.RunAsyncMethod;
-                GetRequiredServiceMethod = ServiceProviderServiceExtensionsReference.GetRequiredServiceMethodSignature.MethodName;
             }
         }
 
-        internal class ExceptionsTM
+        internal class ParametersTM
         {
-            public string ArgumentNullException { get; }
-            public string InvalidOperationException { get; }
-
-            public ExceptionsTM(AppSetupTM owner)
-            {
-                ArgumentNullException = owner.UseType(ArgumentNullExceptionReference.TypeModel);
-                InvalidOperationException = owner.UseType(InvalidOperationExceptionReference.TypeModel);
-            }
-        }
-
-        internal class ParametersVM
-        {
-            public string GlobalConfigurationParameter { get; }
-            public string LoggingSetupParameter { get; }
             public string AppParameter { get; }
-            public string ProviderParameter { get; }
 
-            public ParametersVM()
+            public ParametersTM()
             {
-                GlobalConfigurationParameter = AppSetupSymbols.GlobalConfigurationParameter;
-                LoggingSetupParameter = AppSetupSymbols.LoggingSetupParameter;
                 AppParameter = AppSetupSymbols.AppParameter;
-                ProviderParameter = AppSetupSymbols.ProviderParameter;
             }
         }
 
         internal class SubmoduleTM
         {
-            public string ModuleClass { get; }
             public string FacadeInterface { get; }
             public string FacadeClass { get; }
 
             public SubmoduleTM(AppSetupTM owner, TypeReferenceModel moduleType)
             {
-                ModuleClass = owner.UseType(moduleType);
+                // Registers namespace import for generated facade type references.
+                owner.UseType(moduleType);
                 string moduleNameStem = moduleType.Name;
                 string moduleTypeSuffix = moduleType.TypeArgumentsSuffix;
                 FacadeInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(moduleNameStem, moduleTypeSuffix);
