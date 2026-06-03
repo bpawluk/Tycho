@@ -7,6 +7,8 @@ using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.Models.Tycho;
 using Tycho.Utils.SourceGenerator.Pipelines;
 using Tycho.Utils.SourceGenerator.References.Tycho;
+using Tycho.Utils.SourceGenerator.References.Tycho.Apps;
+using Tycho.Utils.SourceGenerator.References.Tycho.Modules;
 using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator
@@ -50,7 +52,13 @@ namespace Tycho.Utils.SourceGenerator
                 ImmutableEquatableArray<MethodDefinitionModel> methodDefinitions = targetTypeSymbol
                     .GetMembers()
                     .OfType<IMethodSymbol>()
-                    .Where(methodSymbol => methodSymbol.IsOverride)
+                    .Where(methodSymbol =>
+                        methodSymbol.Name == TychoAppReference.DefineContractMethodSignature.MethodName ||
+                        methodSymbol.Name == TychoAppReference.DefineEventsMethodSignature.MethodName || 
+                        methodSymbol.Name == TychoAppReference.IncludeModulesMethodSignature.MethodName ||
+                        methodSymbol.Name == TychoModuleReference.DefineContractMethodSignature.MethodName ||
+                        methodSymbol.Name == TychoModuleReference.DefineEventsMethodSignature.MethodName ||
+                        methodSymbol.Name == TychoModuleReference.IncludeModulesMethodSignature.MethodName)
                     .Select(methodSymbol => MethodDefinitionExtractor.Extract(definitionType, methodSymbol, extractorContext))
                     .ToImmutableEquatableArray();
 

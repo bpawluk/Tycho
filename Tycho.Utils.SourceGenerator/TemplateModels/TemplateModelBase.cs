@@ -13,6 +13,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public string Namespace { get; protected set; }
 
         public string[] UsedNamespaces => _namespaces
+            .Where(ns => !string.IsNullOrWhiteSpace(ns))
             .Where(ns => !string.Equals(ns, Namespace, StringComparison.Ordinal))
             .OrderBy(ns => ns, StringComparer.OrdinalIgnoreCase)
             .ToArray();

@@ -29,10 +29,15 @@ namespace Tycho.Utils.SourceGenerator.Extractors
 
         private static string GetNamespace(ITypeSymbol typeSymbol)
         {
-            return typeSymbol.ContainingNamespace
-                .ToDisplayString(SymbolDisplayFormat
-                .FullyQualifiedFormat
-                .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted));
+            if (typeSymbol.ContainingNamespace == null)
+            {
+                return string.Empty;
+            }
+
+            return typeSymbol.ContainingNamespace.ToDisplayString(
+                SymbolDisplayFormat
+                    .FullyQualifiedFormat
+                    .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted));
         }
 
         private static ImmutableEquatableArray<TypeReferenceModel> GetContainingTypes(ITypeSymbol typeSymbol, ExtractorContext context)
