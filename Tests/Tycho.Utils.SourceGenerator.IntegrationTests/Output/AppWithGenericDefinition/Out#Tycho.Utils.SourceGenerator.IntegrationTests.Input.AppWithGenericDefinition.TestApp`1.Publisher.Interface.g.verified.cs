@@ -4,10 +4,7 @@ using System.Threading.Tasks;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithGenericDefinition
 {
-    public partial interface ITestApp<T>
+    public interface ITestAppPublisher<T>
     {
-        public interface IPublisher
-        {
-        }
     }
 }

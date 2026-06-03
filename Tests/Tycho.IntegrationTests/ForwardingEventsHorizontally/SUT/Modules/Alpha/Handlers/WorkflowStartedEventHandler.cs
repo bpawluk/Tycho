@@ -2,9 +2,9 @@ using Tycho.Events;
 
 namespace Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Alpha.Handlers;
 
-internal class WorkflowStartedEventHandler(IAlphaModule.IPublisher publisher) : IEventHandler<WorkflowStartedEvent>
+internal class WorkflowStartedEventHandler(IAlphaModulePublisher publisher) : IEventHandler<WorkflowStartedEvent>
 {
-    private readonly IAlphaModule.IPublisher _publisher = publisher;
+    private readonly IAlphaModulePublisher _publisher = publisher;
 
     public async Task HandleAsync(EventContext<WorkflowStartedEvent> context, CancellationToken cancellationToken)
     {

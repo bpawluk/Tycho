@@ -11,7 +11,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefi
         protected override void __AutoSetup__(IServiceCollection module)
         {
             ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, LocalHelperModuleEventSerializer>(module);
-            ServiceCollectionServiceExtensions.AddTransient<ILocalHelperModule.IPublisher, LocalHelperModulePublisher>(module);
+            ServiceCollectionServiceExtensions.AddTransient<ILocalHelperModulePublisher, LocalHelperModulePublisher>(module);
             ServiceCollectionServiceExtensions.AddTransient<IParent, LocalHelperModuleParent>(module);
         }
     }

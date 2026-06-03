@@ -11,7 +11,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithUpstreamC
         protected override void __AutoSetup__(IServiceCollection module)
         {
             ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestModuleEventSerializer>(module);
-            ServiceCollectionServiceExtensions.AddTransient<ITestModule.IPublisher, TestModulePublisher>(module);
+            ServiceCollectionServiceExtensions.AddTransient<ITestModulePublisher, TestModulePublisher>(module);
             ServiceCollectionServiceExtensions.AddTransient<IParent, TestModuleParent>(module);
         }
     }

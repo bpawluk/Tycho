@@ -48,13 +48,11 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         internal class InterfacesTM
         {
-            public string FacadeInterface { get; }
             public string PublisherInterface { get; }
 
             public InterfacesTM(TychoPublisherModel tychoPublisherModel)
             {
-                FacadeInterface = $"{ModuleFacadeSymbols.GetModuleFacadeInterface(tychoPublisherModel.DefinitionType.Name)}{tychoPublisherModel.DefinitionType.TypeParametersSuffix}";
-                PublisherInterface = PublisherSymbols.PublisherInterface;
+                PublisherInterface = PublisherSymbols.GetPublisherInterface(tychoPublisherModel.DefinitionType.Name, tychoPublisherModel.DefinitionType.TypeParametersSuffix);
             }
         }
 

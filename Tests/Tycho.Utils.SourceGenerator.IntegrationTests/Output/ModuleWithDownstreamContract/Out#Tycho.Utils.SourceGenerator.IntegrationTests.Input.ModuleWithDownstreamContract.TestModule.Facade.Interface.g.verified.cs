@@ -5,7 +5,7 @@ using Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithDownstreamCon
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithDownstreamContract
 {
-    public partial interface ITestModule
+    public interface ITestModule
     {
         Task<GetItemQuery.Result> ExecuteAsync(GetItemQuery requestData, CancellationToken cancellationToken = default);
 

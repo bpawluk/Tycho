@@ -8,7 +8,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInNamespaceAn
     {
         public partial class Inner
         {
-            public partial interface ITestModule
+            public interface ITestModule
             {
             }
         }

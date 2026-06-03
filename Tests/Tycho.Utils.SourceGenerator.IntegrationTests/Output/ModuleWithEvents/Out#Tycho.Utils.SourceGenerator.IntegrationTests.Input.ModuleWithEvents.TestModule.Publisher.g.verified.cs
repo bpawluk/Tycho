@@ -6,7 +6,7 @@ using Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithEvents.Events
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithEvents
 {
-    internal class TestModulePublisher : PublisherBase, ITestModule.IPublisher
+    internal class TestModulePublisher : PublisherBase, ITestModulePublisher
     {
         public TestModulePublisher(IEventPublisher genericPublisher) : base(genericPublisher) { }
 

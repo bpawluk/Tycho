@@ -2,13 +2,13 @@ using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.UsingGenericEvents.SUT.Handlers;
 
-internal class GenericEventWorkflowRequestHandler(ITestApp.IPublisher publisher)
+internal class GenericEventWorkflowRequestHandler(ITestAppPublisher publisher)
     : IRequestHandler<PublishGenericAppIntEventRequest>
     , IRequestHandler<PublishGenericAppStringEventRequest>
     , IRequestHandler<PublishGenericForwardedIntEventRequest>
     , IRequestHandler<PublishGenericForwardedStringEventRequest>
 {
-    private readonly ITestApp.IPublisher _publisher = publisher;
+    private readonly ITestAppPublisher _publisher = publisher;
 
     public async Task HandleAsync(PublishGenericAppIntEventRequest requestData, CancellationToken cancellationToken)
     {

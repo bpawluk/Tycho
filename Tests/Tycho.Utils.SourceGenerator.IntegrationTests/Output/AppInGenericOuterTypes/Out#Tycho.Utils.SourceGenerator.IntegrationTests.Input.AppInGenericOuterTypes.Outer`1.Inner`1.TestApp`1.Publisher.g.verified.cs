@@ -11,7 +11,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInGenericOuterTy
         public partial class Inner<TInner>
             where TInner : notnull
         {
-            internal class TestAppPublisher<TApp> : PublisherBase, IITestApp<TApp>.IPublisher
+            internal class TestAppPublisher<TApp> : PublisherBase, ITestAppPublisher<TApp>
                 where TApp : new()
             {
                 public TestAppPublisher(IEventPublisher genericPublisher) : base(genericPublisher) { }

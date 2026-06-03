@@ -5,7 +5,7 @@ using Tycho.Events.Publishing;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefinitions.Modules
 {
-    internal class HelperStaticClassModulePublisher : PublisherBase, IHelperStaticClassModule.IPublisher
+    internal class HelperStaticClassModulePublisher : PublisherBase, IHelperStaticClassModulePublisher
     {
         public HelperStaticClassModulePublisher(IEventPublisher genericPublisher) : base(genericPublisher) { }
     }

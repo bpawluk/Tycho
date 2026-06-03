@@ -6,7 +6,7 @@ using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Handlers;
 
-internal class AddBasketItemRequestHandler(BasketDbContext dbContext, IBasketModule.IPublisher publisher) : ITransactionalRequestHandler<AddBasketItemRequest>
+internal class AddBasketItemRequestHandler(BasketDbContext dbContext, IBasketModulePublisher publisher) : ITransactionalRequestHandler<AddBasketItemRequest>
 {
     public async Task HandleAsync(AddBasketItemRequest requestData, CancellationToken cancellationToken)
     {

@@ -4,10 +4,7 @@ using System.Threading.Tasks;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithSubmodules.Modules
 {
-    public partial interface IModuleB
+    public interface IModuleBPublisher
     {
-        public interface IPublisher
-        {
-        }
     }
 }

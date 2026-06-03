@@ -28,20 +28,17 @@ namespace {{ namespace }}
 {{~ end ~}}
 {{~#-----------------------------------------#~}}
 {{~#-------------------------------------------- MODULE PUBLISHER INTERFACE --------------------------------------------#~}}
-{{ i0 }}public partial interface {{ interfaces.facade_interface }}
+{{ i0 }}public interface {{ interfaces.publisher_interface }}
 {{~ for owner_constraint in owner_constraints ~}}
 {{   i1   }}{{ owner_constraint }}
 {{~ end ~}}
 {{ i0 }}{
-{{   i1   }}public interface {{ interfaces.publisher_interface }}
-{{   i1   }}{
 {{~ for event in events ~}}
-{{     i2     }}{{ classes.task_class }} {{ methods.publish_async_method }}({{ event }} {{ parameters.event_payload_parameter }}, {{ classes.cancellation_token_class }} {{ parameters.cancellation_token_parameter }} = default);
+{{   i1   }}{{ classes.task_class }} {{ methods.publish_async_method }}({{ event }} {{ parameters.event_payload_parameter }}, {{ classes.cancellation_token_class }} {{ parameters.cancellation_token_parameter }} = default);
 {{~ if !for.last ~}}
 
 {{~ end ~}}
 {{~ end ~}}
-{{   i1   }}}
 {{ i0 }}}
 {{~#--------------------------------------------------------------------------------------------------------------------#~}}
 {{~#------- Close outer type brackets -------#~}}

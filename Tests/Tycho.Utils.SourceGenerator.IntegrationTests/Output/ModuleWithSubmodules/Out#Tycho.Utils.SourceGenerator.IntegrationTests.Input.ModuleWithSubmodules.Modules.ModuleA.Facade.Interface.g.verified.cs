@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithSubmodules.Modules
 {
-    public partial interface IModuleA
+    public interface IModuleA
     {
     }
 }

@@ -11,7 +11,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInGenericOuterTy
         public partial class Inner<TInner>
             where TInner : notnull
         {
-            public partial interface ITestApp<TApp> : IAsyncDisposable
+            public interface ITestApp<TApp> : IAsyncDisposable
                 where TApp : new()
             {
             }

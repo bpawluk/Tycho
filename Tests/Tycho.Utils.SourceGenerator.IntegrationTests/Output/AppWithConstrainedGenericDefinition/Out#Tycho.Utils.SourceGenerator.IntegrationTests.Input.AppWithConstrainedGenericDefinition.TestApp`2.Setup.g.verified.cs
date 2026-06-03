@@ -53,7 +53,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithConstrainedG
         protected override void __AutoSetup__(IServiceCollection app)
         {
             ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestAppEventSerializer<TPayload, TKey>>(app);
-            ServiceCollectionServiceExtensions.AddTransient<ITestApp<TPayload, TKey>.IPublisher, TestAppPublisher<TPayload, TKey>>(app);
+            ServiceCollectionServiceExtensions.AddTransient<ITestAppPublisher<TPayload, TKey>, TestAppPublisher<TPayload, TKey>>(app);
         }
     }
 }

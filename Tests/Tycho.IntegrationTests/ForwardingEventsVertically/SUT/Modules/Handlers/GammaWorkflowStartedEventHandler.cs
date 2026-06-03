@@ -2,10 +2,10 @@ using Tycho.Events;
 
 namespace Tycho.IntegrationTests.ForwardingEventsVertically.SUT.Modules.Handlers;
 
-internal class GammaWorkflowStartedEventHandler(IGammaModule.IPublisher publisher)
+internal class GammaWorkflowStartedEventHandler(IGammaModulePublisher publisher)
     : IEventHandler<GammaWorkflowStartedEvent>
 {
-    private readonly IGammaModule.IPublisher _publisher = publisher;
+    private readonly IGammaModulePublisher _publisher = publisher;
 
     public async Task HandleAsync(EventContext<GammaWorkflowStartedEvent> context, CancellationToken cancellationToken)
     {

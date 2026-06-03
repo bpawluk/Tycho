@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefinitions
 {
-    public partial interface ITestApp : IAsyncDisposable
+    public interface ITestApp : IAsyncDisposable
     {
         Task<String> ExecuteAsync(TestRequestFromHelperExtension requestData, CancellationToken cancellationToken = default);
 

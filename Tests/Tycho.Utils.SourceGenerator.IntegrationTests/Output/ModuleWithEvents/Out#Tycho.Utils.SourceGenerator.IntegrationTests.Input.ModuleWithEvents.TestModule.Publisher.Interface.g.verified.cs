@@ -5,15 +5,12 @@ using Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithEvents.Events
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithEvents
 {
-    public partial interface ITestModule
+    public interface ITestModulePublisher
     {
-        public interface IPublisher
-        {
-            Task PublishAsync(OrderCreatedEvent eventPayload, CancellationToken cancellationToken = default);
+        Task PublishAsync(OrderCreatedEvent eventPayload, CancellationToken cancellationToken = default);
 
-            Task PublishAsync(PaymentProcessedEvent eventPayload, CancellationToken cancellationToken = default);
+        Task PublishAsync(PaymentProcessedEvent eventPayload, CancellationToken cancellationToken = default);
 
-            Task PublishAsync(PaymentFailedEvent eventPayload, CancellationToken cancellationToken = default);
-        }
+        Task PublishAsync(PaymentFailedEvent eventPayload, CancellationToken cancellationToken = default);
     }
 }

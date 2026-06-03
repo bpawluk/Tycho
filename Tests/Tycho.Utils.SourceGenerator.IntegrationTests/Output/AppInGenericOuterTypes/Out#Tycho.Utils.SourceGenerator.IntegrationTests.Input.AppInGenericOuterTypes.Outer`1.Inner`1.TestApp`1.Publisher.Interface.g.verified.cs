@@ -10,12 +10,9 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInGenericOuterTy
         public partial class Inner<TInner>
             where TInner : notnull
         {
-            public partial interface ITestApp<TApp>
+            public interface ITestAppPublisher<TApp>
                 where TApp : new()
             {
-                public interface IPublisher
-                {
-                }
             }
         }
     }

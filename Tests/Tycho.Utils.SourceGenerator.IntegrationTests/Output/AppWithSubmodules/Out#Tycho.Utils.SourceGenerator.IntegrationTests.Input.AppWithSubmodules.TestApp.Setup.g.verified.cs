@@ -51,7 +51,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithSubmodules
         protected override void __AutoSetup__(IServiceCollection app)
         {
             ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestAppEventSerializer>(app);
-            ServiceCollectionServiceExtensions.AddTransient<ITestApp.IPublisher, TestAppPublisher>(app);
+            ServiceCollectionServiceExtensions.AddTransient<ITestAppPublisher, TestAppPublisher>(app);
             ServiceCollectionServiceExtensions.AddTransient<IModuleA, ModuleAFacade>(app);
             ServiceCollectionServiceExtensions.AddTransient<IModuleB, ModuleBFacade>(app);
         }

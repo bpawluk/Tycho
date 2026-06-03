@@ -10,12 +10,9 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInGenericOute
         public partial class Inner<TInner>
             where TInner : notnull
         {
-            public partial interface ITestModule<TModule>
+            public interface ITestModulePublisher<TModule>
                 where TModule : notnull
             {
-                public interface IPublisher
-                {
-                }
             }
         }
     }

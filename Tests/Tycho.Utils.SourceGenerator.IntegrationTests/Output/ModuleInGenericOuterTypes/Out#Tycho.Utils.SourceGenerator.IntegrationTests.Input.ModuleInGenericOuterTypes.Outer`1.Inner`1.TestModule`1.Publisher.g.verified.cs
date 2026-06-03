@@ -11,7 +11,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInGenericOute
         public partial class Inner<TInner>
             where TInner : notnull
         {
-            internal class TestModulePublisher<TModule> : PublisherBase, ITestModule<TModule>.IPublisher
+            internal class TestModulePublisher<TModule> : PublisherBase, ITestModulePublisher<TModule>
                 where TModule : notnull
             {
                 public TestModulePublisher(IEventPublisher genericPublisher) : base(genericPublisher) { }

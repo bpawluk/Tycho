@@ -57,7 +57,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInGenericOuterTy
                 protected override void __AutoSetup__(IServiceCollection app)
                 {
                     ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestAppEventSerializer<TApp>>(app);
-                    ServiceCollectionServiceExtensions.AddTransient<ITestApp<TApp>.IPublisher, TestAppPublisher<TApp>>(app);
+                    ServiceCollectionServiceExtensions.AddTransient<ITestAppPublisher<TApp>, TestAppPublisher<TApp>>(app);
                 }
             }
         }

@@ -2,9 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-public partial interface ITestApp
+public interface ITestAppPublisher
 {
-    public interface IPublisher
-    {
-    }
 }

@@ -6,7 +6,7 @@ using Tycho.Utils.SourceGenerator.IntegrationTests.Input.SharedConstraints;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithConstrainedGenericDefinition
 {
-    internal class TestModulePublisher<TPayload, TKey> : PublisherBase, ITestModule<TPayload, TKey>.IPublisher
+    internal class TestModulePublisher<TPayload, TKey> : PublisherBase, ITestModulePublisher<TPayload, TKey>
         where TPayload : PayloadBase, IMarker, new()
         where TKey : notnull
     {

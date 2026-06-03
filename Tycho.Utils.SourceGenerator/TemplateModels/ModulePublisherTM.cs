@@ -63,7 +63,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(TychoPublisherModel tychoPublisherModel)
             {
-                PublisherInterface = $"{ModuleFacadeSymbols.GetModuleFacadeInterface(tychoPublisherModel.DefinitionType.Name)}{tychoPublisherModel.DefinitionType.TypeParametersSuffix}.{PublisherSymbols.PublisherInterface}";
+                PublisherInterface = PublisherSymbols.GetPublisherInterface(tychoPublisherModel.DefinitionType.Name, tychoPublisherModel.DefinitionType.TypeParametersSuffix);
             }
         }
 

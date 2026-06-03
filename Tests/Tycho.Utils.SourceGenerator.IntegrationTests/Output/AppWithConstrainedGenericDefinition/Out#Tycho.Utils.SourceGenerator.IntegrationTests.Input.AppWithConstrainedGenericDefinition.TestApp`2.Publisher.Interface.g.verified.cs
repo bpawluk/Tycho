@@ -5,12 +5,9 @@ using Tycho.Utils.SourceGenerator.IntegrationTests.Input.SharedConstraints;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithConstrainedGenericDefinition
 {
-    public partial interface ITestApp<TPayload, TKey>
+    public interface ITestAppPublisher<TPayload, TKey>
         where TPayload : PayloadBase, IMarker, new()
         where TKey : notnull
     {
-        public interface IPublisher
-        {
-        }
     }
 }

@@ -6,7 +6,7 @@ using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Handlers;
 
-internal class StockItemRequestHandler(InventoryDbContext dbContext, IInventoryModule.IPublisher publisher) : ITransactionalRequestHandler<StockItemRequest>
+internal class StockItemRequestHandler(InventoryDbContext dbContext, IInventoryModulePublisher publisher) : ITransactionalRequestHandler<StockItemRequest>
 {
     public async Task HandleAsync(StockItemRequest requestData, CancellationToken cancellationToken)
     {

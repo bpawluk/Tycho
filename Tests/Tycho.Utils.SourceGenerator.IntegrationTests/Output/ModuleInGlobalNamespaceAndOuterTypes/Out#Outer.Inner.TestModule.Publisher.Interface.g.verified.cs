@@ -6,11 +6,8 @@ public partial class Outer
 {
     public partial class Inner
     {
-        public partial interface ITestModule
+        public interface ITestModulePublisher
         {
-            public interface IPublisher
-            {
-            }
         }
     }
 }

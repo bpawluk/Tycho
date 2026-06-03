@@ -52,7 +52,7 @@ public partial class Outer
             protected override void __AutoSetup__(IServiceCollection app)
             {
                 ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestAppEventSerializer>(app);
-                ServiceCollectionServiceExtensions.AddTransient<ITestApp.IPublisher, TestAppPublisher>(app);
+                ServiceCollectionServiceExtensions.AddTransient<ITestAppPublisher, TestAppPublisher>(app);
             }
         }
     }

@@ -4,19 +4,16 @@ using System.Threading.Tasks;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefinitions
 {
-    public partial interface ITestApp
+    public interface ITestAppPublisher
     {
-        public interface IPublisher
-        {
-            Task PublishAsync(TestEventFromHelperExtension eventPayload, CancellationToken cancellationToken = default);
+        Task PublishAsync(TestEventFromHelperExtension eventPayload, CancellationToken cancellationToken = default);
 
-            Task PublishAsync(TestEventFromHelperStaticClass eventPayload, CancellationToken cancellationToken = default);
+        Task PublishAsync(TestEventFromHelperStaticClass eventPayload, CancellationToken cancellationToken = default);
 
-            Task PublishAsync(TestEventFromHelperClass eventPayload, CancellationToken cancellationToken = default);
+        Task PublishAsync(TestEventFromHelperClass eventPayload, CancellationToken cancellationToken = default);
 
-            Task PublishAsync(TestEventFromLocalStaticHelper eventPayload, CancellationToken cancellationToken = default);
+        Task PublishAsync(TestEventFromLocalStaticHelper eventPayload, CancellationToken cancellationToken = default);
 
-            Task PublishAsync(TestEventFromLocalHelper eventPayload, CancellationToken cancellationToken = default);
-        }
+        Task PublishAsync(TestEventFromLocalHelper eventPayload, CancellationToken cancellationToken = default);
     }
 }

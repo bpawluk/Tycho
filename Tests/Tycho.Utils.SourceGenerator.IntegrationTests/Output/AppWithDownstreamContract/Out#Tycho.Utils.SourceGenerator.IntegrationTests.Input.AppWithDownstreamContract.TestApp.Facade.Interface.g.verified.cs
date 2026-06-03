@@ -6,7 +6,7 @@ using Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithDownstreamContra
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithDownstreamContract
 {
-    public partial interface ITestApp : IAsyncDisposable
+    public interface ITestApp : IAsyncDisposable
     {
         Task<GetItemQuery.Result> ExecuteAsync(GetItemQuery requestData, CancellationToken cancellationToken = default);
 

@@ -7,7 +7,7 @@ using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Handlers;
 
-internal class AddReactionRequestHandler(ReactionsDbContext dbContext, IReactionsModule.IPublisher publisher) : ITransactionalRequestHandler<AddReactionRequest>
+internal class AddReactionRequestHandler(ReactionsDbContext dbContext, IReactionsModulePublisher publisher) : ITransactionalRequestHandler<AddReactionRequest>
 {
     public async Task HandleAsync(AddReactionRequest requestData, CancellationToken cancellationToken)
     {

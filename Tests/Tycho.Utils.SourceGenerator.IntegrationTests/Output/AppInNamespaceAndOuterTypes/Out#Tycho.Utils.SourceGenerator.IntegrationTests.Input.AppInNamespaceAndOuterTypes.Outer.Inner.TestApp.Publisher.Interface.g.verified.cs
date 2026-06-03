@@ -8,11 +8,8 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInNamespaceAndOu
     {
         public partial class Inner
         {
-            public partial interface ITestApp
+            public interface ITestAppPublisher
             {
-                public interface IPublisher
-                {
-                }
             }
         }
     }

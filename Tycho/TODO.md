@@ -6,11 +6,11 @@ All Tycho Definitions should be easily navigable in the IDE.
 
 This includes:
 - Apps Definitions 
-  - Move Publisher from <AppName> to I<AppName> generated partial interface
+  - Move IPublisher out of <AppName> partial class and rename from IPublisher to I<AppName>Publisher
   - Move Setup from <AppName> to a new dedicated partial class AppSetup
 - Modules Definitions
-  - Move IParent from <ModuleName> to I<ModuleName> generated partial interface
-  - Move Publisher from <ModuleName> to I<ModuleName> generated partial interface
+  - Move IParent out of <ModuleName> partial class and rename from IParent to I<ModuleName>Parent
+  - Move IPublisher out of <ModuleName> partial class and rename from IPublisher to I<ModuleName>Publisher
   - Move Setup from <ModuleName> to a new dedicated partial class ModuleSetup
 - Requests Definitions - already easily navigable - no changes needed
 - Request Handlers Definitions - already easily navigable - no changes needed
@@ -18,8 +18,8 @@ This includes:
 - Event Handlers Definitions - already easily navigable - no changes needed
 
 ## Tasks
-- [x] Move Publisher from <AppName> to I<AppName> generated partial interface
-- [x] Move Publisher from <ModuleName> to I<ModuleName> generated partial interface
-- [ ] Move IParent from <ModuleName> to I<ModuleName> generated partial interface
+- [x] Move IPublisher out of <AppName> partial class and rename from IPublisher to I<AppName>Publisher
+- [x] Move IPublisher out of <ModuleName> partial class and rename from IPublisher to I<ModuleName>Publisher
+- [ ] Move IParent out of <ModuleName> partial class and rename from IParent to I<ModuleName>Parent
 - [ ] Move Setup from <AppName> to a new dedicated partial class AppSetup
 - [ ] Move Setup from <ModuleName> to a new dedicated partial class ModuleSetup

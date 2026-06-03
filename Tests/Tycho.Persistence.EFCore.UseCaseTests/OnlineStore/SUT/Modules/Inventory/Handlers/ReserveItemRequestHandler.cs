@@ -7,7 +7,7 @@ using static Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inven
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Handlers;
 
-internal class ReserveItemRequestHandler(InventoryDbContext dbContext, IInventoryModule.IPublisher publisher) : ITransactionalRequestHandler<ReserveItemRequest, Response>
+internal class ReserveItemRequestHandler(InventoryDbContext dbContext, IInventoryModulePublisher publisher) : ITransactionalRequestHandler<ReserveItemRequest, Response>
 {
     public async Task<Response> HandleAsync(ReserveItemRequest requestData, CancellationToken cancellationToken)
     {

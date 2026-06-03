@@ -51,7 +51,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefi
         protected override void __AutoSetup__(IServiceCollection app)
         {
             ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestAppEventSerializer>(app);
-            ServiceCollectionServiceExtensions.AddTransient<ITestApp.IPublisher, TestAppPublisher>(app);
+            ServiceCollectionServiceExtensions.AddTransient<ITestAppPublisher, TestAppPublisher>(app);
             ServiceCollectionServiceExtensions.AddTransient<IHelperExtensionModule, HelperExtensionModuleFacade>(app);
             ServiceCollectionServiceExtensions.AddTransient<IHelperStaticClassModule, HelperStaticClassModuleFacade>(app);
             ServiceCollectionServiceExtensions.AddTransient<IHelperClassModule, HelperClassModuleFacade>(app);

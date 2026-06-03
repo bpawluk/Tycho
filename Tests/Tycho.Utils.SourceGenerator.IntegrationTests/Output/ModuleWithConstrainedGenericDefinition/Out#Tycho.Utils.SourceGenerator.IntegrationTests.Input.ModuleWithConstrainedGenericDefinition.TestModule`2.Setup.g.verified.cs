@@ -14,7 +14,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithConstrain
         protected override void __AutoSetup__(IServiceCollection module)
         {
             ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestModuleEventSerializer<TPayload, TKey>>(module);
-            ServiceCollectionServiceExtensions.AddTransient<ITestModule<TPayload, TKey>.IPublisher, TestModulePublisher<TPayload, TKey>>(module);
+            ServiceCollectionServiceExtensions.AddTransient<ITestModulePublisher<TPayload, TKey>, TestModulePublisher<TPayload, TKey>>(module);
             ServiceCollectionServiceExtensions.AddTransient<IParent, TestModuleParent<TPayload, TKey>>(module);
         }
     }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithGenericDefinition
 {
-    public partial interface ITestApp<T> : IAsyncDisposable
+    public interface ITestApp<T> : IAsyncDisposable
     {
     }
 }

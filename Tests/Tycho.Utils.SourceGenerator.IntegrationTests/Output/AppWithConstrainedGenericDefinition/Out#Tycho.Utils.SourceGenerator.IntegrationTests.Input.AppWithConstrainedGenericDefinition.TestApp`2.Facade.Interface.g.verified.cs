@@ -6,7 +6,7 @@ using Tycho.Utils.SourceGenerator.IntegrationTests.Input.SharedConstraints;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithConstrainedGenericDefinition
 {
-    public partial interface ITestApp<TPayload, TKey> : IAsyncDisposable
+    public interface ITestApp<TPayload, TKey> : IAsyncDisposable
         where TPayload : PayloadBase, IMarker, new()
         where TKey : notnull
     {
