@@ -4,7 +4,7 @@ using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Handlers;
 
-internal class SetReadingRequestHandler(HomeDashboardApp.IPublisher publisher) : ITransactionalRequestHandler<SetReadingRequest>
+internal class SetReadingRequestHandler(IHomeDashboardApp.IPublisher publisher) : ITransactionalRequestHandler<SetReadingRequest>
 {
     public Task HandleAsync(SetReadingRequest requestData, CancellationToken cancellationToken)
     {

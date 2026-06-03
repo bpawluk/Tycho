@@ -1,4 +1,4 @@
-﻿//HintName: TestApp.Setup.g.cs
+//HintName: TestApp.Setup.g.cs
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -48,6 +48,6 @@ public partial class TestApp : TychoApp
     protected override void __AutoSetup__(IServiceCollection app)
     {
         ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestAppEventSerializer>(app);
-        ServiceCollectionServiceExtensions.AddTransient<IPublisher, TestAppPublisher>(app);
+        ServiceCollectionServiceExtensions.AddTransient<ITestApp.IPublisher, TestAppPublisher>(app);
     }
 }

@@ -1,4 +1,4 @@
-﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithDownstreamContract.TestApp.Facade.Interface.g.cs
+//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithDownstreamContract.TestApp.Facade.Interface.g.cs
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,7 +6,7 @@ using Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithDownstreamContra
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithDownstreamContract
 {
-    public interface ITestApp : IAsyncDisposable
+    public partial interface ITestApp : IAsyncDisposable
     {
         Task<GetItemQuery.Result> ExecuteAsync(GetItemQuery requestData, CancellationToken cancellationToken = default);
 

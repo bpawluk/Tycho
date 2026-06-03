@@ -1,11 +1,11 @@
-﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefinitions.TestApp.Facade.Interface.g.cs
+//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefinitions.TestApp.Facade.Interface.g.cs
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefinitions
 {
-    public interface ITestApp : IAsyncDisposable
+    public partial interface ITestApp : IAsyncDisposable
     {
         Task<String> ExecuteAsync(TestRequestFromHelperExtension requestData, CancellationToken cancellationToken = default);
 

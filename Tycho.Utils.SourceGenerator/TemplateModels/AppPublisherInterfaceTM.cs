@@ -1,7 +1,6 @@
 using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
 using Tycho.Utils.SourceGenerator.References.System;
-using Tycho.Utils.SourceGenerator.References.Tycho.Apps;
 using Tycho.Utils.SourceGenerator.References.Tycho.Events;
 using Tycho.Utils.SourceGenerator.Symbols;
 
@@ -28,8 +27,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             Namespace = tychoPublisherModel.DefinitionType.Namespace;
             ContainingTypes = UseContainingTypes(tychoPublisherModel.DefinitionType.ContainingTypes);
             OwnerConstraints = UseConstraintClauses(tychoPublisherModel.DefinitionType.TypeParameters).ToArray();
-            Classes = new ClassesTM(this, tychoPublisherModel);
-            Interfaces = new InterfacesTM();
+            Classes = new ClassesTM(this);
+            Interfaces = new InterfacesTM(tychoPublisherModel);
             Methods = new MethodsTM();
             Parameters = new ParametersTM();
             Events = tychoPublisherModel.Events.Select(e => UseType(e)).ToArray();
@@ -37,15 +36,11 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         internal class ClassesTM
         {
-            public string AppClass { get; }
-            public string AppBaseClass { get; }
             public string TaskClass { get; }
             public string CancellationTokenClass { get; }
 
-            public ClassesTM(AppPublisherInterfaceTM owner, TychoPublisherModel tychoPublisherModel)
+            public ClassesTM(AppPublisherInterfaceTM owner)
             {
-                AppClass = tychoPublisherModel.DefinitionType.DeclarationName;
-                AppBaseClass = owner.UseType(TychoAppReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);
             }
@@ -53,10 +48,12 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         internal class InterfacesTM
         {
+            public string FacadeInterface { get; }
             public string PublisherInterface { get; }
 
-            public InterfacesTM()
+            public InterfacesTM(TychoPublisherModel tychoPublisherModel)
             {
+                FacadeInterface = $"{AppFacadeSymbols.GetAppFacadeInterface(tychoPublisherModel.DefinitionType.Name)}{tychoPublisherModel.DefinitionType.TypeParametersSuffix}";
                 PublisherInterface = PublisherSymbols.PublisherInterface;
             }
         }

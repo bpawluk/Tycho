@@ -83,7 +83,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public InterfacesTM(AppSetupTM owner, TychoSetupModel tychoSetupModel)
             {
                 FacadeInterface = $"{AppFacadeSymbols.GetAppFacadeInterface(tychoSetupModel.DefinitionType.Name)}{tychoSetupModel.DefinitionType.TypeParametersSuffix}";
-                PublisherInterface = PublisherSymbols.PublisherInterface;
+                PublisherInterface = $"{AppFacadeSymbols.GetAppFacadeInterface(tychoSetupModel.DefinitionType.Name)}{tychoSetupModel.DefinitionType.TypeParametersSuffix}.{PublisherSymbols.PublisherInterface}";
                 EventSerializerInterface = owner.UseType(IEventSerializerReference.TypeModel);
                 ConfigurationInterface = owner.UseType(IConfigurationReference.TypeModel);
                 LoggingBuilderInterface = owner.UseType(ILoggingBuilderReference.TypeModel);

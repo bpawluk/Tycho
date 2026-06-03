@@ -28,7 +28,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             ContainingTypes = UseContainingTypes(tychoPublisherModel.DefinitionType.ContainingTypes);
             OwnerConstraints = UseConstraintClauses(tychoPublisherModel.DefinitionType.TypeParameters).ToArray();
             Classes = new ClassesTM(this, tychoPublisherModel);
-            Interfaces = new InterfacesTM();
+            Interfaces = new InterfacesTM(tychoPublisherModel);
             Methods = new MethodsTM();
             Parameters = new ParametersTM();
             Events = tychoPublisherModel.Events.Select(e => UseType(e)).ToArray();
@@ -36,7 +36,6 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         internal class ClassesTM
         {
-            public string AppClass { get; }
             public string PublisherClass { get; }
             public string PublisherClassWithTypeParams { get; }
             public string PublisherBaseClass { get; }
@@ -47,7 +46,6 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public ClassesTM(AppPublisherTM owner, TychoPublisherModel tychoPublisherModel)
             {
                 string appNameStem = tychoPublisherModel.DefinitionType.Name;
-                AppClass = tychoPublisherModel.DefinitionType.DeclarationName;
                 PublisherClass = PublisherSymbols.GetPublisherClass(appNameStem);
                 PublisherClassWithTypeParams = PublisherSymbols.GetPublisherClass(appNameStem, tychoPublisherModel.DefinitionType.TypeParametersSuffix);
                 PublisherBaseClass = owner.UseType(PublisherBaseReference.TypeModel);
@@ -61,9 +59,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         {
             public string PublisherInterface { get; }
 
-            public InterfacesTM()
+            public InterfacesTM(TychoPublisherModel tychoPublisherModel)
             {
-                PublisherInterface = PublisherSymbols.PublisherInterface;
+                PublisherInterface = $"{AppFacadeSymbols.GetAppFacadeInterface(tychoPublisherModel.DefinitionType.Name)}{tychoPublisherModel.DefinitionType.TypeParametersSuffix}.{PublisherSymbols.PublisherInterface}";
             }
         }
 

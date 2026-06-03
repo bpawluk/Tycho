@@ -27,7 +27,7 @@ namespace {{ namespace }}
 {{~ end ~}}
 {{~#-----------------------------------------#~}}
 {{~#----------------------------------------------- APP FACADE INTERFACE -----------------------------------------------#~}}
-{{ i0 }}public interface {{ interfaces.facade_interface }} : {{ interfaces.async_disposable_interface }}
+{{ i0 }}public partial interface {{ interfaces.facade_interface }} : {{ interfaces.async_disposable_interface }}
 {{~ for owner_constraint in owner_constraints ~}}
 {{   i1   }}{{ owner_constraint }}
 {{~ end ~}}

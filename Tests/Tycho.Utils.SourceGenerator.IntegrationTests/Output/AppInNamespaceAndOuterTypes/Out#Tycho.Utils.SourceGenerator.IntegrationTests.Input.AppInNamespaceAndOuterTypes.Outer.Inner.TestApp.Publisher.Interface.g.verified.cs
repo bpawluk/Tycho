@@ -1,7 +1,6 @@
-﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInNamespaceAndOuterTypes.Outer.Inner.TestApp.Publisher.Interface.g.cs
+//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInNamespaceAndOuterTypes.Outer.Inner.TestApp.Publisher.Interface.g.cs
 using System.Threading;
 using System.Threading.Tasks;
-using Tycho.Apps;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInNamespaceAndOuterTypes
 {
@@ -9,7 +8,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInNamespaceAndOu
     {
         public partial class Inner
         {
-            public partial class TestApp : TychoApp
+            public partial interface ITestApp
             {
                 public interface IPublisher
                 {

@@ -1,4 +1,4 @@
-﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithEvents.TestApp.Publisher.g.cs
+//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithEvents.TestApp.Publisher.g.cs
 using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Events.Publishing;
@@ -6,7 +6,7 @@ using Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithEvents.Events;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithEvents
 {
-    internal class TestAppPublisher : PublisherBase, TestApp.IPublisher
+    internal class TestAppPublisher : PublisherBase, ITestApp.IPublisher
     {
         public TestAppPublisher(IEventPublisher genericPublisher) : base(genericPublisher) { }
 

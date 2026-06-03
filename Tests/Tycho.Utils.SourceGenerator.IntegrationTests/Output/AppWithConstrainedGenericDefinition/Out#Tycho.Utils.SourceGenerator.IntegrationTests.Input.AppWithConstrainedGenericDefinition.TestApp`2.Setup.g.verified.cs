@@ -1,4 +1,4 @@
-﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithConstrainedGenericDefinition.TestApp`2.Setup.g.cs
+//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithConstrainedGenericDefinition.TestApp`2.Setup.g.cs
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -53,7 +53,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithConstrainedG
         protected override void __AutoSetup__(IServiceCollection app)
         {
             ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestAppEventSerializer<TPayload, TKey>>(app);
-            ServiceCollectionServiceExtensions.AddTransient<IPublisher, TestAppPublisher<TPayload, TKey>>(app);
+            ServiceCollectionServiceExtensions.AddTransient<ITestApp<TPayload, TKey>.IPublisher, TestAppPublisher<TPayload, TKey>>(app);
         }
     }
 }

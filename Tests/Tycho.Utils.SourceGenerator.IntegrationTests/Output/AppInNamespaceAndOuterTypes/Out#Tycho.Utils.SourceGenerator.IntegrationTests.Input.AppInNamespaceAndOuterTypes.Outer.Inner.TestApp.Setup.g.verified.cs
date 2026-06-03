@@ -1,4 +1,4 @@
-﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInNamespaceAndOuterTypes.Outer.Inner.TestApp.Setup.g.cs
+//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInNamespaceAndOuterTypes.Outer.Inner.TestApp.Setup.g.cs
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -54,7 +54,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInNamespaceAndOu
                 protected override void __AutoSetup__(IServiceCollection app)
                 {
                     ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestAppEventSerializer>(app);
-                    ServiceCollectionServiceExtensions.AddTransient<IPublisher, TestAppPublisher>(app);
+                    ServiceCollectionServiceExtensions.AddTransient<ITestApp.IPublisher, TestAppPublisher>(app);
                 }
             }
         }
