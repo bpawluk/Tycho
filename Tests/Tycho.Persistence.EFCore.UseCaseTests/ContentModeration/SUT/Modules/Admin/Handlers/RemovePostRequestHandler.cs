@@ -6,7 +6,7 @@ using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Handlers;
 
-internal class RemovePostRequestHandler(AdminDbContext dbContext, AdminModule.IParent parent, IAdminModulePublisher publisher) : ITransactionalRequestHandler<RemovePostRequest>
+internal class RemovePostRequestHandler(AdminDbContext dbContext, IAdminModuleParent parent, IAdminModulePublisher publisher) : ITransactionalRequestHandler<RemovePostRequest>
 {
     public async Task HandleAsync(RemovePostRequest requestData, CancellationToken cancellationToken)
     {

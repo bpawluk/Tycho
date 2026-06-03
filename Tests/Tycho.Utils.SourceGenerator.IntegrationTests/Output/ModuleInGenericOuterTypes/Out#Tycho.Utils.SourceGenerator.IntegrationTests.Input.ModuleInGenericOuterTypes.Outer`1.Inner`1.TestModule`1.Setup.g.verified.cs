@@ -19,7 +19,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInGenericOute
                 {
                     ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestModuleEventSerializer<TModule>>(module);
                     ServiceCollectionServiceExtensions.AddTransient<ITestModulePublisher<TModule>, TestModulePublisher<TModule>>(module);
-                    ServiceCollectionServiceExtensions.AddTransient<IParent, TestModuleParent<TModule>>(module);
+                    ServiceCollectionServiceExtensions.AddTransient<ITestModuleParent<TModule>, TestModuleParent<TModule>>(module);
                 }
             }
         }

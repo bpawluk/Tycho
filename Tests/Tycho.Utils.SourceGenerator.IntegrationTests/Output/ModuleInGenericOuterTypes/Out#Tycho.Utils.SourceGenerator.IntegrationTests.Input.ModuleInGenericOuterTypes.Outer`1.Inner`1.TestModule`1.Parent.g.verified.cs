@@ -11,7 +11,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInGenericOute
         public partial class Inner<TInner>
             where TInner : notnull
         {
-            internal class TestModuleParent<TModule> : ParentBase, TestModule<TModule>.IParent
+            internal class TestModuleParent<TModule> : ParentBase, ITestModuleParent<TModule>
                 where TModule : notnull
             {
                 public TestModuleParent(IParentReference parentReference) : base(parentReference) { }

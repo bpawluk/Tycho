@@ -2,7 +2,7 @@ using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.UsingGenericRequests.SUT.Modules.Handlers;
 
-internal class GenericModuleRequestHandler<T>(TestModule.IParent parent) : IRequestHandler<GenericModuleRequest<T>, GenericModuleRequest<T>.Response<T>>
+internal class GenericModuleRequestHandler<T>(ITestModuleParent parent) : IRequestHandler<GenericModuleRequest<T>, GenericModuleRequest<T>.Response<T>>
 {
     public async Task<GenericModuleRequest<T>.Response<T>> HandleAsync(GenericModuleRequest<T> requestData, CancellationToken cancellationToken)
     {

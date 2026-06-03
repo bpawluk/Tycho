@@ -15,7 +15,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithConstrain
         {
             ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestModuleEventSerializer<TPayload, TKey>>(module);
             ServiceCollectionServiceExtensions.AddTransient<ITestModulePublisher<TPayload, TKey>, TestModulePublisher<TPayload, TKey>>(module);
-            ServiceCollectionServiceExtensions.AddTransient<IParent, TestModuleParent<TPayload, TKey>>(module);
+            ServiceCollectionServiceExtensions.AddTransient<ITestModuleParent<TPayload, TKey>, TestModuleParent<TPayload, TKey>>(module);
         }
     }
 }

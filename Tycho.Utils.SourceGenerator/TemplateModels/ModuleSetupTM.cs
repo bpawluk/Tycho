@@ -71,7 +71,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(ModuleSetupTM owner, TychoSetupModel tychoDefinitionModel)
             {
-                ModuleParentInterface = ModuleParentSymbols.ParentInterface;
+                ModuleParentInterface = ModuleParentSymbols.GetParentInterface(tychoDefinitionModel.DefinitionType.Name, tychoDefinitionModel.DefinitionType.TypeParametersSuffix);
                 PublisherInterface = PublisherSymbols.GetPublisherInterface(tychoDefinitionModel.DefinitionType.Name, tychoDefinitionModel.DefinitionType.TypeParametersSuffix);
                 EventSerializerInterface = owner.UseType(IEventSerializerReference.TypeModel);
                 ServiceCollectionInterface = owner.UseType(IServiceCollectionReference.TypeModel);

@@ -1,13 +1,12 @@
 using Tycho.Requests;
-using static Tycho.IntegrationTests.SendingRequestsHorizontally.SUT.Modules.Alpha.AlphaModule;
 
 namespace Tycho.IntegrationTests.SendingRequestsHorizontally.SUT.Modules.Alpha.Handlers;
 
-internal class AlphaInRequestHandler(IParent parent)
+internal class AlphaInRequestHandler(IAlphaModuleParent parent)
     : IRequestHandler<AlphaInRequest>
     , IRequestHandler<AlphaInRequestWithResponse, string>
 {
-    private readonly IParent _parent = parent;
+    private readonly IAlphaModuleParent _parent = parent;
 
     public Task HandleAsync(AlphaInRequest requestData, CancellationToken cancellationToken)
     {

@@ -3,11 +3,10 @@ using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Cont
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Domain;
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Persistence;
 using Tycho.Requests;
-using static Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.CatalogModule;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Handlers;
 
-internal class BuyProductRequestHandler(CatalogDbContext dbContext, IParent parent) : IRequestHandler<BuyProductRequest>
+internal class BuyProductRequestHandler(CatalogDbContext dbContext, ICatalogModuleParent parent) : IRequestHandler<BuyProductRequest>
 {
     public async Task HandleAsync(BuyProductRequest requestData, CancellationToken cancellationToken)
     {

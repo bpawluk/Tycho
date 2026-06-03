@@ -1,4 +1,4 @@
-﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithUpstreamContract.TestModule.Parent.g.cs
+//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithUpstreamContract.TestModule.Parent.g.cs
 using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Structure.Parent;
@@ -6,7 +6,7 @@ using Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithUpstreamContr
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithUpstreamContract
 {
-    internal class TestModuleParent : ParentBase, TestModule.IParent
+    internal class TestModuleParent : ParentBase, ITestModuleParent
     {
         public TestModuleParent(IParentReference parentReference) : base(parentReference) { }
 

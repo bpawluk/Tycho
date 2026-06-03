@@ -1,13 +1,12 @@
 using Tycho.Requests;
-using static Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Modules.Beta.BetaModule;
 
 namespace Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Modules.Beta.Handlers;
 
-internal class BetaRequestHandler(IParent parent)
+internal class BetaRequestHandler(IBetaModuleParent parent)
     : IRequestHandler<BetaRequest>
     , IRequestHandler<BetaRequestWithResponse, string>
 {
-    private readonly IParent _parent = parent;
+    private readonly IBetaModuleParent _parent = parent;
 
     public Task HandleAsync(BetaRequest requestData, CancellationToken cancellationToken)
     {

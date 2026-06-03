@@ -12,7 +12,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithUpstreamC
         {
             ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestModuleEventSerializer>(module);
             ServiceCollectionServiceExtensions.AddTransient<ITestModulePublisher, TestModulePublisher>(module);
-            ServiceCollectionServiceExtensions.AddTransient<IParent, TestModuleParent>(module);
+            ServiceCollectionServiceExtensions.AddTransient<ITestModuleParent, TestModuleParent>(module);
         }
     }
 }

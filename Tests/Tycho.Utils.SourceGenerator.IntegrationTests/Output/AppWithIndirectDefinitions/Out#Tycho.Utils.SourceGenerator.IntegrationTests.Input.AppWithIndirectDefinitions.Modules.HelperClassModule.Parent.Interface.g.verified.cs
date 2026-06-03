@@ -1,14 +1,10 @@
-﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefinitions.Modules.HelperClassModule.Parent.Interface.g.cs
+//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefinitions.Modules.HelperClassModule.Parent.Interface.g.cs
 using System.Threading;
 using System.Threading.Tasks;
-using Tycho.Modules;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefinitions.Modules
 {
-    public partial class HelperClassModule : TychoModule
+    public interface IHelperClassModuleParent
     {
-        public interface IParent
-        {
-        }
     }
 }

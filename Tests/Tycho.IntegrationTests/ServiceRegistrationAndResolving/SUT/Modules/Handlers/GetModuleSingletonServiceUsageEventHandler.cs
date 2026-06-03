@@ -1,14 +1,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events;
 using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Services;
-using static Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules.TestModule;
 
 namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules.Handlers;
 
-internal class GetModuleSingletonServiceUsageEventHandler(IParent parent, IServiceProvider serviceProvider)
+internal class GetModuleSingletonServiceUsageEventHandler(ITestModuleParent parent, IServiceProvider serviceProvider)
     : IEventHandler<GetModuleSingletonServiceUsageEvent>
 {
-    private readonly IParent _parent = parent;
+    private readonly ITestModuleParent _parent = parent;
     private readonly IServiceProvider _serviceProvider = serviceProvider;
 
     public Task HandleAsync(EventContext<GetModuleSingletonServiceUsageEvent> context, CancellationToken cancellationToken)

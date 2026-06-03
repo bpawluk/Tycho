@@ -1,11 +1,11 @@
-﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithSubmodules.Modules.ModuleA.Parent.g.cs
+//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithSubmodules.Modules.ModuleA.Parent.g.cs
 using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Structure.Parent;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithSubmodules.Modules
 {
-    internal class ModuleAParent : ParentBase, ModuleA.IParent
+    internal class ModuleAParent : ParentBase, IModuleAParent
     {
         public ModuleAParent(IParentReference parentReference) : base(parentReference) { }
     }

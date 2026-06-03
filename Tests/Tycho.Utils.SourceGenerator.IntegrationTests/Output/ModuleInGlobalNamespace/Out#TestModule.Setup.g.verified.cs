@@ -10,6 +10,6 @@ public partial class TestModule : TychoModule
     {
         ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestModuleEventSerializer>(module);
         ServiceCollectionServiceExtensions.AddTransient<ITestModulePublisher, TestModulePublisher>(module);
-        ServiceCollectionServiceExtensions.AddTransient<IParent, TestModuleParent>(module);
+        ServiceCollectionServiceExtensions.AddTransient<ITestModuleParent, TestModuleParent>(module);
     }
 }

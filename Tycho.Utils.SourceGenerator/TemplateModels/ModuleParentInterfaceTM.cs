@@ -2,7 +2,6 @@ using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
 using Tycho.Utils.SourceGenerator.Models.Tycho;
 using Tycho.Utils.SourceGenerator.References.System;
-using Tycho.Utils.SourceGenerator.References.Tycho.Modules;
 using Tycho.Utils.SourceGenerator.References.Tycho.Structure;
 using Tycho.Utils.SourceGenerator.Symbols;
 
@@ -29,8 +28,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             Namespace = tychoParentModel.DefinitionType.Namespace;
             ContainingTypes = UseContainingTypes(tychoParentModel.DefinitionType.ContainingTypes);
             OwnerConstraints = UseConstraintClauses(tychoParentModel.DefinitionType.TypeParameters).ToArray();
-            Classes = new ClassesTM(this, tychoParentModel);
-            Interfaces = new InterfacesTM();
+            Classes = new ClassesTM(this);
+            Interfaces = new InterfacesTM(tychoParentModel);
             Methods = new MethodsTM();
             Parameters = new ParametersTM();
             Requests = tychoParentModel.Requests.Select(r => new RequestTM(this, r)).ToArray();
@@ -38,15 +37,11 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         internal class ClassesTM
         {
-            public string ModuleClass { get; }
-            public string ModuleBaseClass { get; }
             public string TaskClass { get; }
             public string CancellationTokenClass { get; }
 
-            public ClassesTM(ModuleParentInterfaceTM owner, TychoParentModel tychoParentModel)
+            public ClassesTM(ModuleParentInterfaceTM owner)
             {
-                ModuleClass = tychoParentModel.DefinitionType.DeclarationName;
-                ModuleBaseClass = owner.UseType(TychoModuleReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);
             }
@@ -56,9 +51,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         {
             public string ParentInterface { get; }
 
-            public InterfacesTM()
+            public InterfacesTM(TychoParentModel tychoParentModel)
             {
-                ParentInterface = ModuleParentSymbols.ParentInterface;
+                ParentInterface = ModuleParentSymbols.GetParentInterface(tychoParentModel.DefinitionType.Name, tychoParentModel.DefinitionType.TypeParametersSuffix);
             }
         }
 

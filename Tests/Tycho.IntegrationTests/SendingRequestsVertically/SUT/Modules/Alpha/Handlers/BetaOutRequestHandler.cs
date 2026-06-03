@@ -1,14 +1,13 @@
 using Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Beta;
 using Tycho.Requests;
-using static Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Alpha.AlphaModule;
 
 namespace Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Alpha.Handlers;
 
-internal class GammaOutRequestHandler(IParent parent)
+internal class GammaOutRequestHandler(IAlphaModuleParent parent)
     : IRequestHandler<BetaOutRequest>
     , IRequestHandler<BetaOutRequestWithResponse, string>
 {
-    private readonly IParent _parent = parent;
+    private readonly IAlphaModuleParent _parent = parent;
 
     public Task HandleAsync(BetaOutRequest requestData, CancellationToken cancellationToken)
     {

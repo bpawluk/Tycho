@@ -12,7 +12,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefi
         {
             ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, LocalHelperModuleEventSerializer>(module);
             ServiceCollectionServiceExtensions.AddTransient<ILocalHelperModulePublisher, LocalHelperModulePublisher>(module);
-            ServiceCollectionServiceExtensions.AddTransient<IParent, LocalHelperModuleParent>(module);
+            ServiceCollectionServiceExtensions.AddTransient<ILocalHelperModuleParent, LocalHelperModuleParent>(module);
         }
     }
 }

@@ -20,6 +20,6 @@ This includes:
 ## Tasks
 - [x] Move IPublisher out of <AppName> partial class and rename from IPublisher to I<AppName>Publisher
 - [x] Move IPublisher out of <ModuleName> partial class and rename from IPublisher to I<ModuleName>Publisher
-- [ ] Move IParent out of <ModuleName> partial class and rename from IParent to I<ModuleName>Parent
-- [ ] Move Setup from <AppName> to a new dedicated partial class AppSetup
+- [x] Move IParent out of <ModuleName> partial class and rename from IParent to I<ModuleName>Parent
 - [ ] Move Setup from <ModuleName> to a new dedicated partial class ModuleSetup
+- [ ] Move Setup from <AppName> to a new dedicated partial class AppSetup

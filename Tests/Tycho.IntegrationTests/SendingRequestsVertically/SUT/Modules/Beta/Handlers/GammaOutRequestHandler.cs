@@ -1,14 +1,13 @@
 using Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Gamma;
 using Tycho.Requests;
-using static Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Beta.BetaModule;
 
 namespace Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Beta.Handlers;
 
-internal class GammaOutRequestHandler(IParent parent)
+internal class GammaOutRequestHandler(IBetaModuleParent parent)
     : IRequestHandler<GammaOutRequest>
     , IRequestHandler<GammaOutRequestWithResponse, string>
 {
-    private readonly IParent _parent = parent;
+    private readonly IBetaModuleParent _parent = parent;
 
     public Task HandleAsync(GammaOutRequest requestData, CancellationToken cancellationToken)
     {

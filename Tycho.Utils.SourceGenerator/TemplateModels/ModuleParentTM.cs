@@ -29,7 +29,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             ContainingTypes = UseContainingTypes(tychoParentModel.DefinitionType.ContainingTypes);
             OwnerConstraints = UseConstraintClauses(tychoParentModel.DefinitionType.TypeParameters).ToArray();
             Classes = new ClassesTM(this, tychoParentModel);
-            Interfaces = new InterfacesTM();
+            Interfaces = new InterfacesTM(tychoParentModel);
             Methods = new MethodsTM();
             Parameters = new ParametersTM();
             Requests = tychoParentModel.Requests.Select(r => new RequestTM(this, r)).ToArray();
@@ -37,7 +37,6 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         internal class ClassesTM
         {
-            public string ModuleClass { get; }
             public string ParentClass { get; }
             public string ParentClassWithTypeParams { get; }
             public string ParentBaseClass { get; }
@@ -48,7 +47,6 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public ClassesTM(ModuleParentTM owner, TychoParentModel tychoParentModel)
             {
                 string moduleNameStem = tychoParentModel.DefinitionType.Name;
-                ModuleClass = tychoParentModel.DefinitionType.DeclarationName;
                 ParentClass = ModuleParentSymbols.GetParentClass(moduleNameStem);
                 ParentClassWithTypeParams = ModuleParentSymbols.GetParentClass(moduleNameStem, tychoParentModel.DefinitionType.TypeParametersSuffix);
                 ParentBaseClass = owner.UseType(ParentBaseReference.TypeModel);
@@ -62,9 +60,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         {
             public string ParentInterface { get; }
 
-            public InterfacesTM()
+            public InterfacesTM(TychoParentModel tychoParentModel)
             {
-                ParentInterface = ModuleParentSymbols.ParentInterface;
+                ParentInterface = ModuleParentSymbols.GetParentInterface(tychoParentModel.DefinitionType.Name, tychoParentModel.DefinitionType.TypeParametersSuffix);
             }
         }
 
