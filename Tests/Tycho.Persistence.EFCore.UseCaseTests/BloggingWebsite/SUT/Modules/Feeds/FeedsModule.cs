@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
-using Tycho.Persistence.EFCore;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Articles;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;

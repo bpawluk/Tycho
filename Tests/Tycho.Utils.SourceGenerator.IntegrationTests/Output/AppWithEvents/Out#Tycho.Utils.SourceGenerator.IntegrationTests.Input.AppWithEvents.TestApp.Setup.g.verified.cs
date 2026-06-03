@@ -1,4 +1,4 @@
-//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithEvents.TestApp.Setup.g.cs
+﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithEvents.TestApp.Setup.g.cs
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -46,8 +46,11 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithEvents
             var appInstance = await RunBaseAsync().ConfigureAwait(false);
             return new TestAppFacade(appInstance);
         }
+    }
 
-        protected override void __AutoSetup__(IServiceCollection app)
+    public class TestAppSetup
+    {
+        public static void Setup(IServiceCollection app)
         {
             ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestAppEventSerializer>(app);
             ServiceCollectionServiceExtensions.AddTransient<ITestAppPublisher, TestAppPublisher>(app);

@@ -44,6 +44,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         internal class ClassesTM
         {
             public string AppClass { get; }
+            public string SetupClass { get; }
             public string FacadeClass { get; }
             public string PublisherClass { get; }
             public string EventSerializerClass { get; }
@@ -59,6 +60,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 string appTypeSuffix = tychoSetupModel.DefinitionType.TypeParametersSuffix;
 
                 AppClass = tychoSetupModel.DefinitionType.DeclarationName;
+                SetupClass = AppSetupSymbols.GetSetupClass(appNameStem, appTypeSuffix);
                 FacadeClass = AppFacadeSymbols.GetAppFacadeClass(appNameStem, appTypeSuffix);
                 PublisherClass = PublisherSymbols.GetPublisherClass(appNameStem, appTypeSuffix);
                 EventSerializerClass = EventSerializerSymbols.GetEventSerializerClass(appNameStem, appTypeSuffix);
@@ -94,6 +96,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         internal class MethodsTM
         {
+            public string SetupMethod { get; }
             public string WithConfigurationBaseMethod { get; }
             public string WithLoggingBaseMethod { get; }
             public string RunBaseMethod { get; }
@@ -108,6 +111,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public MethodsTM()
             {
+                SetupMethod = AppSetupSymbols.SetupMethod;
                 WithConfigurationBaseMethod = TychoAppReference.WithConfigurationBaseMethodSignature.MethodName;
                 WithLoggingBaseMethod = TychoAppReference.WithLoggingBaseMethodSignature.MethodName;
                 RunBaseMethod = TychoAppReference.RunBaseAsyncMethodSignature.MethodName;

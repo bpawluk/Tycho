@@ -109,12 +109,15 @@ public class TychoAppTests
             app.AddSingleton(eventSerializerMock.Object);
         }
 
-        protected override void __AutoSetup__(IServiceCollection app) { }
-
         public Task<IApp> RunAsync() => RunBaseAsync();
 
         public void CallWithConfigurationBase(IConfiguration config) => WithConfigurationBase(config);
 
         public void CallWithLoggingBase(Action<ILoggingBuilder> setup) => WithLoggingBase(setup);
+    }
+
+    private sealed class ExposedInternalsAppSetup
+    {
+        public static void Setup(IServiceCollection app) { }
     }
 }

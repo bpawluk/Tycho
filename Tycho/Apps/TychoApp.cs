@@ -130,7 +130,7 @@ namespace Tycho.Apps
             EnsureItIsRunOnlyOnce();
 
             _builder.WithCleanup(Cleanup).Init();
-            __AutoSetup__(_builder.Services);
+            this.AddGeneratedSetup(_builder.Services);
 
             RegisterServices(_builder.Services);
             DefineContract(_builder.Contract);

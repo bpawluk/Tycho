@@ -67,8 +67,14 @@ namespace {{ namespace }}
 {{     i2     }}var appInstance = await {{ methods.run_base_method }}().{{ methods.configure_await_method }}(false);
 {{     i2     }}return new {{ classes.facade_class }}(appInstance);
 {{   i1   }}}
+{{ i0 }}}
 
-{{   i1   }}protected override void {{ methods.auto_setup_method }}({{ interfaces.service_collection_interface }} {{ parameters.app_parameter }})
+{{ i0 }}public class {{ classes.setup_class }}
+{{~ for owner_constraint in owner_constraints ~}}
+{{   i1   }}{{ owner_constraint }}
+{{~ end ~}}
+{{ i0 }}{
+{{   i1   }}public static void {{ methods.setup_method }}({{ interfaces.service_collection_interface }} {{ parameters.app_parameter }})
 {{   i1   }}{
 {{     i2     }}{{ classes.service_collection_service_extensions_class }}.{{ methods.add_singleton_method }}<{{ interfaces.event_serializer_interface }}, {{ classes.event_serializer_class }}>({{ parameters.app_parameter }});
 {{     i2     }}{{ classes.service_collection_service_extensions_class }}.{{ methods.add_transient_method }}<{{ interfaces.publisher_interface }}, {{ classes.publisher_class }}>({{ parameters.app_parameter }});
