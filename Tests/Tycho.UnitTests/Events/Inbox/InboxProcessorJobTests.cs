@@ -222,7 +222,7 @@ public class InboxProcessorJobTests
     {
         var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        routedEvent = new RoutedEvent<TestEvent>(Guid.NewGuid(), eventId, handlerId, Route.Create(), new TestEvent());
+        routedEvent = new RoutedEvent<TestEvent>(Guid.NewGuid(), Guid.NewGuid(), eventId, handlerId, Route.Create(), new TestEvent());
         return new InboxEvent(Guid.NewGuid(), routedEvent);
     }
 }

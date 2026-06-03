@@ -74,17 +74,20 @@ public class OutboxWriterTests
         [
             new RoutedEvent<TestEvent>(
                 Guid.NewGuid(),
+                Guid.NewGuid(),
                 EventIdentity.Create<TestEvent>(),
                 EventHandlerIdentity.Parse("handler-1"),
                 Route.Create(),
                 new TestEvent()),
             new RoutedEvent<TestEvent>(
                 Guid.NewGuid(),
+                Guid.NewGuid(),
                 EventIdentity.Create<TestEvent>(),
                 EventHandlerIdentity.Parse("handler-2"),
                 Route.Create(),
                 new TestEvent()),
             new RoutedEvent<TestEvent>(
+                Guid.NewGuid(),
                 Guid.NewGuid(),
                 EventIdentity.Create<TestEvent>(),
                 EventHandlerIdentity.Parse("handler-3"),
@@ -94,7 +97,7 @@ public class OutboxWriterTests
 
         _eventSerializerMock
             .Setup(s => s.Serialize(It.IsAny<RoutedEvent>()))
-            .Returns<RoutedEvent>(re => new SerializedRoutedEvent(re.Id, re.EventId, re.HandlerId, re.Route, "{}"));
+            .Returns<RoutedEvent>(re => new SerializedRoutedEvent(re.Id, re.PublishId, re.EventId, re.HandlerId, re.Route, "{}"));
 
         // Act
         await _sut.Write(routedEvents, cancellationToken);

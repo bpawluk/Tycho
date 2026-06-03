@@ -38,7 +38,7 @@ public class FinalEventRegistrationTests
         // Assert
         RoutedEvent<TestEvent> routedEvent = Assert.IsType<RoutedEvent<TestEvent>>(Assert.Single(result));
 
-        //Assert.Equal(publishId, routedEvent.PublishId); TODO
+        Assert.Equal(publishId, routedEvent.PublishId);
         Assert.Same(eventPayload, routedEvent.Payload);
         Assert.Equal(sut.HandlerId, routedEvent.HandlerId);
         Assert.Single(routedEvent.Route);

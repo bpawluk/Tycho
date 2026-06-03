@@ -28,6 +28,7 @@ internal class OutboxWriter(
             return new OutboxEntry
             {
                 Id = serializedEvent.Id,
+                PublishId = serializedEvent.PublishId,
                 Event = serializedEvent.EventId.ToString(),
                 Handler = serializedEvent.HandlerId.ToString(),
                 Route = serializedEvent.Route.ToString(),

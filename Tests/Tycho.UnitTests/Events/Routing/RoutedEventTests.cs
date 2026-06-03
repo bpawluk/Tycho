@@ -124,6 +124,7 @@ public class RoutedEventTests
 
     private static RoutedEvent<TestEvent> CreateRoutedEvent(
         Guid? id = null,
+        Guid? publishId = null,
         EventHandlerIdentity? handlerId = null,
         Route? route = null,
         TestEvent? payload = null)
@@ -131,6 +132,7 @@ public class RoutedEventTests
         var eventId = EventIdentity.Create<TestEvent>();
         return new RoutedEvent<TestEvent>(
             id ?? Guid.NewGuid(),
+            publishId ?? Guid.NewGuid(),
             eventId,
             handlerId ?? EventHandlerIdentity.Create<TestEventHandler>(),
             route ?? Route.Create(),

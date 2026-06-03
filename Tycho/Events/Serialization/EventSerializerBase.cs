@@ -24,6 +24,7 @@ namespace Tycho.Events.Serialization
             string serializedPayload = routedEvent.SerializePayloadWith(_payloadSerializer);
             return new SerializedRoutedEvent(
                 routedEvent.Id,
+                routedEvent.PublishId,
                 routedEvent.EventId,
                 routedEvent.HandlerId,
                 routedEvent.Route,
@@ -51,6 +52,7 @@ namespace Tycho.Events.Serialization
             TEvent payload = _payloadSerializer.Deserialize<TEvent>(serializedEvent.Payload);
             return new RoutedEvent<TEvent>(
                 serializedEvent.Id,
+                serializedEvent.PublishId,
                 serializedEvent.EventId,
                 serializedEvent.HandlerId,
                 serializedEvent.Route,

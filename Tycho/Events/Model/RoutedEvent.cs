@@ -11,7 +11,7 @@ namespace Tycho.Events.Model
     {
         internal Route Route { get; }
 
-        internal RoutedEvent(Guid id, EventIdentity eventId, EventHandlerIdentity handlerId, Route route) : base(id, eventId, handlerId)
+        internal RoutedEvent(Guid id, Guid publishId, EventIdentity eventId, EventHandlerIdentity handlerId, Route route) : base(id, publishId, eventId, handlerId)
         {
             Route = route;
         }
@@ -27,7 +27,7 @@ namespace Tycho.Events.Model
     {
         internal TEvent Payload { get; }
 
-        internal RoutedEvent(Guid id, EventIdentity eventId, EventHandlerIdentity handlerId, Route route, TEvent payload) : base(id, eventId, handlerId, route)
+        internal RoutedEvent(Guid id, Guid publishId, EventIdentity eventId, EventHandlerIdentity handlerId, Route route, TEvent payload) : base(id, publishId, eventId, handlerId, route)
         {
             Payload = payload;
         }

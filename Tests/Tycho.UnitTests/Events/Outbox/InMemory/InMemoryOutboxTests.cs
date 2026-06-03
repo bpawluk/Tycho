@@ -153,17 +153,18 @@ public class InMemoryOutboxTests
     {
         var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        return new RoutedEvent<TestEvent>(Guid.NewGuid(), eventId, handlerId, Route.Create(), new TestEvent());
+        return new RoutedEvent<TestEvent>(Guid.NewGuid(), Guid.NewGuid(), eventId, handlerId, Route.Create(), new TestEvent());
     }
 
     private (SerializedRoutedEvent Serialized, RoutedEvent Routed) CreateSerializedAndRoutedEventPair()
     {
         var id = Guid.NewGuid();
+        var publishId = Guid.NewGuid();
         var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
         var route = Route.Create();
-        var serialized = new SerializedRoutedEvent(id, eventId, handlerId, route, "{}");
-        var deserialized = new RoutedEvent<TestEvent>(id, eventId, handlerId, route, new TestEvent());
+        var serialized = new SerializedRoutedEvent(id, publishId, eventId, handlerId, route, "{}");
+        var deserialized = new RoutedEvent<TestEvent>(id, publishId, eventId, handlerId, route, new TestEvent());
         _eventSerializerMock.Setup(s => s.Serialize(deserialized)).Returns(serialized);
         return (serialized, deserialized);
     }

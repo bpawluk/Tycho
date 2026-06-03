@@ -135,9 +135,9 @@ public class ForwardingEventRegistrationTests
     private static RoutedEvent<TEvent> CreateRoutedEvent<TEvent>(TEvent payload)
         where TEvent : class, IEvent
     {
-        var publishId = EventIdentity.Create<TEvent>();
+        var eventId = EventIdentity.Create<TEvent>();
         var handlerId = EventHandlerIdentity.Create<MultiEventHandler>();
-        return new RoutedEvent<TEvent>(Guid.NewGuid(), publishId, handlerId, Route.Create(), payload);
+        return new RoutedEvent<TEvent>(Guid.NewGuid(), Guid.NewGuid(), eventId, handlerId, Route.Create(), payload);
     }
 
     private static void AssertRouteStartsWithDownStream(Route route)

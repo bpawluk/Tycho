@@ -23,7 +23,7 @@ namespace Tycho.Events.Registrating.Registrations
         {
             var eventId = EventIdentity.Create<TEvent>();
             var route = Routing.Route.Create();
-            return new[] { new RoutedEvent<TEvent>(Guid.NewGuid(), /*publishId, TODO*/ eventId, HandlerId, route, eventPayload) };
+            return new[] { new RoutedEvent<TEvent>(Guid.NewGuid(), publishId, eventId, HandlerId, route, eventPayload) };
         }
     }
 }

@@ -79,6 +79,7 @@ internal class InboxConsumer(
         {
             var serializedEvent = new SerializedRoutedEvent(
                 entry.Id,
+                entry.PublishId,
                 EventIdentity.Parse(entry.Event),
                 EventHandlerIdentity.Parse(entry.Handler),
                 Route.Empty(),

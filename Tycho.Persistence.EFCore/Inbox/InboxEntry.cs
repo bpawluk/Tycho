@@ -10,6 +10,9 @@ internal class InboxEntry
     public Guid Id { get; set; } = Guid.Empty;
 
     [Required]
+    public Guid PublishId { get; set; } = Guid.Empty;
+
+    [Required]
     public string Event { get; set; } = string.Empty;
 
     [Required]

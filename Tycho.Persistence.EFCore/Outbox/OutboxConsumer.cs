@@ -73,6 +73,7 @@ internal class OutboxConsumer(TychoDbContext dbContext, OutboxConsumerSettings? 
                     claimId,
                     new SerializedRoutedEvent(
                         entry.Id,
+                        entry.PublishId,
                         EventIdentity.Parse(entry.Event),
                         EventHandlerIdentity.Parse(entry.Handler),
                         Route.Parse(entry.Route),

@@ -70,7 +70,7 @@ public class OutboxProcessorJobFactoryTests
     {
         var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        var routedEvent = new SerializedRoutedEvent(Guid.NewGuid(), eventId, handlerId, Route.Create(), "{}");
+        var routedEvent = new SerializedRoutedEvent(Guid.NewGuid(), Guid.NewGuid(), eventId, handlerId, Route.Create(), "{}");
         return new OutboxEvent(Guid.NewGuid(), routedEvent);
     }
 }

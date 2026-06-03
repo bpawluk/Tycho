@@ -70,7 +70,7 @@ public class InboxProcessorJobFactoryTests
     {
         var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        var routedEvent = new RoutedEvent<TestEvent>(Guid.NewGuid(), eventId, handlerId, Route.Create(), new TestEvent());
+        var routedEvent = new RoutedEvent<TestEvent>(Guid.NewGuid(), Guid.NewGuid(), eventId, handlerId, Route.Create(), new TestEvent());
         return new InboxEvent(Guid.NewGuid(), routedEvent);
     }
 }

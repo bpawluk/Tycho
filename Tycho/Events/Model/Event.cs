@@ -7,13 +7,16 @@ namespace Tycho.Events.Model
     {
         internal Guid Id { get; }
 
+        internal Guid PublishId { get; }
+
         internal EventIdentity EventId { get; }
 
         internal EventHandlerIdentity HandlerId { get; }
 
-        internal Event(Guid id, EventIdentity eventId, EventHandlerIdentity handlerId)
+        internal Event(Guid id, Guid publishId, EventIdentity eventId, EventHandlerIdentity handlerId)
         {
             Id = id;
+            PublishId = publishId;
             EventId = eventId;
             HandlerId = handlerId;
         }

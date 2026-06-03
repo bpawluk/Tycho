@@ -152,6 +152,6 @@ public class UpStreamRouteDeliveryTests
         }
         var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        return new SerializedRoutedEvent(Guid.NewGuid(), eventId, handlerId, route, "{}");
+        return new SerializedRoutedEvent(Guid.NewGuid(), Guid.NewGuid(), eventId, handlerId, route, "{}");
     }
 }

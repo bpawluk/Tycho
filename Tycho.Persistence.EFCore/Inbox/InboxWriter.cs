@@ -17,6 +17,7 @@ internal class InboxWriter(ITransaction transaction, InboxActivity inboxActivity
         var inboxEntry = new InboxEntry
         {
             Id = serializedEvent.Id,
+            PublishId = serializedEvent.PublishId,
             Event = serializedEvent.EventId.ToString(),
             Handler = serializedEvent.HandlerId.ToString(),
             Payload = serializedEvent.Payload.ToString()!

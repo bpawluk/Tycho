@@ -381,6 +381,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         return new OutboxEntry
         {
             Id = id,
+            PublishId = Guid.NewGuid(),
             Event = "TestEvent",
             Handler = "TestHandler",
             Route = Route.Create().ToString(),

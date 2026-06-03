@@ -426,6 +426,7 @@ public sealed class InboxConsumerTests : IAsyncLifetime
         return new InboxEntry
         {
             Id = id,
+            PublishId = Guid.NewGuid(),
             Event = EventIdentity.Create<TestEvent>().ToString(),
             Handler = EventHandlerIdentity.Create<TestEventHandler>().ToString(),
             Payload = "{}",
@@ -442,6 +443,7 @@ public sealed class InboxConsumerTests : IAsyncLifetime
     {
         return new RoutedEvent<TestEvent>(
             serializedEvent.Id,
+            serializedEvent.PublishId,
             serializedEvent.EventId,
             serializedEvent.HandlerId,
             serializedEvent.Route,
