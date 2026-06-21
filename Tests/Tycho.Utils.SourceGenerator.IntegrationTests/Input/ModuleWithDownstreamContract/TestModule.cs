@@ -6,7 +6,7 @@ using Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithDownstreamCon
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithDownstreamContract;
 
 [TychoDefinition]
-public partial class TestModule : TychoModule
+public class TestModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

@@ -7,7 +7,7 @@ using Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithEvents.Module
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithEvents;
 
 [TychoDefinition]
-public partial class TestModule : TychoModule
+public class TestModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module) { }
     protected override void DefineEvents(IModuleEvents module)

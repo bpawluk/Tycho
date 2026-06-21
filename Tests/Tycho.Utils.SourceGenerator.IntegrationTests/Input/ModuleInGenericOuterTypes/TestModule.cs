@@ -10,7 +10,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleInGenericOute
             where TInner : notnull
         {
             [TychoDefinition]
-            public partial class TestModule<TModule> : TychoModule
+            public class TestModule<TModule> : TychoModule
                 where TModule : notnull
             {
                 protected override void DefineContract(IModuleContract module) { }

@@ -10,7 +10,7 @@ namespace Tycho.IntegrationTests.UsingGenericAppsAndModules.SUT.Modules;
 public sealed record ModuleWorkflowRequest(TestResult Result) : IRequest<string>;
 
 [TychoDefinition]
-public partial class TestModule<TInput, TOutput> : TychoModule
+public class TestModule<TInput, TOutput> : TychoModule
     where TInput : IInput, new()
     where TOutput : IOutput, new()
 {

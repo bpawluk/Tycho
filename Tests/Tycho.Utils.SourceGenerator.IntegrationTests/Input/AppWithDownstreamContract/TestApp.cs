@@ -6,7 +6,7 @@ using Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithDownstreamContra
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithDownstreamContract;
 
 [TychoDefinition]
-public partial class TestApp : TychoApp
+public class TestApp : TychoApp
 {
     protected override void DefineContract(IAppContract app)
     {

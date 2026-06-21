@@ -19,7 +19,7 @@ public record WorkflowFinishedEvent(TestResult Result, string FinalModule) : IEv
 public record WorkflowWithMappingStartedEvent(TestResult Result) : IEvent;
 
 [TychoDefinition]
-public partial class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
+public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;
 

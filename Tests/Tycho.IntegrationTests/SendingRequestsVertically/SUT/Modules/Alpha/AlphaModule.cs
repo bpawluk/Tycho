@@ -15,7 +15,7 @@ public record AlphaOutRequest(TestResult Result) : IRequest;
 public record AlphaOutRequestWithResponse(TestResult Result) : IRequest<string>;
 
 [TychoDefinition]
-public partial class AlphaModule : TychoModule
+public class AlphaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

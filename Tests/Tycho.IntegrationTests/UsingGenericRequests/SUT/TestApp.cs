@@ -19,7 +19,7 @@ public record GenericAppRequestToForward<T>(T Data) : IRequest<GenericAppRequest
 }
 
 [TychoDefinition]
-public partial class TestApp : TychoApp
+public class TestApp : TychoApp
 {
     protected override void DefineContract(IAppContract app)
     {

@@ -4,7 +4,7 @@ using Tycho.Modules;
 namespace Tycho.IntegrationTests.RunningCleanupLogic.SUT.Modules;
 
 [TychoDefinition]
-public partial class GammaModule : TychoModule
+public class GammaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module) { }
 

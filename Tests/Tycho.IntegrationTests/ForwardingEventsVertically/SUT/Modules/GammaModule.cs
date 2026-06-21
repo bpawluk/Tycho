@@ -10,7 +10,7 @@ public record GammaWorkflowStartedEvent(TestResult Result) : IEvent;
 public record GammaWorkflowFinishedEvent(TestResult Result) : IEvent;
 
 [TychoDefinition]
-public partial class GammaModule : TychoModule
+public class GammaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module) { }
 

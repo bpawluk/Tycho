@@ -5,7 +5,7 @@ using Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithUpstreamContr
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithUpstreamContract;
 
 [TychoDefinition]
-public partial class TestModule : TychoModule
+public class TestModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

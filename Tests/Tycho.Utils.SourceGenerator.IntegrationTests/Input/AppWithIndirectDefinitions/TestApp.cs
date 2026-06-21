@@ -21,7 +21,7 @@ public record TestEventFromHelperStaticClass : IEvent;
 public record TestEventFromHelperExtension : IEvent;
 
 [TychoDefinition]
-public partial class TestApp : TychoApp
+public class TestApp : TychoApp
 {
     protected override void DefineContract(IAppContract app)
     {

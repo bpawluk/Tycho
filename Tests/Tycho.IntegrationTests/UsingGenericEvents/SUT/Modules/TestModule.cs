@@ -10,7 +10,7 @@ public record GenericModuleEvent<T>(T Data) : IEvent;
 public record GenericModuleFinishedEvent<T>(T Data) : IEvent;
 
 [TychoDefinition]
-public partial class TestModule : TychoModule
+public class TestModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module) { }
 

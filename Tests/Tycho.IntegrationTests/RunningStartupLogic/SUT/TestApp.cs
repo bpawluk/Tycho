@@ -11,7 +11,7 @@ namespace Tycho.IntegrationTests.RunningStartupLogic.SUT;
 public record GetAppValueRequest : IRequest<string>;
 
 [TychoDefinition]
-public partial class TestApp : TychoApp
+public class TestApp : TychoApp
 {
     protected override void DefineContract(IAppContract app)
     {

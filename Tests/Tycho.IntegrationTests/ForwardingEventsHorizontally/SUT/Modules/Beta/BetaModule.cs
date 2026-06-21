@@ -10,7 +10,7 @@ public record BetaWorkflowStartedEvent(TestResult Result) : IEvent;
 public record BetaWorkflowFinishedEvent(TestResult Result) : IEvent;
 
 [TychoDefinition]
-public partial class BetaModule : TychoModule
+public class BetaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module) { }
 

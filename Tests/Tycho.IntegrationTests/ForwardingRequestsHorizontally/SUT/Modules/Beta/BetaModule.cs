@@ -10,7 +10,7 @@ public record BetaRequest(TestResult Result) : IRequest;
 public record BetaRequestWithResponse(TestResult Result) : IRequest<string>;
 
 [TychoDefinition]
-public partial class BetaModule : TychoModule
+public class BetaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

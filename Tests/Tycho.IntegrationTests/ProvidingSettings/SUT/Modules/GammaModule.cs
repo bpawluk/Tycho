@@ -10,7 +10,7 @@ namespace Tycho.IntegrationTests.ProvidingSettings.SUT.Modules;
 public record GetGammaValueRequest : IRequest<string>;
 
 [TychoDefinition]
-public partial class GammaModule : TychoModule
+public class GammaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

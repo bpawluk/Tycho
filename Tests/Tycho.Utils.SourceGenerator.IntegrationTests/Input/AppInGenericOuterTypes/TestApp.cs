@@ -10,7 +10,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInGenericOuterTy
             where TInner : notnull
         {
             [TychoDefinition]
-            public partial class TestApp<TApp> : TychoApp
+            public class TestApp<TApp> : TychoApp
                 where TApp : new()
             {
                 protected override void DefineContract(IAppContract app) { }

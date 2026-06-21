@@ -6,7 +6,7 @@ using Tycho.IntegrationTests.ProvidingSettings.SUT.Settings;
 namespace Tycho.IntegrationTests.ProvidingSettings.SUT;
 
 [TychoDefinition]
-public partial class TestApp : TychoApp
+public class TestApp : TychoApp
 {
     protected override void DefineContract(IAppContract app)
     {

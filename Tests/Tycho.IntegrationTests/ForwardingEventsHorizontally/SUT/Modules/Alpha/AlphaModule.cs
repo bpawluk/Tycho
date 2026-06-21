@@ -10,7 +10,7 @@ public record AlphaWorkflowStartedEvent(TestResult Result) : IEvent;
 public record AlphaWorkflowFinishedEvent(TestResult Result) : IEvent;
 
 [TychoDefinition]
-public partial class AlphaModule : TychoModule
+public class AlphaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module) { }
 

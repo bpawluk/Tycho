@@ -4,7 +4,7 @@ using Tycho.Apps;
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithGenericDefinition
 {
     [TychoDefinition]
-    public partial class TestApp<T> : TychoApp
+    public class TestApp<T> : TychoApp
     {
         protected override void DefineContract(IAppContract app) { }
         protected override void DefineEvents(IAppEvents app) { }

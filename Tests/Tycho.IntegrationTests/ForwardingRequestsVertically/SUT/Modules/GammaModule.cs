@@ -10,7 +10,7 @@ public record GammaRequest(TestResult Result) : IRequest;
 public record GammaRequestWithResponse(TestResult Result) : IRequest<string>;
 
 [TychoDefinition]
-public partial class GammaModule : TychoModule
+public class GammaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

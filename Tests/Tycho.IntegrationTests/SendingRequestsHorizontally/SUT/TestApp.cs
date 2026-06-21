@@ -14,7 +14,7 @@ public record Request(TestResult Result) : IRequest;
 public record RequestWithResponse(TestResult Result) : IRequest<string>;
 
 [TychoDefinition]
-public partial class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
+public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
 {
     private readonly TestWorkflow<TestResult> _testWorkflow = testWorkflow;
 

@@ -10,7 +10,7 @@ namespace Tycho.IntegrationTests.RunningStartupLogic.SUT.Modules;
 public record GetModuleValueRequest : IRequest<string>;
 
 [TychoDefinition]
-public partial class TestModule : TychoModule
+public class TestModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {

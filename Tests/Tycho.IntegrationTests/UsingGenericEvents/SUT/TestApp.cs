@@ -25,7 +25,7 @@ public record GenericAppEventToForward<T>(T Data) : IEvent;
 public record GenericAppForwardedEvent<T>(T Data) : IEvent;
 
 [TychoDefinition]
-public partial class TestApp(
+public class TestApp(
     TestWorkflow<GenericEventResult<int>> intWorkflow,
     TestWorkflow<GenericEventResult<string>> stringWorkflow)
     : TychoApp

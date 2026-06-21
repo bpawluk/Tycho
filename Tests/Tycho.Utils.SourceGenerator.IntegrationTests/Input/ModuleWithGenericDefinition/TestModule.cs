@@ -4,7 +4,7 @@ using Tycho.Modules;
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithGenericDefinition
 {
     [TychoDefinition]
-    public partial class TestModule<T> : TychoModule
+    public class TestModule<T> : TychoModule
     {
         protected override void DefineContract(IModuleContract module) { }
         protected override void DefineEvents(IModuleEvents module) { }

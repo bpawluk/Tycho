@@ -13,7 +13,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithConstrain
     public interface IMarker { }
 
     [TychoDefinition]
-    public partial class TestModule<TPayload, TKey> : TychoModule
+    public class TestModule<TPayload, TKey> : TychoModule
         where TPayload : PayloadBase, IMarker, new()
         where TKey : notnull
     {

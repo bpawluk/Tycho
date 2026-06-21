@@ -13,7 +13,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithConstrainedG
     public interface IMarker { }
 
     [TychoDefinition]
-    public partial class TestApp<TPayload, TKey> : TychoApp
+    public class TestApp<TPayload, TKey> : TychoApp
         where TPayload : PayloadBase, IMarker, new()
         where TKey : notnull
     {

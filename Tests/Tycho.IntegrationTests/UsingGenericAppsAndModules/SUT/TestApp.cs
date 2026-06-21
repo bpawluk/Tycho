@@ -12,7 +12,7 @@ namespace Tycho.IntegrationTests.UsingGenericAppsAndModules.SUT;
 public sealed record AppWorkflowRequest(TestResult Result) : IRequest<string>;
 
 [TychoDefinition]
-public partial class TestApp<TInput, TOutput> : TychoApp
+public class TestApp<TInput, TOutput> : TychoApp
     where TInput : IInput, new()
     where TOutput : IOutput, new()
 {

@@ -8,7 +8,7 @@ public partial class Outer
     {
 
         [TychoDefinition]
-        public partial class TestApp : TychoApp
+        public class TestApp : TychoApp
         {
             protected override void DefineContract(IAppContract app) { }
             protected override void DefineEvents(IAppEvents app) { }
