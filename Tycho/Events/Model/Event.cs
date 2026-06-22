@@ -3,6 +3,9 @@ using Tycho.Identity.Events;
 
 namespace Tycho.Events.Model
 {
+    /// <summary>
+    /// Base class for Tycho Events.
+    /// </summary>
     public abstract class Event
     {
         internal Guid Id { get; }

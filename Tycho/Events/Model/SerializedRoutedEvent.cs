@@ -4,6 +4,9 @@ using Tycho.Identity.Events;
 
 namespace Tycho.Events.Model
 {
+    /// <summary>
+    /// Represents a routed Event with a serialized payload.
+    /// </summary>
     public class SerializedRoutedEvent : Event
     {
         internal Route Route { get; }

@@ -7,6 +7,9 @@ using Tycho.Identity.Events;
 
 namespace Tycho.Events.Model
 {
+    /// <summary>
+    /// Represents an Event with routing information.
+    /// </summary>
     public abstract class RoutedEvent : Event
     {
         internal Route Route { get; }
@@ -23,6 +26,10 @@ namespace Tycho.Events.Model
         internal abstract Task HandleWith(IEventHandler handler, CancellationToken cancellationToken);
     }
 
+    /// <summary>
+    /// Represents a routed Event with a strongly typed payload.
+    /// </summary>
+    /// <typeparam name="TEvent">The Event payload type.</typeparam>
     public class RoutedEvent<TEvent> : RoutedEvent where TEvent : class, IEvent
     {
         internal TEvent Payload { get; }

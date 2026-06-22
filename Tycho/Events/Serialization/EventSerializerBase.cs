@@ -6,12 +6,19 @@ using Tycho.Utils;
 
 namespace Tycho.Events.Serialization
 {
+    /// <summary>
+    /// Base class for generated Event serializers.
+    /// </summary>
     [ReferencedBySourceGenerator]
     public abstract class EventSerializerBase : IEventSerializer
     {
         private readonly IPayloadSerializer _payloadSerializer;
         private readonly Dictionary<EventIdentity, Func<SerializedRoutedEvent, RoutedEvent>> _deserializers;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventSerializerBase"/> class.
+        /// </summary>
+        /// <param name="payloadSerializer">The underlying Event payload serializer.</param>
         [ReferencedBySourceGenerator]
         protected EventSerializerBase(IPayloadSerializer payloadSerializer)
         {
@@ -19,6 +26,7 @@ namespace Tycho.Events.Serialization
             _deserializers = new Dictionary<EventIdentity, Func<SerializedRoutedEvent, RoutedEvent>>();
         }
 
+        /// <inheritdoc />
         public SerializedRoutedEvent Serialize(RoutedEvent routedEvent)
         {
             string serializedPayload = routedEvent.SerializePayloadWith(_payloadSerializer);
@@ -31,6 +39,7 @@ namespace Tycho.Events.Serialization
                 serializedPayload);
         }
 
+        /// <inheritdoc />
         public RoutedEvent Deserialize(SerializedRoutedEvent serializedEvent)
         {
             if (_deserializers.TryGetValue(serializedEvent.EventId, out Func<SerializedRoutedEvent, RoutedEvent>? deserializer))
@@ -40,6 +49,10 @@ namespace Tycho.Events.Serialization
             throw new InvalidOperationException($"Failed to deserialize an unregistered event with ID {serializedEvent.EventId}");
         }
 
+        /// <summary>
+        /// Registers an Event payload type for generated deserialization.
+        /// </summary>
+        /// <typeparam name="TEvent">The Event payload type.</typeparam>
         [ReferencedBySourceGenerator]
         protected void RegisterEvent<TEvent>() where TEvent : class, IEvent
         {
