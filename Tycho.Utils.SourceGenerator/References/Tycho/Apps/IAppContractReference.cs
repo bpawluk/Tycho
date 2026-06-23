@@ -8,7 +8,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
     {
         private const string Namespace = "Tycho.Apps";
         private const string TypeName = "IAppContract";
-        private const string RequestExpectationTypeName = "IAppRequestExpectation";
+        private const string RequestBindingTypeName = "IAppRequestBinding";
 
         public static HashSet<MethodSignatureModel> DownstreamContractDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
         {
@@ -21,10 +21,10 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
 
         public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
 
-        public static TypeReferenceModel RequestExpectationTypeModel => new TypeReferenceModel(
+        public static TypeReferenceModel RequestBindingTypeModel => new TypeReferenceModel(
             Namespace,
             ImmutableEquatableArray<TypeReferenceModel>.Empty,
-            RequestExpectationTypeName,
+            RequestBindingTypeName,
             new ImmutableEquatableArray<TypeArgumentModel>(new[]
             {
                 new TypeArgumentModel(
@@ -32,10 +32,10 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
                     new TypeReferenceModel(Namespace, RequestTypeParameterName)),
             }));
 
-        public static TypeReferenceModel RequestExpectationWithResponseTypeModel => new TypeReferenceModel(
+        public static TypeReferenceModel RequestBindingWithResponseTypeModel => new TypeReferenceModel(
             Namespace,
             ImmutableEquatableArray<TypeReferenceModel>.Empty,
-            RequestExpectationTypeName,
+            RequestBindingTypeName,
             new ImmutableEquatableArray<TypeArgumentModel>(new[]
             {
                 new TypeArgumentModel(
@@ -49,11 +49,11 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
         public static MethodSignatureModel ExpectsMethodSignature => new MethodSignatureModel(
             methodName: "Expects",
             parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
-            result: RequestExpectationTypeModel);
+            result: RequestBindingTypeModel);
 
         public static MethodSignatureModel ExpectsWithResponseMethodSignature => new MethodSignatureModel(
             methodName: "Expects",
             parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
-            result: RequestExpectationWithResponseTypeModel);
+            result: RequestBindingWithResponseTypeModel);
     }
 }

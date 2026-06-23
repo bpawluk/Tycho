@@ -8,7 +8,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
     {
         private const string Namespace = "Tycho.Modules";
         private const string TypeName = "IModuleEvents";
-        private const string EventExpectationTypeName = "IModuleEventExpectation";
+        private const string EventBindingTypeName = "IModuleEventBinding";
 
         public static HashSet<MethodSignatureModel> HandledEventDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
         {
@@ -24,10 +24,10 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
 
         public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
 
-        public static TypeReferenceModel EventExpectationTypeModel => new TypeReferenceModel(
+        public static TypeReferenceModel EventBindingTypeModel => new TypeReferenceModel(
             Namespace,
             ImmutableEquatableArray<TypeReferenceModel>.Empty,
-            EventExpectationTypeName,
+            EventBindingTypeName,
             new ImmutableEquatableArray<TypeArgumentModel>(new[]
             {
                 new TypeArgumentModel(
@@ -38,7 +38,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
         public static MethodSignatureModel ExpectsMethodSignature => new MethodSignatureModel(
             methodName: "Expects",
             parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
-            result: EventExpectationTypeModel);
+            result: EventBindingTypeModel);
 
         public static MethodSignatureModel HandlesWithMethodSignature => new MethodSignatureModel(
             methodName: "HandlesWith",

@@ -1,9 +1,9 @@
 using Tycho.Requests;
 
-namespace Tycho.Modules
+namespace Tycho.Apps
 {
     /// <summary>
-    /// An interface for fulfilling a submodule contract.
+    /// An interface for fulfilling a module contract.
     /// </summary>
     public interface IContractFulfillment
     {
