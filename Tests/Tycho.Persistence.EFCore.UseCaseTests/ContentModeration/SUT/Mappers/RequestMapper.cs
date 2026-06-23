@@ -5,12 +5,12 @@ namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Mappers;
 
 internal static class RequestMapper
 {
-    public static GetPostRequest Map(GetAuthorRequest requestData)
+    public static GetPostRequest MapRequest(GetAuthorRequest requestData)
     {
         return new(requestData.PostId);
     }
 
-    public static GetAuthorRequest.Response Map(GetPostRequest.Response responseData)
+    public static GetAuthorRequest.Response MapResponse(GetPostRequest.Response responseData)
     {
         return new(responseData.Post.AuthorId);
     }

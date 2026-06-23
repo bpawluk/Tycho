@@ -45,13 +45,19 @@ public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
 
     protected override void IncludeModules(IAppStructure app)
     {
-        app.Uses<AlphaModule>(contract =>
+        app.Uses<AlphaModule>(app =>
         {
-            contract.Handle<Request, RequestHandler>()
-                    .Handle<RequestWithResponse, string, RequestHandler>();
+            app.Fulfills<Request>()
+               .HandlesWith<RequestHandler>();
 
-            contract.Handle<AlphaRequest, AlphaRequestHandler>()
-                    .Handle<AlphaRequestWithResponse, string, AlphaRequestHandler>();
+            app.Fulfills<RequestWithResponse, string>()
+               .HandlesWith<RequestHandler>();
+
+            app.Fulfills<AlphaRequest>()
+               .HandlesWith<AlphaRequestHandler>();
+
+            app.Fulfills<AlphaRequestWithResponse, string>()
+               .HandlesWith<AlphaRequestHandler>();
         });
     }
 

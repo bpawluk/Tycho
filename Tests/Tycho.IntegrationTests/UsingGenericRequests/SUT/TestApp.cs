@@ -46,10 +46,13 @@ public class TestApp : TychoApp
 
     protected override void IncludeModules(IAppStructure app)
     {
-        app.Uses<TestModule>(contract =>
+        app.Uses<TestModule>(app =>
         {
-            contract.Handle<GenericModuleRequiredRequest<int>, GenericModuleRequiredRequest<int>.Response<int>, GenericModuleRequiredRequestHandler<int>>();
-            contract.Handle<GenericModuleRequiredRequest<string>, GenericModuleRequiredRequest<string>.Response<string>, GenericModuleRequiredRequestHandler<string>>();
+            app.Fulfills<GenericModuleRequiredRequest<int>, GenericModuleRequiredRequest<int>.Response<int>>()
+               .HandlesWith<GenericModuleRequiredRequestHandler<int>>();
+
+            app.Fulfills<GenericModuleRequiredRequest<string>, GenericModuleRequiredRequest<string>.Response<string>>()
+               .HandlesWith<GenericModuleRequiredRequestHandler<string>>();
         });
     }
 

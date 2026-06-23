@@ -1,7 +1,6 @@
 using System;
 using Tycho.Modules;
 using Tycho.Requests;
-using Tycho.Requests.Handling;
 using Tycho.Requests.Registrating;
 using Tycho.Structure;
 using Tycho.Utils;
@@ -18,80 +17,166 @@ namespace Tycho.Apps.Setup
             _registrator = new Registrator(internals);
         }
 
-        public IContractFulfillment Forward<TRequest, TTargetModule>()
+        public IContractRequestFulfillment<TRequest> Fulfills<TRequest>()
             where TRequest : class, IRequest
-            where TTargetModule : TychoModule
         {
-            _registrator.ForwardDownStreamRequest<TSourceModule, TRequest, TTargetModule>();
-            return this;
+            return new RequestFulfillment<TRequest>(this, _registrator);
         }
 
-        public IContractFulfillment Forward<TRequest, TResponse, TTargetModule>()
+        public IContractRequestFulfillment<TRequest, TResponse> Fulfills<TRequest, TResponse>()
             where TRequest : class, IRequest<TResponse>
-            where TTargetModule : TychoModule
         {
-            _registrator.ForwardDownStreamRequest<TSourceModule, TRequest, TResponse, TTargetModule>();
-            return this;
+            return new RequestFulfillment<TRequest, TResponse>(this, _registrator);
         }
 
-        public IContractFulfillment ForwardAs<TRequest, TTargetRequest, TTargetModule>(
-            Func<TRequest, TTargetRequest> map)
+        private class RequestFulfillment<TRequest> : IContractRequestFulfillment<TRequest>
+            where TRequest : class, IRequest
+        {
+            private readonly IContractFulfillment _root;
+            private readonly Registrator _registrator;
+
+            public RequestFulfillment(IContractFulfillment root, Registrator registrator)
+            {
+                _root = root;
+                _registrator = registrator;
+            }
+
+            public IContractFulfillment Ignores()
+            {
+                _registrator.IgnoreDownStreamRequest<TSourceModule, TRequest>();
+                return _root;
+            }
+
+            public IContractFulfillment HandlesWith<THandler>()
+                where THandler : class, IRequestHandler<TRequest>
+            {
+                _registrator.HandleDownStreamRequest<TSourceModule, TRequest, THandler>();
+                return _root;
+            }
+
+            public IContractFulfillment ForwardsTo<TModule>()
+                where TModule : TychoModule
+            {
+                _registrator.ForwardDownStreamRequest<TSourceModule, TRequest, TModule>();
+                return _root;
+            }
+
+            public IMappedContractRequestFulfillment<TTargetRequest> MapsTo<TTargetRequest>(
+                Func<TRequest, TTargetRequest> mapRequest)
+                where TTargetRequest : class, IRequest
+            {
+                mapRequest.ThrowIfNull();
+                return new MappedRequestFulfillment<TRequest, TTargetRequest>(_root, _registrator, mapRequest);
+            }
+        }
+
+        private class RequestFulfillment<TRequest, TResponse> : IContractRequestFulfillment<TRequest, TResponse>
+            where TRequest : class, IRequest<TResponse>
+        {
+            private readonly IContractFulfillment _root;
+            private readonly Registrator _registrator;
+
+            public RequestFulfillment(IContractFulfillment root, Registrator registrator)
+            {
+                _root = root;
+                _registrator = registrator;
+            }
+
+            public IContractFulfillment Ignores()
+            {
+                _registrator.IgnoreDownStreamRequest<TSourceModule, TRequest, TResponse>();
+                return _root;
+            }
+
+            public IContractFulfillment HandlesWith<THandler>()
+                where THandler : class, IRequestHandler<TRequest, TResponse>
+            {
+                _registrator.HandleDownStreamRequest<TSourceModule, TRequest, TResponse, THandler>();
+                return _root;
+            }
+
+            public IContractFulfillment ForwardsTo<TModule>()
+                where TModule : TychoModule
+            {
+                _registrator.ForwardDownStreamRequest<TSourceModule, TRequest, TResponse, TModule>();
+                return _root;
+            }
+
+            public IMappedContractRequestFulfillment<TTargetRequest, TTargetResponse> MapsTo<TTargetRequest, TTargetResponse>(
+                Func<TRequest, TTargetRequest> mapRequest,
+                Func<TTargetResponse, TResponse> mapResponse)
+                where TTargetRequest : class, IRequest<TTargetResponse>
+            {
+                mapRequest.ThrowIfNull();
+                mapResponse.ThrowIfNull();
+                return new MappedRequestFulfillment<TRequest, TResponse, TTargetRequest, TTargetResponse>(
+                    _root,
+                    _registrator,
+                    mapRequest,
+                    mapResponse);
+            }
+        }
+
+        private class MappedRequestFulfillment<TRequest, TTargetRequest>
+            : IMappedContractRequestFulfillment<TTargetRequest>
             where TRequest : class, IRequest
             where TTargetRequest : class, IRequest
-            where TTargetModule : TychoModule
         {
-            map.ThrowIfNull();
-            _registrator.ForwardMappedDownStreamRequest<TSourceModule, TRequest, TTargetRequest, TTargetModule>(map);
-            return this;
+            private readonly IContractFulfillment _root;
+            private readonly Registrator _registrator;
+            private readonly Func<TRequest, TTargetRequest> _mapRequest;
+
+            public MappedRequestFulfillment(
+                IContractFulfillment root,
+                Registrator registrator,
+                Func<TRequest, TTargetRequest> mapRequest)
+            {
+                _root = root;
+                _registrator = registrator;
+                _mapRequest = mapRequest;
+            }
+
+            public IContractFulfillment ForwardsTo<TModule>()
+                where TModule : TychoModule
+            {
+                _registrator.ForwardMappedDownStreamRequest<TSourceModule, TRequest, TTargetRequest, TModule>(
+                    _mapRequest);
+                return _root;
+            }
         }
 
-        public IContractFulfillment ForwardAs<TRequest, TResponse, TTargetRequest, TTargetResponse, TTargetModule>(
-            Func<TRequest, TTargetRequest> mapRequest,
-            Func<TTargetResponse, TResponse> mapResponse)
+        private class MappedRequestFulfillment<TRequest, TResponse, TTargetRequest, TTargetResponse>
+            : IMappedContractRequestFulfillment<TTargetRequest, TTargetResponse>
             where TRequest : class, IRequest<TResponse>
             where TTargetRequest : class, IRequest<TTargetResponse>
-            where TTargetModule : TychoModule
         {
-            mapRequest.ThrowIfNull();
-            mapResponse.ThrowIfNull();
-            _registrator.ForwardMappedDownStreamRequest<
-                TSourceModule,
-                TRequest, TResponse,
-                TTargetRequest, TTargetResponse,
-                TTargetModule>(mapRequest, mapResponse);
-            return this;
-        }
+            private readonly IContractFulfillment _root;
+            private readonly Registrator _registrator;
+            private readonly Func<TRequest, TTargetRequest> _mapRequest;
+            private readonly Func<TTargetResponse, TResponse> _mapResponse;
 
-        public IContractFulfillment Handle<TRequest, THandler>()
-            where TRequest : class, IRequest
-            where THandler : class, IRequestHandler<TRequest>
-        {
-            _registrator.HandleDownStreamRequest<TSourceModule, TRequest, THandler>();
-            return this;
-        }
+            public MappedRequestFulfillment(
+                IContractFulfillment root,
+                Registrator registrator,
+                Func<TRequest, TTargetRequest> mapRequest,
+                Func<TTargetResponse, TResponse> mapResponse)
+            {
+                _root = root;
+                _registrator = registrator;
+                _mapRequest = mapRequest;
+                _mapResponse = mapResponse;
+            }
 
-        public IContractFulfillment Handle<TRequest, TResponse, THandler>()
-            where TRequest : class, IRequest<TResponse>
-            where THandler : class, IRequestHandler<TRequest, TResponse>
-        {
-            _registrator.HandleDownStreamRequest<TSourceModule, TRequest, TResponse, THandler>();
-            return this;
-        }
-
-        public IContractFulfillment Ignore<TRequest>()
-            where TRequest : class, IRequest
-        {
-            _registrator.HandleDownStreamRequest<TSourceModule, TRequest, RequestIgnorer<TRequest>>();
-            return this;
-        }
-
-        public IContractFulfillment Ignore<TRequest, TResponse>()
-            where TRequest : class, IRequest<TResponse>
-        {
-            _registrator.HandleDownStreamRequest<
-                TSourceModule, TRequest, TResponse,
-                RequestIgnorer<TRequest, TResponse>>();
-            return this;
+            public IContractFulfillment ForwardsTo<TModule>()
+                where TModule : TychoModule
+            {
+                _registrator.ForwardMappedDownStreamRequest<
+                    TSourceModule,
+                    TRequest, TResponse,
+                    TTargetRequest, TTargetResponse,
+                    TModule>(_mapRequest, _mapResponse);
+                return _root;
+            }
         }
     }
 }

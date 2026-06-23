@@ -40,16 +40,23 @@ public class AlphaModule : TychoModule
 
     protected override void IncludeModules(IModuleStructure module)
     {
-        module.Uses<BetaModule>(contract =>
+        module.Uses<BetaModule>(module =>
         {
-            contract.Expose<Request>()
-                    .Expose<RequestWithResponse, string>();
+            module.Fulfills<Request>()
+                  .Exposes();
 
-            contract.ExposeAs<BetaRequest, AlphaRequest>(
-                        requestData => new(requestData.Result))
-                    .ExposeAs<BetaRequestWithResponse, string, AlphaRequestWithResponse, string>(
-                        requestData => new(requestData.Result),
-                        response => response);
+            module.Fulfills<RequestWithResponse, string>()
+                  .Exposes();
+
+            module.Fulfills<BetaRequest>()
+                  .MapsTo<AlphaRequest>(request => new(request.Result))
+                  .Exposes();
+
+            module.Fulfills<BetaRequestWithResponse, string>()
+                  .MapsTo<AlphaRequestWithResponse, string>(
+                      request => new(request.Result),
+                      response => response)
+                  .Exposes();
         });
     }
 

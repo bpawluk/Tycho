@@ -40,16 +40,23 @@ public class BetaModule : TychoModule
 
     protected override void IncludeModules(IModuleStructure module)
     {
-        module.Uses<GammaModule>(contract =>
+        module.Uses<GammaModule>(module =>
         {
-            contract.Expose<Request>()
-                    .Expose<RequestWithResponse, string>();
+            module.Fulfills<Request>()
+                  .Exposes();
 
-            contract.ExposeAs<GammaRequest, BetaRequest>(
-                        requestData => new(requestData.Result))
-                    .ExposeAs<GammaRequestWithResponse, string, BetaRequestWithResponse, string>(
-                        requestData => new(requestData.Result),
-                        response => response);
+            module.Fulfills<RequestWithResponse, string>()
+                  .Exposes();
+
+            module.Fulfills<GammaRequest>()
+                  .MapsTo<BetaRequest>(request => new(request.Result))
+                  .Exposes();
+
+            module.Fulfills<GammaRequestWithResponse, string>()
+                  .MapsTo<BetaRequestWithResponse, string>(
+                      request => new(request.Result),
+                      response => response)
+                  .Exposes();
         });
     }
 

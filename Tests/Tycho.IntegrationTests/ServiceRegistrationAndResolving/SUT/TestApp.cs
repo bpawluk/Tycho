@@ -72,9 +72,10 @@ public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
 
     protected override void IncludeModules(IAppStructure app)
     {
-        app.Uses<TestModule>(contract =>
+        app.Uses<TestModule>(app =>
         {
-            contract.Handle<EndTestWorkflowRequest, EndTestWorkflowRequestHandler>();
+            app.Fulfills<EndTestWorkflowRequest>()
+               .HandlesWith<EndTestWorkflowRequestHandler>();
         });
     }
 

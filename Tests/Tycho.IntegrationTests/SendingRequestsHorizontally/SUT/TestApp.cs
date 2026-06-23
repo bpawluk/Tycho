@@ -31,22 +31,31 @@ public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
 
     protected override void IncludeModules(IAppStructure app)
     {
-        app.Uses<AlphaModule>(contract =>
+        app.Uses<AlphaModule>(app =>
         {
-            contract.Handle<AlphaOutRequest, AlphaOutRequestHandler>()
-                    .Handle<AlphaOutRequestWithResponse, string, AlphaOutRequestHandler>();
+            app.Fulfills<AlphaOutRequest>()
+               .HandlesWith<AlphaOutRequestHandler>();
+
+            app.Fulfills<AlphaOutRequestWithResponse, string>()
+               .HandlesWith<AlphaOutRequestHandler>();
         });
 
-        app.Uses<BetaModule>(contract =>
+        app.Uses<BetaModule>(app =>
         {
-            contract.Handle<BetaOutRequest, BetaOutRequestHandler>()
-                    .Handle<BetaOutRequestWithResponse, string, BetaOutRequestHandler>();
+            app.Fulfills<BetaOutRequest>()
+               .HandlesWith<BetaOutRequestHandler>();
+
+            app.Fulfills<BetaOutRequestWithResponse, string>()
+               .HandlesWith<BetaOutRequestHandler>();
         });
 
-        app.Uses<GammaModule>(contract =>
+        app.Uses<GammaModule>(app =>
         {
-            contract.Handle<GammaOutRequest, GammaOutRequestHandler>()
-                    .Handle<GammaOutRequestWithResponse, string, GammaOutRequestHandler>();
+            app.Fulfills<GammaOutRequest>()
+               .HandlesWith<GammaOutRequestHandler>();
+
+            app.Fulfills<GammaOutRequestWithResponse, string>()
+               .HandlesWith<GammaOutRequestHandler>();
         });
     }
 

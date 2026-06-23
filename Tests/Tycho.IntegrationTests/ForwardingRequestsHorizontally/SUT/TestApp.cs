@@ -47,37 +47,57 @@ public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
 
     protected override void IncludeModules(IAppStructure app)
     {
-        app.Uses<AlphaModule>(contract =>
+        app.Uses<AlphaModule>(app =>
         {
-            contract.Forward<Request, BetaModule>()
-                    .Forward<RequestWithResponse, string, BetaModule>();
+            app.Fulfills<Request>()
+               .ForwardsTo<BetaModule>();
 
-            contract.ForwardAs<AlphaRequest, BetaRequest, BetaModule>(
-                        requestData => new(requestData.Result))
-                    .ForwardAs<AlphaRequestWithResponse, string, BetaRequestWithResponse, string, BetaModule>(
-                        requestData => new(requestData.Result),
-                        response => response);
+            app.Fulfills<RequestWithResponse, string>()
+               .ForwardsTo<BetaModule>();
+
+            app.Fulfills<AlphaRequest>()
+               .MapsTo<BetaRequest>(request => new(request.Result))
+               .ForwardsTo<BetaModule>();
+
+            app.Fulfills<AlphaRequestWithResponse, string>()
+               .MapsTo<BetaRequestWithResponse, string>(
+                   request => new(request.Result),
+                   response => response)
+               .ForwardsTo<BetaModule>();
         });
 
-        app.Uses<BetaModule>(contract =>
+        app.Uses<BetaModule>(app =>
         {
-            contract.Forward<Request, GammaModule>()
-                    .Forward<RequestWithResponse, string, GammaModule>();
+            app.Fulfills<Request>()
+               .ForwardsTo<GammaModule>();
 
-            contract.ForwardAs<BetaRequest, GammaRequest, GammaModule>(
-                        requestData => new(requestData.Result))
-                    .ForwardAs<BetaRequestWithResponse, string, GammaRequestWithResponse, string, GammaModule>(
-                        requestData => new(requestData.Result),
-                        response => response);
+            app.Fulfills<RequestWithResponse, string>()
+               .ForwardsTo<GammaModule>();
+
+            app.Fulfills<BetaRequest>()
+               .MapsTo<GammaRequest>(request => new(request.Result))
+               .ForwardsTo<GammaModule>();
+
+            app.Fulfills<BetaRequestWithResponse, string>()
+               .MapsTo<GammaRequestWithResponse, string>(
+                   request => new(request.Result),
+                   response => response)
+               .ForwardsTo<GammaModule>();
         });
 
-        app.Uses<GammaModule>(contract =>
+        app.Uses<GammaModule>(app =>
         {
-            contract.Handle<Request, RequestHandler>()
-                    .Handle<RequestWithResponse, string, RequestHandler>();
+            app.Fulfills<Request>()
+               .HandlesWith<RequestHandler>();
 
-            contract.Handle<GammaRequest, GammaRequestHandler>()
-                    .Handle<GammaRequestWithResponse, string, GammaRequestHandler>();
+            app.Fulfills<RequestWithResponse, string>()
+               .HandlesWith<RequestHandler>();
+
+            app.Fulfills<GammaRequest>()
+               .HandlesWith<GammaRequestHandler>();
+
+            app.Fulfills<GammaRequestWithResponse, string>()
+               .HandlesWith<GammaRequestHandler>();
         });
     }
 

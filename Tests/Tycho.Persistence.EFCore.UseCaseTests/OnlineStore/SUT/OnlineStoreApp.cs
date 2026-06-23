@@ -59,17 +59,18 @@ public partial class OnlineStoreApp : TychoApp
 
     protected override void IncludeModules(IAppStructure app)
     {
-        app.Uses<CatalogModule>(outgoingRequests =>
+        app.Uses<CatalogModule>(app =>
         {
-            outgoingRequests.ForwardAs<
-                AddProductToBasketRequest,
-                AddBasketItemRequest,
-                BasketModule>(RequestMapper.Map);
+            app.Fulfills<AddProductToBasketRequest>()
+               .MapsTo<AddBasketItemRequest>(RequestMapper.Map)
+               .ForwardsTo<BasketModule>();
         });
 
-        app.Uses<InventoryModule>()
-           .Uses<BasketModule>()
-           .Uses<OrderingModule>();
+        app.Uses<InventoryModule>();
+
+        app.Uses<BasketModule>();
+
+        app.Uses<OrderingModule>();
     }
 
     protected override void RegisterServices(IServiceCollection app) { }

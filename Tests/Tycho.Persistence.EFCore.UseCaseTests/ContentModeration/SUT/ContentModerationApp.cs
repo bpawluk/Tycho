@@ -48,15 +48,17 @@ public partial class ContentModerationApp : TychoApp
 
     protected override void IncludeModules(IAppStructure app)
     {
-        app.Uses<UsersModule>()
-           .Uses<PostsModule>();
+        app.Uses<UsersModule>();
 
-        app.Uses<AdminModule>(outgoingRequests =>
+        app.Uses<PostsModule>();
+
+        app.Uses<AdminModule>(app =>
         {
-            outgoingRequests.ForwardAs<
-                GetAuthorRequest, GetAuthorRequest.Response,
-                GetPostRequest, GetPostRequest.Response,
-                PostsModule>(RequestMapper.Map, RequestMapper.Map);
+            app.Fulfills<GetAuthorRequest, GetAuthorRequest.Response>()
+               .MapsTo<GetPostRequest, GetPostRequest.Response>(
+                    RequestMapper.MapRequest,
+                    RequestMapper.MapResponse)
+               .ForwardsTo<PostsModule>();
         });
     }
 

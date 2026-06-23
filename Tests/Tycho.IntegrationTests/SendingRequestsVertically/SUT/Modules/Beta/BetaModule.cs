@@ -33,10 +33,13 @@ public class BetaModule : TychoModule
 
     protected override void IncludeModules(IModuleStructure module)
     {
-        module.Uses<GammaModule>(contract =>
+        module.Uses<GammaModule>(module =>
         {
-            contract.Handle<GammaOutRequest, GammaOutRequestHandler>()
-                    .Handle<GammaOutRequestWithResponse, string, GammaOutRequestHandler>();
+            module.Fulfills<GammaOutRequest>()
+                  .HandlesWith<GammaOutRequestHandler>();
+
+            module.Fulfills<GammaOutRequestWithResponse, string>()
+                  .HandlesWith<GammaOutRequestHandler>();
         });
     }
 
