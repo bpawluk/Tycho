@@ -4,7 +4,7 @@ using Tycho.Identity.Events;
 namespace Tycho.Events.Model
 {
     /// <summary>
-    /// Base class for Tycho Events.
+    /// Base class for Tycho events.
     /// </summary>
     public abstract class Event
     {

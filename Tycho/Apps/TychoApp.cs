@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +10,7 @@ using Tycho.Utils;
 namespace Tycho.Apps
 {
     /// <summary>
-    /// Base class for defining a Tycho Application
+    /// Base class for defining a Tycho application.
     /// </summary>
     [ReferencedBySourceGenerator]
     public abstract class TychoApp
@@ -21,12 +21,12 @@ namespace Tycho.Apps
         private bool _wasAlreadyRun = false;
 
         /// <summary>
-        /// Gets the global configuration used by the Application and its Modules.
+        /// Gets the global configuration used by the application and its modules.
         /// </summary>
         protected IConfiguration Configuration => _builder.Globals.Configuration;
 
         /// <summary>
-        /// Creates a new instance of the <see cref="TychoApp"/> class.
+        /// Initializes a new instance of the TychoApp class.
         /// </summary>
         public TychoApp()
         {
@@ -35,55 +35,55 @@ namespace Tycho.Apps
         }
 
         /// <summary>
-        /// Use this method to define Requests handled by the Application
+        /// Use this method to define the requests handled by the application.
         /// </summary>
-        /// <param name="app">An interface to define Requests</param>
+        /// <param name="app">An interface for defining requests.</param>
         [ReferencedBySourceGenerator]
         protected abstract void DefineContract(IAppContract app);
 
         /// <summary>
-        /// Use this method to define Events handled and routed by the Application
+        /// Use this method to define the events handled and routed by the application.
         /// </summary>
-        /// <param name="app">An interface to define Events</param>
+        /// <param name="app">An interface for defining events.</param>
         [ReferencedBySourceGenerator]
         protected abstract void DefineEvents(IAppEvents app);
 
         /// <summary>
-        /// Use this method to define Modules used by the Application
+        /// Use this method to define the modules used by the application.
         /// </summary>
-        /// <param name="app">An interface to include Modules</param>
+        /// <param name="app">An interface for including modules.</param>
         [ReferencedBySourceGenerator]
         protected abstract void IncludeModules(IAppStructure app);
 
         /// <summary>
-        /// Use this method to define services required by the Application
+        /// Use this method to define the services required by the application.
         /// </summary>
-        /// <param name="app">An interface to register services</param>
+        /// <param name="app">An interface for registering services.</param>
         protected abstract void RegisterServices(IServiceCollection app);
 
         /// <summary>
-        /// Override this method if you need to execute code before the Application runs
+        /// Override this method if you need to execute code before the application runs.
         /// </summary>
-        /// <param name="app">A provider of the services configured for the Application</param>
+        /// <param name="app">A provider of the services configured for the application.</param>
         protected virtual Task Startup(IServiceProvider app)
         {
             return Task.CompletedTask;
         }
 
         /// <summary>
-        /// Override this method if you need to execute code before the Application is disposed
+        /// Override this method if you need to execute code before the application is disposed.
         /// </summary>
-        /// <param name="app">A provider of the services configured for the Application</param>
+        /// <param name="app">A provider of the services configured for the application.</param>
         protected virtual Task Cleanup(IServiceProvider app)
         {
             return Task.CompletedTask;
         }
 
         /// <summary>
-        /// Provides automated setup for the App.
+        /// Provides automated setup for the application.
         /// </summary>
         /// <remarks>
-        /// Do not override – it is implemented using source generation.
+        /// Do not override; it is implemented using source generation.
         /// </remarks>
 #pragma warning disable IDE1006
         [ReferencedBySourceGenerator]
@@ -96,10 +96,10 @@ namespace Tycho.Apps
 #pragma warning restore IDE1006
 
         /// <summary>
-        /// Supplies global configuration for the Application and its Modules.
+        /// Supplies global configuration for the application and its modules.
         /// </summary>
-        /// <param name="globalConfiguration">Configuration to be used</param>
-        /// <exception cref="ArgumentNullException"/>"
+        /// <param name="globalConfiguration">The configuration to use.</param>
+        /// <exception cref="ArgumentNullException"/>
         [ReferencedBySourceGenerator]
         public void WithConfigurationBase(IConfiguration globalConfiguration)
         {
@@ -108,10 +108,10 @@ namespace Tycho.Apps
         }
 
         /// <summary>
-        /// Supplies logging setup for the Application and its Modules.
+        /// Supplies logging setup for the application and its modules.
         /// </summary>
-        /// <param name="loggingSetup">Logging setup to be used</param>
-        /// <exception cref="ArgumentNullException"/>"
+        /// <param name="loggingSetup">The logging setup to use.</param>
+        /// <exception cref="ArgumentNullException"/>
         [ReferencedBySourceGenerator]
         public void WithLoggingBase(Action<ILoggingBuilder> loggingSetup)
         {
@@ -120,9 +120,9 @@ namespace Tycho.Apps
         }
 
         /// <summary>
-        /// Builds and runs the Application according to the definition.
+        /// Builds and runs the application according to the definition.
         /// </summary>
-        /// <returns>A fresh and ready to use instance of the Application</returns>
+        /// <returns>A fresh, ready-to-use instance of the application.</returns>
         /// <exception cref="InvalidOperationException"/>
         [ReferencedBySourceGenerator]
         public async Task<IApp> RunBaseAsync()

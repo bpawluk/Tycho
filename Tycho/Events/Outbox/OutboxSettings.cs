@@ -3,7 +3,7 @@ using System;
 namespace Tycho.Events.Outbox
 {
     /// <summary>
-    /// Settings for Tycho outbox processor.
+    /// Settings for the Tycho outbox processor.
     /// </summary>
     public class OutboxSettings
     {
@@ -33,9 +33,7 @@ namespace Tycho.Events.Outbox
         /// <summary>
         /// Gets or sets the maximum polling interval for the outbox processor.
         /// </summary>
-        /// <value>
-        /// The maximum time interval between outbox processor iterations
-        /// </value>
+        /// <value>The maximum time interval between outbox processor iterations.</value>
         /// <remarks>
         /// Processing stops when the polling interval exceeds this value.
         /// </remarks>

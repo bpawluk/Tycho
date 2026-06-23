@@ -7,7 +7,7 @@ using Tycho.Utils;
 namespace Tycho.Events.Serialization
 {
     /// <summary>
-    /// Base class for generated Event serializers.
+    /// Base class for generated event serializers.
     /// </summary>
     [ReferencedBySourceGenerator]
     public abstract class EventSerializerBase : IEventSerializer
@@ -18,7 +18,7 @@ namespace Tycho.Events.Serialization
         /// <summary>
         /// Initializes a new instance of the <see cref="EventSerializerBase"/> class.
         /// </summary>
-        /// <param name="payloadSerializer">The underlying Event payload serializer.</param>
+        /// <param name="payloadSerializer">The underlying event payload serializer.</param>
         [ReferencedBySourceGenerator]
         protected EventSerializerBase(IPayloadSerializer payloadSerializer)
         {
@@ -26,7 +26,7 @@ namespace Tycho.Events.Serialization
             _deserializers = new Dictionary<EventIdentity, Func<SerializedRoutedEvent, RoutedEvent>>();
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public SerializedRoutedEvent Serialize(RoutedEvent routedEvent)
         {
             string serializedPayload = routedEvent.SerializePayloadWith(_payloadSerializer);
@@ -39,7 +39,7 @@ namespace Tycho.Events.Serialization
                 serializedPayload);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public RoutedEvent Deserialize(SerializedRoutedEvent serializedEvent)
         {
             if (_deserializers.TryGetValue(serializedEvent.EventId, out Func<SerializedRoutedEvent, RoutedEvent>? deserializer))
@@ -50,9 +50,9 @@ namespace Tycho.Events.Serialization
         }
 
         /// <summary>
-        /// Registers an Event payload type for generated deserialization.
+        /// Registers an event payload type for generated deserialization.
         /// </summary>
-        /// <typeparam name="TEvent">The Event payload type.</typeparam>
+        /// <typeparam name="TEvent">The event payload type.</typeparam>
         [ReferencedBySourceGenerator]
         protected void RegisterEvent<TEvent>() where TEvent : class, IEvent
         {

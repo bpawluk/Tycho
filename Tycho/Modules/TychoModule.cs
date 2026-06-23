@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +12,7 @@ using Tycho.Utils;
 namespace Tycho.Modules
 {
     /// <summary>
-    /// Base class for defining a Tycho Module
+    /// Base class for defining a Tycho module.
     /// </summary>
     [ReferencedBySourceGenerator]
     public abstract class TychoModule
@@ -23,12 +23,12 @@ namespace Tycho.Modules
         private bool _wasAlreadyRun = false;
 
         /// <summary>
-        /// Gets the global configuration used by the Module and its submodules.
+        /// Gets the global configuration used by the module and its submodules.
         /// </summary>
         protected IConfiguration Configuration => _builder.Globals.Configuration;
 
         /// <summary>
-        /// Creates a new instance of the <see cref="TychoModule"/> class.
+        /// Initializes a new instance of the TychoModule class.
         /// </summary>
         public TychoModule()
         {
@@ -37,65 +37,65 @@ namespace Tycho.Modules
         }
 
         /// <summary>
-        /// Use this method to define Requests handled and required by the Module
+        /// Use this method to define the requests handled and required by the module.
         /// </summary>
-        /// <param name="module">An interface to define Requests</param>
+        /// <param name="module">An interface for defining requests.</param>
         [ReferencedBySourceGenerator]
         protected abstract void DefineContract(IModuleContract module);
 
         /// <summary>
-        /// Use this method to define Events handled and routed by the Module
+        /// Use this method to define the events handled and routed by the module.
         /// </summary>
-        /// <param name="module">An interface to define Events</param>
+        /// <param name="module">An interface for defining events.</param>
         [ReferencedBySourceGenerator]
         protected abstract void DefineEvents(IModuleEvents module);
 
         /// <summary>
-        /// Use this method to define submodules used by the Module
+        /// Use this method to define the submodules used by the module.
         /// </summary>
-        /// <param name="module">An interface to include submodules</param>
+        /// <param name="module">An interface for including submodules.</param>
         [ReferencedBySourceGenerator]
         protected abstract void IncludeModules(IModuleStructure module);
 
         /// <summary>
-        /// Use this method to define services required by the Module
+        /// Use this method to define the services required by the module.
         /// </summary>
-        /// <param name="module">An interface to register services</param>
+        /// <param name="module">An interface for registering services.</param>
         protected abstract void RegisterServices(IServiceCollection module);
 
         /// <summary>
-        /// Override this method if you need to execute code before the Module runs
+        /// Override this method if you need to execute code before the module runs.
         /// </summary>
-        /// <param name="module">A provider of the services configured for the Module</param>
+        /// <param name="module">A provider of the services configured for the module.</param>
         protected virtual Task Startup(IServiceProvider module)
         {
             return Task.CompletedTask;
         }
 
         /// <summary>
-        /// Override this method if you need to execute code before the Module is disposed
+        /// Override this method if you need to execute code before the module is disposed.
         /// </summary>
-        /// <param name="module">A provider of the services configured for the Module</param>
+        /// <param name="module">A provider of the services configured for the module.</param>
         protected virtual Task Cleanup(IServiceProvider module)
         {
             return Task.CompletedTask;
         }
 
         /// <summary>
-        /// Retrieves the settings provided to the Module by its parent
+        /// Retrieves the settings provided to the module by its parent.
         /// </summary>
-        /// <typeparam name="TSettings">The type of settings to retrieve</typeparam>
-        /// <returns>Matching settings or a new instance of the requested settings type</returns>
+        /// <typeparam name="TSettings">The type of settings to retrieve.</typeparam>
+        /// <returns>Matching settings, or a new instance of the requested settings type.</returns>
         protected TSettings GetSettings<TSettings>() where TSettings : class, IModuleSettings, new()
         {
             return _builder.Settings as TSettings ?? new TSettings();
         }
 
         /// <summary>
-        /// Provides automated setup for the Module.
+        /// Provides automated setup for the module.
         /// </summary>
         /// <remarks>
-        /// Do not override – it is implemented using source generation.
+        /// Do not override; it is implemented using source generation.
         /// </remarks>
 #pragma warning disable IDE1006
         [ReferencedBySourceGenerator]

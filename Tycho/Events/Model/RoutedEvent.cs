@@ -8,7 +8,7 @@ using Tycho.Identity.Events;
 namespace Tycho.Events.Model
 {
     /// <summary>
-    /// Represents an Event with routing information.
+    /// Represents an event with routing information.
     /// </summary>
     public abstract class RoutedEvent : Event
     {
@@ -27,9 +27,9 @@ namespace Tycho.Events.Model
     }
 
     /// <summary>
-    /// Represents a routed Event with a strongly typed payload.
+    /// Represents a routed event with a strongly typed payload.
     /// </summary>
-    /// <typeparam name="TEvent">The Event payload type.</typeparam>
+    /// <typeparam name="TEvent">The event payload type.</typeparam>
     public class RoutedEvent<TEvent> : RoutedEvent where TEvent : class, IEvent
     {
         internal TEvent Payload { get; }

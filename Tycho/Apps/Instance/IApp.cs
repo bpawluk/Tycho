@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Tycho.Requests.Broker;
 using Tycho.Structure;
 using Tycho.Utils;
@@ -6,7 +6,7 @@ using Tycho.Utils;
 namespace Tycho.Apps.Instance
 {
     /// <summary>
-    /// Represents a running Tycho Application instance.
+    /// Represents a running Tycho application instance.
     /// </summary>
     [ReferencedBySourceGenerator]
     public interface IApp : IAsyncDisposable
@@ -16,9 +16,9 @@ namespace Tycho.Apps.Instance
     }
 
     /// <summary>
-    /// Represents a running Tycho Application instance defined by <typeparamref name="TAppDefinition"/>.
+    /// Represents a running Tycho application instance defined by <typeparamref name="TAppDefinition"/>.
     /// </summary>
-    /// <typeparam name="TAppDefinition">The Application definition type.</typeparam>
+    /// <typeparam name="TAppDefinition">The application definition type.</typeparam>
     [ReferencedBySourceGenerator]
     public interface IApp<TAppDefinition> : IApp where TAppDefinition : TychoApp
     {

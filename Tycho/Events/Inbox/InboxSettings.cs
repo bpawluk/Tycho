@@ -3,7 +3,7 @@ using System;
 namespace Tycho.Events.Inbox
 {
     /// <summary>
-    /// Settings for Tycho inbox processor.
+    /// Settings for the Tycho inbox processor.
     /// </summary>
     public class InboxSettings
     {
@@ -33,9 +33,7 @@ namespace Tycho.Events.Inbox
         /// <summary>
         /// Gets or sets the maximum polling interval for the inbox processor.
         /// </summary>
-        /// <value>
-        /// The maximum time interval between inbox processor iterations.
-        /// </value>
+        /// <value>The maximum time interval between inbox processor iterations.</value>
         /// <remarks>
         /// Processing stops when the polling interval exceeds this value.
         /// </remarks>

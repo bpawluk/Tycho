@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore;
 using Tycho.Persistence.EFCore.Inbox;
 using Tycho.Persistence.EFCore.Outbox;
@@ -6,23 +6,22 @@ using Tycho.Persistence.EFCore.Outbox;
 namespace Tycho.Persistence.EFCore;
 
 /// <summary>
-/// Database context with entities required by Tycho
+/// Database context containing the entities required by Tycho.
 /// </summary>
 public abstract class TychoDbContext : DbContext
 {
     /// <summary>
-    /// Database schema name to use for Tycho tables.
-    /// Return <c>null</c> to use the database default schema.
+    /// The database schema name to use for Tycho tables. Return null to use the database default schema.
     /// </summary>
     public virtual string? Schema => null;
 
     /// <summary>
-    /// Database table name to use for Tycho Events inbox.
+    /// The database table name to use for the Tycho events inbox.
     /// </summary>
     public virtual string InboxTableName => $"{GetDbContextName()}Inbox";
 
     /// <summary>
-    /// Database table name to use for Tycho Events outbox.
+    /// The database table name to use for the Tycho events outbox.
     /// </summary>
     public virtual string OutboxTableName => $"{GetDbContextName()}Outbox";
 

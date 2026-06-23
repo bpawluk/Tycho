@@ -6,67 +6,66 @@ using Tycho.Utils;
 namespace Tycho.Apps
 {
     /// <summary>
-    /// An interface for declaring Events expected by a Tycho Application.
+    /// An interface for declaring the events expected by a Tycho application.
     /// </summary>
     [ReferencedBySourceGenerator]
     public interface IAppEvents
     {
         /// <summary>
-        /// Declares that the Application expects Events of type <typeparamref name="TEvent"/>.
+        /// Declares that the application expects events of type <typeparamref name="TEvent"/>.
         /// </summary>
-        /// <typeparam name="TEvent">The type of the expected Event.</typeparam>
-        /// <returns>An expectation builder for the Event.</returns>
+        /// <typeparam name="TEvent">The type of the expected event.</typeparam>
+        /// <returns>An expectation builder for the event.</returns>
         [ReferencedBySourceGenerator]
         IAppEventExpectation<TEvent> Expects<TEvent>()
             where TEvent : class, IEvent;
     }
 
     /// <summary>
-    /// Configures how an expected Event is handled or routed within an Application.
+    /// Configures how an expected event is handled or routed within an application.
     /// </summary>
-    /// <typeparam name="TEvent">The type of the expected Event.</typeparam>
+    /// <typeparam name="TEvent">The type of the expected event.</typeparam>
     [ReferencedBySourceGenerator]
     public interface IAppEventExpectation<TEvent>
         where TEvent : class, IEvent
     {
         /// <summary>
-        /// Declares that the Application will handle the expected Event using a Handler
-        /// <typeparamref name="THandler"/>.
+        /// Declares that the application will handle the expected event using the handler <typeparamref name="THandler"/>.
         /// </summary>
-        /// <typeparam name="THandler">The type of Event Handler.</typeparam>
+        /// <typeparam name="THandler">The type of event handler.</typeparam>
         [ReferencedBySourceGenerator]
         IAppEvents HandlesWith<THandler>()
             where THandler : class, IEventHandler<TEvent>;
 
         /// <summary>
-        /// Forwards the expected Event to a Module of type <typeparamref name="TModule"/>.
+        /// Forwards the expected event to a module of type <typeparamref name="TModule"/>.
         /// </summary>
-        /// <typeparam name="TModule">The type of the Module that receives the Event.</typeparam>
+        /// <typeparam name="TModule">The type of the module that receives the event.</typeparam>
         IAppEventExpectation<TEvent> ForwardsTo<TModule>()
             where TModule : TychoModule;
 
         /// <summary>
-        /// Maps the expected Event to <typeparamref name="TTargetEvent"/> for routed delivery.
+        /// Maps the expected event to <typeparamref name="TTargetEvent"/> for routed delivery.
         /// </summary>
-        /// <typeparam name="TTargetEvent">The target Event type.</typeparam>
-        /// <param name="map">The Event mapper.</param>
+        /// <typeparam name="TTargetEvent">The target event type.</typeparam>
+        /// <param name="map">The event mapper.</param>
         IAppMappedEventExpectation<TEvent, TTargetEvent> MapsTo<TTargetEvent>(Func<TEvent, TTargetEvent> map)
             where TTargetEvent : class, IEvent;
     }
 
     /// <summary>
-    /// Configures routed delivery for a mapped Application Event.
+    /// Configures routed delivery for a mapped application event.
     /// </summary>
-    /// <typeparam name="TEvent">The type of the expected Event.</typeparam>
-    /// <typeparam name="TTargetEvent">The target Event type.</typeparam>
+    /// <typeparam name="TEvent">The type of the expected event.</typeparam>
+    /// <typeparam name="TTargetEvent">The target event type.</typeparam>
     public interface IAppMappedEventExpectation<TEvent, TTargetEvent>
         where TEvent : class, IEvent
         where TTargetEvent : class, IEvent
     {
         /// <summary>
-        /// Forwards the mapped Event to a Module of type <typeparamref name="TModule"/>.
+        /// Forwards the mapped event to a module of type <typeparamref name="TModule"/>.
         /// </summary>
-        /// <typeparam name="TModule">The type of the Module that receives the mapped Event.</typeparam>
+        /// <typeparam name="TModule">The type of the module that receives the mapped event.</typeparam>
         IAppMappedEventExpectation<TEvent, TTargetEvent> ForwardsTo<TModule>()
             where TModule : TychoModule;
     }

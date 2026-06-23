@@ -5,7 +5,7 @@ using Tycho.Utils;
 namespace Tycho.Events.Publishing
 {
     /// <summary>
-    /// Base class for generated publishers for Tycho Events.
+    /// Base class for generated publishers for Tycho events.
     /// </summary>
     [ReferencedBySourceGenerator]
     public abstract class PublisherBase
@@ -15,7 +15,7 @@ namespace Tycho.Events.Publishing
         /// <summary>
         /// Initializes a new instance of the <see cref="PublisherBase"/> class.
         /// </summary>
-        /// <param name="genericPublisher">The underlying Event publisher.</param>
+        /// <param name="genericPublisher">The underlying event publisher.</param>
         [ReferencedBySourceGenerator]
         public PublisherBase(IEventPublisher genericPublisher)
         {
@@ -23,12 +23,12 @@ namespace Tycho.Events.Publishing
         }
 
         /// <summary>
-        /// Publishes an Event.
+        /// Publishes an event.
         /// </summary>
-        /// <typeparam name="TEvent">The Event type.</typeparam>
-        /// <param name="eventPayload">The Event payload to publish.</param>
-        /// <param name="cancellationToken">A token that can cancel Event publishing.</param>
-        /// <returns>A task that completes when the Event has been published.</returns>
+        /// <typeparam name="TEvent">The event type.</typeparam>
+        /// <param name="eventPayload">The event payload to publish.</param>
+        /// <param name="cancellationToken">A token that can cancel event publishing.</param>
+        /// <returns>A task that completes when the event has been published.</returns>
         [ReferencedBySourceGenerator]
         protected Task PublishAsync<TEvent>(TEvent eventPayload, CancellationToken cancellationToken = default)
             where TEvent : class, IEvent
