@@ -15,8 +15,11 @@ public partial class FeedsModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<AddEntryRequest, AddEntryRequest.Response, AddEntryRequestHandler>()
-              .Handles<GetFeedEntriesRequest, GetFeedEntriesRequest.Response, GetFeedEntriesRequestHandler>();
+        module.Expects<AddEntryRequest, AddEntryRequest.Response>()
+              .HandlesWith<AddEntryRequestHandler>();
+
+        module.Expects<GetFeedEntriesRequest, GetFeedEntriesRequest.Response>()
+              .HandlesWith<GetFeedEntriesRequestHandler>();
     }
 
     protected override void DefineEvents(IModuleEvents module)

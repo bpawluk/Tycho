@@ -14,7 +14,8 @@ public class GammaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<GetGammaValueRequest, string, GetValueRequestHandler>();
+        module.Expects<GetGammaValueRequest, string>()
+              .HandlesWith<GetValueRequestHandler>();
     }
 
     protected override void DefineEvents(IModuleEvents module) { }

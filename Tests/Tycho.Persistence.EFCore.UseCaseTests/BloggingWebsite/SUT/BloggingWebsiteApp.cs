@@ -4,8 +4,8 @@ using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Contract.Incoming;
-using Feeds = Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds;
-using Reactions = Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions;
+using FeedsIn = Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
+using ReactionsOut = Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Contract.Outgoing;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT;
 
@@ -14,16 +14,20 @@ public partial class BloggingWebsiteApp : TychoApp
 {
     protected override void DefineContract(IAppContract app)
     {
-        app.Forwards<AddEntryRequest, AddEntryRequest.Response, FeedsModule>()
-           .Forwards<GetFeedEntriesRequest, GetFeedEntriesRequest.Response, FeedsModule>();
+        app.Expects<AddEntryRequest, AddEntryRequest.Response>()
+           .ForwardsTo<FeedsModule>();
 
-        app.Forwards<AddReactionRequest, ReactionsModule>();
+        app.Expects<GetFeedEntriesRequest, GetFeedEntriesRequest.Response>()
+           .ForwardsTo<FeedsModule>();
+
+        app.Expects<AddReactionRequest>()
+           .ForwardsTo<ReactionsModule>();
     }
 
     protected override void DefineEvents(IAppEvents app)
     {
-        app.Expects<Reactions.Contract.Outgoing.ScoreChangedEvent>()
-           .MapsTo<Feeds.Contract.ScoreChangedEvent>(eventData => new(eventData.TargetId, eventData.NewScore))
+        app.Expects<ReactionsOut.ScoreChangedEvent>()
+           .MapsTo<FeedsIn.ScoreChangedEvent>(payload => new(payload.TargetId, payload.NewScore))
            .ForwardsTo<FeedsModule>();
     }
 

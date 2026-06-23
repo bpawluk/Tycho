@@ -13,8 +13,11 @@ public class AlphaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Forwards<LogBetaRequest, BetaModule>()
-              .Handles<LogAlphaRequest, LogAlphaRequestHandler>();
+        module.Expects<LogAlphaRequest>()
+              .HandlesWith<LogAlphaRequestHandler>();
+
+        module.Expects<LogBetaRequest>()
+              .ForwardsTo<BetaModule>();
     }
 
     protected override void DefineEvents(IModuleEvents module) { }

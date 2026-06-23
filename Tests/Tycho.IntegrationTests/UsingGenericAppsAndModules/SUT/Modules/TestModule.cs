@@ -16,7 +16,8 @@ public class TestModule<TInput, TOutput> : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<ModuleWorkflowRequest, string, ModuleWorkflowRequestHandler<TInput, TOutput>>();
+        module.Expects<ModuleWorkflowRequest, string>()
+              .HandlesWith<ModuleWorkflowRequestHandler<TInput, TOutput>>();
     }
 
     protected override void DefineEvents(IModuleEvents module) { }

@@ -13,7 +13,8 @@ public class BetaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<LogBetaRequest, LogBetaRequestHandler>();
+        module.Expects<LogBetaRequest>()
+              .HandlesWith<LogBetaRequestHandler>();
     }
 
     protected override void DefineEvents(IModuleEvents module) { }

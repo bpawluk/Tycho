@@ -10,8 +10,8 @@ public class TestApp : TychoApp
 {
     protected override void DefineContract(IAppContract app)
     {
-        app.Handles<GetItemQuery, GetItemQuery.Result, GetItemQueryHandler>();
-        app.Handles<DeleteItemCommand, DeleteItemCommandHandler>();
+        app.Expects<GetItemQuery, GetItemQuery.Result>().HandlesWith<GetItemQueryHandler>();
+        app.Expects<DeleteItemCommand>().HandlesWith<DeleteItemCommandHandler>();
     }
     protected override void DefineEvents(IAppEvents app) { }
     protected override void IncludeModules(IAppStructure app) { }

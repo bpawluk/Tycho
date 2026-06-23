@@ -27,15 +27,26 @@ public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
 
     protected override void DefineContract(IAppContract app)
     {
-        app.Handles<GetAppSingletonServiceUsageRequest, int, GetAppSingletonServiceUsageRequestHandler>()
-           .Handles<GetAppScopedServiceUsageRequest, int, GetAppScopedServiceUsageRequestHandler>()
-           .Handles<GetAppTransientServiceUsageRequest, int, GetAppTransientServiceUsageRequestHandler>();
+        app.Expects<BeginTestWorkflowRequest>()
+           .HandlesWith<BeginTestWorkflowRequestHandler>();
 
-        app.Forwards<GetModuleSingletonServiceUsageRequest, int, TestModule>()
-           .Forwards<GetModuleScopedServiceUsageRequest, int, TestModule>()
-           .Forwards<GetModuleTransientServiceUsageRequest, int, TestModule>();
+        app.Expects<GetAppSingletonServiceUsageRequest, int>()
+           .HandlesWith<GetAppSingletonServiceUsageRequestHandler>();
 
-        app.Handles<BeginTestWorkflowRequest, BeginTestWorkflowRequestHandler>();
+        app.Expects<GetAppScopedServiceUsageRequest, int>()
+           .HandlesWith<GetAppScopedServiceUsageRequestHandler>();
+
+        app.Expects<GetAppTransientServiceUsageRequest, int>()
+           .HandlesWith<GetAppTransientServiceUsageRequestHandler>();
+
+        app.Expects<GetModuleSingletonServiceUsageRequest, int>()
+           .ForwardsTo<TestModule>();
+
+        app.Expects<GetModuleScopedServiceUsageRequest, int>()
+           .ForwardsTo<TestModule>();
+
+        app.Expects<GetModuleTransientServiceUsageRequest, int>()
+           .ForwardsTo<TestModule>();
     }
 
     protected override void DefineEvents(IAppEvents app)

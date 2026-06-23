@@ -10,8 +10,8 @@ public class TestModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<GetItemQuery, GetItemQuery.Result, GetItemQueryHandler>();
-        module.Handles<DeleteItemCommand, DeleteItemCommandHandler>();
+        module.Expects<GetItemQuery, GetItemQuery.Result>().HandlesWith<GetItemQueryHandler>();
+        module.Expects<DeleteItemCommand>().HandlesWith<DeleteItemCommandHandler>();
     }
     protected override void DefineEvents(IModuleEvents module) { }
     protected override void IncludeModules(IModuleStructure module) { }

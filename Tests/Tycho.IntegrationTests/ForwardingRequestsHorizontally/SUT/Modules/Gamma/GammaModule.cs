@@ -14,17 +14,23 @@ public class GammaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<Request, RequestHandler>()
-              .Handles<RequestWithResponse, string, RequestHandler>();
+        module.Requires<GammaRequest>();
+        module.Requires<GammaRequestWithResponse, string>();
 
-        module.Requires<Request>()
-              .Requires<RequestWithResponse, string>();
+        module.Requires<Request>();
+        module.Requires<RequestWithResponse, string>();
 
-        module.Handles<GammaRequest, GammaRequestHandler>()
-              .Handles<GammaRequestWithResponse, string, GammaRequestHandler>();
+        module.Expects<GammaRequest>()
+              .HandlesWith<GammaRequestHandler>();
 
-        module.Requires<GammaRequest>()
-              .Requires<GammaRequestWithResponse, string>();
+        module.Expects<GammaRequestWithResponse, string>()
+              .HandlesWith<GammaRequestHandler>();
+
+        module.Expects<Request>()
+              .HandlesWith<RequestHandler>();
+
+        module.Expects<RequestWithResponse, string>()
+              .HandlesWith<RequestHandler>();
     }
 
     protected override void DefineEvents(IModuleEvents module) { }

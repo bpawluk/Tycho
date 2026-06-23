@@ -13,7 +13,8 @@ public partial class SecurityModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<GetSecurityEventsRequest, GetSecurityEventsRequest.Response, GetSecurityEventsRequestHandler>();
+        module.Expects<GetSecurityEventsRequest, GetSecurityEventsRequest.Response>()
+              .HandlesWith<GetSecurityEventsRequestHandler>();
     }
 
     protected override void DefineEvents(IModuleEvents module)

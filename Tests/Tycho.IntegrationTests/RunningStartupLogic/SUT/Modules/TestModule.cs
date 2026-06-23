@@ -14,7 +14,8 @@ public class TestModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<GetModuleValueRequest, string, GetValueRequestHandler>();
+        module.Expects<GetModuleValueRequest, string>()
+              .HandlesWith<GetValueRequestHandler>();
     }
 
     protected override void DefineEvents(IModuleEvents module) { }

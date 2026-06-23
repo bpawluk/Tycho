@@ -16,14 +16,23 @@ public partial class ContentModerationApp : TychoApp
 {
     protected override void DefineContract(IAppContract app)
     {
-        app.Forwards<AddUserRequest, AddUserRequest.Response, UsersModule>()
-           .Forwards<GetUsersRequest, GetUsersRequest.Response, UsersModule>();
+        app.Expects<AddUserRequest, AddUserRequest.Response>()
+           .ForwardsTo<UsersModule>();
 
-        app.Forwards<AddPostRequest, AddPostRequest.Response, PostsModule>()
-           .Forwards<GetPostRequest, GetPostRequest.Response, PostsModule>()
-           .Forwards<GetPostsRequest, GetPostsRequest.Response, PostsModule>();
+        app.Expects<GetUsersRequest, GetUsersRequest.Response>()
+           .ForwardsTo<UsersModule>();
 
-        app.Forwards<RemovePostRequest, AdminModule>();
+        app.Expects<AddPostRequest, AddPostRequest.Response>()
+           .ForwardsTo<PostsModule>();
+
+        app.Expects<GetPostRequest, GetPostRequest.Response>()
+           .ForwardsTo<PostsModule>();
+
+        app.Expects<GetPostsRequest, GetPostsRequest.Response>()
+           .ForwardsTo<PostsModule>();
+
+        app.Expects<RemovePostRequest>()
+           .ForwardsTo<AdminModule>();
     }
 
     protected override void DefineEvents(IAppEvents app)

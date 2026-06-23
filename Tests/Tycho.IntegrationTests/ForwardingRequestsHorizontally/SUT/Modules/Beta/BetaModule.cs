@@ -14,17 +14,23 @@ public class BetaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<Request, RequestHandler>()
-              .Handles<RequestWithResponse, string, RequestHandler>();
+        module.Requires<BetaRequest>();
+        module.Requires<BetaRequestWithResponse, string>();
 
-        module.Requires<Request>()
-              .Requires<RequestWithResponse, string>();
+        module.Requires<Request>();
+        module.Requires<RequestWithResponse, string>();
 
-        module.Handles<BetaRequest, BetaRequestHandler>()
-              .Handles<BetaRequestWithResponse, string, BetaRequestHandler>();
+        module.Expects<BetaRequest>()
+              .HandlesWith<BetaRequestHandler>();
 
-        module.Requires<BetaRequest>()
-              .Requires<BetaRequestWithResponse, string>();
+        module.Expects<BetaRequestWithResponse, string>()
+              .HandlesWith<BetaRequestHandler>();
+
+        module.Expects<Request>()
+              .HandlesWith<RequestHandler>();
+
+        module.Expects<RequestWithResponse, string>()
+              .HandlesWith<RequestHandler>();
     }
 
     protected override void DefineEvents(IModuleEvents module) { }

@@ -13,20 +13,27 @@ public class AlphaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Forwards<Request, BetaModule>()
-              .Forwards<RequestWithResponse, string, BetaModule>();
+        module.Requires<AlphaRequest>();
+        module.Requires<AlphaRequestWithResponse, string>();
 
-        module.Requires<Request>()
-              .Requires<RequestWithResponse, string>();
+        module.Requires<Request>();
+        module.Requires<RequestWithResponse, string>();
 
-        module.ForwardsAs<AlphaRequest, BetaRequest, BetaModule>(
-                  requestData => new(requestData.Result))
-              .ForwardsAs<AlphaRequestWithResponse, string, BetaRequestWithResponse, string, BetaModule>(
-                  requestData => new(requestData.Result),
-                  response => response);
+        module.Expects<AlphaRequest>()
+              .MapsTo<BetaRequest>(request => new(request.Result))
+              .ForwardsTo<BetaModule>();
 
-        module.Requires<AlphaRequest>()
-              .Requires<AlphaRequestWithResponse, string>();
+        module.Expects<AlphaRequestWithResponse, string>()
+              .MapsTo<BetaRequestWithResponse, string>(
+                  request => new(request.Result),
+                  response => response)
+              .ForwardsTo<BetaModule>();
+
+        module.Expects<Request>()
+              .ForwardsTo<BetaModule>();
+
+        module.Expects<RequestWithResponse, string>()
+              .ForwardsTo<BetaModule>();
     }
 
     protected override void DefineEvents(IModuleEvents module) { }

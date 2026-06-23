@@ -12,11 +12,16 @@ public partial class CatalogModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<CreateProductRequest, CreateProductRequest.Response, CreateProductRequestHandler>()
-              .Handles<GetProductsRequest, GetProductsRequest.Response, GetProductsRequestHandler>()
-              .Handles<BuyProductRequest, BuyProductRequestHandler>();
-
         module.Requires<AddProductToBasketRequest>();
+
+        module.Expects<CreateProductRequest, CreateProductRequest.Response>()
+              .HandlesWith<CreateProductRequestHandler>();
+
+        module.Expects<GetProductsRequest, GetProductsRequest.Response>()
+              .HandlesWith<GetProductsRequestHandler>();
+
+        module.Expects<BuyProductRequest>()
+              .HandlesWith<BuyProductRequestHandler>();
     }
 
     protected override void DefineEvents(IModuleEvents module)

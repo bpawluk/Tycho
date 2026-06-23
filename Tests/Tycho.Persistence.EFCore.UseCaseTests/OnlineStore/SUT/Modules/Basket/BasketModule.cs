@@ -12,11 +12,20 @@ public partial class BasketModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<AddBasketItemRequest, AddBasketItemRequestHandler>()
-              .Handles<ConfirmBasketItemRequest, ConfirmBasketItemRequestHandler>()
-              .Handles<DeclineBasketItemRequest, DeclineBasketItemRequestHandler>()
-              .Handles<GetBasketRequest, GetBasketRequest.Response, GetBasketRequestHandler>()
-              .Handles<CheckoutRequest, CheckoutRequestHandler>();
+        module.Expects<AddBasketItemRequest>()
+              .HandlesWith<AddBasketItemRequestHandler>();
+
+        module.Expects<ConfirmBasketItemRequest>()
+              .HandlesWith<ConfirmBasketItemRequestHandler>();
+
+        module.Expects<DeclineBasketItemRequest>()
+              .HandlesWith<DeclineBasketItemRequestHandler>();
+
+        module.Expects<GetBasketRequest, GetBasketRequest.Response>()
+              .HandlesWith<GetBasketRequestHandler>();
+
+        module.Expects<CheckoutRequest>()
+              .HandlesWith<CheckoutRequestHandler>();
     }
 
     protected override void DefineEvents(IModuleEvents module)

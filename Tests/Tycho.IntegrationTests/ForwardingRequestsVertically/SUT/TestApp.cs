@@ -24,14 +24,21 @@ public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
 
     protected override void DefineContract(IAppContract app)
     {
-        app.Forwards<Request, AlphaModule>()
-           .Forwards<RequestWithResponse, string, AlphaModule>();
+        app.Expects<Request>()
+           .ForwardsTo<AlphaModule>();
 
-        app.ForwardsAs<RequestToMap, AlphaRequest, AlphaModule>(
-                requestData => new(requestData.Result))
-           .ForwardsAs<RequestToMapWithResponse, Response, AlphaRequestWithResponse, string, AlphaModule>(
-                requestData => new(requestData.Result),
-                response => new(response));
+        app.Expects<RequestWithResponse, string>()
+           .ForwardsTo<AlphaModule>();
+
+        app.Expects<RequestToMap>()
+           .MapsTo<AlphaRequest>(request => new(request.Result))
+           .ForwardsTo<AlphaModule>();
+
+        app.Expects<RequestToMapWithResponse, Response>()
+           .MapsTo<AlphaRequestWithResponse, string>(
+                request => new(request.Result),
+                response => new(response))
+           .ForwardsTo<AlphaModule>();
     }
 
     protected override void DefineEvents(IAppEvents app) { }

@@ -13,7 +13,8 @@ public partial class ClimateModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<GetTemperatureReadingsRequest, GetTemperatureReadingsRequest.Response, GetTemperatureReadingsRequestHandler>();
+        module.Expects<GetTemperatureReadingsRequest, GetTemperatureReadingsRequest.Response>()
+              .HandlesWith<GetTemperatureReadingsRequestHandler>();
     }
 
     protected override void DefineEvents(IModuleEvents module)

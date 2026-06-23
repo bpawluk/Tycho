@@ -18,8 +18,11 @@ public class TestApp<TInput, TOutput> : TychoApp
 {
     protected override void DefineContract(IAppContract app)
     {
-        app.Handles<AppWorkflowRequest, string, AppWorkflowRequestHandler<TInput, TOutput>>()
-           .Forwards<ModuleWorkflowRequest, string, TestModule<ModuleInput, ModuleOutput>>();
+        app.Expects<AppWorkflowRequest, string>()
+           .HandlesWith<AppWorkflowRequestHandler<TInput, TOutput>>();
+
+        app.Expects<ModuleWorkflowRequest, string>()
+           .ForwardsTo<TestModule<ModuleInput, ModuleOutput>>();
     }
 
     protected override void DefineEvents(IAppEvents app) { }

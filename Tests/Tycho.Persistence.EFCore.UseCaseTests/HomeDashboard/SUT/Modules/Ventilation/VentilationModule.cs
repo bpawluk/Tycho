@@ -13,7 +13,8 @@ public partial class VentilationModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<GetAirQualityReadingsRequest, GetAirQualityReadingsRequest.Response, GetAirQualityReadingsRequestHandler>();
+        module.Expects<GetAirQualityReadingsRequest, GetAirQualityReadingsRequest.Response>()
+              .HandlesWith<GetAirQualityReadingsRequestHandler>();
     }
 
     protected override void DefineEvents(IModuleEvents module)

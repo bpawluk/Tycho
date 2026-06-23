@@ -18,11 +18,17 @@ public partial class HomeDashboardApp : TychoApp
 {
     protected override void DefineContract(IAppContract app)
     {
-        app.Handles<SetReadingRequest, SetReadingRequestHandler>();
+        app.Expects<SetReadingRequest>()
+           .HandlesWith<SetReadingRequestHandler>();
 
-        app.Forwards<GetTemperatureReadingsRequest, GetTemperatureReadingsRequest.Response, ClimateModule>()
-           .Forwards<GetAirQualityReadingsRequest, GetAirQualityReadingsRequest.Response, VentilationModule>()
-           .Forwards<GetSecurityEventsRequest, GetSecurityEventsRequest.Response, SecurityModule>();
+        app.Expects<GetTemperatureReadingsRequest, GetTemperatureReadingsRequest.Response>()
+           .ForwardsTo<ClimateModule>();
+
+        app.Expects<GetAirQualityReadingsRequest, GetAirQualityReadingsRequest.Response>()
+           .ForwardsTo<VentilationModule>();
+
+        app.Expects<GetSecurityEventsRequest, GetSecurityEventsRequest.Response>()
+           .ForwardsTo<SecurityModule>();
     }
 
     protected override void DefineEvents(IAppEvents app)

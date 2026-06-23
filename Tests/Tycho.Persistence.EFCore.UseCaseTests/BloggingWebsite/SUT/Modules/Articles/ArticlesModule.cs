@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
-using Tycho.Persistence.EFCore;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Handlers;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Articles.Persistence;
@@ -12,8 +11,11 @@ public partial class ArticlesModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<AddArticleRequest, AddArticleRequest.Response, AddArticleRequestHandler>()
-              .Handles<GetArticlesRequest, GetArticlesRequest.Response, GetArticlesRequestHandler>();
+        module.Expects<AddArticleRequest, AddArticleRequest.Response>()
+              .HandlesWith<AddArticleRequestHandler>();
+
+        module.Expects<GetArticlesRequest, GetArticlesRequest.Response>()
+              .HandlesWith<GetArticlesRequestHandler>();
     }
 
     protected override void DefineEvents(IModuleEvents module) { }

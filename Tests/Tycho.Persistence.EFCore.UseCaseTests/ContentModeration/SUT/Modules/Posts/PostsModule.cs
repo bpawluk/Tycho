@@ -11,9 +11,14 @@ public partial class PostsModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<AddPostRequest, AddPostRequest.Response, AddPostRequestHandler>()
-              .Handles<GetPostRequest, GetPostRequest.Response, GetPostRequestHandler>()
-              .Handles<GetPostsRequest, GetPostsRequest.Response, GetPostsRequestHandler>();
+        module.Expects<AddPostRequest, AddPostRequest.Response>()
+              .HandlesWith<AddPostRequestHandler>();
+
+        module.Expects<GetPostRequest, GetPostRequest.Response>()
+              .HandlesWith<GetPostRequestHandler>();
+
+        module.Expects<GetPostsRequest, GetPostsRequest.Response>()
+              .HandlesWith<GetPostsRequestHandler>();
     }
 
     protected override void DefineEvents(IModuleEvents module)

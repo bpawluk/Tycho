@@ -25,11 +25,16 @@ public class TestModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<GetModuleSingletonServiceUsageRequest, int, GetModuleSingletonServiceUsageRequestHandler>()
-              .Handles<GetModuleScopedServiceUsageRequest, int, GetModuleScopedServiceUsageRequestHandler>()
-              .Handles<GetModuleTransientServiceUsageRequest, int, GetModuleTransientServiceUsageRequestHandler>();
-
         module.Requires<EndTestWorkflowRequest>();
+
+        module.Expects<GetModuleSingletonServiceUsageRequest, int>()
+              .HandlesWith<GetModuleSingletonServiceUsageRequestHandler>();
+
+        module.Expects<GetModuleScopedServiceUsageRequest, int>()
+              .HandlesWith<GetModuleScopedServiceUsageRequestHandler>();
+
+        module.Expects<GetModuleTransientServiceUsageRequest, int>()
+              .HandlesWith<GetModuleTransientServiceUsageRequestHandler>();
     }
 
     protected override void DefineEvents(IModuleEvents module)

@@ -14,8 +14,11 @@ public class AlphaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Forwards<GetBetaValueRequest, string, BetaModule>()
-              .Handles<GetAlphaValueRequest, string, GetValueRequestHandler>();
+        module.Expects<GetAlphaValueRequest, string>()
+              .HandlesWith<GetValueRequestHandler>();
+
+        module.Expects<GetBetaValueRequest, string>()
+              .ForwardsTo<BetaModule>();
     }
 
     protected override void DefineEvents(IModuleEvents module) { }

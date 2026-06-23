@@ -11,8 +11,11 @@ public partial class UsersModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<AddUserRequest, AddUserRequest.Response, AddUserRequestHandler>()
-              .Handles<GetUsersRequest, GetUsersRequest.Response, GetUsersRequestHandler>();
+        module.Expects<AddUserRequest, AddUserRequest.Response>()
+              .HandlesWith<AddUserRequestHandler>();
+
+        module.Expects<GetUsersRequest, GetUsersRequest.Response>()
+              .HandlesWith<GetUsersRequestHandler>();
     }
 
     protected override void DefineEvents(IModuleEvents module)

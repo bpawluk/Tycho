@@ -14,7 +14,8 @@ public class BetaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<GetBetaValueRequest, string, GetValueRequestHandler>();
+        module.Expects<GetBetaValueRequest, string>()
+              .HandlesWith<GetValueRequestHandler>();
     }
 
     protected override void DefineEvents(IModuleEvents module) { }

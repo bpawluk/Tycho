@@ -35,10 +35,17 @@ public class TestApp(
 
     protected override void DefineContract(IAppContract app)
     {
-        app.Handles<PublishGenericAppIntEventRequest, GenericEventWorkflowRequestHandler>();
-        app.Handles<PublishGenericAppStringEventRequest, GenericEventWorkflowRequestHandler>();
-        app.Handles<PublishGenericForwardedIntEventRequest, GenericEventWorkflowRequestHandler>();
-        app.Handles<PublishGenericForwardedStringEventRequest, GenericEventWorkflowRequestHandler>();
+        app.Expects<PublishGenericAppIntEventRequest>()
+           .HandlesWith<GenericEventWorkflowRequestHandler>();
+
+        app.Expects<PublishGenericAppStringEventRequest>()
+           .HandlesWith<GenericEventWorkflowRequestHandler>();
+
+        app.Expects<PublishGenericForwardedIntEventRequest>()
+           .HandlesWith<GenericEventWorkflowRequestHandler>();
+
+        app.Expects<PublishGenericForwardedStringEventRequest>()
+           .HandlesWith<GenericEventWorkflowRequestHandler>();
     }
 
     protected override void DefineEvents(IAppEvents app)
@@ -50,11 +57,11 @@ public class TestApp(
            .HandlesWith<GenericAppEventHandler<string>>();
 
         app.Expects<GenericAppEventToForward<int>>()
-           .MapsTo<GenericModuleEvent<int>>(eventData => new(eventData.Data))
+           .MapsTo<GenericModuleEvent<int>>(payload => new(payload.Data))
            .ForwardsTo<TestModule>();
 
         app.Expects<GenericAppEventToForward<string>>()
-           .MapsTo<GenericModuleEvent<string>>(eventData => new(eventData.Data))
+           .MapsTo<GenericModuleEvent<string>>(payload => new(payload.Data))
            .ForwardsTo<TestModule>();
 
         app.Expects<GenericAppForwardedEvent<int>>()

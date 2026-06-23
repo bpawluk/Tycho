@@ -26,7 +26,7 @@ public class GammaModule : TychoModule
               .HandlesWith<GammaWorkflowStartedEventHandler>();
 
         module.Expects<GammaWorkflowFinishedEvent>()
-              .MapsTo<BetaWorkflowFinishedEvent>(eventData => new(eventData.Result))
+              .MapsTo<BetaWorkflowFinishedEvent>(payload => new(payload.Result))
               .Exposes();
     }
 

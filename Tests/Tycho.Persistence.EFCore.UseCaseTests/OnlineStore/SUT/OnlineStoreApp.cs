@@ -21,16 +21,26 @@ public partial class OnlineStoreApp : TychoApp
 {
     protected override void DefineContract(IAppContract app)
     {
-        app.Forwards<CreateProductRequest, CreateProductRequest.Response, CatalogModule>()
-           .Forwards<GetProductsRequest, GetProductsRequest.Response, CatalogModule>()
-           .Forwards<BuyProductRequest, CatalogModule>();
+        app.Expects<CreateProductRequest, CreateProductRequest.Response>()
+           .ForwardsTo<CatalogModule>();
 
-        app.Forwards<StockItemRequest, InventoryModule>();
+        app.Expects<GetProductsRequest, GetProductsRequest.Response>()
+           .ForwardsTo<CatalogModule>();
 
-        app.Forwards<GetBasketRequest, GetBasketRequest.Response, BasketModule>()
-           .Forwards<CheckoutRequest, BasketModule>();
+        app.Expects<BuyProductRequest>()
+           .ForwardsTo<CatalogModule>();
 
-        app.Forwards<GetOrdersRequest, GetOrdersRequest.Response, OrderingModule>();
+        app.Expects<StockItemRequest>()
+           .ForwardsTo<InventoryModule>();
+
+        app.Expects<GetBasketRequest, GetBasketRequest.Response>()
+           .ForwardsTo<BasketModule>();
+
+        app.Expects<CheckoutRequest>()
+           .ForwardsTo<BasketModule>();
+
+        app.Expects<GetOrdersRequest, GetOrdersRequest.Response>()
+           .ForwardsTo<OrderingModule>();
     }
 
     protected override void DefineEvents(IAppEvents app)

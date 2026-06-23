@@ -13,7 +13,8 @@ public class TestApp : TychoApp
 {
     protected override void DefineContract(IAppContract app)
     {
-        app.Handles<TestRequest, string, TestRequestHandler>();
+        app.Expects<TestRequest, string>()
+           .HandlesWith<TestRequestHandler>();
     }
 
     protected override void DefineEvents(IAppEvents app) { }

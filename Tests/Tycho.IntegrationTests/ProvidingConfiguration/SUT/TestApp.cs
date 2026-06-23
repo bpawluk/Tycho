@@ -15,9 +15,14 @@ public class TestApp : TychoApp
 {
     protected override void DefineContract(IAppContract app)
     {
-        app.Forwards<GetAlphaValueRequest, string, AlphaModule>()
-           .Forwards<GetBetaValueRequest, string, BetaModule>()
-           .Handles<GetAppValueRequest, string, GetValueRequestHandler>();
+        app.Expects<GetAppValueRequest, string>()
+           .HandlesWith<GetValueRequestHandler>();
+
+        app.Expects<GetAlphaValueRequest, string>()
+           .ForwardsTo<AlphaModule>();
+
+        app.Expects<GetBetaValueRequest, string>()
+           .ForwardsTo<BetaModule>();
     }
 
     protected override void DefineEvents(IAppEvents app) { }

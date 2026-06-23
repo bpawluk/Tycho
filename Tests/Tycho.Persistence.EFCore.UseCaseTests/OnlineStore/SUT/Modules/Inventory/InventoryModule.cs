@@ -12,8 +12,11 @@ public partial class InventoryModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<StockItemRequest, StockItemRequestHandler>()
-              .Handles<ReserveItemRequest, ReserveItemRequest.Response, ReserveItemRequestHandler>();
+        module.Expects<StockItemRequest>()
+              .HandlesWith<StockItemRequestHandler>();
+
+        module.Expects<ReserveItemRequest, ReserveItemRequest.Response>()
+              .HandlesWith<ReserveItemRequestHandler>();
     }
 
     protected override void DefineEvents(IModuleEvents module)

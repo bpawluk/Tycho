@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Tycho.Utils.SourceGenerator.Models.System;
-using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
@@ -9,15 +8,12 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
     {
         private const string Namespace = "Tycho.Modules";
         private const string TypeName = "IModuleContract";
+        private const string RequestExpectationTypeName = "IModuleRequestExpectation";
 
         public static HashSet<MethodSignatureModel> DownstreamContractDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
         {
-            ForwardsMethodSignature,
-            ForwardsWithResponseMethodSignature,
-            ForwardsAsMethodSignature,
-            ForwardsAsWithResponseMethodSignature,
-            HandlesMethodSignature,
-            HandlesWithResponseMethodSignature,
+            ExpectsMethodSignature,
+            ExpectsWithResponseMethodSignature,
         });
 
         public static HashSet<MethodSignatureModel> UpstreamContractDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
@@ -31,42 +27,40 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
 
         public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
 
-        public static MethodSignatureModel ForwardsMethodSignature => new MethodSignatureModel(
-            methodName: "Forwards",
-            parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
-            result: TypeModel);
-
-        public static MethodSignatureModel ForwardsWithResponseMethodSignature => new MethodSignatureModel(
-            methodName: "Forwards",
-            parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
-            result: TypeModel);
-
-        public static MethodSignatureModel ForwardsAsMethodSignature => new MethodSignatureModel(
-            methodName: "ForwardsAs",
-            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
+        public static TypeReferenceModel RequestExpectationTypeModel => new TypeReferenceModel(
+            Namespace,
+            ImmutableEquatableArray<TypeReferenceModel>.Empty,
+            RequestExpectationTypeName,
+            new ImmutableEquatableArray<TypeArgumentModel>(new[]
             {
-                FuncReference.TypeModel,
-            }),
-            result: TypeModel);
+                new TypeArgumentModel(
+                    RequestTypeParameterName,
+                    new TypeReferenceModel(Namespace, RequestTypeParameterName)),
+            }));
 
-        public static MethodSignatureModel ForwardsAsWithResponseMethodSignature => new MethodSignatureModel(
-            methodName: "ForwardsAs",
-            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
+        public static TypeReferenceModel RequestExpectationWithResponseTypeModel => new TypeReferenceModel(
+            Namespace,
+            ImmutableEquatableArray<TypeReferenceModel>.Empty,
+            RequestExpectationTypeName,
+            new ImmutableEquatableArray<TypeArgumentModel>(new[]
             {
-                FuncReference.TypeModel,
-                FuncReference.TypeModel,
-            }),
-            result: TypeModel);
+                new TypeArgumentModel(
+                    RequestTypeParameterName,
+                    new TypeReferenceModel(Namespace, RequestTypeParameterName)),
+                new TypeArgumentModel(
+                    ResponseTypeParameterName,
+                    new TypeReferenceModel(Namespace, ResponseTypeParameterName)),
+            }));
 
-        public static MethodSignatureModel HandlesMethodSignature => new MethodSignatureModel(
-            methodName: "Handles",
+        public static MethodSignatureModel ExpectsMethodSignature => new MethodSignatureModel(
+            methodName: "Expects",
             parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
-            result: TypeModel);
+            result: RequestExpectationTypeModel);
 
-        public static MethodSignatureModel HandlesWithResponseMethodSignature => new MethodSignatureModel(
-            methodName: "Handles",
+        public static MethodSignatureModel ExpectsWithResponseMethodSignature => new MethodSignatureModel(
+            methodName: "Expects",
             parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
-            result: TypeModel);
+            result: RequestExpectationWithResponseTypeModel);
 
         public static MethodSignatureModel RequiresMethodSignature => new MethodSignatureModel(
             methodName: "Requires",

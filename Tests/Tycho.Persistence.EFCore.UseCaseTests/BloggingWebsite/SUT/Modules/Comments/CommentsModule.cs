@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
-using Tycho.Persistence.EFCore;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Handlers;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Persistence;
@@ -12,8 +11,11 @@ public partial class CommentsModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<AddCommentRequest, AddCommentRequest.Response, AddCommentRequestHandler>()
-              .Handles<GetCommentsRequest, GetCommentsRequest.Response, GetCommentsRequestHandler>();
+        module.Expects<AddCommentRequest, AddCommentRequest.Response>()
+              .HandlesWith<AddCommentRequestHandler>();
+
+        module.Expects<GetCommentsRequest, GetCommentsRequest.Response>()
+              .HandlesWith<GetCommentsRequestHandler>();
     }
 
     protected override void DefineEvents(IModuleEvents module) { }

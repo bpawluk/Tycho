@@ -12,9 +12,10 @@ public partial class AdminModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<RemovePostRequest, RemovePostRequestHandler>();
-
         module.Requires<GetAuthorRequest, GetAuthorRequest.Response>();
+
+        module.Expects<RemovePostRequest>()
+              .HandlesWith<RemovePostRequestHandler>();
     }
 
     protected override void DefineEvents(IModuleEvents module)

@@ -24,7 +24,8 @@ public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
 
     protected override void DefineContract(IAppContract app)
     {
-        app.Handles<BeginTestWorkflowRequest, BeginTestWorkflowRequestHandler>();
+        app.Expects<BeginTestWorkflowRequest>()
+           .HandlesWith<BeginTestWorkflowRequestHandler>();
     }
 
     protected override void DefineEvents(IAppEvents app)
@@ -36,7 +37,7 @@ public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
            .HandlesWith<WorkflowFinishedEventHandler>();
 
         app.Expects<WorkflowWithMappingStartedEvent>()
-           .MapsTo<AlphaWorkflowStartedEvent>(eventData => new(eventData.Result))
+           .MapsTo<AlphaWorkflowStartedEvent>(payload => new(payload.Result))
            .ForwardsTo<AlphaModule>();
 
         app.Expects<WorkflowWithMappingFinishedEvent>()

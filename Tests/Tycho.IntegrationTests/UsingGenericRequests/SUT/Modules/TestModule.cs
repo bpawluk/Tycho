@@ -22,11 +22,15 @@ public class TestModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<GenericModuleRequest<int>, GenericModuleRequest<int>.Response<int>, GenericModuleRequestHandler<int>>();
-        module.Handles<GenericModuleRequest<string>, GenericModuleRequest<string>.Response<string>, GenericModuleRequestHandler<string>>();
-
         module.Requires<GenericModuleRequiredRequest<int>, GenericModuleRequiredRequest<int>.Response<int>>();
         module.Requires<GenericModuleRequiredRequest<string>, GenericModuleRequiredRequest<string>.Response<string>>();
+
+        module.Expects<GenericModuleRequest<int>, GenericModuleRequest<int>.Response<int>>()
+              .HandlesWith<GenericModuleRequestHandler<int>>();
+
+        module.Expects<GenericModuleRequest<string>, GenericModuleRequest<string>.Response<string>>()
+              .HandlesWith<GenericModuleRequestHandler<string>>();
+
     }
 
     protected override void DefineEvents(IModuleEvents module) { }

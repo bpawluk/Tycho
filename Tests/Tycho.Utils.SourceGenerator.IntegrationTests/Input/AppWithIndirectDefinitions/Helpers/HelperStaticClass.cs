@@ -8,12 +8,12 @@ internal static class HelperStaticClass
 {
     public static void DefineContract(IAppContract app)
     {
-        app.Handles<TestRequestFromHelperStaticClass, string, TestRequestHandler>();
+        app.Expects<TestRequestFromHelperStaticClass, string>().HandlesWith<TestRequestHandler>();
     }
 
     public static void DefineContractFromExtension(this IAppContract app)
     {
-        app.Handles<TestRequestFromHelperExtension, string, TestRequestHandler>();
+        app.Expects<TestRequestFromHelperExtension, string>().HandlesWith<TestRequestHandler>();
     }
 
     public static void DefineEvents(IAppEvents app)

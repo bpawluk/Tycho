@@ -8,7 +8,7 @@ internal class HelperClass
 {
     public void DefineContract(IAppContract app)
     {
-        app.Handles<TestRequestFromHelperClass, string, TestRequestHandler>();
+        app.Expects<TestRequestFromHelperClass, string>().HandlesWith<TestRequestHandler>();
     }
 
     public void DefineEvents(IAppEvents app)

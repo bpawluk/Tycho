@@ -18,8 +18,11 @@ public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
 
     protected override void DefineContract(IAppContract app)
     {
-        app.Handles<Request, RequestHandler>()
-           .Handles<RequestWithResponse, string, RequestHandler>();
+        app.Expects<Request>()
+           .HandlesWith<RequestHandler>();
+
+        app.Expects<RequestWithResponse, string>()
+           .HandlesWith<RequestHandler>();
     }
 
     protected override void DefineEvents(IAppEvents app) { }

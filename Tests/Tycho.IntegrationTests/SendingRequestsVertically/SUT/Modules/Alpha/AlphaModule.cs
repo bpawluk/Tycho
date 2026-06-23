@@ -19,11 +19,14 @@ public class AlphaModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<AlphaInRequest, AlphaInRequestHandler>()
-              .Handles<AlphaInRequestWithResponse, string, AlphaInRequestHandler>();
+        module.Requires<AlphaOutRequest>();
+        module.Requires<AlphaOutRequestWithResponse, string>();
 
-        module.Requires<AlphaOutRequest>()
-              .Requires<AlphaOutRequestWithResponse, string>();
+        module.Expects<AlphaInRequest>()
+              .HandlesWith<AlphaInRequestHandler>();
+
+        module.Expects<AlphaInRequestWithResponse, string>()
+              .HandlesWith<AlphaInRequestHandler>();
     }
 
     protected override void DefineEvents(IModuleEvents module) { }

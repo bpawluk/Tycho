@@ -23,22 +23,23 @@ public class TestApp : TychoApp
 {
     protected override void DefineContract(IAppContract app)
     {
-        app.Handles<GenericAppRequest<int>, GenericAppRequest<int>.Response<int>, GenericAppRequestHandler<int>>();
-        app.Handles<GenericAppRequest<string>, GenericAppRequest<string>.Response<string>, GenericAppRequestHandler<string>>();
+        app.Expects<GenericAppRequest<int>, GenericAppRequest<int>.Response<int>>()
+           .HandlesWith<GenericAppRequestHandler<int>>();
 
-        app.ForwardsAs<
-            GenericAppRequestToForward<int>, GenericAppRequestToForward<int>.Response<int>,
-            GenericModuleRequest<int>, GenericModuleRequest<int>.Response<int>,
-            TestModule>(
-                request => new GenericModuleRequest<int>(request.Data),
-                response => new GenericAppRequestToForward<int>.Response<int>(response.Data));
+        app.Expects<GenericAppRequest<string>, GenericAppRequest<string>.Response<string>>()
+           .HandlesWith<GenericAppRequestHandler<string>>();
 
-        app.ForwardsAs<
-            GenericAppRequestToForward<string>, GenericAppRequestToForward<string>.Response<string>,
-            GenericModuleRequest<string>, GenericModuleRequest<string>.Response<string>,
-            TestModule>(
-                request => new GenericModuleRequest<string>(request.Data),
-                response => new GenericAppRequestToForward<string>.Response<string>(response.Data));
+        app.Expects<GenericAppRequestToForward<int>, GenericAppRequestToForward<int>.Response<int>>()
+           .MapsTo<GenericModuleRequest<int>, GenericModuleRequest<int>.Response<int>>(
+               request => new GenericModuleRequest<int>(request.Data),
+               response => new GenericAppRequestToForward<int>.Response<int>(response.Data))
+           .ForwardsTo<TestModule>();
+
+        app.Expects<GenericAppRequestToForward<string>, GenericAppRequestToForward<string>.Response<string>>()
+           .MapsTo<GenericModuleRequest<string>, GenericModuleRequest<string>.Response<string>>(
+               request => new GenericModuleRequest<string>(request.Data),
+               response => new GenericAppRequestToForward<string>.Response<string>(response.Data))
+           .ForwardsTo<TestModule>();
     }
 
     protected override void DefineEvents(IAppEvents app) { }

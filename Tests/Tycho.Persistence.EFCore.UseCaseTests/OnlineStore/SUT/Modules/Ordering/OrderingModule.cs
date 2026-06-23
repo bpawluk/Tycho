@@ -11,7 +11,8 @@ public partial class OrderingModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
-        module.Handles<GetOrdersRequest, GetOrdersRequest.Response, GetOrdersRequestHandler>();
+        module.Expects<GetOrdersRequest, GetOrdersRequest.Response>()
+              .HandlesWith<GetOrdersRequestHandler>();
     }
 
     protected override void DefineEvents(IModuleEvents module)

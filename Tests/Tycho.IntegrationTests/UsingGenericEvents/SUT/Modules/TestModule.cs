@@ -23,11 +23,11 @@ public class TestModule : TychoModule
               .HandlesWith<GenericModuleEventHandler<string>>();
 
         module.Expects<GenericModuleFinishedEvent<int>>()
-              .MapsTo<GenericAppForwardedEvent<int>>(eventData => new(eventData.Data))
+              .MapsTo<GenericAppForwardedEvent<int>>(payload => new(payload.Data))
               .Exposes();
 
         module.Expects<GenericModuleFinishedEvent<string>>()
-              .MapsTo<GenericAppForwardedEvent<string>>(eventData => new(eventData.Data))
+              .MapsTo<GenericAppForwardedEvent<string>>(payload => new(payload.Data))
               .Exposes();
     }
 

@@ -60,7 +60,7 @@ public class TestApp : TychoApp
 
     private void DefineContractFromLocalHelper(IAppContract app)
     {
-        app.Handles<TestRequestFromLocalHelper, string, TestRequestHandler>();
+        app.Expects<TestRequestFromLocalHelper, string>().HandlesWith<TestRequestHandler>();
     }
 
     private void DefineEventsFromLocalHelper(IAppEvents app)
@@ -75,7 +75,7 @@ public class TestApp : TychoApp
 
     private static void DefineContractFromLocalStaticHelper(IAppContract app)
     {
-        app.Handles<TestRequestFromLocalStaticHelper, string, TestRequestHandler>();
+        app.Expects<TestRequestFromLocalStaticHelper, string>().HandlesWith<TestRequestHandler>();
     }
 
     private static void DefineEventsFromLocalStaticHelper(IAppEvents app)
