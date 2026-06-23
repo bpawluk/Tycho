@@ -15,19 +15,19 @@ public class AlphaModule : TychoModule
 
     protected override void DefineEvents(IModuleEvents module)
     {
-        module.Routes<WorkflowStartedEvent>()
-              .Forwards<BetaModule>();
+        module.Expects<WorkflowStartedEvent>()
+              .ForwardsTo<BetaModule>();
 
-        module.Routes<WorkflowFinishedEvent>()
+        module.Expects<WorkflowFinishedEvent>()
               .Exposes();
 
-        module.Routes<AlphaWorkflowStartedEvent>()
-              .ForwardsAs<BetaWorkflowStartedEvent, BetaModule>(
-                  eventData => new(eventData.Result));
+        module.Expects<AlphaWorkflowStartedEvent>()
+              .MapsTo<BetaWorkflowStartedEvent>(eventData => new(eventData.Result))
+              .ForwardsTo<BetaModule>();
 
-        module.Routes<AlphaWorkflowFinishedEvent>()
-              .ExposesAs<WorkflowWithMappingFinishedEvent>(
-                  eventData => new(eventData.Result));
+        module.Expects<AlphaWorkflowFinishedEvent>()
+              .MapsTo<WorkflowWithMappingFinishedEvent>(eventData => new(eventData.Result))
+              .Exposes();
     }
 
     protected override void IncludeModules(IModuleStructure module)

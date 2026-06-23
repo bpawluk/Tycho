@@ -14,6 +14,7 @@ using Tycho.Events.Registrating;
 using Tycho.Events.Serialization;
 using Tycho.Structure;
 using Tycho.Transactions;
+using Tycho.Utils;
 
 namespace Tycho.Modules.Setup
 {
@@ -38,18 +39,10 @@ namespace Tycho.Modules.Setup
             _parentEventBroker = parentEventBroker;
         }
 
-        public IModuleEvents Handles<TEvent, THandler>()
-            where TEvent : class, IEvent
-            where THandler : class, IEventHandler<TEvent>
-        {
-            _registrator.HandleEvent<TEvent, THandler>();
-            return this;
-        }
-
-        public IEventRouting<TEvent> Routes<TEvent>()
+        public IModuleEventExpectation<TEvent> Expects<TEvent>()
             where TEvent : class, IEvent
         {
-            return new EventRouting<TEvent>(_registrator);
+            return new ModuleEventExpectation<TEvent>(this, _registrator);
         }
 
         public Task BuildAsync()
@@ -97,6 +90,73 @@ namespace Tycho.Modules.Setup
             _internals.GetRequiredService<OutboxProcessor>().Initialize();
             _internals.GetRequiredService<InboxProcessor>().Initialize();
             _internals.InternalsBuilt -= OnInternalsBuilt;
+        }
+    }
+
+    internal class ModuleEventExpectation<TEvent> : IModuleEventExpectation<TEvent>
+        where TEvent : class, IEvent
+    {
+        private readonly Registrator _registrator;
+        private readonly IModuleEvents _events;
+
+        public ModuleEventExpectation(IModuleEvents events, Registrator registrator)
+        {
+            _events = events;
+            _registrator = registrator;
+        }
+
+        public IModuleEvents HandlesWith<THandler>()
+            where THandler : class, IEventHandler<TEvent>
+        {
+            _registrator.HandleEvent<TEvent, THandler>();
+            return _events;
+        }
+
+        public IModuleEventExpectation<TEvent> ForwardsTo<TModule>()
+            where TModule : TychoModule
+        {
+            _registrator.ForwardEvent<TEvent, TModule>();
+            return this;
+        }
+
+        public IModuleEventExpectation<TEvent> Exposes()
+        {
+            _registrator.ExposeEvent<TEvent>();
+            return this;
+        }
+
+        public IModuleMappedEventExpectation<TEvent, TTargetEvent> MapsTo<TTargetEvent>(Func<TEvent, TTargetEvent> map)
+            where TTargetEvent : class, IEvent
+        {
+            map.ThrowIfNull();
+            return new ModuleMappedEventExpectation<TEvent, TTargetEvent>(_registrator, map);
+        }
+    }
+
+    internal class ModuleMappedEventExpectation<TEvent, TTargetEvent> : IModuleMappedEventExpectation<TEvent, TTargetEvent>
+        where TEvent : class, IEvent
+        where TTargetEvent : class, IEvent
+    {
+        private readonly Registrator _registrator;
+        private readonly Func<TEvent, TTargetEvent> _map;
+
+        public ModuleMappedEventExpectation(Registrator registrator, Func<TEvent, TTargetEvent> map)
+        {
+            _registrator = registrator;
+            _map = map;
+        }
+
+        public IModuleMappedEventExpectation<TEvent, TTargetEvent> ForwardsTo<TModule>()
+            where TModule : TychoModule
+        {
+            _registrator.ForwardEvent<TEvent, TTargetEvent, TModule>(_map);
+            return this;
+        }
+
+        public IModuleMappedEventExpectation<TEvent, TTargetEvent> Exposes()
+        {
+            _registrator.ExposeEvent(_map);
+            return this;
         }
     }
 }

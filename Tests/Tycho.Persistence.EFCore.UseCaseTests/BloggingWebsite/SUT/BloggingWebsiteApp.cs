@@ -22,9 +22,9 @@ public partial class BloggingWebsiteApp : TychoApp
 
     protected override void DefineEvents(IAppEvents app)
     {
-        app.Routes<Reactions.Contract.Outgoing.ScoreChangedEvent>()
-           .ForwardsAs<Feeds.Contract.ScoreChangedEvent, FeedsModule>(
-               eventData => new(eventData.TargetId, eventData.NewScore));
+        app.Expects<Reactions.Contract.Outgoing.ScoreChangedEvent>()
+           .MapsTo<Feeds.Contract.ScoreChangedEvent>(eventData => new(eventData.TargetId, eventData.NewScore))
+           .ForwardsTo<FeedsModule>();
     }
 
     protected override void IncludeModules(IAppStructure app)

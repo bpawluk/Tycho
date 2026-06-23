@@ -16,7 +16,8 @@ public partial class OrderingModule : TychoModule
 
     protected override void DefineEvents(IModuleEvents module)
     {
-        module.Handles<OrderPlacedEvent, OrderPlacedEventHandler>();
+        module.Expects<OrderPlacedEvent>()
+              .HandlesWith<OrderPlacedEventHandler>();
     }
 
     protected override void IncludeModules(IModuleStructure module) { }

@@ -65,7 +65,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
         {
             token.ThrowIfCancellationRequested();
             var invocations = input.Method.Body
-                .Where(invocation => invocation.Signature.IsHandledOrRoutedEventDefiningMethod())
+                .Where(invocation => invocation.Signature.IsPublishableEventDefiningMethod())
                 .ToImmutableEquatableArray();
             return (input.DefinitionKind, input.Method.ContainingType, invocations);
         }

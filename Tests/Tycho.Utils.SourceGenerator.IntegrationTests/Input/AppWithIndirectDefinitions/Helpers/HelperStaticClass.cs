@@ -18,12 +18,12 @@ internal static class HelperStaticClass
 
     public static void DefineEvents(IAppEvents app)
     {
-        app.Handles<TestEventFromHelperStaticClass, TestEventHandler>();
+        app.Expects<TestEventFromHelperStaticClass>().HandlesWith<TestEventHandler>();
     }
 
     public static void DefineEventsFromExtension(this IAppEvents app)
     {
-        app.Handles<TestEventFromHelperExtension, TestEventHandler>();
+        app.Expects<TestEventFromHelperExtension>().HandlesWith<TestEventHandler>();
     }
 
     public static void IncludeModules(IAppStructure app)

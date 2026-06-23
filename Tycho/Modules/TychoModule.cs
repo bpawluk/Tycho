@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +12,7 @@ using Tycho.Utils;
 namespace Tycho.Modules
 {
     /// <summary>
-    /// Base class for defining a Tycho module
+    /// Base class for defining a Tycho Module
     /// </summary>
     [ReferencedBySourceGenerator]
     public abstract class TychoModule
@@ -23,7 +23,7 @@ namespace Tycho.Modules
         private bool _wasAlreadyRun = false;
 
         /// <summary>
-        /// Gets the global configuration used by the module and its submodules.
+        /// Gets the global configuration used by the Module and its submodules.
         /// </summary>
         protected IConfiguration Configuration => _builder.Globals.Configuration;
 
@@ -37,52 +37,52 @@ namespace Tycho.Modules
         }
 
         /// <summary>
-        /// Use this method to define requests handled and required by the module
+        /// Use this method to define Requests handled and required by the Module
         /// </summary>
-        /// <param name="module">An interface to define requests</param>
+        /// <param name="module">An interface to define Requests</param>
         [ReferencedBySourceGenerator]
         protected abstract void DefineContract(IModuleContract module);
 
         /// <summary>
-        /// Use this method to define events handled and routed by the module
+        /// Use this method to define Events handled and routed by the Module
         /// </summary>
-        /// <param name="module">An interface to define events</param>
+        /// <param name="module">An interface to define Events</param>
         [ReferencedBySourceGenerator]
         protected abstract void DefineEvents(IModuleEvents module);
 
         /// <summary>
-        /// Use this method to define submodules used by the module
+        /// Use this method to define submodules used by the Module
         /// </summary>
         /// <param name="module">An interface to include submodules</param>
         [ReferencedBySourceGenerator]
         protected abstract void IncludeModules(IModuleStructure module);
 
         /// <summary>
-        /// Use this method to define services required by the module
+        /// Use this method to define services required by the Module
         /// </summary>
         /// <param name="module">An interface to register services</param>
         protected abstract void RegisterServices(IServiceCollection module);
 
         /// <summary>
-        /// Override this method if you need to execute code before the module runs
+        /// Override this method if you need to execute code before the Module runs
         /// </summary>
-        /// <param name="module">A provider of the services configured for the module</param>
+        /// <param name="module">A provider of the services configured for the Module</param>
         protected virtual Task Startup(IServiceProvider module)
         {
             return Task.CompletedTask;
         }
 
         /// <summary>
-        /// Override this method if you need to execute code before the module is disposed
+        /// Override this method if you need to execute code before the Module is disposed
         /// </summary>
-        /// <param name="module">A provider of the services configured for the module</param>
+        /// <param name="module">A provider of the services configured for the Module</param>
         protected virtual Task Cleanup(IServiceProvider module)
         {
             return Task.CompletedTask;
         }
 
         /// <summary>
-        /// Retrieves the settings provided to the module by its parent
+        /// Retrieves the settings provided to the Module by its parent
         /// </summary>
         /// <typeparam name="TSettings">The type of settings to retrieve</typeparam>
         /// <returns>Matching settings or a new instance of the requested settings type</returns>
@@ -92,7 +92,7 @@ namespace Tycho.Modules
         }
 
         /// <summary>
-        /// Provides automated setup for the module.
+        /// Provides automated setup for the Module.
         /// </summary>
         /// <remarks>
         /// Do not override – it is implemented using source generation.

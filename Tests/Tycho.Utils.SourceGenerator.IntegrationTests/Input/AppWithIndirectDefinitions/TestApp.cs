@@ -65,7 +65,7 @@ public class TestApp : TychoApp
 
     private void DefineEventsFromLocalHelper(IAppEvents app)
     {
-        app.Handles<TestEventFromLocalHelper, TestEventHandler>();
+        app.Expects<TestEventFromLocalHelper>().HandlesWith<TestEventHandler>();
     }
 
     private void IncludeModulesFromLocalHelper(IAppStructure app)
@@ -80,7 +80,7 @@ public class TestApp : TychoApp
 
     private static void DefineEventsFromLocalStaticHelper(IAppEvents app)
     {
-        app.Handles<TestEventFromLocalStaticHelper, TestEventHandler>();
+        app.Expects<TestEventFromLocalStaticHelper>().HandlesWith<TestEventHandler>();
     }
 
     private static void IncludeModulesFromLocalStaticHelper(IAppStructure app)

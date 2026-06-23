@@ -72,7 +72,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                 input.DefinitionKind,
                 input.DefinitionType,
                 input.MethodInvocations
-                    .Select(invocation => invocation.TypeArguments
+                    .Select(invocation => invocation.ReceiverType!.Value.TypeArguments
                         .Single(argument => argument.IsEventType())
                         .Value)
                     .Distinct()

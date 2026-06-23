@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
-using Tycho.Persistence.EFCore;
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming;
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Outgoing;
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Handlers;
@@ -22,10 +21,10 @@ public partial class BasketModule : TychoModule
 
     protected override void DefineEvents(IModuleEvents module)
     {
-        module.Routes<BasketItemAddedEvent>()
+        module.Expects<BasketItemAddedEvent>()
               .Exposes();
 
-        module.Routes<BasketCheckedOutEvent>()
+        module.Expects<BasketCheckedOutEvent>()
               .Exposes();
     }
 

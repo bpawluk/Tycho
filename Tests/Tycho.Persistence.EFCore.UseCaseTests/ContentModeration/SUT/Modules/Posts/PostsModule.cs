@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
-using Tycho.Persistence.EFCore;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Handlers;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Persistence;
@@ -19,7 +18,8 @@ public partial class PostsModule : TychoModule
 
     protected override void DefineEvents(IModuleEvents module)
     {
-        module.Handles<PostStatusChangedEvent, PostStatusChangedEventHandler>();
+        module.Expects<PostStatusChangedEvent>()
+              .HandlesWith<PostStatusChangedEventHandler>();
     }
 
     protected override void IncludeModules(IModuleStructure module) { }

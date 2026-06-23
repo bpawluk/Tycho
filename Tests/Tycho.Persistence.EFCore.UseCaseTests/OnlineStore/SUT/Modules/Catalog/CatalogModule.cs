@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
-using Tycho.Persistence.EFCore;
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming;
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Outgoing;
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Handlers;
@@ -22,7 +21,8 @@ public partial class CatalogModule : TychoModule
 
     protected override void DefineEvents(IModuleEvents module)
     {
-        module.Handles<ProductAvailabilityChangedEvent, ProductAvailabilityChangedEventHandler>();
+        module.Expects<ProductAvailabilityChangedEvent>()
+              .HandlesWith<ProductAvailabilityChangedEventHandler>();
     }
 
     protected override void IncludeModules(IModuleStructure module) { }

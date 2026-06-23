@@ -16,14 +16,16 @@ public class BetaModule : TychoModule
 
     protected override void DefineEvents(IModuleEvents module)
     {
-        module.Handles<WorkflowStartedEvent, WorkflowStartedEventHandler>();
+        module.Expects<WorkflowStartedEvent>()
+              .HandlesWith<WorkflowStartedEventHandler>();
 
-        module.Routes<WorkflowFinishedEvent>()
+        module.Expects<WorkflowFinishedEvent>()
               .Exposes();
 
-        module.Handles<BetaWorkflowStartedEvent, BetaWorkflowStartedEventHandler>();
+        module.Expects<BetaWorkflowStartedEvent>()
+              .HandlesWith<BetaWorkflowStartedEventHandler>();
 
-        module.Routes<BetaWorkflowFinishedEvent>()
+        module.Expects<BetaWorkflowFinishedEvent>()
               .Exposes();
     }
 

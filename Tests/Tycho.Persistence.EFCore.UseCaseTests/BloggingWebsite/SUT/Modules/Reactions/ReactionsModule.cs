@@ -18,7 +18,7 @@ public partial class ReactionsModule : TychoModule
 
     protected override void DefineEvents(IModuleEvents module)
     {
-        module.Routes<ScoreChangedEvent>()
+        module.Expects<ScoreChangedEvent>()
               .Exposes();
     }
 

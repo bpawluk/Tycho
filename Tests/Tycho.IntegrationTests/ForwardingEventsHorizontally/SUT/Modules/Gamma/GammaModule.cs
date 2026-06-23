@@ -16,14 +16,16 @@ public class GammaModule : TychoModule
 
     protected override void DefineEvents(IModuleEvents module)
     {
-        module.Handles<WorkflowStartedEvent, WorkflowStartedEventHandler>();
+        module.Expects<WorkflowStartedEvent>()
+              .HandlesWith<WorkflowStartedEventHandler>();
 
-        module.Routes<WorkflowFinishedEvent>()
+        module.Expects<WorkflowFinishedEvent>()
               .Exposes();
 
-        module.Handles<GammaWorkflowStartedEvent, GammaWorkflowStartedEventHandler>();
+        module.Expects<GammaWorkflowStartedEvent>()
+              .HandlesWith<GammaWorkflowStartedEventHandler>();
 
-        module.Routes<GammaWorkflowFinishedEvent>()
+        module.Expects<GammaWorkflowFinishedEvent>()
               .Exposes();
     }
 

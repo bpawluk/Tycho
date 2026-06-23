@@ -13,7 +13,7 @@ internal class HelperClass
 
     public void DefineEvents(IAppEvents app)
     {
-        app.Handles<TestEventFromHelperClass, TestEventHandler>();
+        app.Expects<TestEventFromHelperClass>().HandlesWith<TestEventHandler>();
     }
 
     public void IncludeModules(IAppStructure app)

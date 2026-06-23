@@ -16,14 +16,16 @@ public class AlphaModule : TychoModule
 
     protected override void DefineEvents(IModuleEvents module)
     {
-        module.Handles<WorkflowStartedEvent, WorkflowStartedEventHandler>();
+        module.Expects<WorkflowStartedEvent>()
+              .HandlesWith<WorkflowStartedEventHandler>();
 
-        module.Routes<WorkflowFinishedEvent>()
+        module.Expects<WorkflowFinishedEvent>()
               .Exposes();
 
-        module.Handles<AlphaWorkflowStartedEvent, AlphaWorkflowStartedEventHandler>();
+        module.Expects<AlphaWorkflowStartedEvent>()
+              .HandlesWith<AlphaWorkflowStartedEventHandler>();
 
-        module.Routes<AlphaWorkflowFinishedEvent>()
+        module.Expects<AlphaWorkflowFinishedEvent>()
               .Exposes();
     }
 

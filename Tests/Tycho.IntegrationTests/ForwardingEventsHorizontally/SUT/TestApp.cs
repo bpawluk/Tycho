@@ -30,24 +30,34 @@ public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
 
     protected override void DefineEvents(IAppEvents app)
     {
-        app.Routes<WorkflowStartedEvent>()
-           .Forwards<AlphaModule>()
-           .Forwards<BetaModule>()
-           .Forwards<GammaModule>();
+        app.Expects<WorkflowStartedEvent>()
+           .ForwardsTo<AlphaModule>()
+           .ForwardsTo<BetaModule>()
+           .ForwardsTo<GammaModule>();
 
-        app.Handles<WorkflowFinishedEvent, WorkflowFinishedEventHandler>();
+        app.Expects<WorkflowFinishedEvent>()
+           .HandlesWith<WorkflowFinishedEventHandler>();
 
-        app.Routes<WorkflowWithMappingStartedEvent>()
-           .ForwardsAs<AlphaWorkflowStartedEvent, AlphaModule>(
-                eventData => new(eventData.Result))
-           .ForwardsAs<BetaWorkflowStartedEvent, BetaModule>(
-                eventData => new(eventData.Result))
-           .ForwardsAs<GammaWorkflowStartedEvent, GammaModule>(
-                eventData => new(eventData.Result));
+        app.Expects<WorkflowWithMappingStartedEvent>()
+           .MapsTo<AlphaWorkflowStartedEvent>(eventData => new(eventData.Result))
+           .ForwardsTo<AlphaModule>();
 
-        app.Handles<AlphaWorkflowFinishedEvent, AlphaWorkflowFinishedEventHandler>()
-           .Handles<BetaWorkflowFinishedEvent, BetaWorkflowFinishedEventHandler>()
-           .Handles<GammaWorkflowFinishedEvent, GammaWorkflowFinishedEventHandler>();
+        app.Expects<WorkflowWithMappingStartedEvent>()
+           .MapsTo<BetaWorkflowStartedEvent>(eventData => new(eventData.Result))
+           .ForwardsTo<BetaModule>();
+
+        app.Expects<WorkflowWithMappingStartedEvent>()
+           .MapsTo<GammaWorkflowStartedEvent>(eventData => new(eventData.Result))
+           .ForwardsTo<GammaModule>();
+
+        app.Expects<AlphaWorkflowFinishedEvent>()
+           .HandlesWith<AlphaWorkflowFinishedEventHandler>();
+
+        app.Expects<BetaWorkflowFinishedEvent>()
+           .HandlesWith<BetaWorkflowFinishedEventHandler>();
+
+        app.Expects<GammaWorkflowFinishedEvent>()
+           .HandlesWith<GammaWorkflowFinishedEventHandler>();
     }
 
     protected override void IncludeModules(IAppStructure app)

@@ -18,7 +18,8 @@ public partial class VentilationModule : TychoModule
 
     protected override void DefineEvents(IModuleEvents module)
     {
-        module.Handles<SensorEvent<AirQualityReading>, SensorEventHandler>();
+        module.Expects<SensorEvent<AirQualityReading>>()
+              .HandlesWith<SensorEventHandler>();
     }
 
     protected override void IncludeModules(IModuleStructure module) { }

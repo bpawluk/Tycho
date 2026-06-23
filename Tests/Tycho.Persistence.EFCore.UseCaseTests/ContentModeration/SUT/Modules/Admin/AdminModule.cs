@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
-using Tycho.Persistence.EFCore;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Incoming;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Outgoing;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Handlers;
@@ -20,10 +19,10 @@ public partial class AdminModule : TychoModule
 
     protected override void DefineEvents(IModuleEvents module)
     {
-        module.Routes<PostRemovedEvent>()
+        module.Expects<PostRemovedEvent>()
               .Exposes();
 
-        module.Routes<UserBannedEvent>()
+        module.Expects<UserBannedEvent>()
               .Exposes();
     }
 

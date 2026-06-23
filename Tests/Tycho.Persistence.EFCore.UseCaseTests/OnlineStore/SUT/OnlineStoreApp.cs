@@ -35,13 +35,16 @@ public partial class OnlineStoreApp : TychoApp
 
     protected override void DefineEvents(IAppEvents app)
     {
-        app.Routes<ItemAvailabilityChangedEvent>()
-           .ForwardsAs<ProductAvailabilityChangedEvent, CatalogModule>(EventMapper.Map);
+        app.Expects<ItemAvailabilityChangedEvent>()
+           .MapsTo<ProductAvailabilityChangedEvent>(EventMapper.Map)
+           .ForwardsTo<CatalogModule>();
 
-        app.Routes<BasketCheckedOutEvent>()
-           .ForwardsAs<OrderPlacedEvent, OrderingModule>(EventMapper.Map);
+        app.Expects<BasketCheckedOutEvent>()
+           .MapsTo<OrderPlacedEvent>(EventMapper.Map)
+           .ForwardsTo<OrderingModule>();
 
-        app.Handles<BasketItemAddedEvent, BasketItemAddedEventHandler>();
+        app.Expects<BasketItemAddedEvent>()
+           .HandlesWith<BasketItemAddedEventHandler>();
     }
 
     protected override void IncludeModules(IAppStructure app)

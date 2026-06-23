@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Tycho.Modules;
 using Tycho.Requests;
 using Tycho.Utils;
@@ -6,42 +6,42 @@ using Tycho.Utils;
 namespace Tycho.Apps
 {
     /// <summary>
-    /// An interface for declaring the contract of a Tycho application.
+    /// An interface for declaring the contract of a Tycho Application.
     /// </summary>
     [ReferencedBySourceGenerator]
     public interface IAppContract
     {
         /// <summary>
-        /// Declares that the application will forward all requests of type <typeparamref name="TRequest"/>
-        /// to module <typeparamref name="TModule"/>.
+        /// Declares that the Application will forward all Requests of type <typeparamref name="TRequest"/>
+        /// to Module <typeparamref name="TModule"/>.
         /// </summary>
-        /// <typeparam name="TRequest">The type of the request to forward.</typeparam>
-        /// <typeparam name="TModule">The type of the target module.</typeparam>
+        /// <typeparam name="TRequest">The type of the Request to forward.</typeparam>
+        /// <typeparam name="TModule">The type of the target Module.</typeparam>
         [ReferencedBySourceGenerator]
         IAppContract Forwards<TRequest, TModule>()
             where TRequest : class, IRequest
             where TModule : TychoModule;
 
         /// <summary>
-        /// Declares that the application will forward all requests of type <typeparamref name="TRequest"/>
-        /// to module <typeparamref name="TModule"/>.
+        /// Declares that the Application will forward all Requests of type <typeparamref name="TRequest"/>
+        /// to Module <typeparamref name="TModule"/>.
         /// </summary>
-        /// <typeparam name="TRequest">The type of the request to forward.</typeparam>
-        /// <typeparam name="TResponse">The type of the request response.</typeparam>
-        /// <typeparam name="TModule">The type of the target module.</typeparam>
+        /// <typeparam name="TRequest">The type of the Request to forward.</typeparam>
+        /// <typeparam name="TResponse">The type of the Request response.</typeparam>
+        /// <typeparam name="TModule">The type of the target Module.</typeparam>
         [ReferencedBySourceGenerator]
         IAppContract Forwards<TRequest, TResponse, TModule>()
             where TRequest : class, IRequest<TResponse>
             where TModule : TychoModule;
 
         /// <summary>
-        /// Declares that the application will forward all requests of type <typeparamref name="TRequest"/>
-        /// to module <typeparamref name="TModule"/>, mapped as requests of type <typeparamref name="TTargetRequest"/>.
+        /// Declares that the Application will forward all Requests of type <typeparamref name="TRequest"/>
+        /// to Module <typeparamref name="TModule"/>, mapped as Requests of type <typeparamref name="TTargetRequest"/>.
         /// </summary>
-        /// <typeparam name="TRequest">The type of the original request to forward.</typeparam>
-        /// <typeparam name="TTargetRequest">The type of the request expected by the target module.</typeparam>
-        /// <typeparam name="TModule">The type of the target module.</typeparam>
-        /// <param name="mapRequest">Maps the original request to the target request.</param>
+        /// <typeparam name="TRequest">The type of the original Request to forward.</typeparam>
+        /// <typeparam name="TTargetRequest">The type of the Request expected by the target Module.</typeparam>
+        /// <typeparam name="TModule">The type of the target Module.</typeparam>
+        /// <param name="mapRequest">Maps the original Request to the target Request.</param>
         /// <exception cref="ArgumentNullException"/>
         [ReferencedBySourceGenerator]
         IAppContract ForwardsAs<TRequest, TTargetRequest, TModule>(
@@ -51,15 +51,15 @@ namespace Tycho.Apps
             where TModule : TychoModule;
 
         /// <summary>
-        /// Declares that the application will forward all requests of type <typeparamref name="TRequest"/>
-        /// to module <typeparamref name="TModule"/>, mapped as requests of type <typeparamref name="TTargetRequest"/>.
+        /// Declares that the Application will forward all Requests of type <typeparamref name="TRequest"/>
+        /// to Module <typeparamref name="TModule"/>, mapped as Requests of type <typeparamref name="TTargetRequest"/>.
         /// </summary>
-        /// <typeparam name="TRequest">The type of the original request to forward.</typeparam>
-        /// <typeparam name="TResponse">The type of the original request response.</typeparam>
-        /// <typeparam name="TTargetRequest">The type of the request expected by the target module.</typeparam>
-        /// <typeparam name="TTargetResponse">The type of the target request response.</typeparam>
-        /// <typeparam name="TModule">The type of the target module.</typeparam>
-        /// <param name="mapRequest">Maps the original request to the target request.</param>
+        /// <typeparam name="TRequest">The type of the original Request to forward.</typeparam>
+        /// <typeparam name="TResponse">The type of the original Request response.</typeparam>
+        /// <typeparam name="TTargetRequest">The type of the Request expected by the target Module.</typeparam>
+        /// <typeparam name="TTargetResponse">The type of the target Request response.</typeparam>
+        /// <typeparam name="TModule">The type of the target Module.</typeparam>
+        /// <param name="mapRequest">Maps the original Request to the target Request.</param>
         /// <param name="mapResponse">Maps the target response to the original response.</param>
         /// <exception cref="ArgumentNullException"/>
         [ReferencedBySourceGenerator]
@@ -71,23 +71,23 @@ namespace Tycho.Apps
             where TModule : TychoModule;
 
         /// <summary>
-        /// Declares that the application will handle all requests of type <typeparamref name="TRequest"/>
-        /// using handler <typeparamref name="THandler"/>.
+        /// Declares that the Application will handle all Requests of type <typeparamref name="TRequest"/>
+        /// using Handler <typeparamref name="THandler"/>.
         /// </summary>
-        /// <typeparam name="TRequest">The type of the request to handle.</typeparam>
-        /// <typeparam name="THandler">The type of request handler.</typeparam>
+        /// <typeparam name="TRequest">The type of the Request to handle.</typeparam>
+        /// <typeparam name="THandler">The type of Request Handler.</typeparam>
         [ReferencedBySourceGenerator]
         IAppContract Handles<TRequest, THandler>()
             where TRequest : class, IRequest
             where THandler : class, IRequestHandler<TRequest>;
 
         /// <summary>
-        /// Declares that the application will handle all requests of type <typeparamref name="TRequest"/>
-        /// using handler <typeparamref name="THandler"/>.
+        /// Declares that the Application will handle all Requests of type <typeparamref name="TRequest"/>
+        /// using Handler <typeparamref name="THandler"/>.
         /// </summary>
-        /// <typeparam name="TRequest">The type of the request to handle.</typeparam>
-        /// <typeparam name="TResponse">The type of the request response.</typeparam>
-        /// <typeparam name="THandler">The type of request handler.</typeparam>
+        /// <typeparam name="TRequest">The type of the Request to handle.</typeparam>
+        /// <typeparam name="TResponse">The type of the Request response.</typeparam>
+        /// <typeparam name="THandler">The type of Request Handler.</typeparam>
         [ReferencedBySourceGenerator]
         IAppContract Handles<TRequest, TResponse, THandler>()
             where TRequest : class, IRequest<TResponse>

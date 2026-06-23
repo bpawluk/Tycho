@@ -43,19 +43,25 @@ public class TestApp(
 
     protected override void DefineEvents(IAppEvents app)
     {
-        app.Handles<GenericAppEvent<int>, GenericAppEventHandler<int>>();
-        app.Handles<GenericAppEvent<string>, GenericAppEventHandler<string>>();
+        app.Expects<GenericAppEvent<int>>()
+           .HandlesWith<GenericAppEventHandler<int>>();
 
-        app.Routes<GenericAppEventToForward<int>>()
-           .ForwardsAs<GenericModuleEvent<int>, TestModule>(
-               eventData => new GenericModuleEvent<int>(eventData.Data));
+        app.Expects<GenericAppEvent<string>>()
+           .HandlesWith<GenericAppEventHandler<string>>();
 
-        app.Routes<GenericAppEventToForward<string>>()
-           .ForwardsAs<GenericModuleEvent<string>, TestModule>(
-               eventData => new GenericModuleEvent<string>(eventData.Data));
+        app.Expects<GenericAppEventToForward<int>>()
+           .MapsTo<GenericModuleEvent<int>>(eventData => new(eventData.Data))
+           .ForwardsTo<TestModule>();
 
-        app.Handles<GenericAppForwardedEvent<int>, GenericAppForwardedEventHandler<int>>();
-        app.Handles<GenericAppForwardedEvent<string>, GenericAppForwardedEventHandler<string>>();
+        app.Expects<GenericAppEventToForward<string>>()
+           .MapsTo<GenericModuleEvent<string>>(eventData => new(eventData.Data))
+           .ForwardsTo<TestModule>();
+
+        app.Expects<GenericAppForwardedEvent<int>>()
+           .HandlesWith<GenericAppForwardedEventHandler<int>>();
+
+        app.Expects<GenericAppForwardedEvent<string>>()
+           .HandlesWith<GenericAppForwardedEventHandler<string>>();
     }
 
     protected override void IncludeModules(IAppStructure app)

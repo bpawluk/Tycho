@@ -40,18 +40,23 @@ public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
 
     protected override void DefineEvents(IAppEvents app)
     {
-        app.Handles<GetAppSingletonServiceUsageEvent, GetAppSingletonServiceUsageEventHandler>()
-           .Handles<GetAppScopedServiceUsageEvent, GetAppScopedServiceUsageEventHandler>()
-           .Handles<GetAppTransientServiceUsageEvent, GetAppTransientServiceUsageEventHandler>();
+        app.Expects<GetAppSingletonServiceUsageEvent>()
+           .HandlesWith<GetAppSingletonServiceUsageEventHandler>();
 
-        app.Routes<GetModuleSingletonServiceUsageEvent>()
-           .Forwards<TestModule>();
+        app.Expects<GetAppScopedServiceUsageEvent>()
+           .HandlesWith<GetAppScopedServiceUsageEventHandler>();
 
-        app.Routes<GetModuleScopedServiceUsageEvent>()
-           .Forwards<TestModule>();
+        app.Expects<GetAppTransientServiceUsageEvent>()
+           .HandlesWith<GetAppTransientServiceUsageEventHandler>();
 
-        app.Routes<GetModuleTransientServiceUsageEvent>()
-           .Forwards<TestModule>();
+        app.Expects<GetModuleSingletonServiceUsageEvent>()
+           .ForwardsTo<TestModule>();
+
+        app.Expects<GetModuleScopedServiceUsageEvent>()
+           .ForwardsTo<TestModule>();
+
+        app.Expects<GetModuleTransientServiceUsageEvent>()
+           .ForwardsTo<TestModule>();
     }
 
     protected override void IncludeModules(IAppStructure app)

@@ -27,17 +27,17 @@ public partial class HomeDashboardApp : TychoApp
 
     protected override void DefineEvents(IAppEvents app)
     {
-        app.Routes<SensorEvent<TemperatureReading>>()
-           .Forwards<ClimateModule>();
+        app.Expects<SensorEvent<TemperatureReading>>()
+           .ForwardsTo<ClimateModule>();
 
-        app.Routes<SensorEvent<AirQualityReading>>()
-           .Forwards<VentilationModule>();
+        app.Expects<SensorEvent<AirQualityReading>>()
+           .ForwardsTo<VentilationModule>();
 
-        app.Routes<SensorEvent<MotionDetected>>()
-           .Forwards<SecurityModule>();
+        app.Expects<SensorEvent<MotionDetected>>()
+           .ForwardsTo<SecurityModule>();
 
-        app.Routes<SensorEvent<DoorOpened>>()
-           .Forwards<SecurityModule>();
+        app.Expects<SensorEvent<DoorOpened>>()
+           .ForwardsTo<SecurityModule>();
     }
 
     protected override void IncludeModules(IAppStructure app)

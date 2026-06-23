@@ -25,9 +25,9 @@ namespace Tycho.Utils.SourceGenerator.Extensions
             IAppEventsReference.HandledEventDefiningMethods.Any(m => m.Matches(methodSignature)) ||
             IModuleEventsReference.HandledEventDefiningMethods.Any(m => m.Matches(methodSignature));
 
-        public static bool IsHandledOrRoutedEventDefiningMethod(this MethodSignatureModel methodSignature) =>
-            IAppEventsReference.HandledOrRoutedEventDefiningMethods.Any(m => m.Matches(methodSignature)) ||
-            IModuleEventsReference.HandledOrRoutedEventDefiningMethods.Any(m => m.Matches(methodSignature));
+        public static bool IsPublishableEventDefiningMethod(this MethodSignatureModel methodSignature) =>
+            IAppEventsReference.PublishableEventDefiningMethods.Any(m => m.Matches(methodSignature)) ||
+            IModuleEventsReference.PublishableEventDefiningMethods.Any(m => m.Matches(methodSignature));
 
         public static bool IsIncludeModulesMethod(this MethodSignatureModel methodSignature) =>
             TychoAppReference.IncludeModulesMethodSignature.Matches(methodSignature) ||

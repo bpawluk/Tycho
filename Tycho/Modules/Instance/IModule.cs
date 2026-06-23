@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Tycho.Events.Broker;
 using Tycho.Identity.Modules;
 using Tycho.Requests.Broker;
@@ -8,7 +8,7 @@ using Tycho.Utils;
 namespace Tycho.Modules.Instance
 {
     /// <summary>
-    /// Represents a running Tycho module instance.
+    /// Represents a running Tycho Module instance.
     /// </summary>
     [ReferencedBySourceGenerator]
     public interface IModule : IAsyncDisposable
@@ -23,9 +23,9 @@ namespace Tycho.Modules.Instance
     }
 
     /// <summary>
-    /// Represents a running Tycho module instance defined by <typeparamref name="TTychoDefinition"/>.
+    /// Represents a running Tycho Module instance defined by <typeparamref name="TTychoDefinition"/>.
     /// </summary>
-    /// <typeparam name="TTychoDefinition">The module definition type.</typeparam>
+    /// <typeparam name="TTychoDefinition">The Module definition type.</typeparam>
     [ReferencedByReflection]
     [ReferencedBySourceGenerator]
     public interface IModule<TTychoDefinition> : IModule

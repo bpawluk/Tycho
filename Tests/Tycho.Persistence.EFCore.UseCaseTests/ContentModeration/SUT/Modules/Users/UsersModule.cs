@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
-using Tycho.Persistence.EFCore;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Handlers;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Persistence;
@@ -18,7 +17,8 @@ public partial class UsersModule : TychoModule
 
     protected override void DefineEvents(IModuleEvents module)
     {
-        module.Handles<UserStatusChangedEvent, UserStatusChangedEventHandler>();
+        module.Expects<UserStatusChangedEvent>()
+              .HandlesWith<UserStatusChangedEventHandler>();
     }
 
     protected override void IncludeModules(IModuleStructure module) { }

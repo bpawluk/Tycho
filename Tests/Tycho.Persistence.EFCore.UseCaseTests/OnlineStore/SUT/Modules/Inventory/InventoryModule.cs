@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
-using Tycho.Persistence.EFCore;
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Incoming;
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Contract.Outgoing;
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Handlers;
@@ -19,7 +18,7 @@ public partial class InventoryModule : TychoModule
 
     protected override void DefineEvents(IModuleEvents module)
     {
-        module.Routes<ItemAvailabilityChangedEvent>()
+        module.Expects<ItemAvailabilityChangedEvent>()
               .Exposes();
     }
 

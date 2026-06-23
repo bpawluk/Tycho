@@ -34,9 +34,14 @@ public class TestModule : TychoModule
 
     protected override void DefineEvents(IModuleEvents module)
     {
-        module.Handles<GetModuleSingletonServiceUsageEvent, GetModuleSingletonServiceUsageEventHandler>()
-              .Handles<GetModuleScopedServiceUsageEvent, GetModuleScopedServiceUsageEventHandler>()
-              .Handles<GetModuleTransientServiceUsageEvent, GetModuleTransientServiceUsageEventHandler>();
+        module.Expects<GetModuleSingletonServiceUsageEvent>()
+              .HandlesWith<GetModuleSingletonServiceUsageEventHandler>();
+
+        module.Expects<GetModuleScopedServiceUsageEvent>()
+              .HandlesWith<GetModuleScopedServiceUsageEventHandler>();
+
+        module.Expects<GetModuleTransientServiceUsageEvent>()
+              .HandlesWith<GetModuleTransientServiceUsageEventHandler>();
     }
 
     protected override void IncludeModules(IModuleStructure module) { }

@@ -12,7 +12,6 @@ namespace Tycho.IntegrationTests.ForwardingEventsVertically.SUT;
 public record BeginTestWorkflowRequest(TestResult Result) : IRequest;
 
 // Events
-public record Dupka(TestResult Result) : IEvent;
 public record WorkflowStartedEvent(TestResult Result) : IEvent;
 public record WorkflowFinishedEvent(TestResult Result) : IEvent;
 public record WorkflowWithMappingStartedEvent(TestResult Result) : IEvent;
@@ -30,16 +29,18 @@ public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
 
     protected override void DefineEvents(IAppEvents app)
     {
-        app.Routes<WorkflowStartedEvent>()
-           .Forwards<AlphaModule>();
+        app.Expects<WorkflowStartedEvent>()
+           .ForwardsTo<AlphaModule>();
 
-        app.Handles<WorkflowFinishedEvent, WorkflowFinishedEventHandler>();
+        app.Expects<WorkflowFinishedEvent>()
+           .HandlesWith<WorkflowFinishedEventHandler>();
 
-        app.Routes<WorkflowWithMappingStartedEvent>()
-           .ForwardsAs<AlphaWorkflowStartedEvent, AlphaModule>(
-               eventData => new(eventData.Result));
+        app.Expects<WorkflowWithMappingStartedEvent>()
+           .MapsTo<AlphaWorkflowStartedEvent>(eventData => new(eventData.Result))
+           .ForwardsTo<AlphaModule>();
 
-        app.Handles<WorkflowWithMappingFinishedEvent, WorkflowWithMappingFinishedEventHandler>();
+        app.Expects<WorkflowWithMappingFinishedEvent>()
+           .HandlesWith<WorkflowWithMappingFinishedEventHandler>();
     }
 
     protected override void IncludeModules(IAppStructure app)

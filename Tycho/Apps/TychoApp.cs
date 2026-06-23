@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +10,7 @@ using Tycho.Utils;
 namespace Tycho.Apps
 {
     /// <summary>
-    /// Base class for defining a Tycho application
+    /// Base class for defining a Tycho Application
     /// </summary>
     [ReferencedBySourceGenerator]
     public abstract class TychoApp
@@ -21,7 +21,7 @@ namespace Tycho.Apps
         private bool _wasAlreadyRun = false;
 
         /// <summary>
-        /// Gets the global configuration used by the application and its modules.
+        /// Gets the global configuration used by the Application and its Modules.
         /// </summary>
         protected IConfiguration Configuration => _builder.Globals.Configuration;
 
@@ -35,52 +35,52 @@ namespace Tycho.Apps
         }
 
         /// <summary>
-        /// Use this method to define requests handled by the application
+        /// Use this method to define Requests handled by the Application
         /// </summary>
-        /// <param name="app">An interface to define requests</param>
+        /// <param name="app">An interface to define Requests</param>
         [ReferencedBySourceGenerator]
         protected abstract void DefineContract(IAppContract app);
 
         /// <summary>
-        /// Use this method to define events handled and routed by the application
+        /// Use this method to define Events handled and routed by the Application
         /// </summary>
-        /// <param name="app">An interface to define events</param>
+        /// <param name="app">An interface to define Events</param>
         [ReferencedBySourceGenerator]
         protected abstract void DefineEvents(IAppEvents app);
 
         /// <summary>
-        /// Use this method to define modules used by the application
+        /// Use this method to define Modules used by the Application
         /// </summary>
-        /// <param name="app">An interface to include modules</param>
+        /// <param name="app">An interface to include Modules</param>
         [ReferencedBySourceGenerator]
         protected abstract void IncludeModules(IAppStructure app);
 
         /// <summary>
-        /// Use this method to define services required by the application
+        /// Use this method to define services required by the Application
         /// </summary>
         /// <param name="app">An interface to register services</param>
         protected abstract void RegisterServices(IServiceCollection app);
 
         /// <summary>
-        /// Override this method if you need to execute code before the application runs
+        /// Override this method if you need to execute code before the Application runs
         /// </summary>
-        /// <param name="app">A provider of the services configured for the application</param>
+        /// <param name="app">A provider of the services configured for the Application</param>
         protected virtual Task Startup(IServiceProvider app)
         {
             return Task.CompletedTask;
         }
 
         /// <summary>
-        /// Override this method if you need to execute code before the application is disposed
+        /// Override this method if you need to execute code before the Application is disposed
         /// </summary>
-        /// <param name="app">A provider of the services configured for the application</param>
+        /// <param name="app">A provider of the services configured for the Application</param>
         protected virtual Task Cleanup(IServiceProvider app)
         {
             return Task.CompletedTask;
         }
 
         /// <summary>
-        /// Provides automated setup for the app.
+        /// Provides automated setup for the App.
         /// </summary>
         /// <remarks>
         /// Do not override – it is implemented using source generation.
@@ -96,7 +96,7 @@ namespace Tycho.Apps
 #pragma warning restore IDE1006
 
         /// <summary>
-        /// Supplies global configuration for the application and its modules.
+        /// Supplies global configuration for the Application and its Modules.
         /// </summary>
         /// <param name="globalConfiguration">Configuration to be used</param>
         /// <exception cref="ArgumentNullException"/>"
@@ -108,7 +108,7 @@ namespace Tycho.Apps
         }
 
         /// <summary>
-        /// Supplies logging setup for the application and its modules.
+        /// Supplies logging setup for the Application and its Modules.
         /// </summary>
         /// <param name="loggingSetup">Logging setup to be used</param>
         /// <exception cref="ArgumentNullException"/>"
@@ -120,9 +120,9 @@ namespace Tycho.Apps
         }
 
         /// <summary>
-        /// Builds and runs the application according to the definition.
+        /// Builds and runs the Application according to the definition.
         /// </summary>
-        /// <returns>A fresh and ready to use instance of the application</returns>
+        /// <returns>A fresh and ready to use instance of the Application</returns>
         /// <exception cref="InvalidOperationException"/>
         [ReferencedBySourceGenerator]
         public async Task<IApp> RunBaseAsync()

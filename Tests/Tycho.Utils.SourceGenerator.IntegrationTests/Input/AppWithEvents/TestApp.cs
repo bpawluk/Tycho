@@ -12,9 +12,9 @@ public class TestApp : TychoApp
     protected override void DefineContract(IAppContract app) { }
     protected override void DefineEvents(IAppEvents app)
     {
-        app.Handles<OrderCreatedEvent, OrderCreatedEventHandler>();
-        app.Handles<PaymentProcessedEvent, PaymentProcessedEventHandler>();
-        app.Routes<PaymentFailedEvent>().Forwards<ModuleA>();
+        app.Expects<OrderCreatedEvent>().HandlesWith<OrderCreatedEventHandler>();
+        app.Expects<PaymentProcessedEvent>().HandlesWith<PaymentProcessedEventHandler>();
+        app.Expects<PaymentFailedEvent>().ForwardsTo<ModuleA>();
     }
     protected override void IncludeModules(IAppStructure app) { }
     protected override void RegisterServices(IServiceCollection app) { }

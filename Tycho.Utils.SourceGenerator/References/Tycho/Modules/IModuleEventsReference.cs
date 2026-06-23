@@ -8,27 +8,26 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
     {
         private const string Namespace = "Tycho.Modules";
         private const string TypeName = "IModuleEvents";
-        private const string EventRoutingTypeName = "IEventRouting";
+        private const string EventExpectationTypeName = "IModuleEventExpectation";
 
         public static HashSet<MethodSignatureModel> HandledEventDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
         {
-            HandlesMethodSignature,
+            HandlesWithMethodSignature,
         });
 
-        public static HashSet<MethodSignatureModel> HandledOrRoutedEventDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
+        public static HashSet<MethodSignatureModel> PublishableEventDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
         {
-            HandlesMethodSignature,
-            RoutesMethodSignature,
+            ExpectsMethodSignature,
         });
 
         public static string EventTypeParameterName => "TEvent";
 
         public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
 
-        public static TypeReferenceModel EventRoutingTypeModel => new TypeReferenceModel(
+        public static TypeReferenceModel EventExpectationTypeModel => new TypeReferenceModel(
             Namespace,
             ImmutableEquatableArray<TypeReferenceModel>.Empty,
-            EventRoutingTypeName,
+            EventExpectationTypeName,
             new ImmutableEquatableArray<TypeArgumentModel>(new[]
             {
                 new TypeArgumentModel(
@@ -36,14 +35,14 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
                     new TypeReferenceModel(Namespace, EventTypeParameterName)),
             }));
 
-        public static MethodSignatureModel HandlesMethodSignature => new MethodSignatureModel(
-            methodName: "Handles",
+        public static MethodSignatureModel ExpectsMethodSignature => new MethodSignatureModel(
+            methodName: "Expects",
+            parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
+            result: EventExpectationTypeModel);
+
+        public static MethodSignatureModel HandlesWithMethodSignature => new MethodSignatureModel(
+            methodName: "HandlesWith",
             parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
             result: TypeModel);
-
-        public static MethodSignatureModel RoutesMethodSignature => new MethodSignatureModel(
-            methodName: "Routes",
-            parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
-            result: EventRoutingTypeModel);
     }
 }

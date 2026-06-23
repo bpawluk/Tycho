@@ -18,7 +18,8 @@ public partial class ClimateModule : TychoModule
 
     protected override void DefineEvents(IModuleEvents module)
     {
-        module.Handles<SensorEvent<TemperatureReading>, SensorEventHandler>();
+        module.Expects<SensorEvent<TemperatureReading>>()
+              .HandlesWith<SensorEventHandler>();
     }
 
     protected override void IncludeModules(IModuleStructure module) { }

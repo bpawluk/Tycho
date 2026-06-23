@@ -21,7 +21,8 @@ public partial class FeedsModule : TychoModule
 
     protected override void DefineEvents(IModuleEvents module)
     {
-        module.Handles<ScoreChangedEvent, ScoreChangedEventHandler>();
+        module.Expects<ScoreChangedEvent>()
+              .HandlesWith<ScoreChangedEventHandler>();
     }
 
     protected override void IncludeModules(IModuleStructure module)

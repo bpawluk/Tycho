@@ -1,11 +1,11 @@
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Tycho.Utils;
 
 namespace Tycho.Logging
 {
     /// <summary>
-    /// Provides methods to configure logging for Tycho applications.
+    /// Provides methods to configure logging for Tycho Applications.
     /// </summary>
     [ReferencedBySourceGenerator]
     public static class LoggingConfiguration

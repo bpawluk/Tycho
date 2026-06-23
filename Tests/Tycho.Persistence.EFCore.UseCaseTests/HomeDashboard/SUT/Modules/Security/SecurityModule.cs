@@ -18,8 +18,11 @@ public partial class SecurityModule : TychoModule
 
     protected override void DefineEvents(IModuleEvents module)
     {
-        module.Handles<SensorEvent<MotionDetected>, MotionDetectedHandler>()
-              .Handles<SensorEvent<DoorOpened>, DoorOpenedHandler>();
+        module.Expects<SensorEvent<MotionDetected>>()
+              .HandlesWith<MotionDetectedHandler>();
+
+        module.Expects<SensorEvent<DoorOpened>>()
+              .HandlesWith<DoorOpenedHandler>();
     }
 
     protected override void IncludeModules(IModuleStructure module) { }

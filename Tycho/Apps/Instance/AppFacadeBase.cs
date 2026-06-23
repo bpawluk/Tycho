@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Requests;
@@ -7,7 +7,7 @@ using Tycho.Utils;
 namespace Tycho.Apps.Instance
 {
     /// <summary>
-    /// Base class for generated application facades.
+    /// Base class for generated Application facades.
     /// </summary>
     [ReferencedBySourceGenerator]
     public abstract class AppFacadeBase : IAsyncDisposable
@@ -17,7 +17,7 @@ namespace Tycho.Apps.Instance
         /// <summary>
         /// Initializes a new instance of the <see cref="AppFacadeBase"/> class.
         /// </summary>
-        /// <param name="app">The running application instance used to execute Requests.</param>
+        /// <param name="app">The running Application instance used to execute Requests.</param>
         [ReferencedBySourceGenerator]
         public AppFacadeBase(IApp app)
         {

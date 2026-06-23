@@ -16,14 +16,19 @@ public class TestModule : TychoModule
 
     protected override void DefineEvents(IModuleEvents module)
     {
-        module.Handles<GenericModuleEvent<int>, GenericModuleEventHandler<int>>();
-        module.Handles<GenericModuleEvent<string>, GenericModuleEventHandler<string>>();
+        module.Expects<GenericModuleEvent<int>>()
+              .HandlesWith<GenericModuleEventHandler<int>>();
 
-        module.Routes<GenericModuleFinishedEvent<int>>()
-              .ExposesAs(eventData => new GenericAppForwardedEvent<int>(eventData.Data));
+        module.Expects<GenericModuleEvent<string>>()
+              .HandlesWith<GenericModuleEventHandler<string>>();
 
-        module.Routes<GenericModuleFinishedEvent<string>>()
-              .ExposesAs(eventData => new GenericAppForwardedEvent<string>(eventData.Data));
+        module.Expects<GenericModuleFinishedEvent<int>>()
+              .MapsTo<GenericAppForwardedEvent<int>>(eventData => new(eventData.Data))
+              .Exposes();
+
+        module.Expects<GenericModuleFinishedEvent<string>>()
+              .MapsTo<GenericAppForwardedEvent<string>>(eventData => new(eventData.Data))
+              .Exposes();
     }
 
     protected override void IncludeModules(IModuleStructure module) { }

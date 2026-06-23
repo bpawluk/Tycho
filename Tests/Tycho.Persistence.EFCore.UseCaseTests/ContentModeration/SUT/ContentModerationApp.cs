@@ -28,11 +28,13 @@ public partial class ContentModerationApp : TychoApp
 
     protected override void DefineEvents(IAppEvents app)
     {
-        app.Routes<UserBannedEvent>()
-           .ForwardsAs<UserStatusChangedEvent, UsersModule>(EventMapper.Map);
+        app.Expects<UserBannedEvent>()
+           .MapsTo<UserStatusChangedEvent>(EventMapper.Map)
+           .ForwardsTo<UsersModule>();
 
-        app.Routes<PostRemovedEvent>()
-           .ForwardsAs<PostStatusChangedEvent, PostsModule>(EventMapper.Map);
+        app.Expects<PostRemovedEvent>()
+           .MapsTo<PostStatusChangedEvent>(EventMapper.Map)
+           .ForwardsTo<PostsModule>();
     }
 
     protected override void IncludeModules(IAppStructure app)

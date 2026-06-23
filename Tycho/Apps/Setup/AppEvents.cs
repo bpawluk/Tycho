@@ -12,8 +12,10 @@ using Tycho.Events.Outbox.InMemory;
 using Tycho.Events.Publishing;
 using Tycho.Events.Registrating;
 using Tycho.Events.Serialization;
+using Tycho.Modules;
 using Tycho.Structure;
 using Tycho.Transactions;
+using Tycho.Utils;
 
 namespace Tycho.Apps.Setup
 {
@@ -28,18 +30,10 @@ namespace Tycho.Apps.Setup
             _registrator = new Registrator(internals);
         }
 
-        public IAppEvents Handles<TEvent, THandler>()
-            where TEvent : class, IEvent
-            where THandler : class, IEventHandler<TEvent>
-        {
-            _registrator.HandleEvent<TEvent, THandler>();
-            return this;
-        }
-
-        public IEventRouting<TEvent> Routes<TEvent>()
+        public IAppEventExpectation<TEvent> Expects<TEvent>()
             where TEvent : class, IEvent
         {
-            return new EventRouting<TEvent>(_registrator);
+            return new AppEventExpectation<TEvent>(this, _registrator);
         }
 
         public Task BuildAsync()
@@ -86,6 +80,61 @@ namespace Tycho.Apps.Setup
             _internals.GetRequiredService<OutboxProcessor>().Initialize();
             _internals.GetRequiredService<InboxProcessor>().Initialize();
             _internals.InternalsBuilt -= OnInternalsBuilt;
+        }
+    }
+
+    internal class AppEventExpectation<TEvent> : IAppEventExpectation<TEvent>
+        where TEvent : class, IEvent
+    {
+        private readonly Registrator _registrator;
+        private readonly IAppEvents _events;
+
+        public AppEventExpectation(IAppEvents events, Registrator registrator)
+        {
+            _events = events;
+            _registrator = registrator;
+        }
+
+        public IAppEvents HandlesWith<THandler>()
+            where THandler : class, IEventHandler<TEvent>
+        {
+            _registrator.HandleEvent<TEvent, THandler>();
+            return _events;
+        }
+
+        public IAppEventExpectation<TEvent> ForwardsTo<TModule>()
+            where TModule : TychoModule
+        {
+            _registrator.ForwardEvent<TEvent, TModule>();
+            return this;
+        }
+
+        public IAppMappedEventExpectation<TEvent, TTargetEvent> MapsTo<TTargetEvent>(Func<TEvent, TTargetEvent> map)
+            where TTargetEvent : class, IEvent
+        {
+            map.ThrowIfNull();
+            return new AppMappedEventExpectation<TEvent, TTargetEvent>(_registrator, map);
+        }
+    }
+
+    internal class AppMappedEventExpectation<TEvent, TTargetEvent> : IAppMappedEventExpectation<TEvent, TTargetEvent>
+        where TEvent : class, IEvent
+        where TTargetEvent : class, IEvent
+    {
+        private readonly Registrator _registrator;
+        private readonly Func<TEvent, TTargetEvent> _map;
+
+        public AppMappedEventExpectation(Registrator registrator, Func<TEvent, TTargetEvent> map)
+        {
+            _registrator = registrator;
+            _map = map;
+        }
+
+        public IAppMappedEventExpectation<TEvent, TTargetEvent> ForwardsTo<TModule>()
+            where TModule : TychoModule
+        {
+            _registrator.ForwardEvent<TEvent, TTargetEvent, TModule>(_map);
+            return this;
         }
     }
 }
