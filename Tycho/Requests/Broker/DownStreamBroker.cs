@@ -2,9 +2,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
+using Tycho.Requests.Pipeline;
 using Tycho.Requests.Registrating.Registrations;
 using Tycho.Structure;
-using Tycho.Transactions;
 using Tycho.Utils;
 
 namespace Tycho.Requests.Broker
@@ -39,30 +39,9 @@ namespace Tycho.Requests.Broker
 
             await using AsyncServiceScope scope = _internals.CreateAsyncScope();
 
-            ITransaction transaction = scope.ServiceProvider.GetRequiredService<ITransaction>();
             IDownStreamRequestRegistration<TRequest, TModule> registration = scope.ServiceProvider.GetRequiredService<IDownStreamRequestRegistration<TRequest, TModule>>();
-
-            if (registration.Handler is ITransactionalRequestHandler)
-            {
-                await transaction.BeginAsync(cancellationToken).ConfigureAwait(false);
-            }
-
-            try
-            {
-                await registration.Handler.HandleAsync(requestData, cancellationToken).ConfigureAwait(false);
-                if (transaction.IsInProgress)
-                {
-                    await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-                }
-            }
-            catch
-            {
-                if (transaction.IsInProgress)
-                {
-                    await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-                }
-                throw;
-            }
+            RequestPipeline<TRequest, NoResponse> pipeline = RequestPipelineBuilder.Build(scope.ServiceProvider, registration.Handler);
+            await pipeline.ExecuteAsync(requestData, cancellationToken).ConfigureAwait(false);
         }
 
         [EntryPoint]
@@ -73,31 +52,9 @@ namespace Tycho.Requests.Broker
 
             await using AsyncServiceScope scope = _internals.CreateAsyncScope();
 
-            ITransaction transaction = scope.ServiceProvider.GetRequiredService<ITransaction>();
             IDownStreamRequestRegistration<TRequest, TResponse, TModule> registration = scope.ServiceProvider.GetRequiredService<IDownStreamRequestRegistration<TRequest, TResponse, TModule>>();
-
-            if (registration.Handler is ITransactionalRequestHandler)
-            {
-                await transaction.BeginAsync(cancellationToken).ConfigureAwait(false);
-            }
-
-            try
-            {
-                TResponse response = await registration.Handler.HandleAsync(requestData, cancellationToken).ConfigureAwait(false);
-                if (transaction.IsInProgress)
-                {
-                    await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-                }
-                return response;
-            }
-            catch
-            {
-                if (transaction.IsInProgress)
-                {
-                    await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-                }
-                throw;
-            }
+            RequestPipeline<TRequest, TResponse> pipeline = RequestPipelineBuilder.Build(scope.ServiceProvider, registration.Handler);
+            return await pipeline.ExecuteAsync(requestData, cancellationToken).ConfigureAwait(false);
         }
     }
 }

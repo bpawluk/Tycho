@@ -54,7 +54,7 @@ namespace Tycho.Utils.SourceGenerator
                     .OfType<IMethodSymbol>()
                     .Where(methodSymbol =>
                         methodSymbol.Name == TychoAppReference.DefineContractMethodSignature.MethodName ||
-                        methodSymbol.Name == TychoAppReference.DefineEventsMethodSignature.MethodName || 
+                        methodSymbol.Name == TychoAppReference.DefineEventsMethodSignature.MethodName ||
                         methodSymbol.Name == TychoAppReference.IncludeModulesMethodSignature.MethodName ||
                         methodSymbol.Name == TychoModuleReference.DefineContractMethodSignature.MethodName ||
                         methodSymbol.Name == TychoModuleReference.DefineEventsMethodSignature.MethodName ||
