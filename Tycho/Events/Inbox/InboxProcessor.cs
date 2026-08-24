@@ -31,7 +31,11 @@ namespace Tycho.Events.Inbox
             _jobProcessor = new JobProcessor(inboxJobFactory, jobProcessorSettings);
         }
 
-        public void Initialize() => _inboxActivity.NewEntriesAdded += OnEntriesAdded;
+        public void Initialize()
+        {
+            _inboxActivity.NewEntriesAdded += OnEntriesAdded;
+            _jobProcessor.Activate();
+        }
 
         private void OnEntriesAdded(object _, EventArgs __) => _jobProcessor.Activate();
 

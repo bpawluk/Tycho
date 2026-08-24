@@ -31,7 +31,11 @@ namespace Tycho.Events.Outbox
             _jobProcessor = new JobProcessor(outboxJobFactory, jobProcessorSettings);
         }
 
-        public void Initialize() => _outboxActivity.NewEntriesAdded += OnEntriesAdded;
+        public void Initialize()
+        {
+            _outboxActivity.NewEntriesAdded += OnEntriesAdded;
+            _jobProcessor.Activate();
+        }
 
         private void OnEntriesAdded(object _, EventArgs __) => _jobProcessor.Activate();
 

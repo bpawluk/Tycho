@@ -129,10 +129,9 @@ namespace Tycho.Processor
                 }
 
                 TimeSpan newInterval = _currentInterval * _settings.IntervalMultiplier;
-
                 if (newInterval > _settings.MaxInterval)
                 {
-                    newInterval = Timeout.InfiniteTimeSpan;
+                    newInterval = _settings.MaxInterval;
                 }
 
                 _currentInterval = newInterval;

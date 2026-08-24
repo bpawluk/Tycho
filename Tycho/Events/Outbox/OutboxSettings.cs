@@ -22,22 +22,22 @@ namespace Tycho.Events.Outbox
         /// Gets or sets the initial polling interval for the outbox processor.
         /// </summary>
         /// <value>The initial time interval between outbox processor iterations.</value>
-        public TimeSpan InitialPollingInterval { get; set; } = TimeSpan.FromSeconds(0.1);
+        public TimeSpan InitialPollingInterval { get; set; } = TimeSpan.FromMilliseconds(100);
 
         /// <summary>
         /// Gets or sets the polling interval multiplier for the outbox processor.
         /// </summary>
         /// <value>The factor by which the polling interval increases when the outbox processor is idle.</value>
-        public double PollingIntervalMultiplier { get; set; } = 2.0;
+        public double PollingIntervalMultiplier { get; set; } = 3.0;
 
         /// <summary>
         /// Gets or sets the maximum polling interval for the outbox processor.
         /// </summary>
         /// <value>The maximum time interval between outbox processor iterations.</value>
         /// <remarks>
-        /// Processing stops when the polling interval exceeds this value.
+        /// Polling continues at this interval while the processor is idle.
         /// </remarks>
-        public TimeSpan MaxPollingInterval { get; set; } = TimeSpan.FromSeconds(2);
+        public TimeSpan MaxPollingInterval { get; set; } = TimeSpan.FromMinutes(5);
 
         /// <summary>
         /// Gets or sets the processing timeout for the outbox processor.
