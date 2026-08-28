@@ -2,18 +2,17 @@ using System;
 
 namespace Tycho.Processor
 {
-    internal class JobProcessorSettings
+    internal sealed class JobProcessorSettings
     {
-        public int ConcurrencyLimit { get; set; } = 100;
+        public int ConcurrencyLimit { get; set; }
 
-        public TimeSpan InitialInterval { get; set; } = TimeSpan.FromSeconds(1);
+        public TimeSpan JobProcessingTimeout { get; set; }
 
-        public double IntervalMultiplier { get; set; } = 2;
+        public TimeSpan InitialInterval { get; set; }
 
-        public TimeSpan MaxInterval { get; set; } = TimeSpan.FromSeconds(5);
+        public double IntervalMultiplier { get; set; }
 
-        public TimeSpan ScheduleProcessingTimeout { get; set; } = TimeSpan.FromSeconds(10);
+        public TimeSpan MaxInterval { get; set; }
 
-        public TimeSpan JobProcessingTimeout { get; set; } = TimeSpan.FromSeconds(10);
     }
 }

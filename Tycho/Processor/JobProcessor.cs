@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -7,145 +6,195 @@ namespace Tycho.Processor
 {
     internal sealed class JobProcessor : IDisposable
     {
-        private readonly Timer _timer;
-
         private readonly IJobFactory _jobFactory;
-        private readonly JobProcessorSettings _settings;
+        private readonly IJobRunner _jobRunner;
+        private readonly IProcessingSuspender _processingSuspender;
+        private readonly IIntervalCalculator _idleTimeCalculator;
+        private readonly JobProcessorSettings _jobProcessorSettings;
 
-        private readonly SemaphoreSlim _scheduleProcessingSemaphore = new SemaphoreSlim(1, 1);
-        private readonly object _timerChangeLock = new object();
+        private readonly CancellationTokenSource _processingCts = new CancellationTokenSource();
+        private readonly object _sync = new object();
+        private Task? _processingTask;
 
-        private TimeSpan _currentInterval = Timeout.InfiniteTimeSpan;
-        private int _jobsInProgress = 0;
+        private bool WasStarted => _processingTask != null;
+        private bool IsRunning => WasStarted && !_processingTask!.IsCompleted && !IsStopped;
+        private bool IsStopped { get; set; }
 
-        public event EventHandler<Exception>? OnScheduleProcessingError;
-        public event EventHandler<Exception>? OnJobProcessingError;
+        public event EventHandler<Exception>? OnJobProcessorError;
 
-        public JobProcessor(IJobFactory jobFactory, JobProcessorSettings settings)
+        public JobProcessor(IJobFactory jobFactory, JobProcessorSettings jobProcessorSettings)
         {
-            _timer = new Timer(ProcessScheduleAsync, null, Timeout.Infinite, Timeout.Infinite);
             _jobFactory = jobFactory;
-            _settings = settings;
+            _jobRunner = new JobRunner(
+                jobProcessorSettings.ConcurrencyLimit,
+                jobProcessorSettings.JobProcessingTimeout,
+                ReportError);
+            _processingSuspender = new ProcessingSuspender();
+            _idleTimeCalculator = new IntervalCalculator(
+                jobProcessorSettings.InitialInterval,
+                jobProcessorSettings.MaxInterval,
+                jobProcessorSettings.IntervalMultiplier);
+            _jobProcessorSettings = jobProcessorSettings;
         }
 
-        public void Activate() => ResetInterval();
-
-        private async void ProcessScheduleAsync(object? _)
+        public JobProcessor(
+            IJobFactory jobFactory,
+            IJobRunner jobRunner,
+            IProcessingSuspender processingSuspender,
+            IIntervalCalculator idleTimeCalculator,
+            JobProcessorSettings jobProcessorSettings)
         {
-            if (await _scheduleProcessingSemaphore.WaitAsync(0).ConfigureAwait(false))
+            _jobRunner = jobRunner;
+            _jobFactory = jobFactory;
+            _processingSuspender = processingSuspender;
+            _idleTimeCalculator = idleTimeCalculator;
+            _jobProcessorSettings = jobProcessorSettings;
+        }
+
+        public void Start()
+        {
+            lock (_sync)
             {
-                try
+                if (IsStopped)
                 {
-                    int capacity = _settings.ConcurrencyLimit - Volatile.Read(ref _jobsInProgress);
-                    if (capacity > 0)
-                    {
-                        await StartJobsAsync(capacity).ConfigureAwait(false);
-                    }
+                    throw new InvalidOperationException("Processing was stopped.");
                 }
-                catch (Exception exception)
+
+                if (WasStarted)
                 {
-                    try
-                    {
-                        OnScheduleProcessingError?.Invoke(this, exception);
-                    }
-                    catch { }
+                    throw new InvalidOperationException("Processing already started.");
                 }
-                finally
-                {
-                    _scheduleProcessingSemaphore.Release();
-                }
+
+                _processingTask = Task.Run(Process);
             }
         }
 
-        private async Task StartJobsAsync(int amount)
+        public void Ping()
         {
-            using var cts = new CancellationTokenSource(_settings.ScheduleProcessingTimeout);
-            IReadOnlyCollection<IJob> newJobs = await _jobFactory.CreateJobsAsync(amount, cts.Token).ConfigureAwait(false);
-
-            if (newJobs.Count > 0)
+            lock (_sync)
             {
-                foreach (IJob job in newJobs)
+                if (IsStopped)
                 {
-                    cts.Token.ThrowIfCancellationRequested();
-                    Interlocked.Increment(ref _jobsInProgress);
-                    try
-                    {
-                        _ = Task.Run(async () => await ProcessJobAsync(job).ConfigureAwait(false));
-                    }
-                    catch
-                    {
-                        Interlocked.Decrement(ref _jobsInProgress);
-                        throw;
-                    }
+                    throw new InvalidOperationException("Processing was stopped.");
                 }
-                ResetInterval();
+
+                if (!IsRunning)
+                {
+                    throw new InvalidOperationException("Processing is not running.");
+                }
             }
-            else
-            {
-                IncreaseInterval();
-            }
+
+            _processingSuspender.TryResume();
         }
 
-        private async Task ProcessJobAsync(IJob job)
+        public async Task StopAsync()
         {
-            using var cts = new CancellationTokenSource(_settings.JobProcessingTimeout);
+            Task? processingTask;
+            bool shouldCancelProcessing;
+
+            lock (_sync)
+            {
+                processingTask = _processingTask;
+                shouldCancelProcessing = !IsStopped;
+                IsStopped = true;
+            }
+
+            if (shouldCancelProcessing)
+            {
+                _processingCts.Cancel();
+            }
+
+            if (processingTask != null)
+            {
+                await processingTask.ConfigureAwait(false);
+            }
+            await _jobRunner.StopAsync().ConfigureAwait(false);
+        }
+
+        private async Task Process()
+        {
             try
             {
-                await job.ExecuteAsync(cts.Token).ConfigureAwait(false);
+                await ProcessLoop().ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (_processingCts.IsCancellationRequested)
+            {
+                // Processor stopped
             }
             catch (Exception exception)
             {
                 try
                 {
-                    OnJobProcessingError?.Invoke(this, exception);
+                    OnJobProcessorError?.Invoke(this, exception);
                 }
                 catch { }
             }
-            finally
+        }
+
+        private async Task ProcessLoop()
+        {
+            while (true)
             {
-                Interlocked.Decrement(ref _jobsInProgress);
+                _processingCts.Token.ThrowIfCancellationRequested();
+
+                bool shouldSuspendProcessing;
+                try
+                {
+                    bool workPerformed = await ProcessIteration().ConfigureAwait(false);
+                    shouldSuspendProcessing = !workPerformed;
+                }
+                catch (OperationCanceledException) when (_processingCts.IsCancellationRequested)
+                {
+                    throw;
+                }
+                catch (Exception exception)
+                {
+                    shouldSuspendProcessing = true;
+                    ReportError(exception);
+                }
+
+                if (shouldSuspendProcessing)
+                {
+                    SuspendResult result = await _processingSuspender.SuspendAsync(_idleTimeCalculator.Current, _processingCts.Token).ConfigureAwait(false);
+                    if (result == SuspendResult.Completed)
+                    {
+                        _idleTimeCalculator.Increase();
+                    }
+                }
+                else
+                {
+                    _idleTimeCalculator.Reset();
+                }
             }
         }
 
-        private void ResetInterval()
+        private async Task<bool> ProcessIteration()
         {
-            lock (_timerChangeLock)
+            await _jobRunner.WaitForCapacityAsync(_processingCts.Token).ConfigureAwait(false);
+
+            IJob? job = await _jobFactory.TryCreateJobAsync(_processingCts.Token).ConfigureAwait(false);
+            if (job == null)
             {
-                if (_currentInterval != _settings.InitialInterval)
-                {
-                    _currentInterval = _settings.InitialInterval;
-                    _timer.Change(TimeSpan.Zero, _currentInterval);
-                }
+                return false;
             }
+
+            _jobRunner.Run(job);
+            return true;
         }
 
-        private void IncreaseInterval()
+        private void ReportError(Exception exception)
         {
-            lock (_timerChangeLock)
+            try
             {
-                if (_currentInterval == Timeout.InfiniteTimeSpan)
-                {
-                    return;
-                }
-
-                TimeSpan newInterval = _currentInterval * _settings.IntervalMultiplier;
-                if (newInterval > _settings.MaxInterval)
-                {
-                    newInterval = _settings.MaxInterval;
-                }
-
-                _currentInterval = newInterval;
-                _timer.Change(_currentInterval, _currentInterval);
+                OnJobProcessorError?.Invoke(this, exception);
             }
+            catch { }
         }
 
         public void Dispose()
         {
-            using var timerDisposal = new ManualResetEvent(false);
-            _timer.Dispose(timerDisposal);
-
-            timerDisposal.WaitOne();
-            _scheduleProcessingSemaphore.Dispose();
+            _processingCts.Dispose();
+            _jobRunner.Dispose();
         }
     }
 }

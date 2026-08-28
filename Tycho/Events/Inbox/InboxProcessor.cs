@@ -24,7 +24,6 @@ namespace Tycho.Events.Inbox
                 IntervalMultiplier = inboxSettings.PollingIntervalMultiplier,
                 MaxInterval = inboxSettings.MaxPollingInterval,
                 JobProcessingTimeout = inboxSettings.MessageProcessingTimeout,
-                ScheduleProcessingTimeout = inboxSettings.MessageProcessingTimeout,
             };
 
             var inboxJobFactory = new InboxProcessorJobFactory(internals);
@@ -34,14 +33,15 @@ namespace Tycho.Events.Inbox
         public void Initialize()
         {
             _inboxActivity.NewEntriesAdded += OnEntriesAdded;
-            _jobProcessor.Activate();
+            _jobProcessor.Start();
         }
 
-        private void OnEntriesAdded(object _, EventArgs __) => _jobProcessor.Activate();
+        private void OnEntriesAdded(object _, EventArgs __) => _jobProcessor.Ping();
 
         public void Dispose()
         {
             _inboxActivity.NewEntriesAdded -= OnEntriesAdded;
+            _jobProcessor.StopAsync().GetAwaiter().GetResult();
             _jobProcessor.Dispose();
         }
     }

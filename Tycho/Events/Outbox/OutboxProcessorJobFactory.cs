@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,14 +18,16 @@ namespace Tycho.Events.Outbox
         }
 
         [EntryPoint]
-        public async Task<IReadOnlyCollection<IJob>> CreateJobsAsync(int maxCount, CancellationToken cancellationToken)
+        public async Task<IJob?> TryCreateJobAsync(CancellationToken cancellationToken)
         {
             await using AsyncServiceScope scope = _internals.CreateAsyncScope();
 
             IOutboxConsumer outbox = scope.ServiceProvider.GetRequiredService<IOutboxConsumer>();
-            IReadOnlyCollection<OutboxEvent> eventsToDeliver = await outbox.Read(maxCount, cancellationToken).ConfigureAwait(false);
+            OutboxEvent? eventToDeliver = (await outbox.Read(1, cancellationToken).ConfigureAwait(false)).FirstOrDefault();
 
-            return eventsToDeliver.Select(eventToDeliver => new OutboxProcessorJob(_internals).ForEvent(eventToDeliver)).ToArray();
+            return eventToDeliver == null
+                ? null
+                : new OutboxProcessorJob(_internals).ForEvent(eventToDeliver);
         }
     }
 }
