@@ -30,40 +30,38 @@ public class OutboxProcessorJobFactoryTests
     }
 
     [Fact]
-    public async Task CreateJobsAsync_WithReceivedEvents_ReturnsMatchingJobCount()
+    public async Task TryCreateJobAsync_WithReceivedEvent_ReturnsJob()
     {
         // Arrange
-        int maxCount = 5;
         var cancellationToken = new CancellationToken();
-        var entries = new List<OutboxEvent> { CreateOutboxEvent(), CreateOutboxEvent(), CreateOutboxEvent() };
+        OutboxEvent outboxEvent = CreateOutboxEvent();
 
-        _outboxConsumerMock.Setup(o => o.Read(It.IsAny<int>(), cancellationToken))
-                           .ReturnsAsync(entries);
+        _outboxConsumerMock.Setup(o => o.TryReadAsync(cancellationToken))
+                           .ReturnsAsync(outboxEvent);
 
         // Act
-        IReadOnlyCollection<IJob> result = await _sut.CreateJobsAsync(maxCount, cancellationToken);
+        IJob? result = await _sut.TryCreateJobAsync(cancellationToken);
 
         // Assert
-        Assert.Equal(entries.Count, result.Count);
-        _outboxConsumerMock.Verify(o => o.Read(maxCount, cancellationToken), Times.Once);
+        Assert.NotNull(result);
+        _outboxConsumerMock.Verify(o => o.TryReadAsync(cancellationToken), Times.Once);
     }
 
     [Fact]
-    public async Task CreateJobsAsync_WithNoReceivedEvents_ReturnsEmptyCollection()
+    public async Task TryCreateJobAsync_WithNoReceivedEvent_ReturnsNull()
     {
         // Arrange
-        int maxCount = 5;
         var cancellationToken = new CancellationToken();
 
-        _outboxConsumerMock.Setup(o => o.Read(It.IsAny<int>(), cancellationToken))
-                           .ReturnsAsync([]);
+        _outboxConsumerMock.Setup(o => o.TryReadAsync(cancellationToken))
+                           .ReturnsAsync((OutboxEvent?)null);
 
         // Act
-        IReadOnlyCollection<IJob> result = await _sut.CreateJobsAsync(maxCount, cancellationToken);
+        IJob? result = await _sut.TryCreateJobAsync(cancellationToken);
 
         // Assert
-        Assert.Empty(result);
-        _outboxConsumerMock.Verify(o => o.Read(maxCount, cancellationToken), Times.Once);
+        Assert.Null(result);
+        _outboxConsumerMock.Verify(o => o.TryReadAsync(cancellationToken), Times.Once);
     }
 
     private static OutboxEvent CreateOutboxEvent()

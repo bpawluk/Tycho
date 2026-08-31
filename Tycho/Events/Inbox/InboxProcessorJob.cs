@@ -57,7 +57,7 @@ namespace Tycho.Events.Inbox
                     await _event.RoutedEvent.HandleWith(eventHandler, cancellationToken).ConfigureAwait(false);
 
                     bool markedAsHandled = await inbox
-                        .MarkAsHandled(_event.EventId, _event.ClaimId, cancellationToken)
+                        .MarkAsHandledAsync(_event.ClaimId, cancellationToken)
                         .ConfigureAwait(false);
 
                     if (!markedAsHandled)
@@ -84,7 +84,7 @@ namespace Tycho.Events.Inbox
                 logger?.LogError(ex, "Failed to process inbox entry with ID {entryId}", _event.EventId);
 
                 bool markedAsFailed = await inbox
-                    .MarkAsFailed(_event.EventId, _event.ClaimId, cancellationToken)
+                    .MarkAsFailedAsync(_event.ClaimId, cancellationToken)
                     .ConfigureAwait(false);
 
                 if (!markedAsFailed)

@@ -38,31 +38,22 @@ namespace Tycho.Events.Outbox.InMemory
             return Task.CompletedTask;
         }
 
-        public Task<IReadOnlyCollection<OutboxEvent>> Read(int count, CancellationToken cancellationToken)
+        public Task<OutboxEvent?> TryReadAsync(CancellationToken cancellationToken)
         {
-            var events = new List<OutboxEvent>();
-
-            for (int i = 0; i < count; i++)
+            if (_entries.TryDequeue(out SerializedRoutedEvent? nextEntry))
             {
-                if (_entries.TryDequeue(out SerializedRoutedEvent? nextEntry))
-                {
-                    events.Add(new OutboxEvent(Guid.Empty, nextEntry));
-                }
-                else
-                {
-                    break;
-                }
+                return Task.FromResult<OutboxEvent?>(new OutboxEvent(Guid.Empty, nextEntry));
             }
 
-            return Task.FromResult<IReadOnlyCollection<OutboxEvent>>(events);
+            return Task.FromResult<OutboxEvent?>(null);
         }
 
-        public Task<bool> MarkAsDelivered(Guid eventId, Guid claimId, CancellationToken cancellationToken)
+        public Task<bool> MarkAsDeliveredAsync(Guid claimId, CancellationToken cancellationToken)
         {
             return Task.FromResult(true);
         }
 
-        public Task<bool> MarkAsFailed(Guid eventId, Guid claimId, CancellationToken cancellationToken)
+        public Task<bool> MarkAsFailedAsync(Guid claimId, CancellationToken cancellationToken)
         {
             return Task.FromResult(true);
         }

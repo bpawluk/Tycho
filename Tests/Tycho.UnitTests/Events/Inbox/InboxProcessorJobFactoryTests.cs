@@ -30,40 +30,38 @@ public class InboxProcessorJobFactoryTests
     }
 
     [Fact]
-    public async Task CreateJobsAsync_WithReceivedEvents_ReturnsMatchingJobCount()
+    public async Task TryCreateJobAsync_WithReceivedEvent_ReturnsJob()
     {
         // Arrange
-        int maxCount = 5;
         var cancellationToken = new CancellationToken();
-        var entries = new List<InboxEvent> { CreateInboxEvent(), CreateInboxEvent(), CreateInboxEvent() };
+        InboxEvent inboxEvent = CreateInboxEvent();
 
-        _inboxConsumerMock.Setup(i => i.Read(It.IsAny<int>(), cancellationToken))
-                          .ReturnsAsync(entries);
+        _inboxConsumerMock.Setup(i => i.TryReadAsync(cancellationToken))
+                          .ReturnsAsync(inboxEvent);
 
         // Act
-        IReadOnlyCollection<IJob> result = await _sut.CreateJobsAsync(maxCount, cancellationToken);
+        IJob? result = await _sut.TryCreateJobAsync(cancellationToken);
 
         // Assert
-        Assert.Equal(entries.Count, result.Count);
-        _inboxConsumerMock.Verify(i => i.Read(maxCount, cancellationToken), Times.Once);
+        Assert.NotNull(result);
+        _inboxConsumerMock.Verify(i => i.TryReadAsync(cancellationToken), Times.Once);
     }
 
     [Fact]
-    public async Task CreateJobsAsync_WithNoReceivedEvents_ReturnsEmptyCollection()
+    public async Task TryCreateJobAsync_WithNoReceivedEvent_ReturnsNull()
     {
         // Arrange
-        int maxCount = 5;
         var cancellationToken = new CancellationToken();
 
-        _inboxConsumerMock.Setup(i => i.Read(It.IsAny<int>(), cancellationToken))
-                          .ReturnsAsync([]);
+        _inboxConsumerMock.Setup(i => i.TryReadAsync(cancellationToken))
+                          .ReturnsAsync((InboxEvent?)null);
 
         // Act
-        IReadOnlyCollection<IJob> result = await _sut.CreateJobsAsync(maxCount, cancellationToken);
+        IJob? result = await _sut.TryCreateJobAsync(cancellationToken);
 
         // Assert
-        Assert.Empty(result);
-        _inboxConsumerMock.Verify(i => i.Read(maxCount, cancellationToken), Times.Once);
+        Assert.Null(result);
+        _inboxConsumerMock.Verify(i => i.TryReadAsync(cancellationToken), Times.Once);
     }
 
     private static InboxEvent CreateInboxEvent()

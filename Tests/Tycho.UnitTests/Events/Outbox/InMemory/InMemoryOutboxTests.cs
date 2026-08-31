@@ -40,7 +40,13 @@ public class InMemoryOutboxTests
 
         // Act
         await _sut.Write([.. entries.Select(e => e.Routed)], cancellationToken);
-        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(entries.Count, cancellationToken);
+        var result = new List<OutboxEvent>();
+        for (int i = 0; i < entries.Count; i++)
+        {
+            OutboxEvent? outboxEvent = await _sut.TryReadAsync(cancellationToken);
+            Assert.NotNull(outboxEvent);
+            result.Add(outboxEvent);
+        }
 
         // Assert
         Assert.Equal(entries.Count, result.Count);
@@ -69,84 +75,76 @@ public class InMemoryOutboxTests
     }
 
     [Fact]
-    public async Task Read_WithEntries_ReturnsRequestedCount()
+    public async Task TryReadAsync_WithEntries_ReturnsOldestEntry()
     {
         // Arrange
         var cancellationToken = new CancellationToken();
-        var entries = new List<RoutedEvent> { CreateRoutedEvent(), CreateRoutedEvent(), CreateRoutedEvent() };
-        await _sut.Write(entries, cancellationToken);
+        var entries = new List<(SerializedRoutedEvent Serialized, RoutedEvent Routed)>
+        {
+            CreateSerializedAndRoutedEventPair(),
+            CreateSerializedAndRoutedEventPair()
+        };
+        await _sut.Write([.. entries.Select(entry => entry.Routed)], cancellationToken);
 
         // Act
-        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(2, cancellationToken);
+        OutboxEvent? result = await _sut.TryReadAsync(cancellationToken);
 
         // Assert
-        Assert.Equal(2, result.Count);
+        Assert.NotNull(result);
+        Assert.Same(entries[0].Serialized, result.RoutedEvent);
     }
 
     [Fact]
-    public async Task Read_WithFewerEntriesThanRequested_ReturnsAvailableEntries()
-    {
-        // Arrange
-        var cancellationToken = new CancellationToken();
-        await _sut.Write([CreateRoutedEvent()], cancellationToken);
-
-        // Act
-        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(5, cancellationToken);
-
-        // Assert
-        Assert.Single(result);
-    }
-
-    [Fact]
-    public async Task Read_WithNoEntries_ReturnsEmptyCollection()
+    public async Task TryReadAsync_WithNoEntries_ReturnsNull()
     {
         // Arrange
         var cancellationToken = new CancellationToken();
 
         // Act
-        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(5, cancellationToken);
+        OutboxEvent? result = await _sut.TryReadAsync(cancellationToken);
 
         // Assert
-        Assert.Empty(result);
+        Assert.Null(result);
     }
 
     [Fact]
-    public async Task Read_ConsumesEntries_SubsequentReadReturnsEmpty()
+    public async Task TryReadAsync_ConsumesOneEntryAtATime()
     {
         // Arrange
         var cancellationToken = new CancellationToken();
-        await _sut.Write([CreateRoutedEvent()], cancellationToken);
+        await _sut.Write([CreateRoutedEvent(), CreateRoutedEvent()], cancellationToken);
 
         // Act
-        await _sut.Read(1, cancellationToken);
-        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(1, cancellationToken);
+        OutboxEvent? firstResult = await _sut.TryReadAsync(cancellationToken);
+        OutboxEvent? secondResult = await _sut.TryReadAsync(cancellationToken);
+        OutboxEvent? thirdResult = await _sut.TryReadAsync(cancellationToken);
 
         // Assert
-        Assert.Empty(result);
+        Assert.NotNull(firstResult);
+        Assert.NotNull(secondResult);
+        Assert.Null(thirdResult);
     }
 
     [Fact]
-    public async Task MarkAsDelivered_ReturnsCompletedTask()
+    public async Task MarkAsDeliveredAsync_ReturnsCompletedTask()
     {
         // Arrange
-        var entryId = Guid.NewGuid();
         var claimId = Guid.NewGuid();
         var cancellationToken = new CancellationToken();
 
         // Act & Assert
-        await _sut.MarkAsDelivered(entryId, claimId, cancellationToken);
+        await _sut.MarkAsDeliveredAsync(claimId, cancellationToken);
     }
 
     [Fact]
-    public async Task MarkAsFailed_ReturnsCompletedTask()
+    public async Task MarkAsFailedAsync_ReturnsCompletedTask()
     {
         // Arrange
-        var entryId = Guid.NewGuid();
         var claimId = Guid.NewGuid();
         var cancellationToken = new CancellationToken();
 
         // Act & Assert
-        await _sut.MarkAsFailed(entryId, claimId, cancellationToken);
+        await _sut.MarkAsFailedAsync(claimId, cancellationToken);
     }
 
     private static RoutedEvent<TestEvent> CreateRoutedEvent()

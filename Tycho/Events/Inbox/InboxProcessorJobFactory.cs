@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,7 +22,7 @@ namespace Tycho.Events.Inbox
             await using AsyncServiceScope scope = _internals.CreateAsyncScope();
 
             IInboxConsumer inbox = scope.ServiceProvider.GetRequiredService<IInboxConsumer>();
-            InboxEvent? receivedEvent = (await inbox.Read(1, cancellationToken).ConfigureAwait(false)).FirstOrDefault();
+            InboxEvent? receivedEvent = await inbox.TryReadAsync(cancellationToken).ConfigureAwait(false);
 
             return receivedEvent == null
                 ? null

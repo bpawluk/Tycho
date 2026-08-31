@@ -46,7 +46,7 @@ namespace Tycho.Events.Outbox
                 await broker.DeliverAsync(_event.RoutedEvent, cancellationToken).ConfigureAwait(false);
 
                 bool markedAsDelivered = await outbox
-                    .MarkAsDelivered(_event.EventId, _event.ClaimId, cancellationToken)
+                    .MarkAsDeliveredAsync(_event.ClaimId, cancellationToken)
                     .ConfigureAwait(false);
 
                 if (!markedAsDelivered)
@@ -59,7 +59,7 @@ namespace Tycho.Events.Outbox
                 logger?.LogError(ex, "Failed to deliver outbox entry with ID {entryId}", _event.EventId);
 
                 bool markedAsFailed = await outbox
-                    .MarkAsFailed(_event.EventId, _event.ClaimId, cancellationToken)
+                    .MarkAsFailedAsync(_event.ClaimId, cancellationToken)
                     .ConfigureAwait(false);
 
                 if (!markedAsFailed)

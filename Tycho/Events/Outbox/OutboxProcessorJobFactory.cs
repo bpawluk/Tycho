@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,7 +22,7 @@ namespace Tycho.Events.Outbox
             await using AsyncServiceScope scope = _internals.CreateAsyncScope();
 
             IOutboxConsumer outbox = scope.ServiceProvider.GetRequiredService<IOutboxConsumer>();
-            OutboxEvent? eventToDeliver = (await outbox.Read(1, cancellationToken).ConfigureAwait(false)).FirstOrDefault();
+            OutboxEvent? eventToDeliver = await outbox.TryReadAsync(cancellationToken).ConfigureAwait(false);
 
             return eventToDeliver == null
                 ? null

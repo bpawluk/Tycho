@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -18,79 +17,61 @@ internal class OutboxConsumer(TychoDbContext dbContext, OutboxConsumerSettings? 
     private readonly TychoDbContext _dbContext = dbContext;
     private readonly OutboxConsumerSettings _settings = settings ?? OutboxConsumerSettings.Default;
 
-    public async Task<IReadOnlyCollection<OutboxEvent>> Read(int count, CancellationToken cancellationToken)
+    public async Task<OutboxEvent?> TryReadAsync(CancellationToken cancellationToken)
     {
-        if (count <= 0)
-        {
-            return [];
-        }
+        Guid claimId = Guid.NewGuid();
+        DateTime utcNow = DateTime.UtcNow;
 
-        DateTime claimCheckTime = DateTime.UtcNow;
         Expression<Func<OutboxEntry, bool>> canBeProcessed = entry =>
             (entry.State == EntryState.New) ||
             (entry.State == EntryState.Failed && entry.DeliveryAttempts < _settings.MaxDeliveryCount) ||
-            (entry.State == EntryState.InProcessing && entry.DeliveryAttempts < _settings.MaxDeliveryCount && entry.ClaimExpiration < claimCheckTime);
+            (entry.State == EntryState.InProcessing && entry.DeliveryAttempts < _settings.MaxDeliveryCount && entry.ClaimExpiration < utcNow);
 
-        Guid[] entriesToClaimIds = await _dbContext
+        int claimedEntries = await _dbContext
             .Set<OutboxEntry>()
             .Where(canBeProcessed)
-            .OrderBy(entry => entry.Created)
-            .Select(entry => entry.Id)
-            .Take(count)
-            .ToArrayAsync(cancellationToken)
-            .ConfigureAwait(false);
-
-        if (entriesToClaimIds.Length == 0)
-        {
-            return [];
-        }
-
-        Guid claimId = Guid.NewGuid();
-        DateTime claimWriteTime = DateTime.UtcNow;
-
-        // Known flaw: relying on system clock for claiming is vulnerable to clock skew when running the app on multiple machines
-        // Recommendation: set DeliveryExpiration to values significantly higher than the potential clock skew to mitigate this issue
-
-        await _dbContext
-            .Set<OutboxEntry>()
-            .Where(canBeProcessed)
-            .Where(entry => entriesToClaimIds.Contains(entry.Id))
+            .OrderBy(entry => entry.Updated)
+            .ThenBy(entry => entry.Id)
+            .Take(1)
             .ExecuteUpdateAsync(setters => setters
-                .SetProperty(entry => entry.Updated, claimWriteTime)
+                .SetProperty(entry => entry.Updated, utcNow)
                 .SetProperty(entry => entry.State, EntryState.InProcessing)
                 .SetProperty(entry => entry.DeliveryAttempts, entry => entry.DeliveryAttempts + 1)
                 .SetProperty(entry => entry.ClaimId, claimId)
-                .SetProperty(entry => entry.ClaimExpiration, claimWriteTime + _settings.DeliveryExpiration), cancellationToken)
+                .SetProperty(entry => entry.ClaimExpiration, utcNow + _settings.DeliveryExpiration), cancellationToken)
             .ConfigureAwait(false);
 
-        return
-        [
-            ..await _dbContext
-                .Set<OutboxEntry>()
-                .Where(entry => entry.ClaimId == claimId)
-                .OrderBy(entry => entry.Created)
-                .Select(entry => new OutboxEvent(
-                    claimId,
-                    new SerializedRoutedEvent(
-                        entry.Id,
-                        entry.PublishId,
-                        EventIdentity.Parse(entry.Event),
-                        EventHandlerIdentity.Parse(entry.Handler),
-                        Route.Parse(entry.Route),
-                        entry.Payload)))
-                .ToArrayAsync(cancellationToken)
-                .ConfigureAwait(false)
-        ];
+        if (claimedEntries != 1)
+        {
+            return null;
+        }
+
+        OutboxEntry? entryToDeliver = await _dbContext
+            .Set<OutboxEntry>()
+            .AsNoTracking()
+            .SingleOrDefaultAsync(entry => entry.ClaimId == claimId, cancellationToken)
+            .ConfigureAwait(false);
+
+        return entryToDeliver == null
+            ? null
+            : new OutboxEvent(
+                claimId,
+                new SerializedRoutedEvent(
+                    entryToDeliver.Id,
+                    entryToDeliver.PublishId,
+                    EventIdentity.Parse(entryToDeliver.Event),
+                    EventHandlerIdentity.Parse(entryToDeliver.Handler),
+                    Route.Parse(entryToDeliver.Route),
+                    entryToDeliver.Payload));
     }
 
-    public async Task<bool> MarkAsDelivered(Guid entryId, Guid claimId, CancellationToken cancellationToken)
+    public async Task<bool> MarkAsDeliveredAsync(Guid claimId, CancellationToken cancellationToken)
     {
         DateTime currentTime = DateTime.UtcNow;
 
-        int updatedRows = await _dbContext
+        int updatedRowsCount = await _dbContext
             .Set<OutboxEntry>()
             .Where(entry =>
-                entry.Id == entryId &&
                 entry.State == EntryState.InProcessing &&
                 entry.ClaimId == claimId)
             .ExecuteUpdateAsync(setters => setters
@@ -100,17 +81,16 @@ internal class OutboxConsumer(TychoDbContext dbContext, OutboxConsumerSettings? 
                 .SetProperty(entry => entry.ClaimExpiration, DateTime.MinValue), cancellationToken)
             .ConfigureAwait(false);
 
-        return updatedRows == 1;
+        return updatedRowsCount == 1;
     }
 
-    public async Task<bool> MarkAsFailed(Guid entryId, Guid claimId, CancellationToken cancellationToken)
+    public async Task<bool> MarkAsFailedAsync(Guid claimId, CancellationToken cancellationToken)
     {
         DateTime currentTime = DateTime.UtcNow;
 
-        int updatedRows = await _dbContext
+        int updatedRowsCount = await _dbContext
             .Set<OutboxEntry>()
             .Where(entry =>
-                entry.Id == entryId &&
                 entry.State == EntryState.InProcessing &&
                 entry.ClaimId == claimId)
             .ExecuteUpdateAsync(setters => setters
@@ -120,6 +100,6 @@ internal class OutboxConsumer(TychoDbContext dbContext, OutboxConsumerSettings? 
                 .SetProperty(entry => entry.ClaimExpiration, DateTime.MinValue), cancellationToken)
             .ConfigureAwait(false);
 
-        return updatedRows == 1;
+        return updatedRowsCount == 1;
     }
 }

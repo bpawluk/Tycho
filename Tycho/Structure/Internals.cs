@@ -9,10 +9,7 @@ namespace Tycho.Structure
     {
         private ServiceCollection? _serviceCollection = new ServiceCollection();
         private ServiceProvider? _serviceProvider;
-
         public Type Owner { get; }
-
-        public event EventHandler? InternalsBuilt;
 
         public Internals(Type owner)
         {
@@ -45,7 +42,6 @@ namespace Tycho.Structure
             {
                 _serviceProvider = _serviceCollection!.BuildServiceProvider();
                 _serviceCollection = null;
-                InternalsBuilt?.Invoke(this, EventArgs.Empty);
             }
         }
 

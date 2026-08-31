@@ -35,35 +35,41 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Read_WithNewEntries_ClaimsAndReadsTheEntries()
+    public async Task TryReadAsync_WithNewEntries_ClaimsAndReadsTheOldestEntry()
     {
         // Arrange
         Guid firstEntryId = Guid.NewGuid();
         Guid secondEntryId = Guid.NewGuid();
         OutboxEntry firstEntry = CreateEntry(firstEntryId, EntryState.New, 0, Guid.Empty, DateTime.MinValue);
         OutboxEntry secondEntry = CreateEntry(secondEntryId, EntryState.New, 0, Guid.Empty, DateTime.MinValue);
+        secondEntry.Created = firstEntry.Created.AddSeconds(1);
 
         await SeedEntries(firstEntry, secondEntry);
 
         DateTime readStartedAt = DateTime.UtcNow;
 
         // Act
-        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(2, CancellationToken.None);
+        OutboxEvent? result = await _sut.TryReadAsync(CancellationToken.None);
 
         // Assert
-        Assert.Equal(2, result.Count);
-        Guid[] returnedIds = [.. result.Select(outboxEvent => outboxEvent.EventId)];
-        Assert.Contains(firstEntryId, returnedIds);
-        Assert.Contains(secondEntryId, returnedIds);
-
-        Guid claimId = Assert.Single(result.Select(outboxEvent => outboxEvent.ClaimId).Distinct());
+        Assert.NotNull(result);
+        Assert.Equal(firstEntryId, result.EventId);
+        Guid claimId = result.ClaimId;
         Assert.NotEqual(Guid.Empty, claimId);
 
         OutboxEntry persistedFirstEntry = await LoadEntry(firstEntryId);
         OutboxEntry persistedSecondEntry = await LoadEntry(secondEntryId);
 
         AssertClaimedEntry(persistedFirstEntry, claimId, 1u, readStartedAt);
-        AssertClaimedEntry(persistedSecondEntry, claimId, 1u, readStartedAt);
+        AssertEntryUnchanged(secondEntry, persistedSecondEntry);
+
+        OutboxEvent? nextResult = await _sut.TryReadAsync(CancellationToken.None);
+        Assert.NotNull(nextResult);
+        Assert.Equal(secondEntryId, nextResult.EventId);
+        Assert.NotEqual(claimId, nextResult.ClaimId);
+
+        persistedSecondEntry = await LoadEntry(secondEntryId);
+        AssertClaimedEntry(persistedSecondEntry, nextResult.ClaimId, 1u, readStartedAt);
     }
 
     [Fact]
@@ -78,10 +84,10 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         DateTime readStartedAt = DateTime.UtcNow;
 
         // Act
-        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(1, CancellationToken.None);
+        OutboxEvent? result = await _sut.TryReadAsync(CancellationToken.None);
 
         // Assert
-        OutboxEvent outboxEvent = Assert.Single(result);
+        OutboxEvent outboxEvent = Assert.IsType<OutboxEvent>(result);
         Assert.Equal(entryId, outboxEvent.EventId);
         Assert.NotEqual(Guid.Empty, outboxEvent.ClaimId);
 
@@ -109,10 +115,10 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         DateTime readStartedAt = DateTime.UtcNow;
 
         // Act
-        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(1, CancellationToken.None);
+        OutboxEvent? result = await _sut.TryReadAsync(CancellationToken.None);
 
         // Assert
-        OutboxEvent outboxEvent = Assert.Single(result);
+        OutboxEvent outboxEvent = Assert.IsType<OutboxEvent>(result);
         Assert.Equal(entryId, outboxEvent.EventId);
         Assert.NotEqual(Guid.Empty, outboxEvent.ClaimId);
         Assert.NotEqual(previousClaimId, outboxEvent.ClaimId);
@@ -132,10 +138,10 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         await SeedEntries(entry);
 
         // Act
-        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(1, CancellationToken.None);
+        OutboxEvent? result = await _sut.TryReadAsync(CancellationToken.None);
 
         // Assert
-        Assert.Empty(result);
+        Assert.Null(result);
 
         OutboxEntry persistedEntry = await LoadEntry(entryId);
         AssertEntryUnchanged(entry, persistedEntry);
@@ -151,10 +157,10 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         await SeedEntries(entry);
 
         // Act
-        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(1, CancellationToken.None);
+        OutboxEvent? result = await _sut.TryReadAsync(CancellationToken.None);
 
         // Assert
-        Assert.Empty(result);
+        Assert.Null(result);
 
         OutboxEntry persistedEntry = await LoadEntry(entryId);
         AssertEntryUnchanged(entry, persistedEntry);
@@ -175,10 +181,10 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         await SeedEntries(entry);
 
         // Act
-        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(1, CancellationToken.None);
+        OutboxEvent? result = await _sut.TryReadAsync(CancellationToken.None);
 
         // Assert
-        Assert.Empty(result);
+        Assert.Null(result);
 
         OutboxEntry persistedEntry = await LoadEntry(entryId);
         AssertEntryUnchanged(entry, persistedEntry);
@@ -199,17 +205,17 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         await SeedEntries(entry);
 
         // Act
-        IReadOnlyCollection<OutboxEvent> result = await _sut.Read(1, CancellationToken.None);
+        OutboxEvent? result = await _sut.TryReadAsync(CancellationToken.None);
 
         // Assert
-        Assert.Empty(result);
+        Assert.Null(result);
 
         OutboxEntry persistedEntry = await LoadEntry(entryId);
         AssertEntryUnchanged(entry, persistedEntry);
     }
 
     [Fact]
-    public async Task MarkAsDelivered_WithEntryInProcessingAndValidClaim_MarksTheEntryAsProcessed()
+    public async Task MarkAsDeliveredAsync_WithEntryInProcessingAndValidClaim_MarksTheEntryAsProcessed()
     {
         // Arrange
         Guid entryId = Guid.NewGuid();
@@ -219,7 +225,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         await SeedEntries(entry);
 
         // Act
-        bool result = await _sut.MarkAsDelivered(entryId, claimId, CancellationToken.None);
+        bool result = await _sut.MarkAsDeliveredAsync(claimId, CancellationToken.None);
 
         // Assert
         Assert.True(result);
@@ -232,7 +238,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task MarkAsDelivered_WithEntryNotInProcessing_DoesNotMarkTheEntryAsProcessed()
+    public async Task MarkAsDeliveredAsync_WithEntryNotInProcessing_DoesNotMarkTheEntryAsProcessed()
     {
         // Arrange
         Guid entryId = Guid.NewGuid();
@@ -242,7 +248,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         await SeedEntries(entry);
 
         // Act
-        bool result = await _sut.MarkAsDelivered(entryId, claimId, CancellationToken.None);
+        bool result = await _sut.MarkAsDeliveredAsync(claimId, CancellationToken.None);
 
         // Assert
         Assert.False(result);
@@ -252,7 +258,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task MarkAsDelivered_WithEntryInProcessingAndInvalidClaim_DoesNotMarkTheEntryAsProcessed()
+    public async Task MarkAsDeliveredAsync_WithEntryInProcessingAndInvalidClaim_DoesNotMarkTheEntryAsProcessed()
     {
         // Arrange
         Guid entryId = Guid.NewGuid();
@@ -263,7 +269,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         await SeedEntries(entry);
 
         // Act
-        bool result = await _sut.MarkAsDelivered(entryId, invalidClaimId, CancellationToken.None);
+        bool result = await _sut.MarkAsDeliveredAsync(invalidClaimId, CancellationToken.None);
 
         // Assert
         Assert.False(result);
@@ -273,7 +279,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task MarkAsFailed_WithEntryInProcessingAndValidClaim_MarksTheEntryAsFailed()
+    public async Task MarkAsFailedAsync_WithEntryInProcessingAndValidClaim_MarksTheEntryAsFailed()
     {
         // Arrange
         Guid entryId = Guid.NewGuid();
@@ -283,7 +289,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         await SeedEntries(entry);
 
         // Act
-        bool result = await _sut.MarkAsFailed(entryId, claimId, CancellationToken.None);
+        bool result = await _sut.MarkAsFailedAsync(claimId, CancellationToken.None);
 
         // Assert
         Assert.True(result);
@@ -296,7 +302,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task MarkAsFailed_WithEntryNotInProcessing_DoesNotMarkTheEntryAsFailed()
+    public async Task MarkAsFailedAsync_WithEntryNotInProcessing_DoesNotMarkTheEntryAsFailed()
     {
         // Arrange
         Guid entryId = Guid.NewGuid();
@@ -306,7 +312,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         await SeedEntries(entry);
 
         // Act
-        bool result = await _sut.MarkAsFailed(entryId, claimId, CancellationToken.None);
+        bool result = await _sut.MarkAsFailedAsync(claimId, CancellationToken.None);
 
         // Assert
         Assert.False(result);
@@ -316,7 +322,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task MarkAsFailed_WithEntryInProcessingAndInvalidClaim_DoesNotMarkTheEntryAsFailed()
+    public async Task MarkAsFailedAsync_WithEntryInProcessingAndInvalidClaim_DoesNotMarkTheEntryAsFailed()
     {
         // Arrange
         Guid entryId = Guid.NewGuid();
@@ -327,7 +333,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         await SeedEntries(entry);
 
         // Act
-        bool result = await _sut.MarkAsFailed(entryId, invalidClaimId, CancellationToken.None);
+        bool result = await _sut.MarkAsFailedAsync(invalidClaimId, CancellationToken.None);
 
         // Assert
         Assert.False(result);

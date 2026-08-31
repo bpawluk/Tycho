@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events;
@@ -46,7 +45,6 @@ namespace Tycho.Apps.Setup
             }
 
             services.AddSingleton<OutboxActivity>();
-            services.AddSingleton<OutboxProcessor>();
 
             if (!_internals.HasService<IInboxWriter>() || !_internals.HasService<IInboxConsumer>())
             {
@@ -56,7 +54,6 @@ namespace Tycho.Apps.Setup
             }
 
             services.AddSingleton<InboxActivity>();
-            services.AddSingleton<InboxProcessor>();
 
             if (!_internals.HasService<ITransaction>())
             {
@@ -69,15 +66,7 @@ namespace Tycho.Apps.Setup
             services.AddTransient<IDeliveryStrategy, DownStreamRouteDelivery>();
             services.AddTransient<IPayloadSerializer, JsonPayloadSerializer>();
 
-            _internals.InternalsBuilt += OnInternalsBuilt;
             return Task.CompletedTask;
-        }
-
-        private void OnInternalsBuilt(object _, EventArgs __)
-        {
-            _internals.GetRequiredService<OutboxProcessor>().Initialize();
-            _internals.GetRequiredService<InboxProcessor>().Initialize();
-            _internals.InternalsBuilt -= OnInternalsBuilt;
         }
     }
 }

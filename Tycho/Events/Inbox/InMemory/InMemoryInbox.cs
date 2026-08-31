@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Events.Model;
@@ -28,32 +27,23 @@ namespace Tycho.Events.Inbox.InMemory
             return Task.CompletedTask;
         }
 
-        public Task<IReadOnlyCollection<InboxEvent>> Read(int count, CancellationToken cancellationToken = default)
+        public Task<InboxEvent?> TryReadAsync(CancellationToken cancellationToken = default)
         {
-            var events = new List<InboxEvent>();
-
-            for (int i = 0; i < count; i++)
+            if (_entries.TryDequeue(out SerializedRoutedEvent? nextEntry))
             {
-                if (_entries.TryDequeue(out SerializedRoutedEvent? nextEntry))
-                {
-                    RoutedEvent deserializedEvent = _eventSerializer.Deserialize(nextEntry);
-                    events.Add(new InboxEvent(Guid.Empty, deserializedEvent));
-                }
-                else
-                {
-                    break;
-                }
+                RoutedEvent deserializedEvent = _eventSerializer.Deserialize(nextEntry);
+                return Task.FromResult<InboxEvent?>(new InboxEvent(Guid.Empty, deserializedEvent));
             }
 
-            return Task.FromResult<IReadOnlyCollection<InboxEvent>>(events);
+            return Task.FromResult<InboxEvent?>(null);
         }
 
-        public Task<bool> MarkAsHandled(Guid eventId, Guid claimId, CancellationToken cancellationToken = default)
+        public Task<bool> MarkAsHandledAsync(Guid claimId, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(true);
         }
 
-        public Task<bool> MarkAsFailed(Guid eventId, Guid claimId, CancellationToken cancellationToken = default)
+        public Task<bool> MarkAsFailedAsync(Guid claimId, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(true);
         }

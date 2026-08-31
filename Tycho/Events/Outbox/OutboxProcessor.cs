@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Tycho.Processor;
 using Tycho.Structure;
 
@@ -30,18 +31,23 @@ namespace Tycho.Events.Outbox
             _jobProcessor = new JobProcessor(outboxJobFactory, jobProcessorSettings);
         }
 
-        public void Initialize()
+        public Task StartAsync()
         {
             _outboxActivity.NewEntriesAdded += OnEntriesAdded;
             _jobProcessor.Start();
+            return Task.CompletedTask;
         }
 
         private void OnEntriesAdded(object _, EventArgs __) => _jobProcessor.Ping();
 
-        public void Dispose()
+        public Task StopAsync()
         {
             _outboxActivity.NewEntriesAdded -= OnEntriesAdded;
-            _jobProcessor.StopAsync().GetAwaiter().GetResult();
+            return _jobProcessor.StopAsync();
+        }
+
+        public void Dispose()
+        {
             _jobProcessor.Dispose();
         }
     }
