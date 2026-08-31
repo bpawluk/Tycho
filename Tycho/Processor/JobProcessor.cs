@@ -10,7 +10,6 @@ namespace Tycho.Processor
         private readonly IJobRunner _jobRunner;
         private readonly IProcessingSuspender _processingSuspender;
         private readonly IIntervalCalculator _idleTimeCalculator;
-        private readonly JobProcessorSettings _jobProcessorSettings;
 
         private readonly CancellationTokenSource _processingCts = new CancellationTokenSource();
         private readonly object _sync = new object();
@@ -22,7 +21,9 @@ namespace Tycho.Processor
 
         public event EventHandler<Exception>? OnJobProcessorError;
 
-        public JobProcessor(IJobFactory jobFactory, JobProcessorSettings jobProcessorSettings)
+        public JobProcessor(
+            IJobFactory jobFactory,
+            JobProcessorSettings jobProcessorSettings)
         {
             _jobFactory = jobFactory;
             _jobRunner = new JobRunner(
@@ -34,21 +35,18 @@ namespace Tycho.Processor
                 jobProcessorSettings.InitialInterval,
                 jobProcessorSettings.MaxInterval,
                 jobProcessorSettings.IntervalMultiplier);
-            _jobProcessorSettings = jobProcessorSettings;
         }
 
         public JobProcessor(
             IJobFactory jobFactory,
             IJobRunner jobRunner,
             IProcessingSuspender processingSuspender,
-            IIntervalCalculator idleTimeCalculator,
-            JobProcessorSettings jobProcessorSettings)
+            IIntervalCalculator idleTimeCalculator)
         {
             _jobRunner = jobRunner;
             _jobFactory = jobFactory;
             _processingSuspender = processingSuspender;
             _idleTimeCalculator = idleTimeCalculator;
-            _jobProcessorSettings = jobProcessorSettings;
         }
 
         public void Start()
