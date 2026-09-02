@@ -1,5 +1,4 @@
 using Tycho.Utils.SourceGenerator.Models.System;
-using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.References.Microsoft
 {
@@ -8,22 +7,9 @@ namespace Tycho.Utils.SourceGenerator.References.Microsoft
         private const string Namespace = "Microsoft.Extensions.DependencyInjection";
         private const string TypeName = "ServiceCollectionServiceExtensions";
 
+        public const string AddSingletonMethodName = "AddSingleton";
+        public const string AddTransientMethodName = "AddTransient";
+
         public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
-
-        public static MethodSignatureModel AddSingletonMethodSignature => new MethodSignatureModel(
-            methodName: "AddSingleton",
-            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
-            {
-                IServiceCollectionReference.TypeModel,
-            }),
-            result: IServiceCollectionReference.TypeModel);
-
-        public static MethodSignatureModel AddTransientMethodSignature => new MethodSignatureModel(
-            methodName: "AddTransient",
-            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
-            {
-                IServiceCollectionReference.TypeModel,
-            }),
-            result: IServiceCollectionReference.TypeModel);
     }
 }

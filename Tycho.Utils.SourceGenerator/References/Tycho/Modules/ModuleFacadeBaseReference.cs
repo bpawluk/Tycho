@@ -1,6 +1,4 @@
 using Tycho.Utils.SourceGenerator.Models.System;
-using Tycho.Utils.SourceGenerator.References.System;
-using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
 {
@@ -9,15 +7,8 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
         private const string Namespace = "Tycho.Modules.Instance";
         private const string TypeName = "ModuleFacadeBase";
 
-        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
+        public const string ExecuteAsyncMethodName = "ExecuteAsync";
 
-        public static MethodSignatureModel ExecuteAsyncMethodSignature => new MethodSignatureModel(
-            methodName: "ExecuteAsync",
-            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
-            {
-                ObjectReference.TypeModel,
-                CancellationTokenReference.TypeModel,
-            }),
-            result: TaskReference.TypeModel);
+        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
     }
 }

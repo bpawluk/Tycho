@@ -9,6 +9,8 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
         private const string Namespace = "Tycho.Apps";
         private const string TypeName = "TychoApp";
 
+        public const string CreateAppBuilderBaseMethodName = "CreateAppBuilderBase";
+
         public static string FullName => $"{Namespace}.{TypeName}";
 
         public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
@@ -36,10 +38,5 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
                 IAppStructureReference.TypeModel,
             }),
             result: VoidReference.TypeModel);
-
-        public static MethodSignatureModel CreateAppBuilderBaseMethodSignature => new MethodSignatureModel(
-            methodName: "CreateAppBuilderBase",
-            parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
-            result: IAppBuilderBaseReference.TypeModel);
     }
 }

@@ -72,7 +72,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public MethodsTM()
             {
-                ExecuteAsyncMethod = ModuleFacadeBaseReference.ExecuteAsyncMethodSignature.MethodName;
+                ExecuteAsyncMethod = ModuleFacadeBaseReference.ExecuteAsyncMethodName;
             }
         }
 

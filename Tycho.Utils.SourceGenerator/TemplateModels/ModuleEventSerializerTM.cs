@@ -67,7 +67,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public MethodsTM()
             {
-                RegisterEventMethod = EventSerializerBaseReference.RegisterEventMethodSignature.MethodName;
+                RegisterEventMethod = EventSerializerBaseReference.RegisterEventMethodName;
             }
         }
 

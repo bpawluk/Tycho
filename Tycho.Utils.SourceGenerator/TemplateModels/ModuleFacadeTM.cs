@@ -43,7 +43,6 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string FacadeClassWithTypeParams { get; }
             public string FacadeBaseClass { get; }
             public string TaskClass { get; }
-            public string ValueTaskClass { get; }
             public string CancellationTokenClass { get; }
 
             public ClassesTM(ModuleFacadeTM owner, TychoFacadeModel tychoFacadeModel)
@@ -57,7 +56,6 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 FacadeClassWithTypeParams = facadeType.DeclarationName;
                 FacadeBaseClass = owner.UseType(ModuleFacadeBaseReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
-                ValueTaskClass = owner.UseType(ValueTaskReference.TypeModel);
                 CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);
             }
         }
@@ -80,12 +78,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         internal class MethodsTM
         {
             public string ExecuteAsyncMethod { get; }
-            public string ConfigureAwaitMethod { get; }
 
             public MethodsTM()
             {
-                ExecuteAsyncMethod = ModuleFacadeBaseReference.ExecuteAsyncMethodSignature.MethodName;
-                ConfigureAwaitMethod = ValueTaskReference.ConfigureAwaitMethodSignature.MethodName;
+                ExecuteAsyncMethod = ModuleFacadeBaseReference.ExecuteAsyncMethodName;
             }
         }
 

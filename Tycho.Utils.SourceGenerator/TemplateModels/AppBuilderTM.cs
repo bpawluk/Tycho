@@ -75,7 +75,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
         internal class MethodsTM
         {
-            public string BuildBaseMethod { get; } = IAppBuilderBaseReference.BuildMethodSignature.MethodName;
+            public string BuildBaseMethod { get; } = IAppBuilderBaseReference.BuildMethodName;
             public string BuildMethod { get; } = AppBuilderSymbols.BuildMethod;
         }
 

@@ -105,12 +105,12 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public MethodsTM(TychoExtensionsModel model)
             {
                 AddAppMethod = AppExtensionsSymbols.GetAddAppMethod(model.DefinitionType.Name);
-                AddHostedServiceMethod = ServiceCollectionHostedServiceExtensionsReference.AddHostedServiceMethodSignature.MethodName;
-                AddSingletonMethod = ServiceCollectionServiceExtensionsReference.AddSingletonMethodSignature.MethodName;
-                AnyMethod = EnumerableReference.AnyMethodSignature.MethodName;
+                AddHostedServiceMethod = ServiceCollectionHostedServiceExtensionsReference.AddHostedServiceMethodName;
+                AddSingletonMethod = ServiceCollectionServiceExtensionsReference.AddSingletonMethodName;
+                AnyMethod = EnumerableReference.AnyMethodName;
                 BuildMethod = AppBuilderSymbols.BuildMethod;
                 CreateAppBuilderMethod = AppExtensionsSymbols.CreateAppBuilderMethod;
-                CreateAppBuilderBaseMethod = TychoAppReference.CreateAppBuilderBaseMethodSignature.MethodName;
+                CreateAppBuilderBaseMethod = TychoAppReference.CreateAppBuilderBaseMethodName;
             }
         }
 

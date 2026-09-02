@@ -98,8 +98,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public MethodsTM()
             {
                 SetupMethod = ModuleSetupSymbols.SetupMethod;
-                AddSingletonMethod = ServiceCollectionServiceExtensionsReference.AddSingletonMethodSignature.MethodName;
-                AddTransientMethod = ServiceCollectionServiceExtensionsReference.AddTransientMethodSignature.MethodName;
+                AddSingletonMethod = ServiceCollectionServiceExtensionsReference.AddSingletonMethodName;
+                AddTransientMethod = ServiceCollectionServiceExtensionsReference.AddTransientMethodName;
             }
         }
 

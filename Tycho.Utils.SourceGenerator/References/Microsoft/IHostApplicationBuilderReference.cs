@@ -7,7 +7,6 @@ namespace Tycho.Utils.SourceGenerator.References.Microsoft
         private const string Namespace = "Microsoft.Extensions.Hosting";
         private const string TypeName = "IHostApplicationBuilder";
 
-        public const string ConfigurationPropertyName = "Configuration";
         public const string ServicesPropertyName = "Services";
 
         public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);

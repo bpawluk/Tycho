@@ -1,6 +1,4 @@
 using Tycho.Utils.SourceGenerator.Models.System;
-using Tycho.Utils.SourceGenerator.References.System;
-using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.References.Tycho.Events
 {
@@ -9,15 +7,8 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Events
         private const string Namespace = "Tycho.Events.Publishing";
         private const string TypeName = "PublisherBase";
 
-        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
+        public const string PublishAsyncMethodName = "PublishAsync";
 
-        public static MethodSignatureModel PublishAsyncMethodSignature => new MethodSignatureModel(
-            methodName: "PublishAsync",
-            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
-            {
-                ObjectReference.TypeModel,
-                CancellationTokenReference.TypeModel,
-            }),
-            result: TaskReference.TypeModel);
+        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
     }
 }

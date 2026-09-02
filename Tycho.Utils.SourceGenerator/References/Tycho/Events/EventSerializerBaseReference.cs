@@ -1,6 +1,4 @@
 using Tycho.Utils.SourceGenerator.Models.System;
-using Tycho.Utils.SourceGenerator.References.System;
-using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.References.Tycho.Events
 {
@@ -9,11 +7,8 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Events
         private const string Namespace = "Tycho.Events.Serialization";
         private const string TypeName = "EventSerializerBase";
 
-        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
+        public const string RegisterEventMethodName = "RegisterEvent";
 
-        public static MethodSignatureModel RegisterEventMethodSignature => new MethodSignatureModel(
-            methodName: "RegisterEvent",
-            parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
-            result: VoidReference.TypeModel);
+        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
     }
 }

@@ -66,7 +66,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public MethodsTM()
             {
-                PublishAsyncMethod = PublisherBaseReference.PublishAsyncMethodSignature.MethodName;
+                PublishAsyncMethod = PublisherBaseReference.PublishAsyncMethodName;
             }
         }
 

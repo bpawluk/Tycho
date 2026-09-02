@@ -79,7 +79,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public MethodsTM()
             {
-                ExecuteAsyncMethod = ParentBaseReference.ExecuteAsyncMethodSignature.MethodName;
+                ExecuteAsyncMethod = ParentBaseReference.ExecuteAsyncMethodName;
             }
         }
 
