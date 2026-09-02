@@ -2,6 +2,10 @@
 
 ## Open findings
 
+### 2B. High — The reference renderer loses type identity
+
+Templates rely on using directives instead of qualifying namespaces, so two referenced types with the same path in different namespaces can become ambiguous.
+
 ### 3. High — Method signature matching does not match method signatures
 
 `MethodSignatureModel.Matches` compares:
@@ -34,21 +38,9 @@ Extension methods use the completed builder and facade references. Applications 
 
 Covered by the `AppsWithSameNestedName`, `AppInGlobalNamespaceAndOuterTypes`, `AppInNamespaceAndOuterTypes`, and `AppInGenericOuterTypes` integration tests, which also validate the generated compilation.
 
-### 2. High — The reference renderer loses type identity
+### 2A. High — The reference renderer loses type identity
 
 `TypeReferenceModel.BuildTypeSuffix` renders generic arguments with `ReferenceName`, which omits containing types. `TypeParameterConstraintModel.TypeConstraint` does the same for type constraints.
-
-Therefore types such as:
-
-```csharp
-Container.NestedType
-Dictionary<string, Container.NestedType>
-where T : Container.NestedConstraint
-```
-
-can still be rendered as unqualified `NestedType` or `NestedConstraint`. Importing their namespace does not make nested types directly visible.
-
-`TemplateModelBase.UseType` now returns `FullReferenceName`, so direct references retain their containing types. It still relies on using directives instead of qualifying namespaces, however, so two referenced types with the same path in different namespaces can become ambiguous.
 
 ### 6. Resolved — Name-only members were modeled as method signatures
 
