@@ -8,10 +8,10 @@ using Tycho.Utils;
 namespace Tycho.Modules.Instance
 {
     /// <summary>
-    /// Represents a running Tycho module instance.
+    /// Represents a Tycho module instance.
     /// </summary>
     [ReferencedBySourceGenerator]
-    public interface IModule : IAsyncDisposable
+    public interface IModule : IRunnable, IDisposable
     {
         internal ModuleIdentity Identity { get; }
 
@@ -23,13 +23,12 @@ namespace Tycho.Modules.Instance
     }
 
     /// <summary>
-    /// Represents a running Tycho module instance defined by <typeparamref name="TTychoDefinition"/>.
+    /// Represents a Tycho module instance defined by <typeparamref name="TTychoDefinition"/>.
     /// </summary>
     /// <typeparam name="TTychoDefinition">The module definition type.</typeparam>
     [ReferencedByReflection]
     [ReferencedBySourceGenerator]
-    public interface IModule<TTychoDefinition> : IModule
-        where TTychoDefinition : TychoModule
+    public interface IModule<TTychoDefinition> : IModule where TTychoDefinition : TychoModule
     {
     }
 }

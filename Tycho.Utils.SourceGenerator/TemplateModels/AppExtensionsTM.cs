@@ -3,7 +3,7 @@ using Tycho.Utils.SourceGenerator.Models;
 using Tycho.Utils.SourceGenerator.References.Microsoft;
 using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.References.Tycho.Apps;
-using Tycho.Utils.SourceGenerator.References.Tycho.Logging;
+using Tycho.Utils.SourceGenerator.References.Tycho.Hosting;
 using Tycho.Utils.SourceGenerator.Symbols;
 
 namespace Tycho.Utils.SourceGenerator.TemplateModels
@@ -11,39 +11,35 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
     internal class AppExtensionsTM : TemplateModelBase
     {
         public string[] TypeParameters { get; }
-
         public string TypeParametersSuffix { get; }
-
         public string[] TypeParametersConstraints { get; }
-
         public ClassesTM Classes { get; }
-
         public InterfacesTM Interfaces { get; }
-
         public MethodsTM Methods { get; }
-
         public PropertiesTM Properties { get; }
-
         public ParametersTM Parameters { get; }
 
-        public AppExtensionsTM(TychoExtensionsModel tychoExtensionsModel)
+        public AppExtensionsTM(TychoExtensionsModel model)
         {
-            Namespace = tychoExtensionsModel.DefinitionType.Namespace;
-            TypeParameters = tychoExtensionsModel.DefinitionType.ContainingTypes
-                .SelectMany(containingType => containingType.TypeParameters.Select(typeParameter => typeParameter.Name))
-                .Concat(tychoExtensionsModel.DefinitionType.TypeParameters.Select(typeParameter => typeParameter.Name))
+            Namespace = model.DefinitionType.Namespace;
+            TypeParameters = model.DefinitionType.ContainingTypes
+                .SelectMany(type => type.TypeParameters.Select(parameter => parameter.Name))
+                .Concat(model.DefinitionType.TypeParameters.Select(parameter => parameter.Name))
                 .Distinct()
                 .ToArray();
-            TypeParametersSuffix = TypeParameters.Length == 0 ? string.Empty : $"<{string.Join(", ", TypeParameters)}>";
+            TypeParametersSuffix = TypeParameters.Length == 0
+                ? string.Empty
+                : $"<{string.Join(", ", TypeParameters)}>";
             TypeParametersConstraints = UseConstraintClauses(
-                tychoExtensionsModel.DefinitionType.ContainingTypes
-                    .SelectMany(containingType => containingType.TypeParameters)
-                    .Concat(tychoExtensionsModel.DefinitionType.TypeParameters))
+                    model.DefinitionType.ContainingTypes
+                        .SelectMany(type => type.TypeParameters)
+                        .Concat(model.DefinitionType.TypeParameters))
                 .Distinct()
                 .ToArray();
-            Classes = new ClassesTM(this, tychoExtensionsModel);
-            Interfaces = new InterfacesTM(this, tychoExtensionsModel);
-            Methods = new MethodsTM(tychoExtensionsModel);
+
+            Classes = new ClassesTM(this, model);
+            Interfaces = new InterfacesTM(this, model);
+            Methods = new MethodsTM(model);
             Properties = new PropertiesTM();
             Parameters = new ParametersTM();
         }
@@ -51,23 +47,26 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         internal class ClassesTM
         {
             public string AppClass { get; }
+            public string AppBuilderClass { get; }
             public string SetupExtensionsClass { get; }
-            public string FacadeClass { get; }
-            public string TaskClass { get; }
-            public string ActionClass { get; }
-            public string LoggingConfigurationClass { get; }
+            public string AppHostedLifecycleServiceClass { get; }
+            public string ArgumentNullExceptionClass { get; }
+            public string EnumerableClass { get; }
+            public string InvalidOperationExceptionClass { get; }
+            public string ServiceCollectionHostedServiceExtensionsClass { get; }
             public string ServiceCollectionServiceExtensionsClass { get; }
 
-            public ClassesTM(AppExtensionsTM owner, TychoExtensionsModel tychoExtensionsModel)
+            public ClassesTM(AppExtensionsTM owner, TychoExtensionsModel model)
             {
-                string appNameStem = tychoExtensionsModel.DefinitionType.Name;
-                string appTypeSuffix = tychoExtensionsModel.DefinitionType.TypeParametersSuffix;
-                AppClass = tychoExtensionsModel.DefinitionType.FullDeclarationName;
-                SetupExtensionsClass = AppExtensionsSymbols.GetAppSetupExtensionsClass(appNameStem);
-                FacadeClass = AppFacadeSymbols.GetAppFacadeClass(appNameStem, appTypeSuffix);
-                TaskClass = owner.UseType(TaskReference.TypeModel);
-                ActionClass = owner.UseType(ActionReference.TypeModel);
-                LoggingConfigurationClass = owner.UseType(LoggingConfigurationReference.TypeModel);
+                string appName = model.DefinitionType.Name;
+                AppClass = model.DefinitionType.FullDeclarationName;
+                AppBuilderClass = AppBuilderSymbols.GetAppBuilderClass(appName);
+                SetupExtensionsClass = AppExtensionsSymbols.GetAppSetupExtensionsClass(appName);
+                AppHostedLifecycleServiceClass = owner.UseType(AppHostedLifecycleServiceReference.TypeModel);
+                ArgumentNullExceptionClass = owner.UseType(ArgumentNullExceptionReference.TypeModel);
+                EnumerableClass = owner.UseType(EnumerableReference.TypeModel);
+                InvalidOperationExceptionClass = owner.UseType(InvalidOperationExceptionReference.TypeModel);
+                ServiceCollectionHostedServiceExtensionsClass = owner.UseType(ServiceCollectionHostedServiceExtensionsReference.TypeModel);
                 ServiceCollectionServiceExtensionsClass = owner.UseType(ServiceCollectionServiceExtensionsReference.TypeModel);
             }
         }
@@ -76,74 +75,53 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         {
             public string HostApplicationBuilderInterface { get; }
             public string FacadeInterface { get; }
-            public string ConfigurationInterface { get; }
-            public string LoggingBuilderInterface { get; }
 
-            public InterfacesTM(AppExtensionsTM owner, TychoExtensionsModel tychoExtensionsModel)
+            public InterfacesTM(AppExtensionsTM owner, TychoExtensionsModel model)
             {
                 HostApplicationBuilderInterface = owner.UseType(IHostApplicationBuilderReference.TypeModel);
-                FacadeInterface = AppFacadeSymbols.GetAppFacadeInterface(tychoExtensionsModel.DefinitionType.Name, tychoExtensionsModel.DefinitionType.TypeParametersSuffix);
-                ConfigurationInterface = owner.UseType(IConfigurationReference.TypeModel);
-                LoggingBuilderInterface = owner.UseType(ILoggingBuilderReference.TypeModel);
+                FacadeInterface = AppFacadeSymbols.GetAppFacadeInterface(
+                    model.DefinitionType.Name,
+                    model.DefinitionType.TypeParametersSuffix);
             }
         }
 
         internal class MethodsTM
         {
             public string AddAppMethod { get; }
-            public string ConfigureLoggingMethod { get; }
+            public string AddHostedServiceMethod { get; }
             public string AddSingletonMethod { get; }
-            public string WithConfigurationMethod { get; }
-            public string WithLoggingMethod { get; }
-            public string WithConfigurationBaseMethod { get; }
-            public string WithLoggingBaseMethod { get; }
-            public string RunBaseMethod { get; }
-            public string RunAsyncMethod { get; }
-            public string ConfigureAwaitMethod { get; }
+            public string AnyMethod { get; }
+            public string BuildMethod { get; }
+            public string CreateAppBuilderMethod { get; }
+            public string CreateAppBuilderBaseMethod { get; }
 
-            public MethodsTM(TychoExtensionsModel tychoextensionsModel)
+            public MethodsTM(TychoExtensionsModel model)
             {
-                AddAppMethod = AppExtensionsSymbols.GetAddAppMethod(tychoextensionsModel.DefinitionType.Name);
-                WithConfigurationMethod = AppSetupSymbols.WithConfigurationMethod;
-                WithLoggingMethod = AppSetupSymbols.WithLoggingMethod;
-                WithConfigurationBaseMethod = TychoAppReference.WithConfigurationBaseMethodSignature.MethodName;
-                WithLoggingBaseMethod = TychoAppReference.WithLoggingBaseMethodSignature.MethodName;
-                RunBaseMethod = TychoAppReference.RunBaseAsyncMethodSignature.MethodName;
-                RunAsyncMethod = AppSetupSymbols.RunAsyncMethod;
+                AddAppMethod = AppExtensionsSymbols.GetAddAppMethod(model.DefinitionType.Name);
+                AddHostedServiceMethod = ServiceCollectionHostedServiceExtensionsReference.AddHostedServiceMethodSignature.MethodName;
                 AddSingletonMethod = ServiceCollectionServiceExtensionsReference.AddSingletonMethodSignature.MethodName;
-                ConfigureLoggingMethod = LoggingConfigurationReference.ConfigureLoggingMethodSignature.MethodName;
-                ConfigureAwaitMethod = TaskReference.ConfigureAwaitMethodSignature.MethodName;
+                AnyMethod = EnumerableReference.AnyMethodSignature.MethodName;
+                BuildMethod = AppBuilderSymbols.BuildMethod;
+                CreateAppBuilderMethod = AppExtensionsSymbols.CreateAppBuilderMethod;
+                CreateAppBuilderBaseMethod = TychoAppReference.CreateAppBuilderBaseMethodSignature.MethodName;
             }
         }
 
         internal class PropertiesTM
         {
-            public string ConfigurationProperty { get; }
-            public string ServicesProperty { get; }
-
-            public PropertiesTM()
-            {
-                ConfigurationProperty = IHostApplicationBuilderReference.ConfigurationPropertyName;
-                ServicesProperty = IHostApplicationBuilderReference.ServicesPropertyName;
-            }
+            public string ServicesProperty { get; } = IHostApplicationBuilderReference.ServicesPropertyName;
+            public string ServiceTypeProperty { get; } = ServiceDescriptorReference.ServiceTypePropertyName;
         }
 
         internal class ParametersTM
         {
-            public string AppParameter { get; }
-            public string BuilderParameter { get; }
-            public string LoggingParameter { get; }
-            public string GlobalConfigurationParameter { get; }
-            public string LoggingSetupParameter { get; }
-
-            public ParametersTM()
-            {
-                AppParameter = AppExtensionsSymbols.AppParameter;
-                BuilderParameter = AppExtensionsSymbols.BuilderParameter;
-                LoggingParameter = AppExtensionsSymbols.LoggingParameter;
-                GlobalConfigurationParameter = AppSetupSymbols.GlobalConfigurationParameter;
-                LoggingSetupParameter = AppSetupSymbols.LoggingSetupParameter;
-            }
+            public string AppParameter { get; } = AppExtensionsSymbols.AppParameter;
+            public string AppDefinitionParameter { get; } = AppExtensionsSymbols.AppDefinitionParameter;
+            public string AppBuilderBaseParameter { get; } = AppExtensionsSymbols.AppBuilderBaseParameter;
+            public string AppBuilderVariable { get; } = AppExtensionsSymbols.AppBuilderVariable;
+            public string BuilderParameter { get; } = AppExtensionsSymbols.BuilderParameter;
+            public string ServiceDescriptorParameter { get; } = AppExtensionsSymbols.ServiceDescriptorParameter;
+            public string ServiceProviderParameter { get; } = AppExtensionsSymbols.ServiceProviderParameter;
         }
     }
 }

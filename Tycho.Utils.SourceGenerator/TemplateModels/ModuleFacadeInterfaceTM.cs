@@ -3,6 +3,7 @@ using Tycho.Utils.SourceGenerator.Models;
 using Tycho.Utils.SourceGenerator.Models.Tycho;
 using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.References.Tycho.Modules;
+using Tycho.Utils.SourceGenerator.References.Tycho.Structure;
 using Tycho.Utils.SourceGenerator.Symbols;
 
 namespace Tycho.Utils.SourceGenerator.TemplateModels
@@ -29,7 +30,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             ContainingTypes = UseContainingTypes(tychoFacadeModel.DefinitionType.ContainingTypes);
             OwnerConstraints = UseConstraintClauses(tychoFacadeModel.DefinitionType.TypeParameters).ToArray();
             Classes = new ClassesTM(this);
-            Interfaces = new InterfacesTM(tychoFacadeModel);
+            Interfaces = new InterfacesTM(this, tychoFacadeModel);
             Methods = new MethodsTM();
             Parameters = new ParametersTM();
             Requests = tychoFacadeModel.Requests.Select(r => new RequestTM(this, r)).ToArray();
@@ -50,10 +51,14 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         internal class InterfacesTM
         {
             public string ModuleInterface { get; }
+            public string RunnableInterface { get; }
+            public string DisposableInterface { get; }
 
-            public InterfacesTM(TychoFacadeModel tychoFacadeModel)
+            public InterfacesTM(ModuleFacadeInterfaceTM owner, TychoFacadeModel tychoFacadeModel)
             {
                 ModuleInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(tychoFacadeModel.DefinitionType.Name, tychoFacadeModel.DefinitionType.TypeParametersSuffix);
+                RunnableInterface = owner.UseType(IRunnableReference.TypeModel);
+                DisposableInterface = owner.UseType(IDisposableReference.TypeModel);
             }
         }
 

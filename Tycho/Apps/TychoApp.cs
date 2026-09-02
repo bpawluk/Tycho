@@ -1,10 +1,16 @@
 using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Tycho.Apps.Instance;
 using Tycho.Apps.Setup;
+using Tycho.Hosting;
+using Tycho.Hosting.Files;
 using Tycho.Utils;
 
 namespace Tycho.Apps
@@ -15,144 +21,107 @@ namespace Tycho.Apps
     [ReferencedBySourceGenerator]
     public abstract class TychoApp
     {
-        private readonly object _runLock;
-        private readonly AppBuilder _builder;
-
-        private bool _wasAlreadyRun = false;
-
         /// <summary>
-        /// Gets the global configuration used by the application and its modules.
+        /// Defines the requests handled by the application.
         /// </summary>
-        protected IConfiguration Configuration => _builder.Globals.Configuration;
-
-        /// <summary>
-        /// Initializes a new instance of the TychoApp class.
-        /// </summary>
-        public TychoApp()
-        {
-            _runLock = new object();
-            _builder = new AppBuilder(GetType());
-        }
-
-        /// <summary>
-        /// Use this method to define the requests handled by the application.
-        /// </summary>
-        /// <param name="app">An interface for defining requests.</param>
         [ReferencedBySourceGenerator]
         protected abstract void DefineContract(IAppContract app);
 
         /// <summary>
-        /// Use this method to define the events handled and routed by the application.
+        /// Defines the events handled and routed by the application.
         /// </summary>
-        /// <param name="app">An interface for defining events.</param>
         [ReferencedBySourceGenerator]
         protected abstract void DefineEvents(IAppEvents app);
 
         /// <summary>
-        /// Use this method to define the modules used by the application.
+        /// Defines the modules used by the application.
         /// </summary>
-        /// <param name="app">An interface for including modules.</param>
         [ReferencedBySourceGenerator]
         protected abstract void IncludeModules(IAppStructure app);
 
         /// <summary>
-        /// Use this method to define the services required by the application.
+        /// Registers services required by the application.
         /// </summary>
-        /// <param name="app">An interface for registering services.</param>
         protected abstract void RegisterServices(IServiceCollection app);
 
         /// <summary>
-        /// Override this method if you need to execute code before the application runs.
+        /// Creates the internal host builder used by the application.
         /// </summary>
-        /// <param name="app">A provider of the services configured for the application.</param>
-        protected virtual Task Startup(IServiceProvider app)
+        protected virtual HostApplicationBuilder CreateHostBuilder()
         {
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Override this method if you need to execute code before the application is disposed.
-        /// </summary>
-        /// <param name="app">A provider of the services configured for the application.</param>
-        protected virtual Task Cleanup(IServiceProvider app)
-        {
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Provides automated setup for the application.
-        /// </summary>
-        /// <remarks>
-        /// Do not override; it is implemented using source generation.
-        /// </remarks>
-#pragma warning disable IDE1006
-        [ReferencedBySourceGenerator]
-        protected virtual void __AutoSetup__(IServiceCollection app)
-        {
-            throw new NotImplementedException(
-                $"Failed to provide automated setup for {GetType()} app. " +
-                $"Make sure your app definition is a public partial class marked with the TychoDefinition attribute");
-        }
-#pragma warning restore IDE1006
-
-        /// <summary>
-        /// Supplies global configuration for the application and its modules.
-        /// </summary>
-        /// <param name="globalConfiguration">The configuration to use.</param>
-        /// <exception cref="ArgumentNullException"/>
-        [ReferencedBySourceGenerator]
-        public void WithConfigurationBase(IConfiguration globalConfiguration)
-        {
-            globalConfiguration.ThrowIfNull();
-            _builder.WithConfiguration(globalConfiguration);
-        }
-
-        /// <summary>
-        /// Supplies logging setup for the application and its modules.
-        /// </summary>
-        /// <param name="loggingSetup">The logging setup to use.</param>
-        /// <exception cref="ArgumentNullException"/>
-        [ReferencedBySourceGenerator]
-        public void WithLoggingBase(Action<ILoggingBuilder> loggingSetup)
-        {
-            loggingSetup.ThrowIfNull();
-            _builder.WithLogging(loggingSetup);
-        }
-
-        /// <summary>
-        /// Builds and runs the application according to the definition.
-        /// </summary>
-        /// <returns>A fresh, ready-to-use instance of the application.</returns>
-        /// <exception cref="InvalidOperationException"/>
-        [ReferencedBySourceGenerator]
-        public async Task<IApp> RunBaseAsync()
-        {
-            EnsureItIsRunOnlyOnce();
-
-            _builder.WithCleanup(Cleanup).Init();
-            this.AddGeneratedSetup(_builder.Services);
-
-            RegisterServices(_builder.Services);
-            DefineContract(_builder.Contract);
-            DefineEvents(_builder.Events);
-            IncludeModules(_builder.Structure);
-
-            IApp app = await _builder.BuildAsync().ConfigureAwait(false);
-            await Startup(app.Internals).ConfigureAwait(false);
-
-            return app;
-        }
-
-        private void EnsureItIsRunOnlyOnce()
-        {
-            lock (_runLock)
+            return Host.CreateEmptyApplicationBuilder(new HostApplicationBuilderSettings
             {
-                if (_wasAlreadyRun)
-                {
-                    throw new InvalidOperationException("This app has already been run");
-                }
-                _wasAlreadyRun = true;
+                ApplicationName = GetType().Assembly.GetName().Name,
+            });
+        }
+
+        /// <summary>
+        /// Configures the internal application host.
+        /// </summary>
+        protected virtual void ConfigureHost(
+            IServiceProvider? parentServiceProvider,
+            HostApplicationBuilder appHostBuilder)
+        {
+            appHostBuilder.Services.RemoveAll<IHostLifetime>();
+            appHostBuilder.Services.AddSingleton<IHostLifetime, StandaloneHostLifetime>();
+
+            if (parentServiceProvider == null)
+            {
+                return;
             }
+
+            IHostEnvironment parentEnvironment = parentServiceProvider.GetRequiredService<IHostEnvironment>();
+            appHostBuilder.Environment.EnvironmentName = parentEnvironment.EnvironmentName;
+            appHostBuilder.Environment.ContentRootPath = parentEnvironment.ContentRootPath;
+
+            IFileProvider parentFileProvider = parentEnvironment.ContentRootFileProvider;
+            appHostBuilder.Environment.ContentRootFileProvider =
+                parentFileProvider is NonDisposingFileProvider
+                    ? parentFileProvider
+                    : new NonDisposingFileProvider(parentFileProvider);
+
+            IConfiguration parentConfiguration = parentServiceProvider.GetRequiredService<IConfiguration>();
+            appHostBuilder.Configuration.AddConfiguration(parentConfiguration, shouldDisposeConfiguration: false);
+            appHostBuilder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                [HostDefaults.ApplicationKey] = appHostBuilder.Environment.ApplicationName,
+                [HostDefaults.EnvironmentKey] = parentEnvironment.EnvironmentName,
+                [HostDefaults.ContentRootKey] = parentEnvironment.ContentRootPath,
+            });
+
+            ILoggerFactory parentLoggerFactory = parentServiceProvider.GetRequiredService<ILoggerFactory>();
+            appHostBuilder.Services.AddSingleton(parentLoggerFactory);
+        }
+
+        /// <summary>
+        /// Runs application startup logic.
+        /// </summary>
+        protected virtual Task Startup(IServiceProvider app, CancellationToken cancellationToken) => Task.CompletedTask;
+
+        /// <summary>
+        /// Runs application cleanup logic.
+        /// </summary>
+        protected virtual Task Cleanup(IServiceProvider app, CancellationToken cancellationToken) => Task.CompletedTask;
+
+        /// <summary>
+        /// Creates the base application builder.
+        /// </summary>
+        [ReferencedBySourceGenerator]
+        public IAppBuilderBase CreateAppBuilderBase()
+        {
+            return new AppBuilderBase(GetType())
+                .WithHostBuilder(CreateHostBuilder)
+                .WithHostConfiguration(ConfigureHost)
+                .WithContract(DefineContract)
+                .WithEvents(DefineEvents)
+                .WithStructure(IncludeModules)
+                .WithServices(services =>
+                {
+                    this.AddGeneratedSetup(services);
+                    RegisterServices(services);
+                })
+                .WithStartup(Startup)
+                .WithCleanup(Cleanup);
         }
     }
 }

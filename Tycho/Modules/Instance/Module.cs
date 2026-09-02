@@ -1,6 +1,5 @@
-using System;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Broker;
 using Tycho.Identity.Modules;
 using Tycho.Requests.Broker;
@@ -10,15 +9,12 @@ using Tycho.Utils;
 namespace Tycho.Modules.Instance
 {
     [ReferencedByReflection]
-    internal class Module<TModuleDefinition> : IModule<TModuleDefinition>
-        where TModuleDefinition : TychoModule
+    internal class Module<TModuleDefinition> : IModule<TModuleDefinition> where TModuleDefinition : TychoModule
     {
         private readonly ModuleIdentity _identity;
         private readonly Internals _internals;
         private readonly IRequestBroker _requestBroker;
         private readonly IEventBroker _eventBroker;
-
-        private readonly Func<IServiceProvider, Task> _cleanup;
 
         ModuleIdentity IModule.Identity => _identity;
         Internals IModule.Internals => _internals;
@@ -26,35 +22,18 @@ namespace Tycho.Modules.Instance
         IRequestBroker IModule.RequestBroker => _requestBroker;
 
         [ReferencedByReflection]
-        public Module(Internals internals, Func<IServiceProvider, Task> cleanup)
+        public Module(Internals internals)
         {
             _identity = ModuleIdentity.Create<TModuleDefinition>();
             _internals = internals;
             _eventBroker = new EventBroker(_internals);
             _requestBroker = new UpStreamBroker(_internals);
-            _cleanup = cleanup;
         }
 
-        public async ValueTask DisposeAsync()
-        {
-            IModuleProvider moduleProvider = _internals.GetRequiredService<IModuleProvider>();
+        public Task StartAsync(CancellationToken cancellationToken = default) => _internals.StartAsync(cancellationToken);
 
-            try
-            {
-                await _cleanup(_internals).ConfigureAwait(false);
-            }
-            catch { }
+        public Task StopAsync(CancellationToken cancellationToken = default) => _internals.StopAsync(cancellationToken);
 
-            foreach (IModule module in moduleProvider.GetAllModules())
-            {
-                try
-                {
-                    await module.DisposeAsync().ConfigureAwait(false);
-                }
-                catch { }
-            }
-
-            await _internals.DisposeAsync().ConfigureAwait(false);
-        }
+        public void Dispose() => _internals.Dispose();
     }
 }

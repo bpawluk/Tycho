@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events;
 using Tycho.Events.Broker;
@@ -33,9 +32,9 @@ namespace Tycho.Apps.Setup
             return new AppEventBinding<TEvent>(this, _registrator);
         }
 
-        public Task BuildAsync()
+        public void Build()
         {
-            IServiceCollection services = _internals.GetServiceCollection();
+            IServiceCollection services = _internals.GetHostBuilder().Services;
 
             if (!_internals.HasService<IOutboxWriter>() || !_internals.HasService<IOutboxConsumer>())
             {
@@ -66,7 +65,6 @@ namespace Tycho.Apps.Setup
             services.AddTransient<IDeliveryStrategy, DownStreamRouteDelivery>();
             services.AddTransient<IPayloadSerializer, JsonPayloadSerializer>();
 
-            return Task.CompletedTask;
         }
     }
 }

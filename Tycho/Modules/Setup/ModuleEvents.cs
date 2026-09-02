@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events;
 using Tycho.Events.Broker;
@@ -24,8 +23,7 @@ namespace Tycho.Modules.Setup
 
         private IEventBroker? _parentEventBroker;
 
-        public IEventBroker ParentEventBroker => _parentEventBroker ??
-            throw new InvalidOperationException("Parent event broker has not been defined yet.");
+        public IEventBroker ParentEventBroker => _parentEventBroker ?? throw new InvalidOperationException("Parent event broker has not been defined yet.");
 
         public ModuleEvents(Internals internals)
         {
@@ -44,9 +42,9 @@ namespace Tycho.Modules.Setup
             return new ModuleEventBinding<TEvent>(this, _registrator);
         }
 
-        public Task BuildAsync()
+        public void Build()
         {
-            IServiceCollection services = _internals.GetServiceCollection();
+            IServiceCollection services = _internals.GetHostBuilder().Services;
 
             if (!_internals.HasService<IOutboxWriter>() || !_internals.HasService<IOutboxConsumer>())
             {
@@ -78,7 +76,6 @@ namespace Tycho.Modules.Setup
             services.AddTransient<IDeliveryStrategy, UpStreamRouteDelivery>();
             services.AddTransient<IPayloadSerializer, JsonPayloadSerializer>();
 
-            return Task.CompletedTask;
         }
     }
 }

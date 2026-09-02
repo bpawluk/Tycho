@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Tycho.Requests;
 using Tycho.Requests.Registrating;
 using Tycho.Structure;
@@ -26,9 +25,5 @@ namespace Tycho.Apps.Setup
             return new AppRequestBinding<TRequest, TResponse>(this, _registrator);
         }
 
-        public Task BuildAsync()
-        {
-            return Task.CompletedTask;
-        }
     }
 }

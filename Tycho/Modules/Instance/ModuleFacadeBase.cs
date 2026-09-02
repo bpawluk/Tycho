@@ -1,6 +1,8 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Requests;
+using Tycho.Structure;
 using Tycho.Utils;
 
 namespace Tycho.Modules.Instance
@@ -9,7 +11,7 @@ namespace Tycho.Modules.Instance
     /// Base class for generated module facades.
     /// </summary>
     [ReferencedBySourceGenerator]
-    public abstract class ModuleFacadeBase
+    public abstract class ModuleFacadeBase : IRunnable, IDisposable
     {
         private readonly IModule _module;
 
@@ -53,5 +55,14 @@ namespace Tycho.Modules.Instance
             requestData.ThrowIfNull();
             return _module.RequestBroker.ExecuteAsync<TRequest, TResponse>(requestData, cancellationToken);
         }
+
+        /// <inheritdoc/>
+        public Task StartAsync(CancellationToken cancellationToken = default) => _module.StartAsync(cancellationToken);
+
+        /// <inheritdoc/>
+        public Task StopAsync(CancellationToken cancellationToken = default) => _module.StopAsync(cancellationToken);
+
+        /// <inheritdoc/>
+        public void Dispose() => _module.Dispose();
     }
 }

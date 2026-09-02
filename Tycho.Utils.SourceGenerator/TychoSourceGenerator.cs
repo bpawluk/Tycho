@@ -28,6 +28,7 @@ namespace Tycho.Utils.SourceGenerator
                    .AddTychoEventSerializerPipeline(tychoPipelineBase)
                    .AddTychoParentPipeline(tychoPipelineBase)
                    .AddTychoSetupPipeline(tychoPipelineBase)
+                   .AddTychoAppBuilderPipeline(tychoPipelineBase)
                    .AddTychoExtensionsPipeline(tychoPipelineBase);
         }
 

@@ -1,3 +1,5 @@
+#nullable enable annotations
+
 {{~#--------- Calculate indentation ---------#~}}
 {{~ ns_offset = namespace != "" ? 1 : 0 ~}}
 {{~ ct_count = array.size containing_types ~}}
@@ -27,7 +29,7 @@ namespace {{ namespace }}
 {{~ end ~}}
 {{~#-----------------------------------------#~}}
 {{~#--------------------------------------------- MODULE FACADE INTERFACE ---------------------------------------------#~}}
-{{ i0 }}public interface {{ interfaces.module_interface }}
+{{ i0 }}public interface {{ interfaces.module_interface }} : {{ interfaces.runnable_interface }}, {{ interfaces.disposable_interface }}
 {{~ for owner_constraint in owner_constraints ~}}
 {{   i1   }}{{ owner_constraint }}
 {{~ end ~}}

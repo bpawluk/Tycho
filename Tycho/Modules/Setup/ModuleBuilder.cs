@@ -1,7 +1,11 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Tycho.Events.Broker;
+using Tycho.Hosting;
+using Tycho.Hosting.Services;
 using Tycho.Modules.Instance;
 using Tycho.Requests.Broker;
 using Tycho.Structure;
@@ -9,91 +13,117 @@ using Tycho.Structure.Parent;
 
 namespace Tycho.Modules.Setup
 {
-    internal class ModuleBuilder
+    internal sealed class ModuleBuilder
     {
+        private readonly Type _moduleDefinitionType;
         private readonly Type _moduleType;
-        private readonly Internals _internals;
+        private readonly HostLifecycleCallbacks _lifecycleCallbacks;
 
-        private Func<IServiceProvider, Task>? _cleanup;
-
-        public Globals Globals { get; private set; }
-
-        public IModuleSettings? Settings { get; private set; }
-
-        public ModuleContract Contract { get; }
-
-        public ModuleEvents Events { get; }
-
-        public ModuleStructure Structure { get; }
-
-        public IServiceCollection Services => _internals.GetServiceCollection();
+        private Func<HostApplicationBuilder>? _createHostBuilderDelegate;
+        private Action<IServiceProvider?, HostApplicationBuilder>? _configureHostDelegate;
+        private Action<IModuleContract>? _configureContractDelegate;
+        private Action<IModuleEvents>? _configureEventsDelegate;
+        private Action<IModuleStructure>? _configureStructureDelegate;
+        private Action<IServiceCollection>? _registerServicesDelegate;
+        private IRequestBroker? _contractFulfillingBroker;
+        private IEventBroker? _parentEventBroker;
+        private int _built;
 
         public ModuleBuilder(Type moduleDefinitionType)
         {
+            _moduleDefinitionType = moduleDefinitionType;
             _moduleType = typeof(Module<>).MakeGenericType(moduleDefinitionType);
-            _internals = new Internals(moduleDefinitionType);
-            Globals = new Globals();
-            Settings = null!;
-            Contract = new ModuleContract(_internals);
-            Events = new ModuleEvents(_internals);
-            Structure = new ModuleStructure(_internals, Globals);
+            _lifecycleCallbacks = new HostLifecycleCallbacks();
         }
 
-        public ModuleBuilder WithGlobals(Globals globals)
+        public ModuleBuilder WithHostBuilder(Func<HostApplicationBuilder> createHostBuilder)
         {
-            Globals.Configuration = globals.Configuration;
-            Globals.LoggingSetup = globals.LoggingSetup;
+            _createHostBuilderDelegate = createHostBuilder ?? throw new ArgumentNullException(nameof(createHostBuilder));
             return this;
         }
 
-        public ModuleBuilder WithSettings(IModuleSettings settings)
+        public ModuleBuilder WithHostConfiguration(Action<IServiceProvider?, HostApplicationBuilder> configureHost)
         {
-            Settings = settings;
+            _configureHostDelegate = configureHost ?? throw new ArgumentNullException(nameof(configureHost));
             return this;
         }
 
-        public ModuleBuilder WithContractFulfillment(IRequestBroker contractFulfillingBroker)
+        public ModuleBuilder WithContract(Action<IModuleContract> configureContract, IRequestBroker? contractFulfillingBroker)
         {
-            Contract.WithContractFulfillment(contractFulfillingBroker);
+            _configureContractDelegate = configureContract ?? throw new ArgumentNullException(nameof(configureContract));
+            _contractFulfillingBroker = contractFulfillingBroker;
             return this;
         }
 
-        public ModuleBuilder WithParentEventBroker(IEventBroker parentEventBroker)
+        public ModuleBuilder WithEvents(Action<IModuleEvents> configureEvents, IEventBroker? parentEventBroker)
         {
-            Events.WithParentEventBroker(parentEventBroker);
+            _configureEventsDelegate = configureEvents ?? throw new ArgumentNullException(nameof(configureEvents));
+            _parentEventBroker = parentEventBroker;
             return this;
         }
 
-        public ModuleBuilder WithCleanup(Func<IServiceProvider, Task> cleanup)
+        public ModuleBuilder WithStructure(Action<IModuleStructure> configureStructure)
         {
-            _cleanup = cleanup;
+            _configureStructureDelegate = configureStructure ?? throw new ArgumentNullException(nameof(configureStructure));
             return this;
         }
 
-        public ModuleBuilder Init()
+        public ModuleBuilder WithServices(Action<IServiceCollection> registerServices)
         {
-            var parent = new ParentReference(Events.ParentEventBroker, Contract.ContractFulfillingBroker);
+            _registerServicesDelegate = registerServices ?? throw new ArgumentNullException(nameof(registerServices));
+            return this;
+        }
 
-            if (Globals.LoggingSetup != null)
+        public ModuleBuilder WithStartup(Func<IServiceProvider, CancellationToken, Task> startup)
+        {
+            _lifecycleCallbacks.WithStartup(startup);
+            return this;
+        }
+
+        public ModuleBuilder WithCleanup(Func<IServiceProvider, CancellationToken, Task> cleanup)
+        {
+            _lifecycleCallbacks.WithCleanup(cleanup);
+            return this;
+        }
+
+        public IModule Build(IServiceProvider? parentServiceProvider = null)
+        {
+            if (Interlocked.Exchange(ref _built, 1) != 0)
             {
-                Services.AddLogging(Globals.LoggingSetup);
+                throw new InvalidOperationException("The module has already been built.");
             }
 
-            Services.AddSingleton<IParentReference>(parent)
-                    .AddSingleton(_internals);
+            HostApplicationBuilder hostBuilder = _createHostBuilderDelegate?.Invoke() ?? throw new InvalidOperationException("The module host builder has not been configured.");
+            var internals = new Internals(_moduleDefinitionType, hostBuilder);
 
-            return this;
-        }
+            hostBuilder.Services.AddSingleton(internals);
+            hostBuilder.Services.AddSingleton<IHostLifecycleCallbacks>(_lifecycleCallbacks);
+            hostBuilder.Services.AddHostedService<HostLifecycleCallbacksService>();
 
-        public async Task<IModule> BuildAsync()
-        {
-            IModule module = Activator.CreateInstance(_moduleType, _internals, _cleanup) as IModule ?? throw new InvalidOperationException($"Failed to create an instance of {_moduleType.Name}.");
-            await Contract.BuildAsync().ConfigureAwait(false);
-            await Events.BuildAsync().ConfigureAwait(false);
-            await Structure.BuildAsync().ConfigureAwait(false);
-            _internals.Build();
+            if (_contractFulfillingBroker == null || _parentEventBroker == null)
+            {
+                throw new InvalidOperationException("The module parent has not been configured.");
+            }
 
-            return module;
+            var structure = new ModuleStructure(internals);
+            _configureStructureDelegate?.Invoke(structure);
+            structure.Build();
+
+            var contract = new ModuleContract(internals);
+            _configureContractDelegate?.Invoke(contract);
+            contract.WithContractFulfillment(_contractFulfillingBroker);
+
+            var events = new ModuleEvents(internals);
+            events.WithParentEventBroker(_parentEventBroker);
+            _configureEventsDelegate?.Invoke(events);
+            hostBuilder.Services.AddSingleton<IParentReference>(new ParentReference(events.ParentEventBroker, contract.ContractFulfillingBroker));
+            events.Build();
+
+            _registerServicesDelegate?.Invoke(hostBuilder.Services);
+            _configureHostDelegate?.Invoke(parentServiceProvider, hostBuilder);
+            internals.Build();
+
+            return Activator.CreateInstance(_moduleType, internals) as IModule ?? throw new InvalidOperationException($"Failed to create an instance of {_moduleType.Name}.");
         }
     }
 }

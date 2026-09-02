@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Requests;
+using Tycho.Structure;
 using Tycho.Utils;
 
 namespace Tycho.Apps.Instance
@@ -10,7 +11,7 @@ namespace Tycho.Apps.Instance
     /// Base class for generated application facades.
     /// </summary>
     [ReferencedBySourceGenerator]
-    public abstract class AppFacadeBase : IAsyncDisposable
+    public abstract class AppFacadeBase : IRunnable, IDisposable
     {
         private readonly IApp _app;
 
@@ -56,6 +57,12 @@ namespace Tycho.Apps.Instance
         }
 
         /// <inheritdoc/>
-        public ValueTask DisposeAsync() => _app.DisposeAsync();
+        public Task StartAsync(CancellationToken cancellationToken = default) => _app.StartAsync(cancellationToken);
+
+        /// <inheritdoc/>
+        public Task StopAsync(CancellationToken cancellationToken = default) => _app.StopAsync(cancellationToken);
+
+        /// <inheritdoc/>
+        public void Dispose() => _app.Dispose();
     }
 }

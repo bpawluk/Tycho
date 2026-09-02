@@ -3,6 +3,7 @@ using Tycho.Utils.SourceGenerator.Models;
 using Tycho.Utils.SourceGenerator.Models.Tycho;
 using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.References.Tycho.Apps;
+using Tycho.Utils.SourceGenerator.References.Tycho.Structure;
 using Tycho.Utils.SourceGenerator.Symbols;
 
 namespace Tycho.Utils.SourceGenerator.TemplateModels
@@ -50,12 +51,14 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         internal class InterfacesTM
         {
             public string FacadeInterface { get; }
-            public string AsyncDisposableInterface { get; }
+            public string RunnableInterface { get; }
+            public string DisposableInterface { get; }
 
             public InterfacesTM(AppFacadeInterfaceTM owner, TychoFacadeModel tychoFacadeModel)
             {
                 FacadeInterface = AppFacadeSymbols.GetAppFacadeInterface(tychoFacadeModel.DefinitionType.Name, tychoFacadeModel.DefinitionType.TypeParametersSuffix);
-                AsyncDisposableInterface = owner.UseType(IAsyncDisposableReference.TypeModel);
+                RunnableInterface = owner.UseType(IRunnableReference.TypeModel);
+                DisposableInterface = owner.UseType(IDisposableReference.TypeModel);
             }
         }
 

@@ -8,7 +8,7 @@ namespace Tycho.Requests.Registrating
     {
         private readonly Internals _internals;
 
-        private IServiceCollection Services => _internals.GetServiceCollection();
+        private IServiceCollection Services => _internals.GetHostBuilder().Services;
 
         public Registrator(Internals internals)
         {

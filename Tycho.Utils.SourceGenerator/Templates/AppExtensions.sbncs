@@ -1,3 +1,5 @@
+#nullable enable annotations
+
 {{~#--------- Calculate indentation ---------#~}}
 {{~ ns_offset = namespace != "" ? 1 : 0 ~}}
 {{~ bi = ns_offset ~}}
@@ -6,95 +8,51 @@
 {{~ i2 = string.pad_left "" ((bi + 2) * 4) ~}}
 {{~ i3 = string.pad_left "" ((bi + 3) * 4) ~}}
 {{~#-----------------------------------------#~}}
-{{~#--------- Write used namespaces ---------#~}}
 {{~ for used_namespace in used_namespaces ~}}
 using {{ used_namespace }};
 {{ end }}
-{{~#-----------------------------------------#~}}
-{{~#----------- Declare namespace -----------#~}}
 {{~ if namespace != "" ~}}
 namespace {{ namespace }}
 {
 {{~ end ~}}
-{{~#-----------------------------------------#~}}
-{{~#-------------------------------------------------- APP EXTENSIONS --------------------------------------------------#~}}
-{{ i0 }}/// <summary>
-{{ i0 }}/// Extension methods for setting up Tycho applications.
-{{ i0 }}/// </summary>
 {{ i0 }}public static partial class {{ classes.setup_extensions_class }}
 {{ i0 }}{
-{{   i1   }}/// <summary>
-{{   i1   }}/// Supplies global configuration for the application and its modules.
-{{   i1   }}/// </summary>
-{{   i1   }}/// <param name="{{ parameters.app_parameter }}">An instance of the application to configure.</param>
-{{   i1   }}/// <param name="{{ parameters.global_configuration_parameter }}">Configuration to be used</param>
-{{   i1   }}/// <returns>The current application instance.</returns>
-{{   i1   }}/// <exception cref="ArgumentNullException"/>
-{{   i1   }}public static {{ classes.app_class }} {{ methods.with_configuration_method }}{{ type_parameters_suffix }}(this {{ classes.app_class }} {{ parameters.app_parameter }}, {{ interfaces.configuration_interface }} {{ parameters.global_configuration_parameter }})
-{{~ for type_parameters_constraint in type_parameters_constraints ~}}
-{{     i2     }}{{ type_parameters_constraint }}
+{{   i1   }}public static {{ classes.app_builder_class }}{{ type_parameters_suffix }} {{ methods.create_app_builder_method }}{{ type_parameters_suffix }}(this {{ classes.app_class }} {{ parameters.app_parameter }})
+{{~ for constraint in type_parameters_constraints ~}}
+{{     i2     }}{{ constraint }}
 {{~ end ~}}
 {{   i1   }}{
-{{     i2     }}{{ parameters.app_parameter }}.{{ methods.with_configuration_base_method }}({{ parameters.global_configuration_parameter }});
-{{     i2     }}return {{ parameters.app_parameter }};
+{{     i2     }}var {{ parameters.app_builder_base_parameter }} = {{ parameters.app_parameter }}.{{ methods.create_app_builder_base_method }}();
+{{     i2     }}return new {{ classes.app_builder_class }}{{ type_parameters_suffix }}({{ parameters.app_builder_base_parameter }});
 {{   i1   }}}
 
-{{   i1   }}/// <summary>
-{{   i1   }}/// Supplies logging setup for the application and its modules.
-{{   i1   }}/// </summary>
-{{   i1   }}/// <param name="{{ parameters.app_parameter }}">An instance of the application to configure.</param>
-{{   i1   }}/// <param name="{{ parameters.logging_setup_parameter }}">Logging setup to be used</param>
-{{   i1   }}/// <returns>The current application instance.</returns>
-{{   i1   }}/// <exception cref="ArgumentNullException"/>
-{{   i1   }}public static {{ classes.app_class }} {{ methods.with_logging_method }}{{ type_parameters_suffix }}(this {{ classes.app_class }} {{ parameters.app_parameter }}, {{ classes.action_class }}<{{ interfaces.logging_builder_interface }}> {{ parameters.logging_setup_parameter }})
-{{~ for type_parameters_constraint in type_parameters_constraints ~}}
-{{     i2     }}{{ type_parameters_constraint }}
+{{   i1   }}public static {{ interfaces.host_application_builder_interface }} {{ methods.add_app_method }}{{ type_parameters_suffix }}(this {{ interfaces.host_application_builder_interface }} {{ parameters.builder_parameter }}, {{ classes.app_class }} {{ parameters.app_definition_parameter }})
+{{~ for constraint in type_parameters_constraints ~}}
+{{     i2     }}{{ constraint }}
 {{~ end ~}}
 {{   i1   }}{
-{{     i2     }}{{ parameters.app_parameter }}.{{ methods.with_logging_base_method }}({{ parameters.logging_setup_parameter }});
-{{     i2     }}return {{ parameters.app_parameter }};
-{{   i1   }}}
+{{     i2     }}if ({{ parameters.builder_parameter }} == null)
+{{     i2     }}{
+{{       i3       }}throw new {{ classes.argument_null_exception_class }}(nameof({{ parameters.builder_parameter }}));
+{{     i2     }}}
 
-{{   i1   }}/// <summary>
-{{   i1   }}/// Builds and runs the application according to the definition.
-{{   i1   }}/// </summary>
-{{   i1   }}/// <param name="{{ parameters.app_parameter }}">An instance of the application to run.</param>
-{{   i1   }}/// <returns>A fresh and ready to use instance of the application facade.</returns>
-{{   i1   }}/// <exception cref="InvalidOperationException"/>
-{{   i1   }}public static async {{ classes.task_class }}<{{ interfaces.facade_interface }}> {{ methods.run_async_method }}{{ type_parameters_suffix }}(this {{ classes.app_class }} {{ parameters.app_parameter }})
-{{~ for type_parameters_constraint in type_parameters_constraints ~}}
-{{     i2     }}{{ type_parameters_constraint }}
-{{~ end ~}}
-{{   i1   }}{
-{{     i2     }}var appInstance = await {{ parameters.app_parameter }}.{{ methods.run_base_method }}().{{ methods.configure_await_method }}(false);
-{{     i2     }}return new {{ classes.facade_class }}(appInstance);
-{{   i1   }}}
+{{     i2     }}if ({{ parameters.app_definition_parameter }} == null)
+{{     i2     }}{
+{{       i3       }}throw new {{ classes.argument_null_exception_class }}(nameof({{ parameters.app_definition_parameter }}));
+{{     i2     }}}
 
-{{   i1   }}/// <summary>
-{{   i1   }}/// Sets up and runs the specified Tycho application and registers it in the host application builder.
-{{   i1   }}/// </summary>
-{{   i1   }}/// <param name="{{ parameters.builder_parameter }}">The host application builder to extend.</param>
-{{   i1   }}/// <param name="{{ parameters.app_parameter }}">An instance of the application to run.</param>
-{{   i1   }}/// <returns>The host application builder.</returns>
-{{   i1   }}public static async {{ classes.task_class }}<{{ interfaces.host_application_builder_interface }}> {{ methods.add_app_method }}{{ type_parameters_suffix }}(this {{ interfaces.host_application_builder_interface }} {{ parameters.builder_parameter }}, {{ classes.app_class }} {{ parameters.app_parameter }})
-{{~ for type_parameters_constraint in type_parameters_constraints ~}}
-{{     i2     }}{{ type_parameters_constraint }}
-{{~ end ~}}
-{{   i1   }}{
-{{     i2     }}var appInstance = await {{ parameters.app_parameter }}
-{{       i3       }}.{{ methods.with_configuration_method }}({{ parameters.builder_parameter }}.{{ properties.configuration_property }})
-{{       i3       }}.{{ methods.with_logging_method }}({{ parameters.logging_parameter }} => {{ classes.logging_configuration_class }}.{{ methods.configure_logging_method }}({{ parameters.logging_parameter }}, {{ parameters.builder_parameter }}.{{ properties.configuration_property }}))
-{{       i3       }}.{{ methods.run_async_method }}()
-{{       i3       }}.{{ methods.configure_await_method }}(false);
+{{     i2     }}if ({{ classes.enumerable_class }}.{{ methods.any_method }}({{ parameters.builder_parameter }}.{{ properties.services_property }}, {{ parameters.service_descriptor_parameter }} => {{ parameters.service_descriptor_parameter }}.{{ properties.service_type_property }} == typeof({{ interfaces.facade_interface }})))
+{{     i2     }}{
+{{       i3       }}throw new {{ classes.invalid_operation_exception_class }}("The application is already registered in the host.");
+{{     i2     }}}
 
-{{     i2     }}{{ classes.service_collection_service_extensions_class }}.{{ methods.add_singleton_method }}({{ parameters.builder_parameter }}.{{ properties.services_property }}, appInstance);
+{{     i2     }}{{ classes.app_builder_class }}{{ type_parameters_suffix }} {{ parameters.app_builder_variable }} = {{ parameters.app_definition_parameter }}.{{ methods.create_app_builder_method }}();
+{{     i2     }}{{ classes.service_collection_service_extensions_class }}.{{ methods.add_singleton_method }}({{ parameters.builder_parameter }}.{{ properties.services_property }}, {{ parameters.service_provider_parameter }} => {{ parameters.app_builder_variable }}.{{ methods.build_method }}({{ parameters.service_provider_parameter }}));
+{{     i2     }}{{ classes.service_collection_hosted_service_extensions_class }}.{{ methods.add_hosted_service_method }}<{{ classes.app_hosted_lifecycle_service_class }}<{{ interfaces.facade_interface }}>>({{ parameters.builder_parameter }}.{{ properties.services_property }});
 
 {{     i2     }}return {{ parameters.builder_parameter }};
 {{   i1   }}}
 {{ i0 }}}
-{{~#--------------------------------------------------------------------------------------------------------------------#~}}
-{{~#-------- Close namespace bracket --------#~}}
 {{~ if namespace != "" ~}}
 }
 {{~ end ~}}
-{{~#-----------------------------------------#~}}

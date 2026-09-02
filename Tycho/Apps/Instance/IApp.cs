@@ -6,17 +6,17 @@ using Tycho.Utils;
 namespace Tycho.Apps.Instance
 {
     /// <summary>
-    /// Represents a running Tycho application instance.
+    /// Represents a Tycho application instance.
     /// </summary>
     [ReferencedBySourceGenerator]
-    public interface IApp : IAsyncDisposable
+    public interface IApp : IRunnable, IDisposable
     {
         internal Internals Internals { get; }
         internal IRequestBroker RequestBroker { get; }
     }
 
     /// <summary>
-    /// Represents a running Tycho application instance defined by <typeparamref name="TAppDefinition"/>.
+    /// Represents a Tycho application instance defined by <typeparamref name="TAppDefinition"/>.
     /// </summary>
     /// <typeparam name="TAppDefinition">The application definition type.</typeparam>
     [ReferencedBySourceGenerator]

@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using Tycho.Requests;
 using Tycho.Requests.Broker;
 using Tycho.Requests.Registrating;
@@ -9,18 +8,15 @@ namespace Tycho.Modules.Setup
 {
     internal class ModuleContract : IModuleContract
     {
-        private readonly Internals _internals;
         private readonly Registrator _registrator;
 
         private IRequestBroker? _contractFulfillingBroker;
 
-        public IRequestBroker ContractFulfillingBroker => _contractFulfillingBroker ??
-            throw new InvalidOperationException("Contract fulfilling broker has not been defined yet.");
+        public IRequestBroker ContractFulfillingBroker => _contractFulfillingBroker ?? throw new InvalidOperationException("Contract fulfilling broker has not been defined yet.");
 
         public ModuleContract(Internals internals)
         {
-            _internals = internals;
-            _registrator = new Registrator(_internals);
+            _registrator = new Registrator(internals);
         }
 
         public void WithContractFulfillment(IRequestBroker contractFulfillingBroker)
@@ -62,11 +58,6 @@ namespace Tycho.Modules.Setup
                     $"the required {typeof(TRequest).Name} request");
             }
             return this;
-        }
-
-        public Task BuildAsync()
-        {
-            return Task.CompletedTask;
         }
     }
 }
