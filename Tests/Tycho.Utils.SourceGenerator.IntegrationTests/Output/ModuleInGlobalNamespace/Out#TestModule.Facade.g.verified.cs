@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Modules.Instance;
 
-public class TestModuleFacade : ModuleFacadeBase, ITestModule
+internal class TestModuleFacade : ModuleFacadeBase, ITestModule
 {
     public TestModuleFacade(IModule<TestModule> module) : base(module) { }
 }

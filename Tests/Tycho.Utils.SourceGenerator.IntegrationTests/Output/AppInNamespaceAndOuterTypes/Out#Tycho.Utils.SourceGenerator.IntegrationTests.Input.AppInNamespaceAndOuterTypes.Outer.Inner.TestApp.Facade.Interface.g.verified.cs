@@ -1,7 +1,8 @@
-//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInNamespaceAndOuterTypes.Outer.Inner.TestApp.Facade.Interface.g.cs
+﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInNamespaceAndOuterTypes.Outer.Inner.TestApp.Facade.Interface.g.cs
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Tycho.Structure;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInNamespaceAndOuterTypes
 {
@@ -9,7 +10,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInNamespaceAndOu
     {
         public partial class Inner
         {
-            public interface ITestApp : IAsyncDisposable
+            public interface ITestApp : IRunnable, IDisposable
             {
             }
         }

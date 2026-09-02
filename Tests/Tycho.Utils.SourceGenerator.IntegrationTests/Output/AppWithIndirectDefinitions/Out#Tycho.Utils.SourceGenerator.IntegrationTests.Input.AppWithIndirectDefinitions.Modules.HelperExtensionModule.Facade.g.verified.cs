@@ -5,7 +5,7 @@ using Tycho.Modules.Instance;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefinitions.Modules
 {
-    public class HelperExtensionModuleFacade : ModuleFacadeBase, IHelperExtensionModule
+    internal class HelperExtensionModuleFacade : ModuleFacadeBase, IHelperExtensionModule
     {
         public HelperExtensionModuleFacade(IModule<HelperExtensionModule> module) : base(module) { }
     }

@@ -1,7 +1,8 @@
-//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInGenericOuterTypes.Outer`1.Inner`1.TestApp`1.Facade.Interface.g.cs
+﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInGenericOuterTypes.Outer`1.Inner`1.TestApp`1.Facade.Interface.g.cs
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Tycho.Structure;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInGenericOuterTypes
 {
@@ -11,7 +12,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInGenericOuterTy
         public partial class Inner<TInner>
             where TInner : notnull
         {
-            public interface ITestApp<TApp> : IAsyncDisposable
+            public interface ITestApp<TApp> : IRunnable, IDisposable
                 where TApp : new()
             {
             }

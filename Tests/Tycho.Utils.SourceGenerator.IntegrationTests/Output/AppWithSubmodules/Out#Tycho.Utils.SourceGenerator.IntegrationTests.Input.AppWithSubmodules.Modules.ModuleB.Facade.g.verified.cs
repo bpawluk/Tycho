@@ -5,7 +5,7 @@ using Tycho.Modules.Instance;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithSubmodules.Modules
 {
-    public class ModuleBFacade : ModuleFacadeBase, IModuleB
+    internal class ModuleBFacade : ModuleFacadeBase, IModuleB
     {
         public ModuleBFacade(IModule<ModuleB> module) : base(module) { }
     }

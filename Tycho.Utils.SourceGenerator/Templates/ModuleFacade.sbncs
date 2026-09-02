@@ -1,5 +1,3 @@
-#nullable enable annotations
-
 {{~#--------- Calculate indentation ---------#~}}
 {{~ ns_offset = namespace != "" ? 1 : 0 ~}}
 {{~ ct_count = array.size containing_types ~}}

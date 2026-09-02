@@ -5,7 +5,7 @@ using Tycho.Modules.Instance;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithGenericDefinition
 {
-    public class TestModuleFacade<T> : ModuleFacadeBase, ITestModule<T>
+    internal class TestModuleFacade<T> : ModuleFacadeBase, ITestModule<T>
     {
         public TestModuleFacade(IModule<TestModule<T>> module) : base(module) { }
     }

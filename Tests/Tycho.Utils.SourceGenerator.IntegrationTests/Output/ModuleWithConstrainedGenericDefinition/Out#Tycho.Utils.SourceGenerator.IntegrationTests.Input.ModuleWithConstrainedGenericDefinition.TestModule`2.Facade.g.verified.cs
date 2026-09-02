@@ -6,7 +6,7 @@ using Tycho.Utils.SourceGenerator.IntegrationTests.Input.SharedConstraints;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithConstrainedGenericDefinition
 {
-    public class TestModuleFacade<TPayload, TKey> : ModuleFacadeBase, ITestModule<TPayload, TKey>
+    internal class TestModuleFacade<TPayload, TKey> : ModuleFacadeBase, ITestModule<TPayload, TKey>
         where TPayload : PayloadBase, IMarker, new()
         where TKey : notnull
     {

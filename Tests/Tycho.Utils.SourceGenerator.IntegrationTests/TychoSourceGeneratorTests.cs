@@ -1,7 +1,9 @@
+using System.Collections.Immutable;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests;
 
@@ -311,26 +313,47 @@ public class TychoSourceGeneratorTests : VerifyBase
 
     private static GeneratorDriver RunGenerator(string[] sources)
     {
-        CSharpCompilation compilation = CreateCompilation(sources);
         var generator = new TychoSourceGenerator();
         GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
-        return driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out _);
+
+        CSharpCompilation compilation = CreateCompilation(sources);
+        HashSet<SyntaxTree> inputSyntaxTrees = [.. compilation.SyntaxTrees];
+
+        driver = driver.RunGeneratorsAndUpdateCompilation(
+            compilation,
+            out Compilation updatedCompilation,
+            out ImmutableArray<Diagnostic> generatorDiagnostics);
+
+        Diagnostic[] errors = [.. generatorDiagnostics
+            .Concat(updatedCompilation.GetDiagnostics()
+                .Where(diagnostic => diagnostic.Location.SourceTree is not { } sourceTree || !inputSyntaxTrees.Contains(sourceTree)))
+            .Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)
+            .DistinctBy(diagnostic => diagnostic.ToString())];
+
+        Assert.True(
+            errors.Length == 0,
+            $"Generated compilation contains errors:{Environment.NewLine}{string.Join(Environment.NewLine, errors.Select(diagnostic => diagnostic.ToString()))}");
+
+        return driver;
     }
 
     private static CSharpCompilation CreateCompilation(string[] sources)
     {
-        var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
         IEnumerable<SyntaxTree> syntaxTrees = sources.Select(source =>
         {
             string sourcePath = Path.Combine(AppContext.BaseDirectory, "Input", source);
             string sourceContent = File.ReadAllText(sourcePath);
-            return CSharpSyntaxTree.ParseText(sourceContent);
+            return CSharpSyntaxTree.ParseText(sourceContent, path: sourcePath);
         });
-        PortableExecutableReference[] references =
-        [
-            MetadataReference.CreateFromFile(typeof(TychoDefinitionAttribute).GetTypeInfo().Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(IServiceCollection).GetTypeInfo().Assembly.Location)
-        ];
-        return CSharpCompilation.Create("Compilation", syntaxTrees, references, options);
+
+        string[] trustedPlatformAssemblies = ((string?)AppContext
+            .GetData("TRUSTED_PLATFORM_ASSEMBLIES"))?
+            .Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries) ?? [];
+
+        PortableExecutableReference[] references = [.. trustedPlatformAssemblies
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Select(path => MetadataReference.CreateFromFile(path))];
+
+        return CSharpCompilation.Create("Compilation", syntaxTrees, references, new(OutputKind.DynamicallyLinkedLibrary));
     }
 }

@@ -6,7 +6,7 @@ using Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithDownstreamCon
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithDownstreamContract
 {
-    public class TestModuleFacade : ModuleFacadeBase, ITestModule
+    internal class TestModuleFacade : ModuleFacadeBase, ITestModule
     {
         public TestModuleFacade(IModule<TestModule> module) : base(module) { }
 

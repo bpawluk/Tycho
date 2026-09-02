@@ -1,3 +1,5 @@
+using System.Threading;
+using System.Threading.Tasks;
 using Tycho.Events;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppWithIndirectDefinitions.Handlers;
