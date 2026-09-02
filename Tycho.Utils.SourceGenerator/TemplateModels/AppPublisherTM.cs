@@ -1,5 +1,6 @@
 using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
+using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.References.Tycho.Events;
 using Tycho.Utils.SourceGenerator.Symbols;
@@ -46,8 +47,11 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public ClassesTM(AppPublisherTM owner, TychoPublisherModel tychoPublisherModel)
             {
                 string appNameStem = tychoPublisherModel.DefinitionType.Name;
-                PublisherClass = PublisherSymbols.GetPublisherClass(appNameStem);
-                PublisherClassWithTypeParams = PublisherSymbols.GetPublisherClass(appNameStem, tychoPublisherModel.DefinitionType.TypeParametersSuffix);
+                var publisherType = new GeneratedTypeModel(
+                    tychoPublisherModel.DefinitionType,
+                    PublisherSymbols.GetPublisherClass(appNameStem));
+                PublisherClass = publisherType.Identifier;
+                PublisherClassWithTypeParams = publisherType.DeclarationName;
                 PublisherBaseClass = owner.UseType(PublisherBaseReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);
@@ -61,7 +65,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(TychoPublisherModel tychoPublisherModel)
             {
-                PublisherInterface = PublisherSymbols.GetPublisherInterface(tychoPublisherModel.DefinitionType.Name, tychoPublisherModel.DefinitionType.TypeParametersSuffix);
+                var publisherInterfaceType = new GeneratedTypeModel(
+                    tychoPublisherModel.DefinitionType,
+                    PublisherSymbols.GetPublisherInterface(tychoPublisherModel.DefinitionType.Name));
+                PublisherInterface = publisherInterfaceType.ReferenceName;
             }
         }
 

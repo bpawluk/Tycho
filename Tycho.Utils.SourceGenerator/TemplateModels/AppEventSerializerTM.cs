@@ -42,8 +42,11 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public ClassesTM(AppEventSerializerTM owner, TypeDefinitionModel appType)
             {
-                EventSerializerClass = EventSerializerSymbols.GetEventSerializerClass(appType.Name);
-                EventSerializerClassWithTypeParams = EventSerializerSymbols.GetEventSerializerClass(appType.Name, appType.TypeParametersSuffix);
+                var eventSerializerType = new GeneratedTypeModel(
+                    appType,
+                    EventSerializerSymbols.GetEventSerializerClass(appType.Name));
+                EventSerializerClass = eventSerializerType.Identifier;
+                EventSerializerClassWithTypeParams = eventSerializerType.DeclarationName;
                 EventSerializerBaseClass = owner.UseType(EventSerializerBaseReference.TypeModel);
             }
         }

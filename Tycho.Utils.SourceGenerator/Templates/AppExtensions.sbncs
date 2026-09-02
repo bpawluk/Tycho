@@ -15,13 +15,13 @@ namespace {{ namespace }}
 {{~ end ~}}
 {{ i0 }}public static partial class {{ classes.setup_extensions_class }}
 {{ i0 }}{
-{{   i1   }}public static {{ classes.app_builder_class }}{{ type_parameters_suffix }} {{ methods.create_app_builder_method }}{{ type_parameters_suffix }}(this {{ classes.app_class }} {{ parameters.app_parameter }})
+{{   i1   }}public static {{ classes.app_builder_class }} {{ methods.create_app_builder_method }}{{ type_parameters_suffix }}(this {{ classes.app_class }} {{ parameters.app_parameter }})
 {{~ for constraint in type_parameters_constraints ~}}
 {{     i2     }}{{ constraint }}
 {{~ end ~}}
 {{   i1   }}{
 {{     i2     }}var {{ parameters.app_builder_base_parameter }} = {{ parameters.app_parameter }}.{{ methods.create_app_builder_base_method }}();
-{{     i2     }}return new {{ classes.app_builder_class }}{{ type_parameters_suffix }}({{ parameters.app_builder_base_parameter }});
+{{     i2     }}return new {{ classes.app_builder_class }}({{ parameters.app_builder_base_parameter }});
 {{   i1   }}}
 
 {{   i1   }}public static {{ interfaces.host_application_builder_interface }} {{ methods.add_app_method }}{{ type_parameters_suffix }}(this {{ interfaces.host_application_builder_interface }} {{ parameters.builder_parameter }}, {{ classes.app_class }} {{ parameters.app_definition_parameter }})
@@ -44,7 +44,7 @@ namespace {{ namespace }}
 {{       i3       }}throw new {{ classes.invalid_operation_exception_class }}("The application is already registered in the host.");
 {{     i2     }}}
 
-{{     i2     }}{{ classes.app_builder_class }}{{ type_parameters_suffix }} {{ parameters.app_builder_variable }} = {{ parameters.app_definition_parameter }}.{{ methods.create_app_builder_method }}();
+{{     i2     }}{{ classes.app_builder_class }} {{ parameters.app_builder_variable }} = {{ parameters.app_definition_parameter }}.{{ methods.create_app_builder_method }}();
 {{     i2     }}{{ classes.service_collection_service_extensions_class }}.{{ methods.add_singleton_method }}({{ parameters.builder_parameter }}.{{ properties.services_property }}, {{ parameters.service_provider_parameter }} => {{ parameters.app_builder_variable }}.{{ methods.build_method }}({{ parameters.service_provider_parameter }}));
 {{     i2     }}{{ classes.service_collection_hosted_service_extensions_class }}.{{ methods.add_hosted_service_method }}<{{ classes.app_hosted_lifecycle_service_class }}<{{ interfaces.facade_interface }}>>({{ parameters.builder_parameter }}.{{ properties.services_property }});
 

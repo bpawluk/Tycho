@@ -1,5 +1,6 @@
 using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
+using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.Models.Tycho;
 using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.References.Tycho.Structure;
@@ -47,8 +48,11 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public ClassesTM(ModuleParentTM owner, TychoParentModel tychoParentModel)
             {
                 string moduleNameStem = tychoParentModel.DefinitionType.Name;
-                ParentClass = ModuleParentSymbols.GetParentClass(moduleNameStem);
-                ParentClassWithTypeParams = ModuleParentSymbols.GetParentClass(moduleNameStem, tychoParentModel.DefinitionType.TypeParametersSuffix);
+                var parentType = new GeneratedTypeModel(
+                    tychoParentModel.DefinitionType,
+                    ModuleParentSymbols.GetParentClass(moduleNameStem));
+                ParentClass = parentType.Identifier;
+                ParentClassWithTypeParams = parentType.DeclarationName;
                 ParentBaseClass = owner.UseType(ParentBaseReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);
@@ -62,7 +66,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(TychoParentModel tychoParentModel)
             {
-                ParentInterface = ModuleParentSymbols.GetParentInterface(tychoParentModel.DefinitionType.Name, tychoParentModel.DefinitionType.TypeParametersSuffix);
+                var parentInterfaceType = new GeneratedTypeModel(
+                    tychoParentModel.DefinitionType,
+                    ModuleParentSymbols.GetParentInterface(tychoParentModel.DefinitionType.Name));
+                ParentInterface = parentInterfaceType.ReferenceName;
             }
         }
 

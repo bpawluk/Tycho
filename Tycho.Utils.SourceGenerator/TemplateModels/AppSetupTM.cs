@@ -45,11 +45,19 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public ClassesTM(AppSetupTM owner, TychoSetupModel tychoSetupModel)
             {
                 string appNameStem = tychoSetupModel.DefinitionType.Name;
-                string appTypeSuffix = tychoSetupModel.DefinitionType.TypeParametersSuffix;
+                var setupType = new GeneratedTypeModel(
+                    tychoSetupModel.DefinitionType,
+                    AppSetupSymbols.GetSetupClass(appNameStem));
+                var publisherType = new GeneratedTypeModel(
+                    tychoSetupModel.DefinitionType,
+                    PublisherSymbols.GetPublisherClass(appNameStem));
+                var eventSerializerType = new GeneratedTypeModel(
+                    tychoSetupModel.DefinitionType,
+                    EventSerializerSymbols.GetEventSerializerClass(appNameStem));
 
-                SetupClass = AppSetupSymbols.GetSetupClass(appNameStem, appTypeSuffix);
-                PublisherClass = PublisherSymbols.GetPublisherClass(appNameStem, appTypeSuffix);
-                EventSerializerClass = EventSerializerSymbols.GetEventSerializerClass(appNameStem, appTypeSuffix);
+                SetupClass = setupType.DeclarationName;
+                PublisherClass = publisherType.ReferenceName;
+                EventSerializerClass = eventSerializerType.ReferenceName;
                 ServiceCollectionServiceExtensionsClass = owner.UseType(ServiceCollectionServiceExtensionsReference.TypeModel);
             }
         }
@@ -62,7 +70,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(AppSetupTM owner, TychoSetupModel tychoSetupModel)
             {
-                PublisherInterface = PublisherSymbols.GetPublisherInterface(tychoSetupModel.DefinitionType.Name, tychoSetupModel.DefinitionType.TypeParametersSuffix);
+                var publisherInterfaceType = new GeneratedTypeModel(
+                    tychoSetupModel.DefinitionType,
+                    PublisherSymbols.GetPublisherInterface(tychoSetupModel.DefinitionType.Name));
+                PublisherInterface = publisherInterfaceType.ReferenceName;
                 EventSerializerInterface = owner.UseType(IEventSerializerReference.TypeModel);
                 ServiceCollectionInterface = owner.UseType(IServiceCollectionReference.TypeModel);
             }
@@ -99,12 +110,14 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public SubmoduleTM(AppSetupTM owner, TypeReferenceModel moduleType)
             {
-                // Registers namespace import for generated facade type references.
-                owner.UseType(moduleType);
-                string moduleNameStem = moduleType.Name;
-                string moduleTypeSuffix = moduleType.TypeArgumentsSuffix;
-                FacadeInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(moduleNameStem, moduleTypeSuffix);
-                FacadeClass = ModuleFacadeSymbols.GetModuleFacadeClass(moduleNameStem, moduleTypeSuffix);
+                var facadeInterfaceType = new GeneratedTypeModel(
+                    moduleType,
+                    ModuleFacadeSymbols.GetModuleFacadeInterface(moduleType.Name));
+                var facadeType = new GeneratedTypeModel(
+                    moduleType,
+                    ModuleFacadeSymbols.GetModuleFacadeClass(moduleType.Name));
+                FacadeInterface = owner.UseType(facadeInterfaceType.TypeReference);
+                FacadeClass = owner.UseType(facadeType.TypeReference);
             }
         }
     }

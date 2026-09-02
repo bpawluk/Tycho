@@ -1,5 +1,6 @@
 using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
+using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.Models.Tycho;
 using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.References.Tycho.Modules;
@@ -48,9 +49,12 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public ClassesTM(ModuleFacadeTM owner, TychoFacadeModel tychoFacadeModel)
             {
                 string moduleNameStem = tychoFacadeModel.DefinitionType.Name;
+                var facadeType = new GeneratedTypeModel(
+                    tychoFacadeModel.DefinitionType,
+                    ModuleFacadeSymbols.GetModuleFacadeClass(moduleNameStem));
                 ModuleClass = tychoFacadeModel.DefinitionType.DeclarationName;
-                FacadeClass = ModuleFacadeSymbols.GetModuleFacadeClass(moduleNameStem);
-                FacadeClassWithTypeParams = ModuleFacadeSymbols.GetModuleFacadeClass(moduleNameStem, tychoFacadeModel.DefinitionType.TypeParametersSuffix);
+                FacadeClass = facadeType.Identifier;
+                FacadeClassWithTypeParams = facadeType.DeclarationName;
                 FacadeBaseClass = owner.UseType(ModuleFacadeBaseReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 ValueTaskClass = owner.UseType(ValueTaskReference.TypeModel);
@@ -65,7 +69,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(ModuleFacadeTM owner, TychoFacadeModel tychoFacadeModel)
             {
-                ModuleInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(tychoFacadeModel.DefinitionType.Name, tychoFacadeModel.DefinitionType.TypeParametersSuffix);
+                var facadeInterfaceType = new GeneratedTypeModel(
+                    tychoFacadeModel.DefinitionType,
+                    ModuleFacadeSymbols.GetModuleFacadeInterface(tychoFacadeModel.DefinitionType.Name));
+                ModuleInterface = facadeInterfaceType.ReferenceName;
                 InstanceInterface = owner.UseType(IModuleReference.TypeModel);
             }
         }

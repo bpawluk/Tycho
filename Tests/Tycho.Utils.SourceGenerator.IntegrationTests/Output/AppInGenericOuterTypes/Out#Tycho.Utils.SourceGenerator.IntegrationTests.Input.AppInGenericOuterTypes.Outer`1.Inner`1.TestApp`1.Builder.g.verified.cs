@@ -7,22 +7,28 @@ using Tycho.Apps.Instance;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInGenericOuterTypes
 {
-    public class TestAppBuilder<TOuter, TInner, TApp>
+    public partial class Outer<TOuter>
         where TOuter : class
-        where TInner : notnull
-        where TApp : new()
     {
-        private readonly IAppBuilderBase _appBuilderBase;
-
-        public TestAppBuilder(IAppBuilderBase appBuilderBase)
+        public partial class Inner<TInner>
+            where TInner : notnull
         {
-            _appBuilderBase = appBuilderBase;
-        }
+            public class TestAppBuilder<TApp>
+                where TApp : new()
+            {
+                private readonly IAppBuilderBase _appBuilderBase;
 
-        public ITestApp<TApp> Build(IServiceProvider? parentServiceProvider = null)
-        {
-            IApp app = _appBuilderBase.Build(parentServiceProvider);
-            return new TestAppFacade<TApp>(app);
+                public TestAppBuilder(IAppBuilderBase appBuilderBase)
+                {
+                    _appBuilderBase = appBuilderBase;
+                }
+
+                public ITestApp<TApp> Build(IServiceProvider? parentServiceProvider = null)
+                {
+                    IApp app = _appBuilderBase.Build(parentServiceProvider);
+                    return new TestAppFacade<TApp>(app);
+                }
+            }
         }
     }
 }

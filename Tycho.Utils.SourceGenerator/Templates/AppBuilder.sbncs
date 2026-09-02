@@ -2,7 +2,8 @@
 
 {{~#--------- Calculate indentation ---------#~}}
 {{~ ns_offset = namespace != "" ? 1 : 0 ~}}
-{{~ bi = ns_offset ~}}
+{{~ ct_count = array.size containing_types ~}}
+{{~ bi = ns_offset + ct_count ~}}
 {{~ i0 = string.pad_left "" (bi * 4) ~}}
 {{~ i1 = string.pad_left "" ((bi + 1) * 4) ~}}
 {{~ i2 = string.pad_left "" ((bi + 2) * 4) ~}}
@@ -14,8 +15,16 @@ using {{ used_namespace }};
 namespace {{ namespace }}
 {
 {{~ end ~}}
-{{ i0 }}public class {{ classes.app_builder_class }}{{ type_parameters_suffix }}
-{{~ for constraint in type_parameters_constraints ~}}
+{{~ for containing_type in containing_types ~}}
+{{~ containing_type_indent = (ns_offset + for.index) * 4 ~}}
+{{ string.pad_left "" containing_type_indent }}{{ containing_type.declaration }}
+{{~ for constraint in containing_type.constraints ~}}
+{{ string.pad_left "" (containing_type_indent + 4) }}{{ constraint }}
+{{~ end ~}}
+{{ string.pad_left "" containing_type_indent }}{
+{{~ end ~}}
+{{ i0 }}public class {{ classes.app_builder_declaration }}
+{{~ for constraint in owner_constraints ~}}
 {{   i1   }}{{ constraint }}
 {{~ end ~}}
 {{ i0 }}{
@@ -32,6 +41,9 @@ namespace {{ namespace }}
 {{     i2     }}return new {{ classes.facade_class }}({{ parameters.app_parameter }});
 {{   i1   }}}
 {{ i0 }}}
+{{~ for containing_type in containing_types ~}}
+{{ string.pad_left "" ((bi - 1 - for.index) * 4) }}}
+{{~ end ~}}
 {{~ if namespace != "" ~}}
 }
 {{~ end ~}}

@@ -1,5 +1,6 @@
 using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
+using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.References.Tycho.Apps;
 using Tycho.Utils.SourceGenerator.Symbols;
@@ -8,9 +9,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 {
     internal class AppBuilderTM : TemplateModelBase
     {
-        public string[] TypeParameters { get; }
-        public string TypeParametersSuffix { get; }
-        public string[] TypeParametersConstraints { get; }
+        public ContainingTypeTM[] ContainingTypes { get; }
+        public string[] OwnerConstraints { get; }
         public ClassesTM Classes { get; }
         public FieldsTM Fields { get; }
         public InterfacesTM Interfaces { get; }
@@ -20,21 +20,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public AppBuilderTM(TychoAppBuilderModel model)
         {
             Namespace = model.DefinitionType.Namespace;
-            TypeParameters = model.DefinitionType.ContainingTypes
-                .SelectMany(type => type.TypeParameters.Select(parameter => parameter.Name))
-                .Concat(model.DefinitionType.TypeParameters.Select(parameter => parameter.Name))
-                .Distinct()
-                .ToArray();
-            TypeParametersSuffix = TypeParameters.Length == 0
-                ? string.Empty
-                : $"<{string.Join(", ", TypeParameters)}>";
-            TypeParametersConstraints = UseConstraintClauses(
-                    model.DefinitionType.ContainingTypes
-                        .SelectMany(type => type.TypeParameters)
-                        .Concat(model.DefinitionType.TypeParameters))
-                .Distinct()
-                .ToArray();
-
+            ContainingTypes = UseContainingTypes(model.DefinitionType.ContainingTypes);
+            OwnerConstraints = UseConstraintClauses(model.DefinitionType.TypeParameters).ToArray();
             Classes = new ClassesTM(model);
             Fields = new FieldsTM();
             Interfaces = new InterfacesTM(this, model);
@@ -45,14 +32,20 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         internal class ClassesTM
         {
             public string AppBuilderClass { get; }
+            public string AppBuilderDeclaration { get; }
             public string FacadeClass { get; }
 
             public ClassesTM(TychoAppBuilderModel model)
             {
-                string appName = model.DefinitionType.Name;
-                string appTypeSuffix = model.DefinitionType.TypeParametersSuffix;
-                AppBuilderClass = AppBuilderSymbols.GetAppBuilderClass(appName);
-                FacadeClass = AppFacadeSymbols.GetAppFacadeClass(appName, appTypeSuffix);
+                var builderType = new GeneratedTypeModel(
+                    model.DefinitionType,
+                    AppBuilderSymbols.GetAppBuilderClass(model.DefinitionType.Name));
+                var facadeType = new GeneratedTypeModel(
+                    model.DefinitionType,
+                    AppFacadeSymbols.GetAppFacadeClass(model.DefinitionType.Name));
+                AppBuilderClass = builderType.Identifier;
+                AppBuilderDeclaration = builderType.DeclarationName;
+                FacadeClass = facadeType.ReferenceName;
             }
         }
 
@@ -70,11 +63,12 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(AppBuilderTM owner, TychoAppBuilderModel model)
             {
+                var facadeInterfaceType = new GeneratedTypeModel(
+                    model.DefinitionType,
+                    AppFacadeSymbols.GetAppFacadeInterface(model.DefinitionType.Name));
                 AppInterface = owner.UseType(IAppReference.TypeModel);
                 AppBuilderBaseInterface = owner.UseType(IAppBuilderBaseReference.TypeModel);
-                FacadeInterface = AppFacadeSymbols.GetAppFacadeInterface(
-                    model.DefinitionType.Name,
-                    model.DefinitionType.TypeParametersSuffix);
+                FacadeInterface = facadeInterfaceType.ReferenceName;
                 ServiceProviderInterface = owner.UseType(IServiceProviderReference.TypeModel);
             }
         }

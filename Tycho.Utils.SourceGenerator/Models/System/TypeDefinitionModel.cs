@@ -51,6 +51,21 @@ namespace Tycho.Utils.SourceGenerator.Models.System
             TypeParameters = typeParameters ?? ImmutableEquatableArray<TypeParameterModel>.Empty;
         }
 
+        public TypeReferenceModel GetReference()
+        {
+            return new TypeReferenceModel(
+                Namespace,
+                ContainingTypes
+                    .Select(type => type.GetReference())
+                    .ToImmutableEquatableArray(),
+                Name,
+                TypeParameters
+                    .Select(typeParameter => new TypeArgumentModel(
+                        typeParameter.Name,
+                        new TypeReferenceModel(string.Empty, typeParameter.Name)))
+                    .ToImmutableEquatableArray());
+        }
+
         public bool Equals(TypeDefinitionModel other)
         {
             return Kind == other.Kind

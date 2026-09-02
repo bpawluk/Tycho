@@ -1,5 +1,6 @@
 using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
+using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.References.Microsoft;
 using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.References.Tycho.Apps;
@@ -10,7 +11,6 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 {
     internal class AppExtensionsTM : TemplateModelBase
     {
-        public string[] TypeParameters { get; }
         public string TypeParametersSuffix { get; }
         public string[] TypeParametersConstraints { get; }
         public ClassesTM Classes { get; }
@@ -22,14 +22,17 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         public AppExtensionsTM(TychoExtensionsModel model)
         {
             Namespace = model.DefinitionType.Namespace;
-            TypeParameters = model.DefinitionType.ContainingTypes
+
+            string[] typeParameters = model.DefinitionType.ContainingTypes
                 .SelectMany(type => type.TypeParameters.Select(parameter => parameter.Name))
                 .Concat(model.DefinitionType.TypeParameters.Select(parameter => parameter.Name))
                 .Distinct()
                 .ToArray();
-            TypeParametersSuffix = TypeParameters.Length == 0
+
+            TypeParametersSuffix = typeParameters.Length == 0
                 ? string.Empty
-                : $"<{string.Join(", ", TypeParameters)}>";
+                : $"<{string.Join(", ", typeParameters)}>";
+
             TypeParametersConstraints = UseConstraintClauses(
                     model.DefinitionType.ContainingTypes
                         .SelectMany(type => type.TypeParameters)
@@ -59,8 +62,11 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public ClassesTM(AppExtensionsTM owner, TychoExtensionsModel model)
             {
                 string appName = model.DefinitionType.Name;
+                var builderType = new GeneratedTypeModel(
+                    model.DefinitionType,
+                    AppBuilderSymbols.GetAppBuilderClass(model.DefinitionType.Name));
                 AppClass = model.DefinitionType.FullDeclarationName;
-                AppBuilderClass = AppBuilderSymbols.GetAppBuilderClass(appName);
+                AppBuilderClass = owner.UseType(builderType.TypeReference);
                 SetupExtensionsClass = AppExtensionsSymbols.GetAppSetupExtensionsClass(appName);
                 AppHostedLifecycleServiceClass = owner.UseType(AppHostedLifecycleServiceReference.TypeModel);
                 ArgumentNullExceptionClass = owner.UseType(ArgumentNullExceptionReference.TypeModel);
@@ -78,10 +84,11 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(AppExtensionsTM owner, TychoExtensionsModel model)
             {
+                var facadeInterfaceType = new GeneratedTypeModel(
+                    model.DefinitionType,
+                    AppFacadeSymbols.GetAppFacadeInterface(model.DefinitionType.Name));
                 HostApplicationBuilderInterface = owner.UseType(IHostApplicationBuilderReference.TypeModel);
-                FacadeInterface = AppFacadeSymbols.GetAppFacadeInterface(
-                    model.DefinitionType.Name,
-                    model.DefinitionType.TypeParametersSuffix);
+                FacadeInterface = owner.UseType(facadeInterfaceType.TypeReference);
             }
         }
 

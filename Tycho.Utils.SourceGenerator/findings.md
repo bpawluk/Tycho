@@ -93,7 +93,3 @@ Unused or obsolete elements include:
 - unused ValueTaskClass and ConfigureAwaitMethod members in both facade template models
 
 These obscure which reference models are authoritative.
-
-## 10. Validation gap — Existing generator tests do not compile generated output
-
-Tests/Tycho.Utils.SourceGenerator.IntegrationTests/TychoSourceGeneratorTests.cs:317 discards the updated compilation and diagnostics. Snapshot scenarios cover nested applications, but never verify that the generated sources compile. That is why the containment failures remain undetected.

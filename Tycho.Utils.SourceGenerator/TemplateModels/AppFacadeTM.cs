@@ -1,5 +1,6 @@
 using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
+using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.Models.Tycho;
 using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.References.Tycho.Apps;
@@ -47,9 +48,12 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public ClassesTM(AppFacadeTM owner, TychoFacadeModel tychoFacadeModel)
             {
+                var facadeType = new GeneratedTypeModel(
+                    tychoFacadeModel.DefinitionType,
+                    AppFacadeSymbols.GetAppFacadeClass(tychoFacadeModel.DefinitionType.Name));
                 AppClass = tychoFacadeModel.DefinitionType.DeclarationName;
-                FacadeClass = AppFacadeSymbols.GetAppFacadeClass(tychoFacadeModel.DefinitionType.Name);
-                FacadeClassWithTypeParams = AppFacadeSymbols.GetAppFacadeClass(tychoFacadeModel.DefinitionType.Name, tychoFacadeModel.DefinitionType.TypeParametersSuffix);
+                FacadeClass = facadeType.Identifier;
+                FacadeClassWithTypeParams = facadeType.DeclarationName;
                 FacadeBaseClass = owner.UseType(AppFacadeBaseReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 ValueTaskClass = owner.UseType(ValueTaskReference.TypeModel);
@@ -64,7 +68,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(AppFacadeTM owner, TychoFacadeModel tychoFacadeModel)
             {
-                FacadeInterface = AppFacadeSymbols.GetAppFacadeInterface(tychoFacadeModel.DefinitionType.Name, tychoFacadeModel.DefinitionType.TypeParametersSuffix);
+                var facadeInterfaceType = new GeneratedTypeModel(
+                    tychoFacadeModel.DefinitionType,
+                    AppFacadeSymbols.GetAppFacadeInterface(tychoFacadeModel.DefinitionType.Name));
+                FacadeInterface = facadeInterfaceType.ReferenceName;
                 InstanceInterface = owner.UseType(IAppReference.TypeModel);
             }
         }

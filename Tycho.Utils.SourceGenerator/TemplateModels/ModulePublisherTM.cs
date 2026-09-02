@@ -1,5 +1,6 @@
 using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
+using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.References.Tycho.Events;
 using Tycho.Utils.SourceGenerator.Symbols;
@@ -47,9 +48,12 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public ClassesTM(ModulePublisherTM owner, TychoPublisherModel tychoPublisherModel)
             {
                 string moduleNameStem = tychoPublisherModel.DefinitionType.Name;
+                var publisherType = new GeneratedTypeModel(
+                    tychoPublisherModel.DefinitionType,
+                    PublisherSymbols.GetPublisherClass(moduleNameStem));
                 ModuleClass = tychoPublisherModel.DefinitionType.DeclarationName;
-                PublisherClass = PublisherSymbols.GetPublisherClass(moduleNameStem);
-                PublisherClassWithTypeParams = PublisherSymbols.GetPublisherClass(moduleNameStem, tychoPublisherModel.DefinitionType.TypeParametersSuffix);
+                PublisherClass = publisherType.Identifier;
+                PublisherClassWithTypeParams = publisherType.DeclarationName;
                 PublisherBaseClass = owner.UseType(PublisherBaseReference.TypeModel);
                 TaskClass = owner.UseType(TaskReference.TypeModel);
                 CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);
@@ -63,7 +67,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(TychoPublisherModel tychoPublisherModel)
             {
-                PublisherInterface = PublisherSymbols.GetPublisherInterface(tychoPublisherModel.DefinitionType.Name, tychoPublisherModel.DefinitionType.TypeParametersSuffix);
+                var publisherInterfaceType = new GeneratedTypeModel(
+                    tychoPublisherModel.DefinitionType,
+                    PublisherSymbols.GetPublisherInterface(tychoPublisherModel.DefinitionType.Name));
+                PublisherInterface = publisherInterfaceType.ReferenceName;
             }
         }
 

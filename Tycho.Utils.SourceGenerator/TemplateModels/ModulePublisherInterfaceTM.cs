@@ -1,5 +1,6 @@
 using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
+using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.References.Tycho.Events;
 using Tycho.Utils.SourceGenerator.Symbols;
@@ -52,7 +53,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(TychoPublisherModel tychoPublisherModel)
             {
-                PublisherInterface = PublisherSymbols.GetPublisherInterface(tychoPublisherModel.DefinitionType.Name, tychoPublisherModel.DefinitionType.TypeParametersSuffix);
+                var publisherInterfaceType = new GeneratedTypeModel(
+                    tychoPublisherModel.DefinitionType,
+                    PublisherSymbols.GetPublisherInterface(tychoPublisherModel.DefinitionType.Name));
+                PublisherInterface = publisherInterfaceType.DeclarationName;
             }
         }
 

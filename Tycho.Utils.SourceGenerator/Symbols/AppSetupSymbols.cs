@@ -5,6 +5,6 @@ namespace Tycho.Utils.SourceGenerator.Symbols
         public const string SetupMethod = "Setup";
         public const string AppParameter = "app";
 
-        public static string GetSetupClass(string ownerClass, string ownerTypeParametersSuffix = null) => $"{ownerClass}Setup{ownerTypeParametersSuffix ?? string.Empty}";
+        public static string GetSetupClass(string ownerClass) => $"{ownerClass}Setup";
     }
 }

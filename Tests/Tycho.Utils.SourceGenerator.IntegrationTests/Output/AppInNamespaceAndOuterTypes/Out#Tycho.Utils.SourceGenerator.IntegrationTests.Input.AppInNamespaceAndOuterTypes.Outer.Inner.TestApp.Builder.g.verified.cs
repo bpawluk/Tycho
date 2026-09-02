@@ -7,19 +7,25 @@ using Tycho.Apps.Instance;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInNamespaceAndOuterTypes
 {
-    public class TestAppBuilder
+    public partial class Outer
     {
-        private readonly IAppBuilderBase _appBuilderBase;
-
-        public TestAppBuilder(IAppBuilderBase appBuilderBase)
+        public partial class Inner
         {
-            _appBuilderBase = appBuilderBase;
-        }
+            public class TestAppBuilder
+            {
+                private readonly IAppBuilderBase _appBuilderBase;
 
-        public ITestApp Build(IServiceProvider? parentServiceProvider = null)
-        {
-            IApp app = _appBuilderBase.Build(parentServiceProvider);
-            return new TestAppFacade(app);
+                public TestAppBuilder(IAppBuilderBase appBuilderBase)
+                {
+                    _appBuilderBase = appBuilderBase;
+                }
+
+                public ITestApp Build(IServiceProvider? parentServiceProvider = null)
+                {
+                    IApp app = _appBuilderBase.Build(parentServiceProvider);
+                    return new TestAppFacade(app);
+                }
+            }
         }
     }
 }

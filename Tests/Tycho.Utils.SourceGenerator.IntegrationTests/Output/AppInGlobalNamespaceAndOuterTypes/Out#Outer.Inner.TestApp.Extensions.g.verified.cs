@@ -7,10 +7,10 @@ using Tycho.Hosting.Services;
 
 public static partial class TestAppSetupExtensions
 {
-    public static TestAppBuilder CreateAppBuilder(this Outer.Inner.TestApp app)
+    public static Outer.Inner.TestAppBuilder CreateAppBuilder(this Outer.Inner.TestApp app)
     {
         var appBuilderBase = app.CreateAppBuilderBase();
-        return new TestAppBuilder(appBuilderBase);
+        return new Outer.Inner.TestAppBuilder(appBuilderBase);
     }
 
     public static IHostApplicationBuilder AddTestApp(this IHostApplicationBuilder builder, Outer.Inner.TestApp appDefinition)
@@ -25,14 +25,14 @@ public static partial class TestAppSetupExtensions
             throw new ArgumentNullException(nameof(appDefinition));
         }
 
-        if (Enumerable.Any(builder.Services, descriptor => descriptor.ServiceType == typeof(ITestApp)))
+        if (Enumerable.Any(builder.Services, descriptor => descriptor.ServiceType == typeof(Outer.Inner.ITestApp)))
         {
             throw new InvalidOperationException("The application is already registered in the host.");
         }
 
-        TestAppBuilder appBuilder = appDefinition.CreateAppBuilder();
+        Outer.Inner.TestAppBuilder appBuilder = appDefinition.CreateAppBuilder();
         ServiceCollectionServiceExtensions.AddSingleton(builder.Services, provider => appBuilder.Build(provider));
-        ServiceCollectionHostedServiceExtensions.AddHostedService<AppHostedLifecycleService<ITestApp>>(builder.Services);
+        ServiceCollectionHostedServiceExtensions.AddHostedService<AppHostedLifecycleService<Outer.Inner.ITestApp>>(builder.Services);
 
         return builder;
     }

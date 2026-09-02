@@ -46,12 +46,23 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public ClassesTM(ModuleSetupTM owner, TychoSetupModel tychoDefinitionModel)
             {
                 string moduleNameStem = tychoDefinitionModel.DefinitionType.Name;
-                string moduleTypeSuffix = tychoDefinitionModel.DefinitionType.TypeParametersSuffix;
+                var setupType = new GeneratedTypeModel(
+                    tychoDefinitionModel.DefinitionType,
+                    ModuleSetupSymbols.GetSetupClass(moduleNameStem));
+                var parentType = new GeneratedTypeModel(
+                    tychoDefinitionModel.DefinitionType,
+                    ModuleParentSymbols.GetParentClass(moduleNameStem));
+                var publisherType = new GeneratedTypeModel(
+                    tychoDefinitionModel.DefinitionType,
+                    PublisherSymbols.GetPublisherClass(moduleNameStem));
+                var eventSerializerType = new GeneratedTypeModel(
+                    tychoDefinitionModel.DefinitionType,
+                    EventSerializerSymbols.GetEventSerializerClass(moduleNameStem));
 
-                SetupClass = ModuleSetupSymbols.GetSetupClass(moduleNameStem, moduleTypeSuffix);
-                ModuleParentClass = ModuleParentSymbols.GetParentClass(moduleNameStem, moduleTypeSuffix);
-                PublisherClass = PublisherSymbols.GetPublisherClass(moduleNameStem, moduleTypeSuffix);
-                EventSerializerClass = EventSerializerSymbols.GetEventSerializerClass(moduleNameStem, moduleTypeSuffix);
+                SetupClass = setupType.DeclarationName;
+                ModuleParentClass = parentType.ReferenceName;
+                PublisherClass = publisherType.ReferenceName;
+                EventSerializerClass = eventSerializerType.ReferenceName;
                 ServiceCollectionServiceExtensionsClass = owner.UseType(ServiceCollectionServiceExtensionsReference.TypeModel);
             }
         }
@@ -65,8 +76,14 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(ModuleSetupTM owner, TychoSetupModel tychoDefinitionModel)
             {
-                ModuleParentInterface = ModuleParentSymbols.GetParentInterface(tychoDefinitionModel.DefinitionType.Name, tychoDefinitionModel.DefinitionType.TypeParametersSuffix);
-                PublisherInterface = PublisherSymbols.GetPublisherInterface(tychoDefinitionModel.DefinitionType.Name, tychoDefinitionModel.DefinitionType.TypeParametersSuffix);
+                var parentInterfaceType = new GeneratedTypeModel(
+                    tychoDefinitionModel.DefinitionType,
+                    ModuleParentSymbols.GetParentInterface(tychoDefinitionModel.DefinitionType.Name));
+                var publisherInterfaceType = new GeneratedTypeModel(
+                    tychoDefinitionModel.DefinitionType,
+                    PublisherSymbols.GetPublisherInterface(tychoDefinitionModel.DefinitionType.Name));
+                ModuleParentInterface = parentInterfaceType.ReferenceName;
+                PublisherInterface = publisherInterfaceType.ReferenceName;
                 EventSerializerInterface = owner.UseType(IEventSerializerReference.TypeModel);
                 ServiceCollectionInterface = owner.UseType(IServiceCollectionReference.TypeModel);
             }
@@ -103,11 +120,14 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public SubmoduleTM(ModuleSetupTM owner, TypeReferenceModel moduleType)
             {
-                owner.UseType(moduleType);
-                string moduleNameStem = moduleType.Name;
-                string moduleTypeSuffix = moduleType.TypeArgumentsSuffix;
-                FacadeInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(moduleNameStem, moduleTypeSuffix);
-                FacadeClass = ModuleFacadeSymbols.GetModuleFacadeClass(moduleNameStem, moduleTypeSuffix);
+                var facadeInterfaceType = new GeneratedTypeModel(
+                    moduleType,
+                    ModuleFacadeSymbols.GetModuleFacadeInterface(moduleType.Name));
+                var facadeType = new GeneratedTypeModel(
+                    moduleType,
+                    ModuleFacadeSymbols.GetModuleFacadeClass(moduleType.Name));
+                FacadeInterface = owner.UseType(facadeInterfaceType.TypeReference);
+                FacadeClass = owner.UseType(facadeType.TypeReference);
             }
         }
     }

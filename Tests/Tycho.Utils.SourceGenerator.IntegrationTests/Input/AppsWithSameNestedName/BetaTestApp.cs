@@ -1,0 +1,18 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Tycho.Apps;
+
+namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppsWithSameNestedName
+{
+    public partial class Beta
+    {
+        [TychoDefinition]
+        public class TestApp : TychoApp
+        {
+            protected override void DefineContract(IAppContract app) { }
+            protected override void DefineEvents(IAppEvents app) { }
+            protected override void IncludeModules(IAppStructure app) { }
+            protected override void RegisterServices(IServiceCollection app) { }
+        }
+    }
+}

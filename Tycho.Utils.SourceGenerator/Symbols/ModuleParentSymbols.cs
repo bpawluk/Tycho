@@ -6,8 +6,8 @@ namespace Tycho.Utils.SourceGenerator.Symbols
         public const string RequestDataParameter = "requestData";
         public const string CancellationTokenParameter = "cancellationToken";
 
-        public static string GetParentInterface(string moduleClass, string moduleTypeParametersSuffix = null) => $"I{moduleClass}Parent{moduleTypeParametersSuffix ?? string.Empty}";
+        public static string GetParentInterface(string moduleClass) => $"I{moduleClass}Parent";
 
-        public static string GetParentClass(string moduleClass, string moduleTypeParametersSuffix = null) => $"{moduleClass}Parent{moduleTypeParametersSuffix ?? string.Empty}";
+        public static string GetParentClass(string moduleClass) => $"{moduleClass}Parent";
     }
 }

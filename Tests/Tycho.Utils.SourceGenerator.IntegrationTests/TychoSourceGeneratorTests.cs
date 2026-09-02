@@ -1,9 +1,6 @@
 using System.Collections.Immutable;
-using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests;
 
@@ -61,6 +58,18 @@ public class TychoSourceGeneratorTests : VerifyBase
         string[] sources =
         [
             "AppInGenericOuterTypes/TestApp.cs"
+        ];
+        GeneratorDriver driver = RunGenerator(sources);
+        return Verify(driver);
+    }
+
+    [Fact]
+    public Task AppsWithSameNestedName()
+    {
+        string[] sources =
+        [
+            "AppsWithSameNestedName/AlphaTestApp.cs",
+            "AppsWithSameNestedName/BetaTestApp.cs"
         ];
         GeneratorDriver driver = RunGenerator(sources);
         return Verify(driver);

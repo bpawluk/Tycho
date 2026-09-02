@@ -11,7 +11,7 @@ public class TestApp : TychoApp
     protected override void DefineEvents(IAppEvents app) { }
     protected override void IncludeModules(IAppStructure app)
     {
-        app.Uses<ModuleA>();
+        app.Uses<Outer<string>.Inner.ModuleA>();
         app.Uses<ModuleB>();
     }
     protected override void RegisterServices(IServiceCollection app) { }

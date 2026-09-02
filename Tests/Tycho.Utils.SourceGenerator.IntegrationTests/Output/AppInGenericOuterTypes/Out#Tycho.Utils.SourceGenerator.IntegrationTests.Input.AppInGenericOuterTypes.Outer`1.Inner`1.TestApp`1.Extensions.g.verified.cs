@@ -9,13 +9,13 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInGenericOuterTy
 {
     public static partial class TestAppSetupExtensions
     {
-        public static TestAppBuilder<TOuter, TInner, TApp> CreateAppBuilder<TOuter, TInner, TApp>(this Outer<TOuter>.Inner<TInner>.TestApp<TApp> app)
+        public static Outer<TOuter>.Inner<TInner>.TestAppBuilder<TApp> CreateAppBuilder<TOuter, TInner, TApp>(this Outer<TOuter>.Inner<TInner>.TestApp<TApp> app)
             where TOuter : class
             where TInner : notnull
             where TApp : new()
         {
             var appBuilderBase = app.CreateAppBuilderBase();
-            return new TestAppBuilder<TOuter, TInner, TApp>(appBuilderBase);
+            return new Outer<TOuter>.Inner<TInner>.TestAppBuilder<TApp>(appBuilderBase);
         }
 
         public static IHostApplicationBuilder AddTestApp<TOuter, TInner, TApp>(this IHostApplicationBuilder builder, Outer<TOuter>.Inner<TInner>.TestApp<TApp> appDefinition)
@@ -33,14 +33,14 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.AppInGenericOuterTy
                 throw new ArgumentNullException(nameof(appDefinition));
             }
 
-            if (Enumerable.Any(builder.Services, descriptor => descriptor.ServiceType == typeof(ITestApp<TApp>)))
+            if (Enumerable.Any(builder.Services, descriptor => descriptor.ServiceType == typeof(Outer<TOuter>.Inner<TInner>.ITestApp<TApp>)))
             {
                 throw new InvalidOperationException("The application is already registered in the host.");
             }
 
-            TestAppBuilder<TOuter, TInner, TApp> appBuilder = appDefinition.CreateAppBuilder();
+            Outer<TOuter>.Inner<TInner>.TestAppBuilder<TApp> appBuilder = appDefinition.CreateAppBuilder();
             ServiceCollectionServiceExtensions.AddSingleton(builder.Services, provider => appBuilder.Build(provider));
-            ServiceCollectionHostedServiceExtensions.AddHostedService<AppHostedLifecycleService<ITestApp<TApp>>>(builder.Services);
+            ServiceCollectionHostedServiceExtensions.AddHostedService<AppHostedLifecycleService<Outer<TOuter>.Inner<TInner>.ITestApp<TApp>>>(builder.Services);
 
             return builder;
         }

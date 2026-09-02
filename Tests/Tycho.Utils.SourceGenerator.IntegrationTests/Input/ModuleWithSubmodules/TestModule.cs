@@ -11,7 +11,7 @@ public class TestModule : TychoModule
     protected override void DefineEvents(IModuleEvents module) { }
     protected override void IncludeModules(IModuleStructure module)
     {
-        module.Uses<ModuleA>();
+        module.Uses<Outer<int>.Inner.ModuleA>();
         module.Uses<ModuleB>();
     }
     protected override void RegisterServices(IServiceCollection module) { }

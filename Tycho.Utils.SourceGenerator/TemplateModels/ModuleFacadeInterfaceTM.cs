@@ -1,5 +1,6 @@
 using System.Linq;
 using Tycho.Utils.SourceGenerator.Models;
+using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.Models.Tycho;
 using Tycho.Utils.SourceGenerator.References.System;
 using Tycho.Utils.SourceGenerator.References.Tycho.Modules;
@@ -56,7 +57,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(ModuleFacadeInterfaceTM owner, TychoFacadeModel tychoFacadeModel)
             {
-                ModuleInterface = ModuleFacadeSymbols.GetModuleFacadeInterface(tychoFacadeModel.DefinitionType.Name, tychoFacadeModel.DefinitionType.TypeParametersSuffix);
+                var facadeInterfaceType = new GeneratedTypeModel(
+                    tychoFacadeModel.DefinitionType,
+                    ModuleFacadeSymbols.GetModuleFacadeInterface(tychoFacadeModel.DefinitionType.Name));
+                ModuleInterface = facadeInterfaceType.DeclarationName;
                 RunnableInterface = owner.UseType(IRunnableReference.TypeModel);
                 DisposableInterface = owner.UseType(IDisposableReference.TypeModel);
             }
