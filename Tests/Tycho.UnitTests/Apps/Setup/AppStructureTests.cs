@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Hosting;
 using Tycho.Apps.Setup;
 using Tycho.Structure;
 using Tycho.UnitTests._Data.Modules;
@@ -7,14 +8,12 @@ namespace Tycho.UnitTests.Apps.Setup;
 public class AppStructureTests
 {
     private readonly Internals _internals;
-    private readonly Globals _globals;
     private readonly AppStructure _sut;
 
     public AppStructureTests()
     {
-        _internals = new Internals(typeof(object));
-        _globals = new Globals();
-        _sut = new AppStructure(_internals, _globals);
+        _internals = new Internals(typeof(object), Host.CreateEmptyApplicationBuilder(default));
+        _sut = new AppStructure(_internals);
     }
 
     [Fact]
