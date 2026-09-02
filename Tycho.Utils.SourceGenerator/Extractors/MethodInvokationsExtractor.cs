@@ -17,6 +17,7 @@ namespace Tycho.Utils.SourceGenerator.Extractors
             context.CancellationToken.ThrowIfCancellationRequested();
 
             var methodInvocations = new HashSet<MethodInvocationModel>();
+            var orderedMethodInvocations = new List<MethodInvocationModel>();
             var visitTracker = new VisitTracker<IMethodSymbol>(SymbolEqualityComparer.Default);
 
             var traversalState = new TraversalState<IMethodSymbol>();
@@ -57,13 +58,17 @@ namespace Tycho.Utils.SourceGenerator.Extractors
                         {
                             IMethodSymbol originalInvokedMethodSymbol = invokedMethodSymbol.GetOriginalDefinition();
                             traversalState.SaveToVisit(originalInvokedMethodSymbol);
-                            methodInvocations.Add(MethodInvokationExtractor.Extract(invokedMethodSymbol, context));
+                            MethodInvocationModel methodInvocation = MethodInvokationExtractor.Extract(invokedMethodSymbol, context);
+                            if (methodInvocations.Add(methodInvocation))
+                            {
+                                orderedMethodInvocations.Add(methodInvocation);
+                            }
                         }
                     }
                 }
             }
 
-            return methodInvocations.ToImmutableEquatableArray();
+            return orderedMethodInvocations.ToImmutableEquatableArray();
         }
 
         private static bool TryGetInvocationExpressions(SyntaxNode declarationSyntax, out IEnumerable<InvocationExpressionSyntax> invocationExpressions)

@@ -2,22 +2,6 @@
 
 ## Open findings
 
-### 2. High — The reference renderer loses type identity
-
-`TypeReferenceModel.BuildTypeSuffix` renders generic arguments with `ReferenceName`, which omits containing types. `TypeParameterConstraintModel.TypeConstraint` does the same for type constraints.
-
-Therefore types such as:
-
-```csharp
-Container.NestedType
-Dictionary<string, Container.NestedType>
-where T : Container.NestedConstraint
-```
-
-can still be rendered as unqualified `NestedType` or `NestedConstraint`. Importing their namespace does not make nested types directly visible.
-
-`TemplateModelBase.UseType` now returns `FullReferenceName`, so direct references retain their containing types. It still relies on using directives instead of qualifying namespaces, however, so two referenced types with the same path in different namespaces can become ambiguous.
-
 ### 3. High — Method signature matching does not match method signatures
 
 `MethodSignatureModel.Matches` compares:
@@ -40,20 +24,6 @@ For example, `TychoFacadePipeline` executes `Single(...)` before the later `Unkn
 
 An unrelated class decorated with `[TychoDefinition]`, an abstract intermediate definition, or temporarily incomplete code can therefore produce a generator exception instead of either no output or a controlled diagnostic.
 
-### 5. Medium — AppExtensions performs ad hoc generic parameter composition
-
-Generated builder declarations and references now use `GeneratedTypeModel`, and the builder templates consume completed names instead of appending generic type syntax themselves.
-
-`AppExtensionsTM` still manually flattens the containing types' and application's type parameters for its generic extension methods. Parameter names are deduplicated independently from constraints, which can produce an invalid or semantically incorrect method when nested types reuse a type-parameter name.
-
-Generic method declaration construction should be represented by a model that keeps each parameter associated with its constraints and defines how shadowed type parameters are handled.
-
-### 8. Medium — Generated output order is not guaranteed
-
-`MethodInvokationsExtractor` accumulates invocations in a `HashSet` and emits its enumeration directly. Output ordering can vary by runtime or hashing behavior, causing unstable generated files and unnecessary incremental rebuilds.
-
-Deduplication should be followed by an explicit stable ordering based on full type identity.
-
 ## Resolved findings
 
 ### 1. Resolved — Nested applications generated uncompilable builder and extension references
@@ -63,6 +33,22 @@ Generated builder types are now declared inside the application's containing typ
 Extension methods use the completed builder and facade references. Applications with the same simple name under different containing types no longer produce invalid references or conflicting members.
 
 Covered by the `AppsWithSameNestedName`, `AppInGlobalNamespaceAndOuterTypes`, `AppInNamespaceAndOuterTypes`, and `AppInGenericOuterTypes` integration tests, which also validate the generated compilation.
+
+### 2. High — The reference renderer loses type identity
+
+`TypeReferenceModel.BuildTypeSuffix` renders generic arguments with `ReferenceName`, which omits containing types. `TypeParameterConstraintModel.TypeConstraint` does the same for type constraints.
+
+Therefore types such as:
+
+```csharp
+Container.NestedType
+Dictionary<string, Container.NestedType>
+where T : Container.NestedConstraint
+```
+
+can still be rendered as unqualified `NestedType` or `NestedConstraint`. Importing their namespace does not make nested types directly visible.
+
+`TemplateModelBase.UseType` now returns `FullReferenceName`, so direct references retain their containing types. It still relies on using directives instead of qualifying namespaces, however, so two referenced types with the same path in different namespaces can become ambiguous.
 
 ### 6. Resolved — Name-only members were modeled as method signatures
 
@@ -76,6 +62,23 @@ The inaccurate unused `GetRequiredService` and `ConfigureAwait` signatures were 
 
 Covered by the nested generic submodules in the `AppWithSubmodules` and `ModuleWithSubmodules` integration tests.
 
+### 8. Resolved — Generated output order is not guaranteed
+
+`MethodInvokationsExtractor` accumulates invocations in a `HashSet` and emits its enumeration directly. Output ordering can vary by runtime or hashing behavior, causing unstable generated files and unnecessary incremental rebuilds.
+
+Deduplication should be followed by an explicit stable ordering based on full type identity.
+
 ### 9. Resolved — Stale architecture remained after the Hosting refactor
 
 The unused `EventDispatcherModel`, obsolete reference classes and members, and unused facade `ValueTask` and `ConfigureAwait` template-model members were removed. Reference models that became unused after replacing name-only signatures were removed as well.
+
+## Ignored findings
+
+### 5. Ignored — AppExtensions performs ad hoc generic parameter composition
+
+Generated builder declarations and references now use `GeneratedTypeModel`, and the builder templates consume completed names instead of appending generic type syntax themselves.
+
+`AppExtensionsTM` still manually flattens the containing types' and application's type parameters for its generic extension methods. Parameter names are deduplicated independently from constraints, which can produce an invalid or semantically incorrect method when nested types reuse a type-parameter name.
+
+Generic method declaration construction should be represented by a model that keeps each parameter associated with its constraints and defines how shadowed type parameters are handled.
+

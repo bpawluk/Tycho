@@ -80,7 +80,7 @@ namespace Tycho.Utils.SourceGenerator.Models.System
 
         private static string BuildTypeSuffix(ImmutableEquatableArray<TypeArgumentModel> typeArguments)
         {
-            return typeArguments.Count == 0 ? string.Empty : $"<{string.Join(", ", typeArguments.Select(value => value.Value.ReferenceName))}>";
+            return typeArguments.Count == 0 ? string.Empty : $"<{string.Join(", ", typeArguments.Select(value => value.Value.FullReferenceName))}>";
         }
 
         private static string BuildPath(ImmutableEquatableArray<string> containingTypes, string typeName)
