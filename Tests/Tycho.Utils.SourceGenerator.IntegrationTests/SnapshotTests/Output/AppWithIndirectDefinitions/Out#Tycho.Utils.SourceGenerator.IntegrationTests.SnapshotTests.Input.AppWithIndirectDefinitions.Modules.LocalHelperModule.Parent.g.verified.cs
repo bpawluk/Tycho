@@ -1,12 +1,8 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.Modules.LocalHelperModule.Parent.g.cs
-using System.Threading;
-using System.Threading.Tasks;
-using Tycho.Structure.Parent;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.Modules
 {
-    internal class LocalHelperModuleParent : ParentBase, ILocalHelperModuleParent
+    internal class LocalHelperModuleParent : global::Tycho.Structure.Parent.ParentBase, ILocalHelperModuleParent
     {
-        public LocalHelperModuleParent(IParentReference parentReference) : base(parentReference) { }
+        public LocalHelperModuleParent(global::Tycho.Structure.Parent.IParentReference parentReference) : base(parentReference) { }
     }
 }

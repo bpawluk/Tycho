@@ -1,15 +1,11 @@
 ﻿//HintName: ModuleOuter.ModuleInner.TestModule.Parent.g.cs
-using System.Threading;
-using System.Threading.Tasks;
-using Tycho.Structure.Parent;
-
 public partial class ModuleOuter
 {
     public partial class ModuleInner
     {
-        internal class TestModuleParent : ParentBase, ITestModuleParent
+        internal class TestModuleParent : global::Tycho.Structure.Parent.ParentBase, ITestModuleParent
         {
-            public TestModuleParent(IParentReference parentReference) : base(parentReference) { }
+            public TestModuleParent(global::Tycho.Structure.Parent.IParentReference parentReference) : base(parentReference) { }
         }
     }
 }

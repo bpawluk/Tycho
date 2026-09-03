@@ -1,28 +1,23 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithEvents.TestApp.Publisher.g.cs
-using System.Threading;
-using System.Threading.Tasks;
-using Tycho.Events.Publishing;
-using Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithEvents.Events;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithEvents
 {
-    internal class TestAppPublisher : PublisherBase, ITestAppPublisher
+    internal class TestAppPublisher : global::Tycho.Events.Publishing.PublisherBase, ITestAppPublisher
     {
-        public TestAppPublisher(IEventPublisher genericPublisher) : base(genericPublisher) { }
+        public TestAppPublisher(global::Tycho.Events.Publishing.IEventPublisher genericPublisher) : base(genericPublisher) { }
 
-        public Task PublishAsync(OrderCreatedEvent eventPayload, CancellationToken cancellationToken)
+        public global::System.Threading.Tasks.Task PublishAsync(global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithEvents.Events.OrderCreatedEvent eventPayload, global::System.Threading.CancellationToken cancellationToken)
         {
-            return PublishAsync<OrderCreatedEvent>(eventPayload, cancellationToken);
+            return PublishAsync<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithEvents.Events.OrderCreatedEvent>(eventPayload, cancellationToken);
         }
 
-        public Task PublishAsync(PaymentProcessedEvent eventPayload, CancellationToken cancellationToken)
+        public global::System.Threading.Tasks.Task PublishAsync(global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithEvents.Events.PaymentProcessedEvent eventPayload, global::System.Threading.CancellationToken cancellationToken)
         {
-            return PublishAsync<PaymentProcessedEvent>(eventPayload, cancellationToken);
+            return PublishAsync<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithEvents.Events.PaymentProcessedEvent>(eventPayload, cancellationToken);
         }
 
-        public Task PublishAsync(PaymentFailedEvent eventPayload, CancellationToken cancellationToken)
+        public global::System.Threading.Tasks.Task PublishAsync(global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithEvents.Events.PaymentFailedEvent eventPayload, global::System.Threading.CancellationToken cancellationToken)
         {
-            return PublishAsync<PaymentFailedEvent>(eventPayload, cancellationToken);
+            return PublishAsync<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithEvents.Events.PaymentFailedEvent>(eventPayload, cancellationToken);
         }
     }
 }

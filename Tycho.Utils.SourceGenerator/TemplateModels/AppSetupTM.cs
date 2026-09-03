@@ -58,7 +58,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 SetupClass = setupType.DeclarationName;
                 PublisherClass = publisherType.ReferenceName;
                 EventSerializerClass = eventSerializerType.ReferenceName;
-                ServiceCollectionServiceExtensionsClass = owner.UseType(ServiceCollectionServiceExtensionsReference.TypeModel);
+                ServiceCollectionServiceExtensionsClass = ServiceCollectionServiceExtensionsReference.TypeModel.FullReferenceName;
             }
         }
 
@@ -74,8 +74,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                     tychoSetupModel.DefinitionType,
                     PublisherSymbols.GetPublisherInterface(tychoSetupModel.DefinitionType.Name));
                 PublisherInterface = publisherInterfaceType.ReferenceName;
-                EventSerializerInterface = owner.UseType(IEventSerializerReference.TypeModel);
-                ServiceCollectionInterface = owner.UseType(IServiceCollectionReference.TypeModel);
+                EventSerializerInterface = IEventSerializerReference.TypeModel.FullReferenceName;
+                ServiceCollectionInterface = IServiceCollectionReference.TypeModel.FullReferenceName;
             }
         }
 
@@ -116,8 +116,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 var facadeType = new GeneratedTypeModel(
                     moduleType,
                     ModuleFacadeSymbols.GetModuleFacadeClass(moduleType.Name));
-                FacadeInterface = owner.UseType(facadeInterfaceType.TypeReference);
-                FacadeClass = owner.UseType(facadeType.TypeReference);
+                FacadeInterface = facadeInterfaceType.TypeReference.FullReferenceName;
+                FacadeClass = facadeType.TypeReference.FullReferenceName;
             }
         }
     }

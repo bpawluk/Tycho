@@ -32,7 +32,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             Interfaces = new InterfacesTM(tychoPublisherModel);
             Methods = new MethodsTM();
             Parameters = new ParametersTM();
-            Events = tychoPublisherModel.Events.Select(e => UseType(e)).ToArray();
+            Events = tychoPublisherModel.Events.Select(e => e.FullReferenceName).ToArray();
         }
 
         internal class ClassesTM
@@ -42,8 +42,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public ClassesTM(AppPublisherInterfaceTM owner)
             {
-                TaskClass = owner.UseType(TaskReference.TypeModel);
-                CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);
+                TaskClass = TaskReference.TypeModel.FullReferenceName;
+                CancellationTokenClass = CancellationTokenReference.TypeModel.FullReferenceName;
             }
         }
 

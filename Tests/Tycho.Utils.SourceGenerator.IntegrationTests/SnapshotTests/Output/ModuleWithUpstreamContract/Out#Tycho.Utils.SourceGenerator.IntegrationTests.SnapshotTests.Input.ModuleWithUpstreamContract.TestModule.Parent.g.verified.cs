@@ -1,23 +1,18 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithUpstreamContract.TestModule.Parent.g.cs
-using System.Threading;
-using System.Threading.Tasks;
-using Tycho.Structure.Parent;
-using Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithUpstreamContract.Requests;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithUpstreamContract
 {
-    internal class TestModuleParent : ParentBase, ITestModuleParent
+    internal class TestModuleParent : global::Tycho.Structure.Parent.ParentBase, ITestModuleParent
     {
-        public TestModuleParent(IParentReference parentReference) : base(parentReference) { }
+        public TestModuleParent(global::Tycho.Structure.Parent.IParentReference parentReference) : base(parentReference) { }
 
-        public Task<GetParentDataQuery.Result> ExecuteAsync(GetParentDataQuery requestData, CancellationToken cancellationToken)
+        public global::System.Threading.Tasks.Task<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithUpstreamContract.Requests.GetParentDataQuery.Result> ExecuteAsync(global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithUpstreamContract.Requests.GetParentDataQuery requestData, global::System.Threading.CancellationToken cancellationToken)
         {
-            return ExecuteAsync<GetParentDataQuery, GetParentDataQuery.Result>(requestData, cancellationToken);
+            return ExecuteAsync<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithUpstreamContract.Requests.GetParentDataQuery, global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithUpstreamContract.Requests.GetParentDataQuery.Result>(requestData, cancellationToken);
         }
 
-        public Task ExecuteAsync(NotifyParentCommand requestData, CancellationToken cancellationToken)
+        public global::System.Threading.Tasks.Task ExecuteAsync(global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithUpstreamContract.Requests.NotifyParentCommand requestData, global::System.Threading.CancellationToken cancellationToken)
         {
-            return ExecuteAsync<NotifyParentCommand>(requestData, cancellationToken);
+            return ExecuteAsync<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithUpstreamContract.Requests.NotifyParentCommand>(requestData, cancellationToken);
         }
     }
 }

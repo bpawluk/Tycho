@@ -1,12 +1,8 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithSubmodules.Modules.ModuleB.Parent.g.cs
-using System.Threading;
-using System.Threading.Tasks;
-using Tycho.Structure.Parent;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithSubmodules.Modules
 {
-    internal class ModuleBParent : ParentBase, IModuleBParent
+    internal class ModuleBParent : global::Tycho.Structure.Parent.ParentBase, IModuleBParent
     {
-        public ModuleBParent(IParentReference parentReference) : base(parentReference) { }
+        public ModuleBParent(global::Tycho.Structure.Parent.IParentReference parentReference) : base(parentReference) { }
     }
 }

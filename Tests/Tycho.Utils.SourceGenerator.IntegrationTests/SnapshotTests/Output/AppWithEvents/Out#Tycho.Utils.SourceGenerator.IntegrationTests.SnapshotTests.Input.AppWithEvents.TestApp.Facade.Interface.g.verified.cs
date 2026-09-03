@@ -1,12 +1,7 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithEvents.TestApp.Facade.Interface.g.cs
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Tycho.Structure;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithEvents
 {
-    public interface ITestApp : IRunnable, IDisposable
+    public interface ITestApp : global::Tycho.Structure.IRunnable, global::System.IDisposable
     {
     }
 }

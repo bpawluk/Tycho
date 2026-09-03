@@ -1,16 +1,12 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithEvents.TestModule.Publisher.Interface.g.cs
-using System.Threading;
-using System.Threading.Tasks;
-using Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithEvents.Events;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithEvents
 {
     public interface ITestModulePublisher
     {
-        Task PublishAsync(OrderCreatedEvent eventPayload, CancellationToken cancellationToken = default);
+        global::System.Threading.Tasks.Task PublishAsync(global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithEvents.Events.OrderCreatedEvent eventPayload, global::System.Threading.CancellationToken cancellationToken = default);
 
-        Task PublishAsync(PaymentProcessedEvent eventPayload, CancellationToken cancellationToken = default);
+        global::System.Threading.Tasks.Task PublishAsync(global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithEvents.Events.PaymentProcessedEvent eventPayload, global::System.Threading.CancellationToken cancellationToken = default);
 
-        Task PublishAsync(PaymentFailedEvent eventPayload, CancellationToken cancellationToken = default);
+        global::System.Threading.Tasks.Task PublishAsync(global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithEvents.Events.PaymentFailedEvent eventPayload, global::System.Threading.CancellationToken cancellationToken = default);
     }
 }

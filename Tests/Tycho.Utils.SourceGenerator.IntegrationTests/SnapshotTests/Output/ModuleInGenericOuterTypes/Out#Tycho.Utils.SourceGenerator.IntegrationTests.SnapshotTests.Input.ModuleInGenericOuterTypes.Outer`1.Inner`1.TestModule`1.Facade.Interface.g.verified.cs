@@ -1,9 +1,4 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleInGenericOuterTypes.Outer`1.Inner`1.TestModule`1.Facade.Interface.g.cs
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Tycho.Structure;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleInGenericOuterTypes
 {
     public partial class Outer<TOuter>
@@ -12,7 +7,7 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.Modul
         public partial class Inner<TInner>
             where TInner : notnull
         {
-            public interface ITestModule<TModule> : IRunnable, IDisposable
+            public interface ITestModule<TModule> : global::Tycho.Structure.IRunnable, global::System.IDisposable
                 where TModule : notnull
             {
             }

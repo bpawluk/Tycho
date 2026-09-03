@@ -1,38 +1,32 @@
 ﻿//HintName: TestApp.Extensions.g.cs
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using System;
-using System.Linq;
-using Tycho.Hosting.Services;
-
 public static partial class TestAppSetupExtensions
 {
-    public static TestAppBuilder CreateAppBuilder(this TestApp app)
+    public static global::TestAppBuilder CreateAppBuilder(this TestApp app)
     {
         var appBuilderBase = app.CreateAppBuilderBase();
-        return new TestAppBuilder(appBuilderBase);
+        return new global::TestAppBuilder(appBuilderBase);
     }
 
-    public static IHostApplicationBuilder AddTestApp(this IHostApplicationBuilder builder, TestApp appDefinition)
+    public static global::Microsoft.Extensions.Hosting.IHostApplicationBuilder AddTestApp(this global::Microsoft.Extensions.Hosting.IHostApplicationBuilder builder, TestApp appDefinition)
     {
         if (builder == null)
         {
-            throw new ArgumentNullException(nameof(builder));
+            throw new global::System.ArgumentNullException(nameof(builder));
         }
 
         if (appDefinition == null)
         {
-            throw new ArgumentNullException(nameof(appDefinition));
+            throw new global::System.ArgumentNullException(nameof(appDefinition));
         }
 
-        if (Enumerable.Any(builder.Services, descriptor => descriptor.ServiceType == typeof(ITestApp)))
+        if (global::System.Linq.Enumerable.Any(builder.Services, descriptor => descriptor.ServiceType == typeof(global::ITestApp)))
         {
-            throw new InvalidOperationException("The application is already registered in the host.");
+            throw new global::System.InvalidOperationException("The application is already registered in the host.");
         }
 
-        TestAppBuilder appBuilder = appDefinition.CreateAppBuilder();
-        ServiceCollectionServiceExtensions.AddSingleton(builder.Services, provider => appBuilder.Build(provider));
-        ServiceCollectionHostedServiceExtensions.AddHostedService<AppHostedLifecycleService<ITestApp>>(builder.Services);
+        global::TestAppBuilder appBuilder = appDefinition.CreateAppBuilder();
+        global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton(builder.Services, provider => appBuilder.Build(provider));
+        global::Microsoft.Extensions.DependencyInjection.ServiceCollectionHostedServiceExtensions.AddHostedService<global::Tycho.Hosting.Services.AppHostedLifecycleService<global::ITestApp>>(builder.Services);
 
         return builder;
     }

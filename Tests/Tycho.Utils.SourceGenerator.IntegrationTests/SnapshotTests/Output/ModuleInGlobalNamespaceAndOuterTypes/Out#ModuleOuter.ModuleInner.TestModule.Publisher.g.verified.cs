@@ -1,15 +1,11 @@
 ﻿//HintName: ModuleOuter.ModuleInner.TestModule.Publisher.g.cs
-using System.Threading;
-using System.Threading.Tasks;
-using Tycho.Events.Publishing;
-
 public partial class ModuleOuter
 {
     public partial class ModuleInner
     {
-        internal class TestModulePublisher : PublisherBase, ITestModulePublisher
+        internal class TestModulePublisher : global::Tycho.Events.Publishing.PublisherBase, ITestModulePublisher
         {
-            public TestModulePublisher(IEventPublisher genericPublisher) : base(genericPublisher) { }
+            public TestModulePublisher(global::Tycho.Events.Publishing.IEventPublisher genericPublisher) : base(genericPublisher) { }
         }
     }
 }

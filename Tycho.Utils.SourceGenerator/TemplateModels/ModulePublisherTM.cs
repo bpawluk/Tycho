@@ -32,7 +32,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             Interfaces = new InterfacesTM(tychoPublisherModel);
             Methods = new MethodsTM();
             Parameters = new ParametersTM();
-            Events = tychoPublisherModel.Events.Select(e => UseType(e)).ToArray();
+            Events = tychoPublisherModel.Events.Select(e => e.FullReferenceName).ToArray();
         }
 
         internal class ClassesTM
@@ -54,10 +54,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 ModuleClass = tychoPublisherModel.DefinitionType.DeclarationName;
                 PublisherClass = publisherType.Identifier;
                 PublisherClassWithTypeParams = publisherType.DeclarationName;
-                PublisherBaseClass = owner.UseType(PublisherBaseReference.TypeModel);
-                TaskClass = owner.UseType(TaskReference.TypeModel);
-                CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);
-                GenericPublisherClass = owner.UseType(IEventPublisherReference.TypeModel);
+                PublisherBaseClass = PublisherBaseReference.TypeModel.FullReferenceName;
+                TaskClass = TaskReference.TypeModel.FullReferenceName;
+                CancellationTokenClass = CancellationTokenReference.TypeModel.FullReferenceName;
+                GenericPublisherClass = IEventPublisherReference.TypeModel.FullReferenceName;
             }
         }
 

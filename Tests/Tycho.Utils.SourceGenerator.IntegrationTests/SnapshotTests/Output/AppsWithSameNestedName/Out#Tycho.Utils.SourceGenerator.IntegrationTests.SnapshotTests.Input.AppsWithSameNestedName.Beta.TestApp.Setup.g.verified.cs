@@ -1,17 +1,14 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppsWithSameNestedName.Beta.TestApp.Setup.g.cs
-using Microsoft.Extensions.DependencyInjection;
-using Tycho.Events.Serialization;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppsWithSameNestedName
 {
     public partial class Beta
     {
         public class TestAppSetup
         {
-            public static void Setup(IServiceCollection app)
+            public static void Setup(global::Microsoft.Extensions.DependencyInjection.IServiceCollection app)
             {
-                ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestAppEventSerializer>(app);
-                ServiceCollectionServiceExtensions.AddTransient<ITestAppPublisher, TestAppPublisher>(app);
+                global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<global::Tycho.Events.Serialization.IEventSerializer, TestAppEventSerializer>(app);
+                global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<ITestAppPublisher, TestAppPublisher>(app);
             }
         }
     }

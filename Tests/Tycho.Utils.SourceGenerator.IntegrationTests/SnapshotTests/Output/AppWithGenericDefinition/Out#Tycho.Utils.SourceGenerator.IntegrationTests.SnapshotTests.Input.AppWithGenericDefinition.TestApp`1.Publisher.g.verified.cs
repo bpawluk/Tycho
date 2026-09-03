@@ -1,12 +1,8 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithGenericDefinition.TestApp`1.Publisher.g.cs
-using System.Threading;
-using System.Threading.Tasks;
-using Tycho.Events.Publishing;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithGenericDefinition
 {
-    internal class TestAppPublisher<T> : PublisherBase, ITestAppPublisher<T>
+    internal class TestAppPublisher<T> : global::Tycho.Events.Publishing.PublisherBase, ITestAppPublisher<T>
     {
-        public TestAppPublisher(IEventPublisher genericPublisher) : base(genericPublisher) { }
+        public TestAppPublisher(global::Tycho.Events.Publishing.IEventPublisher genericPublisher) : base(genericPublisher) { }
     }
 }

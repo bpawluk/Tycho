@@ -6,9 +6,6 @@
 {{~ i2 = string.pad_left "" ((bi + 2) * 4) ~}}
 {{~ i3 = string.pad_left "" ((bi + 3) * 4) ~}}
 {{~#-----------------------------------------#~}}
-{{~ for used_namespace in used_namespaces ~}}
-using {{ used_namespace }};
-{{ end }}
 {{~ if namespace != "" ~}}
 namespace {{ namespace }}
 {

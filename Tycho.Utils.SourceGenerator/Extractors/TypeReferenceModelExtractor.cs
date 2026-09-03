@@ -11,6 +11,11 @@ namespace Tycho.Utils.SourceGenerator.Extractors
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
+            if (typeSymbol is ITypeParameterSymbol)
+            {
+                return TypeReferenceModel.TypeParameter(GetNamespace(typeSymbol), typeSymbol.Name);
+            }
+
             if (typeSymbol is INamedTypeSymbol)
             {
                 return new TypeReferenceModel(

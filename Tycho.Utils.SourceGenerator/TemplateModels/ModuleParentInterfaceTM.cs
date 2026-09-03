@@ -43,8 +43,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public ClassesTM(ModuleParentInterfaceTM owner)
             {
-                TaskClass = owner.UseType(TaskReference.TypeModel);
-                CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);
+                TaskClass = TaskReference.TypeModel.FullReferenceName;
+                CancellationTokenClass = CancellationTokenReference.TypeModel.FullReferenceName;
             }
         }
 
@@ -91,9 +91,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public RequestTM(ModuleParentInterfaceTM owner, TychoRequestModel tychoRequestModel)
             {
-                RequestType = owner.UseType(tychoRequestModel.RequestType);
+                RequestType = tychoRequestModel.RequestType.FullReferenceName;
                 HasResponse = tychoRequestModel.HasResponse;
-                ResponseType = HasResponse ? owner.UseType(tychoRequestModel.ResponseType.Value) : string.Empty;
+                ResponseType = HasResponse ? tychoRequestModel.ResponseType.Value.FullReferenceName : string.Empty;
             }
         }
     }

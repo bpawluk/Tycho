@@ -8,6 +8,8 @@ namespace Tycho.Utils.SourceGenerator.Models.System
     {
         public string Namespace { get; }
 
+        public bool IsTypeParameter { get; }
+
         public ImmutableEquatableArray<TypeReferenceModel> ContainingTypes { get; }
 
         public string Name { get; }
@@ -18,15 +20,29 @@ namespace Tycho.Utils.SourceGenerator.Models.System
 
         public string ReferenceName => $"{Name}{TypeArgumentsSuffix}";
 
-        public string FullReferenceName => BuildPath(
-            ContainingTypes.Select(type => type.ReferenceName).ToImmutableEquatableArray(),
-            ReferenceName);
+        public string FullReferenceName
+        {
+            get
+            {
+                if (IsTypeParameter)
+                {
+                    return ReferenceName;
+                }
+
+                string path = BuildPath(
+                    ContainingTypes.Select(type => type.ReferenceName).ToImmutableEquatableArray(),
+                    ReferenceName);
+                string qualifiedPath = string.IsNullOrEmpty(Namespace) ? path : $"{Namespace}.{path}";
+                return $"global::{qualifiedPath}";
+            }
+        }
 
         public TypeReferenceModel(string typeNamespace, string typeName) : this(
             typeNamespace,
             ImmutableEquatableArray<TypeReferenceModel>.Empty,
             typeName,
-            ImmutableEquatableArray<TypeArgumentModel>.Empty)
+            ImmutableEquatableArray<TypeArgumentModel>.Empty,
+            isTypeParameter: false)
         {
         }
 
@@ -34,17 +50,40 @@ namespace Tycho.Utils.SourceGenerator.Models.System
             string typeNamespace,
             ImmutableEquatableArray<TypeReferenceModel> containingTypes,
             string typeName,
-            ImmutableEquatableArray<TypeArgumentModel> typeArguments)
+            ImmutableEquatableArray<TypeArgumentModel> typeArguments) : this(
+                typeNamespace,
+                containingTypes,
+                typeName,
+                typeArguments,
+                isTypeParameter: false)
+        {
+        }
+
+        public TypeReferenceModel(
+            string typeNamespace,
+            ImmutableEquatableArray<TypeReferenceModel> containingTypes,
+            string typeName,
+            ImmutableEquatableArray<TypeArgumentModel> typeArguments,
+            bool isTypeParameter)
         {
             Namespace = typeNamespace ?? string.Empty;
             ContainingTypes = containingTypes ?? ImmutableEquatableArray<TypeReferenceModel>.Empty;
             Name = typeName ?? string.Empty;
             TypeArguments = typeArguments ?? ImmutableEquatableArray<TypeArgumentModel>.Empty;
+            IsTypeParameter = isTypeParameter;
         }
+
+        public static TypeReferenceModel TypeParameter(string typeNamespace, string typeName) => new TypeReferenceModel(
+            typeNamespace,
+            ImmutableEquatableArray<TypeReferenceModel>.Empty,
+            typeName,
+            ImmutableEquatableArray<TypeArgumentModel>.Empty,
+            isTypeParameter: true);
 
         public bool Matches(TypeReferenceModel other)
         {
             return string.Equals(Namespace, other.Namespace, StringComparison.Ordinal)
+                && IsTypeParameter == other.IsTypeParameter
                 && ContainingTypes.Count == other.ContainingTypes.Count
                 && ContainingTypes.Zip(other.ContainingTypes, (type, otherType) => type.Matches(otherType)).All(match => match)
                 && string.Equals(Name, other.Name, StringComparison.Ordinal)
@@ -55,6 +94,7 @@ namespace Tycho.Utils.SourceGenerator.Models.System
         public bool Equals(TypeReferenceModel other)
         {
             return string.Equals(Namespace, other.Namespace, StringComparison.Ordinal)
+                && IsTypeParameter == other.IsTypeParameter
                 && (ContainingTypes ?? ImmutableEquatableArray<TypeReferenceModel>.Empty).Equals(other.ContainingTypes ?? ImmutableEquatableArray<TypeReferenceModel>.Empty)
                 && string.Equals(Name, other.Name, StringComparison.Ordinal)
                 && (TypeArguments ?? ImmutableEquatableArray<TypeArgumentModel>.Empty).Equals(other.TypeArguments ?? ImmutableEquatableArray<TypeArgumentModel>.Empty);
@@ -69,12 +109,13 @@ namespace Tycho.Utils.SourceGenerator.Models.System
         {
             return HashCode.Combine(
                 StringComparer.Ordinal.GetHashCode(Namespace),
+                IsTypeParameter.GetHashCode(),
                 ContainingTypes.GetHashCode(),
                 StringComparer.Ordinal.GetHashCode(Name),
                 TypeArguments.GetHashCode());
         }
 
-        public override string ToString() => string.IsNullOrEmpty(Namespace) ? FullReferenceName : $"{Namespace}.{FullReferenceName}";
+        public override string ToString() => FullReferenceName;
 
         public static bool operator ==(TypeReferenceModel left, TypeReferenceModel right) => left.Equals(right);
 

@@ -1,38 +1,33 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.TestApp.Facade.g.cs
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Tycho.Apps.Instance;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions
 {
-    internal class TestAppFacade : AppFacadeBase, ITestApp
+    internal class TestAppFacade : global::Tycho.Apps.Instance.AppFacadeBase, ITestApp
     {
-        public TestAppFacade(IApp app) : base(app) { }
+        public TestAppFacade(global::Tycho.Apps.Instance.IApp app) : base(app) { }
 
-        public Task<String> ExecuteAsync(TestRequestFromHelperExtension requestData, CancellationToken cancellationToken)
+        public global::System.Threading.Tasks.Task<global::System.String> ExecuteAsync(global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.TestRequestFromHelperExtension requestData, global::System.Threading.CancellationToken cancellationToken)
         {
-            return ExecuteAsync<TestRequestFromHelperExtension, String>(requestData, cancellationToken);
+            return ExecuteAsync<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.TestRequestFromHelperExtension, global::System.String>(requestData, cancellationToken);
         }    
 
-        public Task<String> ExecuteAsync(TestRequestFromHelperStaticClass requestData, CancellationToken cancellationToken)
+        public global::System.Threading.Tasks.Task<global::System.String> ExecuteAsync(global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.TestRequestFromHelperStaticClass requestData, global::System.Threading.CancellationToken cancellationToken)
         {
-            return ExecuteAsync<TestRequestFromHelperStaticClass, String>(requestData, cancellationToken);
+            return ExecuteAsync<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.TestRequestFromHelperStaticClass, global::System.String>(requestData, cancellationToken);
         }    
 
-        public Task<String> ExecuteAsync(TestRequestFromHelperClass requestData, CancellationToken cancellationToken)
+        public global::System.Threading.Tasks.Task<global::System.String> ExecuteAsync(global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.TestRequestFromHelperClass requestData, global::System.Threading.CancellationToken cancellationToken)
         {
-            return ExecuteAsync<TestRequestFromHelperClass, String>(requestData, cancellationToken);
+            return ExecuteAsync<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.TestRequestFromHelperClass, global::System.String>(requestData, cancellationToken);
         }    
 
-        public Task<String> ExecuteAsync(TestRequestFromLocalStaticHelper requestData, CancellationToken cancellationToken)
+        public global::System.Threading.Tasks.Task<global::System.String> ExecuteAsync(global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.TestRequestFromLocalStaticHelper requestData, global::System.Threading.CancellationToken cancellationToken)
         {
-            return ExecuteAsync<TestRequestFromLocalStaticHelper, String>(requestData, cancellationToken);
+            return ExecuteAsync<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.TestRequestFromLocalStaticHelper, global::System.String>(requestData, cancellationToken);
         }    
 
-        public Task<String> ExecuteAsync(TestRequestFromLocalHelper requestData, CancellationToken cancellationToken)
+        public global::System.Threading.Tasks.Task<global::System.String> ExecuteAsync(global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.TestRequestFromLocalHelper requestData, global::System.Threading.CancellationToken cancellationToken)
         {
-            return ExecuteAsync<TestRequestFromLocalHelper, String>(requestData, cancellationToken);
+            return ExecuteAsync<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.TestRequestFromLocalHelper, global::System.String>(requestData, cancellationToken);
         }    
     }
 }

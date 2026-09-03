@@ -5,11 +5,6 @@
 {{~ i0 = string.pad_left "" (bi * 4) ~}}
 {{~ i1 = string.pad_left "" ((bi + 1) * 4) ~}}
 {{~#-----------------------------------------#~}}
-{{~#--------- Write used namespaces ---------#~}}
-{{~ for used_namespace in used_namespaces ~}}
-using {{ used_namespace }};
-{{ end }}
-{{~#-----------------------------------------#~}}
 {{~#----------- Declare namespace -----------#~}}
 {{~ if namespace != "" ~}}
 namespace {{ namespace }}

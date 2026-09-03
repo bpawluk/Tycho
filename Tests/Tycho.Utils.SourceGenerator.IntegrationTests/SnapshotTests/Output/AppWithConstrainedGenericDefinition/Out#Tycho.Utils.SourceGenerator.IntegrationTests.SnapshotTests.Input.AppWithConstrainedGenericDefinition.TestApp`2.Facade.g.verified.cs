@@ -1,15 +1,10 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithConstrainedGenericDefinition.TestApp`2.Facade.g.cs
-using System.Threading;
-using System.Threading.Tasks;
-using Tycho.Apps.Instance;
-using Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithConstrainedGenericDefinition.Model;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithConstrainedGenericDefinition
 {
-    internal class TestAppFacade<TPayload, TKey> : AppFacadeBase, ITestApp<TPayload, TKey>
-        where TPayload : PayloadBase, IMarker, new()
+    internal class TestAppFacade<TPayload, TKey> : global::Tycho.Apps.Instance.AppFacadeBase, ITestApp<TPayload, TKey>
+        where TPayload : global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithConstrainedGenericDefinition.Model.PayloadBase, global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithConstrainedGenericDefinition.IMarker, new()
         where TKey : notnull
     {
-        public TestAppFacade(IApp app) : base(app) { }
+        public TestAppFacade(global::Tycho.Apps.Instance.IApp app) : base(app) { }
     }
 }

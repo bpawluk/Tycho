@@ -1,12 +1,8 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithGenericDefinition.TestApp`1.Facade.g.cs
-using System.Threading;
-using System.Threading.Tasks;
-using Tycho.Apps.Instance;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithGenericDefinition
 {
-    internal class TestAppFacade<T> : AppFacadeBase, ITestApp<T>
+    internal class TestAppFacade<T> : global::Tycho.Apps.Instance.AppFacadeBase, ITestApp<T>
     {
-        public TestAppFacade(IApp app) : base(app) { }
+        public TestAppFacade(global::Tycho.Apps.Instance.IApp app) : base(app) { }
     }
 }

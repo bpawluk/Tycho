@@ -1,23 +1,18 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithDownstreamContract.TestModule.Facade.g.cs
-using System.Threading;
-using System.Threading.Tasks;
-using Tycho.Modules.Instance;
-using Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithDownstreamContract.Requests;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithDownstreamContract
 {
-    internal class TestModuleFacade : ModuleFacadeBase, ITestModule
+    internal class TestModuleFacade : global::Tycho.Modules.Instance.ModuleFacadeBase, ITestModule
     {
-        public TestModuleFacade(IModule<TestModule> module) : base(module) { }
+        public TestModuleFacade(global::Tycho.Modules.Instance.IModule<TestModule> module) : base(module) { }
 
-        public Task<GetItemQuery.Result> ExecuteAsync(GetItemQuery requestData, CancellationToken cancellationToken)
+        public global::System.Threading.Tasks.Task<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithDownstreamContract.Requests.GetItemQuery.Result> ExecuteAsync(global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithDownstreamContract.Requests.GetItemQuery requestData, global::System.Threading.CancellationToken cancellationToken)
         {
-            return ExecuteAsync<GetItemQuery, GetItemQuery.Result>(requestData, cancellationToken);
+            return ExecuteAsync<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithDownstreamContract.Requests.GetItemQuery, global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithDownstreamContract.Requests.GetItemQuery.Result>(requestData, cancellationToken);
         }
 
-        public Task ExecuteAsync(DeleteItemCommand requestData, CancellationToken cancellationToken)
+        public global::System.Threading.Tasks.Task ExecuteAsync(global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithDownstreamContract.Requests.DeleteItemCommand requestData, global::System.Threading.CancellationToken cancellationToken)
         {
-            return ExecuteAsync<DeleteItemCommand>(requestData, cancellationToken);
+            return ExecuteAsync<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithDownstreamContract.Requests.DeleteItemCommand>(requestData, cancellationToken);
         }
     }
 }

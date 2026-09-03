@@ -1,7 +1,4 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleInNamespaceAndOuterTypes.Outer.Inner.TestModule.Setup.g.cs
-using Microsoft.Extensions.DependencyInjection;
-using Tycho.Events.Serialization;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleInNamespaceAndOuterTypes
 {
     public partial class Outer
@@ -10,11 +7,11 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.Modul
         {
             public class TestModuleSetup
             {
-                public static void Setup(IServiceCollection module)
+                public static void Setup(global::Microsoft.Extensions.DependencyInjection.IServiceCollection module)
                 {
-                    ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestModuleEventSerializer>(module);
-                    ServiceCollectionServiceExtensions.AddTransient<ITestModulePublisher, TestModulePublisher>(module);
-                    ServiceCollectionServiceExtensions.AddTransient<ITestModuleParent, TestModuleParent>(module);
+                    global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<global::Tycho.Events.Serialization.IEventSerializer, TestModuleEventSerializer>(module);
+                    global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<ITestModulePublisher, TestModulePublisher>(module);
+                    global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<ITestModuleParent, TestModuleParent>(module);
                 }
             }
         }

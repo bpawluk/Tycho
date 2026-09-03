@@ -1,12 +1,8 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.Modules.HelperClassModule.Publisher.g.cs
-using System.Threading;
-using System.Threading.Tasks;
-using Tycho.Events.Publishing;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.Modules
 {
-    internal class HelperClassModulePublisher : PublisherBase, IHelperClassModulePublisher
+    internal class HelperClassModulePublisher : global::Tycho.Events.Publishing.PublisherBase, IHelperClassModulePublisher
     {
-        public HelperClassModulePublisher(IEventPublisher genericPublisher) : base(genericPublisher) { }
+        public HelperClassModulePublisher(global::Tycho.Events.Publishing.IEventPublisher genericPublisher) : base(genericPublisher) { }
     }
 }

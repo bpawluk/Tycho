@@ -1,9 +1,7 @@
 ﻿//HintName: TestModule.EventSerializer.g.cs
-using Tycho.Events.Serialization;
-
-internal class TestModuleEventSerializer : EventSerializerBase
+internal class TestModuleEventSerializer : global::Tycho.Events.Serialization.EventSerializerBase
 {
-    public TestModuleEventSerializer(IPayloadSerializer payloadSerializer) : base(payloadSerializer)
+    public TestModuleEventSerializer(global::Tycho.Events.Serialization.IPayloadSerializer payloadSerializer) : base(payloadSerializer)
     {
     }
 }

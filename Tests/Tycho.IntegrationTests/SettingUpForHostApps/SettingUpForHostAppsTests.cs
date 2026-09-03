@@ -15,7 +15,7 @@ public class SettingUpForHostAppsTests
         string expectedResponse = "Hello World!";
         hostapplicationBuilder.Configuration["Response"] = expectedResponse;
 
-        await hostapplicationBuilder.AddTestApp(new());
+        hostapplicationBuilder.AddTestApp(new());
         IHost host = hostapplicationBuilder.Build();
 
         // Act

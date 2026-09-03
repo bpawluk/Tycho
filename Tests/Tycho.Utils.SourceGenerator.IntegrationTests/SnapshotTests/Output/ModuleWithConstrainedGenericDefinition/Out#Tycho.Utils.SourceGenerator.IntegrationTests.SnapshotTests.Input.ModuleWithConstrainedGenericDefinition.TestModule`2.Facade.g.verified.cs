@@ -1,15 +1,10 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithConstrainedGenericDefinition.TestModule`2.Facade.g.cs
-using System.Threading;
-using System.Threading.Tasks;
-using Tycho.Modules.Instance;
-using Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithConstrainedGenericDefinition.Model;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithConstrainedGenericDefinition
 {
-    internal class TestModuleFacade<TPayload, TKey> : ModuleFacadeBase, ITestModule<TPayload, TKey>
-        where TPayload : PayloadBase, IMarker, new()
+    internal class TestModuleFacade<TPayload, TKey> : global::Tycho.Modules.Instance.ModuleFacadeBase, ITestModule<TPayload, TKey>
+        where TPayload : global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithConstrainedGenericDefinition.Model.PayloadBase, global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithConstrainedGenericDefinition.IMarker, new()
         where TKey : notnull
     {
-        public TestModuleFacade(IModule<TestModule<TPayload, TKey>> module) : base(module) { }
+        public TestModuleFacade(global::Tycho.Modules.Instance.IModule<TestModule<TPayload, TKey>> module) : base(module) { }
     }
 }

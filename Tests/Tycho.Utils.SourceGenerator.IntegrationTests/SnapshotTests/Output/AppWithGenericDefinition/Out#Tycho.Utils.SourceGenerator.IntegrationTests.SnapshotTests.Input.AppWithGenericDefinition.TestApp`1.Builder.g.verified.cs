@@ -1,24 +1,20 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithGenericDefinition.TestApp`1.Builder.g.cs
 #nullable enable annotations
 
-using System;
-using Tycho.Apps;
-using Tycho.Apps.Instance;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithGenericDefinition
 {
     public class TestAppBuilder<T>
     {
-        private readonly IAppBuilderBase _appBuilderBase;
+        private readonly global::Tycho.Apps.IAppBuilderBase _appBuilderBase;
 
-        public TestAppBuilder(IAppBuilderBase appBuilderBase)
+        public TestAppBuilder(global::Tycho.Apps.IAppBuilderBase appBuilderBase)
         {
             _appBuilderBase = appBuilderBase;
         }
 
-        public ITestApp<T> Build(IServiceProvider? parentServiceProvider = null)
+        public ITestApp<T> Build(global::System.IServiceProvider? parentServiceProvider = null)
         {
-            IApp app = _appBuilderBase.Build(parentServiceProvider);
+            global::Tycho.Apps.Instance.IApp app = _appBuilderBase.Build(parentServiceProvider);
             return new TestAppFacade<T>(app);
         }
     }

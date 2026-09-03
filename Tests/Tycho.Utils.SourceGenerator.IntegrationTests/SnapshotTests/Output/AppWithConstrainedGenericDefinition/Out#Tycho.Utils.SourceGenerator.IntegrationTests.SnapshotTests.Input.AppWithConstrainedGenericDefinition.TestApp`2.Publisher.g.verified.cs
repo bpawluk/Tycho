@@ -1,15 +1,10 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithConstrainedGenericDefinition.TestApp`2.Publisher.g.cs
-using System.Threading;
-using System.Threading.Tasks;
-using Tycho.Events.Publishing;
-using Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithConstrainedGenericDefinition.Model;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithConstrainedGenericDefinition
 {
-    internal class TestAppPublisher<TPayload, TKey> : PublisherBase, ITestAppPublisher<TPayload, TKey>
-        where TPayload : PayloadBase, IMarker, new()
+    internal class TestAppPublisher<TPayload, TKey> : global::Tycho.Events.Publishing.PublisherBase, ITestAppPublisher<TPayload, TKey>
+        where TPayload : global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithConstrainedGenericDefinition.Model.PayloadBase, global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithConstrainedGenericDefinition.IMarker, new()
         where TKey : notnull
     {
-        public TestAppPublisher(IEventPublisher genericPublisher) : base(genericPublisher) { }
+        public TestAppPublisher(global::Tycho.Events.Publishing.IEventPublisher genericPublisher) : base(genericPublisher) { }
     }
 }

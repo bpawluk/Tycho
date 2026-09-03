@@ -1,15 +1,11 @@
 ﻿//HintName: AppOuter.AppInner.TestApp.Publisher.g.cs
-using System.Threading;
-using System.Threading.Tasks;
-using Tycho.Events.Publishing;
-
 public partial class AppOuter
 {
     public partial class AppInner
     {
-        internal class TestAppPublisher : PublisherBase, ITestAppPublisher
+        internal class TestAppPublisher : global::Tycho.Events.Publishing.PublisherBase, ITestAppPublisher
         {
-            public TestAppPublisher(IEventPublisher genericPublisher) : base(genericPublisher) { }
+            public TestAppPublisher(global::Tycho.Events.Publishing.IEventPublisher genericPublisher) : base(genericPublisher) { }
         }
     }
 }

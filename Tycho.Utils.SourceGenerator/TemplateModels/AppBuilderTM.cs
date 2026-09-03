@@ -66,10 +66,10 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 var facadeInterfaceType = new GeneratedTypeModel(
                     model.DefinitionType,
                     AppFacadeSymbols.GetAppFacadeInterface(model.DefinitionType.Name));
-                AppInterface = owner.UseType(IAppReference.TypeModel);
-                AppBuilderBaseInterface = owner.UseType(IAppBuilderBaseReference.TypeModel);
+                AppInterface = IAppReference.TypeModel.FullReferenceName;
+                AppBuilderBaseInterface = IAppBuilderBaseReference.TypeModel.FullReferenceName;
                 FacadeInterface = facadeInterfaceType.ReferenceName;
-                ServiceProviderInterface = owner.UseType(IServiceProviderReference.TypeModel);
+                ServiceProviderInterface = IServiceProviderReference.TypeModel.FullReferenceName;
             }
         }
 

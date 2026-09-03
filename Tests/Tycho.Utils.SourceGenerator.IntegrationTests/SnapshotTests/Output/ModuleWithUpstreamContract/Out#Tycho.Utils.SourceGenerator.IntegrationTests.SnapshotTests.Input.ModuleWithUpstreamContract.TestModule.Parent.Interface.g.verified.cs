@@ -1,14 +1,10 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithUpstreamContract.TestModule.Parent.Interface.g.cs
-using System.Threading;
-using System.Threading.Tasks;
-using Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithUpstreamContract.Requests;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithUpstreamContract
 {
     public interface ITestModuleParent
     {
-        Task<GetParentDataQuery.Result> ExecuteAsync(GetParentDataQuery requestData, CancellationToken cancellationToken = default);
+        global::System.Threading.Tasks.Task<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithUpstreamContract.Requests.GetParentDataQuery.Result> ExecuteAsync(global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithUpstreamContract.Requests.GetParentDataQuery requestData, global::System.Threading.CancellationToken cancellationToken = default);
 
-        Task ExecuteAsync(NotifyParentCommand requestData, CancellationToken cancellationToken = default);
+        global::System.Threading.Tasks.Task ExecuteAsync(global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithUpstreamContract.Requests.NotifyParentCommand requestData, global::System.Threading.CancellationToken cancellationToken = default);
     }
 }

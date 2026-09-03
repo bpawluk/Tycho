@@ -1,37 +1,33 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.TestApp.Publisher.g.cs
-using System.Threading;
-using System.Threading.Tasks;
-using Tycho.Events.Publishing;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions
 {
-    internal class TestAppPublisher : PublisherBase, ITestAppPublisher
+    internal class TestAppPublisher : global::Tycho.Events.Publishing.PublisherBase, ITestAppPublisher
     {
-        public TestAppPublisher(IEventPublisher genericPublisher) : base(genericPublisher) { }
+        public TestAppPublisher(global::Tycho.Events.Publishing.IEventPublisher genericPublisher) : base(genericPublisher) { }
 
-        public Task PublishAsync(TestEventFromHelperExtension eventPayload, CancellationToken cancellationToken)
+        public global::System.Threading.Tasks.Task PublishAsync(global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.TestEventFromHelperExtension eventPayload, global::System.Threading.CancellationToken cancellationToken)
         {
-            return PublishAsync<TestEventFromHelperExtension>(eventPayload, cancellationToken);
+            return PublishAsync<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.TestEventFromHelperExtension>(eventPayload, cancellationToken);
         }
 
-        public Task PublishAsync(TestEventFromHelperStaticClass eventPayload, CancellationToken cancellationToken)
+        public global::System.Threading.Tasks.Task PublishAsync(global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.TestEventFromHelperStaticClass eventPayload, global::System.Threading.CancellationToken cancellationToken)
         {
-            return PublishAsync<TestEventFromHelperStaticClass>(eventPayload, cancellationToken);
+            return PublishAsync<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.TestEventFromHelperStaticClass>(eventPayload, cancellationToken);
         }
 
-        public Task PublishAsync(TestEventFromHelperClass eventPayload, CancellationToken cancellationToken)
+        public global::System.Threading.Tasks.Task PublishAsync(global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.TestEventFromHelperClass eventPayload, global::System.Threading.CancellationToken cancellationToken)
         {
-            return PublishAsync<TestEventFromHelperClass>(eventPayload, cancellationToken);
+            return PublishAsync<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.TestEventFromHelperClass>(eventPayload, cancellationToken);
         }
 
-        public Task PublishAsync(TestEventFromLocalStaticHelper eventPayload, CancellationToken cancellationToken)
+        public global::System.Threading.Tasks.Task PublishAsync(global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.TestEventFromLocalStaticHelper eventPayload, global::System.Threading.CancellationToken cancellationToken)
         {
-            return PublishAsync<TestEventFromLocalStaticHelper>(eventPayload, cancellationToken);
+            return PublishAsync<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.TestEventFromLocalStaticHelper>(eventPayload, cancellationToken);
         }
 
-        public Task PublishAsync(TestEventFromLocalHelper eventPayload, CancellationToken cancellationToken)
+        public global::System.Threading.Tasks.Task PublishAsync(global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.TestEventFromLocalHelper eventPayload, global::System.Threading.CancellationToken cancellationToken)
         {
-            return PublishAsync<TestEventFromLocalHelper>(eventPayload, cancellationToken);
+            return PublishAsync<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.TestEventFromLocalHelper>(eventPayload, cancellationToken);
         }
     }
 }

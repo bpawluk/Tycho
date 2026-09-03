@@ -1,7 +1,4 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleInGenericOuterTypes.Outer`1.Inner`1.TestModule`1.Setup.g.cs
-using Microsoft.Extensions.DependencyInjection;
-using Tycho.Events.Serialization;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleInGenericOuterTypes
 {
     public partial class Outer<TOuter>
@@ -13,11 +10,11 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.Modul
             public class TestModuleSetup<TModule>
                 where TModule : notnull
             {
-                public static void Setup(IServiceCollection module)
+                public static void Setup(global::Microsoft.Extensions.DependencyInjection.IServiceCollection module)
                 {
-                    ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestModuleEventSerializer<TModule>>(module);
-                    ServiceCollectionServiceExtensions.AddTransient<ITestModulePublisher<TModule>, TestModulePublisher<TModule>>(module);
-                    ServiceCollectionServiceExtensions.AddTransient<ITestModuleParent<TModule>, TestModuleParent<TModule>>(module);
+                    global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<global::Tycho.Events.Serialization.IEventSerializer, TestModuleEventSerializer<TModule>>(module);
+                    global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<ITestModulePublisher<TModule>, TestModulePublisher<TModule>>(module);
+                    global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<ITestModuleParent<TModule>, TestModuleParent<TModule>>(module);
                 }
             }
         }

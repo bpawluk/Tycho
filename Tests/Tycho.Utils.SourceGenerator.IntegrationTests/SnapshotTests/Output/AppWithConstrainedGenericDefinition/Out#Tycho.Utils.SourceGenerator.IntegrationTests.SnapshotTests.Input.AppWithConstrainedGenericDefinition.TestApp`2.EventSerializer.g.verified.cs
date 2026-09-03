@@ -1,14 +1,11 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithConstrainedGenericDefinition.TestApp`2.EventSerializer.g.cs
-using Tycho.Events.Serialization;
-using Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithConstrainedGenericDefinition.Model;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithConstrainedGenericDefinition
 {
-    internal class TestAppEventSerializer<TPayload, TKey> : EventSerializerBase
-        where TPayload : PayloadBase, IMarker, new()
+    internal class TestAppEventSerializer<TPayload, TKey> : global::Tycho.Events.Serialization.EventSerializerBase
+        where TPayload : global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithConstrainedGenericDefinition.Model.PayloadBase, global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithConstrainedGenericDefinition.IMarker, new()
         where TKey : notnull
     {
-        public TestAppEventSerializer(IPayloadSerializer payloadSerializer) : base(payloadSerializer)
+        public TestAppEventSerializer(global::Tycho.Events.Serialization.IPayloadSerializer payloadSerializer) : base(payloadSerializer)
         {
         }
     }

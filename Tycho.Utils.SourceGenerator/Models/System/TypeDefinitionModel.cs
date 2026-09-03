@@ -53,8 +53,9 @@ namespace Tycho.Utils.SourceGenerator.Models.System
 
         public TypeReferenceModel GetReference()
         {
+            string typeNamespace = Namespace;
             return new TypeReferenceModel(
-                Namespace,
+                typeNamespace,
                 ContainingTypes
                     .Select(type => type.GetReference())
                     .ToImmutableEquatableArray(),
@@ -62,7 +63,7 @@ namespace Tycho.Utils.SourceGenerator.Models.System
                 TypeParameters
                     .Select(typeParameter => new TypeArgumentModel(
                         typeParameter.Name,
-                        new TypeReferenceModel(string.Empty, typeParameter.Name)))
+                        TypeReferenceModel.TypeParameter(typeNamespace, typeParameter.Name)))
                     .ToImmutableEquatableArray());
         }
 

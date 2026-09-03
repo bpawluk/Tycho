@@ -1,16 +1,13 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.Modules.LocalHelperModule.Setup.g.cs
-using Microsoft.Extensions.DependencyInjection;
-using Tycho.Events.Serialization;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.Modules
 {
     public class LocalHelperModuleSetup
     {
-        public static void Setup(IServiceCollection module)
+        public static void Setup(global::Microsoft.Extensions.DependencyInjection.IServiceCollection module)
         {
-            ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, LocalHelperModuleEventSerializer>(module);
-            ServiceCollectionServiceExtensions.AddTransient<ILocalHelperModulePublisher, LocalHelperModulePublisher>(module);
-            ServiceCollectionServiceExtensions.AddTransient<ILocalHelperModuleParent, LocalHelperModuleParent>(module);
+            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<global::Tycho.Events.Serialization.IEventSerializer, LocalHelperModuleEventSerializer>(module);
+            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<ILocalHelperModulePublisher, LocalHelperModulePublisher>(module);
+            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<ILocalHelperModuleParent, LocalHelperModuleParent>(module);
         }
     }
 }

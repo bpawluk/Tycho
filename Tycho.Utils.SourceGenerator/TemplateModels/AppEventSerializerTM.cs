@@ -31,7 +31,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             Interfaces = new InterfacesTM(this);
             Methods = new MethodsTM();
             Parameters = new ParametersTM();
-            Events = tychoEventSerializerModel.Events.Select(e => UseType(e)).ToArray();
+            Events = tychoEventSerializerModel.Events.Select(e => e.FullReferenceName).ToArray();
         }
 
         internal class ClassesTM
@@ -47,7 +47,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                     EventSerializerSymbols.GetEventSerializerClass(appType.Name));
                 EventSerializerClass = eventSerializerType.Identifier;
                 EventSerializerClassWithTypeParams = eventSerializerType.DeclarationName;
-                EventSerializerBaseClass = owner.UseType(EventSerializerBaseReference.TypeModel);
+                EventSerializerBaseClass = EventSerializerBaseReference.TypeModel.FullReferenceName;
             }
         }
 
@@ -57,7 +57,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public InterfacesTM(AppEventSerializerTM owner)
             {
-                PayloadSerializerInterface = owner.UseType(IPayloadSerializerReference.TypeModel);
+                PayloadSerializerInterface = IPayloadSerializerReference.TypeModel.FullReferenceName;
             }
         }
 

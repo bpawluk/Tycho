@@ -1,20 +1,15 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithSubmodules.TestModule.Setup.g.cs
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using Tycho.Events.Serialization;
-using Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithSubmodules.Modules;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithSubmodules
 {
     public class TestModuleSetup
     {
-        public static void Setup(IServiceCollection module)
+        public static void Setup(global::Microsoft.Extensions.DependencyInjection.IServiceCollection module)
         {
-            ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestModuleEventSerializer>(module);
-            ServiceCollectionServiceExtensions.AddTransient<ITestModulePublisher, TestModulePublisher>(module);
-            ServiceCollectionServiceExtensions.AddTransient<ITestModuleParent, TestModuleParent>(module);
-            ServiceCollectionServiceExtensions.AddTransient<Outer<Int32>.Inner.IModuleA, Outer<Int32>.Inner.ModuleAFacade>(module);
-            ServiceCollectionServiceExtensions.AddTransient<IModuleB, ModuleBFacade>(module);
+            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<global::Tycho.Events.Serialization.IEventSerializer, TestModuleEventSerializer>(module);
+            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<ITestModulePublisher, TestModulePublisher>(module);
+            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<ITestModuleParent, TestModuleParent>(module);
+            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithSubmodules.Modules.Outer<global::System.Int32>.Inner.IModuleA, global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithSubmodules.Modules.Outer<global::System.Int32>.Inner.ModuleAFacade>(module);
+            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithSubmodules.Modules.IModuleB, global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithSubmodules.Modules.ModuleBFacade>(module);
         }
     }
 }

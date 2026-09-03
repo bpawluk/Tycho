@@ -1,7 +1,4 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppInGenericOuterTypes.Outer`1.Inner`1.TestApp`1.Publisher.Interface.g.cs
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppInGenericOuterTypes
 {
     public partial class Outer<TOuter>

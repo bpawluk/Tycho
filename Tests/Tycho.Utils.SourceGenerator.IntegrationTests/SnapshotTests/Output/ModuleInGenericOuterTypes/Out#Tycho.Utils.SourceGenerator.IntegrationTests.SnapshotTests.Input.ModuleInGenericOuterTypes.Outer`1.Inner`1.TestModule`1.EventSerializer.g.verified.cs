@@ -1,6 +1,4 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleInGenericOuterTypes.Outer`1.Inner`1.TestModule`1.EventSerializer.g.cs
-using Tycho.Events.Serialization;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleInGenericOuterTypes
 {
     public partial class Outer<TOuter>
@@ -9,10 +7,10 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.Modul
         public partial class Inner<TInner>
             where TInner : notnull
         {
-            internal class TestModuleEventSerializer<TModule> : EventSerializerBase
+            internal class TestModuleEventSerializer<TModule> : global::Tycho.Events.Serialization.EventSerializerBase
                 where TModule : notnull
             {
-                public TestModuleEventSerializer(IPayloadSerializer payloadSerializer) : base(payloadSerializer)
+                public TestModuleEventSerializer(global::Tycho.Events.Serialization.IPayloadSerializer payloadSerializer) : base(payloadSerializer)
                 {
                 }
             }

@@ -1,9 +1,5 @@
-//HintName: TestModule.Parent.g.cs
-using System.Threading;
-using System.Threading.Tasks;
-using Tycho.Structure.Parent;
-
-internal class TestModuleParent : ParentBase, ITestModuleParent
+﻿//HintName: TestModule.Parent.g.cs
+internal class TestModuleParent : global::Tycho.Structure.Parent.ParentBase, ITestModuleParent
 {
-    public TestModuleParent(IParentReference parentReference) : base(parentReference) { }
+    public TestModuleParent(global::Tycho.Structure.Parent.IParentReference parentReference) : base(parentReference) { }
 }

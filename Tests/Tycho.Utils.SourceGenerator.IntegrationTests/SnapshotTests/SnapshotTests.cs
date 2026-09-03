@@ -115,6 +115,21 @@ public class SnapshotTests : VerifyBase
     }
 
     [Fact]
+    public Task AppWithAmbiguousTypeNames()
+    {
+        string[] sources =
+        [
+            "AppWithAmbiguousTypeNames/TestApp.cs",
+            "AppWithAmbiguousTypeNames/Alpha/Request.cs",
+            "AppWithAmbiguousTypeNames/Beta/Request.cs",
+            "AppWithAmbiguousTypeNames/Handlers/AlphaRequestHandler.cs",
+            "AppWithAmbiguousTypeNames/Handlers/BetaRequestHandler.cs"
+        ];
+        GeneratorDriver driver = RunGenerator(SourceDir, sources);
+        return Verify(driver);
+    }
+
+    [Fact]
     public Task AppWithEvents()
     {
         string[] sources =

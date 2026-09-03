@@ -29,7 +29,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
             {
                 new TypeArgumentModel(
                     RequestTypeParameterName,
-                    new TypeReferenceModel(Namespace, RequestTypeParameterName)),
+                    TypeReferenceModel.TypeParameter(Namespace, RequestTypeParameterName)),
             }));
 
         public static TypeReferenceModel RequestBindingWithResponseTypeModel => new TypeReferenceModel(
@@ -40,10 +40,10 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
             {
                 new TypeArgumentModel(
                     RequestTypeParameterName,
-                    new TypeReferenceModel(Namespace, RequestTypeParameterName)),
+                    TypeReferenceModel.TypeParameter(Namespace, RequestTypeParameterName)),
                 new TypeArgumentModel(
                     ResponseTypeParameterName,
-                    new TypeReferenceModel(Namespace, ResponseTypeParameterName)),
+                    TypeReferenceModel.TypeParameter(Namespace, ResponseTypeParameterName)),
             }));
 
         public static MethodSignatureModel ExpectsMethodSignature => new MethodSignatureModel(

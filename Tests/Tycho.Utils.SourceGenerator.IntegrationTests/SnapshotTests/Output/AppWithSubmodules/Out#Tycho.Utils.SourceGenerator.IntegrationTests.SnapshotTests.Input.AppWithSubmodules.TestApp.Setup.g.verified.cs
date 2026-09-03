@@ -1,19 +1,14 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithSubmodules.TestApp.Setup.g.cs
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using Tycho.Events.Serialization;
-using Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithSubmodules.Modules;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithSubmodules
 {
     public class TestAppSetup
     {
-        public static void Setup(IServiceCollection app)
+        public static void Setup(global::Microsoft.Extensions.DependencyInjection.IServiceCollection app)
         {
-            ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestAppEventSerializer>(app);
-            ServiceCollectionServiceExtensions.AddTransient<ITestAppPublisher, TestAppPublisher>(app);
-            ServiceCollectionServiceExtensions.AddTransient<Outer<String>.Inner.IModuleA, Outer<String>.Inner.ModuleAFacade>(app);
-            ServiceCollectionServiceExtensions.AddTransient<IModuleB, ModuleBFacade>(app);
+            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<global::Tycho.Events.Serialization.IEventSerializer, TestAppEventSerializer>(app);
+            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<ITestAppPublisher, TestAppPublisher>(app);
+            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithSubmodules.Modules.Outer<global::System.String>.Inner.IModuleA, global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithSubmodules.Modules.Outer<global::System.String>.Inner.ModuleAFacade>(app);
+            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithSubmodules.Modules.IModuleB, global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithSubmodules.Modules.ModuleBFacade>(app);
         }
     }
 }

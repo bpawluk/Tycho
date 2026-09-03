@@ -66,14 +66,14 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                     model.DefinitionType,
                     AppBuilderSymbols.GetAppBuilderClass(model.DefinitionType.Name));
                 AppClass = model.DefinitionType.FullDeclarationName;
-                AppBuilderClass = owner.UseType(builderType.TypeReference);
+                AppBuilderClass = builderType.TypeReference.FullReferenceName;
                 SetupExtensionsClass = AppExtensionsSymbols.GetAppSetupExtensionsClass(appName);
-                AppHostedLifecycleServiceClass = owner.UseType(AppHostedLifecycleServiceReference.TypeModel);
-                ArgumentNullExceptionClass = owner.UseType(ArgumentNullExceptionReference.TypeModel);
-                EnumerableClass = owner.UseType(EnumerableReference.TypeModel);
-                InvalidOperationExceptionClass = owner.UseType(InvalidOperationExceptionReference.TypeModel);
-                ServiceCollectionHostedServiceExtensionsClass = owner.UseType(ServiceCollectionHostedServiceExtensionsReference.TypeModel);
-                ServiceCollectionServiceExtensionsClass = owner.UseType(ServiceCollectionServiceExtensionsReference.TypeModel);
+                AppHostedLifecycleServiceClass = AppHostedLifecycleServiceReference.TypeModel.FullReferenceName;
+                ArgumentNullExceptionClass = ArgumentNullExceptionReference.TypeModel.FullReferenceName;
+                EnumerableClass = EnumerableReference.TypeModel.FullReferenceName;
+                InvalidOperationExceptionClass = InvalidOperationExceptionReference.TypeModel.FullReferenceName;
+                ServiceCollectionHostedServiceExtensionsClass = ServiceCollectionHostedServiceExtensionsReference.TypeModel.FullReferenceName;
+                ServiceCollectionServiceExtensionsClass = ServiceCollectionServiceExtensionsReference.TypeModel.FullReferenceName;
             }
         }
 
@@ -87,8 +87,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 var facadeInterfaceType = new GeneratedTypeModel(
                     model.DefinitionType,
                     AppFacadeSymbols.GetAppFacadeInterface(model.DefinitionType.Name));
-                HostApplicationBuilderInterface = owner.UseType(IHostApplicationBuilderReference.TypeModel);
-                FacadeInterface = owner.UseType(facadeInterfaceType.TypeReference);
+                HostApplicationBuilderInterface = IHostApplicationBuilderReference.TypeModel.FullReferenceName;
+                FacadeInterface = facadeInterfaceType.TypeReference.FullReferenceName;
             }
         }
 

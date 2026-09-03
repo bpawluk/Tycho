@@ -1,27 +1,22 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithConstrainedGenericDefinition.TestApp`2.Builder.g.cs
 #nullable enable annotations
 
-using System;
-using Tycho.Apps;
-using Tycho.Apps.Instance;
-using Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithConstrainedGenericDefinition.Model;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithConstrainedGenericDefinition
 {
     public class TestAppBuilder<TPayload, TKey>
-        where TPayload : PayloadBase, IMarker, new()
+        where TPayload : global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithConstrainedGenericDefinition.Model.PayloadBase, global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithConstrainedGenericDefinition.IMarker, new()
         where TKey : notnull
     {
-        private readonly IAppBuilderBase _appBuilderBase;
+        private readonly global::Tycho.Apps.IAppBuilderBase _appBuilderBase;
 
-        public TestAppBuilder(IAppBuilderBase appBuilderBase)
+        public TestAppBuilder(global::Tycho.Apps.IAppBuilderBase appBuilderBase)
         {
             _appBuilderBase = appBuilderBase;
         }
 
-        public ITestApp<TPayload, TKey> Build(IServiceProvider? parentServiceProvider = null)
+        public ITestApp<TPayload, TKey> Build(global::System.IServiceProvider? parentServiceProvider = null)
         {
-            IApp app = _appBuilderBase.Build(parentServiceProvider);
+            global::Tycho.Apps.Instance.IApp app = _appBuilderBase.Build(parentServiceProvider);
             return new TestAppFacade<TPayload, TKey>(app);
         }
     }

@@ -1,15 +1,10 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithConstrainedGenericDefinition.TestModule`2.Parent.g.cs
-using System.Threading;
-using System.Threading.Tasks;
-using Tycho.Structure.Parent;
-using Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithConstrainedGenericDefinition.Model;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithConstrainedGenericDefinition
 {
-    internal class TestModuleParent<TPayload, TKey> : ParentBase, ITestModuleParent<TPayload, TKey>
-        where TPayload : PayloadBase, IMarker, new()
+    internal class TestModuleParent<TPayload, TKey> : global::Tycho.Structure.Parent.ParentBase, ITestModuleParent<TPayload, TKey>
+        where TPayload : global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithConstrainedGenericDefinition.Model.PayloadBase, global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithConstrainedGenericDefinition.IMarker, new()
         where TKey : notnull
     {
-        public TestModuleParent(IParentReference parentReference) : base(parentReference) { }
+        public TestModuleParent(global::Tycho.Structure.Parent.IParentReference parentReference) : base(parentReference) { }
     }
 }

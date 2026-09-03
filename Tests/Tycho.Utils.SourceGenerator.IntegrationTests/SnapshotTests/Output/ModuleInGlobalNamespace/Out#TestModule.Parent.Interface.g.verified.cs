@@ -1,7 +1,4 @@
-//HintName: TestModule.Parent.Interface.g.cs
-using System.Threading;
-using System.Threading.Tasks;
-
+﻿//HintName: TestModule.Parent.Interface.g.cs
 public interface ITestModuleParent
 {
 }

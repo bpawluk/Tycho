@@ -32,7 +32,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
             {
                 new TypeArgumentModel(
                     EventTypeParameterName,
-                    new TypeReferenceModel(Namespace, EventTypeParameterName)),
+                    TypeReferenceModel.TypeParameter(Namespace, EventTypeParameterName)),
             }));
 
         public static MethodSignatureModel ExpectsMethodSignature => new MethodSignatureModel(

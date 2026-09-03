@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Tycho.Utils.SourceGenerator.Models.System;
@@ -8,21 +7,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 {
     internal class TemplateModelBase
     {
-        private readonly HashSet<string> _namespaces = new HashSet<string>();
-
         public string Namespace { get; protected set; }
-
-        public string[] UsedNamespaces => _namespaces
-            .Where(ns => !string.IsNullOrWhiteSpace(ns))
-            .Where(ns => !string.Equals(ns, Namespace, StringComparison.Ordinal))
-            .OrderBy(ns => ns, StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-
-        public string UseType(TypeReferenceModel typeReference)
-        {
-            UseTypeDeep(typeReference);
-            return typeReference.FullReferenceName;
-        }
 
         protected ContainingTypeTM[] UseContainingTypes(ImmutableEquatableArray<TypeDefinitionModel> containingTypes)
         {
@@ -46,14 +31,6 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             foreach (TypeParameterModel typeParameter in typeParameters)
             {
-                foreach (TypeParameterConstraintModel constraint in typeParameter.Constraints)
-                {
-                    if (constraint.Type.HasValue)
-                    {
-                        UseType(constraint.Type.Value);
-                    }
-                }
-
                 if (!string.IsNullOrEmpty(typeParameter.ConstraintsClause))
                 {
                     yield return typeParameter.ConstraintsClause;
@@ -61,22 +38,5 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             }
         }
 
-        private void UseTypeDeep(TypeReferenceModel typeReference)
-        {
-            if (!string.IsNullOrEmpty(typeReference.Namespace))
-            {
-                _namespaces.Add(typeReference.Namespace);
-            }
-
-            foreach (TypeReferenceModel containingType in typeReference.ContainingTypes)
-            {
-                UseTypeDeep(containingType);
-            }
-
-            foreach (TypeArgumentModel typeArgument in typeReference.TypeArguments)
-            {
-                UseTypeDeep(typeArgument.Value);
-            }
-        }
     }
 }

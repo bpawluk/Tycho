@@ -1,7 +1,4 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithSubmodules.Modules.Outer`1.Inner.ModuleA.Setup.g.cs
-using Microsoft.Extensions.DependencyInjection;
-using Tycho.Events.Serialization;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithSubmodules.Modules
 {
     public partial class Outer<TOuter>
@@ -10,11 +7,11 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.Modul
         {
             public class ModuleASetup
             {
-                public static void Setup(IServiceCollection module)
+                public static void Setup(global::Microsoft.Extensions.DependencyInjection.IServiceCollection module)
                 {
-                    ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, ModuleAEventSerializer>(module);
-                    ServiceCollectionServiceExtensions.AddTransient<IModuleAPublisher, ModuleAPublisher>(module);
-                    ServiceCollectionServiceExtensions.AddTransient<IModuleAParent, ModuleAParent>(module);
+                    global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<global::Tycho.Events.Serialization.IEventSerializer, ModuleAEventSerializer>(module);
+                    global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<IModuleAPublisher, ModuleAPublisher>(module);
+                    global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<IModuleAParent, ModuleAParent>(module);
                 }
             }
         }

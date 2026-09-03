@@ -1,7 +1,4 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppInGenericOuterTypes.Outer`1.Inner`1.TestApp`1.Setup.g.cs
-using Microsoft.Extensions.DependencyInjection;
-using Tycho.Events.Serialization;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppInGenericOuterTypes
 {
     public partial class Outer<TOuter>
@@ -13,10 +10,10 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppIn
             public class TestAppSetup<TApp>
                 where TApp : new()
             {
-                public static void Setup(IServiceCollection app)
+                public static void Setup(global::Microsoft.Extensions.DependencyInjection.IServiceCollection app)
                 {
-                    ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestAppEventSerializer<TApp>>(app);
-                    ServiceCollectionServiceExtensions.AddTransient<ITestAppPublisher<TApp>, TestAppPublisher<TApp>>(app);
+                    global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<global::Tycho.Events.Serialization.IEventSerializer, TestAppEventSerializer<TApp>>(app);
+                    global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<ITestAppPublisher<TApp>, TestAppPublisher<TApp>>(app);
                 }
             }
         }

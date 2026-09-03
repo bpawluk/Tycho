@@ -54,9 +54,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 ModuleClass = tychoFacadeModel.DefinitionType.DeclarationName;
                 FacadeClass = facadeType.Identifier;
                 FacadeClassWithTypeParams = facadeType.DeclarationName;
-                FacadeBaseClass = owner.UseType(ModuleFacadeBaseReference.TypeModel);
-                TaskClass = owner.UseType(TaskReference.TypeModel);
-                CancellationTokenClass = owner.UseType(CancellationTokenReference.TypeModel);
+                FacadeBaseClass = ModuleFacadeBaseReference.TypeModel.FullReferenceName;
+                TaskClass = TaskReference.TypeModel.FullReferenceName;
+                CancellationTokenClass = CancellationTokenReference.TypeModel.FullReferenceName;
             }
         }
 
@@ -71,7 +71,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                     tychoFacadeModel.DefinitionType,
                     ModuleFacadeSymbols.GetModuleFacadeInterface(tychoFacadeModel.DefinitionType.Name));
                 ModuleInterface = facadeInterfaceType.ReferenceName;
-                InstanceInterface = owner.UseType(IModuleReference.TypeModel);
+                InstanceInterface = IModuleReference.TypeModel.FullReferenceName;
             }
         }
 
@@ -107,9 +107,9 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
 
             public RequestTM(ModuleFacadeTM owner, TychoRequestModel tychoRequestModel)
             {
-                RequestType = owner.UseType(tychoRequestModel.RequestType);
+                RequestType = tychoRequestModel.RequestType.FullReferenceName;
                 HasResponse = tychoRequestModel.HasResponse;
-                ResponseType = HasResponse ? owner.UseType(tychoRequestModel.ResponseType.Value) : string.Empty;
+                ResponseType = HasResponse ? tychoRequestModel.ResponseType.Value.FullReferenceName : string.Empty;
             }
         }
     }

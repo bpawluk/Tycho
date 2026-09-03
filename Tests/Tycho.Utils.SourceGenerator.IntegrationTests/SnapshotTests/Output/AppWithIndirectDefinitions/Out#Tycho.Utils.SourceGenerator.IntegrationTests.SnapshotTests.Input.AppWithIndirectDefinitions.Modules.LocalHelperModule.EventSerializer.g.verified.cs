@@ -1,11 +1,9 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.Modules.LocalHelperModule.EventSerializer.g.cs
-using Tycho.Events.Serialization;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.Modules
 {
-    internal class LocalHelperModuleEventSerializer : EventSerializerBase
+    internal class LocalHelperModuleEventSerializer : global::Tycho.Events.Serialization.EventSerializerBase
     {
-        public LocalHelperModuleEventSerializer(IPayloadSerializer payloadSerializer) : base(payloadSerializer)
+        public LocalHelperModuleEventSerializer(global::Tycho.Events.Serialization.IPayloadSerializer payloadSerializer) : base(payloadSerializer)
         {
         }
     }

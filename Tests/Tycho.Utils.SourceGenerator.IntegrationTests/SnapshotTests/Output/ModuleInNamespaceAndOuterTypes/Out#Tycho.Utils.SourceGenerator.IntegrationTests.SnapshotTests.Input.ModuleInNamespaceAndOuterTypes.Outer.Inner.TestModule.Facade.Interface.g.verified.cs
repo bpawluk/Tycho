@@ -1,16 +1,11 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleInNamespaceAndOuterTypes.Outer.Inner.TestModule.Facade.Interface.g.cs
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Tycho.Structure;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleInNamespaceAndOuterTypes
 {
     public partial class Outer
     {
         public partial class Inner
         {
-            public interface ITestModule : IRunnable, IDisposable
+            public interface ITestModule : global::Tycho.Structure.IRunnable, global::System.IDisposable
             {
             }
         }

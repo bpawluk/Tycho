@@ -1,40 +1,34 @@
 ﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppsWithSameNestedName.Beta.TestApp.Extensions.g.cs
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using System;
-using System.Linq;
-using Tycho.Hosting.Services;
-
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppsWithSameNestedName
 {
     public static partial class TestAppSetupExtensions
     {
-        public static Beta.TestAppBuilder CreateAppBuilder(this Beta.TestApp app)
+        public static global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppsWithSameNestedName.Beta.TestAppBuilder CreateAppBuilder(this Beta.TestApp app)
         {
             var appBuilderBase = app.CreateAppBuilderBase();
-            return new Beta.TestAppBuilder(appBuilderBase);
+            return new global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppsWithSameNestedName.Beta.TestAppBuilder(appBuilderBase);
         }
 
-        public static IHostApplicationBuilder AddTestApp(this IHostApplicationBuilder builder, Beta.TestApp appDefinition)
+        public static global::Microsoft.Extensions.Hosting.IHostApplicationBuilder AddTestApp(this global::Microsoft.Extensions.Hosting.IHostApplicationBuilder builder, Beta.TestApp appDefinition)
         {
             if (builder == null)
             {
-                throw new ArgumentNullException(nameof(builder));
+                throw new global::System.ArgumentNullException(nameof(builder));
             }
 
             if (appDefinition == null)
             {
-                throw new ArgumentNullException(nameof(appDefinition));
+                throw new global::System.ArgumentNullException(nameof(appDefinition));
             }
 
-            if (Enumerable.Any(builder.Services, descriptor => descriptor.ServiceType == typeof(Beta.ITestApp)))
+            if (global::System.Linq.Enumerable.Any(builder.Services, descriptor => descriptor.ServiceType == typeof(global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppsWithSameNestedName.Beta.ITestApp)))
             {
-                throw new InvalidOperationException("The application is already registered in the host.");
+                throw new global::System.InvalidOperationException("The application is already registered in the host.");
             }
 
-            Beta.TestAppBuilder appBuilder = appDefinition.CreateAppBuilder();
-            ServiceCollectionServiceExtensions.AddSingleton(builder.Services, provider => appBuilder.Build(provider));
-            ServiceCollectionHostedServiceExtensions.AddHostedService<AppHostedLifecycleService<Beta.ITestApp>>(builder.Services);
+            global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppsWithSameNestedName.Beta.TestAppBuilder appBuilder = appDefinition.CreateAppBuilder();
+            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton(builder.Services, provider => appBuilder.Build(provider));
+            global::Microsoft.Extensions.DependencyInjection.ServiceCollectionHostedServiceExtensions.AddHostedService<global::Tycho.Hosting.Services.AppHostedLifecycleService<global::Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppsWithSameNestedName.Beta.ITestApp>>(builder.Services);
 
             return builder;
         }
