@@ -1,0 +1,12 @@
+﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithGenericDefinition.TestModule`1.Facade.g.cs
+using System.Threading;
+using System.Threading.Tasks;
+using Tycho.Modules.Instance;
+
+namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithGenericDefinition
+{
+    internal class TestModuleFacade<T> : ModuleFacadeBase, ITestModule<T>
+    {
+        public TestModuleFacade(IModule<TestModule<T>> module) : base(module) { }
+    }
+}

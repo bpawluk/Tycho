@@ -1,0 +1,15 @@
+﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithGenericDefinition.TestApp`1.Setup.g.cs
+using Microsoft.Extensions.DependencyInjection;
+using Tycho.Events.Serialization;
+
+namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithGenericDefinition
+{
+    public class TestAppSetup<T>
+    {
+        public static void Setup(IServiceCollection app)
+        {
+            ServiceCollectionServiceExtensions.AddSingleton<IEventSerializer, TestAppEventSerializer<T>>(app);
+            ServiceCollectionServiceExtensions.AddTransient<ITestAppPublisher<T>, TestAppPublisher<T>>(app);
+        }
+    }
+}

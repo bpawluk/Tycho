@@ -1,0 +1,12 @@
+﻿//HintName: Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.Modules.LocalStaticHelperModule.Facade.g.cs
+using System.Threading;
+using System.Threading.Tasks;
+using Tycho.Modules.Instance;
+
+namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.AppWithIndirectDefinitions.Modules
+{
+    internal class LocalStaticHelperModuleFacade : ModuleFacadeBase, ILocalStaticHelperModule
+    {
+        public LocalStaticHelperModuleFacade(IModule<LocalStaticHelperModule> module) : base(module) { }
+    }
+}

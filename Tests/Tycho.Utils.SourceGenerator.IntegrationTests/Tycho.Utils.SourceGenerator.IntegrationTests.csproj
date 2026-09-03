@@ -35,8 +35,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="EdgeCaseTests\SUT\InvalidTychoDefinitions.cs" />
-    <Content Include="EdgeCaseTests\SUT\InvalidTychoDefinitions.cs">
+    <Compile Remove="EdgeCaseTests\SUT\**\*.cs;IncrementalTests\SUT\**\*.cs;SnapshotTests\Input\**\*.cs" />
+    <Content Include="EdgeCaseTests\SUT\**\*.cs;IncrementalTests\SUT\**\*.cs;SnapshotTests\Input\**\*.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

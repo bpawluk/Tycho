@@ -130,7 +130,7 @@ public class IncrementalTests
             "AppWithEvents/Modules/ModuleA.cs"
         ];
 
-        CSharpCompilation compilation = CreateCompilation("SnapshotTests\\Input", sources);
+        CSharpCompilation compilation = CreateCompilation("IncrementalTests\\SUT", sources);
         GeneratorDriver driver = CreateGeneratorDriverWithTracking();
         driver = driver.RunGenerators(compilation, cancellationToken);
 

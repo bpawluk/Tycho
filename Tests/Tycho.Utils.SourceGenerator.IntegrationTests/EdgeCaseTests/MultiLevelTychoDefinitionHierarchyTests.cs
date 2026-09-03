@@ -6,9 +6,9 @@ namespace Tycho.Utils.SourceGenerator.IntegrationTests.EdgeCaseTests;
 public class MultiLevelTychoDefinitionHierarchyTests
 {
     [Fact]
-    public void ConcreteDefinitionsCanInheritRequiredMethodImplementations()
+    public void MultiLevelTychoDefinitionHierarchy_DoesNotFailTheGenerator()
     {
-        GeneratorDriver driver = RunGenerator("SnapshotTests\\Input", ["InheritedDefinitions/Definitions.cs"]);
+        GeneratorDriver driver = RunGenerator("EdgeCaseTests\\SUT", ["MultiLevelTychoDefinitions.cs"]);
         GeneratorDriverRunResult result = driver.GetRunResult();
 
         Assert.All(result.Results, generatorResult => Assert.Null(generatorResult.Exception));

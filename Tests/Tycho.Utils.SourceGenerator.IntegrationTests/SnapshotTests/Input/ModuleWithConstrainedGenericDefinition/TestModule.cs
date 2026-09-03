@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
 using Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithConstrainedGenericDefinition.Model;
 
-namespace Tycho.Utils.SourceGenerator.IntegrationTests.Input.ModuleWithConstrainedGenericDefinition;
+namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests.Input.ModuleWithConstrainedGenericDefinition;
 
 public interface IMarker { }
 

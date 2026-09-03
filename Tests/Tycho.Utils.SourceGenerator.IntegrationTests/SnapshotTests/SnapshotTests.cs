@@ -92,7 +92,8 @@ public class SnapshotTests : VerifyBase
     {
         string[] sources =
         [
-            "AppWithConstrainedGenericDefinition/TestApp.cs"
+            "AppWithConstrainedGenericDefinition/TestApp.cs",
+            "AppWithConstrainedGenericDefinition/Model/PayloadBase.cs"
         ];
         GeneratorDriver driver = RunGenerator(SourceDir, sources);
         return Verify(driver);
@@ -245,7 +246,8 @@ public class SnapshotTests : VerifyBase
     {
         string[] sources =
         [
-            "ModuleWithConstrainedGenericDefinition/TestModule.cs"
+            "ModuleWithConstrainedGenericDefinition/TestModule.cs",
+            "ModuleWithConstrainedGenericDefinition/Model/PayloadBase.cs"
         ];
         GeneratorDriver driver = RunGenerator(SourceDir, sources);
         return Verify(driver);
