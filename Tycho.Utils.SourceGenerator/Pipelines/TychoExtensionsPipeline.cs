@@ -15,11 +15,12 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
 
         public static IncrementalGeneratorInitializationContext AddTychoExtensionsPipeline(
             this IncrementalGeneratorInitializationContext context,
-            IncrementalValuesProvider<(TychoDefinitionKind, ClassDefinitionModel)> pipelineBase)
+            IncrementalValuesProvider<(TychoDefinitionKind Kind, TypeDefinitionModel DefinitionType)> pipelineBase)
         {
             IncrementalValuesProvider<TychoExtensionsModel> getTychoExtensionsModelStepResult = pipelineBase
                 .Where(GetTychoExtensionsModelStepPredicate)
-                .Select(GetTychoExtensionsModelStepTransform);
+                .Select(GetTychoExtensionsModelStepTransform)
+                .WithTrackingName("TychoExtensions.Model");
 
             context.RegisterSourceOutput(
                 getTychoExtensionsModelStepResult,
@@ -34,15 +35,17 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             return context;
         }
 
-        private static bool GetTychoExtensionsModelStepPredicate((TychoDefinitionKind Kind, ClassDefinitionModel Model) input)
+        private static bool GetTychoExtensionsModelStepPredicate((TychoDefinitionKind Kind, TypeDefinitionModel DefinitionType) input)
         {
             return input.Kind == TychoDefinitionKind.App;
         }
 
-        private static TychoExtensionsModel GetTychoExtensionsModelStepTransform((TychoDefinitionKind Kind, ClassDefinitionModel Model) input, CancellationToken token)
+        private static TychoExtensionsModel GetTychoExtensionsModelStepTransform(
+            (TychoDefinitionKind Kind, TypeDefinitionModel DefinitionType) input,
+            CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            return new TychoExtensionsModel(input.Model.ClassType);
+            return new TychoExtensionsModel(input.DefinitionType);
         }
     }
 }

@@ -18,16 +18,15 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
 
         public static IncrementalGeneratorInitializationContext AddTychoEventSerializerPipeline(
             this IncrementalGeneratorInitializationContext context,
-            IncrementalValuesProvider<(TychoDefinitionKind, ClassDefinitionModel)> pipelineBase)
+            IncrementalValuesProvider<(TychoDefinitionKind DefinitionKind, MethodDefinitionModel Method)> pipelineBase)
         {
-            IncrementalValuesProvider<(TychoDefinitionKind DefinitionKind, MethodDefinitionModel Method)> getDefineEventsMethodDefinitionsStepResult = pipelineBase
-                .Select(GetDefineEventsMethodDefinitionsStepTransform);
-
-            IncrementalValuesProvider<(TychoDefinitionKind DefinitionKind, TypeDefinitionModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations)> getSerializableEventMethodInvocationsStepResult = getDefineEventsMethodDefinitionsStepResult
-                .Select(GetSerializableEventMethodInvocationsStepTransform);
+            IncrementalValuesProvider<(TychoDefinitionKind DefinitionKind, TypeDefinitionModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations)> getSerializableEventMethodInvocationsStepResult = pipelineBase
+                .Select(GetSerializableEventMethodInvocationsStepTransform)
+                .WithTrackingName("TychoEventSerializer.Invocations");
 
             IncrementalValuesProvider<TychoEventSerializerModel> getTychoEventSerializerModelStepResult = getSerializableEventMethodInvocationsStepResult
-                .Select(GetTychoEventSerializerModelStepTransform);
+                .Select(GetTychoEventSerializerModelStepTransform)
+                .WithTrackingName("TychoEventSerializer.Model");
 
             context.RegisterSourceOutput(
                 getTychoEventSerializerModelStepResult,
@@ -42,14 +41,6 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                 });
 
             return context;
-        }
-
-        private static (TychoDefinitionKind DefinitionKind, MethodDefinitionModel Method) GetDefineEventsMethodDefinitionsStepTransform(
-            (TychoDefinitionKind DefinitionKind, ClassDefinitionModel Model) input,
-            CancellationToken token)
-        {
-            token.ThrowIfCancellationRequested();
-            return (input.DefinitionKind, input.Model.Methods.Single(method => method.Signature.IsDefineEventsMethod()));
         }
 
         private static (TychoDefinitionKind DefinitionKind, TypeDefinitionModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) GetSerializableEventMethodInvocationsStepTransform(
@@ -72,11 +63,24 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                 input.DefinitionKind,
                 input.DefinitionType,
                 input.MethodInvocations
-                    .Select(invocation => invocation.ReceiverType!.Value.TypeArguments
-                        .Single(argument => argument.IsEventType())
-                        .Value)
+                    .Select(GetEventType)
+                    .Where(eventType => eventType.HasValue)
+                    .Select(eventType => eventType.Value)
                     .Distinct()
                     .ToImmutableEquatableArray());
+        }
+
+        private static TypeReferenceModel? GetEventType(MethodInvocationModel invocation)
+        {
+            if (!invocation.ReceiverType.HasValue)
+            {
+                return null;
+            }
+
+            TypeArgumentModel[] eventArguments = invocation.ReceiverType.Value.TypeArguments
+                .Where(argument => argument.IsEventType())
+                .ToArray();
+            return eventArguments.Length == 1 ? eventArguments[0].Value : (TypeReferenceModel?)null;
         }
 
         private static object CreateTemplateModel(TychoEventSerializerModel model)

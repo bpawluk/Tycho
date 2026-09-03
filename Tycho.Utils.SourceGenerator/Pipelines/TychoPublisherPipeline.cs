@@ -20,16 +20,15 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
 
         public static IncrementalGeneratorInitializationContext AddTychoPublisherPipeline(
             this IncrementalGeneratorInitializationContext context,
-            IncrementalValuesProvider<(TychoDefinitionKind, ClassDefinitionModel)> pipelineBase)
+            IncrementalValuesProvider<(TychoDefinitionKind DefinitionKind, MethodDefinitionModel Method)> pipelineBase)
         {
-            IncrementalValuesProvider<(TychoDefinitionKind DefinitionKind, MethodDefinitionModel Method)> getDefineEventsMethodDefinitionsStepResult = pipelineBase
-                .Select(GetDefineEventsMethodDefinitionsStepTransform);
-
-            IncrementalValuesProvider<(TychoDefinitionKind DefinitionKind, TypeDefinitionModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations)> getPublishableEventMethodInvocationsStepResult = getDefineEventsMethodDefinitionsStepResult
-                .Select(GetPublishableEventMethodInvocationsStepTransform);
+            IncrementalValuesProvider<(TychoDefinitionKind DefinitionKind, TypeDefinitionModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations)> getPublishableEventMethodInvocationsStepResult = pipelineBase
+                .Select(GetPublishableEventMethodInvocationsStepTransform)
+                .WithTrackingName("TychoPublisher.Invocations");
 
             IncrementalValuesProvider<TychoPublisherModel> getTychoPublisherModelStepResult = getPublishableEventMethodInvocationsStepResult
-                .Select(GetTychoPublisherModelStepTransform);
+                .Select(GetTychoPublisherModelStepTransform)
+                .WithTrackingName("TychoPublisher.Model");
 
             context.RegisterSourceOutput(
                 getTychoPublisherModelStepResult,
@@ -49,14 +48,6 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                 });
 
             return context;
-        }
-
-        private static (TychoDefinitionKind DefinitionKind, MethodDefinitionModel Method) GetDefineEventsMethodDefinitionsStepTransform(
-            (TychoDefinitionKind DefinitionKind, ClassDefinitionModel Model) input,
-            CancellationToken token)
-        {
-            token.ThrowIfCancellationRequested();
-            return (input.DefinitionKind, input.Model.Methods.Single(method => method.Signature.IsDefineEventsMethod()));
         }
 
         private static (TychoDefinitionKind DefinitionKind, TypeDefinitionModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) GetPublishableEventMethodInvocationsStepTransform(
@@ -79,11 +70,17 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                 input.DefinitionKind,
                 input.DefinitionType,
                 input.MethodInvocations
-                    .Select(invocation => invocation.TypeArguments
-                        .Single(argument => argument.IsEventType())
-                        .Value)
+                    .Select(GetEventType)
+                    .Where(eventType => eventType.HasValue)
+                    .Select(eventType => eventType.Value)
                     .Distinct()
                     .ToImmutableEquatableArray());
+        }
+
+        private static TypeReferenceModel? GetEventType(MethodInvocationModel invocation)
+        {
+            TypeArgumentModel[] eventArguments = invocation.TypeArguments.Where(argument => argument.IsEventType()).ToArray();
+            return eventArguments.Length == 1 ? eventArguments[0].Value : (TypeReferenceModel?)null;
         }
 
         private static object CreateInterfaceTemplateModel(TychoPublisherModel model)

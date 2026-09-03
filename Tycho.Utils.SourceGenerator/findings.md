@@ -20,15 +20,15 @@ This can classify unrelated overloads as Tycho definition methods. Since several
 
 Additionally, `TypeReferenceModel.Matches` ignores containing types, making nested types with otherwise identical names match incorrectly.
 
-### 4. High — Invalid or incomplete definitions can crash pipelines
-
-The builder, extensions, and parent pipelines filter their supported definition kinds before transforming. Facade, publisher, event-serializer, and setup pipelines do not consistently do so.
-
-For example, `TychoFacadePipeline` executes `Single(...)` before the later `Unknown` guard. `TychoSetupPipeline` uses `FirstOrDefault` and subsequently dereferences the default method model.
-
-An unrelated class decorated with `[TychoDefinition]`, an abstract intermediate definition, or temporarily incomplete code can therefore produce a generator exception instead of either no output or a controlled diagnostic.
-
 ## Resolved findings
+
+### 4. Resolved — Invalid or incomplete definitions can crash pipelines
+
+Attributed definitions are now validated once before entering any generation pipeline. Unsupported and abstract types, and definitions without concrete implementations of all three required Tycho methods, are silently skipped without affecting valid definitions in the same compilation.
+
+Required methods are resolved by their Roslyn override chains, so unrelated same-named overloads are ignored and concrete definitions can inherit implementations from intermediate base classes. Pipelines consume the validated methods directly, and malformed request, event, or submodule invocations are ignored instead of being projected through throwing `Single(...)` or nullable dereferences.
+
+Covered by the invalid-definition and inherited-definition integration tests for apps and modules.
 
 ### 1. Resolved — Nested applications generated uncompilable builder and extension references
 
@@ -73,4 +73,3 @@ Generated builder declarations and references now use `GeneratedTypeModel`, and 
 `AppExtensionsTM` still manually flattens the containing types' and application's type parameters for its generic extension methods. Parameter names are deduplicated independently from constraints, which can produce an invalid or semantically incorrect method when nested types reuse a type-parameter name.
 
 Generic method declaration construction should be represented by a model that keeps each parameter associated with its constraints and defines how shadowed type parameters are handled.
-

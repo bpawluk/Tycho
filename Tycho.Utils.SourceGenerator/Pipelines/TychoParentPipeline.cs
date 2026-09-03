@@ -17,17 +17,20 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
 
         public static IncrementalGeneratorInitializationContext AddTychoParentPipeline(
             this IncrementalGeneratorInitializationContext context,
-            IncrementalValuesProvider<(TychoDefinitionKind, ClassDefinitionModel)> pipelineBase)
+            IncrementalValuesProvider<(TychoDefinitionKind DefinitionKind, MethodDefinitionModel Method)> pipelineBase)
         {
             IncrementalValuesProvider<MethodDefinitionModel> getDefineContractMethodDefinitionsStepResult = pipelineBase
                 .Where(GetDefineContractMethodDefinitionsStepPredicate)
-                .Select(GetDefineContractMethodDefinitionsStepTransform);
+                .Select(GetDefineContractMethodDefinitionsStepTransform)
+                .WithTrackingName("TychoParent.Definition");
 
             IncrementalValuesProvider<(TypeDefinitionModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations)> getRequirementMethodInvocationsStepResult = getDefineContractMethodDefinitionsStepResult
-                .Select(GetRequirementMethodInvocationsStepTransform);
+                .Select(GetRequirementMethodInvocationsStepTransform)
+                .WithTrackingName("TychoParent.Invocations");
 
             IncrementalValuesProvider<TychoParentModel> getTychoParentModelStepResult = getRequirementMethodInvocationsStepResult
-                .Select(GetTychoParentModelStepTransform);
+                .Select(GetTychoParentModelStepTransform)
+                .WithTrackingName("TychoParent.Model");
 
             context.RegisterSourceOutput(
                 getTychoParentModelStepResult,
@@ -47,17 +50,18 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
             return context;
         }
 
-        private static bool GetDefineContractMethodDefinitionsStepPredicate((TychoDefinitionKind Kind, ClassDefinitionModel Model) input)
+        private static bool GetDefineContractMethodDefinitionsStepPredicate(
+            (TychoDefinitionKind DefinitionKind, MethodDefinitionModel Method) input)
         {
-            return input.Kind == TychoDefinitionKind.Module;
+            return input.DefinitionKind == TychoDefinitionKind.Module;
         }
 
         private static MethodDefinitionModel GetDefineContractMethodDefinitionsStepTransform(
-            (TychoDefinitionKind DefinitionKind, ClassDefinitionModel Model) input,
+            (TychoDefinitionKind DefinitionKind, MethodDefinitionModel Method) input,
             CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            return input.Model.Methods.Single(method => method.Signature.IsDefineContractMethod());
+            return input.Method;
         }
 
         private static (TypeDefinitionModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) GetRequirementMethodInvocationsStepTransform(
@@ -80,19 +84,24 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                 input.DefinitionType,
                 input.MethodInvocations
                     .Select(GetTychoRequestModel)
+                    .Where(request => request.HasValue)
+                    .Select(request => request.Value)
                     .Distinct()
                     .ToImmutableEquatableArray());
         }
 
-        private static TychoRequestModel GetTychoRequestModel(MethodInvocationModel model)
+        private static TychoRequestModel? GetTychoRequestModel(MethodInvocationModel model)
         {
-            TypeReferenceModel requestType = model.TypeArguments.Single(argument => argument.IsRequestType()).Value;
-            if (model.TypeArguments.Any(argument => argument.IsResponseType()))
+            TypeArgumentModel[] requestArguments = model.TypeArguments.Where(argument => argument.IsRequestType()).ToArray();
+            TypeArgumentModel[] responseArguments = model.TypeArguments.Where(argument => argument.IsResponseType()).ToArray();
+            if (requestArguments.Length != 1 || responseArguments.Length > 1)
             {
-                TypeReferenceModel responseType = model.TypeArguments.Single(argument => argument.IsResponseType()).Value;
-                return new TychoRequestModel(requestType, responseType);
+                return null;
             }
-            return new TychoRequestModel(requestType);
+
+            return responseArguments.Length == 1
+                ? new TychoRequestModel(requestArguments[0].Value, responseArguments[0].Value)
+                : new TychoRequestModel(requestArguments[0].Value);
         }
     }
 }

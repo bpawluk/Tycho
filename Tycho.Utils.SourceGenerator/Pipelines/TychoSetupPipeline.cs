@@ -18,16 +18,15 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
 
         public static IncrementalGeneratorInitializationContext AddTychoSetupPipeline(
             this IncrementalGeneratorInitializationContext context,
-            IncrementalValuesProvider<(TychoDefinitionKind, ClassDefinitionModel)> pipelineBase)
+            IncrementalValuesProvider<(TychoDefinitionKind SetupKind, MethodDefinitionModel Method)> pipelineBase)
         {
-            IncrementalValuesProvider<(TychoDefinitionKind SetupKind, MethodDefinitionModel Method)> getIncludeModulesMethodSetupStepResult = pipelineBase
-                .Select(GetIncludeModulesMethodSetupStepTransform);
-
-            IncrementalValuesProvider<(TychoDefinitionKind SetupKind, TypeDefinitionModel SetupType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations)> getSubmoduleMethodInvocationsStepResult = getIncludeModulesMethodSetupStepResult
-                .Select(GetSubmoduleMethodInvocationsStepTransform);
+            IncrementalValuesProvider<(TychoDefinitionKind SetupKind, TypeDefinitionModel SetupType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations)> getSubmoduleMethodInvocationsStepResult = pipelineBase
+                .Select(GetSubmoduleMethodInvocationsStepTransform)
+                .WithTrackingName("TychoSetup.Invocations");
 
             IncrementalValuesProvider<TychoSetupModel> getTychoSetupModelStepResult = getSubmoduleMethodInvocationsStepResult
-                .Select(GetTychoSetupModelStepTransform);
+                .Select(GetTychoSetupModelStepTransform)
+                .WithTrackingName("TychoSetup.Model");
 
             context.RegisterSourceOutput(
                 getTychoSetupModelStepResult,
@@ -42,14 +41,6 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                 });
 
             return context;
-        }
-
-        private static (TychoDefinitionKind SetupKind, MethodDefinitionModel Method) GetIncludeModulesMethodSetupStepTransform(
-            (TychoDefinitionKind SetupKind, ClassDefinitionModel Model) input,
-            CancellationToken token)
-        {
-            token.ThrowIfCancellationRequested();
-            return (input.SetupKind, input.Model.Methods.FirstOrDefault(method => method.Signature.IsIncludeModulesMethod()));
         }
 
         private static (TychoDefinitionKind SetupKind, TypeDefinitionModel SetupType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) GetSubmoduleMethodInvocationsStepTransform(
@@ -72,11 +63,17 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                 input.SetupKind,
                 input.SetupType,
                 input.MethodInvocations
-                    .Select(invocation => invocation.TypeArguments
-                        .Single(argument => argument.IsModuleType())
-                        .Value)
+                    .Select(GetModuleType)
+                    .Where(moduleType => moduleType.HasValue)
+                    .Select(moduleType => moduleType.Value)
                     .Distinct()
                     .ToImmutableEquatableArray());
+        }
+
+        private static TypeReferenceModel? GetModuleType(MethodInvocationModel invocation)
+        {
+            TypeArgumentModel[] moduleArguments = invocation.TypeArguments.Where(argument => argument.IsModuleType()).ToArray();
+            return moduleArguments.Length == 1 ? moduleArguments[0].Value : (TypeReferenceModel?)null;
         }
 
         private static object CreateTemplateModel(TychoSetupModel model)

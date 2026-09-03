@@ -20,16 +20,15 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
 
         public static IncrementalGeneratorInitializationContext AddTychoFacadePipeline(
             this IncrementalGeneratorInitializationContext context,
-            IncrementalValuesProvider<(TychoDefinitionKind, ClassDefinitionModel)> pipelineBase)
+            IncrementalValuesProvider<(TychoDefinitionKind DefinitionKind, MethodDefinitionModel Method)> pipelineBase)
         {
-            IncrementalValuesProvider<(TychoDefinitionKind DefinitionKind, MethodDefinitionModel Method)> getDefineContractMethodDefinitionsStepResult = pipelineBase
-                .Select(GetDefineContractMethodDefinitionsStepTransform);
-
-            IncrementalValuesProvider<(TychoDefinitionKind DefinitionKind, TypeDefinitionModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations)> getContractMethodInvocationsStepResult = getDefineContractMethodDefinitionsStepResult
-                .Select(GetContractMethodInvocationsStepTransform);
+            IncrementalValuesProvider<(TychoDefinitionKind DefinitionKind, TypeDefinitionModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations)> getContractMethodInvocationsStepResult = pipelineBase
+                .Select(GetContractMethodInvocationsStepTransform)
+                .WithTrackingName("TychoFacade.Invocations");
 
             IncrementalValuesProvider<TychoFacadeModel> getTychoFacadeModelStepResult = getContractMethodInvocationsStepResult
-                .Select(GetTychoFacadeModelStepTransform);
+                .Select(GetTychoFacadeModelStepTransform)
+                .WithTrackingName("TychoFacade.Model");
 
             context.RegisterSourceOutput(
                 getTychoFacadeModelStepResult,
@@ -49,14 +48,6 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                 });
 
             return context;
-        }
-
-        private static (TychoDefinitionKind DefinitionKind, MethodDefinitionModel Method) GetDefineContractMethodDefinitionsStepTransform(
-            (TychoDefinitionKind DefinitionKind, ClassDefinitionModel Model) input,
-            CancellationToken token)
-        {
-            token.ThrowIfCancellationRequested();
-            return (input.DefinitionKind, input.Model.Methods.Single(method => method.Signature.IsDefineContractMethod()));
         }
 
         private static (TychoDefinitionKind DefinitionKind, TypeDefinitionModel DefinitionType, ImmutableEquatableArray<MethodInvocationModel> MethodInvocations) GetContractMethodInvocationsStepTransform(
@@ -80,19 +71,24 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
                 input.DefinitionType,
                 input.MethodInvocations
                     .Select(GetTychoRequestModel)
+                    .Where(request => request.HasValue)
+                    .Select(request => request.Value)
                     .Distinct()
                     .ToImmutableEquatableArray());
         }
 
-        private static TychoRequestModel GetTychoRequestModel(MethodInvocationModel model)
+        private static TychoRequestModel? GetTychoRequestModel(MethodInvocationModel model)
         {
-            TypeReferenceModel requestType = model.TypeArguments.Single(argument => argument.IsRequestType()).Value;
-            if (model.TypeArguments.Any(argument => argument.IsResponseType()))
+            TypeArgumentModel[] requestArguments = model.TypeArguments.Where(argument => argument.IsRequestType()).ToArray();
+            TypeArgumentModel[] responseArguments = model.TypeArguments.Where(argument => argument.IsResponseType()).ToArray();
+            if (requestArguments.Length != 1 || responseArguments.Length > 1)
             {
-                TypeReferenceModel responseType = model.TypeArguments.Single(argument => argument.IsResponseType()).Value;
-                return new TychoRequestModel(requestType, responseType);
+                return null;
             }
-            return new TychoRequestModel(requestType);
+
+            return responseArguments.Length == 1
+                ? new TychoRequestModel(requestArguments[0].Value, responseArguments[0].Value)
+                : new TychoRequestModel(requestArguments[0].Value);
         }
 
         private static object CreateInterfaceTemplateModel(TychoFacadeModel model)
