@@ -78,6 +78,7 @@ public class ValidApp : TychoApp
     protected override void IncludeModules(IAppStructure app)
     {
         Uses<object>();
+        Uses<UnrelatedModule>("unrelated overload");
     }
 
     protected override void RegisterServices(IServiceCollection app) { }
@@ -89,6 +90,10 @@ public class ValidApp : TychoApp
     private static IAppEvents HandlesWith<T>() => throw new System.NotSupportedException();
 
     private static IAppStructure Uses<T>() => throw new System.NotSupportedException();
+
+    private static IAppStructure Uses<TModule>(string unrelated) => throw new System.NotSupportedException();
+
+    private sealed class UnrelatedModule { }
 }
 
 internal static class EventHelpers

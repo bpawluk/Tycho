@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Tycho.Utils.SourceGenerator.Utils;
 
 namespace Tycho.Utils.SourceGenerator.Models.System
@@ -25,6 +26,7 @@ namespace Tycho.Utils.SourceGenerator.Models.System
         {
             return string.Equals(MethodName, other.MethodName, StringComparison.Ordinal) &&
                    Parameters.Count == other.Parameters.Count &&
+                   Parameters.Zip(other.Parameters, (parameter, otherParameter) => parameter.Matches(otherParameter)).All(match => match) &&
                    Result.Matches(other.Result);
         }
 

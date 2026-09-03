@@ -14,5 +14,9 @@ public class InvalidTychoDefinitionsTests
         Assert.All(result.Results, generatorResult => Assert.Null(generatorResult.Exception));
         Assert.Equal(8, result.GeneratedTrees.Length);
         Assert.All(result.GeneratedTrees, tree => Assert.Contains("ValidApp", tree.FilePath, StringComparison.Ordinal));
+        Assert.All(result.GeneratedTrees, tree => Assert.DoesNotContain(
+            "UnrelatedModule",
+            tree.GetText(TestContext.Current.CancellationToken).ToString(),
+            StringComparison.Ordinal));
     }
 }

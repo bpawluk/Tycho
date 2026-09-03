@@ -12,7 +12,7 @@ public class TestModule : TychoModule
     protected override void IncludeModules(IModuleStructure module)
     {
         module.Uses<Outer<int>.Inner.ModuleA>();
-        module.Uses<ModuleB>();
+        module.Uses<ModuleB>(_ => { });
     }
     protected override void RegisterServices(IServiceCollection module) { }
 }

@@ -6,21 +6,13 @@
 
 Templates rely on using directives instead of qualifying namespaces, so two referenced types with the same path in different namespaces can become ambiguous.
 
-### 3. High — Method signature matching does not match method signatures
-
-`MethodSignatureModel.Matches` compares:
-
-- method name,
-- parameter count,
-- return type,
-
-but never compares parameter types.
-
-This can classify unrelated overloads as Tycho definition methods. Since several pipelines subsequently use `Single(...)`, adding an unrelated overload such as another one-parameter `DefineContract` can crash the generator.
-
-Additionally, `TypeReferenceModel.Matches` ignores containing types, making nested types with otherwise identical names match incorrectly.
-
 ## Resolved findings
+
+### 3. Resolved — Method signature matching did not match method signatures
+
+`MethodSignatureModel.Matches` now compares parameter types positionally, and `TypeReferenceModel.Matches` compares complete containing-type chains recursively. Generic `Action<IContractFulfillment>` references model their app- and module-specific argument types so legitimate `Uses` overloads continue to match precisely.
+
+Covered by focused structural matching tests and integration tests that exercise valid contract-fulfillment overloads while rejecting an unrelated same-name overload.
 
 ### 4. Resolved — Invalid or incomplete definitions can crash pipelines
 

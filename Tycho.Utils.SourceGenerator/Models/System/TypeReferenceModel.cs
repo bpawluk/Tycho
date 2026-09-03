@@ -45,6 +45,8 @@ namespace Tycho.Utils.SourceGenerator.Models.System
         public bool Matches(TypeReferenceModel other)
         {
             return string.Equals(Namespace, other.Namespace, StringComparison.Ordinal)
+                && ContainingTypes.Count == other.ContainingTypes.Count
+                && ContainingTypes.Zip(other.ContainingTypes, (type, otherType) => type.Matches(otherType)).All(match => match)
                 && string.Equals(Name, other.Name, StringComparison.Ordinal)
                 && TypeArguments.Count == other.TypeArguments.Count
                 && TypeArguments.Zip(other.TypeArguments, (a, b) => a.Matches(b)).All(match => match);

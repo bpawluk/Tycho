@@ -12,7 +12,7 @@ public class TestApp : TychoApp
     protected override void IncludeModules(IAppStructure app)
     {
         app.Uses<Outer<string>.Inner.ModuleA>();
-        app.Uses<ModuleB>();
+        app.Uses<ModuleB>(_ => { });
     }
     protected override void RegisterServices(IServiceCollection app) { }
 }
