@@ -34,6 +34,8 @@ namespace Tycho.Utils.SourceGenerator.Models
             IsValid = true;
         }
 
+        public static TychoDefinitionModel None() => new TychoDefinitionModel();
+
         public bool Equals(TychoDefinitionModel other)
         {
             if (IsValid != other.IsValid)
@@ -41,7 +43,7 @@ namespace Tycho.Utils.SourceGenerator.Models
                 return false;
             }
 
-            if (!IsValid)
+            if (!IsValid) // both are Invalid
             {
                 return true;
             }

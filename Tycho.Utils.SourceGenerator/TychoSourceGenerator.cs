@@ -23,9 +23,7 @@ namespace Tycho.Utils.SourceGenerator
                 fullyQualifiedMetadataName: TychoDefinitionAttributeReference.FullName,
                 predicate: GetTychoPipelineBasePredicate,
                 transform: GetTychoPipelineBaseTransform)
-                .WithTrackingName("TychoDefinition.Candidate")
-                .Where(model => model.IsValid)
-                .WithTrackingName("TychoDefinition.Valid");
+                .Where(model => model.IsValid);
 
             IncrementalValuesProvider<(TychoDefinitionKind Kind, TypeDefinitionModel DefinitionType)> definitionTypes = tychoPipelineBase
                 .Select(GetDefinitionType)
@@ -102,19 +100,18 @@ namespace Tycho.Utils.SourceGenerator
                 TychoDefinitionKind definitionKind = TychoDefinitionKindExtractor.Extract(targetTypeSymbol, extractorContext);
                 if (definitionKind == TychoDefinitionKind.Unknown || targetTypeSymbol.IsAbstract)
                 {
-                    return default;
+                    return TychoDefinitionModel.None();
                 }
 
                 TypeDefinitionModel definitionType = TypeDefinitionModelExtractor.Extract(targetTypeSymbol, extractorContext);
 
-                INamedTypeSymbol baseTypeSymbol = context.SemanticModel.Compilation.GetTypeByMetadataName(
-                    definitionKind == TychoDefinitionKind.App ? TychoAppReference.FullName : TychoModuleReference.FullName);
+                INamedTypeSymbol baseTypeSymbol = context.SemanticModel.Compilation.GetTypeByMetadataName(definitionKind == TychoDefinitionKind.App ? TychoAppReference.FullName : TychoModuleReference.FullName);
                 if (baseTypeSymbol == null ||
                     !TryGetRequiredMethod(targetTypeSymbol, baseTypeSymbol, "DefineContract", out IMethodSymbol defineContractMethod) ||
                     !TryGetRequiredMethod(targetTypeSymbol, baseTypeSymbol, "DefineEvents", out IMethodSymbol defineEventsMethod) ||
                     !TryGetRequiredMethod(targetTypeSymbol, baseTypeSymbol, "IncludeModules", out IMethodSymbol includeModulesMethod))
                 {
-                    return default;
+                    return TychoDefinitionModel.None();
                 }
 
                 return new TychoDefinitionModel(
@@ -135,10 +132,8 @@ namespace Tycho.Utils.SourceGenerator
             out IMethodSymbol requiredMethod)
         {
             requiredMethod = null;
-            IMethodSymbol baseMethod = baseTypeSymbol
-                .GetMembers(methodName)
-                .OfType<IMethodSymbol>()
-                .SingleOrDefault();
+
+            IMethodSymbol baseMethod = baseTypeSymbol.GetMembers(methodName).OfType<IMethodSymbol>().SingleOrDefault();
             if (baseMethod == null)
             {
                 return false;
