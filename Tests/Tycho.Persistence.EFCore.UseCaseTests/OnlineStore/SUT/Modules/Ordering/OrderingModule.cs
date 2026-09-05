@@ -28,10 +28,10 @@ public partial class OrderingModule : TychoModule
         module.AddTychoPersistence<OrderingDbContext>();
     }
 
-    protected override async Task Startup(IServiceProvider app)
+    protected override async Task Startup(IServiceProvider module, CancellationToken cancellationToken)
     {
-        using OrderingDbContext context = app.GetRequiredService<OrderingDbContext>();
-        await context.Database.EnsureDeletedAsync();
-        await context.Database.EnsureCreatedAsync();
+        OrderingDbContext context = module.GetRequiredService<OrderingDbContext>();
+        await context.Database.EnsureDeletedAsync(cancellationToken);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
     }
 }

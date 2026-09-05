@@ -29,10 +29,10 @@ public partial class ReactionsModule : TychoModule
         module.AddTychoPersistence<ReactionsDbContext>();
     }
 
-    protected override async Task Startup(IServiceProvider app)
+    protected override async Task Startup(IServiceProvider module, CancellationToken cancellationToken)
     {
-        using ReactionsDbContext context = app.GetRequiredService<ReactionsDbContext>();
-        await context.Database.EnsureDeletedAsync();
-        await context.Database.EnsureCreatedAsync();
+        ReactionsDbContext context = module.GetRequiredService<ReactionsDbContext>();
+        await context.Database.EnsureDeletedAsync(cancellationToken);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
     }
 }

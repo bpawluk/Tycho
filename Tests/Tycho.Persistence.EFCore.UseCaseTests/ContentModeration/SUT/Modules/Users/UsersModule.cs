@@ -31,10 +31,10 @@ public partial class UsersModule : TychoModule
         module.AddTychoPersistence<UsersDbContext>();
     }
 
-    protected override async Task Startup(IServiceProvider app)
+    protected override async Task Startup(IServiceProvider module, CancellationToken cancellationToken)
     {
-        using UsersDbContext context = app.GetRequiredService<UsersDbContext>();
-        await context.Database.EnsureDeletedAsync();
-        await context.Database.EnsureCreatedAsync();
+        UsersDbContext context = module.GetRequiredService<UsersDbContext>();
+        await context.Database.EnsureDeletedAsync(cancellationToken);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
     }
 }

@@ -15,7 +15,8 @@ public sealed class OnlineStoreTests : IAsyncLifetime
 
     public async ValueTask InitializeAsync()
     {
-        _sut = await new OnlineStoreApp().RunAsync();
+        _sut = new OnlineStoreApp().CreateAppBuilder().Build();
+        await _sut.StartAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact(Timeout = 10000)]
@@ -82,6 +83,13 @@ public sealed class OnlineStoreTests : IAsyncLifetime
 
     public async ValueTask DisposeAsync()
     {
-        await _sut!.DisposeAsync();
+        try
+        {
+            await _sut.StopAsync();
+        }
+        finally
+        {
+            _sut.Dispose();
+        }
     }
 }

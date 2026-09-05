@@ -12,7 +12,8 @@ public sealed class BloggingWebsiteTests : IAsyncLifetime
 
     public async ValueTask InitializeAsync()
     {
-        _sut = await new BloggingWebsiteApp().RunAsync();
+        _sut = new BloggingWebsiteApp().CreateAppBuilder().Build();
+        await _sut.StartAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact(Timeout = 10000)]
@@ -99,6 +100,13 @@ public sealed class BloggingWebsiteTests : IAsyncLifetime
 
     public async ValueTask DisposeAsync()
     {
-        await _sut!.DisposeAsync();
+        try
+        {
+            await _sut.StopAsync();
+        }
+        finally
+        {
+            _sut.Dispose();
+        }
     }
 }

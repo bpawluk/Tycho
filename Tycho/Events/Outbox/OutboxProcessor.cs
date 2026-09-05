@@ -1,19 +1,18 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 using Tycho.Processor;
 using Tycho.Structure;
 
 namespace Tycho.Events.Outbox
 {
-    internal sealed class OutboxProcessor : IDisposable
+    internal sealed class OutboxProcessor : IHostedService, IDisposable
     {
         private readonly OutboxActivity _outboxActivity;
         private readonly JobProcessor _jobProcessor;
 
-        public OutboxProcessor(
-            Internals internals,
-            OutboxActivity outboxActivity,
-            OutboxSettings? outboxSettings = null)
+        public OutboxProcessor(Internals internals, OutboxActivity outboxActivity, OutboxSettings? outboxSettings = null)
         {
             _outboxActivity = outboxActivity;
 
@@ -31,16 +30,14 @@ namespace Tycho.Events.Outbox
             _jobProcessor = new JobProcessor(outboxJobFactory, jobProcessorSettings);
         }
 
-        public Task StartAsync()
+        public Task StartAsync(CancellationToken cancellationToken)
         {
             _outboxActivity.NewEntriesAdded += OnEntriesAdded;
             _jobProcessor.Start();
             return Task.CompletedTask;
         }
 
-        private void OnEntriesAdded(object _, EventArgs __) => _jobProcessor.Ping();
-
-        public Task StopAsync()
+        public Task StopAsync(CancellationToken cancellationToken)
         {
             _outboxActivity.NewEntriesAdded -= OnEntriesAdded;
             return _jobProcessor.StopAsync();
@@ -50,5 +47,7 @@ namespace Tycho.Events.Outbox
         {
             _jobProcessor.Dispose();
         }
+
+        private void OnEntriesAdded(object _, EventArgs __) => _jobProcessor.Ping();
     }
 }

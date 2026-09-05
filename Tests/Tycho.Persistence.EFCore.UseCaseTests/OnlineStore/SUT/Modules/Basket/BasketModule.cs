@@ -44,10 +44,10 @@ public partial class BasketModule : TychoModule
         module.AddTychoPersistence<BasketDbContext>();
     }
 
-    protected override async Task Startup(IServiceProvider app)
+    protected override async Task Startup(IServiceProvider module, CancellationToken cancellationToken)
     {
-        using BasketDbContext context = app.GetRequiredService<BasketDbContext>();
-        await context.Database.EnsureDeletedAsync();
-        await context.Database.EnsureCreatedAsync();
+        BasketDbContext context = module.GetRequiredService<BasketDbContext>();
+        await context.Database.EnsureDeletedAsync(cancellationToken);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
     }
 }

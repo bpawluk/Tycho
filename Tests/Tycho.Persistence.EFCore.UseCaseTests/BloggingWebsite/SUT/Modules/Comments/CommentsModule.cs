@@ -27,10 +27,10 @@ public partial class CommentsModule : TychoModule
         module.AddTychoPersistence<CommentsDbContext>();
     }
 
-    protected override async Task Startup(IServiceProvider app)
+    protected override async Task Startup(IServiceProvider module, CancellationToken cancellationToken)
     {
-        using CommentsDbContext context = app.GetRequiredService<CommentsDbContext>();
-        await context.Database.EnsureDeletedAsync();
-        await context.Database.EnsureCreatedAsync();
+        CommentsDbContext context = module.GetRequiredService<CommentsDbContext>();
+        await context.Database.EnsureDeletedAsync(cancellationToken);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
     }
 }

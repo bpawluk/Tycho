@@ -37,10 +37,10 @@ public partial class CatalogModule : TychoModule
         module.AddTychoPersistence<CatalogDbContext>();
     }
 
-    protected override async Task Startup(IServiceProvider app)
+    protected override async Task Startup(IServiceProvider module, CancellationToken cancellationToken)
     {
-        using CatalogDbContext context = app.GetRequiredService<CatalogDbContext>();
-        await context.Database.EnsureDeletedAsync();
-        await context.Database.EnsureCreatedAsync();
+        CatalogDbContext context = module.GetRequiredService<CatalogDbContext>();
+        await context.Database.EnsureDeletedAsync(cancellationToken);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
     }
 }

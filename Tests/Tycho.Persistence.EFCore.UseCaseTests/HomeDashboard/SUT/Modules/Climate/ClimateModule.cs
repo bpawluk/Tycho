@@ -30,10 +30,10 @@ public partial class ClimateModule : TychoModule
         module.AddTychoPersistence<ClimateDbContext>();
     }
 
-    protected override async Task Startup(IServiceProvider app)
+    protected override async Task Startup(IServiceProvider module, CancellationToken cancellationToken)
     {
-        using ClimateDbContext context = app.GetRequiredService<ClimateDbContext>();
-        await context.Database.EnsureDeletedAsync();
-        await context.Database.EnsureCreatedAsync();
+        ClimateDbContext context = module.GetRequiredService<ClimateDbContext>();
+        await context.Database.EnsureDeletedAsync(cancellationToken);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
     }
 }

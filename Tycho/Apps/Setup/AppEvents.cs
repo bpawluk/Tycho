@@ -44,6 +44,7 @@ namespace Tycho.Apps.Setup
             }
 
             services.AddSingleton<OutboxActivity>();
+            services.AddHostedService<OutboxProcessor>();
 
             if (!_internals.HasService<IInboxWriter>() || !_internals.HasService<IInboxConsumer>())
             {
@@ -53,6 +54,7 @@ namespace Tycho.Apps.Setup
             }
 
             services.AddSingleton<InboxActivity>();
+            services.AddHostedService<InboxProcessor>();
 
             if (!_internals.HasService<ITransaction>())
             {
@@ -64,7 +66,6 @@ namespace Tycho.Apps.Setup
             services.AddTransient<IDeliveryStrategy, FinalRouteDelivery>();
             services.AddTransient<IDeliveryStrategy, DownStreamRouteDelivery>();
             services.AddTransient<IPayloadSerializer, JsonPayloadSerializer>();
-
         }
     }
 }

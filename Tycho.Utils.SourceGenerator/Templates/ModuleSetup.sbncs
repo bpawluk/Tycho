@@ -31,11 +31,11 @@ namespace {{ namespace }}
 {{   i1   }}public static void {{ methods.setup_method }}({{ interfaces.service_collection_interface }} {{ parameters.module_parameter }})
 {{   i1   }}{
 {{     i2     }}{{ classes.service_collection_service_extensions_class }}.{{ methods.add_singleton_method }}<{{ interfaces.event_serializer_interface }}, {{ classes.event_serializer_class }}>({{ parameters.module_parameter }});
+{{~ for submodule in submodules ~}}
+{{     i2     }}{{ classes.service_collection_service_extensions_class }}.{{ methods.add_singleton_method }}<{{ submodule.facade_interface }}, {{ submodule.facade_class }}>({{ parameters.module_parameter }});
+{{~ end ~}}
 {{     i2     }}{{ classes.service_collection_service_extensions_class }}.{{ methods.add_transient_method }}<{{ interfaces.publisher_interface }}, {{ classes.publisher_class }}>({{ parameters.module_parameter }});
 {{     i2     }}{{ classes.service_collection_service_extensions_class }}.{{ methods.add_transient_method }}<{{ interfaces.module_parent_interface }}, {{ classes.module_parent_class }}>({{ parameters.module_parameter }});
-{{~ for submodule in submodules ~}}
-{{     i2     }}{{ classes.service_collection_service_extensions_class }}.{{ methods.add_transient_method }}<{{ submodule.facade_interface }}, {{ submodule.facade_class }}>({{ parameters.module_parameter }});
-{{~ end ~}}
 {{   i1   }}}
 {{ i0 }}}
 {{~#--------------------------------------------------------------------------------------------------------------------#~}}

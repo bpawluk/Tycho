@@ -32,10 +32,10 @@ public partial class InventoryModule : TychoModule
         module.AddTychoPersistence<InventoryDbContext>();
     }
 
-    protected override async Task Startup(IServiceProvider app)
+    protected override async Task Startup(IServiceProvider module, CancellationToken cancellationToken)
     {
-        using InventoryDbContext context = app.GetRequiredService<InventoryDbContext>();
-        await context.Database.EnsureDeletedAsync();
-        await context.Database.EnsureCreatedAsync();
+        InventoryDbContext context = module.GetRequiredService<InventoryDbContext>();
+        await context.Database.EnsureDeletedAsync(cancellationToken);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
     }
 }

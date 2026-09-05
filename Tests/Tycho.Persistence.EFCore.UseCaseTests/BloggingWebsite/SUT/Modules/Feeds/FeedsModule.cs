@@ -42,10 +42,10 @@ public partial class FeedsModule : TychoModule
               .AddTransient<FeedProvider>();
     }
 
-    protected override async Task Startup(IServiceProvider app)
+    protected override async Task Startup(IServiceProvider module, CancellationToken cancellationToken)
     {
-        using FeedsDbContext context = app.GetRequiredService<FeedsDbContext>();
-        await context.Database.EnsureDeletedAsync();
-        await context.Database.EnsureCreatedAsync();
+        FeedsDbContext context = module.GetRequiredService<FeedsDbContext>();
+        await context.Database.EnsureDeletedAsync(cancellationToken);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
     }
 }

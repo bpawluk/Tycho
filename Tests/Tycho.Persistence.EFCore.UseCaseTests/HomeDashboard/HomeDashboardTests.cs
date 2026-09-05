@@ -14,7 +14,8 @@ public sealed class HomeDashboardTests : IAsyncLifetime
 
     public async ValueTask InitializeAsync()
     {
-        _sut = await new HomeDashboardApp().RunAsync();
+        _sut = new HomeDashboardApp().CreateAppBuilder().Build();
+        await _sut.StartAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact(Timeout = 10000)]
@@ -55,6 +56,13 @@ public sealed class HomeDashboardTests : IAsyncLifetime
 
     public async ValueTask DisposeAsync()
     {
-        await _sut!.DisposeAsync();
+        try
+        {
+            await _sut.StopAsync();
+        }
+        finally
+        {
+            _sut.Dispose();
+        }
     }
 }

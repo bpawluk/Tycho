@@ -13,7 +13,8 @@ public sealed class ContentModerationTests : IAsyncLifetime
 
     public async ValueTask InitializeAsync()
     {
-        _sut = await new ContentModerationApp().RunAsync();
+        _sut = new ContentModerationApp().CreateAppBuilder().Build();
+        await _sut.StartAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact(Timeout = 10000)]
@@ -75,6 +76,13 @@ public sealed class ContentModerationTests : IAsyncLifetime
 
     public async ValueTask DisposeAsync()
     {
-        await _sut!.DisposeAsync();
+        try
+        {
+            await _sut.StopAsync();
+        }
+        finally
+        {
+            _sut.Dispose();
+        }
     }
 }

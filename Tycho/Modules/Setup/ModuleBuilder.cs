@@ -110,8 +110,8 @@ namespace Tycho.Modules.Setup
             structure.Build();
 
             var contract = new ModuleContract(internals);
-            _configureContractDelegate?.Invoke(contract);
             contract.WithContractFulfillment(_contractFulfillingBroker);
+            _configureContractDelegate?.Invoke(contract);
 
             var events = new ModuleEvents(internals);
             events.WithParentEventBroker(_parentEventBroker);

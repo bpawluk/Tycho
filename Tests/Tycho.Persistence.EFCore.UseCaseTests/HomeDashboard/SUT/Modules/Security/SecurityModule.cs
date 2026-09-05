@@ -33,10 +33,10 @@ public partial class SecurityModule : TychoModule
         module.AddTychoPersistence<SecurityDbContext>();
     }
 
-    protected override async Task Startup(IServiceProvider app)
+    protected override async Task Startup(IServiceProvider module, CancellationToken cancellationToken)
     {
-        using SecurityDbContext context = app.GetRequiredService<SecurityDbContext>();
-        await context.Database.EnsureDeletedAsync();
-        await context.Database.EnsureCreatedAsync();
+        SecurityDbContext context = module.GetRequiredService<SecurityDbContext>();
+        await context.Database.EnsureDeletedAsync(cancellationToken);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
     }
 }

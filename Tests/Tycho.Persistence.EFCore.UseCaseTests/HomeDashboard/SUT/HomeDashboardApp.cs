@@ -58,10 +58,10 @@ public partial class HomeDashboardApp : TychoApp
         app.AddTychoPersistence<HomeDashboardDbContext>();
     }
 
-    protected override async Task Startup(IServiceProvider app)
+    protected override async Task Startup(IServiceProvider app, CancellationToken cancellationToken)
     {
-        using HomeDashboardDbContext context = app.GetRequiredService<HomeDashboardDbContext>();
-        await context.Database.EnsureDeletedAsync();
-        await context.Database.EnsureCreatedAsync();
+        HomeDashboardDbContext context = app.GetRequiredService<HomeDashboardDbContext>();
+        await context.Database.EnsureDeletedAsync(cancellationToken);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
     }
 }
