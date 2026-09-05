@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Tycho.Modules;
+using Tycho.Modules.Instance;
 using Tycho.Requests.Handling;
 using Tycho.Requests.Registrating.Registrations;
-using Tycho.Structure;
 
 namespace Tycho.Requests.Registrating
 {
@@ -35,7 +35,7 @@ namespace Tycho.Requests.Registrating
             AddUpStreamRegistration<TRequest, MappedRequestForwarder<TRequest, TTargetRequest, TTargetModule>>();
             Services.TryAddTransient(sp =>
                 new MappedRequestForwarder<TRequest, TTargetRequest, TTargetModule>(
-                    sp.GetRequiredService<IModule<TTargetModule>>(), 
+                    sp.GetRequiredService<IModule<TTargetModule>>(),
                     map));
         }
 
@@ -47,7 +47,7 @@ namespace Tycho.Requests.Registrating
             where TTargetModule : TychoModule
         {
             AddUpStreamRegistration<
-                TRequest, TResponse, 
+                TRequest, TResponse,
                 MappedRequestForwarder<TRequest, TResponse, TTargetRequest, TTargetResponse, TTargetModule>>();
             Services.TryAddTransient(sp =>
                 new MappedRequestForwarder<TRequest, TResponse, TTargetRequest, TTargetResponse, TTargetModule>(
@@ -60,8 +60,7 @@ namespace Tycho.Requests.Registrating
             where TRequest : class, IRequest
             where THandler : class, IRequestHandler<TRequest>
         {
-            AddUpStreamRegistration<TRequest, ScopedRequestHandler<TRequest, THandler>>();
-            Services.TryAddTransient<ScopedRequestHandler<TRequest, THandler>>();
+            AddUpStreamRegistration<TRequest, THandler>();
             Services.TryAddScoped<THandler>();
         }
 
@@ -69,8 +68,7 @@ namespace Tycho.Requests.Registrating
             where TRequest : class, IRequest<TResponse>
             where THandler : class, IRequestHandler<TRequest, TResponse>
         {
-            AddUpStreamRegistration<TRequest, TResponse, ScopedRequestHandler<TRequest, TResponse, THandler>>();
-            Services.TryAddTransient<ScopedRequestHandler<TRequest, TResponse, THandler>>();
+            AddUpStreamRegistration<TRequest, TResponse, THandler>();
             Services.TryAddScoped<THandler>();
         }
 
@@ -79,8 +77,8 @@ namespace Tycho.Requests.Registrating
             where THandler : class, IRequestHandler<TRequest>
         {
             if (!TryAddRegistration<
-                    IUpStreamHandlerRegistration<TRequest>,
-                    UpStreamHandlerRegistration<TRequest, THandler>>())
+                    IUpStreamRequestRegistration<TRequest>,
+                    UpStreamRequestRegistration<TRequest, THandler>>())
             {
                 throw new ArgumentException(
                     $"Request handler for {typeof(TRequest).Name} already registered",
@@ -93,8 +91,8 @@ namespace Tycho.Requests.Registrating
             where THandler : class, IRequestHandler<TRequest, TResponse>
         {
             if (!TryAddRegistration<
-                    IUpStreamHandlerRegistration<TRequest, TResponse>,
-                    UpStreamHandlerRegistration<TRequest, TResponse, THandler>>())
+                    IUpStreamRequestRegistration<TRequest, TResponse>,
+                    UpStreamRequestRegistration<TRequest, TResponse, THandler>>())
             {
                 throw new ArgumentException(
                     $"Request handler for {typeof(TRequest).Name} already registered",

@@ -1,55 +1,33 @@
-﻿using System;
-using System.Linq;
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Tycho.Events.Routing;
-using Tycho.Persistence;
+using Tycho.Events.Broker;
+using Tycho.Events.Model;
+using Tycho.Events.Outbox;
+using Tycho.Utils;
 
 namespace Tycho.Events.Publishing
 {
-    internal class EventPublisher : IEventPublisher, IUncommittedEventPublisher
+    internal class EventPublisher : IEventPublisher
     {
+        private readonly IEventBroker _broker;
         private readonly IOutboxWriter _outbox;
-        private readonly IEventRouter _router;
-        private readonly IPayloadSerializer _serializer;
 
-        public EventPublisher(IEventRouter router, IOutboxWriter persistentOutbox, IPayloadSerializer serializer)
+        public EventPublisher(IEventBroker broker, IOutboxWriter outbox)
         {
-            _router = router;
-            _outbox = persistentOutbox;
-            _serializer = serializer;
+            _broker = broker;
+            _outbox = outbox;
         }
 
-        public Task Publish<TEvent>(TEvent eventData, CancellationToken cancellationToken)
-            where TEvent : class, IEvent
+        async Task IEventPublisher.PublishAsync<TEvent>(TEvent eventPayload, CancellationToken cancellationToken)
         {
-            return Publish(eventData, true, cancellationToken);
-        }
-
-        public Task PublishWithoutCommitting<TEvent>(TEvent eventData, CancellationToken cancellationToken)
-            where TEvent : class, IEvent
-        {
-            return Publish(eventData, false, cancellationToken);
-        }
-
-        private async Task Publish<TEvent>(
-            TEvent eventData,
-            bool shouldCommit,
-            CancellationToken cancellationToken)
-            where TEvent : class, IEvent
-        {
-            if (eventData is null)
+            eventPayload.ThrowIfNull();
+            var publishId = Guid.NewGuid();
+            IReadOnlyCollection<RoutedEvent> routedEvents = _broker.Route(publishId, eventPayload);
+            if (routedEvents != null && routedEvents.Count > 0)
             {
-                throw new ArgumentNullException(nameof(eventData), $"{nameof(eventData)} cannot be null");
-            }
-
-            var handlerIdentities = _router.IdentifyHandlers<TEvent>();
-
-            if (handlerIdentities.Count > 0)
-            {
-                var serializedPayload = _serializer.Serialize(eventData);
-                var outboxEntries = handlerIdentities.Select(identity => new OutboxEntry(identity, serializedPayload));
-                await _outbox.Write(outboxEntries.ToArray(), shouldCommit, cancellationToken).ConfigureAwait(false);
+                await _outbox.Write(routedEvents, cancellationToken).ConfigureAwait(false);
             }
         }
     }

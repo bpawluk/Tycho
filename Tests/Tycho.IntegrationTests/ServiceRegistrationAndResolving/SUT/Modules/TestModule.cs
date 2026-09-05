@@ -1,0 +1,60 @@
+using Microsoft.Extensions.DependencyInjection;
+using Tycho.Events;
+using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules.Handlers;
+using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Services;
+using Tycho.Modules;
+using Tycho.Requests;
+
+namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules;
+
+// Handles
+public record GetModuleSingletonServiceUsageRequest : IRequest<int>;
+public record GetModuleScopedServiceUsageRequest : IRequest<int>;
+public record GetModuleTransientServiceUsageRequest : IRequest<int>;
+
+// Requires
+public record EndTestWorkflowRequest(TestResult Result) : IRequest;
+
+// Events
+public record GetModuleSingletonServiceUsageEvent(TestResult Result) : IEvent;
+public record GetModuleScopedServiceUsageEvent(TestResult Result) : IEvent;
+public record GetModuleTransientServiceUsageEvent(TestResult Result) : IEvent;
+
+[TychoDefinition]
+public class TestModule : TychoModule
+{
+    protected override void DefineContract(IModuleContract module)
+    {
+        module.Requires<EndTestWorkflowRequest>();
+
+        module.Expects<GetModuleSingletonServiceUsageRequest, int>()
+              .HandlesWith<GetModuleSingletonServiceUsageRequestHandler>();
+
+        module.Expects<GetModuleScopedServiceUsageRequest, int>()
+              .HandlesWith<GetModuleScopedServiceUsageRequestHandler>();
+
+        module.Expects<GetModuleTransientServiceUsageRequest, int>()
+              .HandlesWith<GetModuleTransientServiceUsageRequestHandler>();
+    }
+
+    protected override void DefineEvents(IModuleEvents module)
+    {
+        module.Expects<GetModuleSingletonServiceUsageEvent>()
+              .HandlesWith<GetModuleSingletonServiceUsageEventHandler>();
+
+        module.Expects<GetModuleScopedServiceUsageEvent>()
+              .HandlesWith<GetModuleScopedServiceUsageEventHandler>();
+
+        module.Expects<GetModuleTransientServiceUsageEvent>()
+              .HandlesWith<GetModuleTransientServiceUsageEventHandler>();
+    }
+
+    protected override void IncludeModules(IModuleStructure module) { }
+
+    protected override void RegisterServices(IServiceCollection module)
+    {
+        module.AddSingleton<ISingletonService, SingletonService>()
+              .AddScoped<IScopedService, ScopedService>()
+              .AddTransient<ITransientService, TransientService>();
+    }
+}

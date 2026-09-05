@@ -1,16 +1,18 @@
-﻿using System;
-using System.Threading.Tasks;
+using System;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Tycho.Events;
+using Tycho.Events.Broker;
+using Tycho.Events.Delivery;
+using Tycho.Events.Delivery.Strategies;
+using Tycho.Events.Inbox;
+using Tycho.Events.Inbox.InMemory;
+using Tycho.Events.Outbox;
+using Tycho.Events.Outbox.InMemory;
 using Tycho.Events.Publishing;
 using Tycho.Events.Registrating;
-using Tycho.Events.Routing;
-using Tycho.Modules.Routing;
-using Tycho.Persistence;
-using Tycho.Persistence.InMemory;
-using Tycho.Persistence.Processing;
-using Tycho.Structure.Internal;
+using Tycho.Events.Serialization;
+using Tycho.Structure;
+using Tycho.Transactions;
 
 namespace Tycho.Modules.Setup
 {
@@ -19,10 +21,9 @@ namespace Tycho.Modules.Setup
         private readonly Internals _internals;
         private readonly Registrator _registrator;
 
-        private IEventRouter? _parentEventRouter;
+        private IEventBroker? _parentEventBroker;
 
-        public IEventRouter ParentEventRouter => _parentEventRouter ??
-            throw new InvalidOperationException("Parent event router has not been defined yet.");
+        public IEventBroker ParentEventBroker => _parentEventBroker ?? throw new InvalidOperationException("Parent event broker has not been defined yet.");
 
         public ModuleEvents(Internals internals)
         {
@@ -30,51 +31,52 @@ namespace Tycho.Modules.Setup
             _registrator = new Registrator(internals);
         }
 
-        public void WithParentEventRouter(IEventRouter parentEventRouter)
+        public void WithParentEventBroker(IEventBroker parentEventBroker)
         {
-            _parentEventRouter = parentEventRouter;
+            _parentEventBroker = parentEventBroker;
         }
 
-        public IModuleEvents Handles<TEvent, THandler>()
-            where TEvent : class, IEvent
-            where THandler : class, IEventHandler<TEvent>
-        {
-            _registrator.HandleEvent<TEvent, THandler>();
-            return this;
-        }
-
-        public IEventRouting<TEvent> Routes<TEvent>()
+        public IModuleEventBinding<TEvent> Expects<TEvent>()
             where TEvent : class, IEvent
         {
-            return new EventRouting<TEvent>(_registrator);
+            return new ModuleEventBinding<TEvent>(this, _registrator);
         }
 
-        public Task Build()
+        public void Build()
         {
-            var services = _internals.GetServiceCollection();
+            IServiceCollection services = _internals.GetHostBuilder().Services;
 
             if (!_internals.HasService<IOutboxWriter>() || !_internals.HasService<IOutboxConsumer>())
             {
                 services.AddSingleton<InMemoryOutbox>()
                         .AddTransient<IOutboxWriter>(sp => sp.GetRequiredService<InMemoryOutbox>())
-                        .AddTransient<IOutboxConsumer>(sp => sp.GetRequiredService<InMemoryOutbox>())
-                        .AddTransient<IPayloadSerializer, InMemoryPayloadSerializer>();
+                        .AddTransient<IOutboxConsumer>(sp => sp.GetRequiredService<InMemoryOutbox>());
             }
 
-            services.AddSingleton<OutboxProcessor>()
-                    .AddSingleton<OutboxActivity>()
-                    .AddTransient<IEntryProcessor, EntryProcessor>()
-                    .AddTransient<IEventRouter, EventRouter>()
-                    .AddTransient<IEventPublisher, EventPublisher>();
+            services.AddSingleton<OutboxActivity>();
+            services.AddHostedService<OutboxProcessor>();
 
-            _internals.InternalsBuilt += OnInternalsBuilt;
-            return Task.CompletedTask;
-        }
+            if (!_internals.HasService<IInboxWriter>() || !_internals.HasService<IInboxConsumer>())
+            {
+                services.AddSingleton<InMemoryInbox>()
+                        .AddTransient<IInboxWriter>(sp => sp.GetRequiredService<InMemoryInbox>())
+                        .AddTransient<IInboxConsumer>(sp => sp.GetRequiredService<InMemoryInbox>());
+            }
 
-        private void OnInternalsBuilt(object _, EventArgs __)
-        {
-            _internals.GetRequiredService<OutboxProcessor>().Initialize();
-            _internals.InternalsBuilt -= OnInternalsBuilt;
+            services.AddSingleton<InboxActivity>();
+            services.AddHostedService<InboxProcessor>();
+
+            if (!_internals.HasService<ITransaction>())
+            {
+                services.AddScoped<ITransaction, EmptyTransaction>();
+            }
+
+            services.AddScoped<IEventBroker, ScopedEventBroker>();
+            services.AddTransient<IEventPublisher, EventPublisher>();
+            services.AddTransient<IDeliveryStrategy, FinalRouteDelivery>();
+            services.AddTransient<IDeliveryStrategy, DownStreamRouteDelivery>();
+            services.AddTransient<IDeliveryStrategy, UpStreamRouteDelivery>();
+            services.AddTransient<IPayloadSerializer, JsonPayloadSerializer>();
         }
     }
 }

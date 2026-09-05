@@ -1,5 +1,5 @@
-﻿using Tycho.Modules;
-using Tycho.Structure;
+using Tycho.Modules;
+using Tycho.Modules.Instance;
 
 namespace Tycho.Requests.Handling
 {
@@ -7,7 +7,7 @@ namespace Tycho.Requests.Handling
         where TRequest : class, IRequest
         where TModule : TychoModule
     {
-        public RequestForwarder(IModule<TModule> childModule) : base(childModule)
+        public RequestForwarder(IModule<TModule> childModule) : base(childModule.RequestBroker)
         {
         }
     }
@@ -16,7 +16,7 @@ namespace Tycho.Requests.Handling
         where TRequest : class, IRequest<TResponse>
         where TModule : TychoModule
     {
-        public RequestForwarder(IModule<TModule> childModule) : base(childModule)
+        public RequestForwarder(IModule<TModule> childModule) : base(childModule.RequestBroker)
         {
         }
     }

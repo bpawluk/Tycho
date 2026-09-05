@@ -1,135 +1,153 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Tycho.Events.Routing;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Tycho.Events.Broker;
+using Tycho.Hosting;
+using Tycho.Hosting.Files;
 using Tycho.Modules.Setup;
 using Tycho.Requests.Broker;
-using Tycho.Structure;
-using Tycho.Structure.External;
+using Tycho.Utils;
 
 namespace Tycho.Modules
 {
     /// <summary>
-    /// Base class for defining a Tycho module
+    /// Base class for defining a Tycho module.
     /// </summary>
+    [ReferencedBySourceGenerator]
     public abstract class TychoModule
     {
-        private readonly object _runLock;
-        private readonly ModuleBuilder _builder;
-
-        private bool _wasAlreadyRun = false;
-
-        protected IConfiguration Configuration => _builder.Globals.Configuration;
-
-        public TychoModule()
-        {
-            _runLock = new object();
-            _builder = new ModuleBuilder(GetType());
-        }
+        private IRequestBroker? _contractFulfillingBroker;
+        private IEventBroker? _parentEventBroker;
+        private IModuleSettings? _settings;
 
         /// <summary>
-        /// Retrieves the settings provided to the module by its parent
+        /// Defines the requests handled and required by the module.
         /// </summary>
-        /// <typeparam name="TSettings">The type of settings to retrieve</typeparam>
-        /// <returns>Matching settings or a new instance of the requested settings type</returns>
-        protected TSettings GetSettings<TSettings>() where TSettings : class, IModuleSettings, new()
-        {
-            return _builder.Settings as TSettings ?? new TSettings();
-        }
-
-        /// <summary>
-        /// Use this method to define requests handled and required by the module
-        /// </summary>
-        /// <param name="module">An interface to define the requests</param>
+        [ReferencedBySourceGenerator]
         protected abstract void DefineContract(IModuleContract module);
 
         /// <summary>
-        /// Use this method to define events handled and routed by the module
+        /// Defines the events handled and routed by the module.
         /// </summary>
-        /// <param name="module">An interface to define the events</param>
+        [ReferencedBySourceGenerator]
         protected abstract void DefineEvents(IModuleEvents module);
 
         /// <summary>
-        /// Use this method to define submodules used by the module
+        /// Defines the submodules used by the module.
         /// </summary>
-        /// <param name="module">An interface to include the submodules</param>
+        [ReferencedBySourceGenerator]
         protected abstract void IncludeModules(IModuleStructure module);
 
         /// <summary>
-        /// Use this method to define services required by the module
+        /// Registers services required by the module.
         /// </summary>
-        /// <param name="module">An interface to register the services</param>
         protected abstract void RegisterServices(IServiceCollection module);
 
         /// <summary>
-        /// Override this method if you need to execute code before the module runs
+        /// Creates the internal host builder used by the module.
         /// </summary>
-        /// <param name="module">A provider of the services configured for the module</param>
-        protected virtual Task Startup(IServiceProvider module)
+        protected virtual HostApplicationBuilder CreateHostBuilder()
         {
-            return Task.CompletedTask;
+            return Host.CreateEmptyApplicationBuilder(new HostApplicationBuilderSettings
+            {
+                ApplicationName = GetType().Assembly.GetName().Name,
+            });
         }
 
         /// <summary>
-        /// Override this method if you need to execute code before the module is disposed
+        /// Configures the internal module host and inherits supported context from its parent.
         /// </summary>
-        /// <param name="app">A provider of the services configured for the module</param>
-        protected virtual Task Cleanup(IServiceProvider app)
+        protected virtual void ConfigureHost(IServiceProvider? parentServiceProvider, HostApplicationBuilder moduleHostBuilder)
         {
-            return Task.CompletedTask;
+            moduleHostBuilder.Services.RemoveAll<IHostLifetime>();
+            moduleHostBuilder.Services.AddSingleton<IHostLifetime, StandaloneHostLifetime>();
+
+            if (parentServiceProvider == null)
+            {
+                return;
+            }
+
+            IHostEnvironment parentEnvironment = parentServiceProvider.GetRequiredService<IHostEnvironment>();
+            moduleHostBuilder.Environment.EnvironmentName = parentEnvironment.EnvironmentName;
+            moduleHostBuilder.Environment.ContentRootPath = parentEnvironment.ContentRootPath;
+
+            IFileProvider parentFileProvider = parentEnvironment.ContentRootFileProvider;
+            moduleHostBuilder.Environment.ContentRootFileProvider =
+                parentFileProvider is NonDisposingFileProvider
+                    ? parentFileProvider
+                    : new NonDisposingFileProvider(parentFileProvider);
+
+            IConfiguration parentConfiguration = parentServiceProvider.GetRequiredService<IConfiguration>();
+            moduleHostBuilder.Configuration.AddConfiguration(parentConfiguration, shouldDisposeConfiguration: false);
+            moduleHostBuilder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                [HostDefaults.ApplicationKey] = moduleHostBuilder.Environment.ApplicationName,
+                [HostDefaults.EnvironmentKey] = parentEnvironment.EnvironmentName,
+                [HostDefaults.ContentRootKey] = parentEnvironment.ContentRootPath,
+            });
+
+            ILoggerFactory parentLoggerFactory = parentServiceProvider.GetRequiredService<ILoggerFactory>();
+            moduleHostBuilder.Services.AddSingleton(parentLoggerFactory);
         }
 
-        internal TychoModule WithGlobals(Globals globals)
+        /// <summary>
+        /// Runs module startup logic as part of host startup.
+        /// </summary>
+        protected virtual Task Startup(IServiceProvider module, CancellationToken cancellationToken) => Task.CompletedTask;
+
+        /// <summary>
+        /// Runs module cleanup logic as part of host shutdown.
+        /// </summary>
+        protected virtual Task Cleanup(IServiceProvider module, CancellationToken cancellationToken) => Task.CompletedTask;
+
+        /// <summary>
+        /// Retrieves settings supplied by the parent definition.
+        /// </summary>
+        protected TSettings GetSettings<TSettings>() where TSettings : class, IModuleSettings, new()
         {
-            _builder.WithGlobals(globals);
-            return this;
+            return _settings as TSettings ?? new TSettings();
         }
 
         internal TychoModule WithSettings(IModuleSettings settings)
         {
-            _builder.WithSettings(settings);
+            _settings = settings;
             return this;
         }
 
         internal TychoModule FulfillContract(IRequestBroker contractFulfillingBroker)
         {
-            _builder.WithContractFulfillment(contractFulfillingBroker);
+            _contractFulfillingBroker = contractFulfillingBroker;
             return this;
         }
 
-        internal TychoModule PassEventRouter(IEventRouter parentEventRouter)
+        internal TychoModule PassEventBroker(IEventBroker parentEventBroker)
         {
-            _builder.WithParentEventRouter(parentEventRouter);
+            _parentEventBroker = parentEventBroker;
             return this;
         }
 
-        internal async Task<IModule> Run()
+        internal ModuleBuilder CreateModuleBuilder()
         {
-            EnsureItIsRunOnlyOnce();
-
-            _builder.WithCleanup(Cleanup).Init();
-            RegisterServices(_builder.Services);
-            DefineContract(_builder.Contract);
-            DefineEvents(_builder.Events);
-            IncludeModules(_builder.Structure);
-
-            var module = await _builder.Build().ConfigureAwait(false);
-            await Startup(module.Internals).ConfigureAwait(false);
-
-            return module;
-        }
-
-        private void EnsureItIsRunOnlyOnce()
-        {
-            lock (_runLock)
-            {
-                if (_wasAlreadyRun)
+            return new ModuleBuilder(GetType())
+                .WithHostBuilder(CreateHostBuilder)
+                .WithHostConfiguration(ConfigureHost)
+                .WithContract(DefineContract, _contractFulfillingBroker)
+                .WithEvents(DefineEvents, _parentEventBroker)
+                .WithStructure(IncludeModules)
+                .WithServices(services =>
                 {
-                    throw new InvalidOperationException("This module has already been run");
-                }
-                _wasAlreadyRun = true;
-            }
+                    this.AddGeneratedSetup(services);
+                    RegisterServices(services);
+                })
+                .WithStartup(Startup)
+                .WithCleanup(Cleanup);
         }
     }
 }

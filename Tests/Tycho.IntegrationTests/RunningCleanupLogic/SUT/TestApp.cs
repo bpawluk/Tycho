@@ -1,0 +1,31 @@
+using Microsoft.Extensions.DependencyInjection;
+using Tycho.Apps;
+using Tycho.IntegrationTests.RunningCleanupLogic.SUT.Modules;
+
+namespace Tycho.IntegrationTests.RunningCleanupLogic.SUT;
+
+[TychoDefinition]
+public class TestApp : TychoApp
+{
+    protected override void DefineContract(IAppContract app) { }
+
+    protected override void DefineEvents(IAppEvents app) { }
+
+    protected override void IncludeModules(IAppStructure app)
+    {
+        app.Uses<AlphaModule>();
+        app.Uses<BetaModule>();
+    }
+
+    protected override void RegisterServices(IServiceCollection app)
+    {
+        app.AddSingleton(TestResult.Instance);
+    }
+
+    protected override Task Cleanup(IServiceProvider app, CancellationToken cancellationToken)
+    {
+        TestResult result = app.GetRequiredService<TestResult>();
+        result.AppCleanupPerformed = true;
+        return base.Cleanup(app, cancellationToken);
+    }
+}
