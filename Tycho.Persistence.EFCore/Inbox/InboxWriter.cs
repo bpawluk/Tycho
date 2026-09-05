@@ -22,13 +22,17 @@ internal class InboxWriter(ITransaction transaction, InboxActivity inboxActivity
             Handler = serializedEvent.HandlerId.ToString(),
             Payload = serializedEvent.Payload.ToString()!
         };
+
         _dbContext.Set<InboxEntry>().Add(inboxEntry);
 
-        if (!_transaction.IsInProgress)
+        if (_transaction.IsInProgress)
+        {
+            _transaction.ExecuteAfterCommit(_inboxActivity.NotifyNewEntriesAdded);
+        }
+        else
         {
             await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            _inboxActivity.NotifyNewEntriesAdded();
         }
-
-        _inboxActivity.NotifyNewEntriesAdded();
     }
 }
