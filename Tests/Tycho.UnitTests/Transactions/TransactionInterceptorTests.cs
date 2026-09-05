@@ -137,6 +137,23 @@ public class TransactionInterceptorTests
         transactionMock.Verify(x => x.RollbackAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
 
+    [Fact]
+    public async Task InterceptAsync_WithoutTransactionProvider_RejectsTransactionalHandlerBeforeExecution()
+    {
+        // Arrange
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
+        var handlerMock = new Mock<RequestHandlerDelegate<TestRequestWithResponse, string>>();
+        var sut = new TransactionInterceptor<TestRequestWithResponse, string>(new EmptyTransaction());
+
+        // Act
+        Task Act() => sut.InterceptAsync(handlerMock.Object, new TestRequestWithResponse(), cancellationToken);
+
+        // Assert
+        InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(Act);
+        Assert.Contains("No transaction provider is configured", exception.Message);
+        handlerMock.Verify(handler => handler(It.IsAny<TestRequestWithResponse>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
     private static Mock<ITransaction> CreateTransaction(List<string> calls, CancellationToken cancellationToken)
     {
         var transactionMock = new Mock<ITransaction>();

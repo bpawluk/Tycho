@@ -28,6 +28,13 @@ internal sealed class Transaction(TychoDbContext dbContext) : ITransaction
             return;
         }
 
+        IExecutionStrategy executionStrategy = _dbContext.Database.CreateExecutionStrategy();
+        if (executionStrategy.RetriesOnFailure)
+        {
+            throw new InvalidOperationException(
+                "The configured EF Core execution strategy retries on failure and cannot be used with Tycho-managed transactions. Disable execution-strategy retries for this DbContext.");
+        }
+
         _activeTransaction = await _dbContext.Database
             .BeginTransactionAsync(cancellationToken)
             .ConfigureAwait(false);

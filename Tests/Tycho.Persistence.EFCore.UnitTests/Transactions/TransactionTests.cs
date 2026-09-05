@@ -1,5 +1,6 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Tycho.Persistence.EFCore.Outbox;
 using Tycho.Persistence.EFCore.Transactions;
 
@@ -58,6 +59,26 @@ public sealed class TransactionTests : IAsyncLifetime
 
         // Assert
         Assert.True(_sut.IsInProgress);
+    }
+
+    [Fact]
+    public async Task BeginAsync_WithRetryingExecutionStrategy_ThrowsBeforeStartingTransaction()
+    {
+        // Arrange
+        DbContextOptionsBuilder<TestDbContext> optionsBuilder = new();
+        optionsBuilder.UseSqlite(_connection, sqliteOptions => sqliteOptions.ExecutionStrategy(dependencies => new TestRetryingExecutionStrategy(dependencies)));
+
+        await using var dbContext = new TestDbContext(optionsBuilder.Options);
+        await using var sut = new Transaction(dbContext);
+
+        // Act
+        Task act() => sut.BeginAsync(CancellationToken.None);
+
+        // Assert
+        InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(act);
+        Assert.Contains("execution strategy retries on failure", exception.Message);
+        Assert.False(sut.IsInProgress);
+        Assert.Null(dbContext.Database.CurrentTransaction);
     }
 
     [Fact]
@@ -201,4 +222,10 @@ public sealed class TransactionTests : IAsyncLifetime
     }
 
     private sealed class TestDbContext(DbContextOptions<TestDbContext> options) : TychoDbContext(options);
+
+    private sealed class TestRetryingExecutionStrategy(ExecutionStrategyDependencies dependencies)
+        : ExecutionStrategy(dependencies, 1, TimeSpan.Zero)
+    {
+        protected override bool ShouldRetryOn(Exception exception) => true;
+    }
 }
