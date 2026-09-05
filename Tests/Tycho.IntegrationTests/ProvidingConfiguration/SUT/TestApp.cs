@@ -35,6 +35,7 @@ public class TestApp : TychoApp
 
     protected override void RegisterServices(IServiceCollection app)
     {
-        app.AddSingleton<IConfiguration>(Configuration.GetSection("App"));
+        app.AddSingleton(serviceProvider =>
+            serviceProvider.GetRequiredService<IConfiguration>().GetSection("App"));
     }
 }

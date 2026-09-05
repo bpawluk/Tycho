@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Tycho.IntegrationTests.ConfiguringLogging.SUT;
 using Tycho.IntegrationTests.ConfiguringLogging.SUT.Modules;
@@ -7,10 +9,17 @@ namespace Tycho.IntegrationTests.ConfiguringLogging;
 public sealed class ConfiguringLoggingTests : IAsyncLifetime
 {
     private ITestApp _sut = null!;
+    private IHost _host = null!;
 
     public async ValueTask InitializeAsync()
     {
-        _sut = await new TestApp().WithLogging(ConfigureLogging).RunAsync();
+        var builder = new HostApplicationBuilder();
+        ConfigureLogging(builder.Logging);
+        builder.AddTestApp(new());
+
+        _host = builder.Build();
+        await _host.StartAsync(TestContext.Current.CancellationToken);
+        _sut = _host.Services.GetRequiredService<ITestApp>();
     }
 
     [Fact(Timeout = 5000)]
@@ -34,11 +43,19 @@ public sealed class ConfiguringLoggingTests : IAsyncLifetime
     private static void ConfigureLogging(ILoggingBuilder builder)
     {
         builder.ClearProviders();
+        builder.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.None);
         builder.AddProvider(new TestLoggerProvider());
     }
 
     public async ValueTask DisposeAsync()
     {
-        await _sut!.DisposeAsync();
+        try
+        {
+            await _host.StopAsync();
+        }
+        finally
+        {
+            _host.Dispose();
+        }
     }
 }

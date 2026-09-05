@@ -9,7 +9,8 @@ public sealed class RunningStartupLogicTests : IAsyncLifetime
 
     public async ValueTask InitializeAsync()
     {
-        _sut = await new TestApp().RunAsync();
+        _sut = new TestApp().CreateAppBuilder().Build();
+        await _sut.StartAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact(Timeout = 5000)]
@@ -40,6 +41,13 @@ public sealed class RunningStartupLogicTests : IAsyncLifetime
 
     public async ValueTask DisposeAsync()
     {
-        await _sut!.DisposeAsync();
+        try
+        {
+            await _sut.StopAsync();
+        }
+        finally
+        {
+            _sut.Dispose();
+        }
     }
 }

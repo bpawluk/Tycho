@@ -24,6 +24,7 @@ public class AlphaModule : TychoModule
 
     protected override void RegisterServices(IServiceCollection module)
     {
-        module.AddSingleton<IConfiguration>(Configuration.GetSection("Alpha"));
+        module.AddSingleton(serviceProvider =>
+            serviceProvider.GetRequiredService<IConfiguration>().GetSection("Alpha"));
     }
 }

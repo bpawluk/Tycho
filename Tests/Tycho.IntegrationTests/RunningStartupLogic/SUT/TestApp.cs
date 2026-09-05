@@ -34,7 +34,7 @@ public class TestApp : TychoApp
         app.AddSingleton<TestService>();
     }
 
-    protected override Task Startup(IServiceProvider app)
+    protected override Task Startup(IServiceProvider app, CancellationToken cancellationToken)
     {
         app.GetRequiredService<TestService>().Value = "Test = Passed";
         return Task.CompletedTask;

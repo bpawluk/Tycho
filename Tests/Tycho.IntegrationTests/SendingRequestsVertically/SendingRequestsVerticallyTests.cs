@@ -10,7 +10,8 @@ public sealed class SendingRequestsVerticallyTests : IAsyncLifetime
 
     public async ValueTask InitializeAsync()
     {
-        _sut = await new TestApp(_testWorkflow).RunAsync();
+        _sut = new TestApp(_testWorkflow).CreateAppBuilder().Build();
+        await _sut.StartAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact(Timeout = 5000)]
@@ -48,6 +49,13 @@ public sealed class SendingRequestsVerticallyTests : IAsyncLifetime
 
     public async ValueTask DisposeAsync()
     {
-        await _sut!.DisposeAsync();
+        try
+        {
+            await _sut.StopAsync();
+        }
+        finally
+        {
+            _sut.Dispose();
+        }
     }
 }

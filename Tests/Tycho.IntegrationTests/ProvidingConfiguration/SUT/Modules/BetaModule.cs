@@ -24,6 +24,7 @@ public class BetaModule : TychoModule
 
     protected override void RegisterServices(IServiceCollection module)
     {
-        module.AddSingleton<IConfiguration>(Configuration.GetSection("Beta"));
+        module.AddSingleton(serviceProvider =>
+            serviceProvider.GetRequiredService<IConfiguration>().GetSection("Beta"));
     }
 }

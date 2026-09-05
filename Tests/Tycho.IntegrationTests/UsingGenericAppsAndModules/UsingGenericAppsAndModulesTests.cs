@@ -10,7 +10,8 @@ public sealed class UsingGenericAppsAndModulesTests : IAsyncLifetime
 
     public async ValueTask InitializeAsync()
     {
-        _sut = await new TestApp<AppInput, AppOutput>().RunAsync();
+        _sut = new TestApp<AppInput, AppOutput>().CreateAppBuilder().Build();
+        await _sut.StartAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact(Timeout = 5000)]
@@ -41,6 +42,13 @@ public sealed class UsingGenericAppsAndModulesTests : IAsyncLifetime
 
     public async ValueTask DisposeAsync()
     {
-        await _sut.DisposeAsync();
+        try
+        {
+            await _sut.StopAsync();
+        }
+        finally
+        {
+            _sut.Dispose();
+        }
     }
 }

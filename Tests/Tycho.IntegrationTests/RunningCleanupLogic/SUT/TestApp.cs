@@ -22,10 +22,10 @@ public class TestApp : TychoApp
         app.AddSingleton(TestResult.Instance);
     }
 
-    protected override Task Cleanup(IServiceProvider app)
+    protected override Task Cleanup(IServiceProvider app, CancellationToken cancellationToken)
     {
         TestResult result = app.GetRequiredService<TestResult>();
         result.AppCleanupPerformed = true;
-        return base.Cleanup(app);
+        return base.Cleanup(app, cancellationToken);
     }
 }

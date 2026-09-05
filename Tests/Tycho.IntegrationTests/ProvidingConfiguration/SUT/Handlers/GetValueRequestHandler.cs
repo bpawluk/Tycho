@@ -4,12 +4,12 @@ using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.ProvidingConfiguration.SUT.Handlers;
 
-internal class GetValueRequestHandler(IConfiguration config)
+internal class GetValueRequestHandler(IConfigurationSection config)
     : IRequestHandler<GetAppValueRequest, string>
     , IRequestHandler<GetAlphaValueRequest, string>
     , IRequestHandler<GetBetaValueRequest, string>
 {
-    private readonly IConfiguration _config = config;
+    private readonly IConfigurationSection _config = config;
 
     private string Value => _config["Value"]!;
 

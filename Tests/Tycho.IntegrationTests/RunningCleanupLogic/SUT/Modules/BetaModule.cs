@@ -20,10 +20,10 @@ public class BetaModule : TychoModule
         module.AddSingleton(TestResult.Instance);
     }
 
-    protected override Task Cleanup(IServiceProvider module)
+    protected override Task Cleanup(IServiceProvider module, CancellationToken cancellationToken)
     {
         TestResult result = module.GetRequiredService<TestResult>();
         result.BetaModuleCleanupPerformed = true;
-        return base.Cleanup(module);
+        return base.Cleanup(module, cancellationToken);
     }
 }

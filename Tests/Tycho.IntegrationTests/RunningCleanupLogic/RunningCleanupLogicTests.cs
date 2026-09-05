@@ -8,11 +8,12 @@ public class RunningCleanupLogicTests
     public async Task TychoEnables_RunningCleanupLogic_InAppsAndModules()
     {
         // Arrange
-        ITestApp sut = await new TestApp().RunAsync();
+        using ITestApp sut = new TestApp().CreateAppBuilder().Build();
+        await sut.StartAsync(TestContext.Current.CancellationToken);
         TestResult testResult = TestResult.Instance;
 
         // Act
-        await sut.DisposeAsync();
+        await sut.StopAsync(TestContext.Current.CancellationToken);
 
         // Assert
         Assert.True(testResult.AppCleanupPerformed);
