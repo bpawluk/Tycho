@@ -62,7 +62,8 @@ namespace Tycho.Events.Inbox
 
                     if (!markedAsHandled)
                     {
-                        logger?.LogWarning("Failed to mark inbox entry with ID {entryId} as handled for claim {claimId}", _event.EventId, _event.ClaimId);
+                        throw new InvalidOperationException(
+                            $"Failed to mark inbox entry with ID {_event.EventId} as handled for claim {_event.ClaimId}.");
                     }
 
                     if (transaction.IsInProgress)

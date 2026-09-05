@@ -173,6 +173,31 @@ public class InboxProcessorJobTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_WithAssignedEvent_WhenTransactionalHandlerLosesClaim_RollbacksAndDoesNotCommit()
+    {
+        // Arrange
+        InboxEvent inboxEvent = CreateInboxEvent(out _);
+        var cancellationToken = new CancellationToken();
+        InboxProcessorJob sut = CreateSut(useTransactionalHandler: true);
+
+        _inboxConsumerMock.Setup(i => i.MarkAsHandledAsync(inboxEvent.ClaimId, cancellationToken))
+                          .ReturnsAsync(false);
+        _inboxConsumerMock.Setup(i => i.MarkAsFailedAsync(inboxEvent.ClaimId, cancellationToken))
+                          .ReturnsAsync(false);
+
+        // Act
+        sut.ForEvent(inboxEvent);
+        await sut.ExecuteAsync(cancellationToken);
+
+        // Assert
+        _transactionalHandlerMock.Verify(h => h.HandleAsync(It.IsAny<EventContext<TestEvent>>(), cancellationToken), Times.Once);
+        _inboxConsumerMock.Verify(i => i.MarkAsHandledAsync(inboxEvent.ClaimId, cancellationToken), Times.Once);
+        _transactionMock.Verify(t => t.CommitAsync(cancellationToken), Times.Never);
+        _transactionMock.Verify(t => t.RollbackAsync(cancellationToken), Times.Once);
+        _inboxConsumerMock.Verify(i => i.MarkAsFailedAsync(inboxEvent.ClaimId, cancellationToken), Times.Once);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_WithAssignedEvent_WhenHandlerNotFound_MarksEventAsFailed()
     {
         // Arrange
