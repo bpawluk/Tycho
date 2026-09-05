@@ -22,7 +22,7 @@ internal class OutboxWriter(
 
     public async Task Write(IReadOnlyCollection<RoutedEvent> routedEvents, CancellationToken cancellationToken)
     {
-        IEnumerable<OutboxEntry> outboxEntries = routedEvents.Select(routedEvent =>
+        OutboxEntry[] outboxEntries = [.. routedEvents.Select(routedEvent =>
         {
             SerializedRoutedEvent serializedEvent = _eventSerializer.Serialize(routedEvent);
             return new OutboxEntry
@@ -34,7 +34,7 @@ internal class OutboxWriter(
                 Route = serializedEvent.Route.ToString(),
                 Payload = serializedEvent.Payload.ToString()!
             };
-        });
+        })];
 
         _dbContext.Set<OutboxEntry>().AddRange(outboxEntries);
 

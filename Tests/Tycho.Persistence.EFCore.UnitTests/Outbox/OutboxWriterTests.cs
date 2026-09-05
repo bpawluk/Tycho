@@ -35,13 +35,7 @@ public class OutboxWriterTests
         _eventSerializerMock = new Mock<IEventSerializer>();
 
         _dbSetMock = new Mock<DbSet<OutboxEntry>>();
-        _dbSetMock.Setup(dbSet => dbSet.AddRange(It.IsAny<IEnumerable<OutboxEntry>>()))
-                  .Callback<IEnumerable<OutboxEntry>>(entries =>
-                  {
-                      foreach (OutboxEntry _ in entries)
-                      {
-                      }
-                  });
+        _dbSetMock.Setup(dbSet => dbSet.AddRange(It.IsAny<OutboxEntry[]>()));
 
         _dbContextMock = new Mock<TychoDbContext>();
         _dbContextMock
@@ -104,7 +98,7 @@ public class OutboxWriterTests
 
         // Assert
         _eventSerializerMock.Verify(s => s.Serialize(It.IsAny<RoutedEvent<TestEvent>>()), Times.Exactly(routedEvents.Count));
-        _dbSetMock.Verify(db => db.AddRange(It.IsAny<IEnumerable<OutboxEntry>>()), Times.Once);
+        _dbSetMock.Verify(db => db.AddRange(It.IsAny<OutboxEntry[]>()), Times.Once);
 
         _dbContextMock.Verify(db => db.SaveChangesAsync(cancellationToken), isTransactionInProgress ? Times.Never() : Times.Once());
         _transactionMock.Verify(t => t.ExecuteAfterCommit(It.IsAny<Action>()), isTransactionInProgress ? Times.Once() : Times.Never());
@@ -121,5 +115,60 @@ public class OutboxWriterTests
             Assert.Equal(1, _outboxActivityNotificationCount);
             Assert.Null(_deferredOutboxActivityNotification);
         }
+    }
+
+    [Fact]
+    public async Task Write_WhenSerializationFails_DoesNotAddPartiallySerializedEntries()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken();
+        List<RoutedEvent> routedEvents =
+        [
+            new RoutedEvent<TestEvent>(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                EventIdentity.Create<TestEvent>(),
+                EventHandlerIdentity.Parse("handler-1"),
+                Route.Create(),
+                new TestEvent()),
+            new RoutedEvent<TestEvent>(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                EventIdentity.Create<TestEvent>(),
+                EventHandlerIdentity.Parse("handler-2"),
+                Route.Create(),
+                new TestEvent()),
+        ];
+        int serializationCount = 0;
+        _eventSerializerMock
+            .Setup(s => s.Serialize(It.IsAny<RoutedEvent>()))
+            .Returns<RoutedEvent>(routedEvent =>
+            {
+                serializationCount++;
+                if (serializationCount == 2)
+                {
+                    throw new InvalidOperationException("serialization failure");
+                }
+
+                return new SerializedRoutedEvent(
+                    routedEvent.Id,
+                    routedEvent.PublishId,
+                    routedEvent.EventId,
+                    routedEvent.HandlerId,
+                    routedEvent.Route,
+                    "{}");
+            });
+
+        // Act
+        Task act() => _sut.Write(routedEvents, cancellationToken);
+
+        // Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(act);
+        _eventSerializerMock.Verify(s => s.Serialize(It.IsAny<RoutedEvent<TestEvent>>()), Times.Exactly(2));
+        _dbSetMock.Verify(db => db.AddRange(It.IsAny<OutboxEntry[]>()), Times.Never);
+        _dbSetMock.Verify(db => db.AddRange(It.IsAny<IEnumerable<OutboxEntry>>()), Times.Never);
+        _dbContextMock.Verify(db => db.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+        _transactionMock.Verify(t => t.ExecuteAfterCommit(It.IsAny<Action>()), Times.Never);
+        Assert.Equal(0, _outboxActivityNotificationCount);
     }
 }
