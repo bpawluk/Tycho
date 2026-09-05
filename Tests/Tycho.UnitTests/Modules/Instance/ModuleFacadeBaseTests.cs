@@ -72,6 +72,44 @@ public class ModuleFacadeBaseTests
         await Assert.ThrowsAsync<ArgumentNullException>(Act);
     }
 
+    [Fact]
+    public async Task StartAsync_DelegatesToUnderlyingModule()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken();
+        _moduleMock.Setup(m => m.StartAsync(cancellationToken)).Returns(Task.CompletedTask);
+
+        // Act
+        await _sut.StartAsync(cancellationToken);
+
+        // Assert
+        _moduleMock.Verify(m => m.StartAsync(cancellationToken), Times.Once);
+    }
+
+    [Fact]
+    public async Task StopAsync_DelegatesToUnderlyingModule()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken();
+        _moduleMock.Setup(m => m.StopAsync(cancellationToken)).Returns(Task.CompletedTask);
+
+        // Act
+        await _sut.StopAsync(cancellationToken);
+
+        // Assert
+        _moduleMock.Verify(m => m.StopAsync(cancellationToken), Times.Once);
+    }
+
+    [Fact]
+    public void Dispose_DelegatesToUnderlyingModule()
+    {
+        // Act
+        _sut.Dispose();
+
+        // Assert
+        _moduleMock.Verify(m => m.Dispose(), Times.Once);
+    }
+
     private sealed class ConcreteModuleFacade(IModule module) : ModuleFacadeBase(module)
     {
         public Task Send<TRequest>(TRequest request, CancellationToken ct)

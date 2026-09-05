@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Moq;
 using Tycho.Events.Registrating;
 using Tycho.Events.Registrating.Registrations;
@@ -19,8 +20,8 @@ public class RegistratorTests
 
     public RegistratorTests()
     {
-        _internals = new Internals(typeof(TestModule));
-        _internals.GetServiceCollection()
+        _internals = new Internals(typeof(TestModule), Host.CreateEmptyApplicationBuilder(default));
+        _internals.GetHostBuilder().Services
                   .AddSingleton(_internals);
         _sut = new Registrator(_internals);
     }
@@ -30,7 +31,7 @@ public class RegistratorTests
     {
         // Arrange
         var parentReferenceMock = new Mock<IParentReference>();
-        _internals.GetServiceCollection().AddSingleton(parentReferenceMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(parentReferenceMock.Object);
 
         // Act
         _sut.ExposeEvent<TestEvent>();
@@ -61,7 +62,7 @@ public class RegistratorTests
         // Arrange
         var mapMock = new Mock<Func<TestEvent, OtherEvent>>();
         var parentReferenceMock = new Mock<IParentReference>();
-        _internals.GetServiceCollection().AddSingleton(parentReferenceMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(parentReferenceMock.Object);
 
         // Act
         _sut.ExposeEvent<TestEvent, OtherEvent>(mapMock.Object);
@@ -92,7 +93,7 @@ public class RegistratorTests
     {
         // Arrange
         var targetModuleMock = new Mock<IModule<TestModule>>();
-        _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(targetModuleMock.Object);
 
         // Act
         _sut.ForwardEvent<TestEvent, TestModule>();
@@ -123,7 +124,7 @@ public class RegistratorTests
         // Arrange
         var mapMock = new Mock<Func<TestEvent, OtherEvent>>();
         var targetModuleMock = new Mock<IModule<TestModule>>();
-        _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(targetModuleMock.Object);
 
         // Act
         _sut.ForwardEvent<TestEvent, OtherEvent, TestModule>(mapMock.Object);

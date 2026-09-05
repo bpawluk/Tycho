@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Moq;
 using Tycho.Events.Broker;
 using Tycho.Events.Delivery;
@@ -153,8 +154,8 @@ public class ScopedEventBrokerTests
 
     private static ScopedEventBroker CreateSut(Action<IServiceCollection> configure)
     {
-        var internals = new Internals(typeof(TestModule));
-        configure(internals.GetServiceCollection());
+        var internals = new Internals(typeof(TestModule), Host.CreateEmptyApplicationBuilder(default));
+        configure(internals.GetHostBuilder().Services);
         internals.Build();
         return new ScopedEventBroker(internals);
     }

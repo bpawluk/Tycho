@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Moq;
 using Tycho.Apps.Setup;
 using Tycho.Events.Inbox;
@@ -14,15 +15,15 @@ public class AppEventsTests
 
     public AppEventsTests()
     {
-        _internals = new Internals(typeof(object));
+        _internals = new Internals(typeof(object), Host.CreateEmptyApplicationBuilder(default));
         _sut = new AppEvents(_internals);
     }
 
     [Fact]
-    public async Task BuildAsync_WhenNoCustomInbox_RegistersInMemoryInbox()
+    public void Build_WhenNoCustomInbox_RegistersInMemoryInbox()
     {
         // Act
-        await _sut.BuildAsync();
+        _sut.Build();
 
         // Assert
         Assert.True(_internals.HasService<IInboxWriter>());
@@ -30,29 +31,29 @@ public class AppEventsTests
     }
 
     [Fact]
-    public async Task BuildAsync_WhenCustomInboxAlreadyRegistered_DoesNotOverrideIt()
+    public void Build_WhenCustomInboxAlreadyRegistered_DoesNotOverrideIt()
     {
         // Arrange
         var customInbox = new Mock<IInboxWriter>();
-        _internals.GetServiceCollection().AddSingleton(customInbox.Object);
-        _internals.GetServiceCollection().AddSingleton(Mock.Of<IInboxConsumer>());
+        _internals.GetHostBuilder().Services.AddSingleton(customInbox.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(Mock.Of<IInboxConsumer>());
 
         // Act
-        await _sut.BuildAsync();
+        _sut.Build();
 
         // Assert
         Assert.True(_internals.HasService<IInboxWriter>());
-        var descriptors = _internals.GetServiceCollection()
+        var descriptors = _internals.GetHostBuilder().Services
             .Where(d => d.ServiceType == typeof(IInboxWriter))
             .ToList();
         Assert.Single(descriptors);
     }
 
     [Fact]
-    public async Task BuildAsync_WhenNoCustomOutbox_RegistersInMemoryOutbox()
+    public void Build_WhenNoCustomOutbox_RegistersInMemoryOutbox()
     {
         // Act
-        await _sut.BuildAsync();
+        _sut.Build();
 
         // Assert
         Assert.True(_internals.HasService<IOutboxWriter>());
@@ -60,19 +61,19 @@ public class AppEventsTests
     }
 
     [Fact]
-    public async Task BuildAsync_WhenCustomOutboxAlreadyRegistered_DoesNotOverrideIt()
+    public void Build_WhenCustomOutboxAlreadyRegistered_DoesNotOverrideIt()
     {
         // Arrange
         var customOutbox = new Mock<IOutboxWriter>();
-        _internals.GetServiceCollection().AddSingleton(customOutbox.Object);
-        _internals.GetServiceCollection().AddSingleton(Mock.Of<IOutboxConsumer>());
+        _internals.GetHostBuilder().Services.AddSingleton(customOutbox.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(Mock.Of<IOutboxConsumer>());
 
         // Act
-        await _sut.BuildAsync();
+        _sut.Build();
 
         // Assert
         Assert.True(_internals.HasService<IOutboxWriter>());
-        var descriptors = _internals.GetServiceCollection()
+        var descriptors = _internals.GetHostBuilder().Services
             .Where(d => d.ServiceType == typeof(IOutboxWriter))
             .ToList();
         Assert.Single(descriptors);

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Moq;
 using Tycho.Modules.Instance;
 using Tycho.Requests.Handling;
@@ -19,8 +20,8 @@ public class DownStreamRegistratorTests
 
     public DownStreamRegistratorTests()
     {
-        _internals = new Internals(typeof(object));
-        _internals.GetServiceCollection()
+        _internals = new Internals(typeof(object), Host.CreateEmptyApplicationBuilder(default));
+        _internals.GetHostBuilder().Services
                   .AddSingleton(_internals);
         _sut = new Registrator(_internals);
     }
@@ -29,7 +30,7 @@ public class DownStreamRegistratorTests
     public void Expose_NewRequest_RegistersExposer()
     {
         var targetModuleMock = new Mock<IParentReference>();
-        _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(targetModuleMock.Object);
 
         // Act
         _sut.ExposeDownStreamRequest<OtherModule, TestRequest>();
@@ -46,7 +47,7 @@ public class DownStreamRegistratorTests
     {
         // Arrange
         var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         // Act
         void Act() => _sut.ExposeDownStreamRequest<OtherModule, TestRequest>();
@@ -59,7 +60,7 @@ public class DownStreamRegistratorTests
     public void Expose_NewRequestWithResponse_RegistersExposer()
     {
         var targetModuleMock = new Mock<IParentReference>();
-        _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(targetModuleMock.Object);
 
         // Act
         _sut.ExposeDownStreamRequest<OtherModule, TestRequestWithResponse, string>();
@@ -77,7 +78,7 @@ public class DownStreamRegistratorTests
     {
         // Arrange
         var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         // Act
         void Act() => _sut.ExposeDownStreamRequest<OtherModule, TestRequestWithResponse, string>();
@@ -91,7 +92,7 @@ public class DownStreamRegistratorTests
     {
         var mapMock = new Mock<Func<TestRequest, OtherRequest>>();
         var targetModuleMock = new Mock<IParentReference>();
-        _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(targetModuleMock.Object);
 
         // Act
         _sut.ExposeMappedDownStreamRequest<OtherModule, TestRequest, OtherRequest>(mapMock.Object);
@@ -109,7 +110,7 @@ public class DownStreamRegistratorTests
         // Arrange
         var mapMock = new Mock<Func<TestRequest, OtherRequest>>();
         var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         // Act
         void Act() => _sut.ExposeMappedDownStreamRequest<OtherModule, TestRequest, OtherRequest>(mapMock.Object);
@@ -124,7 +125,7 @@ public class DownStreamRegistratorTests
         var mapRequestMock = new Mock<Func<TestRequestWithResponse, OtherRequestWithResponse>>();
         var mapResponseMock = new Mock<Func<string, string>>();
         var targetModuleMock = new Mock<IParentReference>();
-        _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(targetModuleMock.Object);
 
         // Act
         _sut.ExposeMappedDownStreamRequest<
@@ -151,7 +152,7 @@ public class DownStreamRegistratorTests
         var mapRequestMock = new Mock<Func<TestRequestWithResponse, OtherRequestWithResponse>>();
         var mapResponseMock = new Mock<Func<string, string>>();
         var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         // Act
         void Act() => _sut.ExposeMappedDownStreamRequest<
@@ -169,7 +170,7 @@ public class DownStreamRegistratorTests
     {
         // Arrange
         var targetModuleMock = new Mock<IModule<TestModule>>();
-        _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(targetModuleMock.Object);
 
         // Act
         _sut.ForwardDownStreamRequest<OtherModule, TestRequest, TestModule>();
@@ -186,7 +187,7 @@ public class DownStreamRegistratorTests
     {
         // Arrange
         var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         // Act
         void Act() => _sut.ForwardDownStreamRequest<OtherModule, TestRequest, TestModule>();
@@ -200,7 +201,7 @@ public class DownStreamRegistratorTests
     {
         // Arrange
         var targetModuleMock = new Mock<IModule<TestModule>>();
-        _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(targetModuleMock.Object);
 
         // Act
         _sut.ForwardDownStreamRequest<OtherModule, TestRequestWithResponse, string, TestModule>();
@@ -218,7 +219,7 @@ public class DownStreamRegistratorTests
     {
         // Arrange
         var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         // Act
         void Act() => _sut.ForwardDownStreamRequest<OtherModule, TestRequestWithResponse, string, TestModule>();
@@ -233,7 +234,7 @@ public class DownStreamRegistratorTests
         // Arrange
         var mapMock = new Mock<Func<TestRequest, OtherRequest>>();
         var targetModuleMock = new Mock<IModule<TestModule>>();
-        _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(targetModuleMock.Object);
 
         // Act
         _sut.ForwardMappedDownStreamRequest<OtherModule, TestRequest, OtherRequest, TestModule>(mapMock.Object);
@@ -251,7 +252,7 @@ public class DownStreamRegistratorTests
         // Arrange
         var mapMock = new Mock<Func<TestRequest, OtherRequest>>();
         var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         // Act
         void Act() => _sut.ForwardMappedDownStreamRequest<
@@ -269,7 +270,7 @@ public class DownStreamRegistratorTests
         var mapRequestMock = new Mock<Func<TestRequestWithResponse, OtherRequestWithResponse>>();
         var mapResponseMock = new Mock<Func<string, string>>();
         var targetModuleMock = new Mock<IModule<TestModule>>();
-        _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(targetModuleMock.Object);
 
         // Act
         _sut.ForwardMappedDownStreamRequest<
@@ -298,7 +299,7 @@ public class DownStreamRegistratorTests
         var mapRequestMock = new Mock<Func<TestRequestWithResponse, OtherRequestWithResponse>>();
         var mapResponseMock = new Mock<Func<string, string>>();
         var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         // Act
         void Act() => _sut.ForwardMappedDownStreamRequest<
@@ -333,7 +334,7 @@ public class DownStreamRegistratorTests
     {
         // Arrange
         var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         // Act
         void Act() => _sut.HandleDownStreamRequest<OtherModule, TestRequest, TestRequestHandler>();
@@ -347,7 +348,7 @@ public class DownStreamRegistratorTests
     {
         // Arrange
         var targetModuleMock = new Mock<IModule<TestModule>>();
-        _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(targetModuleMock.Object);
 
         // Act
         _sut.HandleDownStreamRequest<OtherModule, TestRequestWithResponse, string, TestRequestHandler>();
@@ -365,7 +366,7 @@ public class DownStreamRegistratorTests
     {
         // Arrange
         var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         // Act
         void Act() => _sut.HandleDownStreamRequest<OtherModule, TestRequestWithResponse, string, TestRequestHandler>();
@@ -395,7 +396,7 @@ public class DownStreamRegistratorTests
     {
         // Arrange
         var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         // Act
         void Act() => _sut.IgnoreDownStreamRequest<OtherModule, TestRequest>();
@@ -426,7 +427,7 @@ public class DownStreamRegistratorTests
     {
         // Arrange
         var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         // Act
         void Act() => _sut.IgnoreDownStreamRequest<OtherModule, TestRequestWithResponse, string>();

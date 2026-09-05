@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Moq;
 using Tycho.Requests;
 using Tycho.Requests.Broker;
@@ -19,7 +20,7 @@ public class DownStreamBrokerTests
 
     public DownStreamBrokerTests()
     {
-        _internals = new Internals(typeof(object));
+        _internals = new Internals(typeof(object), Host.CreateEmptyApplicationBuilder(default));
         _sut = new DownStreamBroker<TestModule>(_internals);
 
         _transactionMock = new Mock<ITransaction>();
@@ -32,7 +33,7 @@ public class DownStreamBrokerTests
         _transactionMock.Setup(t => t.RollbackAsync(It.IsAny<CancellationToken>()))
                         .Returns(Task.CompletedTask);
 
-        _internals.GetServiceCollection().AddSingleton(_transactionMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(_transactionMock.Object);
     }
 
     [Theory]
@@ -42,7 +43,7 @@ public class DownStreamBrokerTests
     {
         // Arrange
         var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequest, TestModule>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         if (buildInternals)
         {
@@ -63,7 +64,7 @@ public class DownStreamBrokerTests
     {
         // Arrange
         var registrationMock = new Mock<IUpStreamRequestRegistration<TestRequest>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         if (buildInternals)
         {
@@ -84,7 +85,7 @@ public class DownStreamBrokerTests
     {
         // Arrange
         var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequest, OtherModule>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         if (buildInternals)
         {
@@ -123,7 +124,7 @@ public class DownStreamBrokerTests
     {
         // Arrange
         var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequestWithResponse, string, TestModule>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         if (buildInternals)
         {
@@ -144,7 +145,7 @@ public class DownStreamBrokerTests
     {
         // Arrange
         var registrationMock = new Mock<IUpStreamRequestRegistration<TestRequestWithResponse, string>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         if (buildInternals)
         {
@@ -165,7 +166,7 @@ public class DownStreamBrokerTests
     {
         // Arrange
         var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequestWithResponse, string, OtherModule>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         if (buildInternals)
         {
@@ -209,7 +210,7 @@ public class DownStreamBrokerTests
         var registrationMock = new Mock<IDownStreamRequestRegistration<TestRequest, TestModule>>();
         registrationMock.Setup(x => x.Handler).Returns(handlerMock.Object);
 
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
         _internals.Build();
 
         // Act
@@ -237,7 +238,7 @@ public class DownStreamBrokerTests
         registrationMock.Setup(x => x.Handler)
                         .Returns(handlerMock.Object);
 
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
         _internals.Build();
 
         // Act
@@ -271,7 +272,7 @@ public class DownStreamBrokerTests
         registrationMock.Setup(x => x.Handler)
                         .Returns(handlerMock.Object);
 
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
         _internals.Build();
 
         // Act
@@ -302,7 +303,7 @@ public class DownStreamBrokerTests
         registrationMock.Setup(x => x.Handler)
                         .Returns(handlerMock.Object);
 
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
         _internals.Build();
 
         // Act
@@ -368,7 +369,7 @@ public class DownStreamBrokerTests
         registrationMock.Setup(x => x.Handler)
                         .Returns(handlerMock.Object);
 
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
         _internals.Build();
 
         // Act
@@ -397,7 +398,7 @@ public class DownStreamBrokerTests
         registrationMock.Setup(x => x.Handler)
                         .Returns(handlerMock.Object);
 
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
         _internals.Build();
 
         // Act
@@ -432,7 +433,7 @@ public class DownStreamBrokerTests
         registrationMock.Setup(x => x.Handler)
                         .Returns(handlerMock.Object);
 
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
         _internals.Build();
 
         // Act
@@ -464,7 +465,7 @@ public class DownStreamBrokerTests
         registrationMock.Setup(x => x.Handler)
                         .Returns(handlerMock.Object);
 
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
         _internals.Build();
 
         // Act

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Moq;
 using Tycho.Modules.Instance;
 using Tycho.Requests.Handling;
@@ -18,8 +19,8 @@ public class UpStreamRegistratorTests
 
     public UpStreamRegistratorTests()
     {
-        _internals = new Internals(typeof(object));
-        _internals.GetServiceCollection()
+        _internals = new Internals(typeof(object), Host.CreateEmptyApplicationBuilder(default));
+        _internals.GetHostBuilder().Services
                   .AddSingleton(_internals);
         _sut = new Registrator(_internals);
     }
@@ -29,7 +30,7 @@ public class UpStreamRegistratorTests
     {
         // Arrange
         var targetModuleMock = new Mock<IModule<TestModule>>();
-        _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(targetModuleMock.Object);
 
         // Act
         _sut.ForwardUpStreamRequest<TestRequest, TestModule>();
@@ -46,7 +47,7 @@ public class UpStreamRegistratorTests
     {
         // Arrange
         var registrationMock = new Mock<IUpStreamRequestRegistration<TestRequest>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         // Act
         void Act() => _sut.ForwardUpStreamRequest<TestRequest, TestModule>();
@@ -60,7 +61,7 @@ public class UpStreamRegistratorTests
     {
         // Arrange
         var targetModuleMock = new Mock<IModule<TestModule>>();
-        _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(targetModuleMock.Object);
 
         // Act
         _sut.ForwardUpStreamRequest<TestRequestWithResponse, string, TestModule>();
@@ -77,7 +78,7 @@ public class UpStreamRegistratorTests
     {
         // Arrange
         var registrationMock = new Mock<IUpStreamRequestRegistration<TestRequestWithResponse, string>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         // Act
         void Act() => _sut.ForwardUpStreamRequest<TestRequestWithResponse, string, TestModule>();
@@ -92,7 +93,7 @@ public class UpStreamRegistratorTests
         // Arrange
         var mapMock = new Mock<Func<TestRequest, OtherRequest>>();
         var targetModuleMock = new Mock<IModule<TestModule>>();
-        _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(targetModuleMock.Object);
 
         // Act
         _sut.ForwardMappedUpStreamRequest<TestRequest, OtherRequest, TestModule>(mapMock.Object);
@@ -110,7 +111,7 @@ public class UpStreamRegistratorTests
         // Arrange
         var mapMock = new Mock<Func<TestRequest, OtherRequest>>();
         var registrationMock = new Mock<IUpStreamRequestRegistration<TestRequest>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         // Act
         void Act() => _sut.ForwardMappedUpStreamRequest<
@@ -128,7 +129,7 @@ public class UpStreamRegistratorTests
         var mapRequestMock = new Mock<Func<TestRequestWithResponse, OtherRequestWithResponse>>();
         var mapResponseMock = new Mock<Func<string, string>>();
         var targetModuleMock = new Mock<IModule<TestModule>>();
-        _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(targetModuleMock.Object);
 
         // Act
         _sut.ForwardMappedUpStreamRequest<
@@ -156,7 +157,7 @@ public class UpStreamRegistratorTests
         var mapRequestMock = new Mock<Func<TestRequestWithResponse, OtherRequestWithResponse>>();
         var mapResponseMock = new Mock<Func<string, string>>();
         var registrationMock = new Mock<IUpStreamRequestRegistration<TestRequestWithResponse, string>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         // Act
         void Act() => _sut.ForwardMappedUpStreamRequest<
@@ -190,7 +191,7 @@ public class UpStreamRegistratorTests
     {
         // Arrange
         var registrationMock = new Mock<IUpStreamRequestRegistration<TestRequest>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         // Act
         void Act() => _sut.HandleUpStreamRequest<TestRequest, TestRequestHandler>();
@@ -204,7 +205,7 @@ public class UpStreamRegistratorTests
     {
         // Arrange
         var targetModuleMock = new Mock<IModule<TestModule>>();
-        _internals.GetServiceCollection().AddSingleton(targetModuleMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(targetModuleMock.Object);
 
         // Act
         _sut.HandleUpStreamRequest<TestRequestWithResponse, string, TestRequestHandler>();
@@ -221,7 +222,7 @@ public class UpStreamRegistratorTests
     {
         // Arrange
         var registrationMock = new Mock<IUpStreamRequestRegistration<TestRequestWithResponse, string>>();
-        _internals.GetServiceCollection().AddSingleton(registrationMock.Object);
+        _internals.GetHostBuilder().Services.AddSingleton(registrationMock.Object);
 
         // Act
         void Act() => _sut.HandleUpStreamRequest<TestRequestWithResponse, string, TestRequestHandler>();

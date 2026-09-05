@@ -64,9 +64,7 @@ namespace Tycho.Modules
         /// <summary>
         /// Configures the internal module host and inherits supported context from its parent.
         /// </summary>
-        protected virtual void ConfigureHost(
-            IServiceProvider? parentServiceProvider,
-            HostApplicationBuilder moduleHostBuilder)
+        protected virtual void ConfigureHost(IServiceProvider? parentServiceProvider, HostApplicationBuilder moduleHostBuilder)
         {
             moduleHostBuilder.Services.RemoveAll<IHostLifetime>();
             moduleHostBuilder.Services.AddSingleton<IHostLifetime, StandaloneHostLifetime>();

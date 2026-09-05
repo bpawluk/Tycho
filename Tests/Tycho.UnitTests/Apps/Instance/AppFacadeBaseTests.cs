@@ -71,16 +71,41 @@ public class AppFacadeBaseTests
     }
 
     [Fact]
-    public async Task DisposeAsync_DelegatesToUnderlyingApp()
+    public async Task StartAsync_DelegatesToUnderlyingApp()
     {
         // Arrange
-        _appMock.Setup(a => a.DisposeAsync()).Returns(ValueTask.CompletedTask);
+        var cancellationToken = new CancellationToken();
+        _appMock.Setup(a => a.StartAsync(cancellationToken)).Returns(Task.CompletedTask);
 
         // Act
-        await _sut.DisposeAsync();
+        await _sut.StartAsync(cancellationToken);
 
         // Assert
-        _appMock.Verify(a => a.DisposeAsync(), Times.Once);
+        _appMock.Verify(a => a.StartAsync(cancellationToken), Times.Once);
+    }
+
+    [Fact]
+    public async Task StopAsync_DelegatesToUnderlyingApp()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken();
+        _appMock.Setup(a => a.StopAsync(cancellationToken)).Returns(Task.CompletedTask);
+
+        // Act
+        await _sut.StopAsync(cancellationToken);
+
+        // Assert
+        _appMock.Verify(a => a.StopAsync(cancellationToken), Times.Once);
+    }
+
+    [Fact]
+    public void Dispose_DelegatesToUnderlyingApp()
+    {
+        // Act
+        _sut.Dispose();
+
+        // Assert
+        _appMock.Verify(a => a.Dispose(), Times.Once);
     }
 
     private sealed class ConcreteAppFacade(IApp app) : AppFacadeBase(app)

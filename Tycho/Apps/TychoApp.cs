@@ -58,9 +58,7 @@ namespace Tycho.Apps
         /// <summary>
         /// Configures the internal application host.
         /// </summary>
-        protected virtual void ConfigureHost(
-            IServiceProvider? parentServiceProvider,
-            HostApplicationBuilder appHostBuilder)
+        protected virtual void ConfigureHost(IServiceProvider? parentServiceProvider, HostApplicationBuilder appHostBuilder)
         {
             appHostBuilder.Services.RemoveAll<IHostLifetime>();
             appHostBuilder.Services.AddSingleton<IHostLifetime, StandaloneHostLifetime>();
@@ -85,8 +83,8 @@ namespace Tycho.Apps
             appHostBuilder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
             {
                 [HostDefaults.ApplicationKey] = appHostBuilder.Environment.ApplicationName,
-                [HostDefaults.EnvironmentKey] = parentEnvironment.EnvironmentName,
-                [HostDefaults.ContentRootKey] = parentEnvironment.ContentRootPath,
+                [HostDefaults.EnvironmentKey] = appHostBuilder.Environment.EnvironmentName,
+                [HostDefaults.ContentRootKey] = appHostBuilder.Environment.ContentRootPath,
             });
 
             ILoggerFactory parentLoggerFactory = parentServiceProvider.GetRequiredService<ILoggerFactory>();

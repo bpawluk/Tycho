@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Moq;
 using Tycho.Events.Inbox;
 using Tycho.Events.Model;
@@ -19,8 +20,8 @@ public class InboxProcessorJobFactoryTests
 
     public InboxProcessorJobFactoryTests()
     {
-        var internals = new Internals(typeof(TestModule));
-        IServiceCollection serviceCollection = internals.GetServiceCollection();
+        var internals = new Internals(typeof(TestModule), Host.CreateEmptyApplicationBuilder(default));
+        IServiceCollection serviceCollection = internals.GetHostBuilder().Services;
 
         _inboxConsumerMock = new Mock<IInboxConsumer>();
         serviceCollection.AddSingleton(_inboxConsumerMock.Object);

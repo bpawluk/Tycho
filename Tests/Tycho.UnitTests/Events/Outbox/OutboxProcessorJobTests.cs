@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Moq;
 using Tycho.Events.Broker;
 using Tycho.Events.Model;
@@ -21,8 +22,8 @@ public class OutboxProcessorJobTests
 
     public OutboxProcessorJobTests()
     {
-        var internals = new Internals(typeof(TestModule));
-        IServiceCollection serviceCollection = internals.GetServiceCollection();
+        var internals = new Internals(typeof(TestModule), Host.CreateEmptyApplicationBuilder(default));
+        IServiceCollection serviceCollection = internals.GetHostBuilder().Services;
 
         _outboxConsumerMock = new Mock<IOutboxConsumer>();
         serviceCollection.AddSingleton(_outboxConsumerMock.Object);

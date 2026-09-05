@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Moq;
 using Tycho.Events;
 using Tycho.Events.Inbox;
@@ -190,8 +191,8 @@ public class InboxProcessorJobTests
 
     private InboxProcessorJob CreateSut(bool withHandler = true, bool useTransactionalHandler = false)
     {
-        var internals = new Internals(typeof(TestModule));
-        IServiceCollection serviceCollection = internals.GetServiceCollection();
+        var internals = new Internals(typeof(TestModule), Host.CreateEmptyApplicationBuilder(default));
+        IServiceCollection serviceCollection = internals.GetHostBuilder().Services;
 
         serviceCollection.AddSingleton(_inboxConsumerMock.Object);
         serviceCollection.AddSingleton(_transactionMock.Object);
