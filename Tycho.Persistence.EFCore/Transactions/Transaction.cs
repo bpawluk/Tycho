@@ -90,6 +90,10 @@ internal sealed class Transaction(TychoDbContext dbContext, ILogger<Transaction>
             {
                 logger?.LogError(exception, "Failed to roll back the transaction.");
             }
+            finally
+            {
+                _dbContext.ChangeTracker.Clear();
+            }
             throw;
         }
         finally
