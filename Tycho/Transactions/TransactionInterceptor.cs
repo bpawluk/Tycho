@@ -14,30 +14,14 @@ namespace Tycho.Transactions
             _transaction = transaction;
         }
 
-        public async Task<TResponse> InterceptAsync(
+        public Task<TResponse> InterceptAsync(
             RequestHandlerDelegate<TRequest, TResponse> next,
             TRequest requestData,
             CancellationToken cancellationToken)
         {
-            await _transaction.BeginAsync(cancellationToken).ConfigureAwait(false);
-
-            try
-            {
-                TResponse response = await next(requestData, cancellationToken).ConfigureAwait(false);
-                if (_transaction.IsInProgress)
-                {
-                    await _transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-                }
-                return response;
-            }
-            catch
-            {
-                if (_transaction.IsInProgress)
-                {
-                    await _transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-                }
-                throw;
-            }
+            return _transaction.ExecuteAsync(
+                token => next(requestData, token),
+                cancellationToken);
         }
     }
 }

@@ -1,19 +1,25 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Logging;
 using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.Transactions;
 
-internal sealed class Transaction(TychoDbContext dbContext) : ITransaction
+internal sealed class Transaction(TychoDbContext dbContext, ILogger<Transaction>? logger = null) : ITransaction
 {
-    private readonly TychoDbContext _dbContext = dbContext;
-    private readonly List<Action> _afterCommitActions = [];
-    private IDbContextTransaction? _activeTransaction;
+    private const int NotStarted = 0;
+    private const int InProgress = 1;
+    private const int Finished = 2;
 
-    public bool IsInProgress { get; private set; }
+    private readonly TychoDbContext _dbContext = dbContext;
+    private readonly ConcurrentBag<Action> _afterCommitActions = [];
+
+    private int _executionState;
+    public bool IsInProgress => Volatile.Read(ref _executionState) == InProgress;
 
     public void ExecuteAfterCommit(Action action)
     {
@@ -21,67 +27,96 @@ internal sealed class Transaction(TychoDbContext dbContext) : ITransaction
         _afterCommitActions.Add(action);
     }
 
-    public async Task BeginAsync(CancellationToken cancellationToken = default)
+    public async Task ExecuteAsync(Func<CancellationToken, Task> operation, CancellationToken cancellationToken)
     {
-        if (_activeTransaction is not null)
+        ArgumentNullException.ThrowIfNull(operation);
+        async Task<bool> ExecuteWithStubResult(CancellationToken token)
         {
-            return;
+            await operation(token).ConfigureAwait(false);
+            return true;
         }
-
-        IExecutionStrategy executionStrategy = _dbContext.Database.CreateExecutionStrategy();
-        if (executionStrategy.RetriesOnFailure)
-        {
-            throw new InvalidOperationException(
-                "The configured EF Core execution strategy retries on failure and cannot be used with Tycho-managed transactions. Disable execution-strategy retries for this DbContext.");
-        }
-
-        _activeTransaction = await _dbContext.Database
-            .BeginTransactionAsync(cancellationToken)
-            .ConfigureAwait(false);
-
-        IsInProgress = true;
+        await ExecuteAsync(ExecuteWithStubResult, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task CommitAsync(CancellationToken cancellationToken = default)
+    public async Task<TResult> ExecuteAsync<TResult>(Func<CancellationToken, Task<TResult>> operation, CancellationToken cancellationToken)
     {
-        if (_activeTransaction is null)
+        ArgumentNullException.ThrowIfNull(operation);
+
+        if (ExecutionStrategy.Current?.RetriesOnFailure == true)
         {
-            return;
+            throw new InvalidOperationException("Transactions managed by Tycho cannot execute inside an active retrying EF Core execution strategy.");
         }
 
-        await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        await _activeTransaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-        IsInProgress = false;
-
-        foreach (Action afterCommitAction in _afterCommitActions)
+        if (Interlocked.CompareExchange(ref _executionState, InProgress, NotStarted) != NotStarted)
         {
-            afterCommitAction();
+            throw new InvalidOperationException("This transaction has already been executed or is currently in progress.");
+        }
+
+        TResult result;
+        try
+        {
+            var executionStrategy = new NonRetryingScopeExecutionStrategy(_dbContext);
+            result = await executionStrategy.ExecuteAsync(token => ExecuteTransactionAsync(operation, token), cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            Volatile.Write(ref _executionState, Finished);
+        }
+
+        RunAfterCommitActions();
+        return result;
+    }
+
+    private async Task<TResult> ExecuteTransactionAsync<TResult>(Func<CancellationToken, Task<TResult>> operation, CancellationToken cancellationToken)
+    {
+        IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            TResult result = await operation(cancellationToken).ConfigureAwait(false);
+            await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+            cancellationToken.ThrowIfCancellationRequested();
+            await transaction.CommitAsync(CancellationToken.None).ConfigureAwait(false);
+
+            return result;
+        }
+        catch
+        {
+            try
+            {
+                await transaction.RollbackAsync(CancellationToken.None).ConfigureAwait(false);
+            }
+            catch (Exception exception)
+            {
+                logger?.LogError(exception, "Failed to roll back the transaction.");
+            }
+            throw;
+        }
+        finally
+        {
+            try
+            {
+                await transaction.DisposeAsync().ConfigureAwait(false);
+            }
+            catch (Exception exception)
+            {
+                logger?.LogError(exception, "Failed to dispose the transaction.");
+            }
         }
     }
 
-    public async Task RollbackAsync(CancellationToken cancellationToken = default)
+    private void RunAfterCommitActions()
     {
-        if (_activeTransaction is null)
+        foreach (Action action in _afterCommitActions)
         {
-            return;
+            try
+            {
+                action();
+            }
+            catch (Exception exception)
+            {
+                logger?.LogError(exception, "Failed to run an after-commit action.");
+            }
         }
-
-        await _activeTransaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-        IsInProgress = false;
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        _afterCommitActions.Clear();
-        if (_activeTransaction is not null)
-        {
-            await _activeTransaction.DisposeAsync().ConfigureAwait(false);
-        }
-    }
-
-    public void Dispose()
-    {
-        _afterCommitActions.Clear();
-        _activeTransaction?.Dispose();
     }
 }

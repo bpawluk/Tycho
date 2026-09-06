@@ -10,23 +10,14 @@ namespace Tycho.Transactions
 
         public void ExecuteAfterCommit(Action action) { }
 
-        public Task BeginAsync(CancellationToken cancellationToken)
+        public Task ExecuteAsync(Func<CancellationToken, Task> operation, CancellationToken cancellationToken)
         {
             throw new InvalidOperationException("No transaction provider is configured.");
         }
 
-        public Task CommitAsync(CancellationToken cancellationToken)
+        public Task<TResult> ExecuteAsync<TResult>(Func<CancellationToken, Task<TResult>> operation, CancellationToken cancellationToken)
         {
             throw new InvalidOperationException("No transaction provider is configured.");
         }
-
-        public Task RollbackAsync(CancellationToken cancellationToken)
-        {
-            throw new InvalidOperationException("No transaction provider is configured.");
-        }
-
-        public ValueTask DisposeAsync() => default;
-
-        public void Dispose() { }
     }
 }

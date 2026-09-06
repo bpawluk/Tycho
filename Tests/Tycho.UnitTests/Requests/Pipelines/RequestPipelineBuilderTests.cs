@@ -146,13 +146,28 @@ public class RequestPipelineBuilderTests
     private static Mock<ITransaction> CreateTransaction(List<string> calls)
     {
         var transactionMock = new Mock<ITransaction>();
-        transactionMock.SetupGet(x => x.IsInProgress).Returns(true);
-        transactionMock.Setup(x => x.BeginAsync(It.IsAny<CancellationToken>()))
-                       .Callback(() => calls.Add("begin"))
-                       .Returns(Task.CompletedTask);
-        transactionMock.Setup(x => x.CommitAsync(It.IsAny<CancellationToken>()))
-                       .Callback(() => calls.Add("commit"))
-                       .Returns(Task.CompletedTask);
+        transactionMock
+            .Setup(transaction => transaction.ExecuteAsync(
+                It.IsAny<Func<CancellationToken, Task<NoResponse>>>(),
+                It.IsAny<CancellationToken>()))
+            .Returns(async (Func<CancellationToken, Task<NoResponse>> operation, CancellationToken token) =>
+            {
+                calls.Add("begin");
+                NoResponse result = await operation(token);
+                calls.Add("commit");
+                return result;
+            });
+        transactionMock
+            .Setup(transaction => transaction.ExecuteAsync(
+                It.IsAny<Func<CancellationToken, Task<string>>>(),
+                It.IsAny<CancellationToken>()))
+            .Returns(async (Func<CancellationToken, Task<string>> operation, CancellationToken token) =>
+            {
+                calls.Add("begin");
+                string result = await operation(token);
+                calls.Add("commit");
+                return result;
+            });
         return transactionMock;
     }
 }

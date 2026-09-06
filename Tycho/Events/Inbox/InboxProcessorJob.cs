@@ -23,75 +23,102 @@ namespace Tycho.Events.Inbox
 
         public InboxProcessorJob ForEvent(InboxEvent inboxEvent)
         {
-            _event = inboxEvent;
+            if (inboxEvent is null)
+            {
+                throw new ArgumentNullException(nameof(inboxEvent));
+            }
+
+            if (Interlocked.CompareExchange(ref _event, inboxEvent, null) != null)
+            {
+                throw new InvalidOperationException("An inbox event has already been assigned to this job.");
+            }
+
             return this;
         }
 
         [EntryPoint]
         public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            await using AsyncServiceScope scope = _internals.CreateAsyncScope();
-            ILogger<InboxProcessorJob>? logger = scope.ServiceProvider.GetService<ILogger<InboxProcessorJob>>();
-
-            if (_event is null)
+            bool isInputValid = ValidateInput();
+            if (!isInputValid)
             {
-                logger?.LogWarning("No event assigned for processing. Skipping execution.");
                 return;
             }
 
-            IInboxConsumer inbox = scope.ServiceProvider.GetRequiredService<IInboxConsumer>();
+            bool processingSucceeded = await ProcessEventAsync(cancellationToken).ConfigureAwait(false);
+            if (!processingSucceeded)
+            {
+                await FailProcessingAsync(cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        private bool ValidateInput()
+        {
+            if (_event is null)
+            {
+                using IServiceScope scope = _internals.CreateScope();
+                ILogger<InboxProcessorJob>? logger = scope.ServiceProvider.GetService<ILogger<InboxProcessorJob>>();
+                logger?.LogWarning("No event assigned for processing. Skipping execution.");
+                return false;
+            }
+            return true;
+        }
+
+        private async Task<bool> ProcessEventAsync(CancellationToken cancellationToken)
+        {
+            await using AsyncServiceScope scope = _internals.CreateAsyncScope();
+            ILogger<InboxProcessorJob>? logger = scope.ServiceProvider.GetService<ILogger<InboxProcessorJob>>();
 
             try
             {
+                IInboxConsumer inbox = scope.ServiceProvider.GetRequiredService<IInboxConsumer>();
                 var handlerProvider = new EventHandlerProvider(scope.ServiceProvider);
-                IEventHandler eventHandler = _event.RoutedEvent.GetHandlerFrom(handlerProvider);
 
-                ITransaction transaction = scope.ServiceProvider.GetRequiredService<ITransaction>();
+                IEventHandler eventHandler = _event!.RoutedEvent.GetHandlerFrom(handlerProvider);
                 if (eventHandler is ITransactionalEventHandler)
                 {
-                    await transaction.BeginAsync(cancellationToken).ConfigureAwait(false);
+                    ITransaction transaction = scope.ServiceProvider.GetRequiredService<ITransaction>();
+                    await transaction.ExecuteAsync(token => HandleEventAsync(eventHandler, inbox, token), cancellationToken).ConfigureAwait(false);
                 }
-
-                try
+                else
                 {
-                    await _event.RoutedEvent.HandleWith(eventHandler, cancellationToken).ConfigureAwait(false);
-
-                    bool markedAsHandled = await inbox
-                        .MarkAsHandledAsync(_event.ClaimId, cancellationToken)
-                        .ConfigureAwait(false);
-
-                    if (!markedAsHandled)
-                    {
-                        throw new InvalidOperationException(
-                            $"Failed to mark inbox entry with ID {_event.EventId} as handled for claim {_event.ClaimId}.");
-                    }
-
-                    if (transaction.IsInProgress)
-                    {
-                        await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-                    }
+                    await HandleEventAsync(eventHandler, inbox, cancellationToken).ConfigureAwait(false);
                 }
-                catch
-                {
-                    if (transaction.IsInProgress)
-                    {
-                        await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-                    }
-                    throw;
-                }
+
+                return true;
             }
-            catch (Exception ex)
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
-                logger?.LogError(ex, "Failed to process inbox entry with ID {entryId}", _event.EventId);
+                throw;
+            }
+            catch (Exception exception)
+            {
+                logger?.LogError(exception, "Failed to process inbox entry with ID {entryId}", _event.EventId);
+                return false;
+            }
+        }
 
-                bool markedAsFailed = await inbox
-                    .MarkAsFailedAsync(_event.ClaimId, cancellationToken)
-                    .ConfigureAwait(false);
+        private async Task HandleEventAsync(IEventHandler eventHandler, IInboxConsumer inbox, CancellationToken cancellationToken)
+        {
+            await _event!.RoutedEvent.HandleWith(eventHandler, cancellationToken).ConfigureAwait(false);
 
-                if (!markedAsFailed)
-                {
-                    logger?.LogWarning("Failed to mark inbox entry with ID {entryId} as failed for claim {claimId}", _event.EventId, _event.ClaimId);
-                }
+            bool markedAsHandled = await inbox.MarkAsHandledAsync(_event.ClaimId, cancellationToken).ConfigureAwait(false);
+            if (!markedAsHandled)
+            {
+                throw new InvalidOperationException($"Failed to mark inbox entry with ID {_event.EventId} as handled for claim {_event.ClaimId}.");
+            }
+        }
+
+        private async Task FailProcessingAsync(CancellationToken cancellationToken)
+        {
+            await using AsyncServiceScope scope = _internals.CreateAsyncScope();
+            ILogger<InboxProcessorJob>? logger = scope.ServiceProvider.GetService<ILogger<InboxProcessorJob>>();
+            IInboxConsumer inbox = scope.ServiceProvider.GetRequiredService<IInboxConsumer>();
+
+            bool markedAsFailed = await inbox.MarkAsFailedAsync(_event!.ClaimId, cancellationToken).ConfigureAwait(false);
+            if (!markedAsFailed)
+            {
+                logger?.LogWarning("Failed to mark inbox entry with ID {entryId} as failed for claim {claimId}", _event.EventId, _event.ClaimId);
             }
         }
     }

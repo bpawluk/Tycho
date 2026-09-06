@@ -20,9 +20,18 @@ namespace Tycho.Events.Outbox
             _internals = internals;
         }
 
-        public OutboxProcessorJob ForEvent(OutboxEvent routedEvent)
+        public OutboxProcessorJob ForEvent(OutboxEvent outboxEvent)
         {
-            _event = routedEvent;
+            if (outboxEvent is null)
+            {
+                throw new ArgumentNullException(nameof(outboxEvent));
+            }
+
+            if (Interlocked.CompareExchange(ref _event, outboxEvent, null) != null)
+            {
+                throw new InvalidOperationException("An outbox event has already been assigned to this job.");
+            }
+
             return this;
         }
 
@@ -45,23 +54,21 @@ namespace Tycho.Events.Outbox
                 IEventBroker broker = scope.ServiceProvider.GetRequiredService<IEventBroker>();
                 await broker.DeliverAsync(_event.RoutedEvent, cancellationToken).ConfigureAwait(false);
 
-                bool markedAsDelivered = await outbox
-                    .MarkAsDeliveredAsync(_event.ClaimId, cancellationToken)
-                    .ConfigureAwait(false);
-
+                bool markedAsDelivered = await outbox.MarkAsDeliveredAsync(_event.ClaimId, cancellationToken).ConfigureAwait(false);
                 if (!markedAsDelivered)
                 {
                     logger?.LogWarning("Failed to mark outbox entry with ID {entryId} as delivered for claim {claimId}", _event.EventId, _event.ClaimId);
                 }
             }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 logger?.LogError(ex, "Failed to deliver outbox entry with ID {entryId}", _event.EventId);
 
-                bool markedAsFailed = await outbox
-                    .MarkAsFailedAsync(_event.ClaimId, cancellationToken)
-                    .ConfigureAwait(false);
-
+                bool markedAsFailed = await outbox.MarkAsFailedAsync(_event.ClaimId, cancellationToken).ConfigureAwait(false);
                 if (!markedAsFailed)
                 {
                     logger?.LogWarning("Failed to mark outbox entry with ID {entryId} as failed for claim {claimId}", _event.EventId, _event.ClaimId);

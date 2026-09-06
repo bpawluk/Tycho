@@ -4,16 +4,14 @@ using System.Threading.Tasks;
 
 namespace Tycho.Transactions
 {
-    internal interface ITransaction : IAsyncDisposable, IDisposable
+    internal interface ITransaction
     {
         bool IsInProgress { get; }
 
         void ExecuteAfterCommit(Action action);
 
-        Task BeginAsync(CancellationToken cancellationToken = default);
+        Task ExecuteAsync(Func<CancellationToken, Task> operation, CancellationToken cancellationToken = default);
 
-        Task CommitAsync(CancellationToken cancellationToken = default);
-
-        Task RollbackAsync(CancellationToken cancellationToken = default);
+        Task<TResult> ExecuteAsync<TResult>(Func<CancellationToken, Task<TResult>> operation, CancellationToken cancellationToken = default);
     }
 }

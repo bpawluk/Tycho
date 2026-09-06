@@ -24,14 +24,16 @@ public class UpStreamBrokerTests
         _sut = new UpStreamBroker(_internals);
 
         _transactionMock = new Mock<ITransaction>();
-        _transactionMock.SetupGet(t => t.IsInProgress)
-                        .Returns(false);
-        _transactionMock.Setup(t => t.BeginAsync(It.IsAny<CancellationToken>()))
-                        .Returns(Task.CompletedTask);
-        _transactionMock.Setup(t => t.CommitAsync(It.IsAny<CancellationToken>()))
-                        .Returns(Task.CompletedTask);
-        _transactionMock.Setup(t => t.RollbackAsync(It.IsAny<CancellationToken>()))
-                        .Returns(Task.CompletedTask);
+        _transactionMock
+            .Setup(transaction => transaction.ExecuteAsync(
+                It.IsAny<Func<CancellationToken, Task<NoResponse>>>(),
+                It.IsAny<CancellationToken>()))
+            .Returns((Func<CancellationToken, Task<NoResponse>> operation, CancellationToken token) => operation(token));
+        _transactionMock
+            .Setup(transaction => transaction.ExecuteAsync(
+                It.IsAny<Func<CancellationToken, Task<string>>>(),
+                It.IsAny<CancellationToken>()))
+            .Returns((Func<CancellationToken, Task<string>> operation, CancellationToken token) => operation(token));
 
         _internals.GetHostBuilder().Services.AddSingleton(_transactionMock.Object);
     }
@@ -177,9 +179,8 @@ public class UpStreamBrokerTests
 
         // Assert
         handlerMock.Verify(h => h.HandleAsync(request, cancellationToken), Times.Once);
-        _transactionMock.Verify(t => t.BeginAsync(cancellationToken), Times.Never);
-        _transactionMock.Verify(t => t.CommitAsync(cancellationToken), Times.Never);
-        _transactionMock.Verify(t => t.RollbackAsync(cancellationToken), Times.Never);
+        _transactionMock.Verify(transaction => transaction.ExecuteAsync(
+            It.IsAny<Func<CancellationToken, Task<NoResponse>>>(), cancellationToken), Times.Never);
     }
 
     [Fact]
@@ -208,9 +209,8 @@ public class UpStreamBrokerTests
 
         // Assert
         await Assert.ThrowsAsync<InvalidOperationException>(Act);
-        _transactionMock.Verify(t => t.BeginAsync(cancellationToken), Times.Never);
-        _transactionMock.Verify(t => t.CommitAsync(cancellationToken), Times.Never);
-        _transactionMock.Verify(t => t.RollbackAsync(cancellationToken), Times.Never);
+        _transactionMock.Verify(transaction => transaction.ExecuteAsync(
+            It.IsAny<Func<CancellationToken, Task<NoResponse>>>(), cancellationToken), Times.Never);
     }
 
     [Fact]
@@ -239,9 +239,8 @@ public class UpStreamBrokerTests
 
         // Assert
         handlerMock.Verify(h => h.HandleAsync(request, cancellationToken), Times.Once);
-        _transactionMock.Verify(t => t.BeginAsync(cancellationToken), Times.Once);
-        _transactionMock.Verify(t => t.CommitAsync(cancellationToken), Times.Once);
-        _transactionMock.Verify(t => t.RollbackAsync(cancellationToken), Times.Never);
+        _transactionMock.Verify(transaction => transaction.ExecuteAsync(
+            It.IsAny<Func<CancellationToken, Task<NoResponse>>>(), cancellationToken), Times.Once);
     }
 
     [Fact]
@@ -273,9 +272,8 @@ public class UpStreamBrokerTests
 
         // Assert
         await Assert.ThrowsAsync<InvalidOperationException>(Act);
-        _transactionMock.Verify(t => t.BeginAsync(cancellationToken), Times.Once);
-        _transactionMock.Verify(t => t.CommitAsync(cancellationToken), Times.Never);
-        _transactionMock.Verify(t => t.RollbackAsync(cancellationToken), Times.Once);
+        _transactionMock.Verify(transaction => transaction.ExecuteAsync(
+            It.IsAny<Func<CancellationToken, Task<NoResponse>>>(), cancellationToken), Times.Once);
     }
 
     [Fact]
@@ -337,9 +335,8 @@ public class UpStreamBrokerTests
         // Assert
         Assert.Equal(response, result);
         handlerMock.Verify(h => h.HandleAsync(request, cancellationToken), Times.Once);
-        _transactionMock.Verify(t => t.BeginAsync(cancellationToken), Times.Never);
-        _transactionMock.Verify(t => t.CommitAsync(cancellationToken), Times.Never);
-        _transactionMock.Verify(t => t.RollbackAsync(cancellationToken), Times.Never);
+        _transactionMock.Verify(transaction => transaction.ExecuteAsync(
+            It.IsAny<Func<CancellationToken, Task<string>>>(), cancellationToken), Times.Never);
     }
 
     [Fact]
@@ -368,9 +365,8 @@ public class UpStreamBrokerTests
 
         // Assert
         await Assert.ThrowsAsync<InvalidOperationException>(Act);
-        _transactionMock.Verify(t => t.BeginAsync(cancellationToken), Times.Never);
-        _transactionMock.Verify(t => t.CommitAsync(cancellationToken), Times.Never);
-        _transactionMock.Verify(t => t.RollbackAsync(cancellationToken), Times.Never);
+        _transactionMock.Verify(transaction => transaction.ExecuteAsync(
+            It.IsAny<Func<CancellationToken, Task<string>>>(), cancellationToken), Times.Never);
     }
 
     [Fact]
@@ -401,9 +397,8 @@ public class UpStreamBrokerTests
         // Assert
         Assert.Equal(response, result);
         handlerMock.Verify(h => h.HandleAsync(request, cancellationToken), Times.Once);
-        _transactionMock.Verify(t => t.BeginAsync(cancellationToken), Times.Once);
-        _transactionMock.Verify(t => t.CommitAsync(cancellationToken), Times.Once);
-        _transactionMock.Verify(t => t.RollbackAsync(cancellationToken), Times.Never);
+        _transactionMock.Verify(transaction => transaction.ExecuteAsync(
+            It.IsAny<Func<CancellationToken, Task<string>>>(), cancellationToken), Times.Once);
     }
 
     [Fact]
@@ -435,9 +430,8 @@ public class UpStreamBrokerTests
 
         // Assert
         await Assert.ThrowsAsync<InvalidOperationException>(Act);
-        _transactionMock.Verify(t => t.BeginAsync(cancellationToken), Times.Once);
-        _transactionMock.Verify(t => t.CommitAsync(cancellationToken), Times.Never);
-        _transactionMock.Verify(t => t.RollbackAsync(cancellationToken), Times.Once);
+        _transactionMock.Verify(transaction => transaction.ExecuteAsync(
+            It.IsAny<Func<CancellationToken, Task<string>>>(), cancellationToken), Times.Once);
     }
 
     [Fact]

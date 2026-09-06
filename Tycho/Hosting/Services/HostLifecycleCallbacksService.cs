@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Tycho.Utils;
 
 namespace Tycho.Hosting.Services
 {
@@ -16,6 +17,7 @@ namespace Tycho.Hosting.Services
             _callbacks = callbacks;
         }
 
+        [EntryPoint]
         public async Task StartingAsync(CancellationToken cancellationToken)
         {
             await using AsyncServiceScope scope = _scopeFactory.CreateAsyncScope();
@@ -30,6 +32,7 @@ namespace Tycho.Hosting.Services
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
+        [EntryPoint]
         public async Task StoppedAsync(CancellationToken cancellationToken)
         {
             await using AsyncServiceScope scope = _scopeFactory.CreateAsyncScope();
