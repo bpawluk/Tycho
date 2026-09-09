@@ -43,7 +43,7 @@
      limit, so publication eventually overflows the stack. Mapped routes can form equivalent cycles. Validate routing relationships or track visited module/
      event pairs during routing and report the cycle.
 
-  8. Medium — Identity changes when the defining assembly version changes.
+  8. DONE — Identity changes when the defining assembly version changes.
      /C:/Users/immal/source/repos/Tycho/Tycho/Identity/TypeIdentifier.cs:45
      Event, handler, and module identities hash AssemblyQualifiedName, including assembly version. Changing that version changes identities even when the
      event contract is unchanged. Previously serialized events can then fail deserialization or destination lookup. If compatibility across deployments is

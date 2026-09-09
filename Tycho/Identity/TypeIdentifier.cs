@@ -42,7 +42,8 @@ namespace Tycho.Identity
 
         private static string GetShortId(Type type)
         {
-            byte[] typeHash = Crc32.Hash(Encoding.UTF8.GetBytes(type.AssemblyQualifiedName));
+            string stableName = $"{type.Assembly.GetName().Name}:{type.FullName}";
+            byte[] typeHash = Crc32.Hash(Encoding.UTF8.GetBytes(stableName));
             return BitConverter.ToString(typeHash).Replace("-", "");
         }
     }
