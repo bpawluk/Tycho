@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Tycho.Structure
@@ -54,7 +55,8 @@ namespace Tycho.Structure
                 return _hostBuilder.Services.Any(descriptor => descriptor.ServiceType == serviceType);
             }
 
-            return GetService(serviceType) != null;
+            IServiceProviderIsService serviceProviderIsService = _host!.Services.GetRequiredService<IServiceProviderIsService>();
+            return serviceProviderIsService.IsService(serviceType);
         }
 
         public Task StartAsync(CancellationToken cancellationToken = default)

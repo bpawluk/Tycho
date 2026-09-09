@@ -1,4 +1,4 @@
- 1. High — Contract validation resolves scoped handlers from the root provider.
+ 1. DONE — Contract validation resolves scoped handlers from the root provider.
      /C:/Users/immal/source/repos/Tycho/Tycho/Structure/Internals.cs:57
      After building, HasService<T>() calls GetService(). A child module’s Requires<TRequest>() therefore constructs the parent’s request registration and
      its scoped handler merely to check availability. With scope validation enabled, this can prevent startup; otherwise, scoped dependencies are retained
