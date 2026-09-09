@@ -33,8 +33,7 @@ namespace Tycho.Requests.Registrating
             where TRequest : class, IRequest
             where TTargetRequest : class, IRequest
         {
-            AddDownStreamRegistration<TSourceModule, TRequest, MappedRequestExposer<TRequest, TTargetRequest>>();
-            Services.TryAddTransient(sp =>
+            AddDownStreamRegistration<TSourceModule, TRequest, MappedRequestExposer<TRequest, TTargetRequest>>(sp =>
                 new MappedRequestExposer<TRequest, TTargetRequest>(
                     sp.GetRequiredService<IParentReference>(),
                     map));
@@ -49,8 +48,7 @@ namespace Tycho.Requests.Registrating
         {
             AddDownStreamRegistration<
                 TSourceModule, TRequest, TResponse,
-                MappedRequestExposer<TRequest, TResponse, TTargetRequest, TTargetResponse>>();
-            Services.TryAddTransient(sp =>
+                MappedRequestExposer<TRequest, TResponse, TTargetRequest, TTargetResponse>>(sp =>
                 new MappedRequestExposer<TRequest, TResponse, TTargetRequest, TTargetResponse>(
                     sp.GetRequiredService<IParentReference>(),
                     mapRequest,
@@ -86,8 +84,7 @@ namespace Tycho.Requests.Registrating
         {
             AddDownStreamRegistration<
                 TSourceModule, TRequest,
-                MappedRequestForwarder<TRequest, TTargetRequest, TTargetModule>>();
-            Services.TryAddTransient(sp =>
+                MappedRequestForwarder<TRequest, TTargetRequest, TTargetModule>>(sp =>
                 new MappedRequestForwarder<TRequest, TTargetRequest, TTargetModule>(
                     sp.GetRequiredService<IModule<TTargetModule>>(),
                     map));
@@ -103,8 +100,7 @@ namespace Tycho.Requests.Registrating
         {
             AddDownStreamRegistration<
                 TSourceModule, TRequest, TResponse,
-                MappedRequestForwarder<TRequest, TResponse, TTargetRequest, TTargetResponse, TTargetModule>>();
-            Services.TryAddTransient(sp =>
+                MappedRequestForwarder<TRequest, TResponse, TTargetRequest, TTargetResponse, TTargetModule>>(sp =>
                 new MappedRequestForwarder<TRequest, TResponse, TTargetRequest, TTargetResponse, TTargetModule>(
                     sp.GetRequiredService<IModule<TTargetModule>>(),
                     mapRequest,
@@ -160,6 +156,23 @@ namespace Tycho.Requests.Registrating
             }
         }
 
+        private void AddDownStreamRegistration<TSourceModule, TRequest, THandler>(
+            Func<IServiceProvider, THandler> handlerFactory)
+            where TSourceModule : TychoModule
+            where TRequest : class, IRequest
+            where THandler : class, IRequestHandler<TRequest>
+        {
+            if (!TryAddRegistration<
+                    IDownStreamRequestRegistration<TRequest, TSourceModule>,
+                    DownStreamRequestRegistration<TRequest, THandler, TSourceModule>>(sp =>
+                        new DownStreamRequestRegistration<TRequest, THandler, TSourceModule>(handlerFactory(sp))))
+            {
+                throw new ArgumentException(
+                    $"Request handler for {typeof(TRequest).Name} is already registered",
+                    nameof(THandler));
+            }
+        }
+
         private void AddDownStreamRegistration<TSourceModule, TRequest, TResponse, THandler>()
             where TSourceModule : TychoModule
             where TRequest : class, IRequest<TResponse>
@@ -168,6 +181,23 @@ namespace Tycho.Requests.Registrating
             if (!TryAddRegistration<
                     IDownStreamRequestRegistration<TRequest, TResponse, TSourceModule>,
                     DownStreamRequestRegistration<TRequest, TResponse, THandler, TSourceModule>>())
+            {
+                throw new ArgumentException(
+                    $"Request handler for {typeof(TRequest).Name} is already registered",
+                    nameof(THandler));
+            }
+        }
+
+        private void AddDownStreamRegistration<TSourceModule, TRequest, TResponse, THandler>(
+            Func<IServiceProvider, THandler> handlerFactory)
+            where TSourceModule : TychoModule
+            where TRequest : class, IRequest<TResponse>
+            where THandler : class, IRequestHandler<TRequest, TResponse>
+        {
+            if (!TryAddRegistration<
+                    IDownStreamRequestRegistration<TRequest, TResponse, TSourceModule>,
+                    DownStreamRequestRegistration<TRequest, TResponse, THandler, TSourceModule>>(sp =>
+                        new DownStreamRequestRegistration<TRequest, TResponse, THandler, TSourceModule>(handlerFactory(sp))))
             {
                 throw new ArgumentException(
                     $"Request handler for {typeof(TRequest).Name} is already registered",

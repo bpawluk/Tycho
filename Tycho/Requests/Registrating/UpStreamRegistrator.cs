@@ -32,8 +32,7 @@ namespace Tycho.Requests.Registrating
             where TTargetRequest : class, IRequest
             where TTargetModule : TychoModule
         {
-            AddUpStreamRegistration<TRequest, MappedRequestForwarder<TRequest, TTargetRequest, TTargetModule>>();
-            Services.TryAddTransient(sp =>
+            AddUpStreamRegistration<TRequest, MappedRequestForwarder<TRequest, TTargetRequest, TTargetModule>>(sp =>
                 new MappedRequestForwarder<TRequest, TTargetRequest, TTargetModule>(
                     sp.GetRequiredService<IModule<TTargetModule>>(),
                     map));
@@ -48,8 +47,7 @@ namespace Tycho.Requests.Registrating
         {
             AddUpStreamRegistration<
                 TRequest, TResponse,
-                MappedRequestForwarder<TRequest, TResponse, TTargetRequest, TTargetResponse, TTargetModule>>();
-            Services.TryAddTransient(sp =>
+                MappedRequestForwarder<TRequest, TResponse, TTargetRequest, TTargetResponse, TTargetModule>>(sp =>
                 new MappedRequestForwarder<TRequest, TResponse, TTargetRequest, TTargetResponse, TTargetModule>(
                     sp.GetRequiredService<IModule<TTargetModule>>(),
                     mapRequest,
@@ -86,6 +84,22 @@ namespace Tycho.Requests.Registrating
             }
         }
 
+        private void AddUpStreamRegistration<TRequest, THandler>(
+            Func<IServiceProvider, THandler> handlerFactory)
+            where TRequest : class, IRequest
+            where THandler : class, IRequestHandler<TRequest>
+        {
+            if (!TryAddRegistration<
+                    IUpStreamRequestRegistration<TRequest>,
+                    UpStreamRequestRegistration<TRequest, THandler>>(sp =>
+                        new UpStreamRequestRegistration<TRequest, THandler>(handlerFactory(sp))))
+            {
+                throw new ArgumentException(
+                    $"Request handler for {typeof(TRequest).Name} already registered",
+                    nameof(THandler));
+            }
+        }
+
         private void AddUpStreamRegistration<TRequest, TResponse, THandler>()
             where TRequest : class, IRequest<TResponse>
             where THandler : class, IRequestHandler<TRequest, TResponse>
@@ -93,6 +107,22 @@ namespace Tycho.Requests.Registrating
             if (!TryAddRegistration<
                     IUpStreamRequestRegistration<TRequest, TResponse>,
                     UpStreamRequestRegistration<TRequest, TResponse, THandler>>())
+            {
+                throw new ArgumentException(
+                    $"Request handler for {typeof(TRequest).Name} already registered",
+                    nameof(THandler));
+            }
+        }
+
+        private void AddUpStreamRegistration<TRequest, TResponse, THandler>(
+            Func<IServiceProvider, THandler> handlerFactory)
+            where TRequest : class, IRequest<TResponse>
+            where THandler : class, IRequestHandler<TRequest, TResponse>
+        {
+            if (!TryAddRegistration<
+                    IUpStreamRequestRegistration<TRequest, TResponse>,
+                    UpStreamRequestRegistration<TRequest, TResponse, THandler>>(sp =>
+                        new UpStreamRequestRegistration<TRequest, TResponse, THandler>(handlerFactory(sp))))
             {
                 throw new ArgumentException(
                     $"Request handler for {typeof(TRequest).Name} already registered",

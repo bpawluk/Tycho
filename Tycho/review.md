@@ -5,7 +5,7 @@
      in the root scope. Forwarding registrations can also trigger premature construction of other modules. Check registration metadata without constructing
      services.
 
-  2. High — Different request bindings silently reuse the first mapping.
+  2. DONE — Different request bindings silently reuse the first mapping.
      /C:/Users/immal/source/repos/Tycho/Tycho/Requests/Registrating/DownStreamRegistrator.cs:90
      Registrations distinguish TSourceModule, but their mapped forwarder service types do not. TryAddTransient() retains the first factory. If modules A and
      B map the same request types to module C using different delegates, both execute A’s mapping. Mapped exposure has the same problem, and upstream/
