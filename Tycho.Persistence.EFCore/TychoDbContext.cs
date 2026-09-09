@@ -2,6 +2,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Tycho.Persistence.EFCore.Inbox;
 using Tycho.Persistence.EFCore.Outbox;
+using Tycho.Persistence.EFCore.Transactions;
 
 namespace Tycho.Persistence.EFCore;
 
@@ -10,6 +11,8 @@ namespace Tycho.Persistence.EFCore;
 /// </summary>
 public abstract class TychoDbContext : DbContext
 {
+    internal TransactionInterceptor TransactionInterceptor { get; } = new();
+
     /// <summary>
     /// The database schema name to use for Tycho tables. Return null to use the database default schema.
     /// </summary>
@@ -32,15 +35,18 @@ public abstract class TychoDbContext : DbContext
     public TychoDbContext(DbContextOptions options) : base(options) { }
 
     /// <inheritdoc/>
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+        optionsBuilder.AddInterceptors(TransactionInterceptor);
+    }
+
+    /// <inheritdoc/>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
-        modelBuilder.Entity<InboxEntry>()
-                    .ToTable(InboxTableName, Schema);
-
-        modelBuilder.Entity<OutboxEntry>()
-                    .ToTable(OutboxTableName, Schema);
+        modelBuilder.Entity<InboxEntry>().ToTable(InboxTableName, Schema);
+        modelBuilder.Entity<OutboxEntry>().ToTable(OutboxTableName, Schema);
     }
 
     private string GetDbContextName()

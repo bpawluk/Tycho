@@ -3,6 +3,7 @@ using Tycho.Events.Inbox;
 using Tycho.Events.Outbox;
 using Tycho.Persistence.EFCore.Inbox;
 using Tycho.Persistence.EFCore.Outbox;
+using Tycho.Persistence.EFCore.Transactions;
 using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore;
@@ -21,7 +22,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddDbContext<TDbContext>()
                 .AddScoped<TychoDbContext>(sp => sp.GetRequiredService<TDbContext>())
-                .AddScoped<ITransaction, Transactions.Transaction>()
+                .AddScoped<ITransaction, Transaction>()
                 .AddTransient<IOutboxWriter, OutboxWriter>()
                 .AddTransient<IOutboxConsumer, OutboxConsumer>()
                 .AddTransient<IInboxWriter, InboxWriter>()

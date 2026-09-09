@@ -6,10 +6,6 @@ namespace Tycho.Transactions
 {
     internal class EmptyTransaction : ITransaction
     {
-        public bool IsInProgress => false;
-
-        public void ExecuteAfterCommit(Action action) { }
-
         public Task ExecuteAsync(Func<CancellationToken, Task> operation, CancellationToken cancellationToken)
         {
             throw new InvalidOperationException("No transaction provider is configured.");

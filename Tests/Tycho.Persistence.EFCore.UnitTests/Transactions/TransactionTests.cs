@@ -11,9 +11,10 @@ namespace Tycho.Persistence.EFCore.UnitTests.Transactions;
 
 public sealed class TransactionTests : IAsyncLifetime
 {
-    private DbContextOptions<TestDbContext> _dbContextOptions = default!;
-    private TestDbContext _dbContext = default!;
     private SqliteConnection _connection = default!;
+    private DbContextOptions<TestDbContext> _dbOptions = default!;
+    private TestDbContext _dbContext = default!;
+
     private Transaction _sut = default!;
 
     public async ValueTask InitializeAsync()
@@ -21,37 +22,62 @@ public sealed class TransactionTests : IAsyncLifetime
         _connection = new SqliteConnection("Data Source=:memory:");
         await _connection.OpenAsync();
 
-        _dbContextOptions = new DbContextOptionsBuilder<TestDbContext>()
+        _dbOptions = new DbContextOptionsBuilder<TestDbContext>()
             .UseSqlite(_connection)
             .Options;
 
-        _dbContext = new TestDbContext(_dbContextOptions);
+        _dbContext = new TestDbContext(_dbOptions);
         await _dbContext.Database.EnsureCreatedAsync();
+
         _sut = new Transaction(_dbContext);
     }
 
     [Fact]
-    public void ExecuteAfterCommit_WithNullAction_Throws()
+    public async Task ExecuteAsync_CommitsChanges()
     {
         // Act
-        void Act() => _sut.ExecuteAfterCommit(null!);
+        await _sut.ExecuteAsync(async cancellationToken =>
+        {
+            Assert.NotNull(_dbContext.Database.CurrentTransaction);
+            _dbContext.Set<OutboxEntry>().Add(CreateOutboxEntry());
+            await Task.Yield();
+        }, TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.Throws<ArgumentNullException>(Act);
+        Assert.Null(_dbContext.Database.CurrentTransaction);
+        Assert.Equal(1, await CountPersistedOutboxEntries());
+    }
+
+    [Fact]
+    public async Task ExecuteAsyncForResult_CommitsChangesAndReturnsResult()
+    {
+        // Act
+        string result = await _sut.ExecuteAsync(async cancellationToken =>
+        {
+            Assert.NotNull(_dbContext.Database.CurrentTransaction);
+            _dbContext.Set<OutboxEntry>().Add(CreateOutboxEntry());
+            await Task.Yield();
+            return "response";
+        }, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal("response", result);
+        Assert.Null(_dbContext.Database.CurrentTransaction);
+        Assert.Equal(1, await CountPersistedOutboxEntries());
     }
 
     [Fact]
     public async Task ExecuteAsync_WithNullOperation_Throws()
     {
         // Act
-        Task Act() => _sut.ExecuteAsync((Func<CancellationToken, Task>)null!, TestContext.Current.CancellationToken);
+        Task Act() => _sut.ExecuteAsync(null!, TestContext.Current.CancellationToken);
 
         // Assert
         await Assert.ThrowsAsync<ArgumentNullException>(Act);
     }
 
     [Fact]
-    public async Task ExecuteAsync_WithResultAndNullOperation_Throws()
+    public async Task ExecuteAsyncForResult_WithNullOperation_Throws()
     {
         // Act
         Task Act() => _sut.ExecuteAsync<string>(null!, TestContext.Current.CancellationToken);
@@ -61,56 +87,17 @@ public sealed class TransactionTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task ExecuteAsync_CommitsChangesReturnsResultAndRunsCallbacksAfterCleanup()
+    public async Task ExecuteAsync_WhenOperationFails_RollsBackAndClearsTrackedState()
     {
-        // Arrange
-        var calls = new List<string>();
-
-        // Act
-        string result = await _sut.ExecuteAsync(async cancellationToken =>
-        {
-            Assert.True(_sut.IsInProgress);
-            Assert.NotNull(_dbContext.Database.CurrentTransaction);
-            _dbContext.Set<OutboxEntry>().Add(CreateOutboxEntry());
-            _sut.ExecuteAfterCommit(() =>
-            {
-                Assert.False(_sut.IsInProgress);
-                Assert.Null(_dbContext.Database.CurrentTransaction);
-                calls.Add("callback");
-            });
-            calls.Add("operation");
-            await Task.Yield();
-            return "response";
-        }, TestContext.Current.CancellationToken);
-
-        // Assert
-        Assert.Equal("response", result);
-        Assert.Equal(["operation", "callback"], calls);
-        Assert.False(_sut.IsInProgress);
-        Assert.Null(_dbContext.Database.CurrentTransaction);
-        Assert.Equal(1, await CountPersistedOutboxEntries());
-    }
-
-    [Fact]
-    public async Task ExecuteAsync_WhenOperationFails_RollsBackClearsTrackedStateAndDoesNotRunCallback()
-    {
-        // Arrange
-        int callbackCount = 0;
-
         // Act
         Task Act() => _sut.ExecuteAsync(cancellationToken =>
         {
             _dbContext.Set<OutboxEntry>().Add(CreateOutboxEntry());
-            _sut.ExecuteAfterCommit(() => callbackCount++);
             throw new InvalidOperationException("handler failure");
         }, TestContext.Current.CancellationToken);
 
-        InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(Act);
-
         // Assert
-        Assert.Equal("handler failure", exception.Message);
-        Assert.Equal(0, callbackCount);
-        Assert.False(_sut.IsInProgress);
+        await Assert.ThrowsAsync<InvalidOperationException>(Act);
         Assert.Null(_dbContext.Database.CurrentTransaction);
         Assert.Empty(_dbContext.ChangeTracker.Entries());
         Assert.Equal(0, await CountPersistedOutboxEntries());
@@ -129,6 +116,7 @@ public sealed class TransactionTests : IAsyncLifetime
 
         // Assert
         await Assert.ThrowsAsync<InvalidOperationException>(Act);
+        Assert.Null(_dbContext.Database.CurrentTransaction);
         Assert.Empty(_dbContext.ChangeTracker.Entries());
         Assert.Equal(0, await CountPersistedOutboxEntries());
     }
@@ -156,7 +144,7 @@ public sealed class TransactionTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task ExecuteAsync_WithConfiguredRetryStrategy_SuppressesRetriesOnlyInsideTransaction()
+    public async Task ExecuteAsync_WithConfiguredRetryStrategy_SuppressesRetriesInsideTransaction()
     {
         // Arrange
         DbContextOptions<TestDbContext> options = new DbContextOptionsBuilder<TestDbContext>()
@@ -164,83 +152,26 @@ public sealed class TransactionTests : IAsyncLifetime
                 _connection,
                 sqlite => sqlite.ExecutionStrategy(dependencies => new TestRetryingExecutionStrategy(dependencies)))
             .Options;
-
         await using var dbContext = new TestDbContext(options);
-        var sut = new Transaction(dbContext);
-        IExecutionStrategy configuredStrategy = dbContext.Database.CreateExecutionStrategy();
-
-        Assert.True(configuredStrategy.RetriesOnFailure);
 
         int operationCount = 0;
+        var sut = new Transaction(dbContext);
+
+        // Assert
+        Assert.True(dbContext.Database.CreateExecutionStrategy().RetriesOnFailure);
 
         // Act
-        await sut.ExecuteAsync(cancellationToken =>
+        async Task Act() => await sut.ExecuteAsync(cancellationToken =>
         {
             operationCount++;
             Assert.False(dbContext.Database.CreateExecutionStrategy().RetriesOnFailure);
-            dbContext.Set<OutboxEntry>().Add(CreateOutboxEntry());
-            return Task.CompletedTask;
-        }, TestContext.Current.CancellationToken);
-
-        // Assert
-        Assert.Equal(1, operationCount);
-        Assert.True(dbContext.Database.CreateExecutionStrategy().RetriesOnFailure);
-        Assert.Equal(1, await CountPersistedOutboxEntries());
-    }
-
-    [Fact]
-    public async Task ConfiguredRetryStrategy_OutsideTransaction_RetriesNormally()
-    {
-        // Arrange
-        DbContextOptions<TestDbContext> options = new DbContextOptionsBuilder<TestDbContext>()
-            .UseSqlite(
-                _connection,
-                sqlite => sqlite.ExecutionStrategy(dependencies => new TestRetryingExecutionStrategy(dependencies)))
-            .Options;
-
-        await using var dbContext = new TestDbContext(options);
-        IExecutionStrategy configuredStrategy = dbContext.Database.CreateExecutionStrategy();
-        int operationCount = 0;
-
-        // Act
-        int result = await configuredStrategy.ExecuteAsync(() =>
-        {
-            operationCount++;
-            return operationCount == 1
-                ? Task.FromException<int>(new TestTransientException())
-                : Task.FromResult(42);
-        });
-
-        // Assert
-        Assert.Equal(42, result);
-        Assert.Equal(2, operationCount);
-    }
-
-    [Fact]
-    public async Task ExecuteAsync_WhenOperationHasTransientFailure_DoesNotReplayOperation()
-    {
-        // Arrange
-        DbContextOptions<TestDbContext> options = new DbContextOptionsBuilder<TestDbContext>()
-            .UseSqlite(
-                _connection,
-                sqlite => sqlite.ExecutionStrategy(dependencies => new TestRetryingExecutionStrategy(dependencies)))
-            .Options;
-
-        await using var dbContext = new TestDbContext(options);
-        var sut = new Transaction(dbContext);
-        int operationCount = 0;
-
-        // Act
-        Task Act() => sut.ExecuteAsync(cancellationToken =>
-        {
-            operationCount++;
-            throw new TestTransientException();
+            return Task.FromException<int>(new TestTransientException());
         }, TestContext.Current.CancellationToken);
 
         // Assert
         await Assert.ThrowsAsync<TestTransientException>(Act);
         Assert.Equal(1, operationCount);
-        Assert.Null(dbContext.Database.CurrentTransaction);
+        Assert.True(dbContext.Database.CreateExecutionStrategy().RetriesOnFailure);
     }
 
     [Fact]
@@ -252,11 +183,12 @@ public sealed class TransactionTests : IAsyncLifetime
                 _connection,
                 sqlite => sqlite.ExecutionStrategy(dependencies => new TestRetryingExecutionStrategy(dependencies)))
             .Options;
-
         await using var dbContext = new TestDbContext(options);
-        var sut = new Transaction(dbContext);
+
         IExecutionStrategy outerStrategy = dbContext.Database.CreateExecutionStrategy();
+
         int operationCount = 0;
+        var sut = new Transaction(dbContext);
 
         // Act
         Task Act() => outerStrategy.ExecuteAsync(() => sut.ExecuteAsync(cancellationToken =>
@@ -267,8 +199,7 @@ public sealed class TransactionTests : IAsyncLifetime
 
         // Assert
         InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(Act);
-
-        Assert.Contains("active retrying EF Core execution strategy", exception.Message);
+        Assert.Equal("Transactions managed by Tycho cannot execute inside an active retrying EF Core execution strategy.", exception.Message);
         Assert.Equal(0, operationCount);
         Assert.Null(dbContext.Database.CurrentTransaction);
     }
@@ -277,18 +208,14 @@ public sealed class TransactionTests : IAsyncLifetime
     public async Task ExecuteAsync_AfterOneExecution_RejectsReuse()
     {
         // Arrange
-        await _sut.ExecuteAsync(
-            cancellationToken => Task.CompletedTask,
-            TestContext.Current.CancellationToken);
+        await _sut.ExecuteAsync(cancellationToken => Task.CompletedTask, TestContext.Current.CancellationToken);
 
         // Act
-        Task Act() => _sut.ExecuteAsync(
-            cancellationToken => Task.CompletedTask,
-            TestContext.Current.CancellationToken);
+        Task Act() => _sut.ExecuteAsync(cancellationToken => Task.CompletedTask, TestContext.Current.CancellationToken);
 
         // Assert
         InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(Act);
-        Assert.Contains("already been executed", exception.Message);
+        Assert.Equal("This transaction has already been executed or is currently in progress.", exception.Message);
     }
 
     [Fact]
@@ -308,35 +235,31 @@ public sealed class TransactionTests : IAsyncLifetime
 
         // Assert
         await Assert.ThrowsAnyAsync<OperationCanceledException>(Act);
-        Assert.False(_sut.IsInProgress);
         Assert.Null(_dbContext.Database.CurrentTransaction);
         Assert.Empty(_dbContext.ChangeTracker.Entries());
         Assert.Equal(0, await CountPersistedOutboxEntries());
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenDisposalFailsAfterCommit_ReturnsResultAndRunsCallbacks()
+    public async Task ExecuteAsync_WhenDisposalFailsAfterCommit_ReturnsResult()
     {
         // Arrange
         var disposalFailure = new InvalidOperationException("disposal failure");
         Mock<IDbContextTransaction> transaction = InjectCleanupFailures(disposeFailure: disposalFailure);
+
         var logger = new Mock<ILogger<Transaction>>();
         var sut = new Transaction(_dbContext, logger.Object);
-        int callbackCount = 0;
 
         // Act
         int result = await sut.ExecuteAsync(cancellationToken =>
         {
             _dbContext.Set<OutboxEntry>().Add(CreateOutboxEntry());
-            sut.ExecuteAfterCommit(() => callbackCount++);
             return Task.FromResult(42);
         }, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(42, result);
-        Assert.Equal(1, callbackCount);
         Assert.Equal(1, await CountPersistedOutboxEntries());
-        Assert.False(sut.IsInProgress);
         transaction.Verify(t => t.RollbackAsync(It.IsAny<CancellationToken>()), Times.Never);
         VerifyLoggedFailure(logger, disposalFailure);
     }
@@ -347,21 +270,19 @@ public sealed class TransactionTests : IAsyncLifetime
         // Arrange
         var commitFailure = new InvalidOperationException("commit failure");
         Mock<IDbContextTransaction> transaction = InjectCleanupFailures(commitFailure: commitFailure);
-        int callbackCount = 0;
+
         var sut = new Transaction(_dbContext);
 
         // Act
         Task Act() => sut.ExecuteAsync(cancellationToken =>
         {
             _dbContext.Set<OutboxEntry>().Add(CreateOutboxEntry());
-            sut.ExecuteAfterCommit(() => callbackCount++);
             return Task.CompletedTask;
         }, TestContext.Current.CancellationToken);
 
         // Assert
         InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(Act);
         Assert.Same(commitFailure, exception);
-        Assert.Equal(0, callbackCount);
         Assert.Empty(_dbContext.ChangeTracker.Entries());
         Assert.Equal(0, await CountPersistedOutboxEntries());
         transaction.Verify(t => t.RollbackAsync(CancellationToken.None), Times.Once);
@@ -376,17 +297,16 @@ public sealed class TransactionTests : IAsyncLifetime
         var rollbackFailure = new InvalidOperationException("rollback failure");
         var disposalFailure = new InvalidOperationException("disposal failure");
         Mock<IDbContextTransaction> transaction = InjectCleanupFailures(rollbackFailure, disposalFailure);
+
         var logger = new Mock<ILogger<Transaction>>();
         var sut = new Transaction(_dbContext, logger.Object);
         using var cancellationSource = new CancellationTokenSource();
-        int callbackCount = 0;
 
         // Act
         Task Act() => sut.ExecuteAsync(async cancellationToken =>
         {
             _dbContext.Set<OutboxEntry>().Add(CreateOutboxEntry());
             await _dbContext.SaveChangesAsync(cancellationToken);
-            sut.ExecuteAfterCommit(() => callbackCount++);
             cancellationSource.Cancel();
             throw operationFailure;
         }, cancellationSource.Token);
@@ -397,55 +317,24 @@ public sealed class TransactionTests : IAsyncLifetime
         Assert.Same(operationFailure, exception);
         VerifyLoggedFailure(logger, rollbackFailure);
         VerifyLoggedFailure(logger, disposalFailure);
-        Assert.Equal(0, callbackCount);
         Assert.Empty(_dbContext.ChangeTracker.Entries());
         Assert.Equal(0, await CountPersistedOutboxEntries());
-        Assert.False(sut.IsInProgress);
         Assert.Null(_dbContext.Database.CurrentTransaction);
         transaction.Verify(t => t.RollbackAsync(CancellationToken.None), Times.Once);
         transaction.Verify(t => t.DisposeAsync(), Times.Once);
-        await Assert.ThrowsAsync<InvalidOperationException>(() => sut.ExecuteAsync(
-            _ => Task.CompletedTask, TestContext.Current.CancellationToken));
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCallbackFails_ContinuesNotificationsAndPreservesSuccess()
-    {
-        // Arrange
-        var callbackFailure = new InvalidOperationException("callback failure");
-        var logger = new Mock<ILogger<Transaction>>();
-        var sut = new Transaction(_dbContext, logger.Object);
-        int callbackCount = 0;
-
-        // Act
-        int result = await sut.ExecuteAsync(cancellationToken =>
-        {
-            _dbContext.Set<OutboxEntry>().Add(CreateOutboxEntry());
-            sut.ExecuteAfterCommit(() => throw callbackFailure);
-            sut.ExecuteAfterCommit(() => callbackCount++);
-            return Task.FromResult(42);
-        }, TestContext.Current.CancellationToken);
-
-        // Assert
-        Assert.Equal(42, result);
-        Assert.Equal(1, callbackCount);
-        Assert.Equal(1, await CountPersistedOutboxEntries());
-        VerifyLoggedFailure(logger, callbackFailure);
-    }
-
-    [Fact]
-    public async Task ExecuteAsync_WithOverlappingCalls_RejectsSecondOperationAndPreservesFirstCallbacks()
+    public async Task ExecuteAsync_WithOverlappingCalls_RejectsSecondOperation()
     {
         // Arrange
         var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var resume = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        int callbackCount = 0;
 
         // Act
         Task execution = _sut.ExecuteAsync(async cancellationToken =>
         {
             _dbContext.Set<OutboxEntry>().Add(CreateOutboxEntry());
-            _sut.ExecuteAfterCommit(() => callbackCount++);
             entered.SetResult();
             await resume.Task.WaitAsync(cancellationToken);
         }, TestContext.Current.CancellationToken);
@@ -453,7 +342,6 @@ public sealed class TransactionTests : IAsyncLifetime
         await entered.Task.WaitAsync(TestContext.Current.CancellationToken);
         try
         {
-            Assert.True(_sut.IsInProgress);
             Assert.NotNull(_dbContext.Database.CurrentTransaction);
             int secondOperationCount = 0;
             await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.ExecuteAsync(_ =>
@@ -470,9 +358,7 @@ public sealed class TransactionTests : IAsyncLifetime
         }
 
         // Assert
-        Assert.Equal(1, callbackCount);
         Assert.Equal(1, await CountPersistedOutboxEntries());
-        Assert.False(_sut.IsInProgress);
         Assert.Null(_dbContext.Database.CurrentTransaction);
     }
 
@@ -491,7 +377,6 @@ public sealed class TransactionTests : IAsyncLifetime
                 return Task.CompletedTask;
             }, cancellationToken));
 
-            Assert.True(_sut.IsInProgress);
             _dbContext.Set<OutboxEntry>().Add(CreateOutboxEntry());
         }, TestContext.Current.CancellationToken);
 
@@ -506,24 +391,28 @@ public sealed class TransactionTests : IAsyncLifetime
         Exception? commitFailure = null)
     {
         DatabaseFacade database = _dbContext.Database;
-        var databaseMock = new Mock<DatabaseFacade>(_dbContext) { CallBase = true };
         var transactionMock = new Mock<IDbContextTransaction>();
+        var databaseMock = new Mock<DatabaseFacade>(_dbContext) { CallBase = true };
 
-        databaseMock.Setup(d => d.BeginTransactionAsync(It.IsAny<CancellationToken>()))
+        databaseMock
+            .Setup(d => d.BeginTransactionAsync(It.IsAny<CancellationToken>()))
             .Returns(async (CancellationToken cancellationToken) =>
             {
                 IDbContextTransaction transaction = await database.BeginTransactionAsync(cancellationToken);
-                transactionMock.Setup(t => t.CommitAsync(It.IsAny<CancellationToken>()))
+
+                transactionMock
+                    .Setup(t => t.CommitAsync(It.IsAny<CancellationToken>()))
                     .Returns(async (CancellationToken token) =>
                     {
                         if (commitFailure is not null)
                         {
                             throw commitFailure;
                         }
-
                         await transaction.CommitAsync(token);
                     });
-                transactionMock.Setup(t => t.RollbackAsync(It.IsAny<CancellationToken>()))
+
+                transactionMock
+                    .Setup(t => t.RollbackAsync(It.IsAny<CancellationToken>()))
                     .Returns(async (CancellationToken token) =>
                     {
                         await transaction.RollbackAsync(token);
@@ -532,14 +421,18 @@ public sealed class TransactionTests : IAsyncLifetime
                             throw rollbackFailure;
                         }
                     });
-                transactionMock.Setup(t => t.DisposeAsync()).Returns(async () =>
-                {
-                    await transaction.DisposeAsync();
-                    if (disposeFailure is not null)
+
+                transactionMock
+                    .Setup(t => t.DisposeAsync())
+                    .Returns(async () =>
                     {
-                        throw disposeFailure;
-                    }
-                });
+                        await transaction.DisposeAsync();
+                        if (disposeFailure is not null)
+                        {
+                            throw disposeFailure;
+                        }
+                    });
+
                 return transactionMock.Object;
             });
 
@@ -559,7 +452,7 @@ public sealed class TransactionTests : IAsyncLifetime
 
     private async Task<int> CountPersistedOutboxEntries()
     {
-        await using var verificationDbContext = new TestDbContext(_dbContextOptions);
+        await using var verificationDbContext = new TestDbContext(_dbOptions);
         return await verificationDbContext.Set<OutboxEntry>().AsNoTracking().CountAsync();
     }
 
@@ -591,8 +484,7 @@ public sealed class TransactionTests : IAsyncLifetime
         public override DatabaseFacade Database => DatabaseOverride ?? base.Database;
     }
 
-    private sealed class TestRetryingExecutionStrategy(ExecutionStrategyDependencies dependencies)
-        : ExecutionStrategy(dependencies, 1, TimeSpan.Zero)
+    private sealed class TestRetryingExecutionStrategy(ExecutionStrategyDependencies dependencies) : ExecutionStrategy(dependencies, 1, TimeSpan.Zero)
     {
         protected override bool ShouldRetryOn(Exception exception) => exception is TestTransientException;
     }

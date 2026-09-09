@@ -2,20 +2,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Storage;
 using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Events.Serialization;
-using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.Outbox;
 
 internal class OutboxWriter(
-    ITransaction transaction,
     IEventSerializer eventSerializer,
     OutboxActivity outboxActivity,
     TychoDbContext dbContext) : IOutboxWriter
 {
-    private readonly ITransaction _transaction = transaction;
     private readonly IEventSerializer _eventSerializer = eventSerializer;
     private readonly OutboxActivity _outboxActivity = outboxActivity;
     private readonly TychoDbContext _dbContext = dbContext;
@@ -38,14 +36,18 @@ internal class OutboxWriter(
 
         _dbContext.Set<OutboxEntry>().AddRange(outboxEntries);
 
-        if (_transaction.IsInProgress)
+        if (System.Transactions.Transaction.Current is not null)
         {
-            _transaction.ExecuteAfterCommit(_outboxActivity.NotifyNewEntriesAdded);
+            return;
         }
-        else
+
+        if (_dbContext.Database.CurrentTransaction is IDbContextTransaction transaction)
         {
-            await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-            _outboxActivity.NotifyNewEntriesAdded();
+            _dbContext.TransactionInterceptor.ExecuteAfterCommit(transaction.TransactionId, _outboxActivity.NotifyNewEntriesAdded);
+            return;
         }
+
+        await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        _outboxActivity.NotifyNewEntriesAdded();
     }
 }

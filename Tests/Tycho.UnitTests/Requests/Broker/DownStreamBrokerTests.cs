@@ -261,9 +261,6 @@ public class DownStreamBrokerTests
         var request = new TestRequest();
         var cancellationToken = new CancellationToken();
 
-        _transactionMock.SetupGet(t => t.IsInProgress)
-                        .Returns(true);
-
         var handlerMock = new Mock<ITransactionalRequestHandler<TestRequest>>();
         handlerMock.Setup(h => h.HandleAsync(request, cancellationToken))
                    .Returns(Task.CompletedTask);
@@ -290,9 +287,6 @@ public class DownStreamBrokerTests
         // Arrange
         var request = new TestRequest();
         var cancellationToken = new CancellationToken();
-
-        _transactionMock.SetupGet(t => t.IsInProgress)
-                        .Returns(true);
 
         var handlerMock = new Mock<ITransactionalRequestHandler<TestRequest>>();
         handlerMock.Setup(h => h.HandleAsync(request, cancellationToken))
@@ -418,9 +412,6 @@ public class DownStreamBrokerTests
         string response = "success";
         var cancellationToken = new CancellationToken();
 
-        _transactionMock.SetupGet(t => t.IsInProgress)
-                        .Returns(true);
-
         var handlerMock = new Mock<ITransactionalRequestHandler<TestRequestWithResponse, string>>();
         handlerMock.Setup(h => h.HandleAsync(request, cancellationToken))
                    .ReturnsAsync(response);
@@ -448,9 +439,6 @@ public class DownStreamBrokerTests
         // Arrange
         var request = new TestRequestWithResponse();
         var cancellationToken = new CancellationToken();
-
-        _transactionMock.SetupGet(t => t.IsInProgress)
-                        .Returns(true);
 
         var handlerMock = new Mock<ITransactionalRequestHandler<TestRequestWithResponse, string>>();
         handlerMock.Setup(h => h.HandleAsync(request, cancellationToken))

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -16,16 +15,7 @@ internal sealed class Transaction(TychoDbContext dbContext, ILogger<Transaction>
     private const int Finished = 2;
 
     private readonly TychoDbContext _dbContext = dbContext;
-    private readonly ConcurrentBag<Action> _afterCommitActions = [];
-
     private int _executionState;
-    public bool IsInProgress => Volatile.Read(ref _executionState) == InProgress;
-
-    public void ExecuteAfterCommit(Action action)
-    {
-        ArgumentNullException.ThrowIfNull(action);
-        _afterCommitActions.Add(action);
-    }
 
     public async Task ExecuteAsync(Func<CancellationToken, Task> operation, CancellationToken cancellationToken)
     {
@@ -63,7 +53,6 @@ internal sealed class Transaction(TychoDbContext dbContext, ILogger<Transaction>
             Volatile.Write(ref _executionState, Finished);
         }
 
-        RunAfterCommitActions();
         return result;
     }
 
@@ -105,21 +94,6 @@ internal sealed class Transaction(TychoDbContext dbContext, ILogger<Transaction>
             catch (Exception exception)
             {
                 logger?.LogError(exception, "Failed to dispose the transaction.");
-            }
-        }
-    }
-
-    private void RunAfterCommitActions()
-    {
-        foreach (Action action in _afterCommitActions)
-        {
-            try
-            {
-                action();
-            }
-            catch (Exception exception)
-            {
-                logger?.LogError(exception, "Failed to run an after-commit action.");
             }
         }
     }
