@@ -72,18 +72,13 @@ namespace Tycho.Processor
             _ = RemoveWhenCompletedAsync(task);
         }
 
-        public Task StopAsync()
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
             Task stopTask;
 
             lock (_sync)
             {
-                if (_stopTask != null)
-                {
-                    return _stopTask;
-                }
-
-                _stopTask = Task.WhenAll(_runningJobs.ToArray());
+                _stopTask ??= Task.WhenAll(_runningJobs.ToArray());
                 stopTask = _stopTask;
             }
 
@@ -96,7 +91,7 @@ namespace Tycho.Processor
                 ReportError(exception);
             }
 
-            return stopTask;
+            await stopTask.WaitWithCancellationAsync(cancellationToken).ConfigureAwait(false);
         }
 
         private async Task RunJobAsync(IJob job)

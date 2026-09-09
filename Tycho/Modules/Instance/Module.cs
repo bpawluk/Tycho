@@ -30,9 +30,9 @@ namespace Tycho.Modules.Instance
             _requestBroker = new UpStreamBroker(_internals);
         }
 
-        public Task StartAsync(CancellationToken cancellationToken = default) => _internals.StartAsync(cancellationToken);
+        public Task StartAsync(CancellationToken cancellationToken) => _internals.StartAsync(cancellationToken);
 
-        public Task StopAsync(CancellationToken cancellationToken = default) => _internals.StopAsync(cancellationToken);
+        public Task StopAsync(CancellationToken cancellationToken) => _internals.StopAsync(cancellationToken);
 
         public void Dispose() => _internals.Dispose();
     }

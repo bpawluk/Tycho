@@ -40,7 +40,7 @@ namespace Tycho.Events.Outbox
         public Task StopAsync(CancellationToken cancellationToken)
         {
             _outboxActivity.NewEntriesAdded -= OnEntriesAdded;
-            return _jobProcessor.StopAsync();
+            return _jobProcessor.StopAsync(cancellationToken);
         }
 
         public void Dispose()

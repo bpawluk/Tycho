@@ -93,7 +93,7 @@ namespace Tycho.Events.Inbox
             }
             catch (Exception exception)
             {
-                logger?.LogError(exception, "Failed to process inbox entry with ID {entryId}", _event.EventId);
+                logger?.LogError(exception, "Failed to process inbox entry with ID {entryId}", _event!.EventId);
                 return false;
             }
         }

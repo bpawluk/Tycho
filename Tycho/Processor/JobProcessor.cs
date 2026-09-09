@@ -85,7 +85,7 @@ namespace Tycho.Processor
             _processingSuspender.TryResume();
         }
 
-        public async Task StopAsync()
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
             Task? processingTask;
             bool shouldCancelProcessing;
@@ -102,11 +102,17 @@ namespace Tycho.Processor
                 _processingCts.Cancel();
             }
 
-            if (processingTask != null)
+            try
             {
-                await processingTask.ConfigureAwait(false);
+                if (processingTask != null)
+                {
+                    await processingTask.WaitWithCancellationAsync(cancellationToken).ConfigureAwait(false);
+                }
             }
-            await _jobRunner.StopAsync().ConfigureAwait(false);
+            finally
+            {
+                await _jobRunner.StopAsync(cancellationToken).ConfigureAwait(false);
+            }
         }
 
         private async Task Process()

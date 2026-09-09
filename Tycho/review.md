@@ -19,7 +19,7 @@
      which fails for resolved services that implement only IAsyncDisposable. Separate routing metadata from handler resolution; instantiate the selected
      handler during inbox processing.
 
-  4. High — Shutdown can wait indefinitely despite cancellation.
+  4. DONE — Shutdown can wait indefinitely despite cancellation.
      /C:/Users/immal/source/repos/Tycho/Tycho/Events/Inbox/InboxProcessor.cs:40, /C:/Users/immal/source/repos/Tycho/Tycho/Processor/JobRunner.cs:86
      Both processors ignore the token passed to StopAsync(). The runner waits for every running job, while its timeout only requests cancellation. A handler
      that does not observe cancellation can therefore prevent shutdown indefinitely. A stuck queue read similarly blocks JobProcessor.StopAsync(). Propagate

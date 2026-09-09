@@ -66,7 +66,7 @@ namespace Tycho.Structure
             return _host!.StartAsync(cancellationToken);
         }
 
-        public Task StopAsync(CancellationToken cancellationToken = default)
+        public Task StopAsync(CancellationToken cancellationToken)
         {
             ThrowIfDisposed();
             ThrowIfNotBuilt();

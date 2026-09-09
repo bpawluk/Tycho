@@ -10,6 +10,6 @@ namespace Tycho.Processor
 
         void Run(IJob job);
 
-        Task StopAsync();
+        Task StopAsync(CancellationToken cancellationToken);
     }
 }

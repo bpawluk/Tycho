@@ -40,7 +40,7 @@ namespace Tycho.Events.Inbox
         public Task StopAsync(CancellationToken cancellationToken)
         {
             _inboxActivity.NewEntriesAdded -= OnEntriesAdded;
-            return _jobProcessor.StopAsync();
+            return _jobProcessor.StopAsync(cancellationToken);
         }
 
         public void Dispose()
