@@ -14,6 +14,17 @@ namespace Tycho.Identity
 
         public static string GetId(Type type)
         {
+            if (type.IsArray)
+            {
+                string elementId = GetId(type.GetElementType()!);
+                string arraySuffix = type.IsSZArray
+                    ? "[]"
+                    : type.GetArrayRank() == 1
+                        ? "[*]"
+                        : $"[{new string(',', type.GetArrayRank() - 1)}]";
+                return $"{elementId}{arraySuffix}";
+            }
+
             if (type.IsGenericParameter)
             {
                 return type.Name;
