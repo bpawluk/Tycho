@@ -28,9 +28,14 @@ namespace Tycho.Events.Outbox.InMemory
                 return Task.CompletedTask;
             }
 
+            var serializedEvents = new List<SerializedRoutedEvent>(routedEvents.Count);
             foreach (RoutedEvent routedEvent in routedEvents)
             {
-                SerializedRoutedEvent serializedEvent = _eventSerializer.Serialize(routedEvent);
+                serializedEvents.Add(_eventSerializer.Serialize(routedEvent));
+            }
+
+            foreach (SerializedRoutedEvent serializedEvent in serializedEvents)
+            {
                 _entries.Enqueue(serializedEvent);
             }
             _outboxActivity.NotifyNewEntriesAdded();
