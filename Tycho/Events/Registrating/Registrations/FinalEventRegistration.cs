@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Tycho.Events.Model;
 using Tycho.Identity.Events;
 
@@ -19,11 +21,15 @@ namespace Tycho.Events.Registrating.Registrations
             HandlerId = EventHandlerIdentity.Create<TEventHandler>();
         }
 
-        public IReadOnlyCollection<RoutedEvent> Route(Guid publishId, TEvent eventPayload)
+        public Task<IReadOnlyCollection<RoutedEvent>> RouteAsync(
+            Guid publishId,
+            TEvent eventPayload,
+            CancellationToken cancellationToken)
         {
             var eventId = EventIdentity.Create<TEvent>();
             var route = Routing.Route.Create();
-            return new[] { new RoutedEvent<TEvent>(Guid.NewGuid(), publishId, eventId, HandlerId, route, eventPayload) };
+            IReadOnlyCollection<RoutedEvent> routedEvents = new[] { new RoutedEvent<TEvent>(Guid.NewGuid(), publishId, eventId, HandlerId, route, eventPayload) };
+            return Task.FromResult(routedEvents);
         }
     }
 }

@@ -24,7 +24,7 @@ namespace Tycho.Events.Publishing
         {
             eventPayload.ThrowIfNull();
             var publishId = Guid.NewGuid();
-            IReadOnlyCollection<RoutedEvent> routedEvents = _broker.Route(publishId, eventPayload);
+            IReadOnlyCollection<RoutedEvent> routedEvents = await _broker.RouteAsync(publishId, eventPayload, cancellationToken).ConfigureAwait(false);
             if (routedEvents != null && routedEvents.Count > 0)
             {
                 await _outbox.Write(routedEvents, cancellationToken).ConfigureAwait(false);

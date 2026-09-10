@@ -19,11 +19,24 @@ namespace Tycho.Events.Broker
             _serviceProvider = serviceProvider;
         }
 
-        public IReadOnlyCollection<RoutedEvent> Route<TEvent>(Guid publishId, TEvent eventPayload)
+        public async Task<IReadOnlyCollection<RoutedEvent>> RouteAsync<TEvent>(
+            Guid publishId,
+            TEvent eventPayload,
+            CancellationToken cancellationToken)
             where TEvent : class, IEvent
         {
             IEnumerable<IEventRegistration<TEvent>> registrations = _serviceProvider.GetServices<IEventRegistration<TEvent>>();
-            return registrations.SelectMany(registration => registration.Route(publishId, eventPayload)).ToArray();
+            var routedEvents = new List<RoutedEvent>();
+
+            foreach (IEventRegistration<TEvent> registration in registrations)
+            {
+                IReadOnlyCollection<RoutedEvent> registrationEvents = await registration
+                    .RouteAsync(publishId, eventPayload, cancellationToken)
+                    .ConfigureAwait(false);
+                routedEvents.AddRange(registrationEvents);
+            }
+
+            return routedEvents;
         }
 
         public async Task DeliverAsync(SerializedRoutedEvent routedEvent, CancellationToken cancellationToken)

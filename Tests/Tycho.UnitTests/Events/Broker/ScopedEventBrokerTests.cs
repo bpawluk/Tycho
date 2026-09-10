@@ -17,39 +17,42 @@ namespace Tycho.UnitTests.Events.Broker;
 public class ScopedEventBrokerTests
 {
     [Fact]
-    public void Route_WithNoRegistrations_ReturnsEmpty()
+    public async Task RouteAsync_WithNoRegistrations_ReturnsEmpty()
     {
         // Arrange
         ScopedEventBroker sut = CreateSut(_ => { });
 
         // Act
-        IReadOnlyCollection<RoutedEvent> result = sut.Route(Guid.NewGuid(), new TestEvent());
+        IReadOnlyCollection<RoutedEvent> result = await sut.RouteAsync(
+            Guid.NewGuid(),
+            new TestEvent(),
+            TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Empty(result);
     }
 
     [Fact]
-    public void Route_WithMultipleRegistrations_ReturnsAllRoutedEvents()
+    public async Task RouteAsync_WithMultipleRegistrations_ReturnsAllRoutedEvents()
     {
         // Arrange
         var publishId = Guid.NewGuid();
         var eventPayload = new TestEvent();
 
         var emptyRegistration = new Mock<IEventRegistration<TestEvent>>();
-        emptyRegistration.Setup(r => r.Route(It.IsAny<Guid>(), It.IsAny<TestEvent>()))
-                         .Returns([]);
+        emptyRegistration.Setup(r => r.RouteAsync(It.IsAny<Guid>(), It.IsAny<TestEvent>(), It.IsAny<CancellationToken>()))
+                         .ReturnsAsync([]);
 
         RoutedEvent<TestEvent> firstRoutedEvent = CreateRoutedEvent();
         var firstRegistration = new Mock<IEventRegistration<TestEvent>>();
-        firstRegistration.Setup(r => r.Route(It.IsAny<Guid>(), It.IsAny<TestEvent>()))
-                         .Returns([firstRoutedEvent]);
+        firstRegistration.Setup(r => r.RouteAsync(It.IsAny<Guid>(), It.IsAny<TestEvent>(), It.IsAny<CancellationToken>()))
+                         .ReturnsAsync([firstRoutedEvent]);
 
         RoutedEvent<TestEvent> secondRoutedEvent = CreateRoutedEvent();
         RoutedEvent<TestEvent> thirdRoutedEvent = CreateRoutedEvent();
         var secondRegistration = new Mock<IEventRegistration<TestEvent>>();
-        secondRegistration.Setup(r => r.Route(It.IsAny<Guid>(), It.IsAny<TestEvent>()))
-                          .Returns([secondRoutedEvent, thirdRoutedEvent]);
+        secondRegistration.Setup(r => r.RouteAsync(It.IsAny<Guid>(), It.IsAny<TestEvent>(), It.IsAny<CancellationToken>()))
+                          .ReturnsAsync([secondRoutedEvent, thirdRoutedEvent]);
 
         ScopedEventBroker sut = CreateSut(services =>
         {
@@ -59,7 +62,8 @@ public class ScopedEventBrokerTests
         });
 
         // Act
-        IReadOnlyCollection<RoutedEvent> result = sut.Route(publishId, eventPayload);
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
+        IReadOnlyCollection<RoutedEvent> result = await sut.RouteAsync(publishId, eventPayload, cancellationToken);
 
         // Assert
         Assert.Equal(3, result.Count);
@@ -67,9 +71,9 @@ public class ScopedEventBrokerTests
         Assert.Contains(secondRoutedEvent, result);
         Assert.Contains(thirdRoutedEvent, result);
 
-        emptyRegistration.Verify(r => r.Route(publishId, eventPayload), Times.Once);
-        firstRegistration.Verify(r => r.Route(publishId, eventPayload), Times.Once);
-        secondRegistration.Verify(r => r.Route(publishId, eventPayload), Times.Once);
+        emptyRegistration.Verify(r => r.RouteAsync(publishId, eventPayload, cancellationToken), Times.Once);
+        firstRegistration.Verify(r => r.RouteAsync(publishId, eventPayload, cancellationToken), Times.Once);
+        secondRegistration.Verify(r => r.RouteAsync(publishId, eventPayload, cancellationToken), Times.Once);
     }
 
     [Fact]

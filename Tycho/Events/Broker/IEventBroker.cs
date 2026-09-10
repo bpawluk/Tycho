@@ -8,7 +8,10 @@ namespace Tycho.Events.Broker
 {
     internal interface IEventBroker
     {
-        IReadOnlyCollection<RoutedEvent> Route<TEvent>(Guid publishId, TEvent eventPayload)
+        Task<IReadOnlyCollection<RoutedEvent>> RouteAsync<TEvent>(
+            Guid publishId,
+            TEvent eventPayload,
+            CancellationToken cancellationToken)
             where TEvent : class, IEvent;
 
         Task DeliverAsync(SerializedRoutedEvent routedEvent, CancellationToken cancellationToken);

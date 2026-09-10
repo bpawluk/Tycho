@@ -27,41 +27,43 @@ public class ExposingEventRegistrationTests
     }
 
     [Fact]
-    public void Route_WithBrokerReturningNoEvents_ReturnsEmpty()
+    public async Task RouteAsync_WithBrokerReturningNoEvents_ReturnsEmpty()
     {
         // Arrange
         var publishId = Guid.NewGuid();
         var eventPayload = new TestEvent();
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
-        _eventBrokerMock.Setup(eb => eb.Route(publishId, eventPayload))
-                        .Returns([]);
+        _eventBrokerMock.Setup(eb => eb.RouteAsync(publishId, eventPayload, cancellationToken))
+                        .ReturnsAsync([]);
 
         var sut = new ExposingEventRegistration<TestEvent>(_parentReferenceMock.Object);
 
         // Act
-        IReadOnlyCollection<RoutedEvent> result = sut.Route(publishId, eventPayload);
+        IReadOnlyCollection<RoutedEvent> result = await sut.RouteAsync(publishId, eventPayload, cancellationToken);
 
         // Assert
         Assert.Empty(result);
-        _eventBrokerMock.Verify(eb => eb.Route(publishId, eventPayload), Times.Once);
+        _eventBrokerMock.Verify(eb => eb.RouteAsync(publishId, eventPayload, cancellationToken), Times.Once);
     }
 
     [Fact]
-    public void Route_WithBrokerReturningMultipleEvents_PushesUpStreamStepOntoEachRoute()
+    public async Task RouteAsync_WithBrokerReturningMultipleEvents_PushesUpStreamStepOntoEachRoute()
     {
         // Arrange
         var publishId = Guid.NewGuid();
         var eventPayload = new TestEvent();
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
         RoutedEvent<TestEvent> firstRoutedEvent = CreateRoutedEvent(eventPayload);
         RoutedEvent<TestEvent> secondRoutedEvent = CreateRoutedEvent(eventPayload);
 
-        _eventBrokerMock.Setup(eb => eb.Route(publishId, eventPayload))
-                        .Returns([firstRoutedEvent, secondRoutedEvent]);
+        _eventBrokerMock.Setup(eb => eb.RouteAsync(publishId, eventPayload, cancellationToken))
+                        .ReturnsAsync([firstRoutedEvent, secondRoutedEvent]);
 
         var sut = new ExposingEventRegistration<TestEvent>(_parentReferenceMock.Object);
 
         // Act
-        IReadOnlyCollection<RoutedEvent> result = sut.Route(publishId, eventPayload);
+        IReadOnlyCollection<RoutedEvent> result = await sut.RouteAsync(publishId, eventPayload, cancellationToken);
 
         // Assert
         Assert.Equal(2, result.Count);
@@ -69,42 +71,44 @@ public class ExposingEventRegistrationTests
         Assert.Contains(secondRoutedEvent, result);
         AssertRouteStartsWithUpStream(firstRoutedEvent.Route);
         AssertRouteStartsWithUpStream(secondRoutedEvent.Route);
-        _eventBrokerMock.Verify(eb => eb.Route(publishId, eventPayload), Times.Once);
+        _eventBrokerMock.Verify(eb => eb.RouteAsync(publishId, eventPayload, cancellationToken), Times.Once);
     }
 
     [Fact]
-    public void Route_WithMappedRegistration_AndBrokerReturningNoEvents_ReturnsEmpty()
+    public async Task RouteAsync_WithMappedRegistration_AndBrokerReturningNoEvents_ReturnsEmpty()
     {
         // Arrange
         var publishId = Guid.NewGuid();
         var eventPayload = new TestEvent();
         var mappedPayload = new OtherEvent();
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
         var mapMock = new Mock<Func<TestEvent, OtherEvent>>();
         mapMock.Setup(m => m(eventPayload))
                .Returns(mappedPayload);
 
-        _eventBrokerMock.Setup(eb => eb.Route(publishId, mappedPayload))
-                        .Returns([]);
+        _eventBrokerMock.Setup(eb => eb.RouteAsync(publishId, mappedPayload, cancellationToken))
+                        .ReturnsAsync([]);
 
         var sut = new MappedExposingEventRegistration<TestEvent, OtherEvent>(_parentReferenceMock.Object, mapMock.Object);
 
         // Act
-        IReadOnlyCollection<RoutedEvent> result = sut.Route(publishId, eventPayload);
+        IReadOnlyCollection<RoutedEvent> result = await sut.RouteAsync(publishId, eventPayload, cancellationToken);
 
         // Assert
         Assert.Empty(result);
         mapMock.Verify(m => m(eventPayload), Times.Once);
-        _eventBrokerMock.Verify(eb => eb.Route(publishId, mappedPayload), Times.Once);
+        _eventBrokerMock.Verify(eb => eb.RouteAsync(publishId, mappedPayload, cancellationToken), Times.Once);
     }
 
     [Fact]
-    public void Route_WithMappedRegistration_AndBrokerReturningMultipleEvents_PushesUpStreamStepOntoEachRoute()
+    public async Task RouteAsync_WithMappedRegistration_AndBrokerReturningMultipleEvents_PushesUpStreamStepOntoEachRoute()
     {
         // Arrange
         var publishId = Guid.NewGuid();
         var eventPayload = new TestEvent();
         var mappedPayload = new OtherEvent();
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
         RoutedEvent<TestEvent> firstRoutedEvent = CreateRoutedEvent(eventPayload);
         RoutedEvent<TestEvent> secondRoutedEvent = CreateRoutedEvent(eventPayload);
 
@@ -112,13 +116,13 @@ public class ExposingEventRegistrationTests
         mapMock.Setup(m => m(eventPayload))
                .Returns(mappedPayload);
 
-        _eventBrokerMock.Setup(eb => eb.Route(publishId, mappedPayload))
-                        .Returns([firstRoutedEvent, secondRoutedEvent]);
+        _eventBrokerMock.Setup(eb => eb.RouteAsync(publishId, mappedPayload, cancellationToken))
+                        .ReturnsAsync([firstRoutedEvent, secondRoutedEvent]);
 
         var sut = new MappedExposingEventRegistration<TestEvent, OtherEvent>(_parentReferenceMock.Object, mapMock.Object);
 
         // Act
-        IReadOnlyCollection<RoutedEvent> result = sut.Route(publishId, eventPayload);
+        IReadOnlyCollection<RoutedEvent> result = await sut.RouteAsync(publishId, eventPayload, cancellationToken);
 
         // Assert
         Assert.Equal(2, result.Count);
@@ -127,7 +131,7 @@ public class ExposingEventRegistrationTests
         AssertRouteStartsWithUpStream(firstRoutedEvent.Route);
         AssertRouteStartsWithUpStream(secondRoutedEvent.Route);
         mapMock.Verify(m => m(eventPayload), Times.Once);
-        _eventBrokerMock.Verify(eb => eb.Route(publishId, mappedPayload), Times.Once);
+        _eventBrokerMock.Verify(eb => eb.RouteAsync(publishId, mappedPayload, cancellationToken), Times.Once);
     }
 
     private static RoutedEvent<TEvent> CreateRoutedEvent<TEvent>(TEvent payload)

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Tycho.Events.Broker;
 using Tycho.Events.Model;
 using Tycho.Events.Routing;
@@ -19,10 +21,13 @@ namespace Tycho.Events.Registrating.Registrations
             _map = map;
         }
 
-        public IReadOnlyCollection<RoutedEvent> Route(Guid publishId, TEvent eventPayload)
+        public async Task<IReadOnlyCollection<RoutedEvent>> RouteAsync(
+            Guid publishId,
+            TEvent eventPayload,
+            CancellationToken cancellationToken)
         {
             IRouteStep routeStep = GetRouteStep();
-            IReadOnlyCollection<RoutedEvent> routedEvents = _externalEventBroker.Route(publishId, _map(eventPayload));
+            IReadOnlyCollection<RoutedEvent> routedEvents = await _externalEventBroker.RouteAsync(publishId, _map(eventPayload), cancellationToken).ConfigureAwait(false);
 
             foreach (RoutedEvent routedEvent in routedEvents)
             {

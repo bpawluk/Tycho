@@ -24,7 +24,7 @@ public class FinalEventRegistrationTests
     }
 
     [Fact]
-    public void Route_WithAnyEvent_ReturnsSingleRoutedEventWithTheHandlerAndFinalRoute()
+    public async Task RouteAsync_WithAnyEvent_ReturnsSingleRoutedEventWithTheHandlerAndFinalRoute()
     {
         // Arrange
         var publishId = Guid.NewGuid();
@@ -33,7 +33,10 @@ public class FinalEventRegistrationTests
         var sut = new FinalEventRegistration<TestEvent, TestEventHandler>(handler);
 
         // Act
-        IReadOnlyCollection<RoutedEvent> result = sut.Route(publishId, eventPayload);
+        IReadOnlyCollection<RoutedEvent> result = await sut.RouteAsync(
+            publishId,
+            eventPayload,
+            TestContext.Current.CancellationToken);
 
         // Assert
         RoutedEvent<TestEvent> routedEvent = Assert.IsType<RoutedEvent<TestEvent>>(Assert.Single(result));

@@ -11,7 +11,7 @@
      B map the same request types to module C using different delegates, both execute A’s mapping. Mapped exposure has the same problem, and upstream/
      downstream registrations can collide too. Store mapping delegates on each binding or include binding identity in the service type.
 
-  3. High — Routing instantiates event handlers before delivery.
+  3. DONE — Routing instantiates event handlers before delivery.
      /C:/Users/immal/source/repos/Tycho/Tycho/Events/Registrating/Registrations/FinalEventRegistration.cs:16, /C:/Users/immal/source/repos/Tycho/Tycho/
      Events/Broker/EventBroker.cs:25
      Routing resolves registrations whose constructors require actual handlers. Publishing consequently constructs destination handlers and their

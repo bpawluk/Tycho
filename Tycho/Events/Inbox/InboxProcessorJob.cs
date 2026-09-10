@@ -39,7 +39,7 @@ namespace Tycho.Events.Inbox
         [EntryPoint]
         public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            bool isInputValid = ValidateInput();
+            bool isInputValid = await ValidateInputAsync().ConfigureAwait(false);
             if (!isInputValid)
             {
                 return;
@@ -52,11 +52,11 @@ namespace Tycho.Events.Inbox
             }
         }
 
-        private bool ValidateInput()
+        private async Task<bool> ValidateInputAsync()
         {
             if (_event is null)
             {
-                using IServiceScope scope = _internals.CreateScope();
+                await using AsyncServiceScope scope = _internals.CreateAsyncScope();
                 ILogger<InboxProcessorJob>? logger = scope.ServiceProvider.GetService<ILogger<InboxProcessorJob>>();
                 logger?.LogWarning("No event assigned for processing. Skipping execution.");
                 return false;

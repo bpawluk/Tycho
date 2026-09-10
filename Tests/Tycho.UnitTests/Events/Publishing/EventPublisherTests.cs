@@ -49,8 +49,8 @@ public class EventPublisherTests
             CreateRoutedEvent(eventPayload),
         };
 
-        _eventBrokerMock.Setup(eb => eb.Route(It.IsAny<Guid>(), eventPayload))
-                        .Returns(routedEvents);
+        _eventBrokerMock.Setup(eb => eb.RouteAsync(It.IsAny<Guid>(), eventPayload, cancellationToken))
+                        .ReturnsAsync(routedEvents);
 
         // Act
         await _sut.PublishAsync(eventPayload, cancellationToken);
@@ -67,8 +67,8 @@ public class EventPublisherTests
         var routedEvents = new List<RoutedEvent>();
         var cancellationToken = new CancellationToken();
 
-        _eventBrokerMock.Setup(eb => eb.Route(It.IsAny<Guid>(), eventPayload))
-                        .Returns(routedEvents);
+        _eventBrokerMock.Setup(eb => eb.RouteAsync(It.IsAny<Guid>(), eventPayload, cancellationToken))
+                        .ReturnsAsync(routedEvents);
 
         // Act
         await _sut.PublishAsync(eventPayload, cancellationToken);
@@ -86,8 +86,8 @@ public class EventPublisherTests
         var eventPayload = new TestEvent();
         var cancellationToken = new CancellationToken();
 
-        _eventBrokerMock.Setup(eb => eb.Route(It.IsAny<Guid>(), eventPayload))
-                        .Returns<IReadOnlyCollection<RoutedEvent>>(null!);
+        _eventBrokerMock.Setup(eb => eb.RouteAsync(It.IsAny<Guid>(), eventPayload, cancellationToken))
+                        .ReturnsAsync((IReadOnlyCollection<RoutedEvent>)null!);
 
         // Act
         await _sut.PublishAsync(eventPayload, cancellationToken);

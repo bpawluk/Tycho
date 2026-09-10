@@ -19,12 +19,15 @@ namespace Tycho.Events.Broker
         }
 
         [EntryPoint]
-        public IReadOnlyCollection<RoutedEvent> Route<TEvent>(Guid publishId, TEvent eventPayload)
+        public async Task<IReadOnlyCollection<RoutedEvent>> RouteAsync<TEvent>(
+            Guid publishId,
+            TEvent eventPayload,
+            CancellationToken cancellationToken)
             where TEvent : class, IEvent
         {
-            using IServiceScope scope = _internals.CreateScope();
+            await using AsyncServiceScope scope = _internals.CreateAsyncScope();
             IEventBroker scopedBroker = scope.ServiceProvider.GetRequiredService<IEventBroker>();
-            return scopedBroker.Route(publishId, eventPayload);
+            return await scopedBroker.RouteAsync(publishId, eventPayload, cancellationToken).ConfigureAwait(false);
         }
 
         [EntryPoint]
