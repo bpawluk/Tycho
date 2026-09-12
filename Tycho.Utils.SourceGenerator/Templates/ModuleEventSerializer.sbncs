@@ -1,0 +1,48 @@
+{{~#--------- Calculate indentation ---------#~}}
+{{~ ns_offset = namespace != "" ? 1 : 0 ~}}
+{{~ ct_count = array.size containing_types ~}}
+{{~ bi = ns_offset + ct_count ~}}
+{{~ i0 = string.pad_left "" (bi * 4) ~}}
+{{~ i1 = string.pad_left "" ((bi + 1) * 4) ~}}
+{{~ i2 = string.pad_left "" ((bi + 2) * 4) ~}}
+{{~#-----------------------------------------#~}}
+{{~#----------- Declare namespace -----------#~}}
+{{~ if namespace != "" ~}}
+namespace {{ namespace }}
+{
+{{~ end ~}}
+{{~#-----------------------------------------#~}}
+{{~#---------- Declare outer types ----------#~}}
+{{~ for containing_type in containing_types ~}}
+{{~ containing_type_indent = (ns_offset + for.index) * 4 ~}}
+{{ string.pad_left "" containing_type_indent }}{{ containing_type.declaration }}
+{{~ for constraint in containing_type.constraints ~}}
+{{ string.pad_left "" (containing_type_indent + 4) }}{{ constraint }}
+{{~ end ~}}
+{{ string.pad_left "" containing_type_indent }}{
+{{~ end ~}}
+{{~#-----------------------------------------#~}}
+{{~#------------------------------------------- MODULE EVENT SERIALIZER ---------------------------------------------#~}}
+{{ i0 }}internal class {{ classes.event_serializer_class_with_type_params }} : {{ classes.event_serializer_base_class }}
+{{~ for owner_constraint in owner_constraints ~}}
+{{   i1   }}{{ owner_constraint }}
+{{~ end ~}}
+{{ i0 }}{
+{{   i1   }}public {{ classes.event_serializer_class }}({{ interfaces.payload_serializer_interface }} {{ parameters.payload_serializer_parameter }}) : base({{ parameters.payload_serializer_parameter }})
+{{   i1   }}{
+{{~ for event in events ~}}
+{{     i2     }}{{ methods.register_event_method }}<{{ event }}>();
+{{~ end ~}}
+{{   i1   }}}
+{{ i0 }}}
+{{~#------------------------------------------------------------------------------------------------------------------#~}}
+{{~#------- Close outer type brackets -------#~}}
+{{~ for containing_type in containing_types ~}}
+{{ string.pad_left "" ((bi - 1 - for.index) * 4) }}}
+{{~ end ~}}
+{{~#-----------------------------------------#~}}
+{{~#-------- Close namespace bracket --------#~}}
+{{~ if namespace != "" ~}}
+}
+{{~ end ~}}
+{{~#-----------------------------------------#~}}

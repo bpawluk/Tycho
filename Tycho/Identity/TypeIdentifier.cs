@@ -1,0 +1,61 @@
+using System;
+using System.IO.Hashing;
+using System.Linq;
+using System.Text;
+
+namespace Tycho.Identity
+{
+    internal static class TypeIdentifier
+    {
+        public static string GetId<T>()
+        {
+            return GetId(typeof(T));
+        }
+
+        public static string GetId(Type type)
+        {
+            if (type.IsArray)
+            {
+                string elementId = GetId(type.GetElementType()!);
+                string arraySuffix = type.IsSZArray
+                    ? "[]"
+                    : type.GetArrayRank() == 1
+                        ? "[*]"
+                        : $"[{new string(',', type.GetArrayRank() - 1)}]";
+                return $"{elementId}{arraySuffix}";
+            }
+
+            if (type.IsGenericParameter)
+            {
+                return type.Name;
+            }
+
+            if (type.IsGenericType)
+            {
+                string[] genericArguments = type.GetGenericArguments().Select(GetId).ToArray();
+                return $"{GetFlatId(type.GetGenericTypeDefinition())}<{string.Join(",", genericArguments)}>";
+            }
+
+            return GetFlatId(type);
+        }
+
+        private static string GetFlatId(Type type)
+        {
+            return $"{GetShortName(type)}+{GetShortId(type)}";
+        }
+
+        private static string GetShortName(Type type)
+        {
+            string typeName = type.Name;
+            int genericPartIndex = typeName.IndexOf('`');
+            return genericPartIndex == -1 ? typeName : typeName[..genericPartIndex];
+        }
+
+        private static string GetShortId(Type type)
+        {
+            string stableName = $"{type.Assembly.GetName().Name}:{type.FullName}";
+            byte[] typeHash = Crc32.Hash(Encoding.UTF8.GetBytes(stableName));
+            return BitConverter.ToString(typeHash).Replace("-", "");
+        }
+    }
+}

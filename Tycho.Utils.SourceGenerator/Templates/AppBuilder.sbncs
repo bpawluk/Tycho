@@ -1,0 +1,46 @@
+#nullable enable annotations
+
+{{~#--------- Calculate indentation ---------#~}}
+{{~ ns_offset = namespace != "" ? 1 : 0 ~}}
+{{~ ct_count = array.size containing_types ~}}
+{{~ bi = ns_offset + ct_count ~}}
+{{~ i0 = string.pad_left "" (bi * 4) ~}}
+{{~ i1 = string.pad_left "" ((bi + 1) * 4) ~}}
+{{~ i2 = string.pad_left "" ((bi + 2) * 4) ~}}
+{{~#-----------------------------------------#~}}
+{{~ if namespace != "" ~}}
+namespace {{ namespace }}
+{
+{{~ end ~}}
+{{~ for containing_type in containing_types ~}}
+{{~ containing_type_indent = (ns_offset + for.index) * 4 ~}}
+{{ string.pad_left "" containing_type_indent }}{{ containing_type.declaration }}
+{{~ for constraint in containing_type.constraints ~}}
+{{ string.pad_left "" (containing_type_indent + 4) }}{{ constraint }}
+{{~ end ~}}
+{{ string.pad_left "" containing_type_indent }}{
+{{~ end ~}}
+{{ i0 }}public class {{ classes.app_builder_declaration }}
+{{~ for constraint in owner_constraints ~}}
+{{   i1   }}{{ constraint }}
+{{~ end ~}}
+{{ i0 }}{
+{{   i1   }}private readonly {{ interfaces.app_builder_base_interface }} {{ fields.app_builder_base_field }};
+
+{{   i1   }}public {{ classes.app_builder_class }}({{ interfaces.app_builder_base_interface }} {{ parameters.app_builder_base_parameter }})
+{{   i1   }}{
+{{     i2     }}{{ fields.app_builder_base_field }} = {{ parameters.app_builder_base_parameter }};
+{{   i1   }}}
+
+{{   i1   }}public {{ interfaces.facade_interface }} {{ methods.build_method }}({{ interfaces.service_provider_interface }}? {{ parameters.parent_service_provider_parameter }} = null)
+{{   i1   }}{
+{{     i2     }}{{ interfaces.app_interface }} {{ parameters.app_parameter }} = {{ fields.app_builder_base_field }}.{{ methods.build_base_method }}({{ parameters.parent_service_provider_parameter }});
+{{     i2     }}return new {{ classes.facade_class }}({{ parameters.app_parameter }});
+{{   i1   }}}
+{{ i0 }}}
+{{~ for containing_type in containing_types ~}}
+{{ string.pad_left "" ((bi - 1 - for.index) * 4) }}}
+{{~ end ~}}
+{{~ if namespace != "" ~}}
+}
+{{~ end ~}}
