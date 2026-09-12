@@ -62,16 +62,31 @@ internal class InboxConsumer(
             return null;
         }
 
-        var serializedEvent = new SerializedRoutedEvent(
-            entryToDeliver.Id,
-            entryToDeliver.PublishId,
-            EventIdentity.Parse(entryToDeliver.Event),
-            EventHandlerIdentity.Parse(entryToDeliver.Handler),
-            Route.Empty(),
-            entryToDeliver.Payload);
+        try
+        {
+            var serializedEvent = new SerializedRoutedEvent(
+                entryToDeliver.Id,
+                entryToDeliver.PublishId,
+                EventIdentity.Parse(entryToDeliver.Event),
+                EventHandlerIdentity.Parse(entryToDeliver.Handler),
+                Route.Empty(),
+                entryToDeliver.Payload);
 
-        RoutedEvent? routedEvent = await TryDeserializeWith(_eventSerializer, serializedEvent, claimId, cancellationToken).ConfigureAwait(false);
-        return routedEvent == null ? null : new InboxEvent(claimId, routedEvent);
+            RoutedEvent routedEvent = _eventSerializer.Deserialize(serializedEvent);
+            return new InboxEvent(claimId, routedEvent);
+        }
+        catch (Exception exception)
+        {
+            try
+            {
+                await MarkAsFailedAsync(claimId, cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception failureException)
+            {
+                throw new AggregateException("Failed to deserialize an inbox entry and mark it as failed.", exception, failureException);
+            }
+            throw;
+        }
     }
 
     public async Task<bool> MarkAsHandledAsync(Guid claimId, CancellationToken cancellationToken)
@@ -112,20 +127,4 @@ internal class InboxConsumer(
         return updatedRowsCount == 1;
     }
 
-    private async Task<RoutedEvent?> TryDeserializeWith(
-        IEventSerializer eventSerializer,
-        SerializedRoutedEvent serializedEvent,
-        Guid claimId,
-        CancellationToken cancellationToken)
-    {
-        try
-        {
-            return eventSerializer.Deserialize(serializedEvent);
-        }
-        catch
-        {
-            await MarkAsFailedAsync(claimId, cancellationToken).ConfigureAwait(false);
-            return null;
-        }
-    }
 }

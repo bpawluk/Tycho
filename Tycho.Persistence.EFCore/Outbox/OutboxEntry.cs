@@ -1,9 +1,11 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using Tycho.Persistence.EFCore.Common;
 
 namespace Tycho.Persistence.EFCore.Outbox;
 
+[Index(nameof(ClaimId))]
 internal class OutboxEntry
 {
     [Key]
