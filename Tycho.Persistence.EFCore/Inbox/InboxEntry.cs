@@ -1,0 +1,46 @@
+using System;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
+using Tycho.Persistence.EFCore.Common;
+
+namespace Tycho.Persistence.EFCore.Inbox;
+
+[PrimaryKey(nameof(OwnerKey), nameof(Id))]
+[Index(nameof(OwnerKey), nameof(ClaimId))]
+internal class InboxEntry
+{
+    [Required, MaxLength(32)]
+    public string OwnerKey { get; set; } = string.Empty;
+
+    public Guid Id { get; set; } = Guid.Empty;
+
+    [Required]
+    public Guid PublishId { get; set; } = Guid.Empty;
+
+    [Required]
+    public string Event { get; set; } = string.Empty;
+
+    [Required]
+    public string Handler { get; set; } = string.Empty;
+
+    [Required]
+    public string Payload { get; set; } = string.Empty;
+
+    [Required]
+    public EntryState State { get; set; } = EntryState.New;
+
+    [Required]
+    public DateTime Created { get; set; } = DateTime.UtcNow;
+
+    [Required]
+    public DateTime Updated { get; set; } = DateTime.UtcNow;
+
+    [Required]
+    public uint ProcessingAttempts { get; set; } = 0;
+
+    [Required]
+    public Guid ClaimId { get; set; } = Guid.Empty;
+
+    [Required]
+    public DateTime ClaimExpiration { get; set; } = DateTime.MinValue;
+}

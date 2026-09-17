@@ -1,0 +1,36 @@
+using System;
+using Microsoft.Extensions.DependencyInjection;
+using Tycho.Events.Inbox;
+using Tycho.Events.Outbox;
+using Tycho.Persistence.EFCore.Common;
+using Tycho.Persistence.EFCore.Inbox;
+using Tycho.Persistence.EFCore.Outbox;
+using Tycho.Persistence.EFCore.Transactions;
+using Tycho.Transactions;
+
+namespace Tycho.Persistence.EFCore;
+
+/// <summary>
+/// Extension methods for setting up Tycho persistence with Entity Framework Core.
+/// </summary>
+public static class ServiceCollectionExtensions
+{
+    /// <summary>
+    /// Sets up Tycho persistence in the specified IServiceCollection.
+    /// </summary>
+    /// <typeparam name="TDbContext">The type of the TychoDbContext to be used.</typeparam>
+    public static IServiceCollection AddTychoPersistence<TDbContext>(this IServiceCollection services)
+        where TDbContext : TychoDbContext
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        services.AddDbContext<TDbContext>()
+                .AddSingleton<PersistenceOwner>()
+                .AddScoped<TychoDbContext>(sp => sp.GetRequiredService<TDbContext>())
+                .AddScoped<ITransaction, Transaction>()
+                .AddTransient<IOutboxWriter, OutboxWriter>()
+                .AddTransient<IOutboxConsumer, OutboxConsumer>()
+                .AddTransient<IInboxWriter, InboxWriter>()
+                .AddTransient<IInboxConsumer, InboxConsumer>();
+        return services;
+    }
+}

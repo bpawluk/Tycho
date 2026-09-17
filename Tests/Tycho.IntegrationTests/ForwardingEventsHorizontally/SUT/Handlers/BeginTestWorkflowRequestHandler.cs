@@ -1,0 +1,25 @@
+using Tycho.Requests;
+
+namespace Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Handlers;
+
+internal class BeginTestWorkflowRequestHandler(ITestAppPublisher publisher)
+    : IRequestHandler<BeginTestWorkflowRequest>
+{
+    private readonly ITestAppPublisher _publisher = publisher;
+
+    public async Task HandleAsync(BeginTestWorkflowRequest requestData, CancellationToken cancellationToken)
+    {
+        if (requestData.Result.Id == "event-workflow")
+        {
+            await _publisher.PublishAsync(new WorkflowStartedEvent(requestData.Result), cancellationToken);
+        }
+        else if (requestData.Result.Id == "mapped-event-workflow")
+        {
+            await _publisher.PublishAsync(new WorkflowWithMappingStartedEvent(requestData.Result), cancellationToken);
+        }
+        else
+        {
+            throw new ArgumentException($"Unknown workflow ID {requestData.Result.Id}");
+        }
+    }
+}

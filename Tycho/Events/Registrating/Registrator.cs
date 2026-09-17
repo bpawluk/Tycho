@@ -1,12 +1,10 @@
-﻿using System;
-using System.Linq;
+using System;
 using Microsoft.Extensions.DependencyInjection;
-using Tycho.Events.Handling;
-using Tycho.Events.Routing;
-using Tycho.Events.Routing.Sources;
+using Tycho.Events.Registrating.Registrations;
 using Tycho.Modules;
+using Tycho.Modules.Instance;
 using Tycho.Structure;
-using Tycho.Structure.Internal;
+using Tycho.Structure.Parent;
 
 namespace Tycho.Events.Registrating
 {
@@ -14,7 +12,7 @@ namespace Tycho.Events.Registrating
     {
         private readonly Internals _internals;
 
-        private IServiceCollection Services => _internals.GetServiceCollection();
+        private IServiceCollection Services => _internals.GetHostBuilder().Services;
 
         public Registrator(Internals internals)
         {
@@ -24,45 +22,35 @@ namespace Tycho.Events.Registrating
         public void ExposeEvent<TEvent>()
             where TEvent : class, IEvent
         {
-            if (IsSourceAlreadyRegistered<TEvent, UpStreamHandlersSource<TEvent>>())
+            if (!TryAddRegistration<TEvent, ExposingEventRegistration<TEvent>>())
             {
-                throw new ArgumentException(
-                    $"{typeof(TEvent).Name} is already exposed", 
-                    nameof(TEvent));
+                throw new ArgumentException($"{typeof(TEvent).Name} is already exposed", nameof(TEvent));
             }
-
-            Services.AddTransient<IHandlersSource, UpStreamHandlersSource<TEvent>>();
         }
 
         public void ExposeEvent<TEvent, TTargetEvent>(Func<TEvent, TTargetEvent> map)
             where TEvent : class, IEvent
             where TTargetEvent : class, IEvent
         {
-            if (IsSourceAlreadyRegistered<TEvent, UpStreamMappedHandlersSource<TEvent, TTargetEvent>>())
+            if (!TryAddRegistration<TEvent, MappedExposingEventRegistration<TEvent, TTargetEvent>>(sp =>
+                new MappedExposingEventRegistration<TEvent, TTargetEvent>(
+                    sp.GetRequiredService<IParentReference>(),
+                    map)))
             {
-                throw new ArgumentException(
-                    $"{typeof(TEvent).Name} is already exposed",
-                    nameof(TEvent));
+                throw new ArgumentException($"{typeof(TEvent).Name} is already exposed", nameof(TEvent));
             }
-
-            Services.AddTransient<IHandlersSource>(
-                sp => new UpStreamMappedHandlersSource<TEvent, TTargetEvent>(
-                    sp.GetRequiredService<IParent>(),
-                    map));
         }
 
         public void ForwardEvent<TEvent, TModule>()
             where TEvent : class, IEvent
             where TModule : TychoModule
         {
-            if (IsSourceAlreadyRegistered<TEvent, DownStreamHandlersSource<TEvent, TModule>>())
+            if (!TryAddRegistration<TEvent, ForwardingEventRegistration<TEvent, TModule>>())
             {
                 throw new ArgumentException(
                     $"{typeof(TEvent).Name} is already forwarded to {typeof(TModule).Name}",
                     nameof(TEvent));
             }
-
-            Services.AddTransient<IHandlersSource, DownStreamHandlersSource<TEvent, TModule>>();
         }
 
         public void ForwardEvent<TEvent, TTargetEvent, TModule>(Func<TEvent, TTargetEvent> map)
@@ -70,55 +58,72 @@ namespace Tycho.Events.Registrating
             where TTargetEvent : class, IEvent
             where TModule : TychoModule
         {
-            if (IsSourceAlreadyRegistered<TEvent, DownStreamMappedHandlersSource<TEvent, TTargetEvent, TModule>>())
+            if (!TryAddRegistration<TEvent, MappedForwardingEventRegistration<TEvent, TTargetEvent, TModule>>(sp =>
+                new MappedForwardingEventRegistration<TEvent, TTargetEvent, TModule>(
+                    sp.GetRequiredService<IModule<TModule>>(),
+                    map)))
             {
                 throw new ArgumentException(
                     $"{typeof(TEvent).Name} is already forwarded to {typeof(TModule).Name}",
                     nameof(TEvent));
             }
-
-            Services.AddTransient<IHandlersSource>(
-                sp => new DownStreamMappedHandlersSource<TEvent, TTargetEvent, TModule>(
-                    sp.GetRequiredService<IModule<TModule>>(),
-                    map));
         }
 
         public void HandleEvent<TEvent, THandler>()
             where TEvent : class, IEvent
             where THandler : class, IEventHandler<TEvent>
         {
-            if (IsHandlerAlreadyRegistered<TEvent, ScopedEventHandler<TEvent, THandler>>())
+            if (!TryAddFinalRegistration<TEvent, FinalEventRegistration<TEvent, THandler>>())
             {
                 throw new ArgumentException(
-                    $"Event handler for {typeof(TEvent).Name} already registered",
+                    $"Event handler for {typeof(TEvent).Name} is already registered",
                     nameof(THandler));
             }
 
-            Services.AddTransient<IEventHandler<TEvent>, ScopedEventHandler<TEvent, THandler>>();
             Services.AddScoped<THandler>();
+        }
 
-            if (!IsSourceAlreadyRegistered<TEvent, LocalHandlersSource<TEvent>>())
+        private bool TryAddRegistration<TEvent, TRegistration>()
+            where TEvent : class, IEvent
+            where TRegistration : class, IEventRegistration<TEvent>
+        {
+            if (_internals.HasService<TRegistration>())
             {
-                Services.AddSingleton<IHandlersSource>(new LocalHandlersSource<TEvent>(_internals));
+                return false;
             }
+
+            Services.AddTransient<TRegistration>();
+            Services.AddTransient<IEventRegistration<TEvent>>(sp => sp.GetRequiredService<TRegistration>());
+            return true;
         }
 
-        private bool IsHandlerAlreadyRegistered<TEvent, THandler>()
+        private bool TryAddRegistration<TEvent, TRegistration>(Func<IServiceProvider, TRegistration> implementationFactory)
             where TEvent : class, IEvent
-            where THandler : class, IEventHandler<TEvent>
+            where TRegistration : class, IEventRegistration<TEvent>
         {
-            return Services.Any(descriptor =>
-                descriptor.ServiceType == typeof(IEventHandler<TEvent>) &&
-                descriptor.ImplementationType == typeof(THandler));
+            if (_internals.HasService<TRegistration>())
+            {
+                return false;
+            }
+
+            Services.AddTransient(implementationFactory);
+            Services.AddTransient<IEventRegistration<TEvent>>(sp => sp.GetRequiredService<TRegistration>());
+            return true;
         }
 
-        private bool IsSourceAlreadyRegistered<TEvent, THandlersSource>()
+        private bool TryAddFinalRegistration<TEvent, TRegistration>()
             where TEvent : class, IEvent
-            where THandlersSource : class, IHandlersSource
+            where TRegistration : class, IFinalEventRegistration<TEvent>
         {
-            return Services.Any(descriptor =>
-                descriptor.ServiceType == typeof(IHandlersSource) &&
-                descriptor.ImplementationType == typeof(THandlersSource));
+            if (_internals.HasService<TRegistration>())
+            {
+                return false;
+            }
+
+            Services.AddTransient<TRegistration>();
+            Services.AddTransient<IEventRegistration<TEvent>>(sp => sp.GetRequiredService<TRegistration>());
+            Services.AddTransient<IFinalEventRegistration<TEvent>>(sp => sp.GetRequiredService<TRegistration>());
+            return true;
         }
     }
 }

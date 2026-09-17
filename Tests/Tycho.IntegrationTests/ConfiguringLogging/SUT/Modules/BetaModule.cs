@@ -1,0 +1,25 @@
+using Microsoft.Extensions.DependencyInjection;
+using Tycho.IntegrationTests.ConfiguringLogging.SUT.Handlers;
+using Tycho.Modules;
+using Tycho.Requests;
+
+namespace Tycho.IntegrationTests.ConfiguringLogging.SUT.Modules;
+
+// Handles
+public record LogBetaRequest : IRequest;
+
+[TychoDefinition]
+public class BetaModule : TychoModule
+{
+    protected override void DefineContract(IModuleContract module)
+    {
+        module.Expects<LogBetaRequest>()
+              .HandlesWith<LogBetaRequestHandler>();
+    }
+
+    protected override void DefineEvents(IModuleEvents module) { }
+
+    protected override void IncludeModules(IModuleStructure module) { }
+
+    protected override void RegisterServices(IServiceCollection module) { }
+}

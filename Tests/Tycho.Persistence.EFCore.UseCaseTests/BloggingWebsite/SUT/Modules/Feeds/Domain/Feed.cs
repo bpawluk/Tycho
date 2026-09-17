@@ -1,0 +1,99 @@
+using Microsoft.EntityFrameworkCore;
+using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Persistence;
+
+namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Domain;
+
+internal class Feed(string path, EntryType entriesType, FeedsDbContext feedsDbContext)
+{
+    private readonly string _path = path;
+
+    public EntryType EntriesType { get; private set; } = entriesType;
+
+    public Entry AddEntry(EntryType entryType, int contentId)
+    {
+        if (entryType != EntriesType)
+        {
+            throw new InvalidOperationException("Entry type does not match the Feed");
+        }
+
+        var newEntry = new Entry(contentId, _path, entryType);
+        feedsDbContext.Entries.Add(newEntry);
+
+        return newEntry;
+    }
+
+    public async Task<IReadOnlyList<Entry>> GetLatestEntries(CancellationToken cancellationToken)
+    {
+        return await feedsDbContext.Entries
+            .FromSqlRaw(@"
+                SELECT 
+                    entry.Id,
+                    entry.Version,
+                    entry.ContentId,
+                    entry.FeedPath,
+                    entry.Type,
+                    entry.Created,
+                    entry.Score,
+                    COUNT(subentry.Id) AS DiscussionWeight
+                FROM Entries AS entry
+                LEFT JOIN Entries 
+                    AS subentry
+                    ON subentry.FeedPath LIKE entry.FeedPath || '/' || entry.Id || '%'
+                WHERE 
+                    entry.Type = {0} AND 
+                    entry.FeedPath = {1}
+                GROUP BY entry.Id
+                ORDER BY entry.Created DESC;", EntriesType, _path)
+            .ToArrayAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<Entry>> GetMostLikedEntries(CancellationToken cancellationToken)
+    {
+        return await feedsDbContext.Entries
+            .FromSqlRaw(@"
+                SELECT 
+                    entry.Id,
+                    entry.Version,
+                    entry.ContentId,
+                    entry.FeedPath,
+                    entry.Type,
+                    entry.Created,
+                    entry.Score,
+                    COUNT(subentry.Id) AS DiscussionWeight
+                FROM Entries AS entry
+                LEFT JOIN Entries 
+                    AS subentry
+                    ON subentry.FeedPath LIKE entry.FeedPath || '/' || entry.Id || '%'
+                WHERE 
+                    entry.Type = {0} AND 
+                    entry.FeedPath = {1}
+                GROUP BY entry.Id
+                ORDER BY entry.Score DESC;", EntriesType, _path)
+            .ToArrayAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<Entry>> GetMostDiscussedEntries(CancellationToken cancellationToken)
+    {
+        return await feedsDbContext.Entries
+            .FromSqlRaw(@"
+                SELECT 
+                    entry.Id,
+                    entry.Version,
+                    entry.ContentId,
+                    entry.FeedPath,
+                    entry.Type,
+                    entry.Created,
+                    entry.Score,
+                    COUNT(subentry.Id) AS DiscussionWeight
+                FROM Entries AS entry
+                LEFT JOIN Entries 
+                    AS subentry
+                    ON subentry.FeedPath LIKE entry.FeedPath || '/' || entry.Id || '%'
+                WHERE 
+                    entry.Type = {0} AND 
+                    entry.FeedPath = {1}
+                GROUP BY entry.Id
+                ORDER BY DiscussionWeight DESC;", EntriesType, _path)
+            .ToArrayAsync(cancellationToken);
+    }
+}

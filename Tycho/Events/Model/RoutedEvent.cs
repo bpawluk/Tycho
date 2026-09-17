@@ -1,0 +1,65 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Tycho.Events.Routing;
+using Tycho.Events.Serialization;
+using Tycho.Identity.Events;
+
+namespace Tycho.Events.Model
+{
+    /// <summary>
+    /// Represents an event with routing information.
+    /// </summary>
+    public abstract class RoutedEvent : Event
+    {
+        internal Route Route { get; }
+
+        internal RoutedEvent(Guid id, Guid publishId, EventIdentity eventId, EventHandlerIdentity handlerId, Route route) : base(id, publishId, eventId, handlerId)
+        {
+            Route = route;
+        }
+
+        internal abstract string SerializePayloadWith(IPayloadSerializer serializer);
+
+        internal abstract IEventHandler GetHandlerFrom(IEventHandlerProvider provider);
+
+        internal abstract Task HandleWith(IEventHandler handler, CancellationToken cancellationToken);
+    }
+
+    /// <summary>
+    /// Represents a routed event with a strongly typed payload.
+    /// </summary>
+    /// <typeparam name="TEvent">The event payload type.</typeparam>
+    public class RoutedEvent<TEvent> : RoutedEvent where TEvent : class, IEvent
+    {
+        internal TEvent Payload { get; }
+
+        internal RoutedEvent(Guid id, Guid publishId, EventIdentity eventId, EventHandlerIdentity handlerId, Route route, TEvent payload) : base(id, publishId, eventId, handlerId, route)
+        {
+            Payload = payload;
+        }
+
+        internal override string SerializePayloadWith(IPayloadSerializer serializer)
+        {
+            return serializer.Serialize(Payload);
+        }
+
+        internal override IEventHandler GetHandlerFrom(IEventHandlerProvider provider)
+        {
+            return provider.GetHandler<TEvent>(HandlerId);
+        }
+
+        internal override async Task HandleWith(IEventHandler handler, CancellationToken cancellationToken)
+        {
+            if (handler is IEventHandler<TEvent> typedHandler)
+            {
+                var context = new EventContext<TEvent>(Id, Payload);
+                await typedHandler.HandleAsync(context, cancellationToken).ConfigureAwait(false);
+            }
+            else
+            {
+                throw new ArgumentException($"Handler is not of type IEventHandler<{typeof(TEvent).Name}>");
+            }
+        }
+    }
+}

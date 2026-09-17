@@ -1,0 +1,114 @@
+using System.Linq;
+using Tycho.Utils.SourceGenerator.Models;
+using Tycho.Utils.SourceGenerator.Models.System;
+using Tycho.Utils.SourceGenerator.Models.Tycho;
+using Tycho.Utils.SourceGenerator.References.System;
+using Tycho.Utils.SourceGenerator.References.Tycho.Structure;
+using Tycho.Utils.SourceGenerator.Symbols;
+
+namespace Tycho.Utils.SourceGenerator.TemplateModels
+{
+    internal class ModuleParentTM : TemplateModelBase
+    {
+        public ContainingTypeTM[] ContainingTypes { get; }
+
+        public string[] OwnerConstraints { get; }
+
+        public ClassesTM Classes { get; }
+
+        public InterfacesTM Interfaces { get; }
+
+        public MethodsTM Methods { get; }
+
+        public ParametersTM Parameters { get; }
+
+        public RequestTM[] Requests { get; }
+
+        public ModuleParentTM(TychoParentModel tychoParentModel)
+        {
+            Namespace = tychoParentModel.DefinitionType.Namespace;
+            ContainingTypes = UseContainingTypes(tychoParentModel.DefinitionType.ContainingTypes);
+            OwnerConstraints = UseConstraintClauses(tychoParentModel.DefinitionType.TypeParameters).ToArray();
+            Classes = new ClassesTM(this, tychoParentModel);
+            Interfaces = new InterfacesTM(tychoParentModel);
+            Methods = new MethodsTM();
+            Parameters = new ParametersTM();
+            Requests = tychoParentModel.Requests.Select(r => new RequestTM(this, r)).ToArray();
+        }
+
+        internal class ClassesTM
+        {
+            public string ParentClass { get; }
+            public string ParentClassWithTypeParams { get; }
+            public string ParentBaseClass { get; }
+            public string TaskClass { get; }
+            public string CancellationTokenClass { get; }
+            public string ParentReferenceClass { get; }
+
+            public ClassesTM(ModuleParentTM owner, TychoParentModel tychoParentModel)
+            {
+                string moduleNameStem = tychoParentModel.DefinitionType.Name;
+                var parentType = new GeneratedTypeModel(
+                    tychoParentModel.DefinitionType,
+                    ModuleParentSymbols.GetParentClass(moduleNameStem));
+                ParentClass = parentType.Identifier;
+                ParentClassWithTypeParams = parentType.DeclarationName;
+                ParentBaseClass = ParentBaseReference.TypeModel.FullReferenceName;
+                TaskClass = TaskReference.TypeModel.FullReferenceName;
+                CancellationTokenClass = CancellationTokenReference.TypeModel.FullReferenceName;
+                ParentReferenceClass = IParentReferenceReference.TypeModel.FullReferenceName;
+            }
+        }
+
+        internal class InterfacesTM
+        {
+            public string ParentInterface { get; }
+
+            public InterfacesTM(TychoParentModel tychoParentModel)
+            {
+                var parentInterfaceType = new GeneratedTypeModel(
+                    tychoParentModel.DefinitionType,
+                    ModuleParentSymbols.GetParentInterface(tychoParentModel.DefinitionType.Name));
+                ParentInterface = parentInterfaceType.ReferenceName;
+            }
+        }
+
+        internal class MethodsTM
+        {
+            public string ExecuteAsyncMethod { get; }
+
+            public MethodsTM()
+            {
+                ExecuteAsyncMethod = ParentBaseReference.ExecuteAsyncMethodName;
+            }
+        }
+
+        internal class ParametersTM
+        {
+            public string ParentReferenceParameter { get; }
+            public string RequestDataParameter { get; }
+            public string CancellationTokenParameter { get; }
+
+            public ParametersTM()
+            {
+                ParentReferenceParameter = ModuleParentSymbols.ParentReferenceParameter;
+                RequestDataParameter = ModuleParentSymbols.RequestDataParameter;
+                CancellationTokenParameter = ModuleParentSymbols.CancellationTokenParameter;
+            }
+        }
+
+        internal class RequestTM
+        {
+            public string RequestType { get; }
+            public string ResponseType { get; }
+            public bool HasResponse { get; }
+
+            public RequestTM(ModuleParentTM owner, TychoRequestModel tychoRequestModel)
+            {
+                RequestType = tychoRequestModel.RequestType.FullReferenceName;
+                HasResponse = tychoRequestModel.HasResponse;
+                ResponseType = HasResponse ? tychoRequestModel.ResponseType.Value.FullReferenceName : string.Empty;
+            }
+        }
+    }
+}

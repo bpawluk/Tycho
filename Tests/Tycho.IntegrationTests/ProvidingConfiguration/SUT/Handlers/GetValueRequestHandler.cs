@@ -1,0 +1,30 @@
+using Microsoft.Extensions.Configuration;
+using Tycho.IntegrationTests.ProvidingConfiguration.SUT.Modules;
+using Tycho.Requests;
+
+namespace Tycho.IntegrationTests.ProvidingConfiguration.SUT.Handlers;
+
+internal class GetValueRequestHandler(IConfigurationSection config)
+    : IRequestHandler<GetAppValueRequest, string>
+    , IRequestHandler<GetAlphaValueRequest, string>
+    , IRequestHandler<GetBetaValueRequest, string>
+{
+    private readonly IConfigurationSection _config = config;
+
+    private string Value => _config["Value"]!;
+
+    public Task<string> HandleAsync(GetAppValueRequest requestData, CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(Value);
+    }
+
+    public Task<string> HandleAsync(GetAlphaValueRequest requestData, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(Value);
+    }
+
+    public Task<string> HandleAsync(GetBetaValueRequest requestData, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(Value);
+    }
+}

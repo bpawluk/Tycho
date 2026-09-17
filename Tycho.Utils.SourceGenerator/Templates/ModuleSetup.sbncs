@@ -1,0 +1,51 @@
+{{~#--------- Calculate indentation ---------#~}}
+{{~ ns_offset = namespace != "" ? 1 : 0 ~}}
+{{~ ct_count = array.size containing_types ~}}
+{{~ bi = ns_offset + ct_count ~}}
+{{~ i0 = string.pad_left "" (bi * 4) ~}}
+{{~ i1 = string.pad_left "" ((bi + 1) * 4) ~}}
+{{~ i2 = string.pad_left "" ((bi + 2) * 4) ~}}
+{{~#-----------------------------------------#~}}
+{{~#----------- Declare namespace -----------#~}}
+{{~ if namespace != "" ~}}
+namespace {{ namespace }}
+{
+{{~ end ~}}
+{{~#-----------------------------------------#~}}
+{{~#---------- Declare outer types ----------#~}}
+{{~ for containing_type in containing_types ~}}
+{{~ containing_type_indent = (ns_offset + for.index) * 4 ~}}
+{{ string.pad_left "" containing_type_indent }}{{ containing_type.declaration }}
+{{~ for constraint in containing_type.constraints ~}}
+{{ string.pad_left "" (containing_type_indent + 4) }}{{ constraint }}
+{{~ end ~}}
+{{ string.pad_left "" containing_type_indent }}{
+{{~ end ~}}
+{{~#-----------------------------------------#~}}
+{{~#--------------------------------------------------- MODULE SETUP ---------------------------------------------------#~}}
+{{ i0 }}public class {{ classes.setup_class }}
+{{~ for owner_constraint in owner_constraints ~}}
+{{   i1   }}{{ owner_constraint }}
+{{~ end ~}}
+{{ i0 }}{
+{{   i1   }}public static void {{ methods.setup_method }}({{ interfaces.service_collection_interface }} {{ parameters.module_parameter }})
+{{   i1   }}{
+{{     i2     }}{{ classes.service_collection_service_extensions_class }}.{{ methods.add_singleton_method }}<{{ interfaces.event_serializer_interface }}, {{ classes.event_serializer_class }}>({{ parameters.module_parameter }});
+{{~ for submodule in submodules ~}}
+{{     i2     }}{{ classes.service_collection_service_extensions_class }}.{{ methods.add_singleton_method }}<{{ submodule.facade_interface }}, {{ submodule.facade_class }}>({{ parameters.module_parameter }});
+{{~ end ~}}
+{{     i2     }}{{ classes.service_collection_service_extensions_class }}.{{ methods.add_transient_method }}<{{ interfaces.publisher_interface }}, {{ classes.publisher_class }}>({{ parameters.module_parameter }});
+{{     i2     }}{{ classes.service_collection_service_extensions_class }}.{{ methods.add_transient_method }}<{{ interfaces.module_parent_interface }}, {{ classes.module_parent_class }}>({{ parameters.module_parameter }});
+{{   i1   }}}
+{{ i0 }}}
+{{~#--------------------------------------------------------------------------------------------------------------------#~}}
+{{~#------- Close outer type brackets -------#~}}
+{{~ for containing_type in containing_types ~}}
+{{ string.pad_left "" ((bi - 1 - for.index) * 4) }}}
+{{~ end ~}}
+{{~#-----------------------------------------#~}}
+{{~#-------- Close namespace bracket --------#~}}
+{{~ if namespace != "" ~}}
+}
+{{~ end ~}}
+{{~#-----------------------------------------#~}}
