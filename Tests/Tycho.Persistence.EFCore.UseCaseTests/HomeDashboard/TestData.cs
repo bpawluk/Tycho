@@ -9,19 +9,40 @@ internal class TestData
 {
     public Readings InitialReadings { get; } =
     [
-        new("living-room-climate", new TemperatureReading(21.5m), RecordedAt(minutes: 0)),
-        new("bedroom-climate", new TemperatureReading(19.75m), RecordedAt(minutes: 1)),
-        new("kitchen-air", new AirQualityReading(875, 12), RecordedAt(minutes: 2)),
-        new("hallway-motion", new MotionDetected("Hallway"), RecordedAt(minutes: 3)),
-        new("front-door", new DoorOpened("Front Door"), RecordedAt(minutes: 4)),
+        new("downstairs-climate", new TemperatureReading(21.5m), RecordedAt(minutes: 0)),
+        new("upstairs-climate", new TemperatureReading(19.75m), RecordedAt(minutes: 1)),
+        new("downstairs-climate", new TemperatureReading(22.75m), RecordedAt(minutes: 2)),
+        new("upstairs-climate", new TemperatureReading(18.75m), RecordedAt(minutes: 3)),
+        new("downstairs-climate", new TemperatureReading(21.5m), RecordedAt(minutes: 4)),
+        new("upstairs-climate", new TemperatureReading(17.75m), RecordedAt(minutes: 5)),
+        new("downstairs-climate", new TemperatureReading(22.25m), RecordedAt(minutes: 6)),
+        new("kitchen-air", new AirQualityReading(875, 12), RecordedAt(minutes: 7)),
+        new("hallway-motion", new MotionDetected("Hallway"), RecordedAt(minutes: 8)),
+        new("front-door", new DoorOpened("Front Door"), RecordedAt(minutes: 9)),
     ];
 
-    public TemperatureReadings GetTemperatureReadings()
+    public TemperatureReadings GetUpstairsTemperatureReadings()
     {
         return
         [
             .. InitialReadings
                 .Where(reading => reading.Reading is TemperatureReading)
+                .Where(reading => reading.SensorId == "upstairs-climate")
+                .Select(reading =>
+                {
+                    var temperature = (TemperatureReading)reading.Reading;
+                    return new TemperatureReadingExpectation(reading.SensorId, temperature.Celsius, reading.RecordedAt);
+                })
+        ];
+    }
+
+    public TemperatureReadings GetDownstairsTemperatureReadings()
+    {
+        return
+        [
+            .. InitialReadings
+                .Where(reading => reading.Reading is TemperatureReading)
+                .Where(reading => reading.SensorId == "downstairs-climate")
                 .Select(reading =>
                 {
                     var temperature = (TemperatureReading)reading.Reading;

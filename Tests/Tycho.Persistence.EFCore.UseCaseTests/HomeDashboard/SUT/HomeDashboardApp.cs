@@ -3,8 +3,9 @@ using Tycho.Apps;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Contract.Readings;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Handlers;
-using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Climate;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Climate.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Climate.Persistence;
+using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Rooms;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Security;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Security.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Ventilation;
@@ -21,8 +22,8 @@ public partial class HomeDashboardApp : TychoApp
         app.Expects<SetReadingRequest>()
            .HandlesWith<SetReadingRequestHandler>();
 
-        app.Expects<GetTemperatureReadingsRequest, GetTemperatureReadingsRequest.Response>()
-           .ForwardsTo<ClimateModule>();
+        app.Expects<GetRoomTemperatureReadingsRequest, GetTemperatureReadingsRequest.Response>()
+           .HandlesWith<GetRoomTemperatureReadingsRequestHandler>();
 
         app.Expects<GetAirQualityReadingsRequest, GetAirQualityReadingsRequest.Response>()
            .ForwardsTo<VentilationModule>();
@@ -34,7 +35,7 @@ public partial class HomeDashboardApp : TychoApp
     protected override void DefineEvents(IAppEvents app)
     {
         app.Expects<SensorEvent<TemperatureReading>>()
-           .ForwardsTo<ClimateModule>();
+           .HandlesWith<TemperatureSensorEventHandler>();
 
         app.Expects<SensorEvent<AirQualityReading>>()
            .ForwardsTo<VentilationModule>();
@@ -48,7 +49,8 @@ public partial class HomeDashboardApp : TychoApp
 
     protected override void IncludeModules(IAppStructure app)
     {
-        app.Uses<ClimateModule>()
+        app.Uses<DownstairsModule>()
+           .Uses<UpstairsModule>()
            .Uses<VentilationModule>()
            .Uses<SecurityModule>();
     }
@@ -63,5 +65,10 @@ public partial class HomeDashboardApp : TychoApp
         HomeDashboardDbContext context = app.GetRequiredService<HomeDashboardDbContext>();
         await context.Database.EnsureDeletedAsync(cancellationToken);
         await context.Database.EnsureCreatedAsync(cancellationToken);
+
+        // Initialize the ClimateDbContext here once because Climate module has two instances
+        await using var climateDb = new ClimateDbContext();
+        await climateDb.Database.EnsureDeletedAsync(TestContext.Current.CancellationToken);
+        await climateDb.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
     }
 }

@@ -5,6 +5,7 @@ using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Contract.Readings;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Climate.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Climate.Handlers;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Climate.Persistence;
+using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Rooms.Contract;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Climate;
 
@@ -27,13 +28,7 @@ public partial class ClimateModule : TychoModule
 
     protected override void RegisterServices(IServiceCollection module)
     {
-        module.AddTychoPersistence<ClimateDbContext>();
-    }
-
-    protected override async Task Startup(IServiceProvider module, CancellationToken cancellationToken)
-    {
-        ClimateDbContext context = module.GetRequiredService<ClimateDbContext>();
-        await context.Database.EnsureDeletedAsync(cancellationToken);
-        await context.Database.EnsureCreatedAsync(cancellationToken);
+        module.AddTychoPersistence<ClimateDbContext>()
+              .AddSingleton(GetSettings<RoomSettings>());
     }
 }
