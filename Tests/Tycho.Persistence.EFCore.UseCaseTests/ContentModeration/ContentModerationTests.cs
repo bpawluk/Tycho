@@ -1,8 +1,8 @@
+using Tycho.Persistence.EFCore.UseCaseTests._Utils;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Incoming;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract;
-using Tycho.Persistence.EFCore.UseCaseTests._Utils;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration;
 
@@ -42,6 +42,18 @@ public sealed class ContentModerationTests : IAsyncLifetime
         {
             GetPostsRequest.Response posts = await _sut.ExecuteAsync(new GetPostsRequest(), TestContext.Current.CancellationToken);
             return _testData.GetPostsAfterPostRemovals().Match(posts);
+        });
+
+        await AssertEventually.True(async () =>
+        {
+            GetAuditedUsersRequest.Response users = await _sut.ExecuteAsync(new GetAuditedUsersRequest(), TestContext.Current.CancellationToken);
+            return users.UserIds.Order().SequenceEqual(_testData.GetPostRemovals().BannedUsersIds.Distinct().Order());
+        });
+
+        await AssertEventually.True(async () =>
+        {
+            GetAuditedPostsRequest.Response posts = await _sut.ExecuteAsync(new GetAuditedPostsRequest(), TestContext.Current.CancellationToken);
+            return posts.PostIds.Order().SequenceEqual(_testData.GetPostRemovals().RemovedPosts.Select(post => post.Id!.Value).Order());
         });
     }
 

@@ -4,6 +4,8 @@ internal class User(string name)
 {
     public int Id { get; private set; }
 
+    public Guid? AuditId { get; set; }
+
     public string Name { get; private set; } = name;
 
     public UserStatus Status { get; set; } = UserStatus.Active;

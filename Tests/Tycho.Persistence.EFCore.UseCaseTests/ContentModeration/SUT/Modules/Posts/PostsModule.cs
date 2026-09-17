@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Modules;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Audit;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Audit.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Handlers;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Persistence;
@@ -11,6 +13,9 @@ public partial class PostsModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
     {
+        module.Expects<GetAuditedPostsRequest, GetAuditedPostsRequest.Response>()
+              .HandlesWith<GetAuditedPostsRequestHandler>();
+
         module.Expects<AddPostRequest, AddPostRequest.Response>()
               .HandlesWith<AddPostRequestHandler>();
 
@@ -23,11 +28,17 @@ public partial class PostsModule : TychoModule
 
     protected override void DefineEvents(IModuleEvents module)
     {
+        module.Expects<AuditRecordedEvent>()
+              .HandlesWith<AuditRecordedEventHandler>();
+
         module.Expects<PostStatusChangedEvent>()
               .HandlesWith<PostStatusChangedEventHandler>();
     }
 
-    protected override void IncludeModules(IModuleStructure module) { }
+    protected override void IncludeModules(IModuleStructure module)
+    {
+        module.Uses<AuditModule>();
+    }
 
     protected override void RegisterServices(IServiceCollection module)
     {

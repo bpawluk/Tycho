@@ -4,6 +4,8 @@ internal class Post(int authorId, string content)
 {
     public int Id { get; private set; }
 
+    public Guid? AuditId { get; set; }
+
     public int AuthorId { get; private set; } = authorId;
 
     public string Content { get; private set; } = content;

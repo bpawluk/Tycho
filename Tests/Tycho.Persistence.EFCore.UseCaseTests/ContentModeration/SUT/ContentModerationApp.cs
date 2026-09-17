@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Apps;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Audit.Persistence;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Mappers;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Incoming;
@@ -16,6 +17,12 @@ public partial class ContentModerationApp : TychoApp
 {
     protected override void DefineContract(IAppContract app)
     {
+        app.Expects<GetAuditedUsersRequest, GetAuditedUsersRequest.Response>()
+           .ForwardsTo<UsersModule>();
+
+        app.Expects<GetAuditedPostsRequest, GetAuditedPostsRequest.Response>()
+           .ForwardsTo<PostsModule>();
+
         app.Expects<AddUserRequest, AddUserRequest.Response>()
            .ForwardsTo<UsersModule>();
 
@@ -63,4 +70,12 @@ public partial class ContentModerationApp : TychoApp
     }
 
     protected override void RegisterServices(IServiceCollection app) { }
+
+    protected override async Task Startup(IServiceProvider app, CancellationToken cancellationToken)
+    {
+        // Initialize the AuditDbContext here once because Audit module has two instances
+        await using var context = new AuditDbContext();
+        await context.Database.EnsureDeletedAsync(cancellationToken);
+        await context.Database.EnsureCreatedAsync(cancellationToken);
+    }
 }
