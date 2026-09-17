@@ -19,7 +19,7 @@ internal sealed class PersistenceOwner
 
         if (logger?.IsEnabled(LogLevel.Information) == true)
         {
-            logger.LogInformation("Persistence key {OwnerKey} configured for {OwnerInstanceId}", Key, internals.OwnerInstanceId.Value);
+            logger.LogInformation("{OwnerInstanceId} persistence configured with key {OwnerKey}", Key, internals.OwnerInstanceId.Value);
         }
     }
 }
