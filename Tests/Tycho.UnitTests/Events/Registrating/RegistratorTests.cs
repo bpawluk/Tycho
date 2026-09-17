@@ -20,7 +20,7 @@ public class RegistratorTests
 
     public RegistratorTests()
     {
-        _internals = new Internals(typeof(TestModule), Host.CreateEmptyApplicationBuilder(default));
+        _internals = new Internals(Host.CreateEmptyApplicationBuilder(default), typeof(TestModule));
         _internals.GetHostBuilder().Services
                   .AddSingleton(_internals);
         _sut = new Registrator(_internals);

@@ -1,6 +1,6 @@
 using Tycho.Events.Routing;
 using Tycho.Events.Routing.Steps;
-using Tycho.Identity.Modules;
+using Tycho.Identity.Structure;
 using Tycho.UnitTests._Data.Modules;
 
 namespace Tycho.UnitTests.Events.Routing.Steps;
@@ -11,7 +11,7 @@ public class DownStreamRouteStepTests
     public void Create_SetsDestination()
     {
         // Arrange
-        var expectedDestination = ModuleIdentity.Create<TestModule>();
+        var expectedDestination = DefinitionIdentity.Create<TestModule>();
 
         // Act
         var result = DownStreamRouteStep.Create<TestModule>();
@@ -25,7 +25,7 @@ public class DownStreamRouteStepTests
     {
         // Arrange
         var sut = DownStreamRouteStep.Create<TestModule>();
-        var expectedDestination = ModuleIdentity.Create<TestModule>();
+        var expectedDestination = DefinitionIdentity.Create<TestModule>();
 
         // Act
         string result = sut.ToString();
@@ -38,7 +38,7 @@ public class DownStreamRouteStepTests
     public void TryParse_ValidFormat_ReturnsTrueAndDownStreamStep()
     {
         // Arrange
-        var destination = ModuleIdentity.Create<TestModule>();
+        var destination = DefinitionIdentity.Create<TestModule>();
         string input = $"DOWN({destination})";
 
         // Act
@@ -54,7 +54,7 @@ public class DownStreamRouteStepTests
     public void TryParse_ValidFormatDifferentCasing_ReturnsTrueAndDownStreamStep()
     {
         // Arrange
-        var destination = ModuleIdentity.Create<TestModule>();
+        var destination = DefinitionIdentity.Create<TestModule>();
         string input = $"doWn({destination})";
 
         // Act
@@ -84,7 +84,7 @@ public class DownStreamRouteStepTests
     public void Parse_ValidFormat_ReturnsDownStreamStep()
     {
         // Arrange
-        var destination = ModuleIdentity.Create<TestModule>();
+        var destination = DefinitionIdentity.Create<TestModule>();
         string input = $"DOWN({destination})";
 
         // Act

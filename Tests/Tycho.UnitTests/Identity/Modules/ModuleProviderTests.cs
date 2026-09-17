@@ -2,12 +2,13 @@ using Moq;
 using Tycho.Identity.Modules;
 using Tycho.Modules.Instance;
 using Tycho.UnitTests._Data.Modules;
+using Tycho.Identity.Structure;
 
 namespace Tycho.UnitTests.Identity.Modules;
 
 public class ModuleProviderTests
 {
-    private readonly Dictionary<ModuleIdentity, IModule> _registeredModules = [];
+    private readonly Dictionary<DefinitionIdentity, IModule> _registeredModules = [];
 
     private readonly ModuleProvider _sut;
 
@@ -15,19 +16,19 @@ public class ModuleProviderTests
     {
         var firstModuleMock = new Mock<IModule>();
         IModule firstModule = firstModuleMock.Object;
-        var firstModuleId = ModuleIdentity.Create<OtherModule>();
+        var firstModuleId = DefinitionIdentity.Create<OtherModule>();
         _registeredModules.Add(firstModuleId, firstModule);
         firstModuleMock.SetupGet(m => m.Identity).Returns(firstModuleId);
 
         var secondModuleMock = new Mock<IModule>();
         IModule secondModule = secondModuleMock.Object;
-        var secondModuleId = ModuleIdentity.Create<TestModule>();
+        var secondModuleId = DefinitionIdentity.Create<TestModule>();
         _registeredModules.Add(secondModuleId, secondModule);
         secondModuleMock.SetupGet(m => m.Identity).Returns(secondModuleId);
 
         var thirdModuleMock = new Mock<IModule>();
         IModule thirdModule = thirdModuleMock.Object;
-        var thirdModuleId = ModuleIdentity.Create<AnotherModule>();
+        var thirdModuleId = DefinitionIdentity.Create<AnotherModule>();
         _registeredModules.Add(thirdModuleId, thirdModule);
         thirdModuleMock.SetupGet(m => m.Identity).Returns(thirdModuleId);
 
@@ -38,7 +39,7 @@ public class ModuleProviderTests
     public void GetModule_WithRegisteredModule_ReturnsTheModule()
     {
         // Arrange
-        ModuleIdentity moduleId = _registeredModules.Keys.ElementAt(1);
+        DefinitionIdentity moduleId = _registeredModules.Keys.ElementAt(1);
         IModule module = _registeredModules[moduleId];
 
         // Act
@@ -52,7 +53,7 @@ public class ModuleProviderTests
     public void GetModule_WithMissingModule_ThrowsArgumentException()
     {
         // Arrange
-        var missingId = ModuleIdentity.Create<YetAnotherModule>();
+        var missingId = DefinitionIdentity.Create<YetAnotherModule>();
 
         // Act 
         void Act() => _sut.GetModule(missingId);

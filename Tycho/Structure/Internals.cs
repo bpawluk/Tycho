@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Tycho.Identity.Structure;
 
 namespace Tycho.Structure
 {
@@ -13,12 +14,21 @@ namespace Tycho.Structure
         private IHost? _host;
         private int _disposed;
 
-        public Type Owner { get; }
+        public DefinitionIdentity OwnerDefinitionId { get; }
+        public InstanceIdentity OwnerInstanceId { get; }
 
-        public Internals(Type owner, HostApplicationBuilder hostBuilder)
+        public Internals(HostApplicationBuilder hostBuilder, Type ownerDefinition)
         {
-            Owner = owner;
             _hostBuilder = hostBuilder;
+            OwnerDefinitionId = DefinitionIdentity.Create(ownerDefinition);
+            OwnerInstanceId = InstanceIdentity.CreateRoot(OwnerDefinitionId);
+        }
+
+        public Internals(HostApplicationBuilder hostBuilder, Type ownerDefinition, InstanceIdentity parentIdentity)
+        {
+            _hostBuilder = hostBuilder;
+            OwnerDefinitionId = DefinitionIdentity.Create(ownerDefinition);
+            OwnerInstanceId = parentIdentity.CreateChild(OwnerDefinitionId);
         }
 
         public HostApplicationBuilder GetHostBuilder()
@@ -103,7 +113,7 @@ namespace Tycho.Structure
         {
             if (Volatile.Read(ref _disposed) != 0)
             {
-                throw new ObjectDisposedException(Owner.FullName ?? Owner.Name);
+                throw new ObjectDisposedException(OwnerDefinitionId.Value);
             }
         }
     }

@@ -16,6 +16,7 @@ namespace Tycho.Persistence.EFCore.Inbox;
 internal class InboxConsumer(
     IEventSerializer eventSerializer,
     TychoDbContext dbContext,
+    PersistenceOwner owner,
     InboxConsumerSettings? settings = null) : IInboxConsumer
 {
     private readonly IEventSerializer _eventSerializer = eventSerializer;
@@ -34,6 +35,7 @@ internal class InboxConsumer(
 
         int claimedEntriesCount = await _dbContext
             .Set<InboxEntry>()
+            .Where(entry => entry.OwnerKey == owner.Key)
             .Where(canBeProcessed)
             .OrderBy(entry => entry.Updated)
             .ThenBy(entry => entry.Id)
@@ -54,7 +56,9 @@ internal class InboxConsumer(
         InboxEntry? entryToDeliver = await _dbContext
             .Set<InboxEntry>()
             .AsNoTracking()
-            .SingleOrDefaultAsync(entry => entry.ClaimId == claimId, cancellationToken)
+            .SingleOrDefaultAsync(entry =>
+                entry.OwnerKey == owner.Key &&
+                entry.ClaimId == claimId, cancellationToken)
             .ConfigureAwait(false);
 
         if (entryToDeliver == null)
@@ -96,6 +100,7 @@ internal class InboxConsumer(
         int updatedRowsCount = await _dbContext
             .Set<InboxEntry>()
             .Where(entry =>
+                entry.OwnerKey == owner.Key &&
                 entry.State == EntryState.InProcessing &&
                 entry.ClaimId == claimId)
             .ExecuteUpdateAsync(setters => setters
@@ -115,6 +120,7 @@ internal class InboxConsumer(
         int updatedRowsCount = await _dbContext
             .Set<InboxEntry>()
             .Where(entry =>
+                entry.OwnerKey == owner.Key &&
                 entry.State == EntryState.InProcessing &&
                 entry.ClaimId == claimId)
             .ExecuteUpdateAsync(setters => setters

@@ -20,7 +20,7 @@ public class DownStreamRegistratorTests
 
     public DownStreamRegistratorTests()
     {
-        _internals = new Internals(typeof(object), Host.CreateEmptyApplicationBuilder(default));
+        _internals = new Internals(Host.CreateEmptyApplicationBuilder(default), typeof(object));
         _internals.GetHostBuilder().Services
                   .AddSingleton(_internals);
         _sut = new Registrator(_internals);

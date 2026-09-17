@@ -1,6 +1,8 @@
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Inbox;
 using Tycho.Events.Outbox;
+using Tycho.Persistence.EFCore.Common;
 using Tycho.Persistence.EFCore.Inbox;
 using Tycho.Persistence.EFCore.Outbox;
 using Tycho.Persistence.EFCore.Transactions;
@@ -20,7 +22,9 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddTychoPersistence<TDbContext>(this IServiceCollection services)
         where TDbContext : TychoDbContext
     {
+        ArgumentNullException.ThrowIfNull(services);
         services.AddDbContext<TDbContext>()
+                .AddSingleton<PersistenceOwner>()
                 .AddScoped<TychoDbContext>(sp => sp.GetRequiredService<TDbContext>())
                 .AddScoped<ITransaction, Transaction>()
                 .AddTransient<IOutboxWriter, OutboxWriter>()

@@ -1,6 +1,6 @@
 using Tycho.Events.Routing;
 using Tycho.Events.Routing.Steps;
-using Tycho.Identity.Modules;
+using Tycho.Identity.Structure;
 using Tycho.UnitTests._Data.Modules;
 
 namespace Tycho.UnitTests.Events.Routing;
@@ -39,7 +39,7 @@ public class RouteTests
         sut.Push(DownStreamRouteStep.Create<TestModule>());
         sut.Push(UpStreamRouteStep.Create());
 
-        var expectedDestination = ModuleIdentity.Create<TestModule>();
+        var expectedDestination = DefinitionIdentity.Create<TestModule>();
 
         // Act
         string result = sut.ToString();
@@ -66,7 +66,7 @@ public class RouteTests
     public void Parse_WithDownStreamStep_ReturnsCorrectRoute()
     {
         // Arrange
-        var destination = ModuleIdentity.Create<TestModule>();
+        var destination = DefinitionIdentity.Create<TestModule>();
         string input = $"DOWN({destination})/END";
 
         // Act
@@ -97,7 +97,7 @@ public class RouteTests
     public void Parse_ComplexRoute_ReturnsCorrectRoute()
     {
         // Arrange
-        var destination = ModuleIdentity.Create<TestModule>();
+        var destination = DefinitionIdentity.Create<TestModule>();
         string input = $"UP/DOWN({destination})/END";
 
         // Act

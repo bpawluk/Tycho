@@ -12,7 +12,7 @@ using Tycho.Persistence.EFCore.Common;
 
 namespace Tycho.Persistence.EFCore.Outbox;
 
-internal class OutboxConsumer(TychoDbContext dbContext, OutboxConsumerSettings? settings = null) : IOutboxConsumer
+internal class OutboxConsumer(TychoDbContext dbContext, PersistenceOwner owner, OutboxConsumerSettings? settings = null) : IOutboxConsumer
 {
     private readonly TychoDbContext _dbContext = dbContext;
     private readonly OutboxConsumerSettings _settings = settings ?? OutboxConsumerSettings.Default;
@@ -29,6 +29,7 @@ internal class OutboxConsumer(TychoDbContext dbContext, OutboxConsumerSettings? 
 
         int claimedEntries = await _dbContext
             .Set<OutboxEntry>()
+            .Where(entry => entry.OwnerKey == owner.Key)
             .Where(canBeProcessed)
             .OrderBy(entry => entry.Updated)
             .ThenBy(entry => entry.Id)
@@ -49,7 +50,9 @@ internal class OutboxConsumer(TychoDbContext dbContext, OutboxConsumerSettings? 
         OutboxEntry? entryToDeliver = await _dbContext
             .Set<OutboxEntry>()
             .AsNoTracking()
-            .SingleOrDefaultAsync(entry => entry.ClaimId == claimId, cancellationToken)
+            .SingleOrDefaultAsync(entry =>
+                entry.OwnerKey == owner.Key &&
+                entry.ClaimId == claimId, cancellationToken)
             .ConfigureAwait(false);
 
         return entryToDeliver == null
@@ -72,6 +75,7 @@ internal class OutboxConsumer(TychoDbContext dbContext, OutboxConsumerSettings? 
         int updatedRowsCount = await _dbContext
             .Set<OutboxEntry>()
             .Where(entry =>
+                entry.OwnerKey == owner.Key &&
                 entry.State == EntryState.InProcessing &&
                 entry.ClaimId == claimId)
             .ExecuteUpdateAsync(setters => setters
@@ -91,6 +95,7 @@ internal class OutboxConsumer(TychoDbContext dbContext, OutboxConsumerSettings? 
         int updatedRowsCount = await _dbContext
             .Set<OutboxEntry>()
             .Where(entry =>
+                entry.OwnerKey == owner.Key &&
                 entry.State == EntryState.InProcessing &&
                 entry.ClaimId == claimId)
             .ExecuteUpdateAsync(setters => setters

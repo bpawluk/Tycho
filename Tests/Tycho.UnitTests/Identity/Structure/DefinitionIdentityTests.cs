@@ -1,11 +1,11 @@
-using Tycho.Identity.Modules;
+using Tycho.Identity.Structure;
 using Tycho.UnitTests._Data.Modules;
 
-namespace Tycho.UnitTests.Identity.Modules;
+namespace Tycho.UnitTests.Identity.Structure;
 
-public class ModuleIdentityTests
+public class DefinitionIdentityTests
 {
-    private static readonly ModuleIdentity s_moduleIdentity = ModuleIdentity.Create<TestModule>();
+    private static readonly DefinitionIdentity s_moduleIdentity = DefinitionIdentity.Create<TestModule>();
 
     public static readonly IEnumerable<object[]> EqualsTestData =
     [
@@ -14,26 +14,26 @@ public class ModuleIdentityTests
 
         // Same module type => Equal
         [
-            ModuleIdentity.Create<TestModule>(),
-            ModuleIdentity.Create<TestModule>(),
+            DefinitionIdentity.Create<TestModule>(),
+            DefinitionIdentity.Create<TestModule>(),
             true
         ],
 
         // Different module types => Not Equal
         [
-            ModuleIdentity.Create<TestModule>(),
-            ModuleIdentity.Create<OtherModule>(),
+            DefinitionIdentity.Create<TestModule>(),
+            DefinitionIdentity.Create<OtherModule>(),
             false
         ],
 
         // Comparing to null => Not Equal
-        [ModuleIdentity.Create<TestModule>(), null!, false]
+        [DefinitionIdentity.Create<TestModule>(), null!, false]
     ];
 
     public static readonly IEnumerable<object[]> EqualsObjectTestData = EqualsTestData.Concat(
     [
         // Comparing to an object of a different type => Not Equal
-        [ModuleIdentity.Create<TestModule>(), new object(), false]
+        [DefinitionIdentity.Create<TestModule>(), new object(), false]
     ]);
 
     public static readonly IEnumerable<object[]> EqualsOperatorTestData = EqualsTestData.Concat(
@@ -42,14 +42,14 @@ public class ModuleIdentityTests
         [null!, null!, true],
 
         // Comparing null to an identity => Not Equal
-        [null!, ModuleIdentity.Create<TestModule>(), false]
+        [null!, DefinitionIdentity.Create<TestModule>(), false]
     ]);
 
 #pragma warning disable xUnit1042
 
     [Theory]
     [MemberData(nameof(EqualsTestData))]
-    internal void ModuleIdentity_Equals_EvaluatesCorrectly(ModuleIdentity left, ModuleIdentity? right, bool areEqual)
+    internal void DefinitionIdentity_Equals_EvaluatesCorrectly(DefinitionIdentity left, DefinitionIdentity? right, bool areEqual)
     {
         // Act
         bool result = left.Equals(right);
@@ -60,7 +60,7 @@ public class ModuleIdentityTests
 
     [Theory]
     [MemberData(nameof(EqualsObjectTestData))]
-    internal void ModuleIdentity_EqualsObject_EvaluatesCorrectly(ModuleIdentity left, object? right, bool areEqual)
+    internal void DefinitionIdentity_EqualsObject_EvaluatesCorrectly(DefinitionIdentity left, object? right, bool areEqual)
     {
         // Act
         bool result = left.Equals(right);
@@ -71,7 +71,7 @@ public class ModuleIdentityTests
 
     [Theory]
     [MemberData(nameof(EqualsOperatorTestData))]
-    internal void ModuleIdentity_EqualsOperator_EvaluatesCorrectly(ModuleIdentity? left, ModuleIdentity? right, bool areEqual)
+    internal void DefinitionIdentity_EqualsOperator_EvaluatesCorrectly(DefinitionIdentity? left, DefinitionIdentity? right, bool areEqual)
     {
         // Act
         bool result = left == right;
@@ -82,7 +82,7 @@ public class ModuleIdentityTests
 
     [Theory]
     [MemberData(nameof(EqualsOperatorTestData))]
-    internal void ModuleIdentity_NotEqualsOperator_EvaluatesCorrectly(ModuleIdentity? left, ModuleIdentity? right, bool areEqual)
+    internal void DefinitionIdentity_NotEqualsOperator_EvaluatesCorrectly(DefinitionIdentity? left, DefinitionIdentity? right, bool areEqual)
     {
         // Act
         bool result = left != right;

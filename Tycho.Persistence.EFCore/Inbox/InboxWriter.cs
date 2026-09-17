@@ -3,10 +3,11 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Tycho.Events.Inbox;
 using Tycho.Events.Model;
+using Tycho.Persistence.EFCore.Common;
 
 namespace Tycho.Persistence.EFCore.Inbox;
 
-internal class InboxWriter(InboxActivity inboxActivity, TychoDbContext dbContext) : IInboxWriter
+internal class InboxWriter(InboxActivity inboxActivity, TychoDbContext dbContext, PersistenceOwner owner) : IInboxWriter
 {
     private readonly TychoDbContext _dbContext = dbContext;
     private readonly InboxActivity _inboxActivity = inboxActivity;
@@ -15,6 +16,7 @@ internal class InboxWriter(InboxActivity inboxActivity, TychoDbContext dbContext
     {
         var inboxEntry = new InboxEntry
         {
+            OwnerKey = owner.Key,
             Id = serializedEvent.Id,
             PublishId = serializedEvent.PublishId,
             Event = serializedEvent.EventId.ToString(),
@@ -34,7 +36,9 @@ internal class InboxWriter(InboxActivity inboxActivity, TychoDbContext dbContext
             InboxEntry? existing = await _dbContext
                 .Set<InboxEntry>()
                 .AsNoTracking()
-                .SingleOrDefaultAsync(x => x.Id == inboxEntry.Id, cancellationToken)
+                .SingleOrDefaultAsync(x =>
+                    x.OwnerKey == owner.Key &&
+                    x.Id == inboxEntry.Id, cancellationToken)
                 .ConfigureAwait(false);
 
             if (existing is null ||

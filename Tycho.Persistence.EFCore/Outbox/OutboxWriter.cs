@@ -6,13 +6,15 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Events.Serialization;
+using Tycho.Persistence.EFCore.Common;
 
 namespace Tycho.Persistence.EFCore.Outbox;
 
 internal class OutboxWriter(
     IEventSerializer eventSerializer,
     OutboxActivity outboxActivity,
-    TychoDbContext dbContext) : IOutboxWriter
+    TychoDbContext dbContext,
+    PersistenceOwner owner) : IOutboxWriter
 {
     private readonly IEventSerializer _eventSerializer = eventSerializer;
     private readonly OutboxActivity _outboxActivity = outboxActivity;
@@ -25,6 +27,7 @@ internal class OutboxWriter(
             SerializedRoutedEvent serializedEvent = _eventSerializer.Serialize(routedEvent);
             return new OutboxEntry
             {
+                OwnerKey = owner.Key,
                 Id = serializedEvent.Id,
                 PublishId = serializedEvent.PublishId,
                 Event = serializedEvent.EventId.ToString(),

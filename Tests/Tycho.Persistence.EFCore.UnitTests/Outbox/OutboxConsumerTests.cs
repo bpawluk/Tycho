@@ -4,6 +4,7 @@ using Tycho.Events.Outbox;
 using Tycho.Events.Routing;
 using Tycho.Persistence.EFCore.Common;
 using Tycho.Persistence.EFCore.Outbox;
+using Tycho.Persistence.EFCore.UnitTests._Utils;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Outbox;
 
@@ -31,7 +32,8 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         _dbContext = new TestDbContext(options);
         await _dbContext.Database.EnsureCreatedAsync();
 
-        _sut = new OutboxConsumer(_dbContext, _settings);
+        var persistenceOwner = new PersistenceOwner(PersistenceTestInternals.Create(typeof(PersistenceOwner)));
+        _sut = new OutboxConsumer(_dbContext, persistenceOwner, _settings);
     }
 
     [Fact]
@@ -384,8 +386,10 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         DateTime claimExpiration)
     {
         DateTime now = DateTime.UtcNow;
+        var persistenceOwner = new PersistenceOwner(PersistenceTestInternals.Create(typeof(PersistenceOwner)));
         return new OutboxEntry
         {
+            OwnerKey = persistenceOwner.Key,
             Id = id,
             PublishId = Guid.NewGuid(),
             Event = "TestEvent",

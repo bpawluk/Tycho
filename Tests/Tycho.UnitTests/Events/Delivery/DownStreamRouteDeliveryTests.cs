@@ -10,6 +10,7 @@ using Tycho.Modules.Instance;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
 using Tycho.UnitTests._Data.Modules;
+using Tycho.Identity.Structure;
 
 namespace Tycho.UnitTests.Events.Delivery;
 
@@ -18,13 +19,13 @@ public class DownStreamRouteDeliveryTests
     private readonly Mock<IModuleProvider> _moduleProviderMock;
     private readonly Mock<IModule> _moduleMock;
     private readonly Mock<IEventBroker> _eventBrokerMock;
-    private readonly ModuleIdentity _testModuleIdentity;
+    private readonly DefinitionIdentity _testDefinitionIdentity;
 
     private readonly DownStreamRouteDelivery _sut;
 
     public DownStreamRouteDeliveryTests()
     {
-        _testModuleIdentity = ModuleIdentity.Create<TestModule>();
+        _testDefinitionIdentity = DefinitionIdentity.Create<TestModule>();
         _eventBrokerMock = new Mock<IEventBroker>();
 
         _moduleMock = new Mock<IModule>();
@@ -32,7 +33,7 @@ public class DownStreamRouteDeliveryTests
                    .Returns(_eventBrokerMock.Object);
 
         _moduleProviderMock = new Mock<IModuleProvider>();
-        _moduleProviderMock.Setup(mp => mp.GetModule(_testModuleIdentity))
+        _moduleProviderMock.Setup(mp => mp.GetModule(_testDefinitionIdentity))
                            .Returns(_moduleMock.Object);
 
         _sut = new DownStreamRouteDelivery(_moduleProviderMock.Object);
@@ -105,7 +106,7 @@ public class DownStreamRouteDeliveryTests
         await _sut.DeliverAsync(routedEvent, cancellationToken);
 
         // Assert
-        _moduleProviderMock.Verify(mp => mp.GetModule(_testModuleIdentity));
+        _moduleProviderMock.Verify(mp => mp.GetModule(_testDefinitionIdentity));
     }
 
     [Fact]
@@ -116,7 +117,7 @@ public class DownStreamRouteDeliveryTests
         SerializedRoutedEvent routedEvent = CreateRoutedEvent(downStreamStep);
         var cancellationToken = new CancellationToken();
 
-        _moduleProviderMock.Setup(mp => mp.GetModule(_testModuleIdentity))
+        _moduleProviderMock.Setup(mp => mp.GetModule(_testDefinitionIdentity))
                            .Returns<IModule>(null!);
 
         // Act

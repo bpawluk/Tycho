@@ -6,7 +6,7 @@ namespace Tycho.UnitTests.Structure;
 
 public class InternalsTests
 {
-    private readonly Internals _sut = new(typeof(InternalsTests), Host.CreateEmptyApplicationBuilder(default));
+    private readonly Internals _sut = new(Host.CreateEmptyApplicationBuilder(default), typeof(InternalsTests));
 
     [Fact]
     public async Task StartAsync_BeforeBuild_ThrowsInvalidOperationException()

@@ -87,6 +87,7 @@ namespace Tycho.Apps.Setup
 
             submodule.FulfillContract(new DownStreamBroker<TModule>(_internals));
             submodule.PassEventBroker(new EventBroker(_internals));
+            submodule.PassParentId(_internals.OwnerInstanceId);
 
             AddSubmodule(submodule);
         }

@@ -20,7 +20,7 @@ public class UpStreamBrokerTests
 
     public UpStreamBrokerTests()
     {
-        _internals = new Internals(typeof(object), Host.CreateEmptyApplicationBuilder(default));
+        _internals = new Internals(Host.CreateEmptyApplicationBuilder(default), typeof(object));
         _sut = new UpStreamBroker(_internals);
 
         _transactionMock = new Mock<ITransaction>();

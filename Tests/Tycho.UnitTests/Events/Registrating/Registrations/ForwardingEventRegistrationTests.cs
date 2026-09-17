@@ -6,7 +6,7 @@ using Tycho.Events.Registrating.Registrations;
 using Tycho.Events.Routing;
 using Tycho.Events.Routing.Steps;
 using Tycho.Identity.Events;
-using Tycho.Identity.Modules;
+using Tycho.Identity.Structure;
 using Tycho.Modules.Instance;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
@@ -151,7 +151,7 @@ public class ForwardingEventRegistrationTests
         IRouteStep[] routeSteps = [.. route];
         DownStreamRouteStep downStreamRouteStep = Assert.IsType<DownStreamRouteStep>(routeSteps[0]);
 
-        Assert.Equal(ModuleIdentity.Create<TestModule>(), downStreamRouteStep.Destination);
+        Assert.Equal(DefinitionIdentity.Create<TestModule>(), downStreamRouteStep.Destination);
         Assert.IsType<FinalRouteStep>(routeSteps[1]);
     }
 }

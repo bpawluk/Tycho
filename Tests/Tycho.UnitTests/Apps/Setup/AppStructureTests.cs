@@ -12,7 +12,7 @@ public class AppStructureTests
 
     public AppStructureTests()
     {
-        _internals = new Internals(typeof(object), Host.CreateEmptyApplicationBuilder(default));
+        _internals = new Internals(Host.CreateEmptyApplicationBuilder(default), typeof(object));
         _sut = new AppStructure(_internals);
     }
 

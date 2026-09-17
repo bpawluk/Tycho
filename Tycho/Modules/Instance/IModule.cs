@@ -4,6 +4,7 @@ using Tycho.Identity.Modules;
 using Tycho.Requests.Broker;
 using Tycho.Structure;
 using Tycho.Utils;
+using Tycho.Identity.Structure;
 
 namespace Tycho.Modules.Instance
 {
@@ -13,7 +14,7 @@ namespace Tycho.Modules.Instance
     [ReferencedBySourceGenerator]
     public interface IModule : IRunnable, IDisposable
     {
-        internal ModuleIdentity Identity { get; }
+        internal DefinitionIdentity Identity { get; }
 
         internal Internals Internals { get; }
 

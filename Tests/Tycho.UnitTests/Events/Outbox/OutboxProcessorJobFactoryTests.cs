@@ -20,7 +20,7 @@ public class OutboxProcessorJobFactoryTests
 
     public OutboxProcessorJobFactoryTests()
     {
-        var internals = new Internals(typeof(TestModule), Host.CreateEmptyApplicationBuilder(default));
+        var internals = new Internals(Host.CreateEmptyApplicationBuilder(default), typeof(TestModule));
         IServiceCollection serviceCollection = internals.GetHostBuilder().Services;
 
         _outboxConsumerMock = new Mock<IOutboxConsumer>();

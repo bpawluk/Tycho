@@ -4,8 +4,10 @@ using Tycho.Events.Inbox;
 using Tycho.Events.Model;
 using Tycho.Events.Routing;
 using Tycho.Identity.Events;
+using Tycho.Persistence.EFCore.Common;
 using Tycho.Persistence.EFCore.Inbox;
 using Tycho.Persistence.EFCore.UnitTests._Data.Events;
+using Tycho.Persistence.EFCore.UnitTests._Utils;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Inbox;
 
@@ -15,6 +17,7 @@ public sealed class InboxWriterTests : IAsyncLifetime
     private DbContextOptions<TestDbContext> _dbContextOptions = default!;
     private TestDbContext _dbContext = default!;
     private InboxActivity _inboxActivity = default!;
+    private PersistenceOwner _persistenceOwner = default!;
     private InboxWriter _sut = default!;
 
     private int _inboxActivityNotificationCount;
@@ -33,7 +36,9 @@ public sealed class InboxWriterTests : IAsyncLifetime
 
         _inboxActivity = new InboxActivity();
         _inboxActivity.NewEntriesAdded += (_, _) => _inboxActivityNotificationCount++;
-        _sut = new InboxWriter(_inboxActivity, _dbContext);
+
+        _persistenceOwner = new PersistenceOwner(PersistenceTestInternals.Create(typeof(PersistenceOwner)));
+        _sut = new InboxWriter(_inboxActivity, _dbContext, _persistenceOwner);
     }
 
     [Fact]
@@ -62,7 +67,7 @@ public sealed class InboxWriterTests : IAsyncLifetime
         SerializedRoutedEvent serializedEvent = CreateSerializedEvent();
         await _sut.Write(serializedEvent, TestContext.Current.CancellationToken);
         await using var retryDbContext = new TestDbContext(_dbContextOptions);
-        var retryWriter = new InboxWriter(_inboxActivity, retryDbContext);
+        var retryWriter = new InboxWriter(_inboxActivity, retryDbContext, _persistenceOwner);
 
         // Act
         await retryWriter.Write(serializedEvent, TestContext.Current.CancellationToken);
@@ -81,7 +86,7 @@ public sealed class InboxWriterTests : IAsyncLifetime
         await _sut.Write(persistedEvent, TestContext.Current.CancellationToken);
         SerializedRoutedEvent conflictingEvent = CreateSerializedEvent(id: persistedEvent.Id);
         await using var retryDbContext = new TestDbContext(_dbContextOptions);
-        var retryWriter = new InboxWriter(_inboxActivity, retryDbContext);
+        var retryWriter = new InboxWriter(_inboxActivity, retryDbContext, _persistenceOwner);
 
         // Act
         Task act() => retryWriter.Write(conflictingEvent, TestContext.Current.CancellationToken);
@@ -104,7 +109,7 @@ public sealed class InboxWriterTests : IAsyncLifetime
             persistedEvent.PublishId,
             "different payload");
         await using var retryDbContext = new TestDbContext(_dbContextOptions);
-        var retryWriter = new InboxWriter(_inboxActivity, retryDbContext);
+        var retryWriter = new InboxWriter(_inboxActivity, retryDbContext, _persistenceOwner);
 
         // Act
         Task act() => retryWriter.Write(conflictingEvent, TestContext.Current.CancellationToken);
@@ -127,7 +132,7 @@ public sealed class InboxWriterTests : IAsyncLifetime
         await using var dbContext = new FailingDbContext(options);
         await dbContext.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
         dbContext.SaveFailure = persistenceFailure;
-        var sut = new InboxWriter(_inboxActivity, dbContext);
+        var sut = new InboxWriter(_inboxActivity, dbContext, _persistenceOwner);
 
         // Act
         Task act() => sut.Write(CreateSerializedEvent(), TestContext.Current.CancellationToken);
@@ -150,7 +155,7 @@ public sealed class InboxWriterTests : IAsyncLifetime
         await using var dbContext = new FailingDbContext(options);
         await dbContext.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
         dbContext.SaveFailure = persistenceFailure;
-        var sut = new InboxWriter(_inboxActivity, dbContext);
+        var sut = new InboxWriter(_inboxActivity, dbContext, _persistenceOwner);
 
         // Act
         Task act() => sut.Write(CreateSerializedEvent(), TestContext.Current.CancellationToken);

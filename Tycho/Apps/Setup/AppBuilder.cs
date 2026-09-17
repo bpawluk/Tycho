@@ -86,8 +86,13 @@ namespace Tycho.Apps.Setup
                 throw new InvalidOperationException("The app has already been built.");
             }
 
-            HostApplicationBuilder hostBuilder = _createHostBuilderDelegate?.Invoke() ?? throw new InvalidOperationException("The app host builder has not been configured.");
-            var internals = new Internals(_appDefinitionType, hostBuilder);
+            if (_createHostBuilderDelegate == null)
+            {
+                throw new InvalidOperationException("The app host builder has not been configured.");
+            }
+
+            HostApplicationBuilder hostBuilder = _createHostBuilderDelegate.Invoke();
+            var internals = new Internals(hostBuilder, _appDefinitionType);
 
             hostBuilder.Services.AddSingleton(internals);
             hostBuilder.Services.AddSingleton<IHostLifecycleCallbacks>(_lifecycleCallbacks);

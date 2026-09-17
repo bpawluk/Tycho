@@ -6,6 +6,7 @@ using Moq;
 using Tycho.Events.Broker;
 using Tycho.Hosting;
 using Tycho.Hosting.Files;
+using Tycho.Identity.Structure;
 using Tycho.Modules;
 using Tycho.Modules.Instance;
 using Tycho.Requests.Broker;
@@ -183,6 +184,7 @@ public class TychoModuleTests
     {
         moduleDefinition.FulfillContract(new Mock<IRequestBroker>().Object);
         moduleDefinition.PassEventBroker(new Mock<IEventBroker>().Object);
+        moduleDefinition.PassParentId(InstanceIdentity.CreateRoot(DefinitionIdentity.Create(typeof(TychoModuleTests))));
         return moduleDefinition.CreateModuleBuilder().Build(parentServiceProvider);
     }
 

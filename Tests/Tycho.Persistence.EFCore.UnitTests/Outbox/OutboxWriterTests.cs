@@ -9,8 +9,10 @@ using Tycho.Events.Outbox;
 using Tycho.Events.Routing;
 using Tycho.Events.Serialization;
 using Tycho.Identity.Events;
+using Tycho.Persistence.EFCore.Common;
 using Tycho.Persistence.EFCore.Outbox;
 using Tycho.Persistence.EFCore.UnitTests._Data.Events;
+using Tycho.Persistence.EFCore.UnitTests._Utils;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Outbox;
 
@@ -46,7 +48,8 @@ public sealed class OutboxWriterTests : IAsyncLifetime
                 routedEvent.Route,
                 "{}"));
 
-        _sut = new OutboxWriter(_eventSerializer.Object, _outboxActivity, _dbContext);
+        var persistenceOwner = new PersistenceOwner(PersistenceTestInternals.Create(typeof(PersistenceOwner)));
+        _sut = new OutboxWriter(_eventSerializer.Object, _outboxActivity, _dbContext, persistenceOwner);
     }
 
     [Fact]

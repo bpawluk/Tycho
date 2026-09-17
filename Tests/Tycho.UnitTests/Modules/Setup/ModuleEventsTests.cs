@@ -15,7 +15,7 @@ public class ModuleEventsTests
 
     public ModuleEventsTests()
     {
-        _internals = new Internals(typeof(object), Host.CreateEmptyApplicationBuilder(default));
+        _internals = new Internals(Host.CreateEmptyApplicationBuilder(default), typeof(object));
         _sut = new ModuleEvents(_internals);
     }
 

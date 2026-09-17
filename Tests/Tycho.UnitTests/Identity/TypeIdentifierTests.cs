@@ -47,7 +47,7 @@ public partial class TypeIdentifierTests
     {
         // Act
         string result = TypeIdentifier.GetId(type);
-        string pattern = "^" + Regex.Escape(template).Replace("HASH", "[0-9A-F]{8}") + "$";
+        string pattern = "^" + Regex.Escape(template).Replace("HASH", "[A-Za-z0-9#&]{11}") + "$";
 
         // Assert
         Assert.Matches(pattern, result);

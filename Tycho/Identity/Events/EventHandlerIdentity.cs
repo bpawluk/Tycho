@@ -5,8 +5,6 @@ namespace Tycho.Identity.Events
 {
     internal sealed class EventHandlerIdentity : TypeIdentity, IEquatable<EventHandlerIdentity>
     {
-        private EventHandlerIdentity() { }
-
         private EventHandlerIdentity(string typeId) : base(typeId) { }
 
         private EventHandlerIdentity(Type eventHandlerType) : base(eventHandlerType) { }

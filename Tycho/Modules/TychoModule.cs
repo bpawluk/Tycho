@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Tycho.Events.Broker;
 using Tycho.Hosting;
 using Tycho.Hosting.Files;
+using Tycho.Identity.Structure;
 using Tycho.Modules.Setup;
 using Tycho.Requests.Broker;
 using Tycho.Utils;
@@ -25,6 +26,7 @@ namespace Tycho.Modules
     {
         private IRequestBroker? _contractFulfillingBroker;
         private IEventBroker? _parentEventBroker;
+        private InstanceIdentity? _parentId;
         private IModuleSettings? _settings;
 
         /// <summary>
@@ -133,6 +135,12 @@ namespace Tycho.Modules
             return this;
         }
 
+        internal TychoModule PassParentId(InstanceIdentity parentId)
+        {
+            _parentId = parentId;
+            return this;
+        }
+
         internal ModuleBuilder CreateModuleBuilder()
         {
             return new ModuleBuilder(GetType())
@@ -140,6 +148,7 @@ namespace Tycho.Modules
                 .WithHostConfiguration(ConfigureHost)
                 .WithContract(DefineContract, _contractFulfillingBroker)
                 .WithEvents(DefineEvents, _parentEventBroker)
+                .WithParentId(_parentId)
                 .WithStructure(IncludeModules)
                 .WithServices(services =>
                 {

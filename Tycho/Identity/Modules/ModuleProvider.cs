@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tycho.Identity.Structure;
 using Tycho.Modules.Instance;
 
 namespace Tycho.Identity.Modules
@@ -14,7 +15,7 @@ namespace Tycho.Identity.Modules
             _modules = modules.ToArray();
         }
 
-        public IModule GetModule(ModuleIdentity moduleId)
+        public IModule GetModule(DefinitionIdentity moduleId)
         {
             foreach (IModule module in _modules)
             {

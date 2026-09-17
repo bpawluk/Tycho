@@ -5,10 +5,13 @@ using Tycho.Persistence.EFCore.Common;
 
 namespace Tycho.Persistence.EFCore.Outbox;
 
-[Index(nameof(ClaimId))]
+[PrimaryKey(nameof(OwnerKey), nameof(Id))]
+[Index(nameof(OwnerKey), nameof(ClaimId))]
 internal class OutboxEntry
 {
-    [Key]
+    [Required, MaxLength(32)]
+    public string OwnerKey { get; set; } = string.Empty;
+
     public Guid Id { get; set; } = Guid.Empty;
 
     [Required]

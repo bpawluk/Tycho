@@ -9,6 +9,7 @@ using Tycho.Identity.Events;
 using Tycho.Persistence.EFCore.Common;
 using Tycho.Persistence.EFCore.Inbox;
 using Tycho.Persistence.EFCore.UnitTests._Data.Events;
+using Tycho.Persistence.EFCore.UnitTests._Utils;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Inbox;
 
@@ -42,7 +43,8 @@ public sealed class InboxConsumerTests : IAsyncLifetime
             .Setup(serializer => serializer.Deserialize(It.IsAny<SerializedRoutedEvent>()))
             .Returns<SerializedRoutedEvent>(CreateRoutedEvent);
 
-        _sut = new InboxConsumer(_eventSerializerMock.Object, _dbContext, _settings);
+        var persistenceOwner = new PersistenceOwner(PersistenceTestInternals.Create(typeof(PersistenceOwner)));
+        _sut = new InboxConsumer(_eventSerializerMock.Object, _dbContext, persistenceOwner, _settings);
     }
 
     [Fact]
@@ -226,7 +228,7 @@ public sealed class InboxConsumerTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task TryReadAsync_WithEntryDeserializationFailure_MarksFailedAndReturnsNull()
+    public async Task TryReadAsync_WithEntryDeserializationFailure_MarksFailedAndThrows()
     {
         // Arrange
         Guid failingEntryId = Guid.NewGuid();
@@ -242,10 +244,10 @@ public sealed class InboxConsumerTests : IAsyncLifetime
             .Throws(new InvalidOperationException("deserialize failure"));
 
         // Act
-        InboxEvent? result = await _sut.TryReadAsync(CancellationToken.None);
+        Task Act() => _sut.TryReadAsync(CancellationToken.None);
 
         // Assert
-        Assert.Null(result);
+        await Assert.ThrowsAsync<InvalidOperationException>(Act);
 
         InboxEntry persistedFailingEntry = await LoadEntry(failingEntryId);
         Assert.Equal(EntryState.Failed, persistedFailingEntry.State);
@@ -428,8 +430,10 @@ public sealed class InboxConsumerTests : IAsyncLifetime
         DateTime claimExpiration)
     {
         DateTime now = DateTime.UtcNow;
+        var persistenceOwner = new PersistenceOwner(PersistenceTestInternals.Create(typeof(PersistenceOwner)));
         return new InboxEntry
         {
+            OwnerKey = persistenceOwner.Key,
             Id = id,
             PublishId = Guid.NewGuid(),
             Event = EventIdentity.Create<TestEvent>().ToString(),
