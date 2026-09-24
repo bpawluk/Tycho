@@ -55,17 +55,20 @@ internal class OutboxConsumer(TychoDbContext dbContext, PersistenceOwner owner, 
                 entry.ClaimId == claimId, cancellationToken)
             .ConfigureAwait(false);
 
-        return entryToDeliver == null
-            ? null
-            : new OutboxEvent(
-                claimId,
-                new SerializedRoutedEvent(
-                    entryToDeliver.Id,
-                    entryToDeliver.PublishId,
-                    EventIdentity.Parse(entryToDeliver.Event),
-                    EventHandlerIdentity.Parse(entryToDeliver.Handler),
-                    Route.Parse(entryToDeliver.Route),
-                    entryToDeliver.Payload));
+        if (entryToDeliver == null)
+        {
+            return null;
+        }
+
+        return new OutboxEvent(
+            claimId,
+            new SerializedRoutedEvent(
+                entryToDeliver.Id,
+                entryToDeliver.PublishId,
+                EventIdentity.Parse(entryToDeliver.Event),
+                EventHandlerIdentity.Parse(entryToDeliver.Handler),
+                Route.Parse(entryToDeliver.Route),
+                entryToDeliver.Payload));
     }
 
     public async Task<bool> MarkAsDeliveredAsync(Guid claimId, CancellationToken cancellationToken)

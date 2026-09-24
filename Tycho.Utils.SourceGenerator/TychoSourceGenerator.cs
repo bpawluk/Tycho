@@ -50,38 +50,6 @@ namespace Tycho.Utils.SourceGenerator
                    .AddTychoExtensionsPipeline(definitionTypes);
         }
 
-        private static (TychoDefinitionKind Kind, TypeDefinitionModel DefinitionType) GetDefinitionType(
-            TychoDefinitionModel model,
-            CancellationToken token)
-        {
-            token.ThrowIfCancellationRequested();
-            return (model.DefinitionKind, model.DefinitionType);
-        }
-
-        private static (TychoDefinitionKind Kind, MethodDefinitionModel Method) GetContractDefinition(
-            TychoDefinitionModel model,
-            CancellationToken token)
-        {
-            token.ThrowIfCancellationRequested();
-            return (model.DefinitionKind, model.DefineContractMethod);
-        }
-
-        private static (TychoDefinitionKind Kind, MethodDefinitionModel Method) GetEventDefinition(
-            TychoDefinitionModel model,
-            CancellationToken token)
-        {
-            token.ThrowIfCancellationRequested();
-            return (model.DefinitionKind, model.DefineEventsMethod);
-        }
-
-        private static (TychoDefinitionKind Kind, MethodDefinitionModel Method) GetStructureDefinition(
-            TychoDefinitionModel model,
-            CancellationToken token)
-        {
-            token.ThrowIfCancellationRequested();
-            return (model.DefinitionKind, model.IncludeModulesMethod);
-        }
-
         private static bool GetTychoPipelineBasePredicate(SyntaxNode node, CancellationToken token)
         {
             return node is ClassDeclarationSyntax;
@@ -123,6 +91,38 @@ namespace Tycho.Utils.SourceGenerator
             }
 
             return default;
+        }
+
+        private static (TychoDefinitionKind Kind, TypeDefinitionModel DefinitionType) GetDefinitionType(
+            TychoDefinitionModel model,
+            CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            return (model.DefinitionKind, model.DefinitionType);
+        }
+
+        private static (TychoDefinitionKind Kind, MethodDefinitionModel Method) GetContractDefinition(
+            TychoDefinitionModel model,
+            CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            return (model.DefinitionKind, model.DefineContractMethod);
+        }
+
+        private static (TychoDefinitionKind Kind, MethodDefinitionModel Method) GetEventDefinition(
+            TychoDefinitionModel model,
+            CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            return (model.DefinitionKind, model.DefineEventsMethod);
+        }
+
+        private static (TychoDefinitionKind Kind, MethodDefinitionModel Method) GetStructureDefinition(
+            TychoDefinitionModel model,
+            CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            return (model.DefinitionKind, model.IncludeModulesMethod);
         }
 
         private static bool TryGetRequiredMethod(

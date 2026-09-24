@@ -7,6 +7,7 @@ namespace Tycho.Persistence.EFCore.Outbox;
 
 [PrimaryKey(nameof(OwnerKey), nameof(Id))]
 [Index(nameof(OwnerKey), nameof(ClaimId))]
+[Index(nameof(OwnerKey), nameof(State), nameof(Updated))]
 internal class OutboxEntry
 {
     [Required, MaxLength(32)]

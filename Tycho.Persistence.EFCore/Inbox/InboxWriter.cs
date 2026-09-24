@@ -44,8 +44,7 @@ internal class InboxWriter(InboxActivity inboxActivity, TychoDbContext dbContext
             if (existing is null ||
                 existing.PublishId != inboxEntry.PublishId ||
                 existing.Event != inboxEntry.Event ||
-                existing.Handler != inboxEntry.Handler ||
-                existing.Payload != inboxEntry.Payload)
+                existing.Handler != inboxEntry.Handler)
             {
                 throw;
             }

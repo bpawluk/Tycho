@@ -99,7 +99,7 @@ public sealed class InboxWriterTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Write_WithExistingEntryContainingDifferentPayload_RethrowsPersistenceFailure()
+    public async Task Write_WithExistingEntryContainingDifferentPayload_KeepsFirstPayload()
     {
         // Arrange
         SerializedRoutedEvent persistedEvent = CreateSerializedEvent();
@@ -112,13 +112,36 @@ public sealed class InboxWriterTests : IAsyncLifetime
         var retryWriter = new InboxWriter(_inboxActivity, retryDbContext, _persistenceOwner);
 
         // Act
-        Task act() => retryWriter.Write(conflictingEvent, TestContext.Current.CancellationToken);
+        await retryWriter.Write(conflictingEvent, TestContext.Current.CancellationToken);
 
         // Assert
-        await Assert.ThrowsAsync<DbUpdateException>(act);
         Assert.Equal(1, await CountPersistedEntries());
         Assert.Empty(retryDbContext.ChangeTracker.Entries());
-        Assert.Equal(1, _inboxActivityNotificationCount);
+        Assert.Equal(persistedEvent.Payload, (await LoadEntry(persistedEvent.Id)).Payload);
+        Assert.Equal(2, _inboxActivityNotificationCount);
+    }
+
+    [Fact]
+    public async Task Write_WithClearedExistingPayload_PreservesDeduplication()
+    {
+        // Arrange
+        SerializedRoutedEvent serializedEvent = CreateSerializedEvent();
+        await _sut.Write(serializedEvent, TestContext.Current.CancellationToken);
+        await _dbContext.Set<InboxEntry>().ExecuteUpdateAsync(setters => setters
+            .SetProperty(entry => entry.State, EntryState.Processed)
+            .SetProperty(entry => entry.Payload, "{}"), TestContext.Current.CancellationToken);
+        await using var retryDbContext = new TestDbContext(_dbContextOptions);
+        var retryWriter = new InboxWriter(_inboxActivity, retryDbContext, _persistenceOwner);
+
+        // Act
+        await retryWriter.Write(serializedEvent, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(1, await CountPersistedEntries());
+        InboxEntry entry = await LoadEntry(serializedEvent.Id);
+        Assert.Equal("{}", entry.Payload);
+        Assert.Equal(EntryState.Processed, entry.State);
+        Assert.Empty(retryDbContext.ChangeTracker.Entries());
     }
 
     [Fact]
