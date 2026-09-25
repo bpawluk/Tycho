@@ -24,7 +24,6 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
         _inbox.Setup(cleaner => cleaner.CleanPayloadsAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>())).ReturnsAsync(0);
         _outbox.Setup(cleaner => cleaner.CleanEntriesAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>())).ReturnsAsync(0);
         _outbox.Setup(cleaner => cleaner.CleanPayloadsAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>())).ReturnsAsync(0);
-
         _scopeFactory.Setup(factory => factory.CreateScope()).Returns(CreateScope);
         _sut = new PersistenceRetentionService(_scopeFactory.Object, _options, _clock);
         return ValueTask.CompletedTask;
@@ -73,14 +72,10 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
         await RunFirstCleanupAsync();
 
         // Assert
-        _inbox.Verify(cleaner => cleaner.CleanPayloadsAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()),
-            Times.Exactly(inboxPayloads ? 1 : 0));
-        _inbox.Verify(cleaner => cleaner.CleanEntriesAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()),
-            Times.Exactly(inboxEntries ? 1 : 0));
-        _outbox.Verify(cleaner => cleaner.CleanPayloadsAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()),
-            Times.Exactly(outboxPayloads ? 1 : 0));
-        _outbox.Verify(cleaner => cleaner.CleanEntriesAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()),
-            Times.Exactly(outboxEntries ? 1 : 0));
+        _inbox.Verify(cleaner => cleaner.CleanPayloadsAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()), Times.Exactly(inboxPayloads ? 1 : 0));
+        _inbox.Verify(cleaner => cleaner.CleanEntriesAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()), Times.Exactly(inboxEntries ? 1 : 0));
+        _outbox.Verify(cleaner => cleaner.CleanPayloadsAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()), Times.Exactly(outboxPayloads ? 1 : 0));
+        _outbox.Verify(cleaner => cleaner.CleanEntriesAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()), Times.Exactly(outboxEntries ? 1 : 0));
     }
 
     [Fact]
@@ -130,13 +125,16 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
         // Assert
         DateTime secondCleanupTime = _clock.GetUtcNow().UtcDateTime;
         Assert.Equal(firstCleanupTime.Add(_options.CleanupInterval), secondCleanupTime);
+
         _inbox.Verify(cleaner => cleaner.CleanPayloadsAsync(firstCleanupTime.AddDays(-7), It.IsAny<CancellationToken>()), Times.Once);
         _inbox.Verify(cleaner => cleaner.CleanPayloadsAsync(secondCleanupTime.AddDays(-7), It.IsAny<CancellationToken>()), Times.Once);
         _outbox.Verify(cleaner => cleaner.CleanEntriesAsync(firstCleanupTime.AddDays(-7), It.IsAny<CancellationToken>()), Times.Once);
         _outbox.Verify(cleaner => cleaner.CleanEntriesAsync(secondCleanupTime.AddDays(-7), It.IsAny<CancellationToken>()), Times.Once);
         _scopeFactory.Verify(factory => factory.CreateScope(), Times.Exactly(2));
+
         Assert.Equal(2, _scopes.Count);
         Assert.NotSame(_scopes[0].Object, _scopes[1].Object);
+
         foreach (Mock<IServiceScope> scope in _scopes)
         {
             scope.As<IAsyncDisposable>().Verify(item => item.DisposeAsync(), Times.Once);
@@ -171,6 +169,7 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
         // Assert
         _inbox.Verify(cleaner => cleaner.CleanPayloadsAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
         _outbox.Verify(cleaner => cleaner.CleanEntriesAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()), Times.Once);
+
         Assert.Equal(2, _scopes.Count);
         _scopes[1].As<IAsyncDisposable>().Verify(scope => scope.DisposeAsync(), Times.Once);
     }
@@ -198,10 +197,8 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
         // Assert
         Assert.True(_sut.ExecuteTask.IsCompletedSuccessfully);
         _scopeFactory.Verify(factory => factory.CreateScope(), Times.Exactly(afterFirstCleanup ? 1 : 0));
-        _inbox.Verify(cleaner => cleaner.CleanPayloadsAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()),
-            Times.Exactly(afterFirstCleanup ? 1 : 0));
-        _outbox.Verify(cleaner => cleaner.CleanEntriesAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()),
-            Times.Exactly(afterFirstCleanup ? 1 : 0));
+        _inbox.Verify(cleaner => cleaner.CleanPayloadsAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()), Times.Exactly(afterFirstCleanup ? 1 : 0));
+        _outbox.Verify(cleaner => cleaner.CleanEntriesAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()), Times.Exactly(afterFirstCleanup ? 1 : 0));
     }
 
     [Fact]
@@ -209,20 +206,23 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
     {
         // Arrange
         var cleanupStarted = new TaskCompletionSource<CancellationToken>(TaskCreationOptions.RunContinuationsAsynchronously);
-        _inbox.Setup(cleaner => cleaner.CleanPayloadsAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()))
+
+        _inbox
+            .Setup(cleaner => cleaner.CleanPayloadsAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()))
             .Returns(async (DateTime _, CancellationToken token) =>
             {
                 cleanupStarted.SetResult(token);
                 await Task.Delay(Timeout.InfiniteTimeSpan, token);
                 return 0;
             });
+
         await _sut.StartAsync(TestContext.Current.CancellationToken);
         _clock.Advance(await _clock.WaitForDelayAsync());
+
         CancellationToken cleanerToken = await cleanupStarted.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
 
         // Act
-        await _sut.StopAsync(TestContext.Current.CancellationToken)
-            .WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+        await _sut.StopAsync(TestContext.Current.CancellationToken).WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
         await _sut.ExecuteTask!.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
 
         // Assert
@@ -242,6 +242,7 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
         scope.SetupGet(item => item.ServiceProvider).Returns(provider.Object);
         scope.As<IAsyncDisposable>().Setup(item => item.DisposeAsync()).Returns(ValueTask.CompletedTask);
         _scopes.Add(scope);
+
         return scope.Object;
     }
 
