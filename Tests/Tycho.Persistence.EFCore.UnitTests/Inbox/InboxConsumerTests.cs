@@ -1,5 +1,6 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Tycho.Events;
 using Tycho.Events.Inbox;
@@ -83,6 +84,34 @@ public sealed class InboxConsumerTests : IAsyncLifetime
 
         persistedSecondEntry = await LoadEntry(secondEntryId);
         AssertClaimedEntry(persistedSecondEntry, nextResult.ClaimId, 1u, readStartedAt);
+    }
+
+    [Fact]
+    public async Task TryReadAsync_WhenClaimedEntryIsDeletedBeforeRead_LogsMissingEntry()
+    {
+        // Arrange
+        var interceptor = new DeleteAfterClaimInterceptor(_dbContext.InboxTableName);
+        await SeedEntries(CreateEntry(Guid.NewGuid(), EntryState.New, 0, Guid.Empty, DateTime.MinValue));
+
+        DbContextOptions<TestDbContext> options = new DbContextOptionsBuilder<TestDbContext>()
+            .UseSqlite(_connection)
+            .AddInterceptors(interceptor)
+            .Options;
+        await using var racingContext = new TestDbContext(options);
+
+        var logger = new Mock<ILogger<InboxConsumer>>();
+        logger.Setup(item => item.IsEnabled(LogLevel.Warning)).Returns(true);
+
+        var owner = new PersistenceOwner(PersistenceTestInternals.Create(typeof(PersistenceOwner)));
+        var consumer = new InboxConsumer(_eventSerializerMock.Object, racingContext, owner, _settings, logger.Object);
+
+        // Act
+        InboxEvent? result = await consumer.TryReadAsync(CancellationToken.None);
+
+        // Assert
+        Assert.True(interceptor.WasTriggered);
+        Assert.Null(result);
+        LogAssert.Logged(logger, LogLevel.Warning, 2301, "InboxClaimedEntryMissing");
     }
 
     [Fact]
@@ -257,6 +286,39 @@ public sealed class InboxConsumerTests : IAsyncLifetime
 
         InboxEntry persistedSuccessfulEntry = await LoadEntry(successfulEntryId);
         AssertEntryUnchanged(successfulEntry, persistedSuccessfulEntry);
+    }
+
+    [Fact]
+    public async Task TryReadAsync_WhenEntryDisappearsDuringDeserialization_LogsFailedStatusUpdateAndRethrowsOriginalError()
+    {
+        // Arrange
+        Guid entryId = Guid.NewGuid();
+        await SeedEntries(CreateEntry(entryId, EntryState.New, 0, Guid.Empty, DateTime.MinValue));
+
+        var logger = new Mock<ILogger<InboxConsumer>>();
+        logger.Setup(item => item.IsEnabled(LogLevel.Warning)).Returns(true);
+
+        var owner = new PersistenceOwner(PersistenceTestInternals.Create(typeof(PersistenceOwner)));
+        _sut = new InboxConsumer(_eventSerializerMock.Object, _dbContext, owner, _settings, logger.Object);
+
+        var deserializeError = new InvalidOperationException("deserialize failure");
+        Guid claimedId = Guid.Empty;
+        _eventSerializerMock
+            .Setup(serializer => serializer.Deserialize(It.IsAny<SerializedRoutedEvent>()))
+            .Returns<SerializedRoutedEvent>(serializedEvent =>
+            {
+                claimedId = _dbContext.Set<InboxEntry>().AsNoTracking().Single(entry => entry.Id == serializedEvent.Id).ClaimId;
+                _dbContext.Set<InboxEntry>().Where(entry => entry.Id == serializedEvent.Id).ExecuteDelete();
+                throw deserializeError;
+            });
+
+        // Act
+        InvalidOperationException actualError = await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.TryReadAsync(CancellationToken.None));
+
+        // Assert
+        Assert.Same(deserializeError, actualError);
+        Assert.NotEqual(Guid.Empty, claimedId);
+        LogAssert.Logged(logger, LogLevel.Warning, 2302, "InboxMessageStatusUpdateFailed", null, ("EntryId", entryId), ("ClaimId", claimedId));
     }
 
     [Fact]

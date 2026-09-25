@@ -1,10 +1,12 @@
 using System.Threading.Channels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Tycho.Persistence.EFCore.Inbox;
 using Tycho.Persistence.EFCore.Outbox;
 using Tycho.Persistence.EFCore.Retention;
+using Tycho.Persistence.EFCore.UnitTests._Utils;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Retention;
 
@@ -15,6 +17,7 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
     private readonly Mock<IInboxCleaner> _inbox = new();
     private readonly Mock<IOutboxCleaner> _outbox = new();
     private readonly Mock<IServiceScopeFactory> _scopeFactory = new();
+    private readonly Mock<ILogger<PersistenceRetentionService>> _logger = new();
     private readonly List<Mock<IServiceScope>> _scopes = [];
     private PersistenceRetentionService _sut = default!;
 
@@ -25,7 +28,8 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
         _outbox.Setup(cleaner => cleaner.CleanEntriesAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>())).ReturnsAsync(0);
         _outbox.Setup(cleaner => cleaner.CleanPayloadsAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>())).ReturnsAsync(0);
         _scopeFactory.Setup(factory => factory.CreateScope()).Returns(CreateScope);
-        _sut = new PersistenceRetentionService(_scopeFactory.Object, _options, _clock);
+        _logger.Setup(item => item.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
+        _sut = new PersistenceRetentionService(_scopeFactory.Object, _options, _clock, _logger.Object);
         return ValueTask.CompletedTask;
     }
 
@@ -50,6 +54,52 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
         _inbox.VerifyNoOtherCalls();
         _outbox.VerifyNoOtherCalls();
         Assert.Single(_scopes).As<IAsyncDisposable>().Verify(scope => scope.DisposeAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenCleanupAffectsEntries_LogsEachNonemptyOperation()
+    {
+        // Arrange
+        _options.Inbox.FullCleanupRetention = TimeSpan.FromDays(1);
+        _options.Inbox.PayloadRetention = TimeSpan.FromDays(1);
+        _options.Outbox.FullCleanupRetention = TimeSpan.FromDays(1);
+        _options.Outbox.PayloadRetention = TimeSpan.FromDays(1);
+
+        _inbox.Setup(cleaner => cleaner.CleanEntriesAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>())).ReturnsAsync(1);
+        _inbox.Setup(cleaner => cleaner.CleanPayloadsAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>())).ReturnsAsync(2);
+        _outbox.Setup(cleaner => cleaner.CleanEntriesAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>())).ReturnsAsync(3);
+        _outbox.Setup(cleaner => cleaner.CleanPayloadsAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>())).ReturnsAsync(4);
+
+        // Act
+        await RunFirstCleanupAsync();
+
+        // Assert
+        DateTime cutoff = _clock.GetUtcNow().UtcDateTime.AddDays(-1);
+        VerifyCleanupLog("Inbox", "Deleting messages", 1, cutoff);
+        VerifyCleanupLog("Inbox", "Clearing payloads", 2, cutoff);
+        VerifyCleanupLog("Outbox", "Deleting messages", 3, cutoff);
+        VerifyCleanupLog("Outbox", "Clearing payloads", 4, cutoff);
+        _logger.Verify(item => item.Log(
+            LogLevel.Information,
+            It.IsAny<EventId>(),
+            It.IsAny<It.IsAnyType>(),
+            It.IsAny<Exception?>(),
+            It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Exactly(4));
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenCleanupAffectsNoEntries_DoesNotLogCompletion()
+    {
+        // Act
+        await RunFirstCleanupAsync();
+
+        // Assert
+        _logger.Verify(item => item.Log(
+            LogLevel.Information,
+            It.IsAny<EventId>(),
+            It.IsAny<It.IsAnyType>(),
+            It.IsAny<Exception?>(),
+            It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Never);
     }
 
     [Theory]
@@ -161,6 +211,7 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
         Assert.Equal(_options.CleanupInterval, cleanupDelay);
         Assert.Single(_scopes).As<IAsyncDisposable>().Verify(scope => scope.DisposeAsync(), Times.Once);
         _outbox.VerifyNoOtherCalls();
+        LogAssert.Logged(_logger, LogLevel.Error, 2201, "RetentionCleanupFailed", failure, ("RetryDelay", _options.CleanupInterval));
 
         // Act
         _clock.Advance(cleanupDelay);
@@ -230,6 +281,26 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
         Assert.True(_sut.ExecuteTask.IsCompletedSuccessfully);
         Assert.Single(_scopes).As<IAsyncDisposable>().Verify(scope => scope.DisposeAsync(), Times.Once);
         _outbox.VerifyNoOtherCalls();
+        _logger.Verify(item => item.Log(
+            LogLevel.Error,
+            It.IsAny<EventId>(),
+            It.IsAny<It.IsAnyType>(),
+            It.IsAny<Exception?>(),
+            It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Never);
+    }
+
+    private void VerifyCleanupLog(string store, string operation, int affectedCount, DateTime cutoff)
+    {
+        LogAssert.Logged(
+            _logger,
+            LogLevel.Information,
+            2202,
+            "RetentionCleanupAffectedEntries",
+            null,
+            ("Store", store),
+            ("Operation", operation),
+            ("AffectedCount", affectedCount),
+            ("Cutoff", cutoff));
     }
 
     private IServiceScope CreateScope()

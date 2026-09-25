@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Tycho.Events;
 using Tycho.Events.Inbox;
@@ -12,6 +13,7 @@ using Tycho.Transactions;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
 using Tycho.UnitTests._Data.Modules;
+using Tycho.UnitTests._Utils;
 
 namespace Tycho.UnitTests.Events.Inbox;
 
@@ -22,9 +24,11 @@ public class InboxProcessorJobTests
     private readonly Mock<IEventHandler<TestEvent>> _handlerMock = new();
     private readonly Mock<ITransactionalEventHandler<TestEvent>> _transactionalHandlerMock = new();
     private readonly Mock<IFinalEventRegistration<TestEvent>> _registrationMock = new();
+    private readonly Mock<ILogger<InboxProcessorJob>> _logger = new();
 
     public InboxProcessorJobTests()
     {
+        _logger.Setup(item => item.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
         _inboxConsumerMock
             .Setup(inbox => inbox.MarkAsHandledAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
@@ -69,6 +73,7 @@ public class InboxProcessorJobTests
         _registrationMock.VerifyGet(registration => registration.Handler, Times.Never);
         _inboxConsumerMock.Verify(inbox => inbox.MarkAsHandledAsync(It.IsAny<Guid>(), cancellationToken), Times.Never);
         _inboxConsumerMock.Verify(inbox => inbox.MarkAsFailedAsync(It.IsAny<Guid>(), cancellationToken), Times.Never);
+        LogAssert.Logged(_logger, LogLevel.Warning, 1305, "InboxJobIsMissing");
     }
 
     [Fact]
@@ -117,10 +122,11 @@ public class InboxProcessorJobTests
         InboxEvent inboxEvent = CreateInboxEvent(out _);
         CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
+        var failure = new InvalidOperationException("handler failure");
         _transactionalHandlerMock
             .Setup(handler => handler.HandleAsync(
                 It.IsAny<EventContext<TestEvent>>(), cancellationToken))
-            .ThrowsAsync(new InvalidOperationException("handler failure"));
+            .ThrowsAsync(failure);
 
         InboxProcessorJob sut = CreateSut(useTransactionalHandler: true);
 
@@ -131,6 +137,7 @@ public class InboxProcessorJobTests
         VerifyTransactionExecution(Times.Once(), cancellationToken);
         _inboxConsumerMock.Verify(inbox => inbox.MarkAsHandledAsync(inboxEvent.ClaimId, cancellationToken), Times.Never);
         _inboxConsumerMock.Verify(inbox => inbox.MarkAsFailedAsync(inboxEvent.ClaimId, cancellationToken), Times.Once);
+        LogAssert.Logged(_logger, LogLevel.Error, 1303, "InboxMessageProcessingFailed", failure, ("EntryId", inboxEvent.EventId));
     }
 
     [Fact]
@@ -157,6 +164,7 @@ public class InboxProcessorJobTests
         VerifyTransactionExecution(Times.Once(), cancellationToken);
         _inboxConsumerMock.Verify(inbox => inbox.MarkAsHandledAsync(inboxEvent.ClaimId, cancellationToken), Times.Once);
         _inboxConsumerMock.Verify(inbox => inbox.MarkAsFailedAsync(inboxEvent.ClaimId, cancellationToken), Times.Once);
+        LogAssert.Logged(_logger, LogLevel.Warning, 1304, "InboxMessageStatusUpdateFailed", null, ("EntryId", inboxEvent.EventId), ("ClaimId", inboxEvent.ClaimId));
     }
 
     [Fact]
@@ -231,6 +239,7 @@ public class InboxProcessorJobTests
         IServiceCollection services = internals.GetHostBuilder().Services;
         services.AddSingleton(_inboxConsumerMock.Object);
         services.AddSingleton(_transactionMock.Object);
+        services.AddSingleton(_logger.Object);
 
         if (withHandler)
         {

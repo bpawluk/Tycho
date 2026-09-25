@@ -34,7 +34,6 @@ public sealed class ConfiguringLoggingTests : IAsyncLifetime
         await _sut.ExecuteAsync(new LogBetaRequest(), TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.Equal(3, logger.Logs.Count);
         Assert.Contains("App", logger.Logs);
         Assert.Contains("Alpha", logger.Logs);
         Assert.Contains("Beta", logger.Logs);

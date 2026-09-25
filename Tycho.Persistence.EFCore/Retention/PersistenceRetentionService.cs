@@ -3,7 +3,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Tycho.Persistence.EFCore.Inbox;
+using Tycho.Persistence.EFCore.Logging;
 using Tycho.Persistence.EFCore.Outbox;
 
 namespace Tycho.Persistence.EFCore.Retention;
@@ -11,7 +13,8 @@ namespace Tycho.Persistence.EFCore.Retention;
 internal sealed class PersistenceRetentionService(
     IServiceScopeFactory scopeFactory,
     PersistenceRetentionOptions options,
-    TimeProvider? timeProvider = null) : BackgroundService
+    TimeProvider? timeProvider = null,
+    ILogger<PersistenceRetentionService>? logger = null) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -32,9 +35,9 @@ internal sealed class PersistenceRetentionService(
                 {
                     throw;
                 }
-                catch
+                catch (Exception exception)
                 {
-                    // TODO: Log the exception and continue with the next cleanup cycle.
+                    logger?.RetentionCleanupFailed(options.CleanupInterval, exception);
                 }
 
                 await Task.Delay(options.CleanupInterval, clock, stoppingToken).ConfigureAwait(false);
@@ -52,24 +55,44 @@ internal sealed class PersistenceRetentionService(
 
         if (options.Inbox.FullCleanupRetention is TimeSpan inboxRetention)
         {
-            await inbox.CleanEntriesAsync(GetCutoff(utcNow, inboxRetention), cancellationToken).ConfigureAwait(false);
+            DateTime cutoff = GetCutoff(utcNow, inboxRetention);
+            int affectedCount = await inbox.CleanEntriesAsync(cutoff, cancellationToken).ConfigureAwait(false);
+            if (affectedCount > 0)
+            {
+                logger?.RetentionCleanupAffectedEntries("Deleting messages", affectedCount, "Inbox", cutoff);
+            }
         }
 
         if (options.Inbox.PayloadRetention is TimeSpan inboxPayloadRetention)
         {
-            await inbox.CleanPayloadsAsync(GetCutoff(utcNow, inboxPayloadRetention), cancellationToken).ConfigureAwait(false);
+            DateTime cutoff = GetCutoff(utcNow, inboxPayloadRetention);
+            int affectedCount = await inbox.CleanPayloadsAsync(cutoff, cancellationToken).ConfigureAwait(false);
+            if (affectedCount > 0)
+            {
+                logger?.RetentionCleanupAffectedEntries("Clearing payloads", affectedCount, "Inbox", cutoff);
+            }
         }
 
         IOutboxCleaner outbox = services.GetRequiredService<IOutboxCleaner>();
 
         if (options.Outbox.FullCleanupRetention is TimeSpan outboxRetention)
         {
-            await outbox.CleanEntriesAsync(GetCutoff(utcNow, outboxRetention), cancellationToken).ConfigureAwait(false);
+            DateTime cutoff = GetCutoff(utcNow, outboxRetention);
+            int affectedCount = await outbox.CleanEntriesAsync(cutoff, cancellationToken).ConfigureAwait(false);
+            if (affectedCount > 0)
+            {
+                logger?.RetentionCleanupAffectedEntries("Deleting messages", affectedCount, "Outbox", cutoff);
+            }
         }
 
         if (options.Outbox.PayloadRetention is TimeSpan outboxPayloadRetention)
         {
-            await outbox.CleanPayloadsAsync(GetCutoff(utcNow, outboxPayloadRetention), cancellationToken).ConfigureAwait(false);
+            DateTime cutoff = GetCutoff(utcNow, outboxPayloadRetention);
+            int affectedCount = await outbox.CleanPayloadsAsync(cutoff, cancellationToken).ConfigureAwait(false);
+            if (affectedCount > 0)
+            {
+                logger?.RetentionCleanupAffectedEntries("Clearing payloads", affectedCount, "Outbox", cutoff);
+            }
         }
     }
 

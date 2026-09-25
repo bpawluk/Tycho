@@ -4,12 +4,14 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Tycho.Events.Inbox;
 using Tycho.Events.Model;
 using Tycho.Events.Routing;
 using Tycho.Events.Serialization;
 using Tycho.Identity.Events;
 using Tycho.Persistence.EFCore.Common;
+using Tycho.Persistence.EFCore.Logging;
 
 namespace Tycho.Persistence.EFCore.Inbox;
 
@@ -17,7 +19,8 @@ internal class InboxConsumer(
     IEventSerializer eventSerializer,
     TychoDbContext dbContext,
     PersistenceOwner owner,
-    InboxConsumerSettings? settings = null) : IInboxConsumer
+    InboxConsumerSettings? settings = null,
+    ILogger<InboxConsumer>? logger = null) : IInboxConsumer
 {
     private readonly IEventSerializer _eventSerializer = eventSerializer;
     private readonly TychoDbContext _dbContext = dbContext;
@@ -63,6 +66,7 @@ internal class InboxConsumer(
 
         if (entryToDeliver == null)
         {
+            logger?.InboxClaimedEntryMissing(claimId);
             return null;
         }
 
@@ -83,7 +87,11 @@ internal class InboxConsumer(
         {
             try
             {
-                await MarkAsFailedAsync(claimId, cancellationToken).ConfigureAwait(false);
+                bool markedAsFailed = await MarkAsFailedAsync(claimId, cancellationToken).ConfigureAwait(false);
+                if (!markedAsFailed)
+                {
+                    logger?.InboxMessageStatusUpdateFailed(entryToDeliver.Id, claimId);
+                }
             }
             catch (Exception failureException)
             {

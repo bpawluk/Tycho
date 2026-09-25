@@ -4,15 +4,17 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Events.Routing;
 using Tycho.Identity.Events;
 using Tycho.Persistence.EFCore.Common;
+using Tycho.Persistence.EFCore.Logging;
 
 namespace Tycho.Persistence.EFCore.Outbox;
 
-internal class OutboxConsumer(TychoDbContext dbContext, PersistenceOwner owner, OutboxConsumerSettings? settings = null) : IOutboxConsumer
+internal class OutboxConsumer(TychoDbContext dbContext, PersistenceOwner owner, OutboxConsumerSettings? settings = null, ILogger<OutboxConsumer>? logger = null) : IOutboxConsumer
 {
     private readonly TychoDbContext _dbContext = dbContext;
     private readonly OutboxConsumerSettings _settings = settings ?? OutboxConsumerSettings.Default;
@@ -57,6 +59,7 @@ internal class OutboxConsumer(TychoDbContext dbContext, PersistenceOwner owner, 
 
         if (entryToDeliver == null)
         {
+            logger?.OutboxClaimedEntryMissing(claimId);
             return null;
         }
 

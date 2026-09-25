@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Tycho.Events.Inbox;
 using Tycho.Events.Outbox;
+using Tycho.UnitTests._Utils;
 
 namespace Tycho.UnitTests.Events;
 
@@ -24,7 +25,7 @@ public class ActivityTests
 
         // Assert
         Assert.Equal(1, notificationCount);
-        VerifyErrorLogged(loggerMock, exception, 1401, "InboxNotificationFailed");
+        LogAssert.Logged(loggerMock, LogLevel.Error, 1301, "InboxNotificationFailed", exception);
     }
 
     [Fact]
@@ -44,18 +45,6 @@ public class ActivityTests
 
         // Assert
         Assert.Equal(1, notificationCount);
-        VerifyErrorLogged(loggerMock, exception, 1501, "OutboxNotificationFailed");
-    }
-
-    private static void VerifyErrorLogged<T>(Mock<ILogger<T>> loggerMock, Exception exception, int eventId, string eventName)
-    {
-        loggerMock.Verify(
-            logger => logger.Log(
-                LogLevel.Error,
-                It.Is<EventId>(id => id.Id == eventId && id.Name == eventName),
-                It.Is<It.IsAnyType>((_, _) => true),
-                exception,
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
+        LogAssert.Logged(loggerMock, LogLevel.Error, 1401, "OutboxNotificationFailed", exception);
     }
 }

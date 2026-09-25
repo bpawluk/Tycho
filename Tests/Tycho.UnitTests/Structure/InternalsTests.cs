@@ -1,12 +1,34 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Tycho.Structure;
+using Tycho.UnitTests._Utils;
 
 namespace Tycho.UnitTests.Structure;
 
 public class InternalsTests
 {
     private readonly Internals _sut = new(Host.CreateEmptyApplicationBuilder(default), typeof(InternalsTests));
+
+    [Fact]
+    public async Task StartAndStopAsync_LogCompletedLifecycleWithOwnerIdentity()
+    {
+        // Arrange
+        var logger = new Mock<ILogger<Internals>>();
+        logger.Setup(item => item.IsEnabled(LogLevel.Information)).Returns(true);
+
+        _sut.GetHostBuilder().Services.AddSingleton(logger.Object);
+        _sut.Build();
+
+        // Act
+        await _sut.StartAsync(TestContext.Current.CancellationToken);
+        await _sut.StopAsync(TestContext.Current.CancellationToken);
+
+        // Assert
+        LogAssert.Logged(logger, LogLevel.Information, 1001, "TychoHostStarted", null, ("OwnerInstanceId", _sut.OwnerInstanceId.Value));
+        LogAssert.Logged(logger, LogLevel.Information, 1002, "TychoHostStopped", null, ("OwnerInstanceId", _sut.OwnerInstanceId.Value));
+    }
 
     [Fact]
     public async Task StartAsync_BeforeBuild_ThrowsInvalidOperationException()

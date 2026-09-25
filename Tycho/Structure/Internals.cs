@@ -4,7 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Tycho.Identity.Structure;
+using Tycho.Logging;
 
 namespace Tycho.Structure
 {
@@ -69,18 +71,20 @@ namespace Tycho.Structure
             return serviceProviderIsService.IsService(serviceType);
         }
 
-        public Task StartAsync(CancellationToken cancellationToken = default)
+        public async Task StartAsync(CancellationToken cancellationToken = default)
         {
             ThrowIfDisposed();
             ThrowIfNotBuilt();
-            return _host!.StartAsync(cancellationToken);
+            await _host!.StartAsync(cancellationToken).ConfigureAwait(false);
+            _host.Services.GetService<ILogger<Internals>>()?.TychoHostStarted(OwnerInstanceId.Value);
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
             ThrowIfDisposed();
             ThrowIfNotBuilt();
-            return _host!.StopAsync(cancellationToken);
+            await _host!.StopAsync(cancellationToken).ConfigureAwait(false);
+            _host.Services.GetService<ILogger<Internals>>()?.TychoHostStopped(OwnerInstanceId.Value);
         }
 
         public void Dispose()

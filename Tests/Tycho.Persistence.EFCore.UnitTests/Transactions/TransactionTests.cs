@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Tycho.Persistence.EFCore.Outbox;
 using Tycho.Persistence.EFCore.Transactions;
+using Tycho.Persistence.EFCore.UnitTests._Utils;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Transactions;
 
@@ -262,7 +263,7 @@ public sealed class TransactionTests : IAsyncLifetime
         Assert.Equal(42, result);
         Assert.Equal(1, await CountPersistedOutboxEntries());
         transaction.Verify(t => t.RollbackAsync(It.IsAny<CancellationToken>()), Times.Never);
-        VerifyLoggedFailure(logger, disposalFailure, 2102, "TransactionDisposalFailed");
+        LogAssert.Logged(logger, LogLevel.Error, 2102, "TransactionDisposalFailed", disposalFailure);
     }
 
     [Fact]
@@ -317,8 +318,8 @@ public sealed class TransactionTests : IAsyncLifetime
 
         // Assert
         Assert.Same(operationFailure, exception);
-        VerifyLoggedFailure(logger, rollbackFailure, 2101, "TransactionRollbackFailed");
-        VerifyLoggedFailure(logger, disposalFailure, 2102, "TransactionDisposalFailed");
+        LogAssert.Logged(logger, LogLevel.Error, 2101, "TransactionRollbackFailed", rollbackFailure);
+        LogAssert.Logged(logger, LogLevel.Error, 2102, "TransactionDisposalFailed", disposalFailure);
         Assert.Empty(_dbContext.ChangeTracker.Entries());
         Assert.Equal(0, await CountPersistedOutboxEntries());
         Assert.Null(_dbContext.Database.CurrentTransaction);
@@ -440,16 +441,6 @@ public sealed class TransactionTests : IAsyncLifetime
 
         _dbContext.DatabaseOverride = databaseMock.Object;
         return transactionMock;
-    }
-
-    private static void VerifyLoggedFailure(Mock<ILogger<Transaction>> logger, Exception exception, int eventId, string eventName)
-    {
-        logger.Verify(l => l.Log(
-            LogLevel.Error,
-            It.Is<EventId>(id => id.Id == eventId && id.Name == eventName),
-            It.IsAny<It.IsAnyType>(),
-            exception,
-            It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
     }
 
     private async Task<int> CountPersistedOutboxEntries()

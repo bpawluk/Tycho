@@ -1,5 +1,7 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Tycho.Events.Outbox;
 using Tycho.Events.Routing;
 using Tycho.Persistence.EFCore.Common;
@@ -72,6 +74,34 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
 
         persistedSecondEntry = await LoadEntry(secondEntryId);
         AssertClaimedEntry(persistedSecondEntry, nextResult.ClaimId, 1u, readStartedAt);
+    }
+
+    [Fact]
+    public async Task TryReadAsync_WhenClaimedEntryIsDeletedBeforeRead_LogsMissingEntry()
+    {
+        // Arrange
+        var interceptor = new DeleteAfterClaimInterceptor(_dbContext.OutboxTableName);
+        await SeedEntries(CreateEntry(Guid.NewGuid(), EntryState.New, 0, Guid.Empty, DateTime.MinValue));
+
+        DbContextOptions<TestDbContext> options = new DbContextOptionsBuilder<TestDbContext>()
+            .UseSqlite(_connection)
+            .AddInterceptors(interceptor)
+            .Options;
+        await using var racingContext = new TestDbContext(options);
+
+        var logger = new Mock<ILogger<OutboxConsumer>>();
+        logger.Setup(item => item.IsEnabled(LogLevel.Warning)).Returns(true);
+
+        var owner = new PersistenceOwner(PersistenceTestInternals.Create(typeof(PersistenceOwner)));
+        var consumer = new OutboxConsumer(racingContext, owner, _settings, logger.Object);
+
+        // Act
+        OutboxEvent? result = await consumer.TryReadAsync(CancellationToken.None);
+
+        // Assert
+        Assert.True(interceptor.WasTriggered);
+        Assert.Null(result);
+        LogAssert.Logged(logger, LogLevel.Warning, 2401, "OutboxClaimedEntryMissing");
     }
 
     [Fact]
