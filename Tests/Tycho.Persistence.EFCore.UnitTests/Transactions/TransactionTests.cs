@@ -248,6 +248,7 @@ public sealed class TransactionTests : IAsyncLifetime
         Mock<IDbContextTransaction> transaction = InjectCleanupFailures(disposeFailure: disposalFailure);
 
         var logger = new Mock<ILogger<Transaction>>();
+        logger.Setup(l => l.IsEnabled(LogLevel.Error)).Returns(true);
         var sut = new Transaction(_dbContext, logger.Object);
 
         // Act
@@ -261,7 +262,7 @@ public sealed class TransactionTests : IAsyncLifetime
         Assert.Equal(42, result);
         Assert.Equal(1, await CountPersistedOutboxEntries());
         transaction.Verify(t => t.RollbackAsync(It.IsAny<CancellationToken>()), Times.Never);
-        VerifyLoggedFailure(logger, disposalFailure);
+        VerifyLoggedFailure(logger, disposalFailure, 2102, "TransactionDisposalFailed");
     }
 
     [Fact]
@@ -299,6 +300,7 @@ public sealed class TransactionTests : IAsyncLifetime
         Mock<IDbContextTransaction> transaction = InjectCleanupFailures(rollbackFailure, disposalFailure);
 
         var logger = new Mock<ILogger<Transaction>>();
+        logger.Setup(l => l.IsEnabled(LogLevel.Error)).Returns(true);
         var sut = new Transaction(_dbContext, logger.Object);
         using var cancellationSource = new CancellationTokenSource();
 
@@ -315,8 +317,8 @@ public sealed class TransactionTests : IAsyncLifetime
 
         // Assert
         Assert.Same(operationFailure, exception);
-        VerifyLoggedFailure(logger, rollbackFailure);
-        VerifyLoggedFailure(logger, disposalFailure);
+        VerifyLoggedFailure(logger, rollbackFailure, 2101, "TransactionRollbackFailed");
+        VerifyLoggedFailure(logger, disposalFailure, 2102, "TransactionDisposalFailed");
         Assert.Empty(_dbContext.ChangeTracker.Entries());
         Assert.Equal(0, await CountPersistedOutboxEntries());
         Assert.Null(_dbContext.Database.CurrentTransaction);
@@ -440,11 +442,11 @@ public sealed class TransactionTests : IAsyncLifetime
         return transactionMock;
     }
 
-    private static void VerifyLoggedFailure(Mock<ILogger<Transaction>> logger, Exception exception)
+    private static void VerifyLoggedFailure(Mock<ILogger<Transaction>> logger, Exception exception, int eventId, string eventName)
     {
         logger.Verify(l => l.Log(
             LogLevel.Error,
-            It.IsAny<EventId>(),
+            It.Is<EventId>(id => id.Id == eventId && id.Name == eventName),
             It.IsAny<It.IsAnyType>(),
             exception,
             It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);

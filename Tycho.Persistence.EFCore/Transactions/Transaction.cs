@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
+using Tycho.Persistence.EFCore.Logging;
 using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.Transactions;
@@ -77,7 +78,7 @@ internal sealed class Transaction(TychoDbContext dbContext, ILogger<Transaction>
             }
             catch (Exception exception)
             {
-                logger?.LogError(exception, "Failed to roll back the transaction.");
+                logger?.TransactionRollbackFailed(exception);
             }
             finally
             {
@@ -93,7 +94,7 @@ internal sealed class Transaction(TychoDbContext dbContext, ILogger<Transaction>
             }
             catch (Exception exception)
             {
-                logger?.LogError(exception, "Failed to dispose the transaction.");
+                logger?.TransactionDisposalFailed(exception);
             }
         }
     }

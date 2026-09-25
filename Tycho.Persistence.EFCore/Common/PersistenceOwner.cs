@@ -2,6 +2,7 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using Tycho.Persistence.EFCore.Logging;
 using Tycho.Structure;
 
 namespace Tycho.Persistence.EFCore.Common;
@@ -19,7 +20,7 @@ internal sealed class PersistenceOwner
 
         if (logger?.IsEnabled(LogLevel.Information) == true)
         {
-            logger.LogInformation("{OwnerInstanceId} persistence configured with key {Key}", internals.OwnerInstanceId.Value, Key);
+            logger.PersistenceOwnerConfigured(internals.OwnerInstanceId.Value, Key);
         }
     }
 }

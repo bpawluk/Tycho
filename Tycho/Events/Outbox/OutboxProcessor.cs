@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Tycho.Logging;
 using Tycho.Processor;
 using Tycho.Structure;
 
@@ -61,7 +62,7 @@ namespace Tycho.Events.Outbox
 
         private void OnJobProcessorError(object _, Exception exception)
         {
-            _logger?.LogError(exception, "An error occurred while processing outbox entries.");
+            _logger?.OutboxProcessingFailed(exception);
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Tycho.Logging;
 using Tycho.Identity.Events;
 using Tycho.Processor;
 using Tycho.Structure;
@@ -58,7 +59,7 @@ namespace Tycho.Events.Inbox
             {
                 await using AsyncServiceScope scope = _internals.CreateAsyncScope();
                 ILogger<InboxProcessorJob>? logger = scope.ServiceProvider.GetService<ILogger<InboxProcessorJob>>();
-                logger?.LogWarning("No event assigned for processing. Skipping execution.");
+                logger?.InboxJobIsMissing();
                 return false;
             }
             return true;
@@ -93,7 +94,7 @@ namespace Tycho.Events.Inbox
             }
             catch (Exception exception)
             {
-                logger?.LogError(exception, "Failed to process inbox entry with ID {entryId}", _event!.EventId);
+                logger?.InboxMessageProcessingFailed(_event!.EventId, exception);
                 return false;
             }
         }
@@ -118,7 +119,7 @@ namespace Tycho.Events.Inbox
             bool markedAsFailed = await inbox.MarkAsFailedAsync(_event!.ClaimId, cancellationToken).ConfigureAwait(false);
             if (!markedAsFailed)
             {
-                logger?.LogWarning("Failed to mark inbox entry with ID {entryId} as failed for claim {claimId}", _event.EventId, _event.ClaimId);
+                logger?.InboxMessageStatusUpdateFailed(_event.EventId, _event.ClaimId);
             }
         }
     }

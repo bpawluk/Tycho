@@ -13,6 +13,7 @@ public class ActivityTests
         // Arrange
         var exception = new InvalidOperationException("notification failure");
         var loggerMock = new Mock<ILogger<InboxActivity>>();
+        loggerMock.Setup(logger => logger.IsEnabled(LogLevel.Error)).Returns(true);
         var sut = new InboxActivity(loggerMock.Object);
         int notificationCount = 0;
         sut.NewEntriesAdded += (_, _) => throw exception;
@@ -23,7 +24,7 @@ public class ActivityTests
 
         // Assert
         Assert.Equal(1, notificationCount);
-        VerifyErrorLogged(loggerMock, exception);
+        VerifyErrorLogged(loggerMock, exception, 1401, "InboxNotificationFailed");
     }
 
     [Fact]
@@ -32,6 +33,7 @@ public class ActivityTests
         // Arrange
         var exception = new InvalidOperationException("notification failure");
         var loggerMock = new Mock<ILogger<OutboxActivity>>();
+        loggerMock.Setup(logger => logger.IsEnabled(LogLevel.Error)).Returns(true);
         var sut = new OutboxActivity(loggerMock.Object);
         int notificationCount = 0;
         sut.NewEntriesAdded += (_, _) => throw exception;
@@ -42,15 +44,15 @@ public class ActivityTests
 
         // Assert
         Assert.Equal(1, notificationCount);
-        VerifyErrorLogged(loggerMock, exception);
+        VerifyErrorLogged(loggerMock, exception, 1501, "OutboxNotificationFailed");
     }
 
-    private static void VerifyErrorLogged<T>(Mock<ILogger<T>> loggerMock, Exception exception)
+    private static void VerifyErrorLogged<T>(Mock<ILogger<T>> loggerMock, Exception exception, int eventId, string eventName)
     {
         loggerMock.Verify(
             logger => logger.Log(
                 LogLevel.Error,
-                It.IsAny<EventId>(),
+                It.Is<EventId>(id => id.Id == eventId && id.Name == eventName),
                 It.Is<It.IsAnyType>((_, _) => true),
                 exception,
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),

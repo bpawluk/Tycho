@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Tycho.Logging;
 using Tycho.Events.Broker;
 using Tycho.Processor;
 using Tycho.Structure;
@@ -43,7 +44,7 @@ namespace Tycho.Events.Outbox
 
             if (_event is null)
             {
-                logger?.LogWarning("No event assigned for processing. Skipping execution.");
+                logger?.OutboxJobIsMissing();
                 return;
             }
 
@@ -57,7 +58,7 @@ namespace Tycho.Events.Outbox
                 bool markedAsDelivered = await outbox.MarkAsDeliveredAsync(_event.ClaimId, cancellationToken).ConfigureAwait(false);
                 if (!markedAsDelivered)
                 {
-                    logger?.LogWarning("Failed to mark outbox entry with ID {entryId} as delivered for claim {claimId}", _event.EventId, _event.ClaimId);
+                    logger?.OutboxMessageStatusUpdateFailed(_event.EventId, _event.ClaimId);
                 }
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -66,12 +67,12 @@ namespace Tycho.Events.Outbox
             }
             catch (Exception ex)
             {
-                logger?.LogError(ex, "Failed to deliver outbox entry with ID {entryId}", _event.EventId);
+                logger?.OutboxMessageDeliveryFailed(_event.EventId, ex);
 
                 bool markedAsFailed = await outbox.MarkAsFailedAsync(_event.ClaimId, cancellationToken).ConfigureAwait(false);
                 if (!markedAsFailed)
                 {
-                    logger?.LogWarning("Failed to mark outbox entry with ID {entryId} as failed for claim {claimId}", _event.EventId, _event.ClaimId);
+                    logger?.OutboxMessageStatusUpdateFailed(_event.EventId, _event.ClaimId);
                 }
             }
         }

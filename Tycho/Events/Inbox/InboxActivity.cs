@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Extensions.Logging;
+using Tycho.Logging;
 
 namespace Tycho.Events.Inbox
 {
@@ -39,7 +40,7 @@ namespace Tycho.Events.Inbox
         {
             try
             {
-                _logger?.LogError(exception, "Failed to notify an inbox activity subscriber about new entries.");
+                _logger?.InboxNotificationFailed(exception);
             }
             catch
             {

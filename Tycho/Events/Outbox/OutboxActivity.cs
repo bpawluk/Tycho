@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Extensions.Logging;
+using Tycho.Logging;
 
 namespace Tycho.Events.Outbox
 {
@@ -39,7 +40,7 @@ namespace Tycho.Events.Outbox
         {
             try
             {
-                _logger?.LogError(exception, "Failed to notify an outbox activity subscriber about new entries.");
+                _logger?.OutboxNotificationFailed(exception);
             }
             catch
             {
