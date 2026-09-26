@@ -16,8 +16,8 @@ namespace Tycho.Apps.Setup
     internal class AppStructure : IAppStructure
     {
         private readonly Internals _internals;
-        private readonly List<TychoModule> _submodules = new List<TychoModule>();
-        private readonly HashSet<Type> _submoduleTypes = new HashSet<Type>();
+        private readonly List<TychoModule> _submodules = new();
+        private readonly HashSet<Type> _submoduleTypes = new();
 
         public AppStructure(Internals internals)
         {

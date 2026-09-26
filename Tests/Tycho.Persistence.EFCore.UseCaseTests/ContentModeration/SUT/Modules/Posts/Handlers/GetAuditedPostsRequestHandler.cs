@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Tycho.Requests;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Persistence;
+using Tycho.Requests;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Handlers;
 

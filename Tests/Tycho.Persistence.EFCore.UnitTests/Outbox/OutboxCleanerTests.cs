@@ -137,18 +137,18 @@ public sealed class OutboxCleanerTests : IAsyncLifetime
         EntryState state = EntryState.Processed,
         string payload = "original payload",
         Guid? id = null) => new()
-    {
-        OwnerKey = ownerKey,
-        Id = id ?? Guid.NewGuid(),
-        PublishId = Guid.NewGuid(),
-        Event = "TestEvent",
-        Handler = "TestHandler",
-        Route = "test-route",
-        Payload = payload,
-        State = state,
-        Created = updated.AddDays(-1),
-        Updated = updated
-    };
+        {
+            OwnerKey = ownerKey,
+            Id = id ?? Guid.NewGuid(),
+            PublishId = Guid.NewGuid(),
+            Event = "TestEvent",
+            Handler = "TestHandler",
+            Route = "test-route",
+            Payload = payload,
+            State = state,
+            Created = updated.AddDays(-1),
+            Updated = updated
+        };
 
     public async ValueTask DisposeAsync()
     {

@@ -12,9 +12,9 @@ namespace Tycho.Processor
         private readonly TimeSpan _jobTimeout;
         private readonly SemaphoreSlim _capacity;
 
-        private readonly CancellationTokenSource _processingCts = new CancellationTokenSource();
-        private readonly HashSet<Task> _runningJobs = new HashSet<Task>();
-        private readonly object _sync = new object();
+        private readonly CancellationTokenSource _processingCts = new();
+        private readonly HashSet<Task> _runningJobs = new();
+        private readonly object _sync = new();
 
         private Task? _stopTask;
 
@@ -96,7 +96,7 @@ namespace Tycho.Processor
 
         private async Task RunJobAsync(IJob job)
         {
-            using CancellationTokenSource timeoutCts = new CancellationTokenSource();
+            using CancellationTokenSource timeoutCts = new();
             using CancellationTokenSource jobCts = CancellationTokenSource.CreateLinkedTokenSource(_processingCts.Token, timeoutCts.Token);
 
             if (_jobTimeout != Timeout.InfiniteTimeSpan)

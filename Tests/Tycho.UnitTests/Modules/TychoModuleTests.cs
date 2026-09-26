@@ -184,7 +184,7 @@ public class TychoModuleTests
     {
         moduleDefinition.FulfillContract(new Mock<IRequestBroker>().Object);
         moduleDefinition.PassEventBroker(new Mock<IEventBroker>().Object);
-        moduleDefinition.PassParentId(InstanceIdentity.CreateRoot(DefinitionIdentity.Create(typeof(TychoModuleTests))));
+        moduleDefinition.PassParentId(InstanceIdentity.CreateRoot(DefinitionIdentity.Create<TychoModuleTests>()));
         return moduleDefinition.CreateModuleBuilder().Build(parentServiceProvider);
     }
 

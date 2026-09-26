@@ -6,7 +6,7 @@ namespace Tycho.Events.Routing.Steps
     {
         private const string Key = "END";
 
-        public static FinalRouteStep Create() => new FinalRouteStep();
+        public static FinalRouteStep Create() => new();
 
         public override string ToString()
         {

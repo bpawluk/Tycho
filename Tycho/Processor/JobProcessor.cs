@@ -11,8 +11,8 @@ namespace Tycho.Processor
         private readonly IProcessingSuspender _processingSuspender;
         private readonly IIntervalCalculator _idleTimeCalculator;
 
-        private readonly CancellationTokenSource _processingCts = new CancellationTokenSource();
-        private readonly object _sync = new object();
+        private readonly CancellationTokenSource _processingCts = new();
+        private readonly object _sync = new();
         private Task? _processingTask;
 
         private bool WasStarted => _processingTask != null;

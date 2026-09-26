@@ -1,8 +1,8 @@
 using Moq;
 using Tycho.Identity.Modules;
+using Tycho.Identity.Structure;
 using Tycho.Modules.Instance;
 using Tycho.UnitTests._Data.Modules;
-using Tycho.Identity.Structure;
 
 namespace Tycho.UnitTests.Identity.Modules;
 

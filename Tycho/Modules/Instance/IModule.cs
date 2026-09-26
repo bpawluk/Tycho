@@ -1,10 +1,10 @@
 using System;
 using Tycho.Events.Broker;
 using Tycho.Identity.Modules;
+using Tycho.Identity.Structure;
 using Tycho.Requests.Broker;
 using Tycho.Structure;
 using Tycho.Utils;
-using Tycho.Identity.Structure;
 
 namespace Tycho.Modules.Instance
 {

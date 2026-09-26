@@ -10,7 +10,7 @@ namespace Tycho.Events.Inbox
         /// <summary>
         /// Gets the default settings instance.
         /// </summary>
-        public static InboxSettings Default => new InboxSettings();
+        public static InboxSettings Default => new();
 
         /// <summary>
         /// Gets or sets the concurrency limit for the inbox processor.

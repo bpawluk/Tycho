@@ -6,7 +6,7 @@ namespace Tycho.Events.Routing.Steps
     {
         private const string Key = "UP";
 
-        public static UpStreamRouteStep Create() => new UpStreamRouteStep();
+        public static UpStreamRouteStep Create() => new();
 
         public override string ToString()
         {

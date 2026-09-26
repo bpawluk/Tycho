@@ -1,7 +1,7 @@
-using Tycho.Requests;
-using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Rooms;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Climate.Contract;
+using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Rooms;
+using Tycho.Requests;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Handlers;
 

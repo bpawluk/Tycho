@@ -118,7 +118,7 @@ public sealed class ServiceCollectionExtensionsTests
         // Arrange
         var services = new ServiceCollection();
         services.AddTychoPersistenceRetention();
-        ServiceDescriptor[] originalRegistrations = services.ToArray();
+        ServiceDescriptor[] originalRegistrations = [.. services];
 
         // Act
         void Act() => services.AddTychoPersistenceRetention(options => options.CleanupInterval = TimeSpan.Zero);
@@ -126,7 +126,7 @@ public sealed class ServiceCollectionExtensionsTests
         // Assert
         ArgumentOutOfRangeException exception = Assert.Throws<ArgumentOutOfRangeException>(Act);
         Assert.Equal(nameof(PersistenceRetentionOptions.CleanupInterval), exception.ParamName);
-        Assert.Equal(originalRegistrations, services.ToArray());
+        Assert.Equal(originalRegistrations, [.. services]);
     }
 
     [Fact]

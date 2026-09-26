@@ -1,10 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Apps;
-using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Audit.Persistence;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Mappers;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Incoming;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Outgoing;
+using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Audit.Persistence;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users;

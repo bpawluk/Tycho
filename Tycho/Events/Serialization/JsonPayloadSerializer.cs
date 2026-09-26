@@ -5,7 +5,7 @@ namespace Tycho.Events.Serialization
 {
     internal class JsonPayloadSerializer : IPayloadSerializer
     {
-        private readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions();
+        private readonly JsonSerializerOptions _jsonOptions = new();
 
         public string Serialize<TEvent>(TEvent eventData) where TEvent : class, IEvent
         {

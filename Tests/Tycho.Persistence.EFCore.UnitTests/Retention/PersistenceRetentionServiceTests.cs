@@ -1,7 +1,7 @@
 using System.Threading.Channels;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Time.Testing;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Time.Testing;
 using Moq;
 using Tycho.Persistence.EFCore.Inbox;
 using Tycho.Persistence.EFCore.Outbox;

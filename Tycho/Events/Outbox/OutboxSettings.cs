@@ -10,7 +10,7 @@ namespace Tycho.Events.Outbox
         /// <summary>
         /// Gets the default settings instance.
         /// </summary>
-        public static OutboxSettings Default => new OutboxSettings();
+        public static OutboxSettings Default => new();
 
         /// <summary>
         /// Gets or sets the concurrency limit for the outbox processor.

@@ -10,7 +10,7 @@ namespace Tycho.Events.Routing.Steps
         private const string Key = "DOWN";
         private const string DestinationGroup = "destination";
 
-        private static readonly Regex s_pattern = new Regex(@$"^{Key}\((?<{DestinationGroup}>.+)\)$", RegexOptions.IgnoreCase);
+        private static readonly Regex s_pattern = new(@$"^{Key}\((?<{DestinationGroup}>.+)\)$", RegexOptions.IgnoreCase);
 
         public DefinitionIdentity Destination { get; }
 

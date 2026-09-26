@@ -24,7 +24,7 @@ namespace Tycho.Events.Delivery.Strategies
 
         public async Task DeliverAsync(SerializedRoutedEvent routedEvent, CancellationToken cancellationToken)
         {
-            if (!routedEvent.Route.TryPop(out IRouteStep? routeStep) || !(routeStep is UpStreamRouteStep))
+            if (!routedEvent.Route.TryPop(out IRouteStep? routeStep) || routeStep is not UpStreamRouteStep)
             {
                 throw new InvalidOperationException($"Invalid route in {GetType().Name}.");
             }

@@ -6,11 +6,11 @@ using Tycho.Events.Routing;
 using Tycho.Events.Routing.Steps;
 using Tycho.Identity.Events;
 using Tycho.Identity.Modules;
+using Tycho.Identity.Structure;
 using Tycho.Modules.Instance;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
 using Tycho.UnitTests._Data.Modules;
-using Tycho.Identity.Structure;
 
 namespace Tycho.UnitTests.Events.Delivery;
 

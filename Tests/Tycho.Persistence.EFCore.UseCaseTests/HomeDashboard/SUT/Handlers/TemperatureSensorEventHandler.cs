@@ -1,9 +1,9 @@
 using Tycho.Events;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Contract.Readings;
-using Tycho.Transactions;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Rooms;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Rooms.Contract;
+using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Handlers;
 
