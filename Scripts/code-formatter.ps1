@@ -8,7 +8,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$env:DOTNET_SYSTEM_GLOBALIZATION_INVARIANT="1"
+$env:DOTNET_CLI_UI_LANGUAGE = "en-US"
 
 $scriptDirectory = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
 $repoRoot = Split-Path -Path $scriptDirectory -Parent
