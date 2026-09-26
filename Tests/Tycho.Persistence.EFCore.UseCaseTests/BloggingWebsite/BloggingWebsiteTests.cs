@@ -16,7 +16,7 @@ public sealed class BloggingWebsiteTests : IAsyncLifetime
         await _sut.StartAsync(TestContext.Current.CancellationToken);
     }
 
-    [Fact(Timeout = 10000)]
+    [Fact(Timeout = 30000)]
     public async Task TychoUseCase_BloggingWebsiteApp_WorksCorrectly()
     {
         await SetupPostedEntries();

@@ -1,0 +1,14 @@
+{
+  "platformOptions": {
+    "Coverlet": {
+      "format": "cobertura",
+      "include": "[Tycho]*,[Tycho.Persistence.EFCore]*,[Tycho.Utils.SourceGenerator]*",
+      "exclude": "[*.*Tests]*,[Tycho.Utils.SourceGenerator]Scriban*",
+      "excludeByAttribute": "ExcludeFromCodeCoverageAttribute",
+      "includeTestAssembly": false,
+      "skipAutoProps": true,
+      "deterministicReport": true,
+      "useSourceLink": true
+    }
+  }
+}

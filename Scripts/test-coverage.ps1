@@ -3,7 +3,7 @@
 
 param(
   [string]$Solution = "Tycho.slnx",
-  [string]$CoverageSettings = "coverage.runsettings",
+  [string]$CoverageSettings = "coverage.testconfig.json",
   [string]$ResultsDirectory = "Artifacts/TestCoverage/Results",
   [string]$ReportDirectory = "Artifacts/TestCoverage/Report",
   [string]$ReportTypes = "Html;HtmlSummary;Cobertura"
@@ -52,15 +52,15 @@ try {
   }
 
   Write-Host ""
-  Write-Host "Running tests with XPlat Code Coverage"
-  dotnet test $solutionPath --settings $settingsPath --collect:"XPlat Code Coverage" --results-directory $resultsPath
+  Write-Host "Running tests with Coverlet code coverage"
+  dotnet test --solution $solutionPath "-p:CoverageSettingsFile=$settingsPath" --results-directory $resultsPath -- --coverlet
   if ($LASTEXITCODE -ne 0) {
     throw "Running tests failed with exit code $LASTEXITCODE"
   }
 
-  $coverageFiles = @(Get-ChildItem -Path $resultsPath -Filter "coverage.cobertura.xml" -Recurse -File | Select-Object -ExpandProperty FullName)
+  $coverageFiles = @(Get-ChildItem -Path $resultsPath -Filter "*.cobertura*.xml" -Recurse -File | Select-Object -ExpandProperty FullName)
   if ($coverageFiles.Count -eq 0) {
-    throw "No coverage.cobertura.xml files were generated under $resultsPath"
+    throw "No Cobertura coverage files were generated under $resultsPath"
   }
 
   $reportsArgument = [string]::Join(";", $coverageFiles)

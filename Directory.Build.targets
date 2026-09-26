@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <CoverageSettingsFile Condition="'$(CoverageSettingsFile)' == ''">$(MSBuildThisFileDirectory)coverage.testconfig.json</CoverageSettingsFile>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(IsTestProject)' == 'true'">
+    <None Include="$(CoverageSettingsFile)" TargetPath="$(AssemblyName).testconfig.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

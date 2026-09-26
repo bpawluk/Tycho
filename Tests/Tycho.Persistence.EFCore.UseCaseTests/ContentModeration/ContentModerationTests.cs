@@ -17,7 +17,7 @@ public sealed class ContentModerationTests : IAsyncLifetime
         await _sut.StartAsync(TestContext.Current.CancellationToken);
     }
 
-    [Fact(Timeout = 10000)]
+    [Fact(Timeout = 30000)]
     public async Task TychoUseCase_ContentModerationApp_WorksCorrectly()
     {
         await SetupUsers();

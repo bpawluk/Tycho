@@ -18,7 +18,7 @@ public sealed class HomeDashboardTests : IAsyncLifetime
         await _sut.StartAsync(TestContext.Current.CancellationToken);
     }
 
-    [Fact(Timeout = 10000)]
+    [Fact(Timeout = 30000)]
     public async Task TychoUseCase_HomeDashboardApp_WorksCorrectly()
     {
         await SetReadings();
