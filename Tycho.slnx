@@ -6,6 +6,7 @@
   </Folder>
   <Folder Name="/Tests/Tycho.Utils/">
     <Project Path="Tests/Tycho.Utils.SourceGenerator.IntegrationTests/Tycho.Utils.SourceGenerator.IntegrationTests.csproj" Id="a0451a68-9603-4b42-bb98-3d6cd214b66c" />
+    <Project Path="Tycho.Utils.SourceGenerator.UnitTests/Tycho.Utils.SourceGenerator.UnitTests.csproj" Id="8d76f73f-648e-49b5-812a-e1a0fb712904" />
   </Folder>
   <Folder Name="/Tests/Tycho/">
     <Project Path="Tests/Tycho.IntegrationTests/Tycho.IntegrationTests.csproj" />

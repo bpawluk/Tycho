@@ -93,7 +93,7 @@ namespace Tycho.Utils.SourceGenerator.Models.System
                 TypeParameters.GetHashCode());
         }
 
-        public override string ToString() => string.IsNullOrEmpty(Namespace) ? FullMetadataName : $"{Namespace}.{FullMetadataName}";
+        public override string ToString() => FullMetadataName;
 
         public static bool operator ==(TypeDefinitionModel left, TypeDefinitionModel right) => left.Equals(right);
 
