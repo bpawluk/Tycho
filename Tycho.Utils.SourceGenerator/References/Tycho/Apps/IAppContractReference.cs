@@ -7,7 +7,6 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
     internal static class IAppContractReference
     {
         private const string Namespace = "Tycho.Apps";
-        private const string TypeName = "IAppContract";
         private const string RequestBindingTypeName = "IAppRequestBinding";
 
         public static HashSet<MethodSignatureModel> DownstreamContractDefiningMethods { get; } = new HashSet<MethodSignatureModel>(new[]
@@ -18,8 +17,6 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
 
         public static string RequestTypeParameterName => "TRequest";
         public static string ResponseTypeParameterName => "TResponse";
-
-        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
 
         public static TypeReferenceModel RequestBindingTypeModel => new TypeReferenceModel(
             Namespace,

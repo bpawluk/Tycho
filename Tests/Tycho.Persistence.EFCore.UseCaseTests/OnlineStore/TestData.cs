@@ -30,9 +30,9 @@ internal class TestData
             BasketItem? basketItem = basket.FirstOrDefault(item => item.ProductId == product.Id);
             Product updatedProduct = product with
             {
-                Quantity = product.Quantity - basketItem?.Quantity ?? 0
+                Quantity = product.Quantity - (basketItem?.Quantity ?? 0)
             };
-            productsAfterPurchase.Add(product);
+            productsAfterPurchase.Add(updatedProduct);
         }
         return productsAfterPurchase;
     }

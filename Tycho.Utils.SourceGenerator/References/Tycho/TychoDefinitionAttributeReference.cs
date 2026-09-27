@@ -8,7 +8,5 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho
         private const string TypeName = "TychoDefinitionAttribute";
 
         public static string FullName => $"{Namespace}.{TypeName}";
-
-        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
     }
 }
