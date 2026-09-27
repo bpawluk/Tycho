@@ -191,7 +191,7 @@ public sealed class OutboxWriterTests : IAsyncLifetime
     private async Task<int> CountPersistedEntries() =>
         await _dbContext.Set<OutboxEntry>().AsNoTracking().CountAsync(TestContext.Current.CancellationToken);
 
-    private static RoutedEvent CreateRoutedEvent() => new RoutedEvent<TestEvent>(
+    private static RoutedEvent<TestEvent> CreateRoutedEvent() => new(
         Guid.NewGuid(),
         Guid.NewGuid(),
         EventIdentity.Create<TestEvent>(),

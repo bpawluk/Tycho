@@ -75,8 +75,8 @@ public class RouteTests
         // Assert
         Assert.Equal(2, result.Count);
         IRouteStep nextStep = result.Pop();
-        Assert.IsType<DownStreamRouteStep>(nextStep);
-        Assert.Equal(destination, ((DownStreamRouteStep)nextStep).Destination);
+        DownStreamRouteStep step = Assert.IsType<DownStreamRouteStep>(nextStep);
+        Assert.Equal(destination, step.Destination);
     }
 
     [Fact]

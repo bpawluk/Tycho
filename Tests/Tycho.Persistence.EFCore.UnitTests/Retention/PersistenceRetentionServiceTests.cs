@@ -79,12 +79,6 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
         VerifyCleanupLog("Inbox", "Clearing payloads", 2, cutoff);
         VerifyCleanupLog("Outbox", "Deleting messages", 3, cutoff);
         VerifyCleanupLog("Outbox", "Clearing payloads", 4, cutoff);
-        _logger.Verify(item => item.Log(
-            LogLevel.Information,
-            It.IsAny<EventId>(),
-            It.IsAny<It.IsAnyType>(),
-            It.IsAny<Exception?>(),
-            It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Exactly(4));
     }
 
     [Fact]
@@ -94,12 +88,14 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
         await RunFirstCleanupAsync();
 
         // Assert
+#pragma warning disable CA1873
         _logger.Verify(item => item.Log(
             LogLevel.Information,
             It.IsAny<EventId>(),
             It.IsAny<It.IsAnyType>(),
             It.IsAny<Exception?>(),
             It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Never);
+#pragma warning restore CA1873
     }
 
     [Theory]

@@ -40,8 +40,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
                 .Distinct()
                 .ToArray();
 
-            Classes = new ClassesTM(this, model);
-            Interfaces = new InterfacesTM(this, model);
+            Classes = new ClassesTM(model);
+            Interfaces = new InterfacesTM(model);
             Methods = new MethodsTM(model);
             Properties = new PropertiesTM();
             Parameters = new ParametersTM();
@@ -59,7 +59,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string ServiceCollectionHostedServiceExtensionsClass { get; }
             public string ServiceCollectionServiceExtensionsClass { get; }
 
-            public ClassesTM(AppExtensionsTM owner, TychoExtensionsModel model)
+            public ClassesTM(TychoExtensionsModel model)
             {
                 string appName = model.DefinitionType.Name;
                 var builderType = new GeneratedTypeModel(
@@ -82,7 +82,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string HostApplicationBuilderInterface { get; }
             public string FacadeInterface { get; }
 
-            public InterfacesTM(AppExtensionsTM owner, TychoExtensionsModel model)
+            public InterfacesTM(TychoExtensionsModel model)
             {
                 var facadeInterfaceType = new GeneratedTypeModel(
                     model.DefinitionType,

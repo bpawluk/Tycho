@@ -180,7 +180,7 @@ public class TychoAppTests
 
     private sealed class TestAppSetup
     {
-        public static void Setup(IServiceCollection app) { }
+        public static void Setup(IServiceCollection _) { }
     }
 
     private sealed class TestService { }

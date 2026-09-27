@@ -29,11 +29,11 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             Namespace = tychoFacadeModel.DefinitionType.Namespace;
             ContainingTypes = UseContainingTypes(tychoFacadeModel.DefinitionType.ContainingTypes);
             OwnerConstraints = UseConstraintClauses(tychoFacadeModel.DefinitionType.TypeParameters).ToArray();
-            Classes = new ClassesTM(this, tychoFacadeModel);
-            Interfaces = new InterfacesTM(this, tychoFacadeModel);
+            Classes = new ClassesTM(tychoFacadeModel);
+            Interfaces = new InterfacesTM(tychoFacadeModel);
             Methods = new MethodsTM();
             Parameters = new ParametersTM();
-            Requests = tychoFacadeModel.Requests.Select(r => new RequestTM(this, r)).ToArray();
+            Requests = tychoFacadeModel.Requests.Select(r => new RequestTM(r)).ToArray();
         }
 
         internal class ClassesTM
@@ -45,7 +45,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string TaskClass { get; }
             public string CancellationTokenClass { get; }
 
-            public ClassesTM(ModuleFacadeTM owner, TychoFacadeModel tychoFacadeModel)
+            public ClassesTM(TychoFacadeModel tychoFacadeModel)
             {
                 string moduleNameStem = tychoFacadeModel.DefinitionType.Name;
                 var facadeType = new GeneratedTypeModel(
@@ -65,7 +65,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string ModuleInterface { get; }
             public string InstanceInterface { get; }
 
-            public InterfacesTM(ModuleFacadeTM owner, TychoFacadeModel tychoFacadeModel)
+            public InterfacesTM(TychoFacadeModel tychoFacadeModel)
             {
                 var facadeInterfaceType = new GeneratedTypeModel(
                     tychoFacadeModel.DefinitionType,
@@ -105,7 +105,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string ResponseType { get; }
             public bool HasResponse { get; }
 
-            public RequestTM(ModuleFacadeTM owner, TychoRequestModel tychoRequestModel)
+            public RequestTM(TychoRequestModel tychoRequestModel)
             {
                 RequestType = tychoRequestModel.RequestType.FullReferenceName;
                 HasResponse = tychoRequestModel.HasResponse;

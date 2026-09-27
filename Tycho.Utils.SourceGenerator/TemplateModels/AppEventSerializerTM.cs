@@ -27,8 +27,8 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             Namespace = tychoEventSerializerModel.DefinitionType.Namespace;
             ContainingTypes = UseContainingTypes(tychoEventSerializerModel.DefinitionType.ContainingTypes);
             OwnerConstraints = UseConstraintClauses(tychoEventSerializerModel.DefinitionType.TypeParameters).ToArray();
-            Classes = new ClassesTM(this, tychoEventSerializerModel.DefinitionType);
-            Interfaces = new InterfacesTM(this);
+            Classes = new ClassesTM(tychoEventSerializerModel.DefinitionType);
+            Interfaces = new InterfacesTM();
             Methods = new MethodsTM();
             Parameters = new ParametersTM();
             Events = tychoEventSerializerModel.Events.Select(e => e.FullReferenceName).ToArray();
@@ -40,7 +40,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string EventSerializerClass { get; }
             public string EventSerializerBaseClass { get; }
 
-            public ClassesTM(AppEventSerializerTM owner, TypeDefinitionModel appType)
+            public ClassesTM(TypeDefinitionModel appType)
             {
                 var eventSerializerType = new GeneratedTypeModel(
                     appType,
@@ -55,7 +55,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
         {
             public string PayloadSerializerInterface { get; }
 
-            public InterfacesTM(AppEventSerializerTM owner)
+            public InterfacesTM()
             {
                 PayloadSerializerInterface = IPayloadSerializerReference.TypeModel.FullReferenceName;
             }

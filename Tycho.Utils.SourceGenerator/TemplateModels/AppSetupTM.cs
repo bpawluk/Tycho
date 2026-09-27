@@ -28,11 +28,11 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             Namespace = tychoSetupModel.DefinitionType.Namespace;
             ContainingTypes = UseContainingTypes(tychoSetupModel.DefinitionType.ContainingTypes);
             OwnerConstraints = UseConstraintClauses(tychoSetupModel.DefinitionType.TypeParameters).ToArray();
-            Classes = new ClassesTM(this, tychoSetupModel);
-            Interfaces = new InterfacesTM(this, tychoSetupModel);
+            Classes = new ClassesTM(tychoSetupModel);
+            Interfaces = new InterfacesTM(tychoSetupModel);
             Methods = new MethodsTM();
             Parameters = new ParametersTM();
-            Submodules = tychoSetupModel.Submodules.Select(s => new SubmoduleTM(this, s)).ToArray();
+            Submodules = tychoSetupModel.Submodules.Select(s => new SubmoduleTM(s)).ToArray();
         }
 
         internal class ClassesTM
@@ -42,7 +42,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string EventSerializerClass { get; }
             public string ServiceCollectionServiceExtensionsClass { get; }
 
-            public ClassesTM(AppSetupTM owner, TychoSetupModel tychoSetupModel)
+            public ClassesTM(TychoSetupModel tychoSetupModel)
             {
                 string appNameStem = tychoSetupModel.DefinitionType.Name;
                 var setupType = new GeneratedTypeModel(
@@ -68,7 +68,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string EventSerializerInterface { get; }
             public string ServiceCollectionInterface { get; }
 
-            public InterfacesTM(AppSetupTM owner, TychoSetupModel tychoSetupModel)
+            public InterfacesTM(TychoSetupModel tychoSetupModel)
             {
                 var publisherInterfaceType = new GeneratedTypeModel(
                     tychoSetupModel.DefinitionType,
@@ -108,7 +108,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string FacadeInterface { get; }
             public string FacadeClass { get; }
 
-            public SubmoduleTM(AppSetupTM owner, TypeReferenceModel moduleType)
+            public SubmoduleTM(TypeReferenceModel moduleType)
             {
                 var facadeInterfaceType = new GeneratedTypeModel(
                     moduleType,

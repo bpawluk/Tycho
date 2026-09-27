@@ -28,7 +28,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             Namespace = tychoPublisherModel.DefinitionType.Namespace;
             ContainingTypes = UseContainingTypes(tychoPublisherModel.DefinitionType.ContainingTypes);
             OwnerConstraints = UseConstraintClauses(tychoPublisherModel.DefinitionType.TypeParameters).ToArray();
-            Classes = new ClassesTM(this);
+            Classes = new ClassesTM();
             Interfaces = new InterfacesTM(tychoPublisherModel);
             Methods = new MethodsTM();
             Parameters = new ParametersTM();
@@ -40,7 +40,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string TaskClass { get; }
             public string CancellationTokenClass { get; }
 
-            public ClassesTM(ModulePublisherInterfaceTM owner)
+            public ClassesTM()
             {
                 TaskClass = TaskReference.TypeModel.FullReferenceName;
                 CancellationTokenClass = CancellationTokenReference.TypeModel.FullReferenceName;

@@ -46,8 +46,8 @@ public class DownStreamRouteStepTests
 
         // Assert
         Assert.True(success);
-        Assert.IsType<DownStreamRouteStep>(result);
-        Assert.Equal(destination, ((DownStreamRouteStep)result).Destination);
+        DownStreamRouteStep step = Assert.IsType<DownStreamRouteStep>(result);
+        Assert.Equal(destination, step.Destination);
     }
 
     [Fact]
@@ -62,8 +62,8 @@ public class DownStreamRouteStepTests
 
         // Assert
         Assert.True(success);
-        Assert.IsType<DownStreamRouteStep>(result);
-        Assert.Equal(destination, ((DownStreamRouteStep)result).Destination);
+        DownStreamRouteStep step = Assert.IsType<DownStreamRouteStep>(result);
+        Assert.Equal(destination, step.Destination);
     }
 
     [Fact]
@@ -91,8 +91,8 @@ public class DownStreamRouteStepTests
         IRouteStep result = DownStreamRouteStep.Parse(input);
 
         // Assert
-        Assert.IsType<DownStreamRouteStep>(result);
-        Assert.Equal(destination, ((DownStreamRouteStep)result).Destination);
+        DownStreamRouteStep step = Assert.IsType<DownStreamRouteStep>(result);
+        Assert.Equal(destination, step.Destination);
     }
 
     [Fact]

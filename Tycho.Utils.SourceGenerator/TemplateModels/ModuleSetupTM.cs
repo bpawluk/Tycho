@@ -28,11 +28,11 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             Namespace = tychoDefinitionModel.DefinitionType.Namespace;
             ContainingTypes = UseContainingTypes(tychoDefinitionModel.DefinitionType.ContainingTypes);
             OwnerConstraints = UseConstraintClauses(tychoDefinitionModel.DefinitionType.TypeParameters).ToArray();
-            Classes = new ClassesTM(this, tychoDefinitionModel);
-            Interfaces = new InterfacesTM(this, tychoDefinitionModel);
+            Classes = new ClassesTM(tychoDefinitionModel);
+            Interfaces = new InterfacesTM(tychoDefinitionModel);
             Methods = new MethodsTM();
             Parameters = new ParametersTM();
-            Submodules = tychoDefinitionModel.Submodules.Select(s => new SubmoduleTM(this, s)).ToArray();
+            Submodules = tychoDefinitionModel.Submodules.Select(s => new SubmoduleTM(s)).ToArray();
         }
 
         internal class ClassesTM
@@ -43,7 +43,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string EventSerializerClass { get; }
             public string ServiceCollectionServiceExtensionsClass { get; }
 
-            public ClassesTM(ModuleSetupTM owner, TychoSetupModel tychoDefinitionModel)
+            public ClassesTM(TychoSetupModel tychoDefinitionModel)
             {
                 string moduleNameStem = tychoDefinitionModel.DefinitionType.Name;
                 var setupType = new GeneratedTypeModel(
@@ -74,7 +74,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string EventSerializerInterface { get; }
             public string ServiceCollectionInterface { get; }
 
-            public InterfacesTM(ModuleSetupTM owner, TychoSetupModel tychoDefinitionModel)
+            public InterfacesTM(TychoSetupModel tychoDefinitionModel)
             {
                 var parentInterfaceType = new GeneratedTypeModel(
                     tychoDefinitionModel.DefinitionType,
@@ -118,7 +118,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string FacadeInterface { get; }
             public string FacadeClass { get; }
 
-            public SubmoduleTM(ModuleSetupTM owner, TypeReferenceModel moduleType)
+            public SubmoduleTM(TypeReferenceModel moduleType)
             {
                 var facadeInterfaceType = new GeneratedTypeModel(
                     moduleType,

@@ -28,7 +28,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             Namespace = tychoPublisherModel.DefinitionType.Namespace;
             ContainingTypes = UseContainingTypes(tychoPublisherModel.DefinitionType.ContainingTypes);
             OwnerConstraints = UseConstraintClauses(tychoPublisherModel.DefinitionType.TypeParameters).ToArray();
-            Classes = new ClassesTM(this, tychoPublisherModel);
+            Classes = new ClassesTM(tychoPublisherModel);
             Interfaces = new InterfacesTM(tychoPublisherModel);
             Methods = new MethodsTM();
             Parameters = new ParametersTM();
@@ -44,7 +44,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string CancellationTokenClass { get; }
             public string GenericPublisherClass { get; }
 
-            public ClassesTM(AppPublisherTM owner, TychoPublisherModel tychoPublisherModel)
+            public ClassesTM(TychoPublisherModel tychoPublisherModel)
             {
                 string appNameStem = tychoPublisherModel.DefinitionType.Name;
                 var publisherType = new GeneratedTypeModel(

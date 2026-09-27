@@ -13,12 +13,14 @@ internal static class LogAssert
         Exception? exception = null,
         params (string Name, object? Value)[] properties)
     {
+#pragma warning disable CA1873
         logger.Verify(item => item.Log(
             level,
             It.Is<EventId>(id => id.Id == eventId && id.Name == eventName),
             It.Is<It.IsAnyType>((state, _) => HasProperties(state, properties)),
             It.Is<Exception?>(loggedException => ReferenceEquals(loggedException, exception)),
             It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
+#pragma warning restore CA1873
     }
 
     public static async Task WaitForLogAsync<T>(Mock<ILogger<T>> logger, int eventId, CancellationToken cancellationToken)

@@ -230,7 +230,7 @@ public class TychoModuleTests
 
     private sealed class TestModuleSetup
     {
-        public static void Setup(IServiceCollection module) { }
+        public static void Setup(IServiceCollection _) { }
     }
 
     private sealed class TestService { }

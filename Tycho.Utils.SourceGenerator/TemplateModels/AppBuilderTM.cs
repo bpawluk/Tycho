@@ -24,7 +24,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             OwnerConstraints = UseConstraintClauses(model.DefinitionType.TypeParameters).ToArray();
             Classes = new ClassesTM(model);
             Fields = new FieldsTM();
-            Interfaces = new InterfacesTM(this, model);
+            Interfaces = new InterfacesTM(model);
             Methods = new MethodsTM();
             Parameters = new ParametersTM();
         }
@@ -61,7 +61,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string FacadeInterface { get; }
             public string ServiceProviderInterface { get; }
 
-            public InterfacesTM(AppBuilderTM owner, TychoAppBuilderModel model)
+            public InterfacesTM(TychoAppBuilderModel model)
             {
                 var facadeInterfaceType = new GeneratedTypeModel(
                     model.DefinitionType,

@@ -29,11 +29,11 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             Namespace = tychoParentModel.DefinitionType.Namespace;
             ContainingTypes = UseContainingTypes(tychoParentModel.DefinitionType.ContainingTypes);
             OwnerConstraints = UseConstraintClauses(tychoParentModel.DefinitionType.TypeParameters).ToArray();
-            Classes = new ClassesTM(this, tychoParentModel);
+            Classes = new ClassesTM(tychoParentModel);
             Interfaces = new InterfacesTM(tychoParentModel);
             Methods = new MethodsTM();
             Parameters = new ParametersTM();
-            Requests = tychoParentModel.Requests.Select(r => new RequestTM(this, r)).ToArray();
+            Requests = tychoParentModel.Requests.Select(r => new RequestTM(r)).ToArray();
         }
 
         internal class ClassesTM
@@ -45,7 +45,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string CancellationTokenClass { get; }
             public string ParentReferenceClass { get; }
 
-            public ClassesTM(ModuleParentTM owner, TychoParentModel tychoParentModel)
+            public ClassesTM(TychoParentModel tychoParentModel)
             {
                 string moduleNameStem = tychoParentModel.DefinitionType.Name;
                 var parentType = new GeneratedTypeModel(
@@ -103,7 +103,7 @@ namespace Tycho.Utils.SourceGenerator.TemplateModels
             public string ResponseType { get; }
             public bool HasResponse { get; }
 
-            public RequestTM(ModuleParentTM owner, TychoRequestModel tychoRequestModel)
+            public RequestTM(TychoRequestModel tychoRequestModel)
             {
                 RequestType = tychoRequestModel.RequestType.FullReferenceName;
                 HasResponse = tychoRequestModel.HasResponse;
