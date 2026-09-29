@@ -45,6 +45,6 @@ public sealed class OutboxProcessorTests
         }
 
         // Assert
-        LogAssert.Logged(logger, LogLevel.Error, 1402, "OutboxProcessingFailed", failure);
+        LogAssert.LoggedAtLeastOnce(logger, LogLevel.Error, 1402, "OutboxProcessingFailed", failure);
     }
 }

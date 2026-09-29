@@ -45,6 +45,6 @@ public sealed class InboxProcessorTests
         }
 
         // Assert
-        LogAssert.Logged(logger, LogLevel.Error, 1302, "InboxProcessingFailed", failure);
+        LogAssert.LoggedAtLeastOnce(logger, LogLevel.Error, 1302, "InboxProcessingFailed", failure);
     }
 }

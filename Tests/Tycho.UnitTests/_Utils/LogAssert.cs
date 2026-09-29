@@ -12,6 +12,25 @@ internal static class LogAssert
         string eventName,
         Exception? exception = null,
         params (string Name, object? Value)[] properties)
+        => VerifyLogged(logger, level, eventId, eventName, exception, Times.Once(), properties);
+
+    public static void LoggedAtLeastOnce<T>(
+        Mock<ILogger<T>> logger,
+        LogLevel level,
+        int eventId,
+        string eventName,
+        Exception? exception = null,
+        params (string Name, object? Value)[] properties)
+        => VerifyLogged(logger, level, eventId, eventName, exception, Times.AtLeastOnce(), properties);
+
+    private static void VerifyLogged<T>(
+        Mock<ILogger<T>> logger,
+        LogLevel level,
+        int eventId,
+        string eventName,
+        Exception? exception,
+        Times times,
+        (string Name, object? Value)[] properties)
     {
 #pragma warning disable CA1873
         logger.Verify(item => item.Log(
@@ -19,7 +38,7 @@ internal static class LogAssert
             It.Is<EventId>(id => id.Id == eventId && id.Name == eventName),
             It.Is<It.IsAnyType>((state, _) => HasProperties(state, properties)),
             It.Is<Exception?>(loggedException => ReferenceEquals(loggedException, exception)),
-            It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
+            It.IsAny<Func<It.IsAnyType, Exception?, string>>()), times);
 #pragma warning restore CA1873
     }
 
