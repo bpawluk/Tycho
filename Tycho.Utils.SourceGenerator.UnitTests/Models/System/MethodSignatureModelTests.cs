@@ -6,7 +6,20 @@ namespace Tycho.Utils.SourceGenerator.UnitTests.Models.System;
 public sealed class MethodSignatureModelTests
 {
     [Fact]
-    public void Constructor_AndMatches_CompareMethodShape()
+    public void Constructor_SetsMethodShape()
+    {
+        // Arrange
+        TypeReferenceModel parameter = ModelHelpers.TypeReference("Input");
+        TypeReferenceModel resultType = ModelHelpers.TypeReference("Result");
+        var sut = new MethodSignatureModel("Run", ModelHelpers.Items(parameter), resultType);
+        // Assert
+        Assert.Equal("Run", sut.MethodName);
+        Assert.Equal(parameter, Assert.Single(sut.Parameters));
+        Assert.Equal(resultType, sut.Result);
+    }
+
+    [Fact]
+    public void Matches_ComparesMethodShape()
     {
         // Arrange
         TypeReferenceModel parameter = ModelHelpers.TypeReference("Input");
@@ -20,9 +33,6 @@ public sealed class MethodSignatureModelTests
         bool matchesDifferent = sut.Matches(different);
 
         // Assert
-        Assert.Equal("Run", sut.MethodName);
-        Assert.Equal(parameter, sut.Parameters[0]);
-        Assert.Equal(resultType, sut.Result);
         Assert.True(matchesEqual);
         Assert.False(matchesDifferent);
     }
@@ -40,6 +50,16 @@ public sealed class MethodSignatureModelTests
         Assert.Empty(sut.MethodName);
         Assert.Empty(sut.Parameters);
         Assert.Equal(resultType, sut.Result);
+    }
+
+    [Fact]
+    public void Matches_TreatsNullNameAsEmpty()
+    {
+        // Arrange
+        TypeReferenceModel resultType = ModelHelpers.TypeReference("Result");
+        var sut = new MethodSignatureModel(null, null, resultType);
+
+        // Assert
         Assert.True(sut.Matches(new MethodSignatureModel(string.Empty, null, resultType)));
     }
 

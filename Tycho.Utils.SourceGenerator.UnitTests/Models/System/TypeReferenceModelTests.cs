@@ -46,9 +46,9 @@ public sealed class TypeReferenceModelTests
         // Assert
         Assert.Equal("Example", sut.Namespace);
         Assert.False(sut.IsTypeParameter);
-        Assert.Equal(outer, sut.ContainingTypes[0]);
+        Assert.Equal(outer, Assert.Single(sut.ContainingTypes));
         Assert.Equal("Inner", sut.Name);
-        Assert.Equal(argument, sut.TypeArguments[0]);
+        Assert.Equal(argument, Assert.Single(sut.TypeArguments));
         Assert.Equal("<global::Values.Value>", sut.TypeArgumentsSuffix);
         Assert.Equal("Inner<global::Values.Value>", sut.ReferenceName);
         Assert.Equal("global::Example.Outer.Inner<global::Values.Value>", result);

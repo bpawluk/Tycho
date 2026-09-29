@@ -8,7 +8,23 @@ namespace Tycho.Utils.SourceGenerator.UnitTests.Models.Tycho;
 public sealed class TychoFacadeModelTests
 {
     [Fact]
-    public void Constructor_AndEquality_UseKindTypeAndRequests()
+    public void Constructor_SetsKindTypeAndRequests()
+    {
+        // Arrange
+        TypeDefinitionModel definition = ModelHelpers.TypeDefinition("App");
+        var request = new TychoRequestModel(ModelHelpers.TypeReference("Request"));
+
+        // Act
+        var first = new TychoFacadeModel(TychoDefinitionKind.App, definition, ModelHelpers.Items(request));
+
+        // Assert
+        Assert.Equal(TychoDefinitionKind.App, first.DefinitionKind);
+        Assert.Equal(definition, first.DefinitionType);
+        Assert.Equal(request, Assert.Single(first.Requests));
+    }
+
+    [Fact]
+    public void Equality_UsesKindTypeAndRequests()
     {
         // Arrange
         TypeDefinitionModel definition = ModelHelpers.TypeDefinition("App");
@@ -22,9 +38,6 @@ public sealed class TychoFacadeModelTests
         bool unequalWithOperator = first != different;
 
         // Assert
-        Assert.Equal(TychoDefinitionKind.App, first.DefinitionKind);
-        Assert.Equal(definition, first.DefinitionType);
-        Assert.Equal(request, first.Requests[0]);
         ModelHelpers.AssertValueSemantics(first, equal, different);
         Assert.True(equalWithOperator);
         Assert.True(unequalWithOperator);

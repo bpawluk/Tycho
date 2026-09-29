@@ -17,7 +17,6 @@ public sealed class TypeArgumentModelTests
         // Assert
         Assert.Equal("T", sut.Name);
         Assert.Equal(value, sut.Value);
-        Assert.True(sut.Matches(new TypeArgumentModel("T", value)));
     }
 
     [Fact]
@@ -43,18 +42,31 @@ public sealed class TypeArgumentModelTests
         var different = new TypeArgumentModel("U", ModelHelpers.TypeReference("Value"));
 
         // Act
-        bool matchesEquivalent = first.Matches(equal);
-        bool matchesDifferent = first.Matches(different);
         bool equalWithOperator = first == equal;
         bool unequalWithOperator = first != different;
 
         // Assert
         ModelHelpers.AssertValueSemantics(first, equal, different);
-        Assert.True(matchesEquivalent);
-        Assert.False(matchesDifferent);
         Assert.True(equalWithOperator);
         Assert.True(unequalWithOperator);
         Assert.False(first != equal);
         Assert.False(first == different);
+    }
+
+    [Fact]
+    public void Matches_UsesNameAndValue()
+    {
+        // Arrange
+        var first = new TypeArgumentModel("T", ModelHelpers.TypeReference("Value"));
+        var equal = new TypeArgumentModel("T", ModelHelpers.TypeReference("Value"));
+        var different = new TypeArgumentModel("U", ModelHelpers.TypeReference("Value"));
+
+        // Act
+        bool matchesEquivalent = first.Matches(equal);
+        bool matchesDifferent = first.Matches(different);
+
+        // Assert
+        Assert.True(matchesEquivalent);
+        Assert.False(matchesDifferent);
     }
 }

@@ -8,6 +8,10 @@ namespace Tycho.Utils.SourceGenerator.UnitTests._Utils;
 
 internal sealed class RoslynTestCompilation
 {
+    public CSharpCompilation Compilation { get; }
+
+    public ExtractorContext Context { get; }
+
     private RoslynTestCompilation(CSharpCompilation compilation)
     {
         Compilation = compilation;
@@ -16,10 +20,6 @@ internal sealed class RoslynTestCompilation
             new SemanticModelProvider(compilation),
             CancellationToken.None);
     }
-
-    public CSharpCompilation Compilation { get; }
-
-    public ExtractorContext Context { get; }
 
     public static RoslynTestCompilation Create(string source)
     {

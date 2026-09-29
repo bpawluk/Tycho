@@ -53,17 +53,29 @@ public sealed class TypeModifierTests
 
     [Theory]
     [MemberData(nameof(Modifiers))]
-    public void Keyword_AndToString_ReturnExpectedValue(string expected)
+    public void Keyword_ReturnsExpectedValue(string expected)
     {
         // Arrange
         TypeModifier sut = s_modifierCases.Single(testCase => testCase.Expected == expected).Sut;
 
         // Act
-        string keyword = sut.Keyword;
+        string result = sut.Keyword;
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(Modifiers))]
+    public void ToString_ReturnsKeyword(string expected)
+    {
+        // Arrange
+        TypeModifier sut = s_modifierCases.Single(testCase => testCase.Expected == expected).Sut;
+
+        // Act
         string result = sut.ToString();
 
         // Assert
-        Assert.Equal(expected, keyword);
         Assert.Equal(expected, result);
     }
 

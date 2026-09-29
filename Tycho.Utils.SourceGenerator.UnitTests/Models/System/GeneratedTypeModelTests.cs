@@ -36,9 +36,10 @@ public sealed class GeneratedTypeModelTests
         // Assert
         Assert.Equal("OwnerPublisher", sut.Identifier);
         Assert.Equal("Example", sut.TypeReference.Namespace);
-        Assert.Equal(containingType, sut.TypeReference.ContainingTypes[0]);
+        Assert.Equal(containingType, Assert.Single(sut.TypeReference.ContainingTypes));
         Assert.Equal("OwnerPublisher", sut.TypeReference.Name);
-        Assert.Equal(owner.TypeArguments[0], sut.TypeReference.TypeArguments[0]);
+        TypeArgumentModel expectedArgument = Assert.Single(owner.TypeArguments);
+        Assert.Equal(expectedArgument, Assert.Single(sut.TypeReference.TypeArguments));
         Assert.Equal("OwnerPublisher<global::Example.Value>", sut.DeclarationName);
         Assert.Equal(sut.DeclarationName, sut.ReferenceName);
         Assert.Equal("global::Example.Container.OwnerPublisher<global::Example.Value>", sut.FullReferenceName);

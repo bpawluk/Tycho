@@ -8,7 +8,22 @@ namespace Tycho.Utils.SourceGenerator.UnitTests.Models.Tycho;
 public sealed class TychoParentModelTests
 {
     [Fact]
-    public void Constructor_AndEquality_UseDefinitionTypeAndRequests()
+    public void Constructor_SetsDefinitionTypeAndRequests()
+    {
+        // Arrange
+        TypeDefinitionModel definition = ModelHelpers.TypeDefinition("Module");
+        var request = new TychoRequestModel(ModelHelpers.TypeReference("Request"));
+
+        // Act
+        var first = new TychoParentModel(definition, ModelHelpers.Items(request));
+
+        // Assert
+        Assert.Equal(definition, first.DefinitionType);
+        Assert.Equal(request, Assert.Single(first.Requests));
+    }
+
+    [Fact]
+    public void Equality_UsesDefinitionTypeAndRequests()
     {
         // Arrange
         TypeDefinitionModel definition = ModelHelpers.TypeDefinition("Module");
@@ -23,8 +38,6 @@ public sealed class TychoParentModelTests
         bool unequalWithOperator = first != different;
 
         // Assert
-        Assert.Equal(definition, first.DefinitionType);
-        Assert.Equal(request, first.Requests[0]);
         ModelHelpers.AssertValueSemantics(first, equal, different);
         Assert.True(equalWithOperator);
         Assert.True(unequalWithOperator);

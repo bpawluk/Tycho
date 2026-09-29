@@ -1,6 +1,5 @@
 using Tycho.Utils.SourceGenerator.Models;
 using Tycho.Utils.SourceGenerator.Models.System;
-using Tycho.Utils.SourceGenerator.Models.Tycho;
 using Tycho.Utils.SourceGenerator.UnitTests._Utils;
 
 namespace Tycho.Utils.SourceGenerator.UnitTests.Models.Tycho;
@@ -8,7 +7,20 @@ namespace Tycho.Utils.SourceGenerator.UnitTests.Models.Tycho;
 public sealed class TychoAppBuilderModelTests
 {
     [Fact]
-    public void Constructor_AndEquality_UseDefinitionType()
+    public void Constructor_SetsDefinitionType()
+    {
+        // Arrange
+        TypeDefinitionModel definition = ModelHelpers.TypeDefinition("App");
+
+        // Act
+        var first = new TychoAppBuilderModel(definition);
+
+        // Assert
+        Assert.Equal(definition, first.DefinitionType);
+    }
+
+    [Fact]
+    public void Equality_UsesDefinitionType()
     {
         // Arrange
         TypeDefinitionModel definition = ModelHelpers.TypeDefinition("App");
@@ -21,7 +33,6 @@ public sealed class TychoAppBuilderModelTests
         bool unequalWithOperator = first != different;
 
         // Assert
-        Assert.Equal(definition, first.DefinitionType);
         ModelHelpers.AssertValueSemantics(first, equal, different);
         Assert.True(equalWithOperator);
         Assert.True(unequalWithOperator);

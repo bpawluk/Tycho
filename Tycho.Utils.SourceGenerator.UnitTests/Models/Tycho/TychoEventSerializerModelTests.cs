@@ -8,7 +8,23 @@ namespace Tycho.Utils.SourceGenerator.UnitTests.Models.Tycho;
 public sealed class TychoEventSerializerModelTests
 {
     [Fact]
-    public void Constructor_AndEquality_UseKindTypeAndEvents()
+    public void Constructor_SetsKindTypeAndEvents()
+    {
+        // Arrange
+        TypeDefinitionModel definition = ModelHelpers.TypeDefinition("App");
+        TypeReferenceModel eventType = ModelHelpers.TypeReference("Event");
+
+        // Act
+        var first = new TychoEventSerializerModel(TychoDefinitionKind.App, definition, ModelHelpers.Items(eventType));
+
+        // Assert
+        Assert.Equal(TychoDefinitionKind.App, first.DefinitionKind);
+        Assert.Equal(definition, first.DefinitionType);
+        Assert.Equal(eventType, Assert.Single(first.Events));
+    }
+
+    [Fact]
+    public void Equality_UsesKindTypeAndEvents()
     {
         // Arrange
         TypeDefinitionModel definition = ModelHelpers.TypeDefinition("App");
@@ -22,9 +38,6 @@ public sealed class TychoEventSerializerModelTests
         bool unequalWithOperator = first != different;
 
         // Assert
-        Assert.Equal(TychoDefinitionKind.App, first.DefinitionKind);
-        Assert.Equal(definition, first.DefinitionType);
-        Assert.Equal(eventType, first.Events[0]);
         ModelHelpers.AssertValueSemantics(first, equal, different);
         Assert.True(equalWithOperator);
         Assert.True(unequalWithOperator);

@@ -42,6 +42,23 @@ public sealed class MethodInvocationModelTests
     }
 
     [Fact]
+    public void Constructor_SetsSignatureReceiverAndTypeArguments()
+    {
+        // Arrange
+        MethodSignatureModel signature = ModelHelpers.MethodSignature();
+        TypeReferenceModel receiver = ModelHelpers.TypeReference("Receiver");
+        var typeArgument = new TypeArgumentModel("T", ModelHelpers.TypeReference("Value"));
+
+        // Act
+        var first = new MethodInvocationModel(signature, receiver, ModelHelpers.Items(typeArgument));
+
+        // Assert
+        Assert.Equal(signature, first.Signature);
+        Assert.Equal(receiver, first.ReceiverType);
+        Assert.Equal(typeArgument, Assert.Single(first.TypeArguments));
+    }
+
+    [Fact]
     public void Equality_ReceiverAndTypeArguments_AffectEquality()
     {
         // Arrange
@@ -58,9 +75,6 @@ public sealed class MethodInvocationModelTests
 
         // Assert
         ModelHelpers.AssertValueSemantics(first, equal, different);
-        Assert.Equal(signature, first.Signature);
-        Assert.Equal(receiver, first.ReceiverType);
-        Assert.Equal(typeArgument, first.TypeArguments[0]);
         Assert.True(equalWithOperator);
         Assert.True(unequalWithOperator);
         Assert.False(first != equal);

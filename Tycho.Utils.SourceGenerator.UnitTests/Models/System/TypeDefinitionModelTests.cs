@@ -6,7 +6,54 @@ namespace Tycho.Utils.SourceGenerator.UnitTests.Models.System;
 public sealed class TypeDefinitionModelTests
 {
     [Fact]
-    public void Constructor_AndComputedNames_ReturnExpectedValues()
+    public void Constructor_SetsTypeDefinitionMembers()
+    {
+        // Arrange
+        TypeDefinitionModel outer = ModelHelpers.TypeDefinition("Outer", typeNamespace: "Example");
+        var parameter = new TypeParameterModel("T", ModelHelpers.Items(TypeParameterConstraintModel.ReferenceType));
+        TypeDefinitionModel sut = ModelHelpers.TypeDefinition(
+            "Inner",
+            containingTypes: ModelHelpers.Items(outer),
+            kind: TypeKind.Struct,
+            modifiers: ModelHelpers.Items(TypeModifier.Public, TypeModifier.ReadOnly),
+            typeParameters: ModelHelpers.Items(parameter));
+
+        // Assert
+        Assert.Equal(TypeKind.Struct, sut.Kind);
+        Assert.Equal("Example", sut.Namespace);
+        Assert.Equal(outer, Assert.Single(sut.ContainingTypes));
+        Assert.Equal("Inner", sut.Name);
+        Assert.Equal(2, sut.Modifiers.Count);
+        Assert.Equal(TypeModifier.Public, sut.Modifiers[0]);
+        Assert.Equal(TypeModifier.ReadOnly, sut.Modifiers[1]);
+        Assert.Equal(parameter, Assert.Single(sut.TypeParameters));
+    }
+
+    [Fact]
+    public void ComputedNames_DescribeNestedGenericType()
+    {
+        // Arrange
+        TypeDefinitionModel outer = ModelHelpers.TypeDefinition("Outer", typeNamespace: "Example");
+        var parameter = new TypeParameterModel("T", ModelHelpers.Items(TypeParameterConstraintModel.ReferenceType));
+        TypeDefinitionModel sut = ModelHelpers.TypeDefinition(
+            "Inner",
+            containingTypes: ModelHelpers.Items(outer),
+            kind: TypeKind.Struct,
+            modifiers: ModelHelpers.Items(TypeModifier.Public, TypeModifier.ReadOnly),
+            typeParameters: ModelHelpers.Items(parameter));
+
+        // Assert
+        Assert.Equal("<T>", sut.TypeParametersSuffix);
+        Assert.Equal("Inner<T>", sut.DeclarationName);
+        Assert.Equal("Outer.Inner<T>", sut.FullDeclarationName);
+        Assert.Equal("Inner`1", sut.MetadataName);
+        Assert.Equal("Example.Outer.Inner`1", sut.FullMetadataName);
+        Assert.Equal("public readonly struct Inner<T>", sut.DeclarationSignature);
+        Assert.Equal("Example.Outer.Inner`1", sut.ToString());
+    }
+
+    [Fact]
+    public void GetReference_PreservesNestedGenericTypeContext()
     {
         // Arrange
         TypeDefinitionModel outer = ModelHelpers.TypeDefinition("Outer", typeNamespace: "Example");
@@ -22,23 +69,10 @@ public sealed class TypeDefinitionModelTests
         TypeReferenceModel reference = sut.GetReference();
 
         // Assert
-        Assert.Equal(TypeKind.Struct, sut.Kind);
-        Assert.Equal("Example", sut.Namespace);
-        Assert.Equal(outer, sut.ContainingTypes[0]);
-        Assert.Equal("Inner", sut.Name);
-        Assert.Equal(TypeModifier.Public, sut.Modifiers[0]);
-        Assert.Equal(parameter, sut.TypeParameters[0]);
-        Assert.Equal("<T>", sut.TypeParametersSuffix);
-        Assert.Equal("Inner<T>", sut.DeclarationName);
-        Assert.Equal("Outer.Inner<T>", sut.FullDeclarationName);
-        Assert.Equal("Inner`1", sut.MetadataName);
-        Assert.Equal("Example.Outer.Inner`1", sut.FullMetadataName);
-        Assert.Equal("public readonly struct Inner<T>", sut.DeclarationSignature);
-        Assert.Equal("Example.Outer.Inner`1", sut.ToString());
         Assert.Equal("Example", reference.Namespace);
         Assert.Equal("Inner", reference.Name);
         Assert.Equal("global::Example.Outer.Inner<T>", reference.FullReferenceName);
-        Assert.True(reference.TypeArguments[0].Value.IsTypeParameter);
+        Assert.True(Assert.Single(reference.TypeArguments).Value.IsTypeParameter);
     }
 
     [Fact]

@@ -4,53 +4,87 @@ namespace Tycho.Utils.SourceGenerator.UnitTests.Utils;
 
 public sealed class HashCodeTests
 {
-    public static TheoryData<int[]> Values => new()
+    [Fact]
+    public void Combine_TwoValues_UsesPairHash()
     {
-        { [1, 2] },
-        { [1, 2, 3] },
-        { [1, 2, 3, 4] },
-        { [1, 2, 3, 4, 5] },
-        { [1, 2, 3, 4, 5, 6] },
-        { [1, 2, 3, 4, 5, 6, 7] },
-        { [1, 2, 3, 4, 5, 6, 7, 8] },
-    };
+        // Act
+        int result = SourceHashCode.Combine(1, 2);
 
-    [Theory]
-    [MemberData(nameof(Values))]
-    public void Combine_OverloadsReturnExpectedGrouping(int[] values)
-    {
-        int result = values.Length switch
-        {
-            2 => SourceHashCode.Combine(values[0], values[1]),
-            3 => SourceHashCode.Combine(values[0], values[1], values[2]),
-            4 => SourceHashCode.Combine(values[0], values[1], values[2], values[3]),
-            5 => SourceHashCode.Combine(values[0], values[1], values[2], values[3], values[4]),
-            6 => SourceHashCode.Combine(values[0], values[1], values[2], values[3], values[4], values[5]),
-            7 => SourceHashCode.Combine(values[0], values[1], values[2], values[3], values[4], values[5], values[6]),
-            8 => SourceHashCode.Combine(values[0], values[1], values[2], values[3], values[4], values[5], values[6], values[7]),
-            _ => throw new ArgumentOutOfRangeException(nameof(values)),
-        };
-
-        Assert.Equal(ExpectedCombine(values), result);
+        // Assert
+        Assert.Equal(CombinePair(1, 2), result);
     }
 
-    private static int ExpectedCombine(int[] values) => values.Length switch
+    [Fact]
+    public void Combine_ThreeValues_GroupsFirstTwoValues()
     {
-        2 => CombinePair(values[0], values[1]),
-        3 => CombinePair(CombinePair(values[0], values[1]), values[2]),
-        4 => CombinePair(CombinePair(values[0], values[1]), CombinePair(values[2], values[3])),
-        5 => CombinePair(CombinePair(CombinePair(values[0], values[1]), CombinePair(values[2], values[3])), values[4]),
-        6 => CombinePair(
-            CombinePair(CombinePair(values[0], values[1]), values[2]),
-            CombinePair(CombinePair(values[3], values[4]), values[5])),
-        7 => CombinePair(
-            CombinePair(CombinePair(values[0], values[1]), CombinePair(values[2], values[3])),
-            CombinePair(CombinePair(values[4], values[5]), values[6])),
-        8 => CombinePair(
-            CombinePair(CombinePair(values[0], values[1]), CombinePair(values[2], values[3])),
-            CombinePair(CombinePair(values[4], values[5]), CombinePair(values[6], values[7]))),
-        _ => throw new ArgumentOutOfRangeException(nameof(values)),
-    };
+        // Act
+        int result = SourceHashCode.Combine(1, 2, 3);
+
+        // Assert
+        Assert.Equal(CombinePair(CombinePair(1, 2), 3), result);
+    }
+
+    [Fact]
+    public void Combine_FourValues_GroupsIntoTwoPairs()
+    {
+        // Act
+        int result = SourceHashCode.Combine(1, 2, 3, 4);
+
+        // Assert
+        Assert.Equal(CombinePair(CombinePair(1, 2), CombinePair(3, 4)), result);
+    }
+
+    [Fact]
+    public void Combine_FiveValues_GroupsFirstFourValues()
+    {
+        // Act
+        int result = SourceHashCode.Combine(1, 2, 3, 4, 5);
+
+        // Assert
+        Assert.Equal(CombinePair(CombinePair(CombinePair(1, 2), CombinePair(3, 4)), 5), result);
+    }
+
+    [Fact]
+    public void Combine_SixValues_GroupsIntoTwoTriples()
+    {
+        // Act
+        int result = SourceHashCode.Combine(1, 2, 3, 4, 5, 6);
+
+        // Assert
+        Assert.Equal(
+            CombinePair(
+                CombinePair(CombinePair(1, 2), 3),
+                CombinePair(CombinePair(4, 5), 6)),
+            result);
+    }
+
+    [Fact]
+    public void Combine_SevenValues_GroupsFourThenThree()
+    {
+        // Act
+        int result = SourceHashCode.Combine(1, 2, 3, 4, 5, 6, 7);
+
+        // Assert
+        Assert.Equal(
+            CombinePair(
+                CombinePair(CombinePair(1, 2), CombinePair(3, 4)),
+                CombinePair(CombinePair(5, 6), 7)),
+            result);
+    }
+
+    [Fact]
+    public void Combine_EightValues_GroupsIntoTwoFours()
+    {
+        // Act
+        int result = SourceHashCode.Combine(1, 2, 3, 4, 5, 6, 7, 8);
+
+        // Assert
+        Assert.Equal(
+            CombinePair(
+                CombinePair(CombinePair(1, 2), CombinePair(3, 4)),
+                CombinePair(CombinePair(5, 6), CombinePair(7, 8))),
+            result);
+    }
 
     private static int CombinePair(int first, int second)
     {

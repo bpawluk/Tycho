@@ -8,7 +8,18 @@ namespace Tycho.Utils.SourceGenerator.UnitTests.Models;
 public sealed class TychoDefinitionModelTests
 {
     [Fact]
-    public void None_ReturnsEqualInvalidDefinitions()
+    public void None_ReturnsInvalidDefinition()
+    {
+        // Act
+        TychoDefinitionModel result = TychoDefinitionModel.None();
+
+        // Assert
+        Assert.False(result.IsValid);
+        Assert.Equal(0, result.GetHashCode());
+    }
+
+    [Fact]
+    public void Equality_NoneDefinitionsAreEqual()
     {
         // Arrange
         TychoDefinitionModel first = TychoDefinitionModel.None();
@@ -20,8 +31,6 @@ public sealed class TychoDefinitionModelTests
         bool unequalWithOperator = first != valid;
 
         // Assert
-        Assert.False(first.IsValid);
-        Assert.Equal(0, first.GetHashCode());
         ModelHelpers.AssertValueSemantics(first, equal, valid);
         Assert.True(equalWithOperator);
         Assert.True(unequalWithOperator);

@@ -7,24 +7,42 @@ namespace Tycho.Utils.SourceGenerator.UnitTests.TemplateModels;
 
 public sealed class TemplateModelBaseTests
 {
-    private static readonly string[] s_expected = ["where T : class"];
+    [Fact]
+    public void UseConstraintClauses_ReturnsEmptyForNullParameters()
+    {
+        // Arrange
+        var probe = new TemplateModelProbe();
+
+        // Act
+        string[] result = [.. probe.ConstraintClauses(null!)];
+
+        // Assert
+        Assert.Empty(result);
+    }
 
     [Fact]
-    public void UseConstraintClauses_IgnoresNullAndEmptyConstraints()
+    public void UseConstraintClauses_SkipsUnconstrainedParameters()
     {
+        // Arrange
         var probe = new TemplateModelProbe();
-        var constrained = new TypeParameterModel(
+        var constrainedParameter = new TypeParameterModel(
             "T",
             ModelHelpers.Items(TypeParameterConstraintModel.ReferenceType));
-        var unconstrained = new TypeParameterModel("U", ImmutableEquatableArray<TypeParameterConstraintModel>.Empty);
+        var unconstrainedParameter = new TypeParameterModel(
+            "U", ImmutableEquatableArray<TypeParameterConstraintModel>.Empty);
 
-        Assert.Empty(probe.ConstraintClauses(null!));
-        Assert.Equal(s_expected, probe.ConstraintClauses([constrained, unconstrained]));
+        // Act
+        string[] result = [.. probe.ConstraintClauses([constrainedParameter, unconstrainedParameter])];
+
+        // Assert
+        string item = Assert.Single(result);
+        Assert.Equal("where T : class", item);
     }
 
     [Fact]
     public void UseContainingTypes_MapsDeclarationAndConstraintClauses()
     {
+        // Arrange
         var probe = new TemplateModelProbe();
         TypeDefinitionModel outer = ModelHelpers.TypeDefinition(
             "Outer",
@@ -32,10 +50,15 @@ public sealed class TemplateModelBaseTests
                 "T",
                 ModelHelpers.Items(TypeParameterConstraintModel.ReferenceType))));
 
-        ContainingTypeTM result = Assert.Single(probe.ContainingTypes(ModelHelpers.Items(outer)));
+        // Act
+        ContainingTypeTM[] result = probe.ContainingTypes(ModelHelpers.Items(outer));
 
-        Assert.Equal("class Outer<T>", result.Declaration);
-        Assert.Equal(s_expected, result.Constraints);
+        // Assert
+        ContainingTypeTM item = Assert.Single(result);
+        Assert.Equal("class Outer<T>", item.Declaration);
+
+        string constraints = Assert.Single(result[0].Constraints);
+        Assert.Equal("where T : class", constraints);
     }
 
     private sealed class TemplateModelProbe : TemplateModelBase

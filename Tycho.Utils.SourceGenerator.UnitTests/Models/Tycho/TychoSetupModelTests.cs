@@ -8,7 +8,23 @@ namespace Tycho.Utils.SourceGenerator.UnitTests.Models.Tycho;
 public sealed class TychoSetupModelTests
 {
     [Fact]
-    public void Constructor_AndEquality_UseKindTypeAndSubmodules()
+    public void Constructor_SetsKindTypeAndSubmodules()
+    {
+        // Arrange
+        TypeDefinitionModel definition = ModelHelpers.TypeDefinition("App");
+        TypeReferenceModel submodule = ModelHelpers.TypeReference("Module");
+
+        // Act
+        var first = new TychoSetupModel(TychoDefinitionKind.App, definition, ModelHelpers.Items(submodule));
+
+        // Assert
+        Assert.Equal(TychoDefinitionKind.App, first.DefinitionKind);
+        Assert.Equal(definition, first.DefinitionType);
+        Assert.Equal(submodule, Assert.Single(first.Submodules));
+    }
+
+    [Fact]
+    public void Equality_UsesKindTypeAndSubmodules()
     {
         // Arrange
         TypeDefinitionModel definition = ModelHelpers.TypeDefinition("App");
@@ -22,9 +38,6 @@ public sealed class TychoSetupModelTests
         bool unequalWithOperator = first != different;
 
         // Assert
-        Assert.Equal(TychoDefinitionKind.App, first.DefinitionKind);
-        Assert.Equal(definition, first.DefinitionType);
-        Assert.Equal(submodule, first.Submodules[0]);
         ModelHelpers.AssertValueSemantics(first, equal, different);
         Assert.True(equalWithOperator);
         Assert.True(unequalWithOperator);

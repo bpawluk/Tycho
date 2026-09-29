@@ -31,7 +31,29 @@ public sealed class TypeParameterConstraintModelTests
 
     [Theory]
     [MemberData(nameof(BuiltInConstraints))]
-    public void BuiltInConstraint_HasKeywordAndNoType(string expected)
+    public void BuiltInConstraint_HasExpectedKeyword(string expected)
+    {
+        // Arrange
+        TypeParameterConstraintModel sut = s_builtInConstraintCases.Single(testCase => testCase.Expected == expected).Sut;
+
+        // Assert
+        Assert.Equal(expected, sut.Keyword);
+    }
+
+    [Theory]
+    [MemberData(nameof(BuiltInConstraints))]
+    public void BuiltInConstraint_HasNoType(string expected)
+    {
+        // Arrange
+        TypeParameterConstraintModel sut = s_builtInConstraintCases.Single(testCase => testCase.Expected == expected).Sut;
+
+        // Assert
+        Assert.Null(sut.Type);
+    }
+
+    [Theory]
+    [MemberData(nameof(BuiltInConstraints))]
+    public void BuiltInConstraint_ToStringReturnsKeyword(string expected)
     {
         // Arrange
         TypeParameterConstraintModel sut = s_builtInConstraintCases.Single(testCase => testCase.Expected == expected).Sut;
@@ -40,9 +62,7 @@ public sealed class TypeParameterConstraintModelTests
         string result = sut.ToString();
 
         // Assert
-        Assert.Equal(expected, sut.Keyword);
         Assert.Equal(expected, result);
-        Assert.Null(sut.Type);
     }
 
     [Fact]
@@ -55,8 +75,32 @@ public sealed class TypeParameterConstraintModelTests
         TypeParameterConstraintModel sut = TypeParameterConstraintModel.TypeConstraint(type);
 
         // Assert
-        Assert.Equal("global::Example.Base", sut.Keyword);
         Assert.Equal(type, sut.Type);
+    }
+
+    [Fact]
+    public void TypeConstraint_UsesQualifiedKeyword()
+    {
+        // Arrange
+        TypeReferenceModel type = ModelHelpers.TypeReference("Base");
+
+        // Act
+        TypeParameterConstraintModel sut = TypeParameterConstraintModel.TypeConstraint(type);
+
+        // Assert
+        Assert.Equal("global::Example.Base", sut.Keyword);
+    }
+
+    [Fact]
+    public void TypeConstraint_ToStringReturnsQualifiedKeyword()
+    {
+        // Arrange
+        TypeReferenceModel type = ModelHelpers.TypeReference("Base");
+
+        // Act
+        TypeParameterConstraintModel sut = TypeParameterConstraintModel.TypeConstraint(type);
+
+        // Assert
         Assert.Equal("global::Example.Base", sut.ToString());
     }
 

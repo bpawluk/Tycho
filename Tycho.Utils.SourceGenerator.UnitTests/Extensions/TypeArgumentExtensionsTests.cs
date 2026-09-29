@@ -6,23 +6,74 @@ namespace Tycho.Utils.SourceGenerator.UnitTests.Extensions;
 public sealed class TypeArgumentExtensionsTests
 {
     [Theory]
-    [InlineData("TRequest", true, false, false, false)]
-    [InlineData("TResponse", false, true, false, false)]
-    [InlineData("TEvent", false, false, true, false)]
-    [InlineData("TModule", false, false, false, true)]
-    [InlineData("TOther", false, false, false, false)]
-    public void TypeParameterNames_AreRecognizedForTheirContractKind(
-        string name,
-        bool isRequest,
-        bool isResponse,
-        bool isEvent,
-        bool isModule)
+    [InlineData("TRequest", true)]
+    [InlineData("TResponse", false)]
+    [InlineData("TEvent", false)]
+    [InlineData("TModule", false)]
+    [InlineData("TOther", false)]
+    public void IsRequestType_RecognizesOnlyRequestTypeParameter(string name, bool expected)
     {
+        // Arrange
         var argument = new TypeArgumentModel(name, TypeReferenceModel.TypeParameter("Demo", name));
 
-        Assert.Equal(isRequest, argument.IsRequestType());
-        Assert.Equal(isResponse, argument.IsResponseType());
-        Assert.Equal(isEvent, argument.IsEventType());
-        Assert.Equal(isModule, argument.IsModuleType());
+        // Act
+        bool result = argument.IsRequestType();
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [InlineData("TRequest", false)]
+    [InlineData("TResponse", true)]
+    [InlineData("TEvent", false)]
+    [InlineData("TModule", false)]
+    [InlineData("TOther", false)]
+    public void IsResponseType_RecognizesOnlyResponseTypeParameter(string name, bool expected)
+    {
+        // Arrange
+        var argument = new TypeArgumentModel(name, TypeReferenceModel.TypeParameter("Demo", name));
+
+        // Act
+        bool result = argument.IsResponseType();
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [InlineData("TRequest", false)]
+    [InlineData("TResponse", false)]
+    [InlineData("TEvent", true)]
+    [InlineData("TModule", false)]
+    [InlineData("TOther", false)]
+    public void IsEventType_RecognizesOnlyEventTypeParameter(string name, bool expected)
+    {
+        // Arrange
+        var argument = new TypeArgumentModel(name, TypeReferenceModel.TypeParameter("Demo", name));
+
+        // Act
+        bool result = argument.IsEventType();
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [InlineData("TRequest", false)]
+    [InlineData("TResponse", false)]
+    [InlineData("TEvent", false)]
+    [InlineData("TModule", true)]
+    [InlineData("TOther", false)]
+    public void IsModuleType_RecognizesOnlyModuleTypeParameter(string name, bool expected)
+    {
+        // Arrange
+        var argument = new TypeArgumentModel(name, TypeReferenceModel.TypeParameter("Demo", name));
+
+        // Act
+        bool result = argument.IsModuleType();
+
+        // Assert
+        Assert.Equal(expected, result);
     }
 }
