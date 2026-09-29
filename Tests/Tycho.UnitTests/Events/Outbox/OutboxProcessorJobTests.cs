@@ -41,6 +41,36 @@ public class OutboxProcessorJobTests
     }
 
     [Fact]
+    public void ForEvent_WhenEventIsNull_Throws()
+    {
+        // Act
+        ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => _sut.ForEvent(null!));
+
+        // Assert
+        Assert.Equal("outboxEvent", exception.ParamName);
+    }
+
+    [Fact]
+    public async Task ForEvent_WhenEventWasAlreadyAssigned_KeepsOriginalEvent()
+    {
+        // Arrange
+        OutboxEvent original = CreateOutboxEvent();
+        OutboxEvent rejected = CreateOutboxEvent();
+        _sut.ForEvent(original);
+        _brokerMock.Setup(broker => broker.DeliverAsync(original.RoutedEvent, It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() => _sut.ForEvent(rejected));
+        await _sut.ExecuteAsync(TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal("An outbox event has already been assigned to this job.", exception.Message);
+        _brokerMock.Verify(broker => broker.DeliverAsync(original.RoutedEvent, It.IsAny<CancellationToken>()), Times.Once);
+        _brokerMock.Verify(broker => broker.DeliverAsync(rejected.RoutedEvent, It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_WithNoEventAssigned_ReturnsEarly()
     {
         // Arrange
@@ -75,6 +105,28 @@ public class OutboxProcessorJobTests
         _brokerMock.Verify(b => b.DeliverAsync(outboxEvent.RoutedEvent, cancellationToken), Times.Once);
         _outboxConsumerMock.Verify(o => o.MarkAsDeliveredAsync(outboxEvent.ClaimId, cancellationToken), Times.Once);
         _outboxConsumerMock.Verify(o => o.MarkAsFailedAsync(outboxEvent.ClaimId, cancellationToken), Times.Never);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenDeliveryIsCanceled_PropagatesCancellationWithoutMarkingFailure()
+    {
+        // Arrange
+        OutboxEvent outboxEvent = CreateOutboxEvent();
+        using var cancellation = new CancellationTokenSource();
+        _brokerMock
+            .Setup(broker => broker.DeliverAsync(outboxEvent.RoutedEvent, cancellation.Token))
+            .Returns((SerializedRoutedEvent _, CancellationToken token) =>
+            {
+                cancellation.Cancel();
+                return Task.FromCanceled(token);
+            });
+
+        // Act
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => _sut.ForEvent(outboxEvent).ExecuteAsync(cancellation.Token));
+
+        // Assert
+        _outboxConsumerMock.Verify(outbox => outbox.MarkAsDeliveredAsync(outboxEvent.ClaimId, It.IsAny<CancellationToken>()), Times.Never);
+        _outboxConsumerMock.Verify(outbox => outbox.MarkAsFailedAsync(outboxEvent.ClaimId, It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]

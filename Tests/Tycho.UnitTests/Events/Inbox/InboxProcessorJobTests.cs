@@ -60,6 +60,34 @@ public class InboxProcessorJobTests
     }
 
     [Fact]
+    public void ForEvent_WhenEventIsNull_Throws()
+    {
+        // Act
+        ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => CreateSut().ForEvent(null!));
+
+        // Assert
+        Assert.Equal("inboxEvent", exception.ParamName);
+    }
+
+    [Fact]
+    public async Task ForEvent_WhenEventWasAlreadyAssigned_KeepsOriginalEvent()
+    {
+        // Arrange
+        InboxEvent original = CreateInboxEvent(out _);
+        InboxEvent rejected = CreateInboxEvent(out _);
+        InboxProcessorJob sut = CreateSut().ForEvent(original);
+
+        // Act
+        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() => sut.ForEvent(rejected));
+        await sut.ExecuteAsync(TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal("An inbox event has already been assigned to this job.", exception.Message);
+        _inboxConsumerMock.Verify(inbox => inbox.MarkAsHandledAsync(original.ClaimId, It.IsAny<CancellationToken>()), Times.Once);
+        _inboxConsumerMock.Verify(inbox => inbox.MarkAsHandledAsync(rejected.ClaimId, It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_WithNoEventAssigned_ReturnsEarly()
     {
         // Arrange
@@ -95,6 +123,29 @@ public class InboxProcessorJobTests
             cancellationToken), Times.Once);
         _inboxConsumerMock.Verify(inbox => inbox.MarkAsHandledAsync(inboxEvent.ClaimId, cancellationToken), Times.Once);
         _inboxConsumerMock.Verify(inbox => inbox.MarkAsFailedAsync(inboxEvent.ClaimId, cancellationToken), Times.Never);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenHandlerIsCanceled_PropagatesCancellationWithoutMarkingFailure()
+    {
+        // Arrange
+        InboxEvent inboxEvent = CreateInboxEvent(out _);
+        using var cancellation = new CancellationTokenSource();
+        _handlerMock
+            .Setup(handler => handler.HandleAsync(It.IsAny<EventContext<TestEvent>>(), cancellation.Token))
+            .Returns((EventContext<TestEvent> _, CancellationToken token) =>
+            {
+                cancellation.Cancel();
+                return Task.FromCanceled(token);
+            });
+        InboxProcessorJob sut = CreateSut().ForEvent(inboxEvent);
+
+        // Act
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => sut.ExecuteAsync(cancellation.Token));
+
+        // Assert
+        _inboxConsumerMock.Verify(inbox => inbox.MarkAsHandledAsync(inboxEvent.ClaimId, It.IsAny<CancellationToken>()), Times.Never);
+        _inboxConsumerMock.Verify(inbox => inbox.MarkAsFailedAsync(inboxEvent.ClaimId, It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]

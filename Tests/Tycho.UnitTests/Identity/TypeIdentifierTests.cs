@@ -28,6 +28,14 @@ public partial class TypeIdentifierTests
         { typeof(TestModule), typeof(TestEvent) }
     };
 
+    public static readonly TheoryData<Type, string> ArrayTypesWithSuffixes = new()
+    {
+        { typeof(int[]), "[]" },
+        { typeof(int).MakeArrayType(1), "[*]" },
+        { typeof(int[,]), "[,]" },
+        { typeof(int[][]), "[][]" }
+    };
+
     [Fact]
     public void GenericGetId_ReturnsSameResultAsTypeOverload()
     {
@@ -63,5 +71,16 @@ public partial class TypeIdentifierTests
 
         // Assert
         Assert.NotEqual(firstResult, secondResult);
+    }
+
+    [Theory]
+    [MemberData(nameof(ArrayTypesWithSuffixes))]
+    public void GetId_ForArray_PreservesArrayShape(Type arrayType, string suffix)
+    {
+        // Act
+        string result = TypeIdentifier.GetId(arrayType);
+
+        // Assert
+        Assert.Equal(TypeIdentifier.GetId<int>() + suffix, result);
     }
 }
