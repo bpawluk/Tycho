@@ -29,7 +29,7 @@ internal class InventoryDbContext : TychoDbContext
         base.OnConfiguring(optionsBuilder);
 
         string dbPath = Path.Combine(Directory.GetCurrentDirectory(), "OnlineStore.Inventory.db");
-        optionsBuilder.UseSqlite($"Data Source={dbPath}");
+        optionsBuilder.UseSqlite($"Data Source={dbPath};Pooling=False");
     }
 
     private static class ReservationShadowProperties

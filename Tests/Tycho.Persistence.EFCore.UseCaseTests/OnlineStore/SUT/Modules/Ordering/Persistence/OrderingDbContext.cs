@@ -13,6 +13,6 @@ internal class OrderingDbContext : TychoDbContext
         base.OnConfiguring(optionsBuilder);
 
         string dbPath = Path.Combine(Directory.GetCurrentDirectory(), "OnlineStore.Ordering.db");
-        optionsBuilder.UseSqlite($"Data Source={dbPath}");
+        optionsBuilder.UseSqlite($"Data Source={dbPath};Pooling=False");
     }
 }

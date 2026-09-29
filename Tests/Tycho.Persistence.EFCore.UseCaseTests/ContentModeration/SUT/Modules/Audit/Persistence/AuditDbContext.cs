@@ -12,6 +12,6 @@ internal class AuditDbContext : TychoDbContext
         base.OnConfiguring(optionsBuilder);
 
         string dbPath = Path.Combine(Directory.GetCurrentDirectory(), "ContentModeration.Audit.db");
-        optionsBuilder.UseSqlite($"Data Source={dbPath}");
+        optionsBuilder.UseSqlite($"Data Source={dbPath};Pooling=False");
     }
 }

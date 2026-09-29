@@ -12,6 +12,6 @@ internal class SecurityDbContext : TychoDbContext
         base.OnConfiguring(optionsBuilder);
 
         string dbPath = Path.Combine(Directory.GetCurrentDirectory(), "HomeDashboard.Security.db");
-        optionsBuilder.UseSqlite($"Data Source={dbPath}");
+        optionsBuilder.UseSqlite($"Data Source={dbPath};Pooling=False");
     }
 }

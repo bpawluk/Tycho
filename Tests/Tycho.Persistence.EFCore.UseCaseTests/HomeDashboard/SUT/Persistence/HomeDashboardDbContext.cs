@@ -9,6 +9,6 @@ internal class HomeDashboardDbContext : TychoDbContext
         base.OnConfiguring(optionsBuilder);
 
         string dbPath = Path.Combine(Directory.GetCurrentDirectory(), "HomeDashboard.App.db");
-        optionsBuilder.UseSqlite($"Data Source={dbPath}");
+        optionsBuilder.UseSqlite($"Data Source={dbPath};Pooling=False");
     }
 }
