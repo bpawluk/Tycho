@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Tycho.Processor
+namespace Tycho.Extensions
 {
     internal static class TaskExtensions
     {
