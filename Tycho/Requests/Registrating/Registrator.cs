@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using System;
+using Microsoft.Extensions.DependencyInjection;
 using Tycho.Requests.Registrating.Registrations;
-using Tycho.Structure.Internal;
+using Tycho.Structure;
 
 namespace Tycho.Requests.Registrating
 {
@@ -8,7 +9,7 @@ namespace Tycho.Requests.Registrating
     {
         private readonly Internals _internals;
 
-        private IServiceCollection Services => _internals.GetServiceCollection();
+        private IServiceCollection Services => _internals.GetHostBuilder().Services;
 
         public Registrator(Internals internals)
         {
@@ -16,7 +17,7 @@ namespace Tycho.Requests.Registrating
         }
 
         private bool TryAddRegistration<THandlerRegistrationInterface, THandlerRegistration>()
-            where THandlerRegistrationInterface : class, IHandlerRegistration
+            where THandlerRegistrationInterface : class, IRequestRegistration
             where THandlerRegistration : class, THandlerRegistrationInterface
         {
             if (_internals.HasService<THandlerRegistrationInterface>())
@@ -25,6 +26,20 @@ namespace Tycho.Requests.Registrating
             }
 
             Services.AddTransient<THandlerRegistrationInterface, THandlerRegistration>();
+            return true;
+        }
+
+        private bool TryAddRegistration<THandlerRegistrationInterface, THandlerRegistration>(
+            Func<IServiceProvider, THandlerRegistration> registrationFactory)
+            where THandlerRegistrationInterface : class, IRequestRegistration
+            where THandlerRegistration : class, THandlerRegistrationInterface
+        {
+            if (_internals.HasService<THandlerRegistrationInterface>())
+            {
+                return false;
+            }
+
+            Services.AddTransient<THandlerRegistrationInterface>(registrationFactory);
             return true;
         }
     }

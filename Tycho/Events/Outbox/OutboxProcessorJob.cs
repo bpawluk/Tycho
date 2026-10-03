@@ -1,0 +1,80 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Tycho.Events.Broker;
+using Tycho.Logging;
+using Tycho.Processor;
+using Tycho.Structure;
+using Tycho.Utils;
+
+namespace Tycho.Events.Outbox
+{
+    internal class OutboxProcessorJob : IJob
+    {
+        private readonly Internals _internals;
+        private OutboxEvent? _event;
+
+        public OutboxProcessorJob(Internals internals)
+        {
+            _internals = internals;
+        }
+
+        public OutboxProcessorJob ForEvent(OutboxEvent outboxEvent)
+        {
+            if (outboxEvent is null)
+            {
+                throw new ArgumentNullException(nameof(outboxEvent));
+            }
+
+            if (Interlocked.CompareExchange(ref _event, outboxEvent, null) != null)
+            {
+                throw new InvalidOperationException("An outbox event has already been assigned to this job.");
+            }
+
+            return this;
+        }
+
+        [EntryPoint]
+        public async Task ExecuteAsync(CancellationToken cancellationToken)
+        {
+            await using AsyncServiceScope scope = _internals.CreateAsyncScope();
+            ILogger<OutboxProcessorJob>? logger = scope.ServiceProvider.GetService<ILogger<OutboxProcessorJob>>();
+
+            if (_event is null)
+            {
+                logger?.OutboxJobIsMissing();
+                return;
+            }
+
+            IOutboxConsumer outbox = scope.ServiceProvider.GetRequiredService<IOutboxConsumer>();
+
+            try
+            {
+                IEventBroker broker = scope.ServiceProvider.GetRequiredService<IEventBroker>();
+                await broker.DeliverAsync(_event.RoutedEvent, cancellationToken).ConfigureAwait(false);
+
+                bool markedAsDelivered = await outbox.MarkAsDeliveredAsync(_event.ClaimId, cancellationToken).ConfigureAwait(false);
+                if (!markedAsDelivered)
+                {
+                    logger?.OutboxMessageStatusUpdateFailed(_event.EventId, _event.ClaimId);
+                }
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                logger?.OutboxMessageDeliveryFailed(_event.EventId, ex);
+
+                bool markedAsFailed = await outbox.MarkAsFailedAsync(_event.ClaimId, cancellationToken).ConfigureAwait(false);
+                if (!markedAsFailed)
+                {
+                    logger?.OutboxMessageStatusUpdateFailed(_event.EventId, _event.ClaimId);
+                }
+            }
+        }
+    }
+}
