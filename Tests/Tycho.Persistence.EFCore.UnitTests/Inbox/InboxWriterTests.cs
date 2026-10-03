@@ -149,11 +149,7 @@ public sealed class InboxWriterTests : IAsyncLifetime
     {
         // Arrange
         var persistenceFailure = new DbUpdateException("persistence failure");
-        DbContextOptions<FailingDbContext> options = new DbContextOptionsBuilder<FailingDbContext>()
-            .UseSqlite(_connection)
-            .Options;
-        await using var dbContext = new FailingDbContext(options);
-        await dbContext.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
+        await using FailingDbContext dbContext = CreateFailingDbContext();
         dbContext.SaveFailure = persistenceFailure;
         var sut = new InboxWriter(_inboxActivity, dbContext, _persistenceOwner);
 
@@ -172,11 +168,7 @@ public sealed class InboxWriterTests : IAsyncLifetime
     {
         // Arrange
         var persistenceFailure = new InvalidOperationException("persistence failure");
-        DbContextOptions<FailingDbContext> options = new DbContextOptionsBuilder<FailingDbContext>()
-            .UseSqlite(_connection)
-            .Options;
-        await using var dbContext = new FailingDbContext(options);
-        await dbContext.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
+        await using FailingDbContext dbContext = CreateFailingDbContext();
         dbContext.SaveFailure = persistenceFailure;
         var sut = new InboxWriter(_inboxActivity, dbContext, _persistenceOwner);
 
@@ -187,6 +179,91 @@ public sealed class InboxWriterTests : IAsyncLifetime
         InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(act);
         Assert.Same(persistenceFailure, exception);
         Assert.Equal(0, _inboxActivityNotificationCount);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Write_WhenUpdateFailsWithPartiallyMatchingEntry_RethrowsPersistenceFailure(bool sameOwner)
+    {
+        // Arrange
+        SerializedRoutedEvent serializedEvent = CreateSerializedEvent();
+        await using FailingDbContext dbContext = CreateFailingDbContext();
+        InboxEntry decoy = CreateDecoyEntry(serializedEvent, sameOwner);
+        dbContext.Set<InboxEntry>().Add(decoy);
+        await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+        dbContext.ChangeTracker.Clear();
+
+        var persistenceFailure = new DbUpdateException("persistence failure");
+        dbContext.SaveFailure = persistenceFailure;
+        var sut = new InboxWriter(_inboxActivity, dbContext, _persistenceOwner);
+
+        // Act
+        Task Act() => sut.Write(serializedEvent, TestContext.Current.CancellationToken);
+
+        // Assert
+        DbUpdateException exception = await Assert.ThrowsAsync<DbUpdateException>(Act);
+        Assert.Same(persistenceFailure, exception);
+        Assert.Empty(dbContext.ChangeTracker.Entries());
+        InboxEntry persistedEntry = await _dbContext.Set<InboxEntry>().AsNoTracking()
+            .SingleAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(decoy.OwnerKey, persistedEntry.OwnerKey);
+        Assert.Equal(decoy.Id, persistedEntry.Id);
+        Assert.Equal(decoy.Payload, persistedEntry.Payload);
+        Assert.Equal(0, _inboxActivityNotificationCount);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Write_WithMatchingEntryAndPartiallyMatchingDecoy_TreatsReceiptAsSuccessful(bool sameOwner)
+    {
+        // Arrange
+        SerializedRoutedEvent serializedEvent = CreateSerializedEvent();
+        await _sut.Write(serializedEvent, TestContext.Current.CancellationToken);
+        await using var retryDbContext = new TestDbContext(_dbContextOptions);
+        InboxEntry decoy = CreateDecoyEntry(serializedEvent, sameOwner);
+        retryDbContext.Set<InboxEntry>().Add(decoy);
+        await retryDbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+        retryDbContext.ChangeTracker.Clear();
+        var retryWriter = new InboxWriter(_inboxActivity, retryDbContext, _persistenceOwner);
+
+        // Act
+        await retryWriter.Write(serializedEvent, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(2, await CountPersistedEntries());
+        Assert.Empty(retryDbContext.ChangeTracker.Entries());
+        InboxEntry persistedEntry = await _dbContext.Set<InboxEntry>().AsNoTracking()
+            .SingleAsync(entry => entry.OwnerKey == _persistenceOwner.Key && entry.Id == serializedEvent.Id,
+                TestContext.Current.CancellationToken);
+        Assert.Equal(serializedEvent.Payload, persistedEntry.Payload);
+        InboxEntry persistedDecoy = await _dbContext.Set<InboxEntry>().AsNoTracking()
+            .SingleAsync(entry => entry.OwnerKey == decoy.OwnerKey && entry.Id == decoy.Id,
+                TestContext.Current.CancellationToken);
+        Assert.Equal(decoy.Payload, persistedDecoy.Payload);
+        Assert.Equal(2, _inboxActivityNotificationCount);
+    }
+
+    private FailingDbContext CreateFailingDbContext()
+    {
+        DbContextOptions<FailingDbContext> options = new DbContextOptionsBuilder<FailingDbContext>()
+            .UseSqlite(_connection)
+            .Options;
+        return new FailingDbContext(options);
+    }
+
+    private InboxEntry CreateDecoyEntry(SerializedRoutedEvent serializedEvent, bool sameOwner)
+    {
+        return new InboxEntry
+        {
+            OwnerKey = sameOwner ? _persistenceOwner.Key : new string('0', 32),
+            Id = sameOwner ? Guid.NewGuid() : serializedEvent.Id,
+            PublishId = serializedEvent.PublishId,
+            Event = serializedEvent.EventId.ToString(),
+            Handler = serializedEvent.HandlerId.ToString(),
+            Payload = "decoy payload"
+        };
     }
 
     private async Task<InboxEntry> LoadEntry(Guid entryId)

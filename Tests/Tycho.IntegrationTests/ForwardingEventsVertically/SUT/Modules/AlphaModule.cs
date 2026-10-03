@@ -22,11 +22,11 @@ public class AlphaModule : TychoModule
               .Exposes();
 
         module.Expects<AlphaWorkflowStartedEvent>()
-              .MapsTo<BetaWorkflowStartedEvent>(payload => new(payload.Result))
+              .MapsTo<BetaWorkflowStartedEvent>(payload => new(payload.Result with { Value = payload.Result.Value + "|alpha-forward" }))
               .ForwardsTo<BetaModule>();
 
         module.Expects<AlphaWorkflowFinishedEvent>()
-              .MapsTo<WorkflowWithMappingFinishedEvent>(payload => new(payload.Result))
+              .MapsTo<WorkflowWithMappingFinishedEvent>(payload => new(payload.Result with { Value = payload.Result.Value + "|alpha-expose" }))
               .Exposes();
     }
 

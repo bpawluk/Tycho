@@ -34,14 +34,16 @@ public sealed class ForwardingEventsVerticallyTests : IAsyncLifetime
     {
         // Arrange
         string workflowId = "mapped-event-workflow";
-        var request = new BeginTestWorkflowRequest(new TestResult { Id = workflowId });
+        var request = new BeginTestWorkflowRequest(new TestResult { Id = workflowId, Value = "payload" });
 
         // Act
         await _sut!.ExecuteAsync(request, TestContext.Current.CancellationToken);
-        TestResult testResult = await _testWorkflow.GetResult();
+        TestResult testResult = await _testWorkflow.GetResult().WaitAsync(TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(workflowId, testResult.Id);
+        Assert.Equal("payload|app-forward|alpha-forward|beta-forward", testResult.LeafValue);
+        Assert.Equal("payload|app-forward|alpha-forward|beta-forward|gamma-expose|beta-expose|alpha-expose", testResult.Value);
     }
 
     public async ValueTask DisposeAsync()

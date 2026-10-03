@@ -37,7 +37,7 @@ public class TestApp(TestWorkflow<TestResult> testWorkflow) : TychoApp
            .HandlesWith<WorkflowFinishedEventHandler>();
 
         app.Expects<WorkflowWithMappingStartedEvent>()
-           .MapsTo<AlphaWorkflowStartedEvent>(payload => new(payload.Result))
+           .MapsTo<AlphaWorkflowStartedEvent>(payload => new(payload.Result with { Value = payload.Result.Value + "|app-forward" }))
            .ForwardsTo<AlphaModule>();
 
         app.Expects<WorkflowWithMappingFinishedEvent>()

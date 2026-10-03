@@ -9,6 +9,7 @@ internal class GammaWorkflowStartedEventHandler(IGammaModulePublisher publisher)
 
     public async Task HandleAsync(EventContext<GammaWorkflowStartedEvent> context, CancellationToken cancellationToken)
     {
-        await _publisher.PublishAsync(new GammaWorkflowFinishedEvent(context.Payload.Result), cancellationToken);
+        TestResult result = context.Payload.Result with { LeafValue = context.Payload.Result.Value };
+        await _publisher.PublishAsync(new GammaWorkflowFinishedEvent(result), cancellationToken);
     }
 }
