@@ -5,13 +5,18 @@ namespace Tycho.Events.Serialization
 {
     internal class JsonPayloadSerializer : IPayloadSerializer
     {
-        private readonly JsonSerializerOptions _jsonOptions = new();
+        private readonly JsonPayloadSerializerSettings _settings;
+
+        public JsonPayloadSerializer(JsonPayloadSerializerSettings settings)
+        {
+            _settings = settings;
+        }
 
         public string Serialize<TEvent>(TEvent eventData) where TEvent : class, IEvent
         {
             if (eventData != null)
             {
-                return JsonSerializer.Serialize(eventData, eventData.GetType(), _jsonOptions);
+                return JsonSerializer.Serialize(eventData, eventData.GetType(), _settings.JsonOptions);
             }
             throw new ArgumentNullException(nameof(eventData), "Cannot serialize null event data");
         }
@@ -20,7 +25,7 @@ namespace Tycho.Events.Serialization
         {
             if (!string.IsNullOrWhiteSpace(payload))
             {
-                if (JsonSerializer.Deserialize<TEvent>(payload, _jsonOptions) is TEvent eventData)
+                if (JsonSerializer.Deserialize<TEvent>(payload, _settings.JsonOptions) is TEvent eventData)
                 {
                     return eventData;
                 }

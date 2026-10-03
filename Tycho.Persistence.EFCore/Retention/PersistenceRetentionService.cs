@@ -22,7 +22,10 @@ internal sealed class PersistenceRetentionService(
 
         try
         {
-            await Task.Delay(TimeSpan.FromSeconds(Random.Shared.Next(300, 601)), clock, stoppingToken).ConfigureAwait(false);
+            if (options.InitialDelay > TimeSpan.Zero)
+            {
+                await Task.Delay(options.InitialDelay, clock, stoppingToken).ConfigureAwait(false);
+            }
 
             while (!stoppingToken.IsCancellationRequested)
             {

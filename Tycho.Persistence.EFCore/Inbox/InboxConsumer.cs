@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Tycho.Events.Inbox;
 using Tycho.Events.Model;
 using Tycho.Events.Routing;
@@ -19,12 +20,14 @@ internal class InboxConsumer(
     IEventSerializer eventSerializer,
     TychoDbContext dbContext,
     PersistenceOwner owner,
-    InboxConsumerSettings? settings = null,
+    InboxConsumerSettings settings,
     ILogger<InboxConsumer>? logger = null) : IInboxConsumer
 {
     private readonly IEventSerializer _eventSerializer = eventSerializer;
     private readonly TychoDbContext _dbContext = dbContext;
-    private readonly InboxConsumerSettings _settings = settings ?? InboxConsumerSettings.Default;
+    private readonly PersistenceOwner _owner = owner;
+    private readonly InboxConsumerSettings _settings = settings;
+    private readonly ILogger<InboxConsumer> _logger = logger ?? NullLogger<InboxConsumer>.Instance;
 
     public async Task<InboxEvent?> TryReadAsync(CancellationToken cancellationToken)
     {
@@ -38,7 +41,7 @@ internal class InboxConsumer(
 
         int claimedEntriesCount = await _dbContext
             .Set<InboxEntry>()
-            .Where(entry => entry.OwnerKey == owner.Key)
+            .Where(entry => entry.OwnerKey == _owner.Key)
             .Where(canBeProcessed)
             .OrderBy(entry => entry.Updated)
             .ThenBy(entry => entry.Id)
@@ -60,13 +63,13 @@ internal class InboxConsumer(
             .Set<InboxEntry>()
             .AsNoTracking()
             .SingleOrDefaultAsync(entry =>
-                entry.OwnerKey == owner.Key &&
+                entry.OwnerKey == _owner.Key &&
                 entry.ClaimId == claimId, cancellationToken)
             .ConfigureAwait(false);
 
         if (entryToDeliver == null)
         {
-            logger?.InboxClaimedEntryMissing(claimId);
+            _logger.InboxClaimedEntryMissing(claimId);
             return null;
         }
 
@@ -108,7 +111,7 @@ internal class InboxConsumer(
         int updatedRowsCount = await _dbContext
             .Set<InboxEntry>()
             .Where(entry =>
-                entry.OwnerKey == owner.Key &&
+                entry.OwnerKey == _owner.Key &&
                 entry.State == EntryState.InProcessing &&
                 entry.ClaimId == claimId)
             .ExecuteUpdateAsync(setters => setters
@@ -128,7 +131,7 @@ internal class InboxConsumer(
         int updatedRowsCount = await _dbContext
             .Set<InboxEntry>()
             .Where(entry =>
-                entry.OwnerKey == owner.Key &&
+                entry.OwnerKey == _owner.Key &&
                 entry.State == EntryState.InProcessing &&
                 entry.ClaimId == claimId)
             .ExecuteUpdateAsync(setters => setters

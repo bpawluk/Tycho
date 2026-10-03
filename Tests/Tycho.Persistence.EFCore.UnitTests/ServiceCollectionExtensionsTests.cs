@@ -79,12 +79,14 @@ public sealed class ServiceCollectionExtensionsTests
         // Act
         IServiceCollection result = services.AddTychoPersistenceRetention();
 
+        using ServiceProvider provider = services.BuildServiceProvider();
+        PersistenceRetentionOptions options = provider.GetRequiredService<PersistenceRetentionOptions>();
+
         // Assert
         Assert.Same(services, result);
         ServiceDescriptor registration = Assert.Single(services, service => service.ServiceType == typeof(PersistenceRetentionOptions));
-        Assert.Equal(ServiceLifetime.Singleton, registration.Lifetime);
-        PersistenceRetentionOptions options = Assert.IsType<PersistenceRetentionOptions>(registration.ImplementationInstance);
-        Assert.True(options.IsEnabled);
+        Assert.Equal(ServiceLifetime.Transient, registration.Lifetime);
+        Assert.True(options.IsRetentionEnabled);
         AssertRegistration<IInboxCleaner, InboxCleaner>(services, ServiceLifetime.Scoped);
         AssertRegistration<IOutboxCleaner, OutboxCleaner>(services, ServiceLifetime.Scoped);
         AssertRegistration<IHostedService, PersistenceRetentionService>(services, ServiceLifetime.Singleton);
@@ -156,9 +158,11 @@ public sealed class ServiceCollectionExtensionsTests
         // Act
         services.AddTychoPersistenceRetention(options => options.CleanupInterval = TimeSpan.FromMinutes(10));
 
+        using ServiceProvider provider = services.BuildServiceProvider();
+        PersistenceRetentionOptions options = provider.GetRequiredService<PersistenceRetentionOptions>();
+
         // Assert
         ServiceDescriptor registration = Assert.Single(services, service => service.ServiceType == typeof(PersistenceRetentionOptions));
-        PersistenceRetentionOptions options = Assert.IsType<PersistenceRetentionOptions>(registration.ImplementationInstance);
         Assert.Equal(TimeSpan.FromMinutes(10), options.CleanupInterval);
         AssertRegistration<IHostedService, PersistenceRetentionService>(services, ServiceLifetime.Singleton);
         AssertRegistration<IInboxCleaner, InboxCleaner>(services, ServiceLifetime.Scoped);

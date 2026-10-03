@@ -22,11 +22,22 @@ public static class ServiceCollectionExtensions
     /// Sets up Tycho persistence in the specified IServiceCollection.
     /// </summary>
     /// <param name="services">The service collection to add the persistence functionality to.</param>
+    /// <param name="configure">An optional callback configuring inbox and outbox consumer settings.</param>
     /// <typeparam name="TDbContext">The type of the TychoDbContext to be used.</typeparam>
-    public static IServiceCollection AddTychoPersistence<TDbContext>(this IServiceCollection services)
+    public static IServiceCollection AddTychoPersistence<TDbContext>(
+        this IServiceCollection services,
+        Action<PersistenceOptions>? configure = null)
         where TDbContext : TychoDbContext
     {
         ArgumentNullException.ThrowIfNull(services);
+
+        var options = new PersistenceOptions();
+        configure?.Invoke(options);
+        PersistenceOptions snapshot = options.Copy();
+        snapshot.Validate();
+        services.Replace(ServiceDescriptor.Transient(_ => snapshot.InboxConsumer.Copy()));
+        services.Replace(ServiceDescriptor.Transient(_ => snapshot.OutboxConsumer.Copy()));
+
         services.AddDbContext<TDbContext>()
                 .AddSingleton<PersistenceOwner>()
                 .AddScoped<TychoDbContext>(sp => sp.GetRequiredService<TDbContext>())
@@ -35,6 +46,7 @@ public static class ServiceCollectionExtensions
                 .AddTransient<IOutboxConsumer, OutboxConsumer>()
                 .AddTransient<IInboxWriter, InboxWriter>()
                 .AddTransient<IInboxConsumer, InboxConsumer>();
+
         return services;
     }
 
@@ -52,8 +64,9 @@ public static class ServiceCollectionExtensions
 
         var options = new PersistenceRetentionOptions();
         configure?.Invoke(options);
-        options.Validate();
-        services.Replace(ServiceDescriptor.Singleton(options));
+        PersistenceRetentionOptions snapshot = options.Copy();
+        snapshot.Validate();
+        services.Replace(ServiceDescriptor.Transient(_ => snapshot.Copy()));
 
         services.TryAddScoped<IInboxCleaner, InboxCleaner>();
         services.TryAddScoped<IOutboxCleaner, OutboxCleaner>();
@@ -68,7 +81,7 @@ public static class ServiceCollectionExtensions
             }
         }
 
-        if (options.IsEnabled)
+        if (snapshot.IsRetentionEnabled)
         {
             services.AddHostedService<PersistenceRetentionService>();
         }

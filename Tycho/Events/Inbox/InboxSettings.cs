@@ -5,7 +5,7 @@ namespace Tycho.Events.Inbox
     /// <summary>
     /// Settings for the Tycho inbox processor.
     /// </summary>
-    public class InboxSettings
+    public sealed class InboxSettings
     {
         /// <summary>
         /// Gets the default settings instance.
@@ -16,7 +16,7 @@ namespace Tycho.Events.Inbox
         /// Gets or sets the concurrency limit for the inbox processor.
         /// </summary>
         /// <value>The maximum number of messages being processed in parallel.</value>
-        public int ConcurrencyLimit { get; set; } = 10;
+        public int ConcurrencyLimit { get; set; } = 5;
 
         /// <summary>
         /// Gets or sets the initial polling interval for the inbox processor.
@@ -44,5 +44,45 @@ namespace Tycho.Events.Inbox
         /// </summary>
         /// <value>The maximum duration of processing a single inbox message.</value>
         public TimeSpan MessageProcessingTimeout { get; set; } = TimeSpan.FromSeconds(5);
+
+        internal void Validate()
+        {
+            if (ConcurrencyLimit <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(ConcurrencyLimit));
+            }
+
+            if (InitialPollingInterval <= TimeSpan.Zero)
+            {
+                throw new ArgumentOutOfRangeException(nameof(InitialPollingInterval));
+            }
+
+            if (MaxPollingInterval < InitialPollingInterval)
+            {
+                throw new ArgumentOutOfRangeException(nameof(MaxPollingInterval));
+            }
+
+            if (double.IsNaN(PollingIntervalMultiplier) || double.IsInfinity(PollingIntervalMultiplier) || PollingIntervalMultiplier <= 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(PollingIntervalMultiplier));
+            }
+
+            if (MessageProcessingTimeout <= TimeSpan.Zero && MessageProcessingTimeout != System.Threading.Timeout.InfiniteTimeSpan)
+            {
+                throw new ArgumentOutOfRangeException(nameof(MessageProcessingTimeout));
+            }
+        }
+
+        internal InboxSettings Copy()
+        {
+            return new()
+            {
+                ConcurrencyLimit = ConcurrencyLimit,
+                InitialPollingInterval = InitialPollingInterval,
+                PollingIntervalMultiplier = PollingIntervalMultiplier,
+                MaxPollingInterval = MaxPollingInterval,
+                MessageProcessingTimeout = MessageProcessingTimeout
+            };
+        }
     }
 }

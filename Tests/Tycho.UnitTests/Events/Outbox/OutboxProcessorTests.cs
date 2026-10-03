@@ -31,7 +31,7 @@ public sealed class OutboxProcessorTests
         internals.GetHostBuilder().Services.AddSingleton(consumer.Object);
         internals.Build();
 
-        using var processor = new OutboxProcessor(internals, new OutboxActivity(), logger: logger.Object);
+        using var processor = new OutboxProcessor(internals, new OutboxActivity(), new OutboxSettings(), logger: logger.Object);
 
         // Act
         await processor.StartAsync(TestContext.Current.CancellationToken);

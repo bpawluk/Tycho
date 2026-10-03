@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Tycho.Events;
 using Tycho.Events.Broker;
 using Tycho.Events.Delivery;
@@ -76,7 +77,20 @@ namespace Tycho.Modules.Setup
             services.AddTransient<IDeliveryStrategy, FinalRouteDelivery>();
             services.AddTransient<IDeliveryStrategy, DownStreamRouteDelivery>();
             services.AddTransient<IDeliveryStrategy, UpStreamRouteDelivery>();
-            services.AddTransient<IPayloadSerializer, JsonPayloadSerializer>();
+
+            var inboxSettings = new InboxSettings();
+            inboxSettings.Validate();
+            services.TryAddTransient(_ => inboxSettings.Copy());
+
+            var outboxSettings = new OutboxSettings();
+            outboxSettings.Validate();
+            services.TryAddTransient(_ => outboxSettings.Copy());
+
+            var jsonPayloadSerializerSettings = new JsonPayloadSerializerSettings();
+            jsonPayloadSerializerSettings.Validate();
+            services.TryAddTransient(_ => jsonPayloadSerializerSettings.Copy());
+
+            services.TryAddTransient<IPayloadSerializer, JsonPayloadSerializer>();
         }
     }
 }

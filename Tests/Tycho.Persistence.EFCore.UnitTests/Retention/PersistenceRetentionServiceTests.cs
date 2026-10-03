@@ -60,9 +60,9 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
     public async Task ExecuteAsync_WhenCleanupAffectsEntries_LogsEachNonemptyOperation()
     {
         // Arrange
-        _options.Inbox.FullCleanupRetention = TimeSpan.FromDays(1);
+        _options.Inbox.FullCleanupRetention = TimeSpan.FromDays(2);
         _options.Inbox.PayloadRetention = TimeSpan.FromDays(1);
-        _options.Outbox.FullCleanupRetention = TimeSpan.FromDays(1);
+        _options.Outbox.FullCleanupRetention = TimeSpan.FromDays(2);
         _options.Outbox.PayloadRetention = TimeSpan.FromDays(1);
 
         _inbox.Setup(cleaner => cleaner.CleanEntriesAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>())).ReturnsAsync(1);
@@ -75,9 +75,9 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
 
         // Assert
         DateTime cutoff = _clock.GetUtcNow().UtcDateTime.AddDays(-1);
-        VerifyCleanupLog("Inbox", "Deleting messages", 1, cutoff);
+        VerifyCleanupLog("Inbox", "Deleting messages", 1, cutoff.AddDays(-1));
         VerifyCleanupLog("Inbox", "Clearing payloads", 2, cutoff);
-        VerifyCleanupLog("Outbox", "Deleting messages", 3, cutoff);
+        VerifyCleanupLog("Outbox", "Deleting messages", 3, cutoff.AddDays(-1));
         VerifyCleanupLog("Outbox", "Clearing payloads", 4, cutoff);
     }
 
@@ -150,7 +150,7 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
         TimeSpan initialDelay = await _clock.WaitForDelayAsync();
 
         // Assert
-        Assert.InRange(initialDelay, TimeSpan.FromSeconds(300), TimeSpan.FromSeconds(600));
+        Assert.Equal(_options.InitialDelay, initialDelay);
         _scopeFactory.Verify(factory => factory.CreateScope(), Times.Never);
         _inbox.VerifyNoOtherCalls();
         _outbox.VerifyNoOtherCalls();
@@ -297,6 +297,36 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
             ("Operation", operation),
             ("AffectedCount", affectedCount),
             ("Cutoff", cutoff));
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(120)]
+    public async Task ExecuteAsync_UsesConfiguredInitialDelay(int seconds)
+    {
+        // Arrange
+        _options.InitialDelay = TimeSpan.FromSeconds(seconds);
+        TimeSpan? initialDelay = null;
+        int? scopeCountBeforeCleanup = null;
+
+        // Act
+        await _sut.StartAsync(TestContext.Current.CancellationToken);
+        if (seconds > 0)
+        {
+            initialDelay = await _clock.WaitForDelayAsync();
+            scopeCountBeforeCleanup = _scopeFactory.Invocations.Count;
+            _clock.Advance(_options.InitialDelay);
+        }
+        TimeSpan cleanupDelay = await _clock.WaitForDelayAsync();
+
+        // Assert
+        if (seconds > 0)
+        {
+            Assert.Equal(_options.InitialDelay, initialDelay);
+            Assert.Equal(0, scopeCountBeforeCleanup);
+        }
+        Assert.Equal(_options.CleanupInterval, cleanupDelay);
+        _scopeFactory.Verify(factory => factory.CreateScope(), Times.Once);
     }
 
     private IServiceScope CreateScope()

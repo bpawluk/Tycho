@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Tycho.Logging;
 using Tycho.Processor;
 using Tycho.Structure;
@@ -13,18 +14,17 @@ namespace Tycho.Events.Inbox
     {
         private readonly InboxActivity _inboxActivity;
         private readonly JobProcessor _jobProcessor;
-        private readonly ILogger<InboxProcessor>? _logger;
+        private readonly ILogger<InboxProcessor> _logger;
 
         public InboxProcessor(
             Internals internals,
             InboxActivity inboxActivity,
-            InboxSettings? inboxSettings = null,
+            InboxSettings inboxSettings,
             ILogger<InboxProcessor>? logger = null)
         {
             _inboxActivity = inboxActivity;
-            _logger = logger;
+            _logger = logger ?? NullLogger<InboxProcessor>.Instance;
 
-            inboxSettings ??= InboxSettings.Default;
             var jobProcessorSettings = new JobProcessorSettings()
             {
                 ConcurrencyLimit = inboxSettings.ConcurrencyLimit,
@@ -62,7 +62,7 @@ namespace Tycho.Events.Inbox
 
         private void OnJobProcessorError(object _, Exception exception)
         {
-            _logger?.InboxProcessingFailed(exception);
+            _logger.InboxProcessingFailed(exception);
         }
     }
 }

@@ -31,7 +31,7 @@ public sealed class InboxProcessorTests
         internals.GetHostBuilder().Services.AddSingleton(consumer.Object);
         internals.Build();
 
-        using var processor = new InboxProcessor(internals, new InboxActivity(), logger: logger.Object);
+        using var processor = new InboxProcessor(internals, new InboxActivity(), new InboxSettings(), logger: logger.Object);
 
         // Act
         await processor.StartAsync(TestContext.Current.CancellationToken);

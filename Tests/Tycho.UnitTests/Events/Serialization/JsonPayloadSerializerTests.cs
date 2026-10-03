@@ -9,7 +9,7 @@ public class JsonPayloadSerializerTests
 {
     private static readonly JsonSerializerOptions s_jsonSerializerOptions = new();
 
-    private readonly JsonPayloadSerializer _sut = new();
+    private readonly JsonPayloadSerializer _sut = new(new JsonPayloadSerializerSettings());
 
     [Fact]
     public void Serialize_WithValidEventData_ReturnsSerialized()

@@ -42,4 +42,13 @@ public sealed class MessageRetentionOptions
             throw new ArgumentException("Payload retention must be shorter than full cleanup retention.");
         }
     }
+
+    internal MessageRetentionOptions Copy()
+    {
+        return new()
+        {
+            PayloadRetention = PayloadRetention,
+            FullCleanupRetention = FullCleanupRetention
+        };
+    }
 }

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Events.Routing;
@@ -14,10 +15,16 @@ using Tycho.Persistence.EFCore.Logging;
 
 namespace Tycho.Persistence.EFCore.Outbox;
 
-internal class OutboxConsumer(TychoDbContext dbContext, PersistenceOwner owner, OutboxConsumerSettings? settings = null, ILogger<OutboxConsumer>? logger = null) : IOutboxConsumer
+internal class OutboxConsumer(
+    TychoDbContext dbContext,
+    PersistenceOwner owner,
+    OutboxConsumerSettings settings,
+    ILogger<OutboxConsumer>? logger = null) : IOutboxConsumer
 {
     private readonly TychoDbContext _dbContext = dbContext;
-    private readonly OutboxConsumerSettings _settings = settings ?? OutboxConsumerSettings.Default;
+    private readonly PersistenceOwner _owner = owner;
+    private readonly OutboxConsumerSettings _settings = settings;
+    private readonly ILogger<OutboxConsumer> _logger = logger ?? NullLogger<OutboxConsumer>.Instance;
 
     public async Task<OutboxEvent?> TryReadAsync(CancellationToken cancellationToken)
     {
@@ -31,7 +38,7 @@ internal class OutboxConsumer(TychoDbContext dbContext, PersistenceOwner owner, 
 
         int claimedEntries = await _dbContext
             .Set<OutboxEntry>()
-            .Where(entry => entry.OwnerKey == owner.Key)
+            .Where(entry => entry.OwnerKey == _owner.Key)
             .Where(canBeProcessed)
             .OrderBy(entry => entry.Updated)
             .ThenBy(entry => entry.Id)
@@ -53,13 +60,13 @@ internal class OutboxConsumer(TychoDbContext dbContext, PersistenceOwner owner, 
             .Set<OutboxEntry>()
             .AsNoTracking()
             .SingleOrDefaultAsync(entry =>
-                entry.OwnerKey == owner.Key &&
+                entry.OwnerKey == _owner.Key &&
                 entry.ClaimId == claimId, cancellationToken)
             .ConfigureAwait(false);
 
         if (entryToDeliver == null)
         {
-            logger?.OutboxClaimedEntryMissing(claimId);
+            _logger.OutboxClaimedEntryMissing(claimId);
             return null;
         }
 
@@ -81,7 +88,7 @@ internal class OutboxConsumer(TychoDbContext dbContext, PersistenceOwner owner, 
         int updatedRowsCount = await _dbContext
             .Set<OutboxEntry>()
             .Where(entry =>
-                entry.OwnerKey == owner.Key &&
+                entry.OwnerKey == _owner.Key &&
                 entry.State == EntryState.InProcessing &&
                 entry.ClaimId == claimId)
             .ExecuteUpdateAsync(setters => setters
@@ -101,7 +108,7 @@ internal class OutboxConsumer(TychoDbContext dbContext, PersistenceOwner owner, 
         int updatedRowsCount = await _dbContext
             .Set<OutboxEntry>()
             .Where(entry =>
-                entry.OwnerKey == owner.Key &&
+                entry.OwnerKey == _owner.Key &&
                 entry.State == EntryState.InProcessing &&
                 entry.ClaimId == claimId)
             .ExecuteUpdateAsync(setters => setters
