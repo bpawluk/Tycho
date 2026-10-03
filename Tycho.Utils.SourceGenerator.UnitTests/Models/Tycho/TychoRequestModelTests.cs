@@ -38,6 +38,25 @@ public sealed class TychoRequestModelTests
     }
 
     [Fact]
+    public void Equals_WithBoxedModel_UsesRequestAndResponse()
+    {
+        // Arrange
+        var sut = new TychoRequestModel(ModelHelpers.TypeReference("Request"), ModelHelpers.TypeReference("Response"));
+        object equal = new TychoRequestModel(ModelHelpers.TypeReference("Request"), ModelHelpers.TypeReference("Response"));
+        object differentRequest = new TychoRequestModel(ModelHelpers.TypeReference("OtherRequest"), ModelHelpers.TypeReference("Response"));
+        object differentResponse = new TychoRequestModel(ModelHelpers.TypeReference("Request"), ModelHelpers.TypeReference("OtherResponse"));
+        object noResponse = new TychoRequestModel(ModelHelpers.TypeReference("Request"));
+
+        // Act & Assert
+        Assert.True(sut.Equals(equal));
+        Assert.False(sut.Equals(differentRequest));
+        Assert.False(sut.Equals(differentResponse));
+        Assert.False(sut.Equals(noResponse));
+        Assert.False(sut.Equals(new object()));
+        Assert.False(sut.Equals((object)null!));
+    }
+
+    [Fact]
     public void Equality_UsesRequestAndOptionalResponse()
     {
         // Arrange

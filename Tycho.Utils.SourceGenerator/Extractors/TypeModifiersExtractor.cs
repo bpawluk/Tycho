@@ -9,6 +9,37 @@ namespace Tycho.Utils.SourceGenerator.Extractors
 {
     internal static class TypeModifiersExtractor
     {
+        private static readonly Dictionary<SyntaxKind, TypeModifier> s_modifiers = new Dictionary<SyntaxKind, TypeModifier>
+        {
+            { SyntaxKind.NewKeyword, TypeModifier.New },
+            { SyntaxKind.PublicKeyword, TypeModifier.Public },
+            { SyntaxKind.ProtectedKeyword, TypeModifier.Protected },
+            { SyntaxKind.InternalKeyword, TypeModifier.Internal },
+            { SyntaxKind.PrivateKeyword, TypeModifier.Private },
+            { SyntaxKind.FileKeyword, TypeModifier.File },
+            { SyntaxKind.StaticKeyword, TypeModifier.Static },
+            { SyntaxKind.VirtualKeyword, TypeModifier.Virtual },
+            { SyntaxKind.SealedKeyword, TypeModifier.Sealed },
+            { SyntaxKind.OverrideKeyword, TypeModifier.Override },
+            { SyntaxKind.AbstractKeyword, TypeModifier.Abstract },
+            { SyntaxKind.ExternKeyword, TypeModifier.Extern },
+            { SyntaxKind.ConstKeyword, TypeModifier.Const },
+            { SyntaxKind.EventKeyword, TypeModifier.Event },
+            { SyntaxKind.FixedKeyword, TypeModifier.Fixed },
+            { SyntaxKind.ReadOnlyKeyword, TypeModifier.ReadOnly },
+            { SyntaxKind.RefKeyword, TypeModifier.Ref },
+            { SyntaxKind.InKeyword, TypeModifier.In },
+            { SyntaxKind.OutKeyword, TypeModifier.Out },
+            { SyntaxKind.ParamsKeyword, TypeModifier.Params },
+            { SyntaxKind.ThisKeyword, TypeModifier.This },
+            { SyntaxKind.ScopedKeyword, TypeModifier.Scoped },
+            { SyntaxKind.UnsafeKeyword, TypeModifier.Unsafe },
+            { SyntaxKind.VolatileKeyword, TypeModifier.Volatile },
+            { SyntaxKind.AsyncKeyword, TypeModifier.Async },
+            { SyntaxKind.PartialKeyword, TypeModifier.Partial },
+            { SyntaxKind.RequiredKeyword, TypeModifier.Required },
+        };
+
         public static ImmutableEquatableArray<TypeModifier> Extract(ITypeSymbol typeSymbol, ExtractorContext context)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
@@ -47,93 +78,7 @@ namespace Tycho.Utils.SourceGenerator.Extractors
 
         private static bool TryMapModifier(SyntaxKind modifierKind, out TypeModifier modifier)
         {
-            switch (modifierKind)
-            {
-                case SyntaxKind.NewKeyword:
-                    modifier = TypeModifier.New;
-                    return true;
-                case SyntaxKind.PublicKeyword:
-                    modifier = TypeModifier.Public;
-                    return true;
-                case SyntaxKind.ProtectedKeyword:
-                    modifier = TypeModifier.Protected;
-                    return true;
-                case SyntaxKind.InternalKeyword:
-                    modifier = TypeModifier.Internal;
-                    return true;
-                case SyntaxKind.PrivateKeyword:
-                    modifier = TypeModifier.Private;
-                    return true;
-                case SyntaxKind.FileKeyword:
-                    modifier = TypeModifier.File;
-                    return true;
-                case SyntaxKind.StaticKeyword:
-                    modifier = TypeModifier.Static;
-                    return true;
-                case SyntaxKind.VirtualKeyword:
-                    modifier = TypeModifier.Virtual;
-                    return true;
-                case SyntaxKind.SealedKeyword:
-                    modifier = TypeModifier.Sealed;
-                    return true;
-                case SyntaxKind.OverrideKeyword:
-                    modifier = TypeModifier.Override;
-                    return true;
-                case SyntaxKind.AbstractKeyword:
-                    modifier = TypeModifier.Abstract;
-                    return true;
-                case SyntaxKind.ExternKeyword:
-                    modifier = TypeModifier.Extern;
-                    return true;
-                case SyntaxKind.ConstKeyword:
-                    modifier = TypeModifier.Const;
-                    return true;
-                case SyntaxKind.EventKeyword:
-                    modifier = TypeModifier.Event;
-                    return true;
-                case SyntaxKind.FixedKeyword:
-                    modifier = TypeModifier.Fixed;
-                    return true;
-                case SyntaxKind.ReadOnlyKeyword:
-                    modifier = TypeModifier.ReadOnly;
-                    return true;
-                case SyntaxKind.RefKeyword:
-                    modifier = TypeModifier.Ref;
-                    return true;
-                case SyntaxKind.InKeyword:
-                    modifier = TypeModifier.In;
-                    return true;
-                case SyntaxKind.OutKeyword:
-                    modifier = TypeModifier.Out;
-                    return true;
-                case SyntaxKind.ParamsKeyword:
-                    modifier = TypeModifier.Params;
-                    return true;
-                case SyntaxKind.ThisKeyword:
-                    modifier = TypeModifier.This;
-                    return true;
-                case SyntaxKind.ScopedKeyword:
-                    modifier = TypeModifier.Scoped;
-                    return true;
-                case SyntaxKind.UnsafeKeyword:
-                    modifier = TypeModifier.Unsafe;
-                    return true;
-                case SyntaxKind.VolatileKeyword:
-                    modifier = TypeModifier.Volatile;
-                    return true;
-                case SyntaxKind.AsyncKeyword:
-                    modifier = TypeModifier.Async;
-                    return true;
-                case SyntaxKind.PartialKeyword:
-                    modifier = TypeModifier.Partial;
-                    return true;
-                case SyntaxKind.RequiredKeyword:
-                    modifier = TypeModifier.Required;
-                    return true;
-                default:
-                    modifier = default;
-                    return false;
-            }
+            return s_modifiers.TryGetValue(modifierKind, out modifier);
         }
     }
 }

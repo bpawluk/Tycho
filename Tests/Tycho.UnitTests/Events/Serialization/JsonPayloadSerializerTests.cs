@@ -87,6 +87,31 @@ public class JsonPayloadSerializerTests
         Assert.Throws<JsonException>(Act);
     }
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" \t\r\n")]
+    public void Deserialize_WithEmptyPayload_ThrowsArgumentException(string? payload)
+    {
+        // Act
+        void Act() => _sut.Deserialize<TestEvent>(payload!);
+
+        // Assert
+        ArgumentException exception = Assert.Throws<ArgumentException>(Act);
+        Assert.Equal("payload", exception.ParamName);
+    }
+
+    [Fact]
+    public void Deserialize_WithJsonNull_ThrowsInvalidOperationException()
+    {
+        // Act
+        void Act() => _sut.Deserialize<TestEvent>("null");
+
+        // Assert
+        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(Act);
+        Assert.Contains(nameof(TestEvent), exception.Message);
+    }
+
     private static string GetSerializedPayload(object toSerialize)
     {
         return JsonSerializer.Serialize(toSerialize, toSerialize.GetType(), s_jsonSerializerOptions);

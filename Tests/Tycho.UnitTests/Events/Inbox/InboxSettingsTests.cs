@@ -6,6 +6,25 @@ namespace Tycho.UnitTests.Events.Inbox;
 
 public sealed class InboxSettingsTests
 {
+    [Fact]
+    public void Default_ReturnsIndependentSettingsWithDefaultValues()
+    {
+        // Arrange
+        InboxSettings first = InboxSettings.Default;
+        first.ConcurrencyLimit = 1;
+
+        // Act
+        InboxSettings result = InboxSettings.Default;
+
+        // Assert
+        Assert.NotSame(first, result);
+        Assert.Equal(5, result.ConcurrencyLimit);
+        Assert.Equal(TimeSpan.FromMilliseconds(100), result.InitialPollingInterval);
+        Assert.Equal(3.0, result.PollingIntervalMultiplier);
+        Assert.Equal(TimeSpan.FromMinutes(5), result.MaxPollingInterval);
+        Assert.Equal(TimeSpan.FromSeconds(5), result.MessageProcessingTimeout);
+    }
+
     [Theory]
     [InlineData("ConcurrencyLimit")]
     [InlineData("InitialPollingInterval")]

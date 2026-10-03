@@ -71,13 +71,29 @@ public sealed class JsonConfigurationTests
 
         // Act
         void ConfigureWithNullCallback() => services.ConfigureTychoEventProcessing(null!);
-        void ConfigureWithNullServices() => Tycho.ServiceCollectionExtensions.ConfigureTychoEventProcessing(null!, _ => { });
+        void ConfigureWithNullServices() => ServiceCollectionExtensions.ConfigureTychoEventProcessing(null!, _ => { });
         void ConfigureWithFailingCallback() => services.ConfigureTychoEventProcessing(_ => throw new InvalidOperationException());
 
         // Assert
         Assert.Throws<ArgumentNullException>(ConfigureWithNullCallback);
         Assert.Throws<ArgumentNullException>(ConfigureWithNullServices);
         Assert.Throws<InvalidOperationException>(ConfigureWithFailingCallback);
+        Assert.Equal(original, [.. services]);
+    }
+
+    [Fact]
+    public void Configure_WithNullJsonOptions_ThrowsWithoutChangingRegistrations()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        services.ConfigureTychoEventProcessing(_ => { });
+        ServiceDescriptor[] original = [.. services];
+
+        // Act
+        void Act() => services.ConfigureTychoEventProcessing(settings => settings.PayloadSerializer.JsonOptions = null!);
+
+        // Assert
+        ArgumentNullException exception = Assert.Throws<ArgumentNullException>(Act);
         Assert.Equal(original, [.. services]);
     }
 

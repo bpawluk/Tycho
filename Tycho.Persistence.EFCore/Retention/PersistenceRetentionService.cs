@@ -56,46 +56,60 @@ internal sealed class PersistenceRetentionService(
     {
         IInboxCleaner inbox = services.GetRequiredService<IInboxCleaner>();
 
-        if (options.Inbox.FullCleanupRetention is TimeSpan inboxRetention)
-        {
-            DateTime cutoff = GetCutoff(utcNow, inboxRetention);
-            int affectedCount = await inbox.CleanEntriesAsync(cutoff, cancellationToken).ConfigureAwait(false);
-            if (affectedCount > 0)
-            {
-                logger?.RetentionCleanupAffectedEntries("Deleting messages", affectedCount, "Inbox", cutoff);
-            }
-        }
+        await RunCleanupAsync(
+            options.Inbox.FullCleanupRetention,
+            utcNow,
+            inbox.CleanEntriesAsync,
+            "Deleting messages",
+            "Inbox",
+            cancellationToken).ConfigureAwait(false);
 
-        if (options.Inbox.PayloadRetention is TimeSpan inboxPayloadRetention)
-        {
-            DateTime cutoff = GetCutoff(utcNow, inboxPayloadRetention);
-            int affectedCount = await inbox.CleanPayloadsAsync(cutoff, cancellationToken).ConfigureAwait(false);
-            if (affectedCount > 0)
-            {
-                logger?.RetentionCleanupAffectedEntries("Clearing payloads", affectedCount, "Inbox", cutoff);
-            }
-        }
+        await RunCleanupAsync(
+            options.Inbox.PayloadRetention,
+            utcNow,
+            inbox.CleanPayloadsAsync,
+            "Clearing payloads",
+            "Inbox",
+            cancellationToken).ConfigureAwait(false);
 
         IOutboxCleaner outbox = services.GetRequiredService<IOutboxCleaner>();
 
-        if (options.Outbox.FullCleanupRetention is TimeSpan outboxRetention)
+        await RunCleanupAsync(
+            options.Outbox.FullCleanupRetention,
+            utcNow,
+            outbox.CleanEntriesAsync,
+            "Deleting messages",
+            "Outbox",
+            cancellationToken).ConfigureAwait(false);
+
+        await RunCleanupAsync(
+            options.Outbox.PayloadRetention,
+            utcNow,
+            outbox.CleanPayloadsAsync,
+            "Clearing payloads",
+            "Outbox",
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task RunCleanupAsync(
+        TimeSpan? retention,
+        DateTime utcNow,
+        Func<DateTime, CancellationToken, Task<int>> clean,
+        string operation,
+        string store,
+        CancellationToken cancellationToken)
+    {
+        if (retention is not TimeSpan duration)
         {
-            DateTime cutoff = GetCutoff(utcNow, outboxRetention);
-            int affectedCount = await outbox.CleanEntriesAsync(cutoff, cancellationToken).ConfigureAwait(false);
-            if (affectedCount > 0)
-            {
-                logger?.RetentionCleanupAffectedEntries("Deleting messages", affectedCount, "Outbox", cutoff);
-            }
+            return;
         }
 
-        if (options.Outbox.PayloadRetention is TimeSpan outboxPayloadRetention)
+        DateTime cutoff = GetCutoff(utcNow, duration);
+        int affectedCount = await clean(cutoff, cancellationToken).ConfigureAwait(false);
+
+        if (affectedCount > 0)
         {
-            DateTime cutoff = GetCutoff(utcNow, outboxPayloadRetention);
-            int affectedCount = await outbox.CleanPayloadsAsync(cutoff, cancellationToken).ConfigureAwait(false);
-            if (affectedCount > 0)
-            {
-                logger?.RetentionCleanupAffectedEntries("Clearing payloads", affectedCount, "Outbox", cutoff);
-            }
+            logger?.RetentionCleanupAffectedEntries(operation, affectedCount, store, cutoff);
         }
     }
 
