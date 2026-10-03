@@ -98,7 +98,7 @@ public sealed class ModuleBuilderTests
         using IModule module = _sut.Build();
 
         // Assert
-        Assert.IsAssignableFrom<IModule<TestModule>>(module);
+        Assert.IsType<IModule<TestModule>>(module, exactMatch: false);
         Assert.Same(module.Internals, module.Internals.GetRequiredService<Internals>());
         Assert.NotNull(module.Internals.GetRequiredService<IHostEnvironment>());
         Assert.Equal(_parentId.CreateChild(DefinitionIdentity.Create<TestModule>()), module.Internals.OwnerInstanceId);

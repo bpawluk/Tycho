@@ -60,7 +60,7 @@ public sealed class AppBuilderBaseTests
         using IApp app = _sut.Build(null);
 
         // Assert
-        Assert.IsAssignableFrom<IApp<TychoApp>>(app);
+        Assert.IsType<IApp<TychoApp>>(app, exactMatch: false);
         Assert.Same(app.Internals, app.Internals.GetRequiredService<Internals>());
         Assert.NotNull(app.Internals.GetRequiredService<IHostEnvironment>());
         Assert.NotNull(app.RequestBroker);
