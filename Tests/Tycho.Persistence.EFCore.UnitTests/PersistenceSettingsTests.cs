@@ -5,7 +5,7 @@ using Tycho.Persistence.EFCore.Outbox;
 
 namespace Tycho.Persistence.EFCore.UnitTests;
 
-public sealed class PersistenceOptionsTests
+public sealed class PersistenceSettingsTests
 {
     [Fact]
     public void AddPersistence_WithoutConfigurationReplacesExistingSettingsWithDefaults()
@@ -47,7 +47,7 @@ public sealed class PersistenceOptionsTests
         Assert.Same(services, result);
         Assert.Equal(5u, Assert.Single(provider.GetServices<InboxConsumerSettings>()).MaxProcessingCount);
         Assert.Equal(7u, Assert.Single(provider.GetServices<OutboxConsumerSettings>()).MaxDeliveryCount);
-        Assert.Null(provider.GetService<PersistenceOptions>());
+        Assert.Null(provider.GetService<PersistenceSettings>());
     }
 
     [Theory]

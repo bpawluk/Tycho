@@ -17,7 +17,7 @@ namespace Tycho
         /// <param name="configure">The callback configuring inbox, outbox, and serialization settings.</param>
         public static IServiceCollection ConfigureTychoEventProcessing(
             this IServiceCollection services,
-            Action<EventProcessingOptions> configure)
+            Action<EventProcessingSettings> configure)
         {
             if (services == null)
             {
@@ -29,9 +29,9 @@ namespace Tycho
                 throw new ArgumentNullException(nameof(configure));
             }
 
-            var options = new EventProcessingOptions();
-            configure(options);
-            EventProcessingOptions snapshot = options.Copy();
+            var settings = new EventProcessingSettings();
+            configure(settings);
+            EventProcessingSettings snapshot = settings.Copy();
             snapshot.Validate();
             services.Replace(ServiceDescriptor.Transient(_ => snapshot.Inbox.Copy()));
             services.Replace(ServiceDescriptor.Transient(_ => snapshot.Outbox.Copy()));

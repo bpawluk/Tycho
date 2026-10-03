@@ -13,7 +13,7 @@ namespace Tycho.Persistence.EFCore.UnitTests.Retention;
 public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
 {
     private readonly TestTimeProvider _clock = new();
-    private readonly PersistenceRetentionOptions _options = new();
+    private readonly PersistenceRetentionSettings _options = new();
     private readonly Mock<IInboxCleaner> _inbox = new();
     private readonly Mock<IOutboxCleaner> _outbox = new();
     private readonly Mock<IServiceScopeFactory> _scopeFactory = new();

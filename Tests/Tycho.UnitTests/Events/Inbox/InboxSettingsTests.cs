@@ -79,7 +79,7 @@ public sealed class InboxSettingsTests
     {
         // Arrange
         var services = new ServiceCollection();
-        EventProcessingOptions? original = null;
+        EventProcessingSettings? original = null;
         services.ConfigureTychoEventProcessing(options =>
         {
             original = options;

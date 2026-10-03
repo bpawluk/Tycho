@@ -6,7 +6,7 @@ namespace Tycho.Persistence.EFCore;
 /// <summary>
 /// Defines settings for Tycho EF Core persistence.
 /// </summary>
-public sealed class PersistenceOptions
+public sealed class PersistenceSettings
 {
     /// <summary>
     /// Gets inbox consumer settings.
@@ -24,7 +24,7 @@ public sealed class PersistenceOptions
         OutboxConsumer.Validate();
     }
 
-    internal PersistenceOptions Copy()
+    internal PersistenceSettings Copy()
     {
         return new()
         {

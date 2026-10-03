@@ -7,7 +7,7 @@ namespace Tycho.Events
     /// <summary>
     /// Defines the settings used to process and serialize events in a Tycho host.
     /// </summary>
-    public sealed class EventProcessingOptions
+    public sealed class EventProcessingSettings
     {
         /// <summary>
         /// Gets inbox processor settings.
@@ -31,7 +31,7 @@ namespace Tycho.Events
             PayloadSerializer.Validate();
         }
 
-        internal EventProcessingOptions Copy()
+        internal EventProcessingSettings Copy()
         {
             return new()
             {

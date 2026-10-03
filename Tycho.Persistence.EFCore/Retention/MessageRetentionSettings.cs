@@ -5,7 +5,7 @@ namespace Tycho.Persistence.EFCore.Retention;
 /// <summary>
 /// Defines how long completed messages and their payloads are retained.
 /// </summary>
-public sealed class MessageRetentionOptions
+public sealed class MessageRetentionSettings
 {
     /// <summary>
     /// Gets or sets the age after which completed message payloads are cleared. Null retains payloads until full cleanup.
@@ -43,7 +43,7 @@ public sealed class MessageRetentionOptions
         }
     }
 
-    internal MessageRetentionOptions Copy()
+    internal MessageRetentionSettings Copy()
     {
         return new()
         {

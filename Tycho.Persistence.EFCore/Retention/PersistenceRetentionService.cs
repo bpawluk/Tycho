@@ -12,7 +12,7 @@ namespace Tycho.Persistence.EFCore.Retention;
 
 internal sealed class PersistenceRetentionService(
     IServiceScopeFactory scopeFactory,
-    PersistenceRetentionOptions options,
+    PersistenceRetentionSettings options,
     TimeProvider? timeProvider = null,
     ILogger<PersistenceRetentionService>? logger = null) : BackgroundService
 {

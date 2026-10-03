@@ -51,7 +51,7 @@ public sealed class InboxConsumerSettingsTests
     {
         // Arrange
         var services = new ServiceCollection();
-        PersistenceOptions? original = null;
+        PersistenceSettings? original = null;
         services.AddTychoPersistence<TestDbContext>(options =>
         {
             original = options;

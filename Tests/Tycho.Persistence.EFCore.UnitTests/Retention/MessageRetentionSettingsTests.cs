@@ -2,7 +2,7 @@ using Tycho.Persistence.EFCore.Retention;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Retention;
 
-public sealed class MessageRetentionOptionsTests
+public sealed class MessageRetentionSettingsTests
 {
     [Theory]
     [InlineData(null, null, false)]
@@ -15,7 +15,7 @@ public sealed class MessageRetentionOptionsTests
         bool expected)
     {
         // Arrange
-        var options = new MessageRetentionOptions
+        var options = new MessageRetentionSettings
         {
             PayloadRetention = payloadDays is int payload ? TimeSpan.FromDays(payload) : null,
             FullCleanupRetention = cleanupDays is int cleanup ? TimeSpan.FromDays(cleanup) : null
@@ -36,7 +36,7 @@ public sealed class MessageRetentionOptionsTests
     public void Validate_WithValidRetentionSettings_DoesNotThrow(int? payloadDays, int? cleanupDays)
     {
         // Arrange
-        var options = new MessageRetentionOptions
+        var options = new MessageRetentionSettings
         {
             PayloadRetention = payloadDays is int payload ? TimeSpan.FromDays(payload) : null,
             FullCleanupRetention = cleanupDays is int cleanup ? TimeSpan.FromDays(cleanup) : null
@@ -55,7 +55,7 @@ public sealed class MessageRetentionOptionsTests
     public void Validate_WithNonPositivePayloadRetention_Throws(int minutes)
     {
         // Arrange
-        var options = new MessageRetentionOptions { PayloadRetention = TimeSpan.FromMinutes(minutes) };
+        var options = new MessageRetentionSettings { PayloadRetention = TimeSpan.FromMinutes(minutes) };
 
         // Act
         Action act = options.Validate;
@@ -72,7 +72,7 @@ public sealed class MessageRetentionOptionsTests
     public void Validate_WithNonPositiveFullCleanupRetention_Throws(int minutes)
     {
         // Arrange
-        var options = new MessageRetentionOptions { FullCleanupRetention = TimeSpan.FromMinutes(minutes) };
+        var options = new MessageRetentionSettings { FullCleanupRetention = TimeSpan.FromMinutes(minutes) };
 
         // Act
         Action act = options.Validate;
@@ -89,7 +89,7 @@ public sealed class MessageRetentionOptionsTests
     public void Validate_WithPayloadRetentionNotShorterThanFullCleanup_Throws(int payloadDays, int cleanupDays)
     {
         // Arrange
-        var options = new MessageRetentionOptions
+        var options = new MessageRetentionSettings
         {
             PayloadRetention = TimeSpan.FromDays(payloadDays),
             FullCleanupRetention = TimeSpan.FromDays(cleanupDays)

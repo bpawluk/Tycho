@@ -3,13 +3,13 @@ using Tycho.Persistence.EFCore.Retention;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Retention;
 
-public sealed class PersistenceRetentionOptionsTests
+public sealed class PersistenceRetentionSettingsTests
 {
     [Fact]
     public void Defaults_ProvideValidRetentionSettings()
     {
         // Arrange
-        var options = new PersistenceRetentionOptions();
+        var options = new PersistenceRetentionSettings();
 
         // Act
         Exception? exception = Record.Exception(options.Validate);
@@ -30,10 +30,10 @@ public sealed class PersistenceRetentionOptionsTests
     {
         // Arrange
         var services = new ServiceCollection();
-        PersistenceRetentionOptions? original = null;
+        PersistenceRetentionSettings? original = null;
         services.AddTychoPersistenceRetention(options => original = options);
         using ServiceProvider provider = services.BuildServiceProvider();
-        PersistenceRetentionOptions registered = provider.GetRequiredService<PersistenceRetentionOptions>();
+        PersistenceRetentionSettings registered = provider.GetRequiredService<PersistenceRetentionSettings>();
 
         // Act
         original!.InitialDelay = TimeSpan.Zero;
@@ -44,7 +44,7 @@ public sealed class PersistenceRetentionOptionsTests
         registered.CleanupInterval = TimeSpan.Zero;
         registered.Inbox.PayloadRetention = TimeSpan.Zero;
         registered.Outbox.FullCleanupRetention = TimeSpan.Zero;
-        PersistenceRetentionOptions next = provider.GetRequiredService<PersistenceRetentionOptions>();
+        PersistenceRetentionSettings next = provider.GetRequiredService<PersistenceRetentionSettings>();
 
         // Assert
         Assert.Equal(TimeSpan.FromMinutes(5), registeredInitialDelay);
@@ -83,7 +83,7 @@ public sealed class PersistenceRetentionOptionsTests
     public void Validate_AcceptsSupportedInitialDelay(long milliseconds)
     {
         // Arrange
-        var options = new PersistenceRetentionOptions { InitialDelay = TimeSpan.FromMilliseconds(milliseconds) };
+        var options = new PersistenceRetentionSettings { InitialDelay = TimeSpan.FromMilliseconds(milliseconds) };
 
         // Act
         Exception? exception = Record.Exception(options.Validate);
@@ -103,7 +103,7 @@ public sealed class PersistenceRetentionOptionsTests
         bool expected)
     {
         // Arrange
-        var options = new PersistenceRetentionOptions();
+        var options = new PersistenceRetentionSettings();
         options.Inbox.PayloadRetention = enableInbox ? TimeSpan.FromDays(1) : null;
         options.Outbox.FullCleanupRetention = enableOutbox ? TimeSpan.FromDays(1) : null;
 
@@ -121,7 +121,7 @@ public sealed class PersistenceRetentionOptionsTests
     public void Validate_WithUnsupportedCleanupInterval_Throws(long milliseconds)
     {
         // Arrange
-        var options = new PersistenceRetentionOptions
+        var options = new PersistenceRetentionSettings
         {
             CleanupInterval = TimeSpan.FromMilliseconds(milliseconds)
         };
@@ -141,7 +141,7 @@ public sealed class PersistenceRetentionOptionsTests
     public void Validate_WithSupportedCleanupInterval_DoesNotThrow(long milliseconds)
     {
         // Arrange
-        var options = new PersistenceRetentionOptions
+        var options = new PersistenceRetentionSettings
         {
             CleanupInterval = TimeSpan.FromMilliseconds(milliseconds)
         };
@@ -157,7 +157,7 @@ public sealed class PersistenceRetentionOptionsTests
     public void Validate_WithInvalidInboxSettings_Throws()
     {
         // Arrange
-        var options = new PersistenceRetentionOptions();
+        var options = new PersistenceRetentionSettings();
         options.Inbox.PayloadRetention = TimeSpan.Zero;
 
         // Act
@@ -173,7 +173,7 @@ public sealed class PersistenceRetentionOptionsTests
     public void Validate_WithInvalidOutboxSettings_Throws()
     {
         // Arrange
-        var options = new PersistenceRetentionOptions();
+        var options = new PersistenceRetentionSettings();
         options.Outbox.FullCleanupRetention = TimeSpan.Zero;
 
         // Act

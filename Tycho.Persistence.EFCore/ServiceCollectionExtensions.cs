@@ -26,14 +26,14 @@ public static class ServiceCollectionExtensions
     /// <typeparam name="TDbContext">The type of the TychoDbContext to be used.</typeparam>
     public static IServiceCollection AddTychoPersistence<TDbContext>(
         this IServiceCollection services,
-        Action<PersistenceOptions>? configure = null)
+        Action<PersistenceSettings>? configure = null)
         where TDbContext : TychoDbContext
     {
         ArgumentNullException.ThrowIfNull(services);
 
-        var options = new PersistenceOptions();
-        configure?.Invoke(options);
-        PersistenceOptions snapshot = options.Copy();
+        var settings = new PersistenceSettings();
+        configure?.Invoke(settings);
+        PersistenceSettings snapshot = settings.Copy();
         snapshot.Validate();
         services.Replace(ServiceDescriptor.Transient(_ => snapshot.InboxConsumer.Copy()));
         services.Replace(ServiceDescriptor.Transient(_ => snapshot.OutboxConsumer.Copy()));
@@ -58,13 +58,13 @@ public static class ServiceCollectionExtensions
     /// <param name="configure">An optional callback overriding the retention defaults.</param>
     public static IServiceCollection AddTychoPersistenceRetention(
         this IServiceCollection services,
-        Action<PersistenceRetentionOptions>? configure = null)
+        Action<PersistenceRetentionSettings>? configure = null)
     {
         ArgumentNullException.ThrowIfNull(services);
 
-        var options = new PersistenceRetentionOptions();
-        configure?.Invoke(options);
-        PersistenceRetentionOptions snapshot = options.Copy();
+        var settings = new PersistenceRetentionSettings();
+        configure?.Invoke(settings);
+        PersistenceRetentionSettings snapshot = settings.Copy();
         snapshot.Validate();
         services.Replace(ServiceDescriptor.Transient(_ => snapshot.Copy()));
 

@@ -4,9 +4,9 @@ using Tycho.Events.Inbox;
 using Tycho.Events.Outbox;
 using Tycho.Events.Serialization;
 
-namespace Tycho.UnitTests;
+namespace Tycho.UnitTests.Events;
 
-public sealed class EventProcessingOptionsTests
+public sealed class EventProcessingSettingsTests
 {
     [Fact]
     public void Configure_RegistersSeparateSettingsAndReplacesAllSettingsFromDefaults()
@@ -25,7 +25,7 @@ public sealed class EventProcessingOptionsTests
         InboxSettings[] inboxSettings = [.. provider.GetServices<InboxSettings>()];
         OutboxSettings[] outboxSettings = [.. provider.GetServices<OutboxSettings>()];
         JsonPayloadSerializerSettings[] serializerSettings = [.. provider.GetServices<JsonPayloadSerializerSettings>()];
-        EventProcessingOptions? registeredOptions = provider.GetService<EventProcessingOptions>();
+        EventProcessingSettings? registeredOptions = provider.GetService<EventProcessingSettings>();
         IServiceCollection result = services.ConfigureTychoEventProcessing(options => options.Inbox.ConcurrencyLimit = 4);
         using ServiceProvider updated = services.BuildServiceProvider();
 
@@ -108,5 +108,5 @@ public sealed class EventProcessingOptionsTests
         Assert.NotNull(restored);
     }
 
-    public sealed class TestEvent : Tycho.Events.IEvent { }
+    public sealed class TestEvent : IEvent { }
 }

@@ -80,11 +80,11 @@ public sealed class ServiceCollectionExtensionsTests
         IServiceCollection result = services.AddTychoPersistenceRetention();
 
         using ServiceProvider provider = services.BuildServiceProvider();
-        PersistenceRetentionOptions options = provider.GetRequiredService<PersistenceRetentionOptions>();
+        PersistenceRetentionSettings options = provider.GetRequiredService<PersistenceRetentionSettings>();
 
         // Assert
         Assert.Same(services, result);
-        ServiceDescriptor registration = Assert.Single(services, service => service.ServiceType == typeof(PersistenceRetentionOptions));
+        ServiceDescriptor registration = Assert.Single(services, service => service.ServiceType == typeof(PersistenceRetentionSettings));
         Assert.Equal(ServiceLifetime.Transient, registration.Lifetime);
         Assert.True(options.IsRetentionEnabled);
         AssertRegistration<IInboxCleaner, InboxCleaner>(services, ServiceLifetime.Scoped);
@@ -108,7 +108,7 @@ public sealed class ServiceCollectionExtensionsTests
 
         // Assert
         using ServiceProvider provider = services.BuildServiceProvider();
-        PersistenceRetentionOptions options = provider.GetRequiredService<PersistenceRetentionOptions>();
+        PersistenceRetentionSettings options = provider.GetRequiredService<PersistenceRetentionSettings>();
         Assert.Equal(TimeSpan.FromMinutes(15), options.CleanupInterval);
         Assert.Equal(TimeSpan.FromDays(2), options.Inbox.PayloadRetention);
         Assert.Equal(TimeSpan.FromDays(3), options.Outbox.FullCleanupRetention);
@@ -127,7 +127,7 @@ public sealed class ServiceCollectionExtensionsTests
 
         // Assert
         ArgumentOutOfRangeException exception = Assert.Throws<ArgumentOutOfRangeException>(Act);
-        Assert.Equal(nameof(PersistenceRetentionOptions.CleanupInterval), exception.ParamName);
+        Assert.Equal(nameof(PersistenceRetentionSettings.CleanupInterval), exception.ParamName);
         Assert.Equal(originalRegistrations, [.. services]);
     }
 
@@ -159,10 +159,10 @@ public sealed class ServiceCollectionExtensionsTests
         services.AddTychoPersistenceRetention(options => options.CleanupInterval = TimeSpan.FromMinutes(10));
 
         using ServiceProvider provider = services.BuildServiceProvider();
-        PersistenceRetentionOptions options = provider.GetRequiredService<PersistenceRetentionOptions>();
+        PersistenceRetentionSettings options = provider.GetRequiredService<PersistenceRetentionSettings>();
 
         // Assert
-        ServiceDescriptor registration = Assert.Single(services, service => service.ServiceType == typeof(PersistenceRetentionOptions));
+        ServiceDescriptor registration = Assert.Single(services, service => service.ServiceType == typeof(PersistenceRetentionSettings));
         Assert.Equal(TimeSpan.FromMinutes(10), options.CleanupInterval);
         AssertRegistration<IHostedService, PersistenceRetentionService>(services, ServiceLifetime.Singleton);
         AssertRegistration<IInboxCleaner, InboxCleaner>(services, ServiceLifetime.Scoped);

@@ -5,7 +5,7 @@ namespace Tycho.Persistence.EFCore.Retention;
 /// <summary>
 /// Controls automatic cleanup of completed inbox and outbox entries.
 /// </summary>
-public sealed class PersistenceRetentionOptions
+public sealed class PersistenceRetentionSettings
 {
     /// <summary>
     /// Gets or sets the delay before the first cleanup. Zero runs immediately.
@@ -20,12 +20,12 @@ public sealed class PersistenceRetentionOptions
     /// <summary>
     /// Gets inbox retention settings.
     /// </summary>
-    public MessageRetentionOptions Inbox { get; init; } = new() { PayloadRetention = TimeSpan.FromDays(7) };
+    public MessageRetentionSettings Inbox { get; init; } = new() { PayloadRetention = TimeSpan.FromDays(7) };
 
     /// <summary>
     /// Gets outbox retention settings.
     /// </summary>
-    public MessageRetentionOptions Outbox { get; init; } = new() { FullCleanupRetention = TimeSpan.FromDays(7) };
+    public MessageRetentionSettings Outbox { get; init; } = new() { FullCleanupRetention = TimeSpan.FromDays(7) };
 
     internal bool IsRetentionEnabled => Inbox.IsEnabled || Outbox.IsEnabled;
 
@@ -48,7 +48,7 @@ public sealed class PersistenceRetentionOptions
         Outbox.Validate();
     }
 
-    internal PersistenceRetentionOptions Copy()
+    internal PersistenceRetentionSettings Copy()
     {
         return new()
         {
