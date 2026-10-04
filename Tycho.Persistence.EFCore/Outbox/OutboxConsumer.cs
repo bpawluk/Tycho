@@ -8,8 +8,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Tycho.Events.Model;
 using Tycho.Events.Outbox;
-using Tycho.Events.Routing;
 using Tycho.Identity.Events;
+using Tycho.Identity.Structure;
 using Tycho.Persistence.EFCore.Common;
 using Tycho.Persistence.EFCore.Logging;
 
@@ -38,14 +38,14 @@ internal class OutboxConsumer(
 
         int claimedEntries = await _dbContext
             .Set<OutboxEntry>()
-            .Where(entry => entry.OwnerKey == _owner.Key)
+            .Where(entry => entry.OwnerId == _owner.Identifier)
             .Where(canBeProcessed)
             .OrderBy(entry => entry.Updated)
-            .ThenBy(entry => entry.Id)
+            .ThenBy(entry => entry.EntryId)
             .Take(1)
             .ExecuteUpdateAsync(setters => setters
-                .SetProperty(entry => entry.Updated, utcNow)
                 .SetProperty(entry => entry.State, EntryState.InProcessing)
+                .SetProperty(entry => entry.Updated, utcNow)
                 .SetProperty(entry => entry.DeliveryAttempts, entry => entry.DeliveryAttempts + 1)
                 .SetProperty(entry => entry.ClaimId, claimId)
                 .SetProperty(entry => entry.ClaimExpiration, utcNow + _settings.DeliveryExpiration), cancellationToken)
@@ -60,7 +60,7 @@ internal class OutboxConsumer(
             .Set<OutboxEntry>()
             .AsNoTracking()
             .SingleOrDefaultAsync(entry =>
-                entry.OwnerKey == _owner.Key &&
+                entry.OwnerId == _owner.Identifier &&
                 entry.ClaimId == claimId, cancellationToken)
             .ConfigureAwait(false);
 
@@ -73,11 +73,11 @@ internal class OutboxConsumer(
         return new OutboxEvent(
             claimId,
             new SerializedRoutedEvent(
-                entryToDeliver.Id,
+                entryToDeliver.EntryId,
                 entryToDeliver.PublishId,
                 EventIdentity.Parse(entryToDeliver.Event),
                 EventHandlerIdentity.Parse(entryToDeliver.Handler),
-                Route.Parse(entryToDeliver.Route),
+                InstanceIdentity.Parse(entryToDeliver.Destination),
                 entryToDeliver.Payload));
     }
 
@@ -88,12 +88,12 @@ internal class OutboxConsumer(
         int updatedRowsCount = await _dbContext
             .Set<OutboxEntry>()
             .Where(entry =>
-                entry.OwnerKey == _owner.Key &&
+                entry.OwnerId == _owner.Identifier &&
                 entry.State == EntryState.InProcessing &&
                 entry.ClaimId == claimId)
             .ExecuteUpdateAsync(setters => setters
-                .SetProperty(entry => entry.Updated, currentTime)
                 .SetProperty(entry => entry.State, EntryState.Processed)
+                .SetProperty(entry => entry.Updated, currentTime)
                 .SetProperty(entry => entry.ClaimId, Guid.Empty)
                 .SetProperty(entry => entry.ClaimExpiration, DateTime.MinValue), cancellationToken)
             .ConfigureAwait(false);
@@ -108,12 +108,12 @@ internal class OutboxConsumer(
         int updatedRowsCount = await _dbContext
             .Set<OutboxEntry>()
             .Where(entry =>
-                entry.OwnerKey == _owner.Key &&
+                entry.OwnerId == _owner.Identifier &&
                 entry.State == EntryState.InProcessing &&
                 entry.ClaimId == claimId)
             .ExecuteUpdateAsync(setters => setters
-                .SetProperty(entry => entry.Updated, currentTime)
                 .SetProperty(entry => entry.State, EntryState.Failed)
+                .SetProperty(entry => entry.Updated, currentTime)
                 .SetProperty(entry => entry.ClaimId, Guid.Empty)
                 .SetProperty(entry => entry.ClaimExpiration, DateTime.MinValue), cancellationToken)
             .ConfigureAwait(false);

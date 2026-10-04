@@ -15,15 +15,15 @@ namespace Tycho.Logging
             EventId = 1001,
             EventName = "TychoHostStarted",
             Level = LogLevel.Information,
-            Message = "Tycho host {OwnerInstanceId} started.")]
-        internal static partial void TychoHostStarted(this ILogger logger, string ownerInstanceId);
+            Message = "Tycho host {OwnerId} started.")]
+        internal static partial void TychoHostStarted(this ILogger logger, string ownerId);
 
         [LoggerMessage(
             EventId = 1002,
             EventName = "TychoHostStopped",
             Level = LogLevel.Information,
-            Message = "Tycho host {OwnerInstanceId} stopped.")]
-        internal static partial void TychoHostStopped(this ILogger logger, string ownerInstanceId);
+            Message = "Tycho host {OwnerId} stopped.")]
+        internal static partial void TychoHostStopped(this ILogger logger, string ownerId);
 
         #endregion
 

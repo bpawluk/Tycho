@@ -5,16 +5,16 @@ namespace Tycho.Events.Inbox
 {
     internal sealed class InboxEvent
     {
-        public Guid EventId => RoutedEvent.Id;
+        public Guid EventId => Event.Id;
 
         public Guid ClaimId { get; }
 
-        public RoutedEvent RoutedEvent { get; }
+        public Event Event { get; }
 
-        public InboxEvent(Guid claimId, RoutedEvent routedEvent)
+        public InboxEvent(Guid claimId, Event @event)
         {
             ClaimId = claimId;
-            RoutedEvent = routedEvent;
+            Event = @event;
         }
     }
 }

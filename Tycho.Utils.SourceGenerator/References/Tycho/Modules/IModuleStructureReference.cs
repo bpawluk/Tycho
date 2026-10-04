@@ -24,7 +24,10 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
 
         public static MethodSignatureModel UsesMethodSignature => new MethodSignatureModel(
             methodName: "Uses",
-            parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
+            parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
+            {
+                StringReference.TypeModel
+            }),
             result: TypeModel);
 
         public static MethodSignatureModel UsesWithContractFulfillmentMethodSignature => new MethodSignatureModel(
@@ -32,6 +35,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
             parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
             {
                 ActionReference.CreateTypeModel(IContractFulfillmentReference.TypeModel),
+                StringReference.TypeModel,
             }),
             result: TypeModel);
 
@@ -40,6 +44,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
             parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
             {
                 IModuleSettingsReference.TypeModel,
+                StringReference.TypeModel,
             }),
             result: TypeModel);
 
@@ -49,6 +54,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
             {
                 ActionReference.CreateTypeModel(IContractFulfillmentReference.TypeModel),
                 IModuleSettingsReference.TypeModel,
+                StringReference.TypeModel,
             }),
             result: TypeModel);
     }

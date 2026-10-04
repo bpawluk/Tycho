@@ -4,29 +4,34 @@ namespace Tycho.Identity.Structure
 {
     internal sealed class InstanceIdentity : Identity, IEquatable<InstanceIdentity>
     {
-        private InstanceIdentity(DefinitionIdentity definitionIdentity) : this(definitionIdentity, null) { }
+        private InstanceIdentity(string value) : base(value) { }
 
-        private InstanceIdentity(DefinitionIdentity definitionIdentity, InstanceIdentity? parent) : base(Construct(definitionIdentity, parent)) { }
-
-        public bool Equals(InstanceIdentity other)
+        public static InstanceIdentity Create(Type definitionType, string? instanceSuffix = null)
         {
-            return this == other;
+            if (definitionType == null)
+            {
+                throw new ArgumentNullException(nameof(definitionType));
+            }
+
+            if (instanceSuffix != null && string.IsNullOrWhiteSpace(instanceSuffix))
+            {
+                throw new ArgumentException("Instance suffix cannot be empty.", nameof(instanceSuffix));
+            }
+
+            string definitionId = TypeIdentifier.GetId(definitionType);
+            return Parse(instanceSuffix == null ? definitionId : definitionId + ":" + instanceSuffix);
         }
 
-        public InstanceIdentity CreateChild(DefinitionIdentity definitionIdentity)
+        public static InstanceIdentity Parse(string value)
         {
-            return new InstanceIdentity(definitionIdentity, this);
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException("Instance identity cannot be empty.", nameof(value));
+            }
+
+            return new InstanceIdentity(value);
         }
 
-        public static InstanceIdentity CreateRoot(DefinitionIdentity definitionIdentity)
-        {
-            return new InstanceIdentity(definitionIdentity);
-        }
-
-        private static string Construct(DefinitionIdentity definitionIdentity, InstanceIdentity? parent)
-        {
-            if (definitionIdentity == null) throw new ArgumentNullException(nameof(definitionIdentity));
-            return parent == null ? definitionIdentity.Value : parent.Value + "/" + definitionIdentity.Value;
-        }
+        public bool Equals(InstanceIdentity? other) => this == other;
     }
 }

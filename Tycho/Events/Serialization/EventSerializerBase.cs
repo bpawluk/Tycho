@@ -13,7 +13,7 @@ namespace Tycho.Events.Serialization
     public abstract class EventSerializerBase : IEventSerializer
     {
         private readonly IPayloadSerializer _payloadSerializer;
-        private readonly Dictionary<EventIdentity, Func<SerializedRoutedEvent, RoutedEvent>> _deserializers;
+        private readonly Dictionary<EventIdentity, Func<SerializedEvent, Event>> _deserializers;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventSerializerBase"/> class.
@@ -23,7 +23,7 @@ namespace Tycho.Events.Serialization
         protected EventSerializerBase(IPayloadSerializer payloadSerializer)
         {
             _payloadSerializer = payloadSerializer;
-            _deserializers = new Dictionary<EventIdentity, Func<SerializedRoutedEvent, RoutedEvent>>();
+            _deserializers = new Dictionary<EventIdentity, Func<SerializedEvent, Event>>();
         }
 
         /// <inheritdoc/>
@@ -35,14 +35,14 @@ namespace Tycho.Events.Serialization
                 routedEvent.PublishId,
                 routedEvent.EventId,
                 routedEvent.HandlerId,
-                routedEvent.Route,
+                routedEvent.DestinationId,
                 serializedPayload);
         }
 
         /// <inheritdoc/>
-        public RoutedEvent Deserialize(SerializedRoutedEvent serializedEvent)
+        public Event Deserialize(SerializedEvent serializedEvent)
         {
-            if (_deserializers.TryGetValue(serializedEvent.EventId, out Func<SerializedRoutedEvent, RoutedEvent>? deserializer))
+            if (_deserializers.TryGetValue(serializedEvent.EventId, out Func<SerializedEvent, Event>? deserializer))
             {
                 return deserializer(serializedEvent);
             }
@@ -60,15 +60,14 @@ namespace Tycho.Events.Serialization
             _deserializers[eventId] = Deserialize<TEvent>;
         }
 
-        private RoutedEvent<TEvent> Deserialize<TEvent>(SerializedRoutedEvent serializedEvent) where TEvent : class, IEvent
+        private Event<TEvent> Deserialize<TEvent>(SerializedEvent serializedEvent) where TEvent : class, IEvent
         {
             TEvent payload = _payloadSerializer.Deserialize<TEvent>(serializedEvent.Payload);
-            return new RoutedEvent<TEvent>(
+            return new Event<TEvent>(
                 serializedEvent.Id,
                 serializedEvent.PublishId,
                 serializedEvent.EventId,
                 serializedEvent.HandlerId,
-                serializedEvent.Route,
                 payload);
         }
     }

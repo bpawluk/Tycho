@@ -1,22 +1,23 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Tycho.Events.Delivery;
 using Tycho.Events.Model;
 using Tycho.Events.Registrating.Registrations;
+using Tycho.Structure;
 
 namespace Tycho.Events.Broker
 {
     internal class ScopedEventBroker : IEventBroker
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly ControlPlane _controlPlane;
 
-        public ScopedEventBroker(IServiceProvider serviceProvider)
+        public ScopedEventBroker(IServiceProvider serviceProvider, ControlPlane controlPlane)
         {
             _serviceProvider = serviceProvider;
+            _controlPlane = controlPlane;
         }
 
         public async Task<IReadOnlyCollection<RoutedEvent>> RouteAsync<TEvent>(
@@ -41,10 +42,11 @@ namespace Tycho.Events.Broker
 
         public async Task DeliverAsync(SerializedRoutedEvent routedEvent, CancellationToken cancellationToken)
         {
-            IEnumerable<IDeliveryStrategy> deliveryStrategies = _serviceProvider.GetServices<IDeliveryStrategy>();
-
-            IDeliveryStrategy? deliveryStrategy = deliveryStrategies.SingleOrDefault(s => s.CanDeliver(routedEvent)) ?? throw new InvalidOperationException($"No delivery strategy found for event with ID {routedEvent.EventId}.");
-            await deliveryStrategy.DeliverAsync(routedEvent, cancellationToken);
+            await _controlPlane
+                .GetModule(routedEvent.DestinationId)
+                .Endpoint
+                .AcceptAsync(routedEvent, cancellationToken)
+                .ConfigureAwait(false);
         }
     }
 }

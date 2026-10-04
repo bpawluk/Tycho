@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Events.Broker;
 using Tycho.Events.Model;
-using Tycho.Events.Routing;
 
 namespace Tycho.Events.Registrating.Registrations
 {
@@ -23,17 +22,9 @@ namespace Tycho.Events.Registrating.Registrations
             TEvent eventPayload,
             CancellationToken cancellationToken)
         {
-            IRouteStep routeStep = GetRouteStep();
             IReadOnlyCollection<RoutedEvent> routedEvents = await _externalEventBroker.RouteAsync(publishId, eventPayload, cancellationToken).ConfigureAwait(false);
-
-            foreach (RoutedEvent routedEvent in routedEvents)
-            {
-                routedEvent.Route.Push(routeStep);
-            }
 
             return routedEvents;
         }
-
-        protected abstract IRouteStep GetRouteStep();
     }
 }

@@ -11,27 +11,27 @@ namespace Tycho.Events.Inbox.InMemory
     {
         private readonly IEventSerializer _eventSerializer;
         private readonly InboxActivity _inboxActivity;
-        private readonly ConcurrentQueue<SerializedRoutedEvent> _entries;
+        private readonly ConcurrentQueue<SerializedEvent> _entries;
 
         public InMemoryInbox(IEventSerializer eventSerializer, InboxActivity inboxActivity)
         {
             _eventSerializer = eventSerializer;
             _inboxActivity = inboxActivity;
-            _entries = new ConcurrentQueue<SerializedRoutedEvent>();
+            _entries = new ConcurrentQueue<SerializedEvent>();
         }
 
-        public Task Write(SerializedRoutedEvent routedEvent, CancellationToken cancellationToken = default)
+        public Task Write(SerializedEvent serializedEvent, CancellationToken cancellationToken = default)
         {
-            _entries.Enqueue(routedEvent);
+            _entries.Enqueue(serializedEvent);
             _inboxActivity.NotifyNewEntriesAdded();
             return Task.CompletedTask;
         }
 
         public Task<InboxEvent?> TryReadAsync(CancellationToken cancellationToken = default)
         {
-            if (_entries.TryDequeue(out SerializedRoutedEvent? nextEntry))
+            if (_entries.TryDequeue(out SerializedEvent? nextEntry))
             {
-                RoutedEvent deserializedEvent = _eventSerializer.Deserialize(nextEntry);
+                Event deserializedEvent = _eventSerializer.Deserialize(nextEntry);
                 return Task.FromResult<InboxEvent?>(new InboxEvent(Guid.Empty, deserializedEvent));
             }
 

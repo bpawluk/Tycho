@@ -75,7 +75,7 @@ namespace Tycho.Events.Inbox
                 IInboxConsumer inbox = scope.ServiceProvider.GetRequiredService<IInboxConsumer>();
                 var handlerProvider = new EventHandlerProvider(scope.ServiceProvider);
 
-                IEventHandler eventHandler = _event!.RoutedEvent.GetHandlerFrom(handlerProvider);
+                IEventHandler eventHandler = _event!.Event.GetHandlerFrom(handlerProvider);
                 if (eventHandler is ITransactionalEventHandler)
                 {
                     ITransaction transaction = scope.ServiceProvider.GetRequiredService<ITransaction>();
@@ -101,7 +101,7 @@ namespace Tycho.Events.Inbox
 
         private async Task HandleEventAsync(IEventHandler eventHandler, IInboxConsumer inbox, CancellationToken cancellationToken)
         {
-            await _event!.RoutedEvent.HandleWith(eventHandler, cancellationToken).ConfigureAwait(false);
+            await _event!.Event.HandleWith(eventHandler, cancellationToken).ConfigureAwait(false);
 
             bool markedAsHandled = await inbox.MarkAsHandledAsync(_event.ClaimId, cancellationToken).ConfigureAwait(false);
             if (!markedAsHandled)

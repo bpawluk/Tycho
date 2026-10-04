@@ -31,7 +31,7 @@ internal sealed class InboxCleaner(TychoDbContext dbContext, PersistenceOwner ow
         return dbContext
             .Set<InboxEntry>()
             .Where(entry =>
-                entry.OwnerKey == owner.Key &&
+                entry.OwnerId == owner.Identifier &&
                 entry.State == EntryState.Processed);
     }
 }

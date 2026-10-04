@@ -12,15 +12,15 @@ internal class InboxWriter(InboxActivity inboxActivity, TychoDbContext dbContext
     private readonly TychoDbContext _dbContext = dbContext;
     private readonly InboxActivity _inboxActivity = inboxActivity;
 
-    public async Task Write(SerializedRoutedEvent serializedEvent, CancellationToken cancellationToken = default)
+    public async Task Write(SerializedEvent serializedEvent, CancellationToken cancellationToken = default)
     {
         var inboxEntry = new InboxEntry
         {
-            OwnerKey = owner.Key,
-            Id = serializedEvent.Id,
+            OwnerId = owner.Identifier,
+            EntryId = serializedEvent.Id,
             PublishId = serializedEvent.PublishId,
-            Event = serializedEvent.EventId.ToString(),
             Handler = serializedEvent.HandlerId.ToString(),
+            Event = serializedEvent.EventId.ToString(),
             Payload = serializedEvent.Payload.ToString()!
         };
         _dbContext.Set<InboxEntry>().Add(inboxEntry);
@@ -37,14 +37,14 @@ internal class InboxWriter(InboxActivity inboxActivity, TychoDbContext dbContext
                 .Set<InboxEntry>()
                 .AsNoTracking()
                 .SingleOrDefaultAsync(x =>
-                    x.OwnerKey == owner.Key &&
-                    x.Id == inboxEntry.Id, cancellationToken)
+                    x.OwnerId == owner.Identifier &&
+                    x.EntryId == inboxEntry.EntryId, cancellationToken)
                 .ConfigureAwait(false);
 
             if (existing is null ||
                 existing.PublishId != inboxEntry.PublishId ||
-                existing.Event != inboxEntry.Event ||
-                existing.Handler != inboxEntry.Handler)
+                existing.Handler != inboxEntry.Handler ||
+                existing.Event != inboxEntry.Event)
             {
                 throw;
             }

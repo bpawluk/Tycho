@@ -6,7 +6,6 @@ using Microsoft.Extensions.Hosting;
 using Tycho.Events.Broker;
 using Tycho.Hosting;
 using Tycho.Hosting.Services;
-using Tycho.Identity.Structure;
 using Tycho.Modules.Instance;
 using Tycho.Requests.Broker;
 using Tycho.Structure;
@@ -28,8 +27,9 @@ namespace Tycho.Modules.Setup
         private Action<IServiceCollection>? _registerServicesDelegate;
         private IRequestBroker? _contractFulfillingBroker;
         private IEventBroker? _parentEventBroker;
-        private InstanceIdentity? _parentId;
+        private string? _instanceSuffix;
         private int _built;
+        private ControlPlane? _controlPlane;
 
         public ModuleBuilder(Type moduleDefinitionType)
         {
@@ -70,9 +70,15 @@ namespace Tycho.Modules.Setup
             return this;
         }
 
-        public ModuleBuilder WithParentId(InstanceIdentity? parentId)
+        internal ModuleBuilder WithControlPlane(ControlPlane controlPlane)
         {
-            _parentId = parentId;
+            _controlPlane = controlPlane;
+            return this;
+        }
+
+        public ModuleBuilder WithInstanceSuffix(string? instanceSuffix)
+        {
+            _instanceSuffix = instanceSuffix;
             return this;
         }
 
@@ -101,7 +107,7 @@ namespace Tycho.Modules.Setup
                 throw new InvalidOperationException("The module has already been built.");
             }
 
-            if (_contractFulfillingBroker == null || _parentEventBroker == null || _parentId == null)
+            if (_contractFulfillingBroker == null || _parentEventBroker == null || _controlPlane == null)
             {
                 throw new InvalidOperationException("The module parent has not been configured.");
             }
@@ -112,9 +118,9 @@ namespace Tycho.Modules.Setup
             }
 
             HostApplicationBuilder hostBuilder = _createHostBuilderDelegate.Invoke();
-            var internals = new Internals(hostBuilder, _moduleDefinitionType, _parentId);
+            var internals = new ModuleInternals(hostBuilder, _controlPlane, _moduleDefinitionType, _instanceSuffix);
 
-            hostBuilder.Services.AddSingleton(internals);
+            hostBuilder.Services.AddSingleton<Internals>(internals);
             hostBuilder.Services.AddSingleton<IHostLifecycleCallbacks>(_lifecycleCallbacks);
             hostBuilder.Services.AddHostedService<HostLifecycleCallbacksService>();
 

@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Events.Model;
 using Tycho.Identity.Events;
+using Tycho.Structure;
 
 namespace Tycho.Events.Registrating.Registrations
 {
@@ -11,13 +12,16 @@ namespace Tycho.Events.Registrating.Registrations
         where TEvent : class, IEvent
         where TEventHandler : IEventHandler<TEvent>
     {
+        private readonly Internals _internals;
+
         public IEventHandler<TEvent> Handler { get; }
 
         public EventHandlerIdentity HandlerId { get; }
 
-        public FinalEventRegistration(TEventHandler handler)
+        public FinalEventRegistration(TEventHandler handler, Internals internals)
         {
             Handler = handler;
+            _internals = internals;
             HandlerId = EventHandlerIdentity.Create<TEventHandler>();
         }
 
@@ -27,8 +31,16 @@ namespace Tycho.Events.Registrating.Registrations
             CancellationToken cancellationToken)
         {
             var eventId = EventIdentity.Create<TEvent>();
-            var route = Routing.Route.Create();
-            IReadOnlyCollection<RoutedEvent> routedEvents = new[] { new RoutedEvent<TEvent>(Guid.NewGuid(), publishId, eventId, HandlerId, route, eventPayload) };
+            IReadOnlyCollection<RoutedEvent> routedEvents = new[]
+            {
+                new RoutedEvent<TEvent>(
+                    Guid.NewGuid(),
+                    publishId,
+                    eventId,
+                    HandlerId,
+                    _internals.OwnerId,
+                    eventPayload)
+            };
             return Task.FromResult(routedEvents);
         }
     }

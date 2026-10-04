@@ -1,7 +1,5 @@
 using System;
 using Tycho.Events.Broker;
-using Tycho.Identity.Modules;
-using Tycho.Identity.Structure;
 using Tycho.Requests.Broker;
 using Tycho.Structure;
 using Tycho.Utils;
@@ -14,8 +12,6 @@ namespace Tycho.Modules.Instance
     [ReferencedBySourceGenerator]
     public interface IModule : IRunnable, IDisposable
     {
-        internal DefinitionIdentity Identity { get; }
-
         internal Internals Internals { get; }
 
         internal IEventBroker EventBroker { get; }

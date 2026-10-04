@@ -49,6 +49,7 @@ namespace Tycho.Utils.SourceGenerator.Pipelines
         {
             token.ThrowIfCancellationRequested();
             var invocations = input.Method.Body
+                .Where(invocation => invocation.HasStructureReceiver())
                 .Where(invocation => invocation.Signature.IsSubmoduleDefiningMethod())
                 .ToImmutableEquatableArray();
             return (input.SetupKind, input.Method.ContainingType, invocations);

@@ -5,38 +5,35 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Tycho.Events.Delivery;
 using Tycho.Identity.Structure;
 using Tycho.Logging;
+using Tycho.Modules.Instance;
 
 namespace Tycho.Structure
 {
-    internal class Internals : IServiceProvider, IRunnable, IDisposable
+    internal abstract class Internals : IServiceProvider, IRunnable, IDisposable
     {
         private HostApplicationBuilder? _hostBuilder;
         private IHost? _host;
         private int _disposed;
 
-        public DefinitionIdentity OwnerDefinitionId { get; }
-        public InstanceIdentity OwnerInstanceId { get; }
+        public ControlPlane ControlPlane { get; }
+        public InstanceIdentity OwnerId { get; }
 
-        public Internals(HostApplicationBuilder hostBuilder, Type ownerDefinition)
+        protected Internals(HostApplicationBuilder hostBuilder, ControlPlane controlPlane, InstanceIdentity instanceId)
         {
             _hostBuilder = hostBuilder;
-            OwnerDefinitionId = DefinitionIdentity.Create(ownerDefinition);
-            OwnerInstanceId = InstanceIdentity.CreateRoot(OwnerDefinitionId);
-        }
-
-        public Internals(HostApplicationBuilder hostBuilder, Type ownerDefinition, InstanceIdentity parentIdentity)
-        {
-            _hostBuilder = hostBuilder;
-            OwnerDefinitionId = DefinitionIdentity.Create(ownerDefinition);
-            OwnerInstanceId = parentIdentity.CreateChild(OwnerDefinitionId);
+            ControlPlane = controlPlane;
+            OwnerId = instanceId;
+            hostBuilder.Services.AddSingleton(ControlPlane);
         }
 
         public HostApplicationBuilder GetHostBuilder()
         {
             ThrowIfDisposed();
             ThrowIfBuilt();
+
             return _hostBuilder!;
         }
 
@@ -44,16 +41,42 @@ namespace Tycho.Structure
         {
             ThrowIfDisposed();
             ThrowIfNotBuilt();
+
             return _host!.Services.GetService(serviceType)!;
         }
 
         public void Build()
         {
             ThrowIfDisposed();
+
             if (_host == null)
             {
                 _host = _hostBuilder!.Build();
                 _hostBuilder = null;
+
+                try
+                {
+                    ControlPlane.RegisterModule(OwnerId, new ModuleReference(new DeliveryEndpoint(this)));
+                }
+                catch
+                {
+                    Dispose();
+                    throw;
+                }
+            }
+        }
+
+        internal void MaterializeModules(CancellationToken cancellationToken)
+        {
+            ThrowIfDisposed();
+            ThrowIfNotBuilt();
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            foreach (IModule module in _host!.Services.GetServices<IModule>())
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                module.Internals.MaterializeModules(cancellationToken);
             }
         }
 
@@ -75,16 +98,20 @@ namespace Tycho.Structure
         {
             ThrowIfDisposed();
             ThrowIfNotBuilt();
+
+            PrepareForStart(cancellationToken);
+
             await _host!.StartAsync(cancellationToken).ConfigureAwait(false);
-            _host.Services.GetService<ILogger<Internals>>()?.TychoHostStarted(OwnerInstanceId.Value);
+            _host.Services.GetService<ILogger<Internals>>()?.TychoHostStarted(OwnerId.Value);
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
             ThrowIfDisposed();
             ThrowIfNotBuilt();
+
             await _host!.StopAsync(cancellationToken).ConfigureAwait(false);
-            _host.Services.GetService<ILogger<Internals>>()?.TychoHostStopped(OwnerInstanceId.Value);
+            _host.Services.GetService<ILogger<Internals>>()?.TychoHostStopped(OwnerId.Value);
         }
 
         public void Dispose()
@@ -96,6 +123,8 @@ namespace Tycho.Structure
 
             _host?.Dispose();
         }
+
+        protected abstract void PrepareForStart(CancellationToken cancellationToken);
 
         private void ThrowIfNotBuilt()
         {
@@ -117,7 +146,7 @@ namespace Tycho.Structure
         {
             if (Volatile.Read(ref _disposed) != 0)
             {
-                throw new ObjectDisposedException(OwnerDefinitionId.Value);
+                throw new ObjectDisposedException(OwnerId.Value);
             }
         }
     }

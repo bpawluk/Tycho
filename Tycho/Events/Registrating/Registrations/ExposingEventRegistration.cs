@@ -1,6 +1,4 @@
 using System;
-using Tycho.Events.Routing;
-using Tycho.Events.Routing.Steps;
 using Tycho.Structure.Parent;
 
 namespace Tycho.Events.Registrating.Registrations
@@ -13,8 +11,6 @@ namespace Tycho.Events.Registrating.Registrations
             : base(parent.EventBroker)
         {
         }
-
-        protected override IRouteStep GetRouteStep() => UpStreamRouteStep.Create();
     }
 
     internal class MappedExposingEventRegistration<TEvent, TTargetEvent>
@@ -26,7 +22,5 @@ namespace Tycho.Events.Registrating.Registrations
             : base(parent.EventBroker, map)
         {
         }
-
-        protected override IRouteStep GetRouteStep() => UpStreamRouteStep.Create();
     }
 }

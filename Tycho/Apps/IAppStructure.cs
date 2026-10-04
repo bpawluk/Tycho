@@ -14,8 +14,9 @@ namespace Tycho.Apps
         /// Declares that a module of type <typeparamref name="TModule"/> is used by the application.
         /// </summary>
         /// <typeparam name="TModule">The definition of the module to use.</typeparam>
+        /// <param name="instanceSuffix">An optional suffix that distinguishes instances of the same module across the application.</param>
         [ReferencedBySourceGenerator]
-        IAppStructure Uses<TModule>()
+        IAppStructure Uses<TModule>(string? instanceSuffix = null)
             where TModule : TychoModule, new();
 
         /// <summary>
@@ -24,8 +25,9 @@ namespace Tycho.Apps
         /// <typeparam name="TModule">The definition of the module to use.</typeparam>
         /// <param name="contractFulfillment">The definition of how to fulfill the module contract.</param>
         /// <exception cref="ArgumentNullException"/>
+        /// <param name="instanceSuffix">An optional suffix that distinguishes instances of the same module across the application.</param>
         [ReferencedBySourceGenerator]
-        IAppStructure Uses<TModule>(Action<IContractFulfillment> contractFulfillment)
+        IAppStructure Uses<TModule>(Action<IContractFulfillment> contractFulfillment, string? instanceSuffix = null)
             where TModule : TychoModule, new();
 
         /// <summary>
@@ -34,8 +36,9 @@ namespace Tycho.Apps
         /// <typeparam name="TModule">The definition of the module to use.</typeparam>
         /// <param name="settings">The settings for the module to use.</param>
         /// <exception cref="ArgumentNullException"/>
+        /// <param name="instanceSuffix">An optional suffix that distinguishes instances of the same module across the application.</param>
         [ReferencedBySourceGenerator]
-        IAppStructure Uses<TModule>(IModuleSettings settings)
+        IAppStructure Uses<TModule>(IModuleSettings settings, string? instanceSuffix = null)
             where TModule : TychoModule, new();
 
         /// <summary>
@@ -45,10 +48,12 @@ namespace Tycho.Apps
         /// <param name="contractFulfillment">The definition of how to fulfill the module contract.</param>
         /// <param name="settings">The settings for the module to use.</param>
         /// <exception cref="ArgumentNullException"/>
+        /// <param name="instanceSuffix">An optional suffix that distinguishes instances of the same module across the application.</param>
         [ReferencedBySourceGenerator]
         IAppStructure Uses<TModule>(
             Action<IContractFulfillment> contractFulfillment,
-            IModuleSettings settings)
+            IModuleSettings settings,
+            string? instanceSuffix = null)
             where TModule : TychoModule, new();
     }
 }

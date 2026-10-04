@@ -31,7 +31,7 @@ internal sealed class OutboxCleaner(TychoDbContext dbContext, PersistenceOwner o
         return dbContext
             .Set<OutboxEntry>()
             .Where(entry =>
-                entry.OwnerKey == owner.Key &&
+                entry.OwnerId == owner.Identifier &&
                 entry.State == EntryState.Processed);
     }
 }

@@ -1,22 +1,19 @@
 using System;
-using Tycho.Events.Routing;
 using Tycho.Identity.Events;
+using Tycho.Identity.Structure;
 
 namespace Tycho.Events.Model
 {
     /// <summary>
     /// Represents a routed event with a serialized payload.
     /// </summary>
-    public class SerializedRoutedEvent : Event
+    public class SerializedRoutedEvent : SerializedEvent
     {
-        internal Route Route { get; }
+        internal InstanceIdentity DestinationId { get; }
 
-        internal string Payload { get; }
-
-        internal SerializedRoutedEvent(Guid id, Guid publishId, EventIdentity eventId, EventHandlerIdentity handlerId, Route route, string payload) : base(id, publishId, eventId, handlerId)
+        internal SerializedRoutedEvent(Guid id, Guid publishId, EventIdentity eventId, EventHandlerIdentity handlerId, InstanceIdentity destinationId, string payload) : base(id, publishId, eventId, handlerId, payload)
         {
-            Route = route;
-            Payload = payload;
+            DestinationId = destinationId;
         }
     }
 }

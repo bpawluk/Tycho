@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Tycho.Events.Broker;
 using Tycho.Hosting.Services;
-using Tycho.Identity.Modules;
 using Tycho.Modules;
 using Tycho.Modules.Instance;
 using Tycho.Modules.Setup;
@@ -24,43 +23,43 @@ namespace Tycho.Apps.Setup
             _internals = internals;
         }
 
-        public IAppStructure Uses<TModule>() where TModule : TychoModule, new()
+        public IAppStructure Uses<TModule>(string? instanceSuffix = null) where TModule : TychoModule, new()
         {
-            Use<TModule>(null, null);
+            Use<TModule>(null, null, instanceSuffix);
             return this;
         }
 
-        public IAppStructure Uses<TModule>(Action<IContractFulfillment> contractFulfillment)
+        public IAppStructure Uses<TModule>(Action<IContractFulfillment> contractFulfillment, string? instanceSuffix = null)
             where TModule : TychoModule, new()
         {
-            Use<TModule>(contractFulfillment, null);
+            Use<TModule>(contractFulfillment, null, instanceSuffix);
             return this;
         }
 
-        public IAppStructure Uses<TModule>(IModuleSettings settings)
+        public IAppStructure Uses<TModule>(IModuleSettings settings, string? instanceSuffix = null)
             where TModule : TychoModule, new()
         {
-            Use<TModule>(null, settings);
+            Use<TModule>(null, settings, instanceSuffix);
             return this;
         }
 
         public IAppStructure Uses<TModule>(
             Action<IContractFulfillment> contractFulfillment,
-            IModuleSettings settings)
+            IModuleSettings settings,
+            string? instanceSuffix = null)
             where TModule : TychoModule, new()
         {
-            Use<TModule>(contractFulfillment, settings);
+            Use<TModule>(contractFulfillment, settings, instanceSuffix);
             return this;
         }
 
         public void Build()
         {
             IServiceCollection services = _internals.GetHostBuilder().Services;
-            services.AddTransient<IModuleProvider, ModuleProvider>();
 
             foreach (TychoModule moduleDefinition in _submodules)
             {
-                ModuleBuilder moduleBuilder = moduleDefinition.CreateModuleBuilder();
+                ModuleBuilder moduleBuilder = moduleDefinition.CreateModuleBuilder().WithControlPlane(_internals.ControlPlane);
                 Type genericModuleInterface = typeof(IModule<>).MakeGenericType(moduleDefinition.GetType());
 
                 services.AddSingleton(genericModuleInterface, provider => moduleBuilder.Build(provider));
@@ -73,9 +72,15 @@ namespace Tycho.Apps.Setup
 
         private void Use<TModule>(
             Action<IContractFulfillment>? contractFulfillment,
-            IModuleSettings? settings)
+            IModuleSettings? settings,
+            string? instanceSuffix)
             where TModule : TychoModule, new()
         {
+            if (instanceSuffix != null && string.IsNullOrWhiteSpace(instanceSuffix))
+            {
+                throw new ArgumentException("Module instance suffix cannot be empty.", nameof(instanceSuffix));
+            }
+
             var submodule = new TModule();
             if (settings != null)
             {
@@ -87,7 +92,7 @@ namespace Tycho.Apps.Setup
 
             submodule.FulfillContract(new DownStreamBroker<TModule>(_internals));
             submodule.PassEventBroker(new EventBroker(_internals));
-            submodule.PassParentId(_internals.OwnerInstanceId);
+            submodule.WithInstanceSuffix(instanceSuffix);
 
             AddSubmodule(submodule);
         }

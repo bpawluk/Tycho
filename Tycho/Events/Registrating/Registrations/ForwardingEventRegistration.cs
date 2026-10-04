@@ -1,6 +1,4 @@
 using System;
-using Tycho.Events.Routing;
-using Tycho.Events.Routing.Steps;
 using Tycho.Modules;
 using Tycho.Modules.Instance;
 
@@ -14,8 +12,6 @@ namespace Tycho.Events.Registrating.Registrations
         public ForwardingEventRegistration(IModule<TModule> submodule) : base(submodule.EventBroker)
         {
         }
-
-        protected override IRouteStep GetRouteStep() => DownStreamRouteStep.Create<TModule>();
     }
 
     internal class MappedForwardingEventRegistration<TEvent, TTargetEvent, TModule>
@@ -27,7 +23,5 @@ namespace Tycho.Events.Registrating.Registrations
         public MappedForwardingEventRegistration(IModule<TModule> submodule, Func<TEvent, TTargetEvent> map) : base(submodule.EventBroker, map)
         {
         }
-
-        protected override IRouteStep GetRouteStep() => DownStreamRouteStep.Create<TModule>();
     }
 }

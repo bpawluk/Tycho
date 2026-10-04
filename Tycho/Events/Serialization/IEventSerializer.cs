@@ -17,10 +17,10 @@ namespace Tycho.Events.Serialization
         SerializedRoutedEvent Serialize(RoutedEvent routedEvent);
 
         /// <summary>
-        /// Deserializes a routed event.
+        /// Deserializes an event.
         /// </summary>
-        /// <param name="serializedEvent">The serialized routed event to deserialize.</param>
-        /// <returns>The deserialized routed event.</returns>
-        RoutedEvent Deserialize(SerializedRoutedEvent serializedEvent);
+        /// <param name="serializedEvent">The serialized event to deserialize.</param>
+        /// <returns>The deserialized event.</returns>
+        Event Deserialize(SerializedEvent serializedEvent);
     }
 }

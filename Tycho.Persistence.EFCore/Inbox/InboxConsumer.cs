@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Tycho.Events.Inbox;
 using Tycho.Events.Model;
-using Tycho.Events.Routing;
 using Tycho.Events.Serialization;
 using Tycho.Identity.Events;
 using Tycho.Persistence.EFCore.Common;
@@ -41,14 +40,14 @@ internal class InboxConsumer(
 
         int claimedEntriesCount = await _dbContext
             .Set<InboxEntry>()
-            .Where(entry => entry.OwnerKey == _owner.Key)
+            .Where(entry => entry.OwnerId == _owner.Identifier)
             .Where(canBeProcessed)
             .OrderBy(entry => entry.Updated)
-            .ThenBy(entry => entry.Id)
+            .ThenBy(entry => entry.EntryId)
             .Take(1)
             .ExecuteUpdateAsync(setters => setters
-                .SetProperty(entry => entry.Updated, utcNow)
                 .SetProperty(entry => entry.State, EntryState.InProcessing)
+                .SetProperty(entry => entry.Updated, utcNow)
                 .SetProperty(entry => entry.ProcessingAttempts, entry => entry.ProcessingAttempts + 1)
                 .SetProperty(entry => entry.ClaimId, claimId)
                 .SetProperty(entry => entry.ClaimExpiration, utcNow + _settings.ProcessingExpiration), cancellationToken)
@@ -63,7 +62,7 @@ internal class InboxConsumer(
             .Set<InboxEntry>()
             .AsNoTracking()
             .SingleOrDefaultAsync(entry =>
-                entry.OwnerKey == _owner.Key &&
+                entry.OwnerId == _owner.Identifier &&
                 entry.ClaimId == claimId, cancellationToken)
             .ConfigureAwait(false);
 
@@ -75,16 +74,15 @@ internal class InboxConsumer(
 
         try
         {
-            var serializedEvent = new SerializedRoutedEvent(
-                entryToDeliver.Id,
+            var serializedEvent = new SerializedEvent(
+                entryToDeliver.EntryId,
                 entryToDeliver.PublishId,
                 EventIdentity.Parse(entryToDeliver.Event),
                 EventHandlerIdentity.Parse(entryToDeliver.Handler),
-                Route.Empty(),
                 entryToDeliver.Payload);
 
-            RoutedEvent routedEvent = _eventSerializer.Deserialize(serializedEvent);
-            return new InboxEvent(claimId, routedEvent);
+            Event deserializedEvent = _eventSerializer.Deserialize(serializedEvent);
+            return new InboxEvent(claimId, deserializedEvent);
         }
         catch (Exception exception)
         {
@@ -93,7 +91,7 @@ internal class InboxConsumer(
                 bool markedAsFailed = await MarkAsFailedAsync(claimId, cancellationToken).ConfigureAwait(false);
                 if (!markedAsFailed)
                 {
-                    logger?.InboxMessageStatusUpdateFailed(entryToDeliver.Id, claimId);
+                    logger?.InboxMessageStatusUpdateFailed(entryToDeliver.EntryId, claimId);
                 }
             }
             catch (Exception failureException)
@@ -111,12 +109,12 @@ internal class InboxConsumer(
         int updatedRowsCount = await _dbContext
             .Set<InboxEntry>()
             .Where(entry =>
-                entry.OwnerKey == _owner.Key &&
+                entry.OwnerId == _owner.Identifier &&
                 entry.State == EntryState.InProcessing &&
                 entry.ClaimId == claimId)
             .ExecuteUpdateAsync(setters => setters
-                .SetProperty(entry => entry.Updated, currentTime)
                 .SetProperty(entry => entry.State, EntryState.Processed)
+                .SetProperty(entry => entry.Updated, currentTime)
                 .SetProperty(entry => entry.ClaimId, Guid.Empty)
                 .SetProperty(entry => entry.ClaimExpiration, DateTime.MinValue), cancellationToken)
             .ConfigureAwait(false);
@@ -131,12 +129,12 @@ internal class InboxConsumer(
         int updatedRowsCount = await _dbContext
             .Set<InboxEntry>()
             .Where(entry =>
-                entry.OwnerKey == _owner.Key &&
+                entry.OwnerId == _owner.Identifier &&
                 entry.State == EntryState.InProcessing &&
                 entry.ClaimId == claimId)
             .ExecuteUpdateAsync(setters => setters
-                .SetProperty(entry => entry.Updated, currentTime)
                 .SetProperty(entry => entry.State, EntryState.Failed)
+                .SetProperty(entry => entry.Updated, currentTime)
                 .SetProperty(entry => entry.ClaimId, Guid.Empty)
                 .SetProperty(entry => entry.ClaimExpiration, DateTime.MinValue), cancellationToken)
             .ConfigureAwait(false);

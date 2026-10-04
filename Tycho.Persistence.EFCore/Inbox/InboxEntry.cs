@@ -5,24 +5,24 @@ using Tycho.Persistence.EFCore.Common;
 
 namespace Tycho.Persistence.EFCore.Inbox;
 
-[PrimaryKey(nameof(OwnerKey), nameof(Id))]
-[Index(nameof(OwnerKey), nameof(ClaimId))]
-[Index(nameof(OwnerKey), nameof(State), nameof(Updated))]
+[PrimaryKey(nameof(OwnerId), nameof(EntryId))]
+[Index(nameof(OwnerId), nameof(ClaimId))]
+[Index(nameof(OwnerId), nameof(State), nameof(Updated))]
 internal class InboxEntry
 {
     [Required, MaxLength(32)]
-    public string OwnerKey { get; set; } = string.Empty;
+    public string OwnerId { get; set; } = string.Empty;
 
-    public Guid Id { get; set; } = Guid.Empty;
+    public Guid EntryId { get; set; } = Guid.Empty;
 
     [Required]
     public Guid PublishId { get; set; } = Guid.Empty;
 
     [Required]
-    public string Event { get; set; } = string.Empty;
+    public string Handler { get; set; } = string.Empty;
 
     [Required]
-    public string Handler { get; set; } = string.Empty;
+    public string Event { get; set; } = string.Empty;
 
     [Required]
     public string Payload { get; set; } = string.Empty;

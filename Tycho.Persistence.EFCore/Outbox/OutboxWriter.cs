@@ -27,12 +27,12 @@ internal class OutboxWriter(
             SerializedRoutedEvent serializedEvent = _eventSerializer.Serialize(routedEvent);
             return new OutboxEntry
             {
-                OwnerKey = owner.Key,
-                Id = serializedEvent.Id,
+                OwnerId = owner.Identifier,
+                EntryId = serializedEvent.Id,
                 PublishId = serializedEvent.PublishId,
-                Event = serializedEvent.EventId.ToString(),
+                Destination = serializedEvent.DestinationId.Value,
                 Handler = serializedEvent.HandlerId.ToString(),
-                Route = serializedEvent.Route.ToString(),
+                Event = serializedEvent.EventId.ToString(),
                 Payload = serializedEvent.Payload.ToString()!
             };
         })];

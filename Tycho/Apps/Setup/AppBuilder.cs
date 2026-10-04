@@ -92,9 +92,9 @@ namespace Tycho.Apps.Setup
             }
 
             HostApplicationBuilder hostBuilder = _createHostBuilderDelegate.Invoke();
-            var internals = new Internals(hostBuilder, _appDefinitionType);
+            var internals = new AppInternals(hostBuilder, _appDefinitionType);
 
-            hostBuilder.Services.AddSingleton(internals);
+            hostBuilder.Services.AddSingleton<Internals>(internals);
             hostBuilder.Services.AddSingleton<IHostLifecycleCallbacks>(_lifecycleCallbacks);
             hostBuilder.Services.AddHostedService<HostLifecycleCallbacksService>();
 
