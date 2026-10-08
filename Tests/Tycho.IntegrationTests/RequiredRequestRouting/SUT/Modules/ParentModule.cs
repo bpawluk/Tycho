@@ -33,7 +33,7 @@ public class ParentModule : TychoModule
                 .ForwardsTo<DestinationModule>();
             contract.Fulfills<IgnoredCommand>().Ignores();
             contract.Fulfills<IgnoredQuery, string>().Ignores();
-        });
+        }, instanceSuffix: "in-parent-module");
         module.Uses<DestinationModule>(GetSettings<RoutingSettings>());
         module.Uses<UnrelatedModule>(GetSettings<RoutingSettings>());
     }

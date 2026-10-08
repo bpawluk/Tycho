@@ -134,7 +134,7 @@ public sealed class TransactionTests : IAsyncLifetime
         // Act
         Task Act() => _sut.ExecuteAsync(cancellationToken =>
         {
-            _dbContext.Set<OutboxEntry>().Add(CreateOutboxEntry(persistedEntry.Id));
+            _dbContext.Set<OutboxEntry>().Add(CreateOutboxEntry(persistedEntry.EntryId));
             return Task.CompletedTask;
         }, TestContext.Current.CancellationToken);
 
@@ -454,10 +454,10 @@ public sealed class TransactionTests : IAsyncLifetime
         DateTime now = DateTime.UtcNow;
         return new OutboxEntry
         {
-            Id = id ?? Guid.NewGuid(),
-            Event = "TestEvent",
+            EntryId = id ?? Guid.NewGuid(),
+            Destination = "END",
             Handler = "TestHandler",
-            Route = "END",
+            Event = "TestEvent",
             Payload = "{}",
             Created = now,
             Updated = now

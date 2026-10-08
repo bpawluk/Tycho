@@ -1,15 +1,16 @@
 using Microsoft.Extensions.Hosting;
-using Tycho.Identity.Structure;
-using Tycho.Persistence.EFCore.Common;
 using Tycho.Structure;
+using Tycho.Identity.Structure;
 
 namespace Tycho.Persistence.EFCore.UnitTests._Utils;
 
 internal static class PersistenceTestInternals
 {
-    public static Internals Create(Type definitionType)
+    public static Internals Create(Type definitionType, Type? applicationType = null)
     {
-        var parent = InstanceIdentity.CreateRoot(DefinitionIdentity.Create<PersistenceOwner>());
-        return new Internals(Host.CreateEmptyApplicationBuilder(null), definitionType, parent);
+        return new ModuleInternals(
+            Host.CreateEmptyApplicationBuilder(null),
+            new ControlPlane(InstanceIdentity.Create(applicationType ?? typeof(PersistenceTestInternals))),
+            definitionType);
     }
 }

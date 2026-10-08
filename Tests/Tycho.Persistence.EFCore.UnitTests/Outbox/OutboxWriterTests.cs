@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Moq;
 using Tycho.Events.Model;
 using Tycho.Events.Outbox;
-using Tycho.Events.Routing;
 using Tycho.Events.Serialization;
 using Tycho.Identity.Events;
+using Tycho.Identity.Structure;
 using Tycho.Persistence.EFCore.Common;
 using Tycho.Persistence.EFCore.Outbox;
 using Tycho.Persistence.EFCore.UnitTests._Data.Events;
@@ -45,7 +45,7 @@ public sealed class OutboxWriterTests : IAsyncLifetime
                 routedEvent.PublishId,
                 routedEvent.EventId,
                 routedEvent.HandlerId,
-                routedEvent.Route,
+                routedEvent.DestinationId,
                 "{}"));
 
         var persistenceOwner = new PersistenceOwner(PersistenceTestInternals.Create(typeof(PersistenceOwner)));
@@ -173,7 +173,7 @@ public sealed class OutboxWriterTests : IAsyncLifetime
                     routedEvent.PublishId,
                     routedEvent.EventId,
                     routedEvent.HandlerId,
-                    routedEvent.Route,
+                    routedEvent.DestinationId,
                     "{}");
             });
 
@@ -196,7 +196,7 @@ public sealed class OutboxWriterTests : IAsyncLifetime
         Guid.NewGuid(),
         EventIdentity.Create<TestEvent>(),
         EventHandlerIdentity.Parse($"handler-{Guid.NewGuid():N}"),
-        Route.Create(),
+        InstanceIdentity.Parse("test-endpoint"),
         new TestEvent());
 
     public async ValueTask DisposeAsync()

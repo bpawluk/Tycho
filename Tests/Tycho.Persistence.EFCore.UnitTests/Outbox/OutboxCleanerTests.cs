@@ -36,18 +36,18 @@ public sealed class OutboxCleanerTests : IAsyncLifetime
         // Arrange
 
         // To clean
-        OutboxEntry old = CreateEntry(_owner.Key, s_cutoff.AddMinutes(-1));
-        OutboxEntry older = CreateEntry(_owner.Key, s_cutoff.AddDays(-2));
+        OutboxEntry old = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(-1));
+        OutboxEntry older = CreateEntry(_owner.Identifier, s_cutoff.AddDays(-2));
 
         // Not to clean
-        OutboxEntry atCutoff = CreateEntry(_owner.Key, s_cutoff);
-        OutboxEntry recentUpdate = CreateEntry(_owner.Key, s_cutoff.AddMinutes(1));
+        OutboxEntry atCutoff = CreateEntry(_owner.Identifier, s_cutoff);
+        OutboxEntry recentUpdate = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(1));
         recentUpdate.Created = s_cutoff.AddDays(-30);
-        OutboxEntry newEntry = CreateEntry(_owner.Key, s_cutoff.AddMinutes(-1), EntryState.New);
-        OutboxEntry processing = CreateEntry(_owner.Key, s_cutoff.AddMinutes(-1), EntryState.InProcessing);
-        OutboxEntry failed = CreateEntry(_owner.Key, s_cutoff.AddMinutes(-1), EntryState.Failed);
-        OutboxEntry alreadyCleared = CreateEntry(_owner.Key, s_cutoff.AddMinutes(-1), payload: "{}");
-        OutboxEntry otherOwner = CreateEntry("another-owner", s_cutoff.AddMinutes(-1), id: old.Id);
+        OutboxEntry newEntry = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(-1), EntryState.New);
+        OutboxEntry processing = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(-1), EntryState.InProcessing);
+        OutboxEntry failed = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(-1), EntryState.Failed);
+        OutboxEntry alreadyCleared = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(-1), payload: "{}");
+        OutboxEntry otherOwner = CreateEntry("another-owner", s_cutoff.AddMinutes(-1), id: old.EntryId);
 
         await SeedEntries(old, older, atCutoff, recentUpdate, newEntry, processing, failed, alreadyCleared, otherOwner);
 
@@ -73,7 +73,7 @@ public sealed class OutboxCleanerTests : IAsyncLifetime
         Assert.Equal(old.Updated, persisted.Updated);
         Assert.Equal(old.State, persisted.State);
         Assert.Equal(old.PublishId, persisted.PublishId);
-        Assert.Equal(old.Route, persisted.Route);
+        Assert.Equal(old.Destination, persisted.Destination);
     }
 
     [Fact]
@@ -82,18 +82,18 @@ public sealed class OutboxCleanerTests : IAsyncLifetime
         // Arrange
 
         // To clean
-        OutboxEntry old = CreateEntry(_owner.Key, s_cutoff.AddMinutes(-1));
-        OutboxEntry older = CreateEntry(_owner.Key, s_cutoff.AddDays(-2));
-        OutboxEntry cleanedPayload = CreateEntry(_owner.Key, s_cutoff.AddMinutes(-1), payload: "{}");
+        OutboxEntry old = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(-1));
+        OutboxEntry older = CreateEntry(_owner.Identifier, s_cutoff.AddDays(-2));
+        OutboxEntry cleanedPayload = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(-1), payload: "{}");
 
         // Not to clean
-        OutboxEntry atCutoff = CreateEntry(_owner.Key, s_cutoff);
-        OutboxEntry recentUpdate = CreateEntry(_owner.Key, s_cutoff.AddMinutes(1));
+        OutboxEntry atCutoff = CreateEntry(_owner.Identifier, s_cutoff);
+        OutboxEntry recentUpdate = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(1));
         recentUpdate.Created = s_cutoff.AddDays(-30);
-        OutboxEntry newEntry = CreateEntry(_owner.Key, s_cutoff.AddMinutes(-1), EntryState.New);
-        OutboxEntry processing = CreateEntry(_owner.Key, s_cutoff.AddMinutes(-1), EntryState.InProcessing);
-        OutboxEntry failed = CreateEntry(_owner.Key, s_cutoff.AddMinutes(-1), EntryState.Failed);
-        OutboxEntry otherOwner = CreateEntry("another-owner", s_cutoff.AddMinutes(-1), id: old.Id);
+        OutboxEntry newEntry = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(-1), EntryState.New);
+        OutboxEntry processing = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(-1), EntryState.InProcessing);
+        OutboxEntry failed = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(-1), EntryState.Failed);
+        OutboxEntry otherOwner = CreateEntry("another-owner", s_cutoff.AddMinutes(-1), id: old.EntryId);
 
         await SeedEntries(old, older, cleanedPayload, atCutoff, recentUpdate, newEntry, processing, failed, otherOwner);
 
@@ -108,7 +108,7 @@ public sealed class OutboxCleanerTests : IAsyncLifetime
 
         foreach (OutboxEntry removed in new[] { old, older, cleanedPayload })
         {
-            Assert.DoesNotContain(entries, entry => entry.OwnerKey == removed.OwnerKey && entry.Id == removed.Id);
+            Assert.DoesNotContain(entries, entry => entry.OwnerId == removed.OwnerId && entry.EntryId == removed.EntryId);
         }
 
         foreach (OutboxEntry retained in new[] { atCutoff, recentUpdate, newEntry, processing, failed, otherOwner })
@@ -129,21 +129,21 @@ public sealed class OutboxCleanerTests : IAsyncLifetime
         .ToListAsync(TestContext.Current.CancellationToken);
 
     private static OutboxEntry FindEntry(IEnumerable<OutboxEntry> entries, OutboxEntry expected) =>
-        Assert.Single(entries, entry => entry.OwnerKey == expected.OwnerKey && entry.Id == expected.Id);
+        Assert.Single(entries, entry => entry.OwnerId == expected.OwnerId && entry.EntryId == expected.EntryId);
 
     private static OutboxEntry CreateEntry(
-        string ownerKey,
+        string ownerId,
         DateTime updated,
         EntryState state = EntryState.Processed,
         string payload = "original payload",
         Guid? id = null) => new()
         {
-            OwnerKey = ownerKey,
-            Id = id ?? Guid.NewGuid(),
+            OwnerId = ownerId,
+            EntryId = id ?? Guid.NewGuid(),
             PublishId = Guid.NewGuid(),
-            Event = "TestEvent",
+            Destination = "test-route",
             Handler = "TestHandler",
-            Route = "test-route",
+            Event = "TestEvent",
             Payload = payload,
             State = state,
             Created = updated.AddDays(-1),

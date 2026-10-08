@@ -3,10 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Tycho.Events.Outbox;
-using Tycho.Events.Routing;
+using Tycho.Identity.Structure;
 using Tycho.Persistence.EFCore.Common;
 using Tycho.Persistence.EFCore.Outbox;
 using Tycho.Persistence.EFCore.UnitTests._Utils;
+using Tycho.Structure;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Outbox;
 
@@ -36,6 +37,22 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
 
         var persistenceOwner = new PersistenceOwner(PersistenceTestInternals.Create(typeof(PersistenceOwner)));
         _sut = new OutboxConsumer(_dbContext, persistenceOwner, _settings);
+    }
+
+    [Fact]
+    public async Task TryReadAsync_WithSameModuleInAnotherApplication_DoesNotClaimItsEntry()
+    {
+        // Arrange
+        OutboxEntry entry = CreateEntry(Guid.NewGuid(), EntryState.New, 0, Guid.Empty, DateTime.MinValue);
+        await SeedEntries(entry);
+
+        using Internals otherInternals = PersistenceTestInternals.Create(typeof(PersistenceOwner), typeof(OutboxConsumerTests));
+        var otherConsumer = new OutboxConsumer(_dbContext, new PersistenceOwner(otherInternals), _settings);
+
+        // Act & Assert
+        Assert.Null(await otherConsumer.TryReadAsync(TestContext.Current.CancellationToken));
+        AssertEntryUnchanged(entry, await LoadEntry(entry.EntryId));
+        Assert.NotNull(await _sut.TryReadAsync(TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -387,7 +404,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         OutboxEntry? entry = await _dbContext
             .Set<OutboxEntry>()
             .AsNoTracking()
-            .SingleOrDefaultAsync(outboxEntry => outboxEntry.Id == id);
+            .SingleOrDefaultAsync(outboxEntry => outboxEntry.EntryId == id);
 
         Assert.NotNull(entry);
         return entry!;
@@ -419,12 +436,12 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         var persistenceOwner = new PersistenceOwner(PersistenceTestInternals.Create(typeof(PersistenceOwner)));
         return new OutboxEntry
         {
-            OwnerKey = persistenceOwner.Key,
-            Id = id,
+            OwnerId = persistenceOwner.Identifier,
+            EntryId = id,
             PublishId = Guid.NewGuid(),
-            Event = "TestEvent",
+            Destination = InstanceIdentity.Parse("test-endpoint").ToString(),
             Handler = "TestHandler",
-            Route = Route.Create().ToString(),
+            Event = "TestEvent",
             Payload = "{}",
             State = state,
             Created = now.AddMinutes(-1),

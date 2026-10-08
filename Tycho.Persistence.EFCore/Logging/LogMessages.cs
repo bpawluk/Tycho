@@ -15,8 +15,8 @@ internal static partial class LogMessages
         EventId = 2001,
         EventName = "PersistenceOwnerConfigured",
         Level = LogLevel.Information,
-        Message = "{OwnerId} persistence configured with key {Key}.")]
-    internal static partial void PersistenceOwnerConfigured(this ILogger logger, string ownerId, string key);
+        Message = "{OwnerId} persistence configured with identifier {Identifier}.")]
+    internal static partial void PersistenceOwnerConfigured(this ILogger logger, string ownerId, string identifier);
 
     #endregion
 

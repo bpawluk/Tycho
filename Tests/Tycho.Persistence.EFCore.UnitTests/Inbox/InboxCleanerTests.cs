@@ -36,18 +36,18 @@ public sealed class InboxCleanerTests : IAsyncLifetime
         // Arrange
 
         // To clean
-        InboxEntry old = CreateEntry(_owner.Key, s_cutoff.AddMinutes(-1));
-        InboxEntry older = CreateEntry(_owner.Key, s_cutoff.AddDays(-2));
+        InboxEntry old = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(-1));
+        InboxEntry older = CreateEntry(_owner.Identifier, s_cutoff.AddDays(-2));
 
         // Not to clean
-        InboxEntry atCutoff = CreateEntry(_owner.Key, s_cutoff);
-        InboxEntry recentUpdate = CreateEntry(_owner.Key, s_cutoff.AddMinutes(1));
+        InboxEntry atCutoff = CreateEntry(_owner.Identifier, s_cutoff);
+        InboxEntry recentUpdate = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(1));
         recentUpdate.Created = s_cutoff.AddDays(-30);
-        InboxEntry newEntry = CreateEntry(_owner.Key, s_cutoff.AddMinutes(-1), EntryState.New);
-        InboxEntry processing = CreateEntry(_owner.Key, s_cutoff.AddMinutes(-1), EntryState.InProcessing);
-        InboxEntry failed = CreateEntry(_owner.Key, s_cutoff.AddMinutes(-1), EntryState.Failed);
-        InboxEntry alreadyCleared = CreateEntry(_owner.Key, s_cutoff.AddMinutes(-1), payload: "{}");
-        InboxEntry otherOwner = CreateEntry("another-owner", s_cutoff.AddMinutes(-1), id: old.Id);
+        InboxEntry newEntry = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(-1), EntryState.New);
+        InboxEntry processing = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(-1), EntryState.InProcessing);
+        InboxEntry failed = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(-1), EntryState.Failed);
+        InboxEntry alreadyCleared = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(-1), payload: "{}");
+        InboxEntry otherOwner = CreateEntry("another-owner", s_cutoff.AddMinutes(-1), id: old.EntryId);
 
         await SeedEntries(old, older, atCutoff, recentUpdate, newEntry, processing, failed, alreadyCleared, otherOwner);
 
@@ -81,18 +81,18 @@ public sealed class InboxCleanerTests : IAsyncLifetime
         // Arrange
 
         // To clean
-        InboxEntry old = CreateEntry(_owner.Key, s_cutoff.AddMinutes(-1));
-        InboxEntry older = CreateEntry(_owner.Key, s_cutoff.AddDays(-2));
-        InboxEntry cleanedPayload = CreateEntry(_owner.Key, s_cutoff.AddMinutes(-1), payload: "{}");
+        InboxEntry old = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(-1));
+        InboxEntry older = CreateEntry(_owner.Identifier, s_cutoff.AddDays(-2));
+        InboxEntry cleanedPayload = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(-1), payload: "{}");
 
         // Not to clean
-        InboxEntry atCutoff = CreateEntry(_owner.Key, s_cutoff);
-        InboxEntry recentUpdate = CreateEntry(_owner.Key, s_cutoff.AddMinutes(1));
+        InboxEntry atCutoff = CreateEntry(_owner.Identifier, s_cutoff);
+        InboxEntry recentUpdate = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(1));
         recentUpdate.Created = s_cutoff.AddDays(-30);
-        InboxEntry newEntry = CreateEntry(_owner.Key, s_cutoff.AddMinutes(-1), EntryState.New);
-        InboxEntry processing = CreateEntry(_owner.Key, s_cutoff.AddMinutes(-1), EntryState.InProcessing);
-        InboxEntry failed = CreateEntry(_owner.Key, s_cutoff.AddMinutes(-1), EntryState.Failed);
-        InboxEntry otherOwner = CreateEntry("another-owner", s_cutoff.AddMinutes(-1), id: old.Id);
+        InboxEntry newEntry = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(-1), EntryState.New);
+        InboxEntry processing = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(-1), EntryState.InProcessing);
+        InboxEntry failed = CreateEntry(_owner.Identifier, s_cutoff.AddMinutes(-1), EntryState.Failed);
+        InboxEntry otherOwner = CreateEntry("another-owner", s_cutoff.AddMinutes(-1), id: old.EntryId);
 
         await SeedEntries(old, older, cleanedPayload, atCutoff, recentUpdate, newEntry, processing, failed, otherOwner);
 
@@ -107,7 +107,7 @@ public sealed class InboxCleanerTests : IAsyncLifetime
 
         foreach (InboxEntry removed in new[] { old, older, cleanedPayload })
         {
-            Assert.DoesNotContain(entries, entry => entry.OwnerKey == removed.OwnerKey && entry.Id == removed.Id);
+            Assert.DoesNotContain(entries, entry => entry.OwnerId == removed.OwnerId && entry.EntryId == removed.EntryId);
         }
 
         foreach (InboxEntry retained in new[] { atCutoff, recentUpdate, newEntry, processing, failed, otherOwner })
@@ -128,20 +128,20 @@ public sealed class InboxCleanerTests : IAsyncLifetime
         .ToListAsync(TestContext.Current.CancellationToken);
 
     private static InboxEntry FindEntry(IEnumerable<InboxEntry> entries, InboxEntry expected) =>
-        Assert.Single(entries, entry => entry.OwnerKey == expected.OwnerKey && entry.Id == expected.Id);
+        Assert.Single(entries, entry => entry.OwnerId == expected.OwnerId && entry.EntryId == expected.EntryId);
 
     private static InboxEntry CreateEntry(
-        string ownerKey,
+        string ownerId,
         DateTime updated,
         EntryState state = EntryState.Processed,
         string payload = "original payload",
         Guid? id = null) => new()
         {
-            OwnerKey = ownerKey,
-            Id = id ?? Guid.NewGuid(),
+            OwnerId = ownerId,
+            EntryId = id ?? Guid.NewGuid(),
             PublishId = Guid.NewGuid(),
-            Event = "TestEvent",
             Handler = "TestHandler",
+            Event = "TestEvent",
             Payload = payload,
             State = state,
             Created = updated.AddDays(-1),

@@ -11,6 +11,7 @@ using Tycho.Persistence.EFCore.Common;
 using Tycho.Persistence.EFCore.Inbox;
 using Tycho.Persistence.EFCore.UnitTests._Data.Events;
 using Tycho.Persistence.EFCore.UnitTests._Utils;
+using Tycho.Structure;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Inbox;
 
@@ -41,11 +42,27 @@ public sealed class InboxConsumerTests : IAsyncLifetime
 
         _eventSerializerMock = new Mock<IEventSerializer>();
         _eventSerializerMock
-            .Setup(serializer => serializer.Deserialize(It.IsAny<SerializedRoutedEvent>()))
-            .Returns<SerializedRoutedEvent>(CreateRoutedEvent);
+            .Setup(serializer => serializer.Deserialize(It.IsAny<SerializedEvent>()))
+            .Returns<SerializedEvent>(CreateEvent);
 
         var persistenceOwner = new PersistenceOwner(PersistenceTestInternals.Create(typeof(PersistenceOwner)));
         _sut = new InboxConsumer(_eventSerializerMock.Object, _dbContext, persistenceOwner, _settings);
+    }
+
+    [Fact]
+    public async Task TryReadAsync_WithSameModuleInAnotherApplication_DoesNotClaimItsEntry()
+    {
+        // Arrange
+        InboxEntry entry = CreateEntry(Guid.NewGuid(), EntryState.New, 0, Guid.Empty, DateTime.MinValue);
+        await SeedEntries(entry);
+
+        using Internals otherInternals = PersistenceTestInternals.Create(typeof(PersistenceOwner), typeof(InboxConsumerTests));
+        var otherConsumer = new InboxConsumer(_eventSerializerMock.Object, _dbContext, new PersistenceOwner(otherInternals), _settings);
+
+        // Act & Assert
+        Assert.Null(await otherConsumer.TryReadAsync(TestContext.Current.CancellationToken));
+        AssertEntryUnchanged(entry, await LoadEntry(entry.EntryId));
+        Assert.NotNull(await _sut.TryReadAsync(TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -269,7 +286,7 @@ public sealed class InboxConsumerTests : IAsyncLifetime
         await SeedEntries(failingEntry, successfulEntry);
 
         _eventSerializerMock
-            .Setup(serializer => serializer.Deserialize(It.Is<SerializedRoutedEvent>(evt => evt.Id == failingEntryId)))
+            .Setup(serializer => serializer.Deserialize(It.Is<SerializedEvent>(evt => evt.Id == failingEntryId)))
             .Throws(new InvalidOperationException("deserialize failure"));
 
         // Act
@@ -304,11 +321,11 @@ public sealed class InboxConsumerTests : IAsyncLifetime
         var deserializeError = new InvalidOperationException("deserialize failure");
         Guid claimedId = Guid.Empty;
         _eventSerializerMock
-            .Setup(serializer => serializer.Deserialize(It.IsAny<SerializedRoutedEvent>()))
-            .Returns<SerializedRoutedEvent>(serializedEvent =>
+            .Setup(serializer => serializer.Deserialize(It.IsAny<SerializedEvent>()))
+            .Returns<SerializedEvent>(serializedEvent =>
             {
-                claimedId = _dbContext.Set<InboxEntry>().AsNoTracking().Single(entry => entry.Id == serializedEvent.Id).ClaimId;
-                _dbContext.Set<InboxEntry>().Where(entry => entry.Id == serializedEvent.Id).ExecuteDelete();
+                claimedId = _dbContext.Set<InboxEntry>().AsNoTracking().Single(entry => entry.EntryId == serializedEvent.Id).ClaimId;
+                _dbContext.Set<InboxEntry>().Where(entry => entry.EntryId == serializedEvent.Id).ExecuteDelete();
                 throw deserializeError;
             });
 
@@ -462,7 +479,7 @@ public sealed class InboxConsumerTests : IAsyncLifetime
         InboxEntry? entry = await _dbContext
             .Set<InboxEntry>()
             .AsNoTracking()
-            .SingleOrDefaultAsync(inboxEntry => inboxEntry.Id == id);
+            .SingleOrDefaultAsync(inboxEntry => inboxEntry.EntryId == id);
 
         Assert.NotNull(entry);
         return entry!;
@@ -495,11 +512,11 @@ public sealed class InboxConsumerTests : IAsyncLifetime
         var persistenceOwner = new PersistenceOwner(PersistenceTestInternals.Create(typeof(PersistenceOwner)));
         return new InboxEntry
         {
-            OwnerKey = persistenceOwner.Key,
-            Id = id,
+            OwnerId = persistenceOwner.Identifier,
+            EntryId = id,
             PublishId = Guid.NewGuid(),
-            Event = EventIdentity.Create<TestEvent>().ToString(),
             Handler = EventHandlerIdentity.Create<TestEventHandler>().ToString(),
+            Event = EventIdentity.Create<TestEvent>().ToString(),
             Payload = "{}",
             State = state,
             Created = now.AddMinutes(-1),
@@ -510,14 +527,13 @@ public sealed class InboxConsumerTests : IAsyncLifetime
         };
     }
 
-    private static RoutedEvent CreateRoutedEvent(SerializedRoutedEvent serializedEvent)
+    private static Event CreateEvent(SerializedEvent serializedEvent)
     {
-        return new RoutedEvent<TestEvent>(
+        return new Event<TestEvent>(
             serializedEvent.Id,
             serializedEvent.PublishId,
             serializedEvent.EventId,
             serializedEvent.HandlerId,
-            serializedEvent.Route,
             new TestEvent());
     }
 

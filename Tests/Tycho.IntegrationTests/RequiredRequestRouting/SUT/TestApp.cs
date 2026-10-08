@@ -36,7 +36,7 @@ public class TestApp(TestResult result) : TychoApp
             contract.Fulfills<MappedQuery, string>().Ignores();
             contract.Fulfills<IgnoredCommand>().Ignores();
             contract.Fulfills<IgnoredQuery, string>().Ignores();
-        });
+        }, instanceSuffix: "in-app");
     }
 
     protected override void RegisterServices(IServiceCollection app) { }
