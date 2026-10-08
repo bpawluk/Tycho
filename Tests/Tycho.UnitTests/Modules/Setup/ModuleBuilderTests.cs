@@ -14,10 +14,9 @@ namespace Tycho.UnitTests.Modules.Setup;
 
 public sealed class ModuleBuilderTests
 {
-    private readonly ModuleBuilder _sut = new(typeof(TestModule));
+    private readonly ModuleBuilder _sut = new ModuleBuilder(typeof(TestModule)).WithControlPlane(new ControlPlane(InstanceIdentity.Create(typeof(ModuleBuilderTests))));
     private readonly IRequestBroker _requestBroker = Mock.Of<IRequestBroker>();
     private readonly IEventBroker _eventBroker = Mock.Of<IEventBroker>();
-    private readonly InstanceIdentity _parentId = InstanceIdentity.CreateRoot(DefinitionIdentity.Create<object>());
 
     [Fact]
     public void Build_WhenAlreadyBuilt_ThrowsWithoutCreatingAnotherHost()
@@ -43,23 +42,27 @@ public sealed class ModuleBuilderTests
     [Theory]
     [InlineData("RequestBroker")]
     [InlineData("EventBroker")]
-    [InlineData("ParentId")]
+    [InlineData("ControlPlane")]
     public void Build_WithMissingParentComponent_ThrowsBeforeCreatingHost(string missingComponent)
     {
         // Arrange
         int hostCalls = 0;
         int configurationCalls = 0;
-        _sut.WithHostBuilder(() =>
+        var sut = new ModuleBuilder(typeof(TestModule));
+        if (missingComponent != "ControlPlane")
+        {
+            sut.WithControlPlane(new ControlPlane(InstanceIdentity.Create(typeof(ModuleBuilderTests))));
+        }
+        sut.WithHostBuilder(() =>
         {
             hostCalls++;
             return Host.CreateEmptyApplicationBuilder(null);
         });
-        _sut.WithContract(_ => configurationCalls++, missingComponent == "RequestBroker" ? null : _requestBroker);
-        _sut.WithEvents(_ => configurationCalls++, missingComponent == "EventBroker" ? null : _eventBroker);
-        _sut.WithParentId(missingComponent == "ParentId" ? null : _parentId);
+        sut.WithContract(_ => configurationCalls++, missingComponent == "RequestBroker" ? null : _requestBroker);
+        sut.WithEvents(_ => configurationCalls++, missingComponent == "EventBroker" ? null : _eventBroker);
 
         // Act
-        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() => _sut.Build());
+        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() => sut.Build());
 
         // Assert
         Assert.Equal("The module parent has not been configured.", exception.Message);
@@ -74,7 +77,6 @@ public sealed class ModuleBuilderTests
         int configurationCalls = 0;
         _sut.WithContract(_ => configurationCalls++, _requestBroker);
         _sut.WithEvents(_ => configurationCalls++, _eventBroker);
-        _sut.WithParentId(_parentId);
         _sut.WithStructure(_ => configurationCalls++);
         _sut.WithServices(_ => configurationCalls++);
         _sut.WithHostConfiguration((_, _) => configurationCalls++);
@@ -101,7 +103,7 @@ public sealed class ModuleBuilderTests
         Assert.IsType<IModule<TestModule>>(module, exactMatch: false);
         Assert.Same(module.Internals, module.Internals.GetRequiredService<Internals>());
         Assert.NotNull(module.Internals.GetRequiredService<IHostEnvironment>());
-        Assert.Equal(_parentId.CreateChild(DefinitionIdentity.Create<TestModule>()), module.Internals.OwnerInstanceId);
+        Assert.Equal(InstanceIdentity.Create(typeof(TestModule)), module.Internals.OwnerId);
         IParentReference parent = module.Internals.GetRequiredService<IParentReference>();
         Assert.Same(_requestBroker, parent.RequestBroker);
         Assert.Same(_eventBroker, parent.EventBroker);
@@ -146,7 +148,6 @@ public sealed class ModuleBuilderTests
         Assert.Same(_sut, _sut.WithContract(_ => { }, _requestBroker));
         Assert.Same(_sut, _sut.WithEvents(_ => { }, _eventBroker));
         Assert.Same(_sut, _sut.WithStructure(_ => { }));
-        Assert.Same(_sut, _sut.WithParentId(_parentId));
         Assert.Same(_sut, _sut.WithServices(_ => { }));
         Assert.Same(_sut, _sut.WithStartup((_, _) => Task.CompletedTask));
         Assert.Same(_sut, _sut.WithCleanup((_, _) => Task.CompletedTask));
@@ -156,6 +157,5 @@ public sealed class ModuleBuilderTests
     {
         _sut.WithContract(_ => { }, _requestBroker);
         _sut.WithEvents(_ => { }, _eventBroker);
-        _sut.WithParentId(_parentId);
     }
 }

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
+using Tycho.Identity.Structure;
 using Tycho.Modules;
 using Tycho.Modules.Instance;
 using Tycho.Modules.Setup;
@@ -13,7 +14,10 @@ namespace Tycho.UnitTests.Modules.Setup;
 
 public sealed class ContractFulfillmentTests : IDisposable
 {
-    private readonly Internals _internals = new(Host.CreateEmptyApplicationBuilder(null), typeof(TestModule));
+    private readonly Internals _internals = new ModuleInternals(
+        Host.CreateEmptyApplicationBuilder(null),
+        new ControlPlane(InstanceIdentity.Create(typeof(ContractFulfillmentTests))),
+        typeof(ContractFulfillmentTests));
     private readonly Mock<IRequestBroker> _destination = new(MockBehavior.Strict);
     private readonly ContractFulfillment<TestModule> _sut;
     private readonly DownStreamBroker<TestModule> _broker;

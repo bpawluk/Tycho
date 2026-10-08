@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Moq;
 using Tycho.Events.Inbox;
 using Tycho.Events.Outbox;
+using Tycho.Identity.Structure;
 using Tycho.Modules.Setup;
 using Tycho.Structure;
 
@@ -15,7 +16,10 @@ public class ModuleEventsTests
 
     public ModuleEventsTests()
     {
-        _internals = new Internals(Host.CreateEmptyApplicationBuilder(default), typeof(object));
+        _internals = new ModuleInternals(
+            Host.CreateEmptyApplicationBuilder(default),
+            new ControlPlane(InstanceIdentity.Create(typeof(ModuleEventsTests))),
+            typeof(ModuleEventsTests));
         _sut = new ModuleEvents(_internals);
     }
 

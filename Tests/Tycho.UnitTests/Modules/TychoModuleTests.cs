@@ -10,6 +10,7 @@ using Tycho.Identity.Structure;
 using Tycho.Modules;
 using Tycho.Modules.Instance;
 using Tycho.Requests.Broker;
+using Tycho.Structure;
 
 namespace Tycho.UnitTests.Modules;
 
@@ -184,8 +185,10 @@ public class TychoModuleTests
     {
         moduleDefinition.FulfillContract(new Mock<IRequestBroker>().Object);
         moduleDefinition.PassEventBroker(new Mock<IEventBroker>().Object);
-        moduleDefinition.PassParentId(InstanceIdentity.CreateRoot(DefinitionIdentity.Create<TychoModuleTests>()));
-        return moduleDefinition.CreateModuleBuilder().Build(parentServiceProvider);
+        var controlPlane = new ControlPlane(InstanceIdentity.Create(typeof(TychoModuleTests)));
+        IModule module = moduleDefinition.CreateModuleBuilder().WithControlPlane(controlPlane).Build(parentServiceProvider);
+        controlPlane.CompleteRegistration();
+        return module;
     }
 
     private sealed class TestSettings : IModuleSettings
