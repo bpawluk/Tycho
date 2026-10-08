@@ -15,7 +15,7 @@ namespace Tycho.Identity
 
         public override bool Equals(object? obj) => obj is Identity other && Equals(other);
 
-        public override int GetHashCode() => Value.GetHashCode(StringComparison.InvariantCulture);
+        public override int GetHashCode() => Value.GetHashCode(StringComparison.Ordinal);
 
         public override string ToString() => Value;
 
@@ -27,7 +27,7 @@ namespace Tycho.Identity
 
             if (left is null || right is null) return false;
 
-            return string.Equals(left.Value, right.Value, StringComparison.InvariantCulture);
+            return string.Equals(left.Value, right.Value, StringComparison.Ordinal);
         }
     }
 }

@@ -1,6 +1,8 @@
 using System;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Registrating.Registrations;
+using Tycho.Identity.Events;
 using Tycho.Modules;
 using Tycho.Modules.Instance;
 using Tycho.Structure;
@@ -73,6 +75,18 @@ namespace Tycho.Events.Registrating
             where TEvent : class, IEvent
             where THandler : class, IEventHandler<TEvent>
         {
+            var handlerId = EventHandlerIdentity.Create<THandler>();
+
+            if (Services.Any(descriptor =>
+                descriptor.IsKeyedService &&
+                descriptor.ServiceKey is EventHandlerIdentity registeredId &&
+                registeredId == handlerId &&
+                descriptor.KeyedImplementationType != typeof(THandler)))
+            {
+                throw new ArgumentException(
+                    $"Handler ID '{handlerId}' is already registered in this module.", nameof(THandler));
+            }
+
             if (!TryAddFinalRegistration<TEvent, FinalEventRegistration<TEvent, THandler>>())
             {
                 throw new ArgumentException(
@@ -80,7 +94,7 @@ namespace Tycho.Events.Registrating
                     nameof(THandler));
             }
 
-            Services.AddScoped<THandler>();
+            Services.AddKeyedScoped<IEventHandler<TEvent>, THandler>(handlerId);
         }
 
         private bool TryAddRegistration<TEvent, TRegistration>()

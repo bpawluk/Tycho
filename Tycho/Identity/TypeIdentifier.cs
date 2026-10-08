@@ -1,12 +1,16 @@
 using System;
 using System.IO.Hashing;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Tycho.Identity
 {
     internal static class TypeIdentifier
     {
+        private static readonly ConditionalWeakTable<Type, string> s_flatIds = new();
+
         public static string GetId<T>()
         {
             return GetId(typeof(T));
@@ -41,7 +45,12 @@ namespace Tycho.Identity
 
         private static string GetFlatId(Type type)
         {
-            return $"{GetShortName(type)}+{GetShortId(type)}";
+            return s_flatIds.GetValue(type, ResolveFlatId);
+        }
+
+        private static string ResolveFlatId(Type type)
+        {
+            return type.GetCustomAttribute<TychoIdAttribute>(inherit: false)?.Id ?? $"{GetShortName(type)}+{GetShortId(type)}";
         }
 
         private static string GetShortName(Type type)

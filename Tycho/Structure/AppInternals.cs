@@ -7,10 +7,15 @@ namespace Tycho.Structure
 {
     internal sealed class AppInternals : Internals
     {
-        public AppInternals(HostApplicationBuilder hostBuilder, Type ownerDefinition) : base(
+        public AppInternals(HostApplicationBuilder hostBuilder, Type ownerDefinition)
+            : this(hostBuilder, InstanceIdentity.Create(ownerDefinition))
+        {
+        }
+
+        private AppInternals(HostApplicationBuilder hostBuilder, InstanceIdentity applicationId) : base(
             hostBuilder,
-            new ControlPlane(),
-            InstanceIdentity.Create(ownerDefinition))
+            new ControlPlane(applicationId),
+            applicationId)
         {
         }
 

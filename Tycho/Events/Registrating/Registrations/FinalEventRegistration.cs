@@ -14,13 +14,10 @@ namespace Tycho.Events.Registrating.Registrations
     {
         private readonly Internals _internals;
 
-        public IEventHandler<TEvent> Handler { get; }
-
         public EventHandlerIdentity HandlerId { get; }
 
-        public FinalEventRegistration(TEventHandler handler, Internals internals)
+        public FinalEventRegistration(Internals internals)
         {
-            Handler = handler;
             _internals = internals;
             HandlerId = EventHandlerIdentity.Create<TEventHandler>();
         }

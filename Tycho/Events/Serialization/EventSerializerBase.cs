@@ -13,7 +13,7 @@ namespace Tycho.Events.Serialization
     public abstract class EventSerializerBase : IEventSerializer
     {
         private readonly IPayloadSerializer _payloadSerializer;
-        private readonly Dictionary<EventIdentity, Func<SerializedEvent, Event>> _deserializers;
+        private readonly Dictionary<EventIdentity, EventRegistration> _deserializers;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventSerializerBase"/> class.
@@ -23,7 +23,7 @@ namespace Tycho.Events.Serialization
         protected EventSerializerBase(IPayloadSerializer payloadSerializer)
         {
             _payloadSerializer = payloadSerializer;
-            _deserializers = new Dictionary<EventIdentity, Func<SerializedEvent, Event>>();
+            _deserializers = new Dictionary<EventIdentity, EventRegistration>();
         }
 
         /// <inheritdoc/>
@@ -42,9 +42,9 @@ namespace Tycho.Events.Serialization
         /// <inheritdoc/>
         public Event Deserialize(SerializedEvent serializedEvent)
         {
-            if (_deserializers.TryGetValue(serializedEvent.EventId, out Func<SerializedEvent, Event>? deserializer))
+            if (_deserializers.TryGetValue(serializedEvent.EventId, out EventRegistration registration))
             {
-                return deserializer(serializedEvent);
+                return registration.Deserialize(serializedEvent);
             }
             throw new InvalidOperationException($"Failed to deserialize an unregistered event with ID {serializedEvent.EventId}");
         }
@@ -57,7 +57,18 @@ namespace Tycho.Events.Serialization
         protected void RegisterEvent<TEvent>() where TEvent : class, IEvent
         {
             var eventId = EventIdentity.Create<TEvent>();
-            _deserializers[eventId] = Deserialize<TEvent>;
+            if (_deserializers.TryGetValue(eventId, out EventRegistration registration))
+            {
+                if (registration.EventType != typeof(TEvent))
+                {
+                    throw new InvalidOperationException(
+                        $"Event ID '{eventId}' is shared by '{registration.EventType}' and '{typeof(TEvent)}'.");
+                }
+
+                return;
+            }
+
+            _deserializers.Add(eventId, new EventRegistration(typeof(TEvent), Deserialize<TEvent>));
         }
 
         private Event<TEvent> Deserialize<TEvent>(SerializedEvent serializedEvent) where TEvent : class, IEvent
@@ -69,6 +80,19 @@ namespace Tycho.Events.Serialization
                 serializedEvent.EventId,
                 serializedEvent.HandlerId,
                 payload);
+        }
+
+        private readonly struct EventRegistration
+        {
+            public Type EventType { get; }
+
+            public Func<SerializedEvent, Event> Deserialize { get; }
+
+            public EventRegistration(Type eventType, Func<SerializedEvent, Event> deserialize)
+            {
+                EventType = eventType;
+                Deserialize = deserialize;
+            }
         }
     }
 }

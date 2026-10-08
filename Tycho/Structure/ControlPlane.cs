@@ -10,6 +10,13 @@ namespace Tycho.Structure
         private readonly Dictionary<InstanceIdentity, ModuleReference> _modules = new();
         private bool _registrationComplete;
 
+        public InstanceIdentity ApplicationId { get; }
+
+        public ControlPlane(InstanceIdentity applicationId)
+        {
+            ApplicationId = applicationId ?? throw new ArgumentNullException(nameof(applicationId));
+        }
+
         public void RegisterModule(InstanceIdentity id, ModuleReference module)
         {
             if (id == null)
