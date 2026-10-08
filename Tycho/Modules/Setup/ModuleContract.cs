@@ -1,26 +1,22 @@
-﻿using System;
-using System.Threading.Tasks;
+using System;
 using Tycho.Requests;
 using Tycho.Requests.Broker;
 using Tycho.Requests.Registrating;
-using Tycho.Structure.Internal;
+using Tycho.Structure;
 
 namespace Tycho.Modules.Setup
 {
     internal class ModuleContract : IModuleContract
     {
-        private readonly Internals _internals;
         private readonly Registrator _registrator;
 
         private IRequestBroker? _contractFulfillingBroker;
 
-        public IRequestBroker ContractFulfillingBroker => _contractFulfillingBroker ??
-            throw new InvalidOperationException("Contract fulfilling broker has not been defined yet.");
+        public IRequestBroker ContractFulfillingBroker => _contractFulfillingBroker ?? throw new InvalidOperationException("Contract fulfilling broker has not been defined yet.");
 
         public ModuleContract(Internals internals)
         {
-            _internals = internals;
-            _registrator = new Registrator(_internals);
+            _registrator = new Registrator(internals);
         }
 
         public void WithContractFulfillment(IRequestBroker contractFulfillingBroker)
@@ -28,60 +24,16 @@ namespace Tycho.Modules.Setup
             _contractFulfillingBroker = contractFulfillingBroker;
         }
 
-        public IModuleContract Forwards<TRequest, TModule>()
+        public IModuleRequestBinding<TRequest> Expects<TRequest>()
             where TRequest : class, IRequest
-            where TModule : TychoModule
         {
-            _registrator.ForwardUpStreamRequest<TRequest, TModule>();
-            return this;
+            return new ModuleRequestBinding<TRequest>(this, _registrator);
         }
 
-        public IModuleContract Forwards<TRequest, TResponse, TModule>()
+        public IModuleRequestBinding<TRequest, TResponse> Expects<TRequest, TResponse>()
             where TRequest : class, IRequest<TResponse>
-            where TModule : TychoModule
         {
-            _registrator.ForwardUpStreamRequest<TRequest, TResponse, TModule>();
-            return this;
-        }
-
-        public IModuleContract ForwardsAs<TRequest, TTargetRequest, TModule>(
-            Func<TRequest, TTargetRequest> map)
-            where TRequest : class, IRequest
-            where TTargetRequest : class, IRequest
-            where TModule : TychoModule
-        {
-            _registrator.ForwardMappedUpStreamRequest<TRequest, TTargetRequest, TModule>(map);
-            return this;
-        }
-
-        public IModuleContract ForwardsAs<TRequest, TResponse, TTargetRequest, TTargetResponse, TModule>(
-            Func<TRequest, TTargetRequest> mapRequest,
-            Func<TTargetResponse, TResponse> mapResponse)
-            where TRequest : class, IRequest<TResponse>
-            where TTargetRequest : class, IRequest<TTargetResponse>
-            where TModule : TychoModule
-        {
-            _registrator.ForwardMappedUpStreamRequest<
-                TRequest, TResponse,
-                TTargetRequest, TTargetResponse,
-                TModule>(mapRequest, mapResponse);
-            return this;
-        }
-
-        public IModuleContract Handles<TRequest, THandler>()
-            where TRequest : class, IRequest
-            where THandler : class, IRequestHandler<TRequest>
-        {
-            _registrator.HandleUpStreamRequest<TRequest, THandler>();
-            return this;
-        }
-
-        public IModuleContract Handles<TRequest, TResponse, THandler>()
-            where TRequest : class, IRequest<TResponse>
-            where THandler : class, IRequestHandler<TRequest, TResponse>
-        {
-            _registrator.HandleUpStreamRequest<TRequest, TResponse, THandler>();
-            return this;
+            return new ModuleRequestBinding<TRequest, TResponse>(this, _registrator);
         }
 
         public IModuleContract Requires<TRequest>()
@@ -93,7 +45,6 @@ namespace Tycho.Modules.Setup
                     $"Parent module does not handle " +
                     $"the required {typeof(TRequest).Name} request");
             }
-
             return this;
         }
 
@@ -106,13 +57,7 @@ namespace Tycho.Modules.Setup
                     $"Parent module does not handle " +
                     $"the required {typeof(TRequest).Name} request");
             }
-
             return this;
-        }
-
-        public Task Build()
-        {
-            return Task.CompletedTask;
         }
     }
 }

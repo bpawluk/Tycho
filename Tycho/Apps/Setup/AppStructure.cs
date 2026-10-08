@@ -1,68 +1,87 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Tycho.Events.Routing;
+using Microsoft.Extensions.Hosting;
+using Tycho.Events.Broker;
+using Tycho.Hosting.Services;
 using Tycho.Modules;
+using Tycho.Modules.Instance;
+using Tycho.Modules.Setup;
 using Tycho.Requests.Broker;
 using Tycho.Structure;
-using Tycho.Structure.External;
-using Tycho.Structure.Internal;
 
 namespace Tycho.Apps.Setup
 {
     internal class AppStructure : IAppStructure
     {
         private readonly Internals _internals;
-        private readonly Globals _globals;
+        private readonly List<TychoModule> _submodules = new();
+        private readonly HashSet<Type> _submoduleTypes = new();
 
-        private readonly Dictionary<Type, TychoModule> _submodules;
-
-        public AppStructure(Internals internals, Globals globals)
+        public AppStructure(Internals internals)
         {
             _internals = internals;
-            _globals = globals;
-            _submodules = new Dictionary<Type, TychoModule>();
         }
 
-        public IAppStructure Uses<TModule>()
-            where TModule : TychoModule, new()
+        public IAppStructure Uses<TModule>(string? instanceSuffix = null) where TModule : TychoModule, new()
         {
-            Use<TModule>(null, null);
+            Use<TModule>(null, null, instanceSuffix);
             return this;
         }
 
-        public IAppStructure Uses<TModule>(Action<IContractFulfillment> contractFulfillment)
+        public IAppStructure Uses<TModule>(Action<IContractFulfillment> contractFulfillment, string? instanceSuffix = null)
             where TModule : TychoModule, new()
         {
-            Use<TModule>(contractFulfillment, null);
+            Use<TModule>(contractFulfillment, null, instanceSuffix);
             return this;
         }
 
-        public IAppStructure Uses<TModule>(IModuleSettings settings)
+        public IAppStructure Uses<TModule>(IModuleSettings settings, string? instanceSuffix = null)
             where TModule : TychoModule, new()
         {
-            Use<TModule>(null, settings);
+            Use<TModule>(null, settings, instanceSuffix);
             return this;
         }
 
         public IAppStructure Uses<TModule>(
             Action<IContractFulfillment> contractFulfillment,
-            IModuleSettings settings)
+            IModuleSettings settings,
+            string? instanceSuffix = null)
             where TModule : TychoModule, new()
         {
-            Use<TModule>(contractFulfillment, settings);
+            Use<TModule>(contractFulfillment, settings, instanceSuffix);
             return this;
+        }
+
+        public void Build()
+        {
+            IServiceCollection services = _internals.GetHostBuilder().Services;
+
+            foreach (TychoModule moduleDefinition in _submodules)
+            {
+                ModuleBuilder moduleBuilder = moduleDefinition.CreateModuleBuilder().WithControlPlane(_internals.ControlPlane);
+                Type genericModuleInterface = typeof(IModule<>).MakeGenericType(moduleDefinition.GetType());
+
+                services.AddSingleton(genericModuleInterface, provider => moduleBuilder.Build(provider));
+                services.AddSingleton(typeof(IModule), provider => provider.GetRequiredService(genericModuleInterface));
+
+                Type lifecycleService = typeof(ModuleHostedLifecycleService<>).MakeGenericType(moduleDefinition.GetType());
+                services.AddSingleton(typeof(IHostedService), lifecycleService);
+            }
         }
 
         private void Use<TModule>(
             Action<IContractFulfillment>? contractFulfillment,
-            IModuleSettings? settings)
+            IModuleSettings? settings,
+            string? instanceSuffix)
             where TModule : TychoModule, new()
         {
-            var submodule = new TModule().WithGlobals(_globals);
+            if (instanceSuffix != null && string.IsNullOrWhiteSpace(instanceSuffix))
+            {
+                throw new ArgumentException("Module instance suffix cannot be empty.", nameof(instanceSuffix));
+            }
 
+            var submodule = new TModule();
             if (settings != null)
             {
                 submodule.WithSettings(settings);
@@ -71,36 +90,21 @@ namespace Tycho.Apps.Setup
             var fulfiller = new ContractFulfillment<TModule>(_internals);
             contractFulfillment?.Invoke(fulfiller);
 
-            var downStreamBroker = new DownStreamBroker<TModule>(_internals);
-            submodule.FulfillContract(downStreamBroker);
-
-            var parentEventRouter = new EventRouter(_internals);
-            submodule.PassEventRouter(parentEventRouter);
+            submodule.FulfillContract(new DownStreamBroker<TModule>(_internals));
+            submodule.PassEventBroker(new EventBroker(_internals));
+            submodule.WithInstanceSuffix(instanceSuffix);
 
             AddSubmodule(submodule);
         }
 
-        public async Task Build()
-        {
-            var services = _internals.GetServiceCollection();
-            await Task.WhenAll(_submodules.Values.Select(async module =>
-            {
-                var moduleInterface = typeof(IModule);
-                var genericModuleInterface = typeof(IModule<>).MakeGenericType(module.GetType());
-                var runningModule = await module.Run().ConfigureAwait(false);
-                services.AddSingleton(moduleInterface, runningModule);
-                services.AddSingleton(genericModuleInterface, runningModule);
-            })).ConfigureAwait(false);
-        }
-
         private void AddSubmodule(TychoModule submodule)
         {
-            if (!_submodules.TryAdd(submodule.GetType(), submodule))
+            Type submoduleType = submodule.GetType();
+            if (!_submoduleTypes.Add(submoduleType))
             {
-                throw new InvalidOperationException(
-                    $"{submodule.GetType().Name} is already defined " +
-                    $"as a submodule for this module");
+                throw new InvalidOperationException($"{submoduleType.Name} is already defined as a submodule for this module");
             }
+            _submodules.Add(submodule);
         }
     }
 }

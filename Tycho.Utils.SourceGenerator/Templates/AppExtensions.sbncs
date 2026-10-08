@@ -1,0 +1,53 @@
+{{~#--------- Calculate indentation ---------#~}}
+{{~ ns_offset = namespace != "" ? 1 : 0 ~}}
+{{~ bi = ns_offset ~}}
+{{~ i0 = string.pad_left "" (bi * 4) ~}}
+{{~ i1 = string.pad_left "" ((bi + 1) * 4) ~}}
+{{~ i2 = string.pad_left "" ((bi + 2) * 4) ~}}
+{{~ i3 = string.pad_left "" ((bi + 3) * 4) ~}}
+{{~#-----------------------------------------#~}}
+{{~ if namespace != "" ~}}
+namespace {{ namespace }}
+{
+{{~ end ~}}
+{{ i0 }}public static partial class {{ classes.setup_extensions_class }}
+{{ i0 }}{
+{{   i1   }}public static {{ classes.app_builder_class }} {{ methods.create_app_builder_method }}{{ type_parameters_suffix }}(this {{ classes.app_class }} {{ parameters.app_parameter }})
+{{~ for constraint in type_parameters_constraints ~}}
+{{     i2     }}{{ constraint }}
+{{~ end ~}}
+{{   i1   }}{
+{{     i2     }}var {{ parameters.app_builder_base_parameter }} = {{ parameters.app_parameter }}.{{ methods.create_app_builder_base_method }}();
+{{     i2     }}return new {{ classes.app_builder_class }}({{ parameters.app_builder_base_parameter }});
+{{   i1   }}}
+
+{{   i1   }}public static {{ interfaces.host_application_builder_interface }} {{ methods.add_app_method }}{{ type_parameters_suffix }}(this {{ interfaces.host_application_builder_interface }} {{ parameters.builder_parameter }}, {{ classes.app_class }} {{ parameters.app_definition_parameter }})
+{{~ for constraint in type_parameters_constraints ~}}
+{{     i2     }}{{ constraint }}
+{{~ end ~}}
+{{   i1   }}{
+{{     i2     }}if ({{ parameters.builder_parameter }} == null)
+{{     i2     }}{
+{{       i3       }}throw new {{ classes.argument_null_exception_class }}(nameof({{ parameters.builder_parameter }}));
+{{     i2     }}}
+
+{{     i2     }}if ({{ parameters.app_definition_parameter }} == null)
+{{     i2     }}{
+{{       i3       }}throw new {{ classes.argument_null_exception_class }}(nameof({{ parameters.app_definition_parameter }}));
+{{     i2     }}}
+
+{{     i2     }}if ({{ classes.enumerable_class }}.{{ methods.any_method }}({{ parameters.builder_parameter }}.{{ properties.services_property }}, {{ parameters.service_descriptor_parameter }} => {{ parameters.service_descriptor_parameter }}.{{ properties.service_type_property }} == typeof({{ interfaces.facade_interface }})))
+{{     i2     }}{
+{{       i3       }}throw new {{ classes.invalid_operation_exception_class }}("The application is already registered in the host.");
+{{     i2     }}}
+
+{{     i2     }}{{ classes.app_builder_class }} {{ parameters.app_builder_variable }} = {{ parameters.app_definition_parameter }}.{{ methods.create_app_builder_method }}();
+{{     i2     }}{{ classes.service_collection_service_extensions_class }}.{{ methods.add_singleton_method }}({{ parameters.builder_parameter }}.{{ properties.services_property }}, {{ parameters.service_provider_parameter }} => {{ parameters.app_builder_variable }}.{{ methods.build_method }}({{ parameters.service_provider_parameter }}));
+{{     i2     }}{{ classes.service_collection_hosted_service_extensions_class }}.{{ methods.add_hosted_service_method }}<{{ classes.app_hosted_lifecycle_service_class }}<{{ interfaces.facade_interface }}>>({{ parameters.builder_parameter }}.{{ properties.services_property }});
+
+{{     i2     }}return {{ parameters.builder_parameter }};
+{{   i1   }}}
+{{ i0 }}}
+{{~ if namespace != "" ~}}
+}
+{{~ end ~}}

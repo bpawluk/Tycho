@@ -1,9 +1,10 @@
-﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Tycho.Requests.Pipeline;
 using Tycho.Requests.Registrating.Registrations;
-using Tycho.Structure.Internal;
+using Tycho.Structure;
+using Tycho.Utils;
 
 namespace Tycho.Requests.Broker
 {
@@ -19,35 +20,39 @@ namespace Tycho.Requests.Broker
         public bool CanExecute<TRequest>()
             where TRequest : class, IRequest
         {
-            return _internals.HasService<IUpStreamHandlerRegistration<TRequest>>();
+            return _internals.HasService<IUpStreamRequestRegistration<TRequest>>();
         }
 
         public bool CanExecute<TRequest, TResponse>()
             where TRequest : class, IRequest<TResponse>
         {
-            return _internals.HasService<IUpStreamHandlerRegistration<TRequest, TResponse>>();
+            return _internals.HasService<IUpStreamRequestRegistration<TRequest, TResponse>>();
         }
 
-        public Task Execute<TRequest>(TRequest requestData, CancellationToken cancellationToken)
+        [EntryPoint]
+        public async Task ExecuteAsync<TRequest>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest
         {
-            if (requestData is null)
-            {
-                throw new ArgumentNullException(nameof(requestData), $"{nameof(requestData)} cannot be null");
-            }
-            var registration = _internals.GetRequiredService<IUpStreamHandlerRegistration<TRequest>>();
-            return registration.Handler.Handle(requestData, cancellationToken);
+            requestData.ThrowIfNull();
+
+            await using AsyncServiceScope scope = _internals.CreateAsyncScope();
+
+            IUpStreamRequestRegistration<TRequest> registration = scope.ServiceProvider.GetRequiredService<IUpStreamRequestRegistration<TRequest>>();
+            RequestPipeline<TRequest, NoResponse> pipeline = RequestPipelineBuilder.Build(scope.ServiceProvider, registration.Handler);
+            await pipeline.ExecuteAsync(requestData, cancellationToken).ConfigureAwait(false);
         }
 
-        public Task<TResponse> Execute<TRequest, TResponse>(TRequest requestData, CancellationToken cancellationToken)
+        [EntryPoint]
+        public async Task<TResponse> ExecuteAsync<TRequest, TResponse>(TRequest requestData, CancellationToken cancellationToken)
             where TRequest : class, IRequest<TResponse>
         {
-            if (requestData is null)
-            {
-                throw new ArgumentNullException(nameof(requestData), $"{nameof(requestData)} cannot be null");
-            }
-            var registration = _internals.GetRequiredService<IUpStreamHandlerRegistration<TRequest, TResponse>>();
-            return registration.Handler.Handle(requestData, cancellationToken);
+            requestData.ThrowIfNull();
+
+            await using AsyncServiceScope scope = _internals.CreateAsyncScope();
+
+            IUpStreamRequestRegistration<TRequest, TResponse> registration = scope.ServiceProvider.GetRequiredService<IUpStreamRequestRegistration<TRequest, TResponse>>();
+            RequestPipeline<TRequest, TResponse> pipeline = RequestPipelineBuilder.Build(scope.ServiceProvider, registration.Handler);
+            return await pipeline.ExecuteAsync(requestData, cancellationToken).ConfigureAwait(false);
         }
     }
 }
