@@ -8,6 +8,7 @@ using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Security.Handlers;
 
+[TychoId("record-door-opened")]
 internal class DoorOpenedHandler(SecurityDbContext dbContext) : ITransactionalEventHandler<SensorEvent<DoorOpened>>
 {
     public Task HandleAsync(EventContext<SensorEvent<DoorOpened>> context, CancellationToken cancellationToken)

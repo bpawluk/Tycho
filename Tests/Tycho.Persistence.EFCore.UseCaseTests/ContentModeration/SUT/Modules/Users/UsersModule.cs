@@ -9,6 +9,7 @@ using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.
 namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users;
 
 [TychoDefinition]
+[TychoId("users")]
 public partial class UsersModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)
@@ -34,7 +35,7 @@ public partial class UsersModule : TychoModule
 
     protected override void IncludeModules(IModuleStructure module)
     {
-        module.Uses<AuditModule>();
+        module.Uses<AuditModule>(instanceSuffix: "in-users");
     }
 
     protected override void RegisterServices(IServiceCollection module)

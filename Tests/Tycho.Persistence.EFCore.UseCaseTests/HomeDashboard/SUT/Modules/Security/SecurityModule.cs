@@ -9,6 +9,7 @@ using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Security.P
 namespace Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Security;
 
 [TychoDefinition]
+[TychoId("security")]
 public partial class SecurityModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)

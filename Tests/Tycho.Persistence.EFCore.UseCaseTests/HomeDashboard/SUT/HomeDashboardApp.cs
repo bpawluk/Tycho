@@ -15,6 +15,7 @@ using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Persistence;
 namespace Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT;
 
 [TychoDefinition]
+[TychoId("home-dashboard")]
 public partial class HomeDashboardApp : TychoApp
 {
     protected override void DefineContract(IAppContract app)

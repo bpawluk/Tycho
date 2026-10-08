@@ -3,6 +3,7 @@ using static Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract;
 
+[TychoId("user-status-changed")]
 public record UserStatusChangedEvent(int UserId, Status NewStatus) : IEvent
 {
     public enum Status

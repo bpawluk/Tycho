@@ -7,6 +7,7 @@ using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Handlers;
 
+[TychoId("route-temperature-reading")]
 internal class TemperatureSensorEventHandler(IDownstairsModule downstairs, IUpstairsModule upstairs)
     : ITransactionalEventHandler<SensorEvent<TemperatureReading>>
 {

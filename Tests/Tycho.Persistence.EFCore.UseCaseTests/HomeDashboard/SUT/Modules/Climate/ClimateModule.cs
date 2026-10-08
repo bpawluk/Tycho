@@ -10,6 +10,7 @@ using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Rooms.Cont
 namespace Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Climate;
 
 [TychoDefinition]
+[TychoId("climate")]
 public partial class ClimateModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)

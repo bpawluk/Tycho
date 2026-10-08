@@ -37,7 +37,7 @@ public partial class PostsModule : TychoModule
 
     protected override void IncludeModules(IModuleStructure module)
     {
-        module.Uses<AuditModule>();
+        module.Uses<AuditModule>(instanceSuffix: "in-posts");
     }
 
     protected override void RegisterServices(IServiceCollection module)

@@ -6,6 +6,7 @@ using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Handlers;
 
+[TychoId("record-post-audit")]
 internal class AuditRecordedEventHandler(PostsDbContext dbContext) : ITransactionalEventHandler<AuditRecordedEvent>
 {
     public async Task HandleAsync(EventContext<AuditRecordedEvent> context, CancellationToken cancellationToken)

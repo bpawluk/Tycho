@@ -9,6 +9,7 @@ using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Ventilatio
 namespace Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Ventilation;
 
 [TychoDefinition]
+[TychoId("ventilation")]
 public partial class VentilationModule : TychoModule
 {
     protected override void DefineContract(IModuleContract module)

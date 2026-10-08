@@ -8,6 +8,7 @@ using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Security.Handlers;
 
+[TychoId("record-motion-detected")]
 internal class MotionDetectedHandler(SecurityDbContext dbContext) : ITransactionalEventHandler<SensorEvent<MotionDetected>>
 {
     public Task HandleAsync(EventContext<SensorEvent<MotionDetected>> context, CancellationToken cancellationToken)

@@ -13,6 +13,7 @@ using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.
 namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT;
 
 [TychoDefinition]
+[TychoId("content-moderation")]
 public partial class ContentModerationApp : TychoApp
 {
     protected override void DefineContract(IAppContract app)

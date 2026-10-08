@@ -8,6 +8,7 @@ using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Climate.Handlers;
 
+[TychoId("record-temperature-reading")]
 internal class SensorEventHandler(ClimateDbContext dbContext, RoomSettings settings) : ITransactionalEventHandler<SensorEvent<TemperatureReading>>
 {
     public Task HandleAsync(EventContext<SensorEvent<TemperatureReading>> context, CancellationToken cancellationToken)

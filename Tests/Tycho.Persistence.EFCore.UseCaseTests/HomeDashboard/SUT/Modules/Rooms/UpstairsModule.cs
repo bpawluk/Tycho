@@ -10,6 +10,7 @@ using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Rooms.Hand
 namespace Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Rooms;
 
 [TychoDefinition]
+[TychoId("upstairs")]
 public partial class UpstairsModule : TychoModule
 {
     private readonly RoomSettings _settings = new() { Room = "upstairs" };
@@ -31,7 +32,7 @@ public partial class UpstairsModule : TychoModule
 
     protected override void IncludeModules(IModuleStructure module)
     {
-        module.Uses<ClimateModule>(_settings);
+        module.Uses<ClimateModule>(_settings, instanceSuffix: "in-upstairs");
     }
 
     protected override void RegisterServices(IServiceCollection module) { }

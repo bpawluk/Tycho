@@ -7,6 +7,7 @@ using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Ventilation.Handlers;
 
+[TychoId("record-air-quality-reading")]
 internal class SensorEventHandler(VentilationDbContext dbContext) : ITransactionalEventHandler<SensorEvent<AirQualityReading>>
 {
     public Task HandleAsync(EventContext<SensorEvent<AirQualityReading>> context, CancellationToken cancellationToken)
