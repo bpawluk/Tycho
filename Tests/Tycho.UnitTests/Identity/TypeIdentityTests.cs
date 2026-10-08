@@ -1,5 +1,5 @@
 using Tycho.Identity;
-using Tycho.Identity.Structure;
+using Tycho.Identity.Events;
 
 namespace Tycho.UnitTests.Identity;
 
@@ -12,8 +12,8 @@ public sealed class TypeIdentityTests
     public void Equals_WithTypedIdentity_ComparesValues(string? otherValue, bool expected)
     {
         // Arrange
-        TypeIdentity sut = DefinitionIdentity.Parse("Example.Type");
-        TypeIdentity? other = otherValue is null ? null : DefinitionIdentity.Parse(otherValue);
+        TypeIdentity sut = EventIdentity.Parse("Example.Type");
+        TypeIdentity? other = otherValue is null ? null : EventIdentity.Parse(otherValue);
 
         // Act
         bool result = sut.Equals(other);

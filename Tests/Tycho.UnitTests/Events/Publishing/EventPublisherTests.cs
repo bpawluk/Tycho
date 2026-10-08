@@ -3,8 +3,8 @@ using Tycho.Events.Broker;
 using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Events.Publishing;
-using Tycho.Events.Routing;
 using Tycho.Identity.Events;
+using Tycho.Identity.Structure;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
 
@@ -102,6 +102,6 @@ public class EventPublisherTests
     {
         var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        return new RoutedEvent<TestEvent>(Guid.NewGuid(), Guid.NewGuid(), eventId, handlerId, Route.Create(), payload ?? new TestEvent());
+        return new RoutedEvent<TestEvent>(Guid.NewGuid(), Guid.NewGuid(), eventId, handlerId, InstanceIdentity.Parse("test-endpoint"), payload ?? new TestEvent());
     }
 }

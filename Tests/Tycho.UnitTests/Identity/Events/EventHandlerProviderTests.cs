@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Tycho.Events;
-using Tycho.Events.Registrating.Registrations;
 using Tycho.Identity.Events;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
@@ -19,25 +18,15 @@ public class EventHandlerProviderTests
     {
         var services = new ServiceCollection();
 
-        var firstEventRegistrationMock = new Mock<IFinalEventRegistration<TestEvent>>();
-        services.AddSingleton(firstEventRegistrationMock.Object);
-
         var firstEventHandlerMock = new Mock<IEventHandler<TestEvent>>();
         IEventHandler<TestEvent> firstEventHandler = firstEventHandlerMock.Object;
-        firstEventRegistrationMock.SetupGet(r => r.Handler).Returns(firstEventHandler);
-
         var firstEventHandlerId = EventHandlerIdentity.Create<TestEventOtherHandler>();
-        firstEventRegistrationMock.SetupGet(r => r.HandlerId).Returns(firstEventHandlerId);
-
-        var secondEventRegistrationMock = new Mock<IFinalEventRegistration<TestEvent>>();
-        services.AddSingleton(secondEventRegistrationMock.Object);
+        services.AddKeyedSingleton(firstEventHandlerId, firstEventHandler);
 
         var secondEventHandlerMock = new Mock<IEventHandler<TestEvent>>();
         _registeredHandler = secondEventHandlerMock.Object;
-        secondEventRegistrationMock.SetupGet(r => r.Handler).Returns(_registeredHandler);
-
         _registeredHandlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        secondEventRegistrationMock.SetupGet(r => r.HandlerId).Returns(_registeredHandlerId);
+        services.AddKeyedSingleton(_registeredHandlerId, _registeredHandler);
 
         ServiceProvider serviceProvider = services.BuildServiceProvider();
         _sut = new EventHandlerProvider(serviceProvider);

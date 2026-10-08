@@ -27,7 +27,7 @@ public sealed class OutboxProcessorTests
             .Setup(item => item.IsEnabled(LogLevel.Error))
             .Returns(true);
 
-        using var internals = new Internals(Host.CreateEmptyApplicationBuilder(default), typeof(TestModule));
+        using var internals = new AppInternals(Host.CreateEmptyApplicationBuilder(default), typeof(OutboxProcessorTests));
         internals.GetHostBuilder().Services.AddSingleton(consumer.Object);
         internals.Build();
 

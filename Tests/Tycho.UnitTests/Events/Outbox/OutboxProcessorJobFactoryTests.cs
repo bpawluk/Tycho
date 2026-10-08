@@ -3,8 +3,8 @@ using Microsoft.Extensions.Hosting;
 using Moq;
 using Tycho.Events.Model;
 using Tycho.Events.Outbox;
-using Tycho.Events.Routing;
 using Tycho.Identity.Events;
+using Tycho.Identity.Structure;
 using Tycho.Processor;
 using Tycho.Structure;
 using Tycho.UnitTests._Data.Events;
@@ -20,7 +20,7 @@ public class OutboxProcessorJobFactoryTests
 
     public OutboxProcessorJobFactoryTests()
     {
-        var internals = new Internals(Host.CreateEmptyApplicationBuilder(default), typeof(TestModule));
+        var internals = new AppInternals(Host.CreateEmptyApplicationBuilder(default), typeof(OutboxProcessorJobFactoryTests));
         IServiceCollection serviceCollection = internals.GetHostBuilder().Services;
 
         _outboxConsumerMock = new Mock<IOutboxConsumer>();
@@ -69,7 +69,7 @@ public class OutboxProcessorJobFactoryTests
     {
         var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        var routedEvent = new SerializedRoutedEvent(Guid.NewGuid(), Guid.NewGuid(), eventId, handlerId, Route.Create(), "{}");
+        var routedEvent = new SerializedRoutedEvent(Guid.NewGuid(), Guid.NewGuid(), eventId, handlerId, InstanceIdentity.Parse("test-endpoint"), "{}");
         return new OutboxEvent(Guid.NewGuid(), routedEvent);
     }
 }

@@ -5,8 +5,8 @@ using Moq;
 using Tycho.Events.Broker;
 using Tycho.Events.Model;
 using Tycho.Events.Outbox;
-using Tycho.Events.Routing;
 using Tycho.Identity.Events;
+using Tycho.Identity.Structure;
 using Tycho.Structure;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
@@ -26,7 +26,7 @@ public class OutboxProcessorJobTests
     public OutboxProcessorJobTests()
     {
         _logger.Setup(item => item.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
-        var internals = new Internals(Host.CreateEmptyApplicationBuilder(default), typeof(TestModule));
+        var internals = new AppInternals(Host.CreateEmptyApplicationBuilder(default), typeof(OutboxProcessorJobTests));
         IServiceCollection serviceCollection = internals.GetHostBuilder().Services;
 
         _outboxConsumerMock = new Mock<IOutboxConsumer>();
@@ -227,7 +227,7 @@ public class OutboxProcessorJobTests
     {
         var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        var routedEvent = new SerializedRoutedEvent(Guid.NewGuid(), Guid.NewGuid(), eventId, handlerId, Route.Create(), "{}");
+        var routedEvent = new SerializedRoutedEvent(Guid.NewGuid(), Guid.NewGuid(), eventId, handlerId, InstanceIdentity.Parse("test-endpoint"), "{}");
         return new OutboxEvent(Guid.NewGuid(), routedEvent);
     }
 }

@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Tycho.Events.Inbox;
 using Tycho.Structure;
-using Tycho.UnitTests._Data.Modules;
 using Tycho.UnitTests._Utils;
 
 namespace Tycho.UnitTests.Events.Inbox;
@@ -27,7 +26,7 @@ public sealed class InboxProcessorTests
             .Setup(item => item.IsEnabled(LogLevel.Error))
             .Returns(true);
 
-        using var internals = new Internals(Host.CreateEmptyApplicationBuilder(default), typeof(TestModule));
+        using var internals = new AppInternals(Host.CreateEmptyApplicationBuilder(default), typeof(InboxProcessorTests));
         internals.GetHostBuilder().Services.AddSingleton(consumer.Object);
         internals.Build();
 

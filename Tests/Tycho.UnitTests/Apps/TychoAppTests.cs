@@ -6,6 +6,7 @@ using Tycho.Apps;
 using Tycho.Apps.Instance;
 using Tycho.Hosting;
 using Tycho.Hosting.Files;
+using Tycho.Identity;
 
 namespace Tycho.UnitTests.Apps;
 
@@ -145,6 +146,17 @@ public class TychoAppTests
         Assert.Equal(0, appDefinition.CleanupCalls);
         await app.StopAsync(cancellationToken);
         Assert.Equal(1, appDefinition.CleanupCalls);
+    }
+
+    [Fact]
+    public void ControlPlane_UsesApplicationTypeIdentity()
+    {
+        // Act
+        using IApp app = new TestApp().CreateAppBuilderBase().Build(default);
+
+        // Assert
+        Assert.Equal(TypeIdentifier.GetId(typeof(TestApp)), app.Internals.ControlPlane.ApplicationId.Value);
+        Assert.Equal(app.Internals.OwnerId, app.Internals.ControlPlane.ApplicationId);
     }
 
     private sealed class TestApp : TychoApp

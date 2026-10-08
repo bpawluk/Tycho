@@ -2,9 +2,9 @@ using Moq;
 using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Events.Outbox.InMemory;
-using Tycho.Events.Routing;
 using Tycho.Events.Serialization;
 using Tycho.Identity.Events;
+using Tycho.Identity.Structure;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
 
@@ -151,7 +151,7 @@ public class InMemoryOutboxTests
     {
         var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        return new RoutedEvent<TestEvent>(Guid.NewGuid(), Guid.NewGuid(), eventId, handlerId, Route.Create(), new TestEvent());
+        return new RoutedEvent<TestEvent>(Guid.NewGuid(), Guid.NewGuid(), eventId, handlerId, InstanceIdentity.Parse("test-endpoint"), new TestEvent());
     }
 
     private (SerializedRoutedEvent Serialized, RoutedEvent Routed) CreateSerializedAndRoutedEventPair()
@@ -160,7 +160,7 @@ public class InMemoryOutboxTests
         var publishId = Guid.NewGuid();
         var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        var route = Route.Create();
+        var route = InstanceIdentity.Parse("test-endpoint");
         var serialized = new SerializedRoutedEvent(id, publishId, eventId, handlerId, route, "{}");
         var deserialized = new RoutedEvent<TestEvent>(id, publishId, eventId, handlerId, route, new TestEvent());
         _eventSerializerMock.Setup(s => s.Serialize(deserialized)).Returns(serialized);

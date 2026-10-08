@@ -20,7 +20,7 @@ public class DownStreamBrokerTests
 
     public DownStreamBrokerTests()
     {
-        _internals = new Internals(Host.CreateEmptyApplicationBuilder(default), typeof(object));
+        _internals = new AppInternals(Host.CreateEmptyApplicationBuilder(default), typeof(DownStreamBrokerTests));
         _sut = new DownStreamBroker<TestModule>(_internals);
 
         _transactionMock = new Mock<ITransaction>();

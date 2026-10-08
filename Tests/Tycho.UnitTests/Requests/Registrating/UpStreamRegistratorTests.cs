@@ -19,7 +19,7 @@ public class UpStreamRegistratorTests
 
     public UpStreamRegistratorTests()
     {
-        _internals = new Internals(Host.CreateEmptyApplicationBuilder(default), typeof(object));
+        _internals = new AppInternals(Host.CreateEmptyApplicationBuilder(default), typeof(UpStreamRegistratorTests));
         _internals.GetHostBuilder().Services
                   .AddSingleton(_internals);
         _sut = new Registrator(_internals);

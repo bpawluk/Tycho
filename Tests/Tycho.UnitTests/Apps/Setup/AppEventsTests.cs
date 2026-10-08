@@ -15,7 +15,7 @@ public class AppEventsTests
 
     public AppEventsTests()
     {
-        _internals = new Internals(Host.CreateEmptyApplicationBuilder(default), typeof(object));
+        _internals = new AppInternals(Host.CreateEmptyApplicationBuilder(default), typeof(AppEventsTests));
         _sut = new AppEvents(_internals);
     }
 
