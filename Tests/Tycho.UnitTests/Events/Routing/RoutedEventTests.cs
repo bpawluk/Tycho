@@ -1,10 +1,8 @@
 using Moq;
-using Tycho.Events;
 using Tycho.Events.Model;
-using Tycho.Events.Routing;
-using Tycho.Events.Routing.Steps;
 using Tycho.Events.Serialization;
 using Tycho.Identity.Events;
+using Tycho.Identity.Structure;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
 
@@ -13,33 +11,40 @@ namespace Tycho.UnitTests.Events.Routing;
 public class RoutedEventTests
 {
     [Fact]
-    public void Constructor_WithDefaultRoute_CreatesRouteWithFinalStep()
+    public void Constructor_WithEventMetadataAndPayload_PreservesThem()
     {
         // Arrange
         var id = Guid.NewGuid();
-        var route = Route.Create();
+        var publishId = Guid.NewGuid();
+        var eventId = EventIdentity.Create<TestEvent>();
+        var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
+        var payload = new TestEvent();
 
         // Act
-        RoutedEvent<TestEvent> result = CreateRoutedEvent(id: id, route: route);
+        var sut = new RoutedEvent<TestEvent>(
+            id, publishId, eventId, handlerId, InstanceIdentity.Parse("test-endpoint"), payload);
 
         // Assert
-        Assert.NotNull(result.Route);
-        IRouteStep step = Assert.Single(result.Route);
-        Assert.IsType<FinalRouteStep>(step);
+        Assert.Equal(id, sut.Id);
+        Assert.Equal(publishId, sut.PublishId);
+        Assert.Equal(eventId, sut.EventId);
+        Assert.Equal(handlerId, sut.HandlerId);
+        Assert.Same(payload, sut.Payload);
     }
 
     [Fact]
-    public void Constructor_WithExplicitRoute_UsesProvidedRoute()
+    public void Constructor_WithExplicitDestination_PreservesIt()
     {
         // Arrange
-        var route = Route.Create();
-        route.Push(UpStreamRouteStep.Create());
+        InstanceIdentity destination = InstanceIdentity.Parse("test-endpoint");
 
         // Act
-        RoutedEvent<TestEvent> result = CreateRoutedEvent(route: route);
+        var sut = new RoutedEvent<TestEvent>(
+            Guid.NewGuid(), Guid.NewGuid(), EventIdentity.Create<TestEvent>(),
+            EventHandlerIdentity.Create<TestEventHandler>(), destination, new TestEvent());
 
         // Assert
-        Assert.Same(route, result.Route);
+        Assert.Same(destination, sut.DestinationId);
     }
 
     [Fact]
@@ -48,95 +53,23 @@ public class RoutedEventTests
         // Arrange
         var payload = new TestEvent();
         string serializedPayload = "{}";
-        RoutedEvent<TestEvent> routedEvent = CreateRoutedEvent(payload: payload);
+        var sut = new RoutedEvent<TestEvent>(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            EventIdentity.Create<TestEvent>(),
+            EventHandlerIdentity.Create<TestEventHandler>(),
+            InstanceIdentity.Parse("test-endpoint"),
+            payload);
 
         var serializerMock = new Mock<IPayloadSerializer>();
         serializerMock.Setup(s => s.Serialize(payload))
                       .Returns(serializedPayload);
 
         // Act
-        string result = routedEvent.SerializePayloadWith(serializerMock.Object);
+        string result = sut.SerializePayloadWith(serializerMock.Object);
 
         // Assert
         Assert.Same(serializedPayload, result);
         serializerMock.Verify(s => s.Serialize(payload), Times.Once);
     }
-
-    [Fact]
-    public void GetHandlerFrom_WithProvider_ReturnsHandlerResolvedByHandlerId()
-    {
-        // Arrange
-        var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        RoutedEvent<TestEvent> routedEvent = CreateRoutedEvent(handlerId: handlerId);
-
-        var handlerMock = new Mock<IEventHandler<TestEvent>>();
-
-        var providerMock = new Mock<IEventHandlerProvider>();
-        providerMock.Setup(p => p.GetHandler<TestEvent>(handlerId))
-                    .Returns(handlerMock.Object);
-
-        // Act
-        IEventHandler result = routedEvent.GetHandlerFrom(providerMock.Object);
-
-        // Assert
-        Assert.Same(handlerMock.Object, result);
-        providerMock.Verify(p => p.GetHandler<TestEvent>(handlerId), Times.Once);
-    }
-
-    [Fact]
-    public async Task HandleWith_WithTypedHandler_InvokesHandleAsyncWithEventContext()
-    {
-        // Arrange
-        var id = Guid.NewGuid();
-        var payload = new TestEvent();
-        var cancellationToken = new CancellationToken();
-        RoutedEvent<TestEvent> routedEvent = CreateRoutedEvent(id: id, payload: payload);
-
-        var handlerMock = new Mock<IEventHandler<TestEvent>>();
-        handlerMock.Setup(h => h.HandleAsync(It.IsAny<EventContext<TestEvent>>(), cancellationToken))
-                   .Returns(Task.CompletedTask);
-
-        // Act
-        await routedEvent.HandleWith(handlerMock.Object, cancellationToken);
-
-        // Assert
-        handlerMock.Verify(
-            h => h.HandleAsync(
-                It.Is<EventContext<TestEvent>>(c => c.Id == id && c.Payload == payload),
-                cancellationToken),
-            Times.Once);
-    }
-
-    [Fact]
-    public async Task HandleWith_WithDifferentHandlerType_ThrowsArgumentException()
-    {
-        // Arrange
-        RoutedEvent<TestEvent> routedEvent = CreateRoutedEvent();
-        var otherHandlerMock = new Mock<IEventHandler<OtherEvent>>();
-
-        // Act
-        Task Act() => routedEvent.HandleWith(otherHandlerMock.Object, new CancellationToken());
-
-        // Assert
-        ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(Act);
-        Assert.Contains("IEventHandler<TestEvent>", exception.Message);
-    }
-
-    private static RoutedEvent<TestEvent> CreateRoutedEvent(
-        Guid? id = null,
-        Guid? publishId = null,
-        EventHandlerIdentity? handlerId = null,
-        Route? route = null,
-        TestEvent? payload = null)
-    {
-        var eventId = EventIdentity.Create<TestEvent>();
-        return new RoutedEvent<TestEvent>(
-            id ?? Guid.NewGuid(),
-            publishId ?? Guid.NewGuid(),
-            eventId,
-            handlerId ?? EventHandlerIdentity.Create<TestEventHandler>(),
-            route ?? Route.Create(),
-            payload ?? new TestEvent());
-    }
-
 }

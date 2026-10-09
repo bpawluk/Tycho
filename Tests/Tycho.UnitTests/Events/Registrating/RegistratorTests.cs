@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
+using Tycho.Events;
 using Tycho.Events.Registrating;
 using Tycho.Events.Registrating.Registrations;
 using Tycho.Identity.Events;
@@ -20,14 +21,14 @@ public class RegistratorTests
 
     public RegistratorTests()
     {
-        _internals = new Internals(Host.CreateEmptyApplicationBuilder(default), typeof(TestModule));
+        _internals = new AppInternals(Host.CreateEmptyApplicationBuilder(default), typeof(RegistratorTests));
         _internals.GetHostBuilder().Services
                   .AddSingleton(_internals);
         _sut = new Registrator(_internals);
     }
 
     [Fact]
-    public void Expose_NewEvent_RegistersExposer()
+    public void ExposeEvent_NewEvent_RegistersExposer()
     {
         // Arrange
         var parentReferenceMock = new Mock<IParentReference>();
@@ -44,7 +45,7 @@ public class RegistratorTests
     }
 
     [Fact]
-    public void Expose_ExistingEvent_ThrowsArgumentException()
+    public void ExposeEvent_ExistingEvent_ThrowsArgumentException()
     {
         // Arrange
         _sut.ExposeEvent<TestEvent>();
@@ -57,7 +58,7 @@ public class RegistratorTests
     }
 
     [Fact]
-    public void Expose_NewMappedEvent_RegistersMappedExposer()
+    public void ExposeEvent_NewMappedEvent_RegistersMappedExposer()
     {
         // Arrange
         var mapMock = new Mock<Func<TestEvent, OtherEvent>>();
@@ -75,7 +76,7 @@ public class RegistratorTests
     }
 
     [Fact]
-    public void Expose_ExistingMappedEvent_ThrowsArgumentException()
+    public void ExposeEvent_ExistingMappedEvent_ThrowsArgumentException()
     {
         // Arrange
         var mapMock = new Mock<Func<TestEvent, OtherEvent>>();
@@ -89,7 +90,7 @@ public class RegistratorTests
     }
 
     [Fact]
-    public void Forward_NewEvent_RegistersForwarder()
+    public void ForwardEvent_NewEvent_RegistersForwarder()
     {
         // Arrange
         var targetModuleMock = new Mock<IModule<TestModule>>();
@@ -106,7 +107,7 @@ public class RegistratorTests
     }
 
     [Fact]
-    public void Forward_ExistingEvent_ThrowsArgumentException()
+    public void ForwardEvent_ExistingEvent_ThrowsArgumentException()
     {
         // Arrange
         _sut.ForwardEvent<TestEvent, TestModule>();
@@ -119,7 +120,7 @@ public class RegistratorTests
     }
 
     [Fact]
-    public void Forward_NewMappedEvent_RegistersMappedForwarder()
+    public void ForwardEvent_NewMappedEvent_RegistersMappedForwarder()
     {
         // Arrange
         var mapMock = new Mock<Func<TestEvent, OtherEvent>>();
@@ -137,7 +138,7 @@ public class RegistratorTests
     }
 
     [Fact]
-    public void Forward_ExistingMappedEvent_ThrowsArgumentException()
+    public void ForwardEvent_ExistingMappedEvent_ThrowsArgumentException()
     {
         // Arrange
         var mapMock = new Mock<Func<TestEvent, OtherEvent>>();
@@ -151,7 +152,7 @@ public class RegistratorTests
     }
 
     [Fact]
-    public void Handle_NewEvent_RegistersHandler()
+    public void HandleEvent_NewEvent_RegistersHandler()
     {
         // Arrange
         // - no arrangement required
@@ -169,14 +170,16 @@ public class RegistratorTests
         Assert.NotNull(finalEventRegistration);
         Assert.IsType<FinalEventRegistration<TestEvent, TestEventHandler>>(finalEventRegistration);
 
-        Assert.NotNull(finalEventRegistration.Handler);
-        Assert.IsType<TestEventHandler>(finalEventRegistration.Handler);
+        using IServiceScope scope = _internals.CreateScope();
+        IEventHandler<TestEvent>? handler = scope.ServiceProvider.GetKeyedService<IEventHandler<TestEvent>>(finalEventRegistration.HandlerId);
+        Assert.NotNull(handler);
+        Assert.IsType<TestEventHandler>(handler);
 
         Assert.Equal(EventHandlerIdentity.Create<TestEventHandler>(), finalEventRegistration.HandlerId);
     }
 
     [Fact]
-    public void Handle_ExistingEvent_ThrowsArgumentException()
+    public void HandleEvent_ExistingEvent_ThrowsArgumentException()
     {
         // Arrange
         _sut.HandleEvent<TestEvent, TestEventHandler>();

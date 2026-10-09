@@ -2,14 +2,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Tycho.Identity.Structure;
 using Tycho.Structure;
 using Tycho.UnitTests._Utils;
 
 namespace Tycho.UnitTests.Structure;
 
-public class InternalsTests
+public class InternalsTests : IDisposable
 {
-    private readonly Internals _sut = new(Host.CreateEmptyApplicationBuilder(default), typeof(InternalsTests));
+    private readonly Internals _sut = new TestInternals();
 
     [Fact]
     public async Task StartAndStopAsync_LogCompletedLifecycleWithOwnerIdentity()
@@ -26,8 +27,8 @@ public class InternalsTests
         await _sut.StopAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        LogAssert.Logged(logger, LogLevel.Information, 1001, "TychoHostStarted", null, ("OwnerInstanceId", _sut.OwnerInstanceId.Value));
-        LogAssert.Logged(logger, LogLevel.Information, 1002, "TychoHostStopped", null, ("OwnerInstanceId", _sut.OwnerInstanceId.Value));
+        LogAssert.Logged(logger, LogLevel.Information, 1001, "TychoHostStarted", null, ("OwnerId", _sut.OwnerId.Value));
+        LogAssert.Logged(logger, LogLevel.Information, 1002, "TychoHostStopped", null, ("OwnerId", _sut.OwnerId.Value));
     }
 
     [Fact]
@@ -75,6 +76,18 @@ public class InternalsTests
 
         // Assert
         Assert.Equal(1, disposable.DisposeCalls);
+    }
+
+    public void Dispose() => _sut.Dispose();
+
+    private sealed class TestInternals() : Internals(
+        Host.CreateEmptyApplicationBuilder(default),
+        new ControlPlane(InstanceIdentity.Create(typeof(InternalsTests))),
+        InstanceIdentity.Create(typeof(InternalsTests)))
+    {
+        protected override void PrepareForStart(CancellationToken cancellationToken)
+        {
+        }
     }
 
     private sealed class DisposableService : IDisposable

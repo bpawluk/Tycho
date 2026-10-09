@@ -12,12 +12,12 @@ using Tycho.UnitTests._Data.Modules;
 
 namespace Tycho.UnitTests.Events.Registrating.Registrations;
 
-public class ForwardingEventRegistrationTests
+public class MappedForwardingEventRegistrationTests
 {
     private readonly Mock<IModule<TestModule>> _moduleMock;
     private readonly Mock<IEventBroker> _eventBrokerMock;
 
-    public ForwardingEventRegistrationTests()
+    public MappedForwardingEventRegistrationTests()
     {
         _eventBrokerMock = new Mock<IEventBroker>();
 
@@ -32,19 +32,25 @@ public class ForwardingEventRegistrationTests
         // Arrange
         var publishId = Guid.NewGuid();
         var eventPayload = new TestEvent();
+        var mappedPayload = new OtherEvent();
         CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
-        _eventBrokerMock.Setup(eb => eb.RouteAsync(publishId, eventPayload, cancellationToken))
+        var mapMock = new Mock<Func<TestEvent, OtherEvent>>();
+        mapMock.Setup(m => m(eventPayload))
+               .Returns(mappedPayload);
+
+        _eventBrokerMock.Setup(eb => eb.RouteAsync(publishId, mappedPayload, cancellationToken))
                         .ReturnsAsync([]);
 
-        var sut = new ForwardingEventRegistration<TestEvent, TestModule>(_moduleMock.Object);
+        var sut = new MappedForwardingEventRegistration<TestEvent, OtherEvent, TestModule>(_moduleMock.Object, mapMock.Object);
 
         // Act
         IReadOnlyCollection<RoutedEvent> result = await sut.RouteAsync(publishId, eventPayload, cancellationToken);
 
         // Assert
         Assert.Empty(result);
-        _eventBrokerMock.Verify(eb => eb.RouteAsync(publishId, eventPayload, cancellationToken), Times.Once);
+        mapMock.Verify(m => m(eventPayload), Times.Once);
+        _eventBrokerMock.Verify(eb => eb.RouteAsync(publishId, mappedPayload, cancellationToken), Times.Once);
     }
 
     [Fact]
@@ -53,14 +59,19 @@ public class ForwardingEventRegistrationTests
         // Arrange
         var publishId = Guid.NewGuid();
         var eventPayload = new TestEvent();
+        var mappedPayload = new OtherEvent();
         CancellationToken cancellationToken = TestContext.Current.CancellationToken;
-        RoutedEvent<TestEvent> firstRoutedEvent = CreateRoutedEvent(eventPayload);
-        RoutedEvent<TestEvent> secondRoutedEvent = CreateRoutedEvent(eventPayload);
+        RoutedEvent<OtherEvent> firstRoutedEvent = CreateRoutedEvent(mappedPayload);
+        RoutedEvent<OtherEvent> secondRoutedEvent = CreateRoutedEvent(mappedPayload);
 
-        _eventBrokerMock.Setup(eb => eb.RouteAsync(publishId, eventPayload, cancellationToken))
+        var mapMock = new Mock<Func<TestEvent, OtherEvent>>();
+        mapMock.Setup(m => m(eventPayload))
+               .Returns(mappedPayload);
+
+        _eventBrokerMock.Setup(eb => eb.RouteAsync(publishId, mappedPayload, cancellationToken))
                         .ReturnsAsync([firstRoutedEvent, secondRoutedEvent]);
 
-        var sut = new ForwardingEventRegistration<TestEvent, TestModule>(_moduleMock.Object);
+        var sut = new MappedForwardingEventRegistration<TestEvent, OtherEvent, TestModule>(_moduleMock.Object, mapMock.Object);
 
         // Act
         IReadOnlyCollection<RoutedEvent> result = await sut.RouteAsync(publishId, eventPayload, cancellationToken);
@@ -71,7 +82,8 @@ public class ForwardingEventRegistrationTests
         Assert.Contains(secondRoutedEvent, result);
         Assert.Equal(InstanceIdentity.Parse("test-endpoint"), firstRoutedEvent.DestinationId);
         Assert.Equal(InstanceIdentity.Parse("test-endpoint"), secondRoutedEvent.DestinationId);
-        _eventBrokerMock.Verify(eb => eb.RouteAsync(publishId, eventPayload, cancellationToken), Times.Once);
+        mapMock.Verify(m => m(eventPayload), Times.Once);
+        _eventBrokerMock.Verify(eb => eb.RouteAsync(publishId, mappedPayload, cancellationToken), Times.Once);
     }
 
     private static RoutedEvent<TEvent> CreateRoutedEvent<TEvent>(TEvent payload)

@@ -5,14 +5,11 @@ using Moq;
 using Tycho.Events;
 using Tycho.Events.Inbox;
 using Tycho.Events.Model;
-using Tycho.Events.Registrating.Registrations;
-using Tycho.Events.Routing;
 using Tycho.Identity.Events;
 using Tycho.Structure;
 using Tycho.Transactions;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
-using Tycho.UnitTests._Data.Modules;
 using Tycho.UnitTests._Utils;
 
 namespace Tycho.UnitTests.Events.Inbox;
@@ -23,7 +20,7 @@ public class InboxProcessorJobTests
     private readonly Mock<ITransaction> _transactionMock = new();
     private readonly Mock<IEventHandler<TestEvent>> _handlerMock = new();
     private readonly Mock<ITransactionalEventHandler<TestEvent>> _transactionalHandlerMock = new();
-    private readonly Mock<IFinalEventRegistration<TestEvent>> _registrationMock = new();
+    private readonly Mock<Func<IEventHandler<TestEvent>>> _handlerFactoryMock = new();
     private readonly Mock<ILogger<InboxProcessorJob>> _logger = new();
 
     public InboxProcessorJobTests()
@@ -54,9 +51,6 @@ public class InboxProcessorJobTests
                 It.IsAny<EventContext<TestEvent>>(),
                 It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
-
-        _registrationMock.SetupGet(registration => registration.HandlerId)
-            .Returns(EventHandlerIdentity.Create<TestEventHandler>());
     }
 
     [Fact]
@@ -98,7 +92,7 @@ public class InboxProcessorJobTests
 
         // Assert
         VerifyTransactionExecution(Times.Never(), cancellationToken);
-        _registrationMock.VerifyGet(registration => registration.Handler, Times.Never);
+        _handlerFactoryMock.Verify(factory => factory(), Times.Never);
         _inboxConsumerMock.Verify(inbox => inbox.MarkAsHandledAsync(It.IsAny<Guid>(), cancellationToken), Times.Never);
         _inboxConsumerMock.Verify(inbox => inbox.MarkAsFailedAsync(It.IsAny<Guid>(), cancellationToken), Times.Never);
         LogAssert.Logged(_logger, LogLevel.Warning, 1305, "InboxJobIsMissing");
@@ -108,7 +102,7 @@ public class InboxProcessorJobTests
     public async Task ExecuteAsync_WithNonTransactionalHandler_HandlesAndAcknowledgesWithoutTransaction()
     {
         // Arrange
-        InboxEvent inboxEvent = CreateInboxEvent(out RoutedEvent<TestEvent> routedEvent);
+        InboxEvent inboxEvent = CreateInboxEvent(out Event<TestEvent> routedEvent);
         CancellationToken cancellationToken = TestContext.Current.CancellationToken;
         InboxProcessorJob sut = CreateSut();
 
@@ -241,7 +235,7 @@ public class InboxProcessorJobTests
         InboxEvent inboxEvent = CreateInboxEvent(out _);
         CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
-        var internals = new Internals(Host.CreateEmptyApplicationBuilder(default), typeof(TestModule));
+        var internals = new AppInternals(Host.CreateEmptyApplicationBuilder(default), typeof(InboxProcessorJobTests));
         IServiceCollection services = internals.GetHostBuilder().Services;
 
         int inboxInstance = 0;
@@ -271,8 +265,8 @@ public class InboxProcessorJobTests
             .Setup(value => value.HandleAsync(It.IsAny<EventContext<TestEvent>>(), cancellationToken))
             .ThrowsAsync(new InvalidOperationException("handler failure"));
 
-        _registrationMock.SetupGet(registration => registration.Handler).Returns(handler.Object);
-        services.AddSingleton(_registrationMock.Object);
+        services.AddKeyedScoped<IEventHandler<TestEvent>>(
+            EventHandlerIdentity.Create<TestEventHandler>(), (_, _) => handler.Object);
 
         internals.Build();
         InboxProcessorJob sut = new InboxProcessorJob(internals).ForEvent(inboxEvent);
@@ -286,7 +280,7 @@ public class InboxProcessorJobTests
 
     private InboxProcessorJob CreateSut(bool withHandler = true, bool useTransactionalHandler = false)
     {
-        var internals = new Internals(Host.CreateEmptyApplicationBuilder(default), typeof(TestModule));
+        var internals = new AppInternals(Host.CreateEmptyApplicationBuilder(default), typeof(InboxProcessorJobTests));
         IServiceCollection services = internals.GetHostBuilder().Services;
         services.AddSingleton(_inboxConsumerMock.Object);
         services.AddSingleton(_transactionMock.Object);
@@ -294,25 +288,25 @@ public class InboxProcessorJobTests
 
         if (withHandler)
         {
-            _registrationMock.SetupGet(registration => registration.Handler)
+            _handlerFactoryMock.Setup(factory => factory())
                 .Returns(useTransactionalHandler
                     ? _transactionalHandlerMock.Object
                     : _handlerMock.Object);
-            services.AddSingleton(_registrationMock.Object);
+            services.AddKeyedScoped<IEventHandler<TestEvent>>(
+                EventHandlerIdentity.Create<TestEventHandler>(), (_, _) => _handlerFactoryMock.Object());
         }
 
         internals.Build();
         return new InboxProcessorJob(internals);
     }
 
-    private static InboxEvent CreateInboxEvent(out RoutedEvent<TestEvent> routedEvent)
+    private static InboxEvent CreateInboxEvent(out Event<TestEvent> routedEvent)
     {
-        routedEvent = new RoutedEvent<TestEvent>(
+        routedEvent = new Event<TestEvent>(
             Guid.NewGuid(),
             Guid.NewGuid(),
             EventIdentity.Create<TestEvent>(),
             EventHandlerIdentity.Create<TestEventHandler>(),
-            Route.Create(),
             new TestEvent());
         return new InboxEvent(Guid.NewGuid(), routedEvent);
     }

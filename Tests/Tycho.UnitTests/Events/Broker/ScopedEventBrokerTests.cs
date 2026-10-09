@@ -5,17 +5,18 @@ using Tycho.Events.Broker;
 using Tycho.Events.Delivery;
 using Tycho.Events.Model;
 using Tycho.Events.Registrating.Registrations;
-using Tycho.Events.Routing;
 using Tycho.Identity.Events;
+using Tycho.Identity.Structure;
 using Tycho.Structure;
 using Tycho.UnitTests._Data.Events;
 using Tycho.UnitTests._Data.Handlers;
-using Tycho.UnitTests._Data.Modules;
 
 namespace Tycho.UnitTests.Events.Broker;
 
-public class ScopedEventBrokerTests
+public class ScopedEventBrokerTests : IDisposable
 {
+    private readonly List<Internals> _hosts = [];
+
     [Fact]
     public async Task RouteAsync_WithNoRegistrations_ReturnsEmpty()
     {
@@ -61,8 +62,9 @@ public class ScopedEventBrokerTests
             services.AddSingleton(secondRegistration.Object);
         });
 
-        // Act
         CancellationToken cancellationToken = TestContext.Current.CancellationToken;
+
+        // Act
         IReadOnlyCollection<RoutedEvent> result = await sut.RouteAsync(publishId, eventPayload, cancellationToken);
 
         // Assert
@@ -77,104 +79,80 @@ public class ScopedEventBrokerTests
     }
 
     [Fact]
-    public async Task DeliverAsync_WithMatchingStrategy_CallsDeliverAsync()
+    public async Task DeliverAsync_WithRegisteredDestination_AcceptsOnlyAtThatEndpoint()
     {
         // Arrange
         SerializedRoutedEvent routedEvent = CreateSerializedRoutedEvent();
-        var cancellationToken = new CancellationToken();
-
-        var matchingStrategyMock = new Mock<IDeliveryStrategy>();
-        matchingStrategyMock.Setup(s => s.CanDeliver(routedEvent)).Returns(true);
-
-        var otherStrategyMock = new Mock<IDeliveryStrategy>();
-        otherStrategyMock.Setup(s => s.CanDeliver(routedEvent)).Returns(false);
-
-        var anotherStrategyMock = new Mock<IDeliveryStrategy>();
-        anotherStrategyMock.Setup(s => s.CanDeliver(routedEvent)).Returns(false);
-
-        ScopedEventBroker sut = CreateSut(services =>
-        {
-            services.AddSingleton(matchingStrategyMock.Object);
-            services.AddSingleton(otherStrategyMock.Object);
-            services.AddSingleton(anotherStrategyMock.Object);
-        });
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
+        var destinationMock = new Mock<IDeliveryEndpoint>(MockBehavior.Strict);
+        destinationMock.Setup(endpoint => endpoint.AcceptAsync(routedEvent, cancellationToken)).Returns(Task.CompletedTask);
+        var otherEndpointMock = new Mock<IDeliveryEndpoint>(MockBehavior.Strict);
+        var controlPlane = new ControlPlane(InstanceIdentity.Create(typeof(ScopedEventBrokerTests)));
+        controlPlane.RegisterModule(routedEvent.DestinationId, new ModuleReference(destinationMock.Object));
+        controlPlane.RegisterModule(InstanceIdentity.Parse("other-module"), new ModuleReference(otherEndpointMock.Object));
+        controlPlane.CompleteRegistration();
+        using ServiceProvider services = new ServiceCollection().BuildServiceProvider();
+        var sut = new ScopedEventBroker(services, controlPlane);
 
         // Act
         await sut.DeliverAsync(routedEvent, cancellationToken);
 
         // Assert
-        matchingStrategyMock.Verify(s => s.DeliverAsync(routedEvent, cancellationToken), Times.Once);
-        otherStrategyMock.Verify(s => s.DeliverAsync(routedEvent, cancellationToken), Times.Never);
-        anotherStrategyMock.Verify(s => s.DeliverAsync(routedEvent, cancellationToken), Times.Never);
+        destinationMock.Verify(endpoint => endpoint.AcceptAsync(routedEvent, cancellationToken), Times.Once);
+        destinationMock.VerifyNoOtherCalls();
+        otherEndpointMock.VerifyNoOtherCalls();
     }
 
     [Fact]
-    public async Task DeliverAsync_WithNoMatchingStrategies_ThrowsInvalidOperationException()
+    public async Task DeliverAsync_WithUnregisteredDestination_ThrowsWithoutCallingOtherEndpoints()
     {
         // Arrange
         SerializedRoutedEvent routedEvent = CreateSerializedRoutedEvent();
-        var cancellationToken = new CancellationToken();
-
-        var notMatchingStrategyMock = new Mock<IDeliveryStrategy>();
-        notMatchingStrategyMock.Setup(s => s.CanDeliver(routedEvent)).Returns(false);
-
-        ScopedEventBroker sut = CreateSut(services =>
-        {
-            services.AddSingleton(_ => notMatchingStrategyMock.Object);
-        });
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
+        var otherEndpointMock = new Mock<IDeliveryEndpoint>(MockBehavior.Strict);
+        var controlPlane = new ControlPlane(InstanceIdentity.Create(typeof(ScopedEventBrokerTests)));
+        controlPlane.RegisterModule(InstanceIdentity.Parse("other-module"), new ModuleReference(otherEndpointMock.Object));
+        controlPlane.CompleteRegistration();
+        using ServiceProvider services = new ServiceCollection().BuildServiceProvider();
+        var sut = new ScopedEventBroker(services, controlPlane);
 
         // Act
         Task Act() => sut.DeliverAsync(routedEvent, cancellationToken);
 
         // Assert
         await Assert.ThrowsAsync<InvalidOperationException>(Act);
+
+        otherEndpointMock.VerifyNoOtherCalls();
     }
 
-    [Fact]
-    public async Task DeliverAsync_WithMoreThanOneMatchingStrategy_ThrowsInvalidOperationException()
+    private ScopedEventBroker CreateSut(Action<IServiceCollection> configure)
     {
-        // Arrange
-        SerializedRoutedEvent routedEvent = CreateSerializedRoutedEvent();
-        var cancellationToken = new CancellationToken();
-
-        var matchingStrategyMock = new Mock<IDeliveryStrategy>();
-        matchingStrategyMock.Setup(s => s.CanDeliver(routedEvent)).Returns(true);
-
-        var otherStrategyMock = new Mock<IDeliveryStrategy>();
-        otherStrategyMock.Setup(s => s.CanDeliver(routedEvent)).Returns(true);
-
-        ScopedEventBroker sut = CreateSut(services =>
-        {
-            services.AddSingleton(matchingStrategyMock.Object);
-            services.AddSingleton(otherStrategyMock.Object);
-        });
-
-        // Act
-        Task Act() => sut.DeliverAsync(routedEvent, cancellationToken);
-
-        // Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(Act);
-    }
-
-    private static ScopedEventBroker CreateSut(Action<IServiceCollection> configure)
-    {
-        var internals = new Internals(Host.CreateEmptyApplicationBuilder(default), typeof(TestModule));
+        var internals = new AppInternals(Host.CreateEmptyApplicationBuilder(default), typeof(ScopedEventBrokerTests));
+        _hosts.Add(internals);
         configure(internals.GetHostBuilder().Services);
         internals.Build();
-        return new ScopedEventBroker(internals);
+        return new ScopedEventBroker(internals, internals.ControlPlane);
     }
 
     private static RoutedEvent<TestEvent> CreateRoutedEvent()
     {
         var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        return new RoutedEvent<TestEvent>(Guid.NewGuid(), Guid.NewGuid(), eventId, handlerId, Route.Create(), new TestEvent());
+        return new RoutedEvent<TestEvent>(Guid.NewGuid(), Guid.NewGuid(), eventId, handlerId, InstanceIdentity.Parse("test-endpoint"), new TestEvent());
     }
 
     private static SerializedRoutedEvent CreateSerializedRoutedEvent()
     {
         var eventId = EventIdentity.Create<TestEvent>();
         var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
-        return new SerializedRoutedEvent(Guid.NewGuid(), Guid.NewGuid(), eventId, handlerId, Route.Create(), "{}");
+        return new SerializedRoutedEvent(Guid.NewGuid(), Guid.NewGuid(), eventId, handlerId, InstanceIdentity.Parse("test-endpoint"), "{}");
+    }
+
+    public void Dispose()
+    {
+        foreach (Internals host in _hosts)
+        {
+            host.Dispose();
+        }
     }
 }
