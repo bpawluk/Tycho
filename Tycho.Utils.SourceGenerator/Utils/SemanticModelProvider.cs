@@ -7,7 +7,7 @@ namespace Tycho.Utils.SourceGenerator.Utils
     {
         private readonly Compilation _compilation;
 
-        private readonly Dictionary<SyntaxTree, SemanticModel> _semanticModels = new Dictionary<SyntaxTree, SemanticModel>();
+        private readonly Dictionary<SyntaxTree, SemanticModel> _semanticModels = new();
 
         public SemanticModelProvider(Compilation compilation)
         {

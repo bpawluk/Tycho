@@ -25,9 +25,9 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
         public static string RequestTypeParameterName => "TRequest";
         public static string ResponseTypeParameterName => "TResponse";
 
-        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
+        public static TypeReferenceModel TypeModel => new(Namespace, TypeName);
 
-        public static TypeReferenceModel RequestBindingTypeModel => new TypeReferenceModel(
+        public static TypeReferenceModel RequestBindingTypeModel => new(
             Namespace,
             ImmutableEquatableArray<TypeReferenceModel>.Empty,
             RequestBindingTypeName,
@@ -38,7 +38,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
                     TypeReferenceModel.TypeParameter(Namespace, RequestTypeParameterName)),
             }));
 
-        public static TypeReferenceModel RequestBindingWithResponseTypeModel => new TypeReferenceModel(
+        public static TypeReferenceModel RequestBindingWithResponseTypeModel => new(
             Namespace,
             ImmutableEquatableArray<TypeReferenceModel>.Empty,
             RequestBindingTypeName,
@@ -52,22 +52,22 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
                     TypeReferenceModel.TypeParameter(Namespace, ResponseTypeParameterName)),
             }));
 
-        public static MethodSignatureModel ExpectsMethodSignature => new MethodSignatureModel(
+        public static MethodSignatureModel ExpectsMethodSignature => new(
             methodName: "Expects",
             parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
             result: RequestBindingTypeModel);
 
-        public static MethodSignatureModel ExpectsWithResponseMethodSignature => new MethodSignatureModel(
+        public static MethodSignatureModel ExpectsWithResponseMethodSignature => new(
             methodName: "Expects",
             parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
             result: RequestBindingWithResponseTypeModel);
 
-        public static MethodSignatureModel RequiresMethodSignature => new MethodSignatureModel(
+        public static MethodSignatureModel RequiresMethodSignature => new(
             methodName: "Requires",
             parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
             result: TypeModel);
 
-        public static MethodSignatureModel RequiresWithResponseMethodSignature => new MethodSignatureModel(
+        public static MethodSignatureModel RequiresWithResponseMethodSignature => new(
             methodName: "Requires",
             parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
             result: TypeModel);

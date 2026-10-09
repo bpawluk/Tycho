@@ -6,7 +6,7 @@ namespace Tycho.Utils.SourceGenerator.References.System
 {
     internal static class ActionReference
     {
-        public static TypeReferenceModel CreateTypeModel(TypeReferenceModel argument) => new TypeReferenceModel(
+        public static TypeReferenceModel CreateTypeModel(TypeReferenceModel argument) => new(
             typeof(Action).Namespace,
             ImmutableEquatableArray<TypeReferenceModel>.Empty,
             nameof(Action),

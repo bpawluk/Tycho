@@ -8,6 +8,6 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
         private const string Namespace = "Tycho.Apps.Instance";
         private const string TypeName = "IApp";
 
-        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
+        public static TypeReferenceModel TypeModel => new(Namespace, TypeName);
     }
 }

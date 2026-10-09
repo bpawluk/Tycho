@@ -7,6 +7,6 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Structure
         private const string Namespace = "Tycho.Structure";
         private const string TypeName = "IRunnable";
 
-        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
+        public static TypeReferenceModel TypeModel => new(Namespace, TypeName);
     }
 }

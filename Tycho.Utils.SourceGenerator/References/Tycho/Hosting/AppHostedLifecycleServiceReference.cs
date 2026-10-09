@@ -7,6 +7,6 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Hosting
         private const string Namespace = "Tycho.Hosting.Services";
         private const string TypeName = "AppHostedLifecycleService";
 
-        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
+        public static TypeReferenceModel TypeModel => new(Namespace, TypeName);
     }
 }

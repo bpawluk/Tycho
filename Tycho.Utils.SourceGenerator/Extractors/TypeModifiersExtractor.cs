@@ -9,7 +9,7 @@ namespace Tycho.Utils.SourceGenerator.Extractors
 {
     internal static class TypeModifiersExtractor
     {
-        private static readonly Dictionary<SyntaxKind, TypeModifier> s_modifiers = new Dictionary<SyntaxKind, TypeModifier>
+        private static readonly Dictionary<SyntaxKind, TypeModifier> s_modifiers = new()
         {
             { SyntaxKind.NewKeyword, TypeModifier.New },
             { SyntaxKind.PublicKeyword, TypeModifier.Public },

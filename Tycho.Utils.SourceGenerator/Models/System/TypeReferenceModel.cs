@@ -73,7 +73,7 @@ namespace Tycho.Utils.SourceGenerator.Models.System
             IsTypeParameter = isTypeParameter;
         }
 
-        public static TypeReferenceModel TypeParameter(string typeNamespace, string typeName) => new TypeReferenceModel(
+        public static TypeReferenceModel TypeParameter(string typeNamespace, string typeName) => new(
             typeNamespace,
             ImmutableEquatableArray<TypeReferenceModel>.Empty,
             typeName,

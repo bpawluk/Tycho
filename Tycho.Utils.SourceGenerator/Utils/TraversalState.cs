@@ -4,7 +4,7 @@ namespace Tycho.Utils.SourceGenerator.Utils
 {
     internal sealed class TraversalState<TNode>
     {
-        private readonly Stack<TNode> _pendingNodes = new Stack<TNode>();
+        private readonly Stack<TNode> _pendingNodes = new();
 
         public void SaveToVisit(TNode node)
         {

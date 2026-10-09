@@ -9,6 +9,6 @@ namespace Tycho.Utils.SourceGenerator.References.Microsoft
 
         public const string AddHostedServiceMethodName = "AddHostedService";
 
-        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
+        public static TypeReferenceModel TypeModel => new(Namespace, TypeName);
     }
 }

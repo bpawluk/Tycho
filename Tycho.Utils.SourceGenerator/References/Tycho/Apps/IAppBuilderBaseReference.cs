@@ -9,6 +9,6 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
 
         public const string BuildMethodName = "Build";
 
-        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
+        public static TypeReferenceModel TypeModel => new(Namespace, TypeName);
     }
 }

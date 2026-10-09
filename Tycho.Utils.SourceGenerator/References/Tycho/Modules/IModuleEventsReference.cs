@@ -22,9 +22,9 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
 
         public static string EventTypeParameterName => "TEvent";
 
-        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
+        public static TypeReferenceModel TypeModel => new(Namespace, TypeName);
 
-        public static TypeReferenceModel EventBindingTypeModel => new TypeReferenceModel(
+        public static TypeReferenceModel EventBindingTypeModel => new(
             Namespace,
             ImmutableEquatableArray<TypeReferenceModel>.Empty,
             EventBindingTypeName,
@@ -35,12 +35,12 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
                     TypeReferenceModel.TypeParameter(Namespace, EventTypeParameterName)),
             }));
 
-        public static MethodSignatureModel ExpectsMethodSignature => new MethodSignatureModel(
+        public static MethodSignatureModel ExpectsMethodSignature => new(
             methodName: "Expects",
             parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
             result: EventBindingTypeModel);
 
-        public static MethodSignatureModel HandlesWithMethodSignature => new MethodSignatureModel(
+        public static MethodSignatureModel HandlesWithMethodSignature => new(
             methodName: "HandlesWith",
             parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
             result: TypeModel);

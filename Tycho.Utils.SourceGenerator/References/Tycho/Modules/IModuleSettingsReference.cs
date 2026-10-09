@@ -8,6 +8,6 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
         private const string Namespace = "Tycho.Modules";
         private const string TypeName = "IModuleSettings";
 
-        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
+        public static TypeReferenceModel TypeModel => new(Namespace, TypeName);
     }
 }

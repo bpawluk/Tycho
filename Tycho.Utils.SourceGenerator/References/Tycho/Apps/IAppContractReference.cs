@@ -18,7 +18,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
         public static string RequestTypeParameterName => "TRequest";
         public static string ResponseTypeParameterName => "TResponse";
 
-        public static TypeReferenceModel RequestBindingTypeModel => new TypeReferenceModel(
+        public static TypeReferenceModel RequestBindingTypeModel => new(
             Namespace,
             ImmutableEquatableArray<TypeReferenceModel>.Empty,
             RequestBindingTypeName,
@@ -29,7 +29,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
                     TypeReferenceModel.TypeParameter(Namespace, RequestTypeParameterName)),
             }));
 
-        public static TypeReferenceModel RequestBindingWithResponseTypeModel => new TypeReferenceModel(
+        public static TypeReferenceModel RequestBindingWithResponseTypeModel => new(
             Namespace,
             ImmutableEquatableArray<TypeReferenceModel>.Empty,
             RequestBindingTypeName,
@@ -43,12 +43,12 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Apps
                     TypeReferenceModel.TypeParameter(Namespace, ResponseTypeParameterName)),
             }));
 
-        public static MethodSignatureModel ExpectsMethodSignature => new MethodSignatureModel(
+        public static MethodSignatureModel ExpectsMethodSignature => new(
             methodName: "Expects",
             parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
             result: RequestBindingTypeModel);
 
-        public static MethodSignatureModel ExpectsWithResponseMethodSignature => new MethodSignatureModel(
+        public static MethodSignatureModel ExpectsWithResponseMethodSignature => new(
             methodName: "Expects",
             parameters: ImmutableEquatableArray<TypeReferenceModel>.Empty,
             result: RequestBindingWithResponseTypeModel);

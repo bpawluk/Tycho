@@ -20,9 +20,9 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
 
         public static string ModuleTypeParameterName => "TModule";
 
-        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
+        public static TypeReferenceModel TypeModel => new(Namespace, TypeName);
 
-        public static MethodSignatureModel UsesMethodSignature => new MethodSignatureModel(
+        public static MethodSignatureModel UsesMethodSignature => new(
             methodName: "Uses",
             parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
             {
@@ -30,7 +30,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
             }),
             result: TypeModel);
 
-        public static MethodSignatureModel UsesWithContractFulfillmentMethodSignature => new MethodSignatureModel(
+        public static MethodSignatureModel UsesWithContractFulfillmentMethodSignature => new(
             methodName: "Uses",
             parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
             {
@@ -39,7 +39,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
             }),
             result: TypeModel);
 
-        public static MethodSignatureModel UsesWithSettingsMethodSignature => new MethodSignatureModel(
+        public static MethodSignatureModel UsesWithSettingsMethodSignature => new(
             methodName: "Uses",
             parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
             {
@@ -48,7 +48,7 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Modules
             }),
             result: TypeModel);
 
-        public static MethodSignatureModel UsesWithContractFulfillmentAndSettingsMethodSignature => new MethodSignatureModel(
+        public static MethodSignatureModel UsesWithContractFulfillmentAndSettingsMethodSignature => new(
             methodName: "Uses",
             parameters: new ImmutableEquatableArray<TypeReferenceModel>(new[]
             {

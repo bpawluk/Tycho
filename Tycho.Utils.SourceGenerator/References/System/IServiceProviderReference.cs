@@ -7,6 +7,6 @@ namespace Tycho.Utils.SourceGenerator.References.System
         private const string Namespace = "System";
         private const string TypeName = "IServiceProvider";
 
-        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
+        public static TypeReferenceModel TypeModel => new(Namespace, TypeName);
     }
 }

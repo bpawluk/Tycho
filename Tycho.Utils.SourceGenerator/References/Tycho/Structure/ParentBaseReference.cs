@@ -9,6 +9,6 @@ namespace Tycho.Utils.SourceGenerator.References.Tycho.Structure
 
         public const string ExecuteAsyncMethodName = "ExecuteAsync";
 
-        public static TypeReferenceModel TypeModel => new TypeReferenceModel(Namespace, TypeName);
+        public static TypeReferenceModel TypeModel => new(Namespace, TypeName);
     }
 }

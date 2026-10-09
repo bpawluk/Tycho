@@ -44,7 +44,7 @@ namespace Tycho.Utils.SourceGenerator.Utils
             return hash;
         }
 
-        public Enumerator GetEnumerator() => new Enumerator(_values);
+        public Enumerator GetEnumerator() => new(_values);
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => ((IEnumerable<T>)_values).GetEnumerator();
 

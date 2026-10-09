@@ -62,8 +62,8 @@ namespace Tycho.Utils.SourceGenerator
             if (context.TargetSymbol is ITypeSymbol targetTypeSymbol)
             {
                 Compilation compilation = context.SemanticModel.Compilation;
-                SemanticModelProvider semanticModelProvider = new SemanticModelProvider(compilation);
-                ExtractorContext extractorContext = new ExtractorContext(compilation, semanticModelProvider, cancellationToken);
+                SemanticModelProvider semanticModelProvider = new(compilation);
+                ExtractorContext extractorContext = new(compilation, semanticModelProvider, cancellationToken);
 
                 TychoDefinitionKind definitionKind = TychoDefinitionKindExtractor.Extract(targetTypeSymbol, extractorContext);
                 if (definitionKind == TychoDefinitionKind.Unknown || targetTypeSymbol.IsAbstract)

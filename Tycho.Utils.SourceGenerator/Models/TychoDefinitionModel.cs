@@ -34,7 +34,7 @@ namespace Tycho.Utils.SourceGenerator.Models
             IsValid = true;
         }
 
-        public static TychoDefinitionModel None() => new TychoDefinitionModel();
+        public static TychoDefinitionModel None() => new();
 
         public bool Equals(TychoDefinitionModel other)
         {
