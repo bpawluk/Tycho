@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
-using Tycho.Events.Broker;
+using Tycho.Events.Routing;
 using Tycho.Identity.Structure;
 using Tycho.Modules.Instance;
 using Tycho.Modules.Setup;
@@ -16,7 +16,7 @@ public sealed class ModuleBuilderTests
 {
     private readonly ModuleBuilder _sut = new ModuleBuilder(typeof(TestModule)).WithControlPlane(new ControlPlane(InstanceIdentity.Create(typeof(ModuleBuilderTests))));
     private readonly IRequestBroker _requestBroker = Mock.Of<IRequestBroker>();
-    private readonly IEventBroker _eventBroker = Mock.Of<IEventBroker>();
+    private readonly IEventRouter _eventRouter = Mock.Of<IEventRouter>();
 
     [Fact]
     public void Build_WhenAlreadyBuilt_ThrowsWithoutCreatingAnotherHost()
@@ -41,7 +41,7 @@ public sealed class ModuleBuilderTests
 
     [Theory]
     [InlineData("RequestBroker")]
-    [InlineData("EventBroker")]
+    [InlineData("EventRouter")]
     [InlineData("ControlPlane")]
     public void Build_WithMissingParentComponent_ThrowsBeforeCreatingHost(string missingComponent)
     {
@@ -59,7 +59,7 @@ public sealed class ModuleBuilderTests
             return Host.CreateEmptyApplicationBuilder(null);
         });
         sut.WithContract(_ => configurationCalls++, missingComponent == "RequestBroker" ? null : _requestBroker);
-        sut.WithEvents(_ => configurationCalls++, missingComponent == "EventBroker" ? null : _eventBroker);
+        sut.WithEvents(_ => configurationCalls++, missingComponent == "EventRouter" ? null : _eventRouter);
 
         // Act
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() => sut.Build());
@@ -76,7 +76,7 @@ public sealed class ModuleBuilderTests
         // Arrange
         int configurationCalls = 0;
         _sut.WithContract(_ => configurationCalls++, _requestBroker);
-        _sut.WithEvents(_ => configurationCalls++, _eventBroker);
+        _sut.WithEvents(_ => configurationCalls++, _eventRouter);
         _sut.WithStructure(_ => configurationCalls++);
         _sut.WithServices(_ => configurationCalls++);
         _sut.WithHostConfiguration((_, _) => configurationCalls++);
@@ -106,7 +106,7 @@ public sealed class ModuleBuilderTests
         Assert.Equal(InstanceIdentity.Create(typeof(TestModule)), module.Internals.OwnerId);
         IParentReference parent = module.Internals.GetRequiredService<IParentReference>();
         Assert.Same(_requestBroker, parent.RequestBroker);
-        Assert.Same(_eventBroker, parent.EventBroker);
+        Assert.Same(_eventRouter, parent.EventRouter);
     }
 
     [Theory]
@@ -126,7 +126,7 @@ public sealed class ModuleBuilderTests
             "WithHostBuilder" => _sut.WithHostBuilder(null!),
             "WithHostConfiguration" => _sut.WithHostConfiguration(null!),
             "WithContract" => _sut.WithContract(null!, _requestBroker),
-            "WithEvents" => _sut.WithEvents(null!, _eventBroker),
+            "WithEvents" => _sut.WithEvents(null!, _eventRouter),
             "WithStructure" => _sut.WithStructure(null!),
             "WithServices" => _sut.WithServices(null!),
             "WithStartup" => _sut.WithStartup(null!),
@@ -146,7 +146,7 @@ public sealed class ModuleBuilderTests
         Assert.Same(_sut, _sut.WithHostBuilder(() => Host.CreateEmptyApplicationBuilder(null)));
         Assert.Same(_sut, _sut.WithHostConfiguration((_, _) => { }));
         Assert.Same(_sut, _sut.WithContract(_ => { }, _requestBroker));
-        Assert.Same(_sut, _sut.WithEvents(_ => { }, _eventBroker));
+        Assert.Same(_sut, _sut.WithEvents(_ => { }, _eventRouter));
         Assert.Same(_sut, _sut.WithStructure(_ => { }));
         Assert.Same(_sut, _sut.WithServices(_ => { }));
         Assert.Same(_sut, _sut.WithStartup((_, _) => Task.CompletedTask));
@@ -156,6 +156,6 @@ public sealed class ModuleBuilderTests
     private void ConfigureParent()
     {
         _sut.WithContract(_ => { }, _requestBroker);
-        _sut.WithEvents(_ => { }, _eventBroker);
+        _sut.WithEvents(_ => { }, _eventRouter);
     }
 }

@@ -1,4 +1,4 @@
-using Tycho.Events.Broker;
+using Tycho.Events.Routing;
 using Tycho.Requests.Broker;
 using Tycho.Utils;
 
@@ -10,7 +10,7 @@ namespace Tycho.Structure.Parent
     [ReferencedBySourceGenerator]
     public interface IParentReference
     {
-        internal IEventBroker EventBroker { get; }
+        internal IEventRouter EventRouter { get; }
         internal IRequestBroker RequestBroker { get; }
     }
 }

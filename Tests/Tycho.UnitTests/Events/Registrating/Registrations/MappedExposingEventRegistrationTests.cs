@@ -1,8 +1,8 @@
 using Moq;
 using Tycho.Events;
-using Tycho.Events.Broker;
 using Tycho.Events.Model;
 using Tycho.Events.Registrating.Registrations;
+using Tycho.Events.Routing;
 using Tycho.Identity.Events;
 using Tycho.Identity.Structure;
 using Tycho.Structure.Parent;
@@ -14,15 +14,15 @@ namespace Tycho.UnitTests.Events.Registrating.Registrations;
 public class MappedExposingEventRegistrationTests
 {
     private readonly Mock<IParentReference> _parentReferenceMock;
-    private readonly Mock<IEventBroker> _eventBrokerMock;
+    private readonly Mock<IEventRouter> _eventRouterMock;
 
     public MappedExposingEventRegistrationTests()
     {
-        _eventBrokerMock = new Mock<IEventBroker>();
+        _eventRouterMock = new Mock<IEventRouter>();
 
         _parentReferenceMock = new Mock<IParentReference>();
-        _parentReferenceMock.SetupGet(pr => pr.EventBroker)
-                            .Returns(_eventBrokerMock.Object);
+        _parentReferenceMock.SetupGet(pr => pr.EventRouter)
+                            .Returns(_eventRouterMock.Object);
     }
 
     [Fact]
@@ -38,7 +38,7 @@ public class MappedExposingEventRegistrationTests
         mapMock.Setup(m => m(eventPayload))
                .Returns(mappedPayload);
 
-        _eventBrokerMock.Setup(eb => eb.RouteAsync(publishId, mappedPayload, cancellationToken))
+        _eventRouterMock.Setup(eb => eb.RouteAsync(publishId, mappedPayload, cancellationToken))
                         .ReturnsAsync([]);
 
         var sut = new MappedExposingEventRegistration<TestEvent, OtherEvent>(_parentReferenceMock.Object, mapMock.Object);
@@ -49,7 +49,7 @@ public class MappedExposingEventRegistrationTests
         // Assert
         Assert.Empty(result);
         mapMock.Verify(m => m(eventPayload), Times.Once);
-        _eventBrokerMock.Verify(eb => eb.RouteAsync(publishId, mappedPayload, cancellationToken), Times.Once);
+        _eventRouterMock.Verify(eb => eb.RouteAsync(publishId, mappedPayload, cancellationToken), Times.Once);
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public class MappedExposingEventRegistrationTests
         mapMock.Setup(m => m(eventPayload))
                .Returns(mappedPayload);
 
-        _eventBrokerMock.Setup(eb => eb.RouteAsync(publishId, mappedPayload, cancellationToken))
+        _eventRouterMock.Setup(eb => eb.RouteAsync(publishId, mappedPayload, cancellationToken))
                         .ReturnsAsync([firstRoutedEvent, secondRoutedEvent]);
 
         var sut = new MappedExposingEventRegistration<TestEvent, OtherEvent>(_parentReferenceMock.Object, mapMock.Object);
@@ -82,7 +82,7 @@ public class MappedExposingEventRegistrationTests
         Assert.Equal(InstanceIdentity.Parse("test-endpoint"), firstRoutedEvent.DestinationId);
         Assert.Equal(InstanceIdentity.Parse("test-endpoint"), secondRoutedEvent.DestinationId);
         mapMock.Verify(m => m(eventPayload), Times.Once);
-        _eventBrokerMock.Verify(eb => eb.RouteAsync(publishId, mappedPayload, cancellationToken), Times.Once);
+        _eventRouterMock.Verify(eb => eb.RouteAsync(publishId, mappedPayload, cancellationToken), Times.Once);
     }
 
     private static RoutedEvent<TEvent> CreateRoutedEvent<TEvent>(TEvent payload)

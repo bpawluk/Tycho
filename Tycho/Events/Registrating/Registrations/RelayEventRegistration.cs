@@ -2,19 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Tycho.Events.Broker;
 using Tycho.Events.Model;
+using Tycho.Events.Routing;
 
 namespace Tycho.Events.Registrating.Registrations
 {
     internal abstract class RelayEventRegistration<TEvent> : IEventRegistration<TEvent>
         where TEvent : class, IEvent
     {
-        private readonly IEventBroker _externalEventBroker;
+        private readonly IEventRouter _externalEventRouter;
 
-        public RelayEventRegistration(IEventBroker externalEventBroker)
+        public RelayEventRegistration(IEventRouter externalEventRouter)
         {
-            _externalEventBroker = externalEventBroker;
+            _externalEventRouter = externalEventRouter;
         }
 
         public async Task<IReadOnlyCollection<RoutedEvent>> RouteAsync(
@@ -22,7 +22,7 @@ namespace Tycho.Events.Registrating.Registrations
             TEvent eventPayload,
             CancellationToken cancellationToken)
         {
-            IReadOnlyCollection<RoutedEvent> routedEvents = await _externalEventBroker.RouteAsync(publishId, eventPayload, cancellationToken).ConfigureAwait(false);
+            IReadOnlyCollection<RoutedEvent> routedEvents = await _externalEventRouter.RouteAsync(publishId, eventPayload, cancellationToken).ConfigureAwait(false);
 
             return routedEvents;
         }

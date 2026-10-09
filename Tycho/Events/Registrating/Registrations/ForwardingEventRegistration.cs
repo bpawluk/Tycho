@@ -9,7 +9,7 @@ namespace Tycho.Events.Registrating.Registrations
         where TEvent : class, IEvent
         where TModule : TychoModule
     {
-        public ForwardingEventRegistration(IModule<TModule> submodule) : base(submodule.EventBroker)
+        public ForwardingEventRegistration(IModule<TModule> submodule) : base(submodule.EventRouter)
         {
         }
     }
@@ -20,7 +20,7 @@ namespace Tycho.Events.Registrating.Registrations
         where TTargetEvent : class, IEvent
         where TModule : TychoModule
     {
-        public MappedForwardingEventRegistration(IModule<TModule> submodule, Func<TEvent, TTargetEvent> map) : base(submodule.EventBroker, map)
+        public MappedForwardingEventRegistration(IModule<TModule> submodule, Func<TEvent, TTargetEvent> map) : base(submodule.EventRouter, map)
         {
         }
     }

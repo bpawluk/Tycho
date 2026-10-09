@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Tycho.Events.Broker;
 using Tycho.Events.Model;
+using Tycho.Events.Routing;
 
 namespace Tycho.Events.Registrating.Registrations
 {
@@ -11,12 +11,12 @@ namespace Tycho.Events.Registrating.Registrations
         where TEvent : class, IEvent
         where TTargetEvent : class, IEvent
     {
-        private readonly IEventBroker _externalEventBroker;
+        private readonly IEventRouter _externalEventRouter;
         private readonly Func<TEvent, TTargetEvent> _map;
 
-        public MappedRelayEventRegistration(IEventBroker externalEventBroker, Func<TEvent, TTargetEvent> map)
+        public MappedRelayEventRegistration(IEventRouter externalEventRouter, Func<TEvent, TTargetEvent> map)
         {
-            _externalEventBroker = externalEventBroker;
+            _externalEventRouter = externalEventRouter;
             _map = map;
         }
 
@@ -25,7 +25,7 @@ namespace Tycho.Events.Registrating.Registrations
             TEvent eventPayload,
             CancellationToken cancellationToken)
         {
-            IReadOnlyCollection<RoutedEvent> routedEvents = await _externalEventBroker.RouteAsync(publishId, _map(eventPayload), cancellationToken).ConfigureAwait(false);
+            IReadOnlyCollection<RoutedEvent> routedEvents = await _externalEventRouter.RouteAsync(publishId, _map(eventPayload), cancellationToken).ConfigureAwait(false);
 
             return routedEvents;
         }

@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Tycho.Events.Broker;
+using Tycho.Events.Delivery;
 using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Identity.Events;
@@ -18,7 +18,7 @@ namespace Tycho.UnitTests.Events.Outbox;
 public class OutboxProcessorJobTests
 {
     private readonly Mock<IOutboxConsumer> _outboxConsumerMock;
-    private readonly Mock<IEventBroker> _brokerMock;
+    private readonly Mock<IEventDeliverer> _delivererMock;
     private readonly Mock<ILogger<OutboxProcessorJob>> _logger = new();
 
     private readonly OutboxProcessorJob _sut;
@@ -32,8 +32,8 @@ public class OutboxProcessorJobTests
         _outboxConsumerMock = new Mock<IOutboxConsumer>();
         serviceCollection.AddSingleton(_outboxConsumerMock.Object);
 
-        _brokerMock = new Mock<IEventBroker>();
-        serviceCollection.AddSingleton(_brokerMock.Object);
+        _delivererMock = new Mock<IEventDeliverer>();
+        serviceCollection.AddSingleton(_delivererMock.Object);
         serviceCollection.AddSingleton(_logger.Object);
 
         internals.Build();
@@ -57,7 +57,7 @@ public class OutboxProcessorJobTests
         OutboxEvent original = CreateOutboxEvent();
         OutboxEvent rejected = CreateOutboxEvent();
         _sut.ForEvent(original);
-        _brokerMock.Setup(broker => broker.DeliverAsync(original.RoutedEvent, It.IsAny<CancellationToken>()))
+        _delivererMock.Setup(deliverer => deliverer.DeliverAsync(original.RoutedEvent, It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         // Act
@@ -66,8 +66,8 @@ public class OutboxProcessorJobTests
 
         // Assert
         Assert.Equal("An outbox event has already been assigned to this job.", exception.Message);
-        _brokerMock.Verify(broker => broker.DeliverAsync(original.RoutedEvent, It.IsAny<CancellationToken>()), Times.Once);
-        _brokerMock.Verify(broker => broker.DeliverAsync(rejected.RoutedEvent, It.IsAny<CancellationToken>()), Times.Never);
+        _delivererMock.Verify(deliverer => deliverer.DeliverAsync(original.RoutedEvent, It.IsAny<CancellationToken>()), Times.Once);
+        _delivererMock.Verify(deliverer => deliverer.DeliverAsync(rejected.RoutedEvent, It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -80,7 +80,7 @@ public class OutboxProcessorJobTests
         await _sut.ExecuteAsync(cancellationToken);
 
         // Assert
-        _brokerMock.Verify(b => b.DeliverAsync(It.IsAny<SerializedRoutedEvent>(), cancellationToken), Times.Never);
+        _delivererMock.Verify(b => b.DeliverAsync(It.IsAny<SerializedRoutedEvent>(), cancellationToken), Times.Never);
         _outboxConsumerMock.Verify(o => o.MarkAsDeliveredAsync(It.IsAny<Guid>(), cancellationToken), Times.Never);
         _outboxConsumerMock.Verify(o => o.MarkAsFailedAsync(It.IsAny<Guid>(), cancellationToken), Times.Never);
         LogAssert.Logged(_logger, LogLevel.Warning, 1405, "OutboxJobIsMissing");
@@ -93,7 +93,7 @@ public class OutboxProcessorJobTests
         OutboxEvent outboxEvent = CreateOutboxEvent();
         var cancellationToken = new CancellationToken();
 
-        _brokerMock
+        _delivererMock
             .Setup(b => b.DeliverAsync(outboxEvent.RoutedEvent, cancellationToken))
             .Returns(Task.CompletedTask);
 
@@ -102,7 +102,7 @@ public class OutboxProcessorJobTests
         await _sut.ExecuteAsync(cancellationToken);
 
         // Assert
-        _brokerMock.Verify(b => b.DeliverAsync(outboxEvent.RoutedEvent, cancellationToken), Times.Once);
+        _delivererMock.Verify(b => b.DeliverAsync(outboxEvent.RoutedEvent, cancellationToken), Times.Once);
         _outboxConsumerMock.Verify(o => o.MarkAsDeliveredAsync(outboxEvent.ClaimId, cancellationToken), Times.Once);
         _outboxConsumerMock.Verify(o => o.MarkAsFailedAsync(outboxEvent.ClaimId, cancellationToken), Times.Never);
     }
@@ -113,8 +113,8 @@ public class OutboxProcessorJobTests
         // Arrange
         OutboxEvent outboxEvent = CreateOutboxEvent();
         using var cancellation = new CancellationTokenSource();
-        _brokerMock
-            .Setup(broker => broker.DeliverAsync(outboxEvent.RoutedEvent, cancellation.Token))
+        _delivererMock
+            .Setup(deliverer => deliverer.DeliverAsync(outboxEvent.RoutedEvent, cancellation.Token))
             .Returns((SerializedRoutedEvent _, CancellationToken token) =>
             {
                 cancellation.Cancel();
@@ -137,7 +137,7 @@ public class OutboxProcessorJobTests
         var cancellationToken = new CancellationToken();
 
         var failure = new Exception("delivery failure");
-        _brokerMock
+        _delivererMock
             .Setup(b => b.DeliverAsync(outboxEvent.RoutedEvent, cancellationToken))
             .ThrowsAsync(failure);
 
@@ -146,7 +146,7 @@ public class OutboxProcessorJobTests
         await _sut.ExecuteAsync(cancellationToken);
 
         // Assert
-        _brokerMock.Verify(b => b.DeliverAsync(outboxEvent.RoutedEvent, cancellationToken), Times.Once);
+        _delivererMock.Verify(b => b.DeliverAsync(outboxEvent.RoutedEvent, cancellationToken), Times.Once);
         _outboxConsumerMock.Verify(o => o.MarkAsDeliveredAsync(outboxEvent.ClaimId, cancellationToken), Times.Never);
         _outboxConsumerMock.Verify(o => o.MarkAsFailedAsync(outboxEvent.ClaimId, cancellationToken), Times.Once);
         LogAssert.Logged(_logger, LogLevel.Error, 1403, "OutboxMessageDeliveryFailed", failure,
@@ -159,7 +159,7 @@ public class OutboxProcessorJobTests
         // Arrange
         OutboxEvent outboxEvent = CreateOutboxEvent();
 
-        _brokerMock
+        _delivererMock
             .Setup(b => b.DeliverAsync(outboxEvent.RoutedEvent, It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
@@ -182,7 +182,7 @@ public class OutboxProcessorJobTests
         OutboxEvent outboxEvent = CreateOutboxEvent();
         var failure = new InvalidOperationException("delivery failure");
 
-        _brokerMock
+        _delivererMock
             .Setup(b => b.DeliverAsync(outboxEvent.RoutedEvent, It.IsAny<CancellationToken>()))
             .ThrowsAsync(failure);
 
@@ -205,7 +205,7 @@ public class OutboxProcessorJobTests
         OutboxEvent outboxEvent = CreateOutboxEvent();
         var cancellationToken = new CancellationToken();
 
-        _brokerMock
+        _delivererMock
             .Setup(b => b.DeliverAsync(outboxEvent.RoutedEvent, cancellationToken))
             .Returns(Task.CompletedTask);
 
@@ -218,7 +218,7 @@ public class OutboxProcessorJobTests
         await _sut.ExecuteAsync(cancellationToken);
 
         // Assert
-        _brokerMock.Verify(b => b.DeliverAsync(outboxEvent.RoutedEvent, cancellationToken), Times.Once);
+        _delivererMock.Verify(b => b.DeliverAsync(outboxEvent.RoutedEvent, cancellationToken), Times.Once);
         _outboxConsumerMock.Verify(o => o.MarkAsDeliveredAsync(outboxEvent.ClaimId, cancellationToken), Times.Once);
         _outboxConsumerMock.Verify(o => o.MarkAsFailedAsync(outboxEvent.ClaimId, cancellationToken), Times.Once);
     }

@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Tycho.Events.Broker;
+using Tycho.Events.Routing;
 using Tycho.Hosting;
 using Tycho.Hosting.Files;
 using Tycho.Modules.Setup;
@@ -24,7 +24,7 @@ namespace Tycho.Modules
     public abstract class TychoModule
     {
         private IRequestBroker? _contractFulfillingBroker;
-        private IEventBroker? _parentEventBroker;
+        private IEventRouter? _parentEventRouter;
         private string? _instanceSuffix;
         private IModuleSettings? _settings;
 
@@ -128,9 +128,9 @@ namespace Tycho.Modules
             return this;
         }
 
-        internal TychoModule PassEventBroker(IEventBroker parentEventBroker)
+        internal TychoModule PassEventRouter(IEventRouter parentEventRouter)
         {
-            _parentEventBroker = parentEventBroker;
+            _parentEventRouter = parentEventRouter;
             return this;
         }
 
@@ -146,7 +146,7 @@ namespace Tycho.Modules
                 .WithHostBuilder(CreateHostBuilder)
                 .WithHostConfiguration(ConfigureHost)
                 .WithContract(DefineContract, _contractFulfillingBroker)
-                .WithEvents(DefineEvents, _parentEventBroker)
+                .WithEvents(DefineEvents, _parentEventRouter)
                 .WithInstanceSuffix(_instanceSuffix)
                 .WithStructure(IncludeModules)
                 .WithServices(services =>

@@ -2,8 +2,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
 using Tycho.Events;
-using Tycho.Events.Broker;
 using Tycho.Events.Model;
+using Tycho.Events.Routing;
 using Tycho.Identity.Events;
 using Tycho.Identity.Structure;
 using Tycho.Modules;
@@ -21,18 +21,18 @@ public sealed class ModuleEventsBindingTests : IDisposable
         Host.CreateEmptyApplicationBuilder(null),
         new ControlPlane(InstanceIdentity.Create(typeof(ModuleEventsBindingTests))),
         typeof(ModuleEventsBindingTests));
-    private readonly Mock<IEventBroker> _child = new(MockBehavior.Strict);
-    private readonly Mock<IEventBroker> _parent = new(MockBehavior.Strict);
-    private readonly Mock<IEventBroker> _unrelated = new(MockBehavior.Strict);
+    private readonly Mock<IEventRouter> _child = new(MockBehavior.Strict);
+    private readonly Mock<IEventRouter> _parent = new(MockBehavior.Strict);
+    private readonly Mock<IEventRouter> _unrelated = new(MockBehavior.Strict);
     private readonly ModuleEvents _sut;
 
     public ModuleEventsBindingTests()
     {
         _internals.GetHostBuilder().Services
             .AddSingleton(_internals)
-            .AddSingleton(Mock.Of<IModule<OtherModule>>(module => module.EventBroker == _child.Object))
-            .AddSingleton(Mock.Of<IModule<AnotherModule>>(module => module.EventBroker == _unrelated.Object))
-            .AddSingleton(Mock.Of<IParentReference>(parent => parent.EventBroker == _parent.Object));
+            .AddSingleton(Mock.Of<IModule<OtherModule>>(module => module.EventRouter == _child.Object))
+            .AddSingleton(Mock.Of<IModule<AnotherModule>>(module => module.EventRouter == _unrelated.Object))
+            .AddSingleton(Mock.Of<IParentReference>(parent => parent.EventRouter == _parent.Object));
         _sut = new ModuleEvents(_internals);
     }
 
@@ -52,8 +52,8 @@ public sealed class ModuleEventsBindingTests : IDisposable
             EventHandlerIdentity.Parse("target-handler"),
             InstanceIdentity.Parse("test-endpoint"),
             mapped);
-        Mock<IEventBroker> destination = expose ? _parent : _child;
-        destination.Setup(broker => broker.RouteAsync(publishId, mapped, token)).ReturnsAsync([routedEvent]);
+        Mock<IEventRouter> destination = expose ? _parent : _child;
+        destination.Setup(router => router.RouteAsync(publishId, mapped, token)).ReturnsAsync([routedEvent]);
         int mappingCalls = 0;
         IModuleEventBindingWithMapping<SourceEvent, TargetEvent> binding = _sut.Expects<SourceEvent>().MapsTo<TargetEvent>(payload =>
         {
@@ -64,10 +64,10 @@ public sealed class ModuleEventsBindingTests : IDisposable
         _sut.Build();
         _internals.Build();
         await using AsyncServiceScope scope = _internals.CreateAsyncScope();
-        IEventBroker broker = scope.ServiceProvider.GetRequiredService<IEventBroker>();
+        IEventRouter router = scope.ServiceProvider.GetRequiredService<IEventRouter>();
 
         // Act
-        IReadOnlyCollection<RoutedEvent> result = await broker.RouteAsync(publishId, source, token);
+        IReadOnlyCollection<RoutedEvent> result = await router.RouteAsync(publishId, source, token);
 
         // Assert
         Assert.Same(binding, returnedBinding);

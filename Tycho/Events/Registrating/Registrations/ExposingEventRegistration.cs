@@ -8,7 +8,7 @@ namespace Tycho.Events.Registrating.Registrations
         where TEvent : class, IEvent
     {
         public ExposingEventRegistration(IParentReference parent)
-            : base(parent.EventBroker)
+            : base(parent.EventRouter)
         {
         }
     }
@@ -19,7 +19,7 @@ namespace Tycho.Events.Registrating.Registrations
         where TTargetEvent : class, IEvent
     {
         public MappedExposingEventRegistration(IParentReference parent, Func<TEvent, TTargetEvent> map)
-            : base(parent.EventBroker, map)
+            : base(parent.EventRouter, map)
         {
         }
     }

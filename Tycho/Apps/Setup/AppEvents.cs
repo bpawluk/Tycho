@@ -1,13 +1,14 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Tycho.Events;
-using Tycho.Events.Broker;
+using Tycho.Events.Delivery;
 using Tycho.Events.Inbox;
 using Tycho.Events.Inbox.InMemory;
 using Tycho.Events.Outbox;
 using Tycho.Events.Outbox.InMemory;
 using Tycho.Events.Publishing;
 using Tycho.Events.Registrating;
+using Tycho.Events.Routing;
 using Tycho.Events.Serialization;
 using Tycho.Structure;
 using Tycho.Transactions;
@@ -60,7 +61,8 @@ namespace Tycho.Apps.Setup
                 services.AddScoped<ITransaction, EmptyTransaction>();
             }
 
-            services.AddScoped<IEventBroker, ScopedEventBroker>();
+            services.AddScoped<IEventRouter, ScopedEventRouter>();
+            services.AddScoped<IEventDeliverer, EventDeliverer>();
             services.AddTransient<IEventPublisher, EventPublisher>();
 
             var inboxSettings = new InboxSettings();

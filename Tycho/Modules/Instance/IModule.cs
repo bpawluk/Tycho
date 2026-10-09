@@ -1,5 +1,5 @@
 using System;
-using Tycho.Events.Broker;
+using Tycho.Events.Routing;
 using Tycho.Requests.Broker;
 using Tycho.Structure;
 using Tycho.Utils;
@@ -14,7 +14,7 @@ namespace Tycho.Modules.Instance
     {
         internal Internals Internals { get; }
 
-        internal IEventBroker EventBroker { get; }
+        internal IEventRouter EventRouter { get; }
 
         internal IRequestBroker RequestBroker { get; }
     }

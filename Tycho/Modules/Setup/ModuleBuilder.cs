@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Tycho.Events.Broker;
+using Tycho.Events.Routing;
 using Tycho.Hosting;
 using Tycho.Hosting.Services;
 using Tycho.Modules.Instance;
@@ -26,7 +26,7 @@ namespace Tycho.Modules.Setup
         private Action<IModuleStructure>? _configureStructureDelegate;
         private Action<IServiceCollection>? _registerServicesDelegate;
         private IRequestBroker? _contractFulfillingBroker;
-        private IEventBroker? _parentEventBroker;
+        private IEventRouter? _parentEventRouter;
         private string? _instanceSuffix;
         private int _built;
         private ControlPlane? _controlPlane;
@@ -57,10 +57,10 @@ namespace Tycho.Modules.Setup
             return this;
         }
 
-        public ModuleBuilder WithEvents(Action<IModuleEvents> configureEvents, IEventBroker? parentEventBroker)
+        public ModuleBuilder WithEvents(Action<IModuleEvents> configureEvents, IEventRouter? parentEventRouter)
         {
             _configureEventsDelegate = configureEvents ?? throw new ArgumentNullException(nameof(configureEvents));
-            _parentEventBroker = parentEventBroker;
+            _parentEventRouter = parentEventRouter;
             return this;
         }
 
@@ -107,7 +107,7 @@ namespace Tycho.Modules.Setup
                 throw new InvalidOperationException("The module has already been built.");
             }
 
-            if (_contractFulfillingBroker == null || _parentEventBroker == null || _controlPlane == null)
+            if (_contractFulfillingBroker == null || _parentEventRouter == null || _controlPlane == null)
             {
                 throw new InvalidOperationException("The module parent has not been configured.");
             }
@@ -133,9 +133,9 @@ namespace Tycho.Modules.Setup
             _configureContractDelegate?.Invoke(contract);
 
             var events = new ModuleEvents(internals);
-            events.WithParentEventBroker(_parentEventBroker);
+            events.WithParentEventRouter(_parentEventRouter);
             _configureEventsDelegate?.Invoke(events);
-            hostBuilder.Services.AddSingleton<IParentReference>(new ParentReference(events.ParentEventBroker, contract.ContractFulfillingBroker));
+            hostBuilder.Services.AddSingleton<IParentReference>(new ParentReference(events.ParentEventRouter, contract.ContractFulfillingBroker));
             events.Build();
 
             _registerServicesDelegate?.Invoke(hostBuilder.Services);

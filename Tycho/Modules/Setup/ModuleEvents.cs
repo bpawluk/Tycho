@@ -2,13 +2,14 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Tycho.Events;
-using Tycho.Events.Broker;
+using Tycho.Events.Delivery;
 using Tycho.Events.Inbox;
 using Tycho.Events.Inbox.InMemory;
 using Tycho.Events.Outbox;
 using Tycho.Events.Outbox.InMemory;
 using Tycho.Events.Publishing;
 using Tycho.Events.Registrating;
+using Tycho.Events.Routing;
 using Tycho.Events.Serialization;
 using Tycho.Structure;
 using Tycho.Transactions;
@@ -20,9 +21,9 @@ namespace Tycho.Modules.Setup
         private readonly Internals _internals;
         private readonly Registrator _registrator;
 
-        private IEventBroker? _parentEventBroker;
+        private IEventRouter? _parentEventRouter;
 
-        public IEventBroker ParentEventBroker => _parentEventBroker ?? throw new InvalidOperationException("Parent event broker has not been defined yet.");
+        public IEventRouter ParentEventRouter => _parentEventRouter ?? throw new InvalidOperationException("Parent event router has not been defined yet.");
 
         public ModuleEvents(Internals internals)
         {
@@ -30,9 +31,9 @@ namespace Tycho.Modules.Setup
             _registrator = new Registrator(internals);
         }
 
-        public void WithParentEventBroker(IEventBroker parentEventBroker)
+        public void WithParentEventRouter(IEventRouter parentEventRouter)
         {
-            _parentEventBroker = parentEventBroker;
+            _parentEventRouter = parentEventRouter;
         }
 
         public IModuleEventBinding<TEvent> Expects<TEvent>()
@@ -70,7 +71,8 @@ namespace Tycho.Modules.Setup
                 services.AddScoped<ITransaction, EmptyTransaction>();
             }
 
-            services.AddScoped<IEventBroker, ScopedEventBroker>();
+            services.AddScoped<IEventRouter, ScopedEventRouter>();
+            services.AddScoped<IEventDeliverer, EventDeliverer>();
             services.AddTransient<IEventPublisher, EventPublisher>();
 
             var inboxSettings = new InboxSettings();

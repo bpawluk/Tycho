@@ -1,8 +1,8 @@
 using Moq;
-using Tycho.Events.Broker;
 using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Events.Publishing;
+using Tycho.Events.Routing;
 using Tycho.Identity.Events;
 using Tycho.Identity.Structure;
 using Tycho.UnitTests._Data.Events;
@@ -12,16 +12,16 @@ namespace Tycho.UnitTests.Events.Publishing;
 
 public class EventPublisherTests
 {
-    private readonly Mock<IEventBroker> _eventBrokerMock;
+    private readonly Mock<IEventRouter> _eventRouterMock;
     private readonly Mock<IOutboxWriter> _outboxWriterMock;
 
     private readonly IEventPublisher _sut;
 
     public EventPublisherTests()
     {
-        _eventBrokerMock = new Mock<IEventBroker>();
+        _eventRouterMock = new Mock<IEventRouter>();
         _outboxWriterMock = new Mock<IOutboxWriter>();
-        _sut = new EventPublisher(_eventBrokerMock.Object, _outboxWriterMock.Object);
+        _sut = new EventPublisher(_eventRouterMock.Object, _outboxWriterMock.Object);
     }
 
     [Fact]
@@ -49,7 +49,7 @@ public class EventPublisherTests
             CreateRoutedEvent(eventPayload),
         };
 
-        _eventBrokerMock.Setup(eb => eb.RouteAsync(It.IsAny<Guid>(), eventPayload, cancellationToken))
+        _eventRouterMock.Setup(eb => eb.RouteAsync(It.IsAny<Guid>(), eventPayload, cancellationToken))
                         .ReturnsAsync(routedEvents);
 
         // Act
@@ -67,7 +67,7 @@ public class EventPublisherTests
         var routedEvents = new List<RoutedEvent>();
         var cancellationToken = new CancellationToken();
 
-        _eventBrokerMock.Setup(eb => eb.RouteAsync(It.IsAny<Guid>(), eventPayload, cancellationToken))
+        _eventRouterMock.Setup(eb => eb.RouteAsync(It.IsAny<Guid>(), eventPayload, cancellationToken))
                         .ReturnsAsync(routedEvents);
 
         // Act
@@ -86,7 +86,7 @@ public class EventPublisherTests
         var eventPayload = new TestEvent();
         var cancellationToken = new CancellationToken();
 
-        _eventBrokerMock.Setup(eb => eb.RouteAsync(It.IsAny<Guid>(), eventPayload, cancellationToken))
+        _eventRouterMock.Setup(eb => eb.RouteAsync(It.IsAny<Guid>(), eventPayload, cancellationToken))
                         .ReturnsAsync((IReadOnlyCollection<RoutedEvent>)null!);
 
         // Act

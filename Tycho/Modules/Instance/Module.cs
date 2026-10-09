@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Tycho.Events.Broker;
+using Tycho.Events.Routing;
 using Tycho.Requests.Broker;
 using Tycho.Structure;
 using Tycho.Utils;
@@ -12,17 +12,17 @@ namespace Tycho.Modules.Instance
     {
         private readonly Internals _internals;
         private readonly IRequestBroker _requestBroker;
-        private readonly IEventBroker _eventBroker;
+        private readonly IEventRouter _eventRouter;
 
         Internals IModule.Internals => _internals;
-        IEventBroker IModule.EventBroker => _eventBroker;
+        IEventRouter IModule.EventRouter => _eventRouter;
         IRequestBroker IModule.RequestBroker => _requestBroker;
 
         [ReferencedByReflection]
         public Module(Internals internals)
         {
             _internals = internals;
-            _eventBroker = new EventBroker(_internals);
+            _eventRouter = new EventRouter(_internals);
             _requestBroker = new UpStreamBroker(_internals);
         }
 

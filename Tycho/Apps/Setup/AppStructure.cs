@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Tycho.Events.Broker;
+using Tycho.Events.Routing;
 using Tycho.Hosting.Services;
 using Tycho.Modules;
 using Tycho.Modules.Instance;
@@ -91,7 +91,7 @@ namespace Tycho.Apps.Setup
             contractFulfillment?.Invoke(fulfiller);
 
             submodule.FulfillContract(new DownStreamBroker<TModule>(_internals));
-            submodule.PassEventBroker(new EventBroker(_internals));
+            submodule.PassEventRouter(new EventRouter(_internals));
             submodule.WithInstanceSuffix(instanceSuffix);
 
             AddSubmodule(submodule);

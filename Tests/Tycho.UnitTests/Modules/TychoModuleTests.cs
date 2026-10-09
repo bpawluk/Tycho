@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Tycho.Events.Broker;
+using Tycho.Events.Routing;
 using Tycho.Hosting;
 using Tycho.Hosting.Files;
 using Tycho.Identity.Structure;
@@ -184,7 +184,7 @@ public class TychoModuleTests
     private static IModule BuildModule(TestModule moduleDefinition, IServiceProvider? parentServiceProvider = null)
     {
         moduleDefinition.FulfillContract(new Mock<IRequestBroker>().Object);
-        moduleDefinition.PassEventBroker(new Mock<IEventBroker>().Object);
+        moduleDefinition.PassEventRouter(new Mock<IEventRouter>().Object);
         var controlPlane = new ControlPlane(InstanceIdentity.Create(typeof(TychoModuleTests)));
         IModule module = moduleDefinition.CreateModuleBuilder().WithControlPlane(controlPlane).Build(parentServiceProvider);
         controlPlane.CompleteRegistration();

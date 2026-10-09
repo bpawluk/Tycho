@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Tycho.Events.Broker;
+using Tycho.Events.Delivery;
 using Tycho.Logging;
 using Tycho.Processor;
 using Tycho.Structure;
@@ -52,8 +52,8 @@ namespace Tycho.Events.Outbox
 
             try
             {
-                IEventBroker broker = scope.ServiceProvider.GetRequiredService<IEventBroker>();
-                await broker.DeliverAsync(_event.RoutedEvent, cancellationToken).ConfigureAwait(false);
+                IEventDeliverer deliverer = scope.ServiceProvider.GetRequiredService<IEventDeliverer>();
+                await deliverer.DeliverAsync(_event.RoutedEvent, cancellationToken).ConfigureAwait(false);
 
                 bool markedAsDelivered = await outbox.MarkAsDeliveredAsync(_event.ClaimId, cancellationToken).ConfigureAwait(false);
                 if (!markedAsDelivered)

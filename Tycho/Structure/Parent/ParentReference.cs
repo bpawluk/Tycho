@@ -1,19 +1,19 @@
-using Tycho.Events.Broker;
+using Tycho.Events.Routing;
 using Tycho.Requests.Broker;
 
 namespace Tycho.Structure.Parent
 {
     internal class ParentReference : IParentReference
     {
-        private readonly IEventBroker _parentEventBroker;
+        private readonly IEventRouter _parentEventRouter;
         private readonly IRequestBroker _contractFulfillingBroker;
 
-        IEventBroker IParentReference.EventBroker => _parentEventBroker;
+        IEventRouter IParentReference.EventRouter => _parentEventRouter;
         IRequestBroker IParentReference.RequestBroker => _contractFulfillingBroker;
 
-        public ParentReference(IEventBroker parentEventBroker, IRequestBroker contractFulfillingBroker)
+        public ParentReference(IEventRouter parentEventRouter, IRequestBroker contractFulfillingBroker)
         {
-            _parentEventBroker = parentEventBroker;
+            _parentEventRouter = parentEventRouter;
             _contractFulfillingBroker = contractFulfillingBroker;
         }
     }
