@@ -1,10 +1,10 @@
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Moq;
+using Tycho.Identity.Structure;
 using Tycho.Persistence.EFCore.Common;
 using Tycho.Persistence.EFCore.UnitTests._Utils;
 using Tycho.Structure;
-using Tycho.Identity.Structure;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Common;
 
@@ -72,10 +72,44 @@ public sealed class PersistenceOwnerTests
     }
 
     [Fact]
+    public void Identifier_ForDifferentSuffixesInSameApplication_IsDifferent()
+    {
+        // Arrange
+        using Internals first = PersistenceTestInternals.Create(typeof(PersistenceOwnerTests), typeof(FirstApp), "first");
+        using Internals second = PersistenceTestInternals.Create(typeof(PersistenceOwnerTests), typeof(FirstApp), "second");
+
+        // Act
+        string firstIdentifier = new PersistenceOwner(first).Identifier;
+        string secondIdentifier = new PersistenceOwner(second).Identifier;
+
+        // Assert
+        Assert.Equal(first.ControlPlane.ApplicationId, second.ControlPlane.ApplicationId);
+        Assert.NotEqual(first.OwnerId, second.OwnerId);
+        Assert.NotEqual(firstIdentifier, secondIdentifier);
+    }
+
+    [Fact]
+    public void Identifier_WithSameExplicitIdsOnRenamedTypes_IsStable()
+    {
+        // Arrange
+        using Internals first = PersistenceTestInternals.Create(typeof(StableModule), typeof(StableApp), "shared");
+        using Internals second = PersistenceTestInternals.Create(typeof(RenamedModule), typeof(RenamedApp), "shared");
+
+        // Act
+        string firstIdentifier = new PersistenceOwner(first).Identifier;
+        string secondIdentifier = new PersistenceOwner(second).Identifier;
+
+        // Assert
+        Assert.Equal(first.ControlPlane.ApplicationId, second.ControlPlane.ApplicationId);
+        Assert.Equal(first.OwnerId, second.OwnerId);
+        Assert.Equal(firstIdentifier, secondIdentifier);
+    }
+
+    [Fact]
     public void Constructor_LogsOwnerIdentityAndConfiguredKey()
     {
         // Arrange
-        Internals internals = PersistenceTestInternals.Create(typeof(PersistenceOwnerTests));
+        using Internals internals = PersistenceTestInternals.Create(typeof(PersistenceOwnerTests));
         var logger = new Mock<ILogger<PersistenceOwner>>();
 
         logger
@@ -99,4 +133,16 @@ public sealed class PersistenceOwnerTests
 
     private sealed class FirstApp { }
     private sealed class SecondApp { }
+
+    [TychoId("stable-app")]
+    private sealed class StableApp { }
+
+    [TychoId("stable-app")]
+    private sealed class RenamedApp { }
+
+    [TychoId("stable-module")]
+    private sealed class StableModule { }
+
+    [TychoId("stable-module")]
+    private sealed class RenamedModule { }
 }

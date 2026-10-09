@@ -8,7 +8,7 @@ using Tycho.UnitTests._Utils;
 
 namespace Tycho.UnitTests.Structure;
 
-public class InternalsTests : IDisposable
+public sealed class InternalsTests : IDisposable
 {
     private readonly Internals _sut = new TestInternals();
 

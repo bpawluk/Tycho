@@ -83,4 +83,74 @@ public partial class TypeIdentifierTests
         // Assert
         Assert.Equal(TypeIdentifier.GetId<int>() + suffix, result);
     }
+
+    [Theory]
+    [InlineData(typeof(StableType), "stable-type")]
+    [InlineData(typeof(StableStruct), "stable-struct")]
+    [InlineData(typeof(IStableInterface), "stable-interface")]
+    [InlineData(typeof(StableGeneric<>), "stable-generic<T>")]
+    [InlineData(typeof(StableGeneric<StableType>), "stable-generic<stable-type>")]
+    [InlineData(typeof(StableGeneric<StableGeneric<StableType>>), "stable-generic<stable-generic<stable-type>>")]
+    [InlineData(typeof(StableType[]), "stable-type[]")]
+    [InlineData(typeof(StableType[,]), "stable-type[,]")]
+    [InlineData(typeof(StableType[][]), "stable-type[][]")]
+    public void GetId_WithExplicitId_UsesItInTheTypeIdentity(Type type, string expectedId)
+    {
+        // Act
+        string result = TypeIdentifier.GetId(type);
+
+        // Assert
+        Assert.Equal(expectedId, result);
+    }
+
+    [Fact]
+    public void GetId_WithAttributedBaseType_DoesNotInheritItsId()
+    {
+        // Act
+        string result = TypeIdentifier.GetId<DerivedType>();
+
+        // Assert
+        Assert.StartsWith("DerivedType+", result, StringComparison.Ordinal);
+        Assert.NotEqual(TypeIdentifier.GetId<StableType>(), result);
+    }
+
+    [Fact]
+    public void GetId_WithAttributedArgument_UsesItsIdInGeneratedGenericIdentity()
+    {
+        // Act
+        string result = TypeIdentifier.GetId<List<StableType>>();
+
+        // Assert
+        Assert.Matches("^List\\+[A-Za-z0-9#&]{11}<stable-type>$", result);
+    }
+
+    [Theory]
+    [InlineData(typeof(TestModule))]
+    [InlineData(typeof(StableType))]
+    [InlineData(typeof(StableGeneric<StableType>))]
+    public void GetId_WithRepeatedResolution_ReturnsSameId(Type type)
+    {
+        // Arrange
+        string expectedId = TypeIdentifier.GetId(type);
+
+        // Act
+        string result = TypeIdentifier.GetId(type);
+
+        // Assert
+        Assert.Equal(expectedId, result);
+    }
+
+    [TychoId("stable-type")]
+    private class StableType { }
+
+    private sealed class DerivedType : StableType { }
+
+    [TychoId("stable-struct")]
+    private struct StableStruct { }
+
+    [TychoId("stable-interface")]
+    private interface IStableInterface { }
+
+    [TychoId("stable-generic")]
+    private sealed class StableGeneric<T> { }
 }

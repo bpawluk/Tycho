@@ -12,7 +12,7 @@ using Tycho.UnitTests._Data.Handlers;
 
 namespace Tycho.UnitTests.Events.Delivery;
 
-public class DeliveryEndpointTests : IDisposable
+public sealed class DeliveryEndpointTests : IDisposable
 {
     private readonly AppInternals _internals = new(
         Host.CreateEmptyApplicationBuilder(null),

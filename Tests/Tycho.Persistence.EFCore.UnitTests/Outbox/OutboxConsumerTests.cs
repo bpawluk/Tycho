@@ -2,6 +2,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Identity.Structure;
 using Tycho.Persistence.EFCore.Common;
@@ -64,6 +65,14 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         OutboxEntry firstEntry = CreateEntry(firstEntryId, EntryState.New, 0, Guid.Empty, DateTime.MinValue);
         OutboxEntry secondEntry = CreateEntry(secondEntryId, EntryState.New, 0, Guid.Empty, DateTime.MinValue);
         secondEntry.Created = firstEntry.Created.AddSeconds(1);
+        firstEntry.Destination = "climate:upstairs";
+        firstEntry.Handler = "upstairs-handler";
+        firstEntry.Event = "upstairs-event";
+        firstEntry.Payload = "{\"room\":\"upstairs\"}";
+        secondEntry.Destination = "climate:downstairs";
+        secondEntry.Handler = "downstairs-handler";
+        secondEntry.Event = "downstairs-event";
+        secondEntry.Payload = "{\"room\":\"downstairs\"}";
 
         await SeedEntries(firstEntry, secondEntry);
 
@@ -75,6 +84,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         // Assert
         Assert.NotNull(result);
         Assert.Equal(firstEntryId, result.EventId);
+        AssertRoutedEvent(firstEntry, result.RoutedEvent);
         Guid claimId = result.ClaimId;
         Assert.NotEqual(Guid.Empty, claimId);
 
@@ -87,6 +97,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         OutboxEvent? nextResult = await _sut.TryReadAsync(CancellationToken.None);
         Assert.NotNull(nextResult);
         Assert.Equal(secondEntryId, nextResult.EventId);
+        AssertRoutedEvent(secondEntry, nextResult.RoutedEvent);
         Assert.NotEqual(claimId, nextResult.ClaimId);
 
         persistedSecondEntry = await LoadEntry(secondEntryId);
@@ -423,6 +434,16 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         Assert.Equal(expected.State, actual.State);
         Assert.Equal(expected.DeliveryAttempts, actual.DeliveryAttempts);
         Assert.Equal(expected.ClaimId, actual.ClaimId);
+    }
+
+    private static void AssertRoutedEvent(OutboxEntry expected, SerializedRoutedEvent actual)
+    {
+        Assert.Equal(expected.EntryId, actual.Id);
+        Assert.Equal(expected.PublishId, actual.PublishId);
+        Assert.Equal(expected.Event, actual.EventId.Value);
+        Assert.Equal(expected.Handler, actual.HandlerId.Value);
+        Assert.Equal(expected.Destination, actual.DestinationId.Value);
+        Assert.Equal(expected.Payload, actual.Payload);
     }
 
     private static OutboxEntry CreateEntry(

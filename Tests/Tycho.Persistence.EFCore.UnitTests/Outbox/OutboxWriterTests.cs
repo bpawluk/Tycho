@@ -13,6 +13,7 @@ using Tycho.Persistence.EFCore.Common;
 using Tycho.Persistence.EFCore.Outbox;
 using Tycho.Persistence.EFCore.UnitTests._Data.Events;
 using Tycho.Persistence.EFCore.UnitTests._Utils;
+using Tycho.Structure;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Outbox;
 
@@ -23,6 +24,7 @@ public sealed class OutboxWriterTests : IAsyncLifetime
     private Mock<IEventSerializer> _eventSerializer = default!;
     private OutboxActivity _outboxActivity = default!;
     private OutboxWriter _sut = default!;
+    private PersistenceOwner _persistenceOwner = default!;
     private int _notificationCount;
 
     public async ValueTask InitializeAsync()
@@ -48,15 +50,21 @@ public sealed class OutboxWriterTests : IAsyncLifetime
                 routedEvent.DestinationId,
                 "{}"));
 
-        var persistenceOwner = new PersistenceOwner(PersistenceTestInternals.Create(typeof(PersistenceOwner)));
-        _sut = new OutboxWriter(_eventSerializer.Object, _outboxActivity, _dbContext, persistenceOwner);
+        using Internals internals = PersistenceTestInternals.Create(typeof(PersistenceOwner));
+        _persistenceOwner = new PersistenceOwner(internals);
+        _sut = new OutboxWriter(_eventSerializer.Object, _outboxActivity, _dbContext, _persistenceOwner);
     }
 
     [Fact]
     public async Task Write_WithoutTransaction_SavesEntriesAndNotifies()
     {
         // Arrange
-        RoutedEvent[] events = [CreateRoutedEvent(), CreateRoutedEvent(), CreateRoutedEvent()];
+        RoutedEvent[] events =
+        [
+            CreateRoutedEvent("module:first"),
+            CreateRoutedEvent("module:second"),
+            CreateRoutedEvent("module:third")
+        ];
 
         // Act
         await _sut.Write(events, TestContext.Current.CancellationToken);
@@ -65,6 +73,23 @@ public sealed class OutboxWriterTests : IAsyncLifetime
         _eventSerializer.Verify(serializer => serializer.Serialize(It.IsAny<RoutedEvent>()), Times.Exactly(events.Length));
         Assert.Equal(1, _notificationCount);
         Assert.Equal(events.Length, await CountPersistedEntries());
+
+        List<OutboxEntry> entries = await _dbContext
+            .Set<OutboxEntry>()
+            .AsNoTracking()
+            .ToListAsync(TestContext.Current.CancellationToken);
+
+        foreach (RoutedEvent routedEvent in events)
+        {
+            OutboxEntry entry = Assert.Single(entries, entry => entry.EntryId == routedEvent.Id);
+            Assert.Equal(_persistenceOwner.Identifier, entry.OwnerId);
+            Assert.Equal(routedEvent.Id, entry.EntryId);
+            Assert.Equal(routedEvent.PublishId, entry.PublishId);
+            Assert.Equal(routedEvent.EventId.Value, entry.Event);
+            Assert.Equal(routedEvent.HandlerId.Value, entry.Handler);
+            Assert.Equal(routedEvent.DestinationId.Value, entry.Destination);
+            Assert.Equal("{}", entry.Payload);
+        }
     }
 
     [Theory]
@@ -191,12 +216,12 @@ public sealed class OutboxWriterTests : IAsyncLifetime
     private async Task<int> CountPersistedEntries() =>
         await _dbContext.Set<OutboxEntry>().AsNoTracking().CountAsync(TestContext.Current.CancellationToken);
 
-    private static RoutedEvent<TestEvent> CreateRoutedEvent() => new(
+    private static RoutedEvent<TestEvent> CreateRoutedEvent(string destination = "test-endpoint") => new(
         Guid.NewGuid(),
         Guid.NewGuid(),
         EventIdentity.Create<TestEvent>(),
         EventHandlerIdentity.Parse($"handler-{Guid.NewGuid():N}"),
-        InstanceIdentity.Parse("test-endpoint"),
+        InstanceIdentity.Parse(destination),
         new TestEvent());
 
     public async ValueTask DisposeAsync()

@@ -13,7 +13,7 @@ public class InstanceIdentityTests
         InstanceIdentity identity = InstanceIdentity.Create(typeof(TestModule));
 
         // Assert
-        Assert.Equal(TypeIdentifier.GetId(typeof(TestModule)), identity.Value);
+        Assert.Equal(TypeIdentifier.GetId<TestModule>(), identity.Value);
         Assert.Equal(identity.Value, identity.ToString());
     }
 
@@ -21,7 +21,7 @@ public class InstanceIdentityTests
     public void Create_WithNullDefinitionType_ThrowsArgumentNullException()
     {
         // Act
-        void Act() => InstanceIdentity.Create(null!);
+        static void Act() => InstanceIdentity.Create(null!);
 
         // Assert
         ArgumentNullException exception = Assert.Throws<ArgumentNullException>(Act);
@@ -35,14 +35,14 @@ public class InstanceIdentityTests
         InstanceIdentity identity = InstanceIdentity.Create(typeof(TestModule), "sales");
 
         // Assert
-        Assert.Equal(TypeIdentifier.GetId(typeof(TestModule)) + ":sales", identity.Value);
+        Assert.Equal(TypeIdentifier.GetId<TestModule>() + ":sales", identity.Value);
     }
 
     [Fact]
     public void Create_WithMultipleSuffixes_PreservesPreviouslyConstructedInstances()
     {
         // Arrange
-        string typeId = TypeIdentifier.GetId(typeof(TestModule));
+        string typeId = TypeIdentifier.GetId<TestModule>();
         InstanceIdentity original = InstanceIdentity.Create(typeof(TestModule));
 
         // Act

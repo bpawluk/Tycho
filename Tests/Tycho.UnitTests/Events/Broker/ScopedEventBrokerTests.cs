@@ -13,7 +13,7 @@ using Tycho.UnitTests._Data.Handlers;
 
 namespace Tycho.UnitTests.Events.Broker;
 
-public class ScopedEventBrokerTests : IDisposable
+public sealed class ScopedEventBrokerTests : IDisposable
 {
     private readonly List<Internals> _hosts = [];
 

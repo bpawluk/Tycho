@@ -14,7 +14,7 @@ using Tycho.UnitTests._Data.Modules;
 
 namespace Tycho.UnitTests.Events.Registrating;
 
-public class RegistratorTests
+public sealed class RegistratorTests : IDisposable
 {
     private readonly Internals _internals;
     private readonly Registrator _sut;
@@ -189,5 +189,132 @@ public class RegistratorTests
 
         // Assert
         Assert.Throws<ArgumentException>(Act);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void HandleEvent_WithSharedHandlerId_ThrowsWithoutChangingRegistrations(bool sameEvent)
+    {
+        // Arrange
+        _sut.HandleEvent<TestEvent, FirstHandler>();
+        IServiceCollection services = _internals.GetHostBuilder().Services;
+        ServiceDescriptor[] originalRegistrations = [.. services];
+
+        // Act
+        void Act()
+        {
+            if (sameEvent)
+            {
+                _sut.HandleEvent<TestEvent, SecondHandler>();
+            }
+            else
+            {
+                _sut.HandleEvent<OtherEvent, SecondHandler>();
+            }
+        }
+
+        // Assert
+        ArgumentException exception = Assert.Throws<ArgumentException>(Act);
+        Assert.Equal("THandler", exception.ParamName);
+        Assert.Contains("shared-handler", exception.Message);
+        Assert.Equal(originalRegistrations, [.. services]);
+    }
+
+    [Fact]
+    public void HandleEvent_WithSharedHandlerIdInDifferentModules_RegistersIndependently()
+    {
+        // Arrange
+        using var firstModule = new ModuleInternals(
+            Host.CreateEmptyApplicationBuilder(default), _internals.ControlPlane, typeof(TestModule));
+        using var secondModule = new ModuleInternals(
+            Host.CreateEmptyApplicationBuilder(default), _internals.ControlPlane, typeof(OtherModule));
+        firstModule.GetHostBuilder().Services.AddSingleton<Internals>(firstModule);
+        secondModule.GetHostBuilder().Services.AddSingleton<Internals>(secondModule);
+        var firstRegistrator = new Registrator(firstModule);
+        var secondRegistrator = new Registrator(secondModule);
+
+        // Act
+        firstRegistrator.HandleEvent<TestEvent, FirstHandler>();
+        secondRegistrator.HandleEvent<TestEvent, SecondHandler>();
+        firstModule.Build();
+        secondModule.Build();
+
+        // Assert
+        using IServiceScope firstScope = firstModule.CreateScope();
+        using IServiceScope secondScope = secondModule.CreateScope();
+        var handlerId = EventHandlerIdentity.Create<FirstHandler>();
+        Assert.IsType<FirstHandler>(new EventHandlerProvider(firstScope.ServiceProvider).GetHandler<TestEvent>(handlerId));
+        Assert.IsType<SecondHandler>(new EventHandlerProvider(secondScope.ServiceProvider).GetHandler<TestEvent>(handlerId));
+    }
+
+    [Fact]
+    public void HandleEvent_WithSameHandlerForDifferentEvents_RegistersBothInterfaces()
+    {
+        // Act
+        _sut.HandleEvent<TestEvent, MultiEventHandler>();
+        _sut.HandleEvent<OtherEvent, MultiEventHandler>();
+        _internals.Build();
+
+        // Assert
+        using IServiceScope scope = _internals.CreateScope();
+        var provider = new EventHandlerProvider(scope.ServiceProvider);
+        var handlerId = EventHandlerIdentity.Create<MultiEventHandler>();
+        Assert.IsType<MultiEventHandler>(provider.GetHandler<TestEvent>(handlerId));
+        Assert.IsType<MultiEventHandler>(provider.GetHandler<OtherEvent>(handlerId));
+    }
+
+    [Fact]
+    public void HandleEvent_WithScopedHandler_ReusesInstanceWithinScope()
+    {
+        // Arrange
+        _sut.HandleEvent<TestEvent, TestEventHandler>();
+        _internals.Build();
+        using IServiceScope scope = _internals.CreateScope();
+        var provider = new EventHandlerProvider(scope.ServiceProvider);
+        var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
+
+        // Act
+        IEventHandler<TestEvent> first = provider.GetHandler<TestEvent>(handlerId);
+        IEventHandler<TestEvent> second = provider.GetHandler<TestEvent>(handlerId);
+
+        // Assert
+        Assert.Same(first, second);
+    }
+
+    [Fact]
+    public void HandleEvent_WithScopedHandler_CreatesDifferentInstancesAcrossScopes()
+    {
+        // Arrange
+        _sut.HandleEvent<TestEvent, TestEventHandler>();
+        _internals.Build();
+        using IServiceScope firstScope = _internals.CreateScope();
+        using IServiceScope secondScope = _internals.CreateScope();
+        var firstProvider = new EventHandlerProvider(firstScope.ServiceProvider);
+        var secondProvider = new EventHandlerProvider(secondScope.ServiceProvider);
+        var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
+
+        // Act
+        IEventHandler<TestEvent> first = firstProvider.GetHandler<TestEvent>(handlerId);
+        IEventHandler<TestEvent> second = secondProvider.GetHandler<TestEvent>(handlerId);
+
+        // Assert
+        Assert.NotSame(first, second);
+    }
+
+    public void Dispose() => _internals.Dispose();
+
+    [TychoId("shared-handler")]
+    private sealed class FirstHandler : IEventHandler<TestEvent>
+    {
+        public Task HandleAsync(EventContext<TestEvent> context, CancellationToken cancellationToken) => Task.CompletedTask;
+    }
+
+    [TychoId("shared-handler")]
+    private sealed class SecondHandler : IEventHandler<TestEvent>, IEventHandler<OtherEvent>
+    {
+        public Task HandleAsync(EventContext<TestEvent> context, CancellationToken cancellationToken) => Task.CompletedTask;
+
+        public Task HandleAsync(EventContext<OtherEvent> context, CancellationToken cancellationToken) => Task.CompletedTask;
     }
 }

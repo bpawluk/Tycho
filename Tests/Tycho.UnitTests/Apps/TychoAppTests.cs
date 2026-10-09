@@ -155,7 +155,7 @@ public class TychoAppTests
         using IApp app = new TestApp().CreateAppBuilderBase().Build(default);
 
         // Assert
-        Assert.Equal(TypeIdentifier.GetId(typeof(TestApp)), app.Internals.ControlPlane.ApplicationId.Value);
+        Assert.Equal(TypeIdentifier.GetId<TestApp>(), app.Internals.ControlPlane.ApplicationId.Value);
         Assert.Equal(app.Internals.OwnerId, app.Internals.ControlPlane.ApplicationId);
     }
 

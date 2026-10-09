@@ -74,6 +74,10 @@ public sealed class InboxConsumerTests : IAsyncLifetime
         InboxEntry firstEntry = CreateEntry(firstEntryId, EntryState.New, 0, Guid.Empty, DateTime.MinValue);
         InboxEntry secondEntry = CreateEntry(secondEntryId, EntryState.New, 0, Guid.Empty, DateTime.MinValue);
         secondEntry.Created = firstEntry.Created.AddSeconds(1);
+        firstEntry.Handler = "first-handler";
+        firstEntry.Payload = "{\"value\":1}";
+        secondEntry.Handler = "second-handler";
+        secondEntry.Payload = "{\"value\":2}";
 
         await SeedEntries(firstEntry, secondEntry);
 
@@ -85,6 +89,7 @@ public sealed class InboxConsumerTests : IAsyncLifetime
         // Assert
         Assert.NotNull(result);
         Assert.Equal(firstEntryId, result.EventId);
+        AssertDeserializedEvent(firstEntry, result.Event);
         Guid claimId = result.ClaimId;
         Assert.NotEqual(Guid.Empty, claimId);
 
@@ -97,6 +102,7 @@ public sealed class InboxConsumerTests : IAsyncLifetime
         InboxEvent? nextResult = await _sut.TryReadAsync(CancellationToken.None);
         Assert.NotNull(nextResult);
         Assert.Equal(secondEntryId, nextResult.EventId);
+        AssertDeserializedEvent(secondEntry, nextResult.Event);
         Assert.NotEqual(claimId, nextResult.ClaimId);
 
         persistedSecondEntry = await LoadEntry(secondEntryId);
@@ -499,6 +505,20 @@ public sealed class InboxConsumerTests : IAsyncLifetime
         Assert.Equal(expected.ProcessingAttempts, actual.ProcessingAttempts);
         Assert.Equal(expected.ClaimId, actual.ClaimId);
         Assert.Equal(expected.ClaimExpiration, actual.ClaimExpiration);
+    }
+
+    private void AssertDeserializedEvent(InboxEntry expected, Event actual)
+    {
+        Assert.Equal(expected.EntryId, actual.Id);
+        Assert.Equal(expected.PublishId, actual.PublishId);
+        Assert.Equal(expected.Event, actual.EventId.Value);
+        Assert.Equal(expected.Handler, actual.HandlerId.Value);
+        _eventSerializerMock.Verify(serializer => serializer.Deserialize(It.Is<SerializedEvent>(serializedEvent =>
+            serializedEvent.Id == expected.EntryId &&
+            serializedEvent.PublishId == expected.PublishId &&
+            serializedEvent.EventId.Value == expected.Event &&
+            serializedEvent.HandlerId.Value == expected.Handler &&
+            serializedEvent.Payload == expected.Payload)), Times.Once);
     }
 
     private static InboxEntry CreateEntry(

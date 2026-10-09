@@ -12,7 +12,7 @@ public sealed class ControlPlaneTests
     [Fact]
     public void Constructor_WithMissingApplicationId_RejectsIt()
     {
-        var exception = Assert.Throws<ArgumentNullException>(() => new ControlPlane(null!));
+        ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => new ControlPlane(null!));
         Assert.Equal("applicationId", exception.ParamName);
     }
 
@@ -41,13 +41,13 @@ public sealed class ControlPlaneTests
         var modules = Enumerable.Range(0, 3).ToDictionary(
             index => InstanceIdentity.Parse($"module-{index}"),
             _ => new ModuleReference(new Mock<IDeliveryEndpoint>(MockBehavior.Strict).Object));
-        foreach (var (id, module) in modules)
+        foreach ((InstanceIdentity? id, ModuleReference? module) in modules)
         {
             _sut.RegisterModule(id, module);
         }
         _sut.CompleteRegistration();
 
-        foreach (var (id, module) in modules)
+        foreach ((InstanceIdentity? id, ModuleReference? module) in modules)
         {
             Assert.Same(module, _sut.GetModule(id));
         }
