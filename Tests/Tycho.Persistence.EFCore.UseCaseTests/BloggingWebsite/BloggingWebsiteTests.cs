@@ -1,24 +1,37 @@
+using Tycho.Persistence.EFCore.UseCaseTests._Infrastructure;
+using Tycho.Persistence.EFCore.UseCaseTests._Utils;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Contract.Incoming;
-using Tycho.Persistence.EFCore.UseCaseTests._Utils;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite;
 
-public sealed class BloggingWebsiteTests : IAsyncLifetime
+public sealed class BloggingWebsiteTests(DatabaseServers servers) : IAsyncLifetime
 {
+    private UseCaseDatabases? _databases;
     private readonly TestData _testData = new();
     private IBloggingWebsiteApp _sut = null!;
 
-    public async ValueTask InitializeAsync()
+    public ValueTask InitializeAsync() => ValueTask.CompletedTask;
+
+    private async Task StartAppAsync()
     {
         _sut = new BloggingWebsiteApp().CreateAppBuilder().Build();
         await _sut.StartAsync(TestContext.Current.CancellationToken);
     }
 
-    [Fact(Timeout = 30000)]
-    public async Task TychoUseCase_BloggingWebsiteApp_WorksCorrectly()
+    [Theory(Timeout = 360000)]
+    [InlineData(DatabaseProvider.SQLite)]
+    [InlineData(DatabaseProvider.SqlServer)]
+    [InlineData(DatabaseProvider.PostgreSql)]
+    [InlineData(DatabaseProvider.MySql)]
+    public async Task TychoUseCase_BloggingWebsiteApp_WorksCorrectly(DatabaseProvider provider)
     {
+        _databases = new UseCaseDatabases(servers, provider);
+        await _databases.InitializeAsync();
+        using var binding = _databases.Bind();
+        await StartAppAsync();
+
         await SetupPostedEntries();
 
         var getMostDiscussedArticles = new GetFeedEntriesRequest(GetFeedEntriesRequest.ArticlesFeedData.MostDiscussed());
@@ -102,11 +115,20 @@ public sealed class BloggingWebsiteTests : IAsyncLifetime
     {
         try
         {
-            await _sut.StopAsync();
+            if (_sut is not null)
+                await _sut.StopAsync();
         }
         finally
         {
-            _sut.Dispose();
+            try
+            {
+                _sut?.Dispose();
+            }
+            finally
+            {
+                if (_databases is not null)
+                    await _databases.DisposeAsync();
+            }
         }
     }
 }

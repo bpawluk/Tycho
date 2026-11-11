@@ -103,7 +103,7 @@ namespace Tycho.Events.Inbox
         {
             await _event!.Event.HandleWith(eventHandler, cancellationToken).ConfigureAwait(false);
 
-            bool markedAsHandled = await inbox.MarkAsHandledAsync(_event.ClaimId, cancellationToken).ConfigureAwait(false);
+            bool markedAsHandled = await inbox.MarkAsHandledAsync(_event.EventId, _event.ClaimId, cancellationToken).ConfigureAwait(false);
             if (!markedAsHandled)
             {
                 throw new InvalidOperationException($"Failed to mark inbox entry with ID {_event.EventId} as handled for claim {_event.ClaimId}.");
@@ -116,7 +116,7 @@ namespace Tycho.Events.Inbox
             ILogger<InboxProcessorJob>? logger = scope.ServiceProvider.GetService<ILogger<InboxProcessorJob>>();
             IInboxConsumer inbox = scope.ServiceProvider.GetRequiredService<IInboxConsumer>();
 
-            bool markedAsFailed = await inbox.MarkAsFailedAsync(_event!.ClaimId, cancellationToken).ConfigureAwait(false);
+            bool markedAsFailed = await inbox.MarkAsFailedAsync(_event!.EventId, _event.ClaimId, cancellationToken).ConfigureAwait(false);
             if (!markedAsFailed)
             {
                 logger?.InboxMessageStatusUpdateFailed(_event.EventId, _event.ClaimId);

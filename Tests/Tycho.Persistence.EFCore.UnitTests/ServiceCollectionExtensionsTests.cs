@@ -4,7 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Moq;
 using Tycho.Events.Inbox;
 using Tycho.Events.Outbox;
-using Tycho.Persistence.EFCore.Common;
+using Tycho.Persistence.EFCore.Identity;
 using Tycho.Persistence.EFCore.Inbox;
 using Tycho.Persistence.EFCore.Outbox;
 using Tycho.Persistence.EFCore.Retention;
@@ -87,8 +87,6 @@ public sealed class ServiceCollectionExtensionsTests
         ServiceDescriptor registration = Assert.Single(services, service => service.ServiceType == typeof(PersistenceRetentionSettings));
         Assert.Equal(ServiceLifetime.Transient, registration.Lifetime);
         Assert.True(options.IsRetentionEnabled);
-        AssertRegistration<IInboxCleaner, InboxCleaner>(services, ServiceLifetime.Scoped);
-        AssertRegistration<IOutboxCleaner, OutboxCleaner>(services, ServiceLifetime.Scoped);
         AssertRegistration<IHostedService, PersistenceRetentionService>(services, ServiceLifetime.Singleton);
     }
 
@@ -165,8 +163,6 @@ public sealed class ServiceCollectionExtensionsTests
         ServiceDescriptor registration = Assert.Single(services, service => service.ServiceType == typeof(PersistenceRetentionSettings));
         Assert.Equal(TimeSpan.FromMinutes(10), options.CleanupInterval);
         AssertRegistration<IHostedService, PersistenceRetentionService>(services, ServiceLifetime.Singleton);
-        AssertRegistration<IInboxCleaner, InboxCleaner>(services, ServiceLifetime.Scoped);
-        AssertRegistration<IOutboxCleaner, OutboxCleaner>(services, ServiceLifetime.Scoped);
     }
 
     [Fact]
@@ -188,26 +184,6 @@ public sealed class ServiceCollectionExtensionsTests
         // Assert
         ServiceDescriptor registration = Assert.Single(services, service => service.ServiceType == typeof(IHostedService));
         Assert.Same(otherWorker, registration.ImplementationInstance);
-    }
-
-    [Fact]
-    public void AddTychoPersistenceRetention_WithExistingCleaners_PreservesRegistrations()
-    {
-        // Arrange
-        var services = new ServiceCollection();
-        IInboxCleaner inboxCleaner = Mock.Of<IInboxCleaner>();
-        IOutboxCleaner outboxCleaner = Mock.Of<IOutboxCleaner>();
-        services.AddSingleton(inboxCleaner);
-        services.AddSingleton(outboxCleaner);
-
-        // Act
-        services.AddTychoPersistenceRetention();
-
-        // Assert
-        ServiceDescriptor inboxRegistration = Assert.Single(services, service => service.ServiceType == typeof(IInboxCleaner));
-        ServiceDescriptor outboxRegistration = Assert.Single(services, service => service.ServiceType == typeof(IOutboxCleaner));
-        Assert.Same(inboxCleaner, inboxRegistration.ImplementationInstance);
-        Assert.Same(outboxCleaner, outboxRegistration.ImplementationInstance);
     }
 
     [Fact]

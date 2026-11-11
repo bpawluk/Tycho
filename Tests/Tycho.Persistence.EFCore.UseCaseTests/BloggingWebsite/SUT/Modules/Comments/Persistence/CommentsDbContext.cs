@@ -1,18 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using Tycho.Persistence.EFCore;
+using Tycho.Persistence.EFCore.UseCaseTests._Infrastructure;
 using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Domain;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Persistence;
 
-internal class CommentsDbContext : TychoDbContext
+internal class CommentsDbContext : UseCaseDbContext<CommentsDbContext>
 {
     public DbSet<Comment> Comments { get; set; } = null!;
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        base.OnConfiguring(optionsBuilder);
-
-        string dbPath = Path.Combine(Directory.GetCurrentDirectory(), "BloggingWebsite.Comments.db");
-        optionsBuilder.UseSqlite($"Data Source={dbPath};Pooling=False");
-    }
 }

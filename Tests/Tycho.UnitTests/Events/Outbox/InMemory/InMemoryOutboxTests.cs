@@ -133,7 +133,7 @@ public class InMemoryOutboxTests
         var cancellationToken = new CancellationToken();
 
         // Act & Assert
-        await _sut.MarkAsDeliveredAsync(claimId, cancellationToken);
+        await _sut.MarkAsDeliveredAsync(Guid.NewGuid(), claimId, cancellationToken);
     }
 
     [Fact]
@@ -144,7 +144,7 @@ public class InMemoryOutboxTests
         var cancellationToken = new CancellationToken();
 
         // Act & Assert
-        await _sut.MarkAsFailedAsync(claimId, cancellationToken);
+        await _sut.MarkAsFailedAsync(Guid.NewGuid(), claimId, cancellationToken);
     }
 
     private static RoutedEvent<TestEvent> CreateRoutedEvent()

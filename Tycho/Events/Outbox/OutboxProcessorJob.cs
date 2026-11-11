@@ -55,7 +55,7 @@ namespace Tycho.Events.Outbox
                 IEventDeliverer deliverer = scope.ServiceProvider.GetRequiredService<IEventDeliverer>();
                 await deliverer.DeliverAsync(_event.RoutedEvent, cancellationToken).ConfigureAwait(false);
 
-                bool markedAsDelivered = await outbox.MarkAsDeliveredAsync(_event.ClaimId, cancellationToken).ConfigureAwait(false);
+                bool markedAsDelivered = await outbox.MarkAsDeliveredAsync(_event.EventId, _event.ClaimId, cancellationToken).ConfigureAwait(false);
                 if (!markedAsDelivered)
                 {
                     logger?.OutboxMessageStatusUpdateFailed(_event.EventId, _event.ClaimId);
@@ -69,7 +69,7 @@ namespace Tycho.Events.Outbox
             {
                 logger?.OutboxMessageDeliveryFailed(_event.EventId, ex);
 
-                bool markedAsFailed = await outbox.MarkAsFailedAsync(_event.ClaimId, cancellationToken).ConfigureAwait(false);
+                bool markedAsFailed = await outbox.MarkAsFailedAsync(_event.EventId, _event.ClaimId, cancellationToken).ConfigureAwait(false);
                 if (!markedAsFailed)
                 {
                     logger?.OutboxMessageStatusUpdateFailed(_event.EventId, _event.ClaimId);

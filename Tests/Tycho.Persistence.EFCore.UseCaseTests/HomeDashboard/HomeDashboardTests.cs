@@ -1,26 +1,39 @@
+using Tycho.Persistence.EFCore.UseCaseTests._Infrastructure;
+using Tycho.Persistence.EFCore.UseCaseTests._Utils;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Climate.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Security.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Ventilation.Contract;
-using Tycho.Persistence.EFCore.UseCaseTests._Utils;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard;
 
-public sealed class HomeDashboardTests : IAsyncLifetime
+public sealed class HomeDashboardTests(DatabaseServers servers) : IAsyncLifetime
 {
+    private UseCaseDatabases? _databases;
     private readonly TestData _testData = new();
     private IHomeDashboardApp _sut = null!;
 
-    public async ValueTask InitializeAsync()
+    public ValueTask InitializeAsync() => ValueTask.CompletedTask;
+
+    private async Task StartAppAsync()
     {
         _sut = new HomeDashboardApp().CreateAppBuilder().Build();
         await _sut.StartAsync(TestContext.Current.CancellationToken);
     }
 
-    [Fact(Timeout = 30000)]
-    public async Task TychoUseCase_HomeDashboardApp_WorksCorrectly()
+    [Theory(Timeout = 360000)]
+    [InlineData(DatabaseProvider.SQLite)]
+    [InlineData(DatabaseProvider.SqlServer)]
+    [InlineData(DatabaseProvider.PostgreSql)]
+    [InlineData(DatabaseProvider.MySql)]
+    public async Task TychoUseCase_HomeDashboardApp_WorksCorrectly(DatabaseProvider provider)
     {
+        _databases = new UseCaseDatabases(servers, provider);
+        await _databases.InitializeAsync();
+        using var binding = _databases.Bind();
+        await StartAppAsync();
+
         await SetReadings();
 
         await AssertEventually.True(async () =>
@@ -37,19 +50,29 @@ public sealed class HomeDashboardTests : IAsyncLifetime
             return _testData.GetSecurityEvents().Match(response);
         });
 
-        await AssertEventually.True(async () =>
-        {
-            GetTemperatureReadingsRequest.Response response = await _sut.ExecuteAsync(
-                new GetRoomTemperatureReadingsRequest("upstairs"), TestContext.Current.CancellationToken);
-            return _testData.GetUpstairsTemperatureReadings().Match(response);
-        });
+        await AssertTemperatureReadings("upstairs", _testData.GetUpstairsTemperatureReadings());
+        await AssertTemperatureReadings("downstairs", _testData.GetDownstairsTemperatureReadings());
+    }
 
-        await AssertEventually.True(async () =>
+    private async Task AssertTemperatureReadings(string room, TestData.TemperatureReadings expected)
+    {
+        GetTemperatureReadingsRequest.Response? actual = null;
+        try
         {
-            GetTemperatureReadingsRequest.Response response = await _sut.ExecuteAsync(
-                new GetRoomTemperatureReadingsRequest("downstairs"), TestContext.Current.CancellationToken);
-            return _testData.GetDownstairsTemperatureReadings().Match(response);
-        });
+            await AssertEventually.True(async () =>
+            {
+                actual = await _sut.ExecuteAsync(
+                    new GetRoomTemperatureReadingsRequest(room), TestContext.Current.CancellationToken);
+                return expected.Match(actual);
+            });
+        }
+        finally
+        {
+            if (actual is not null && !expected.Match(actual))
+            {
+                TestContext.Current.TestOutputHelper?.WriteLine($"Temperature readings for {room}: expected {System.Text.Json.JsonSerializer.Serialize(expected)}; actual {System.Text.Json.JsonSerializer.Serialize(actual.Readings)}");
+            }
+        }
     }
 
     private async Task SetReadings()
@@ -65,11 +88,20 @@ public sealed class HomeDashboardTests : IAsyncLifetime
     {
         try
         {
-            await _sut.StopAsync();
+            if (_sut is not null)
+                await _sut.StopAsync();
         }
         finally
         {
-            _sut.Dispose();
+            try
+            {
+                _sut?.Dispose();
+            }
+            finally
+            {
+                if (_databases is not null)
+                    await _databases.DisposeAsync();
+            }
         }
     }
 }

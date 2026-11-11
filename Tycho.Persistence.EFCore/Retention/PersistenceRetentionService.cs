@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Tycho.Persistence.EFCore.Inbox;
+using Tycho.Persistence.EFCore.Operations;
 using Tycho.Persistence.EFCore.Logging;
-using Tycho.Persistence.EFCore.Outbox;
+using Tycho.Persistence.EFCore.Identity;
 
 namespace Tycho.Persistence.EFCore.Retention;
 
@@ -54,12 +54,13 @@ internal sealed class PersistenceRetentionService(
 
     private async Task CleanupAsync(IServiceProvider services, DateTime utcNow, CancellationToken cancellationToken)
     {
-        IInboxCleaner inbox = services.GetRequiredService<IInboxCleaner>();
+        TychoDbContext dbContext = services.GetRequiredService<TychoDbContext>();
+        PersistenceOwner owner = services.GetRequiredService<PersistenceOwner>();
 
         await RunCleanupAsync(
             options.Inbox.FullCleanupRetention,
             utcNow,
-            inbox.CleanEntriesAsync,
+            (cutoff, token) => DeleteInboxEntriesCommand.ExecuteAsync(dbContext, owner, cutoff, token),
             "Deleting messages",
             "Inbox",
             cancellationToken).ConfigureAwait(false);
@@ -67,17 +68,15 @@ internal sealed class PersistenceRetentionService(
         await RunCleanupAsync(
             options.Inbox.PayloadRetention,
             utcNow,
-            inbox.CleanPayloadsAsync,
+            (cutoff, token) => ClearInboxPayloadsCommand.ExecuteAsync(dbContext, owner, cutoff, token),
             "Clearing payloads",
             "Inbox",
             cancellationToken).ConfigureAwait(false);
 
-        IOutboxCleaner outbox = services.GetRequiredService<IOutboxCleaner>();
-
         await RunCleanupAsync(
             options.Outbox.FullCleanupRetention,
             utcNow,
-            outbox.CleanEntriesAsync,
+            (cutoff, token) => DeleteOutboxEntriesCommand.ExecuteAsync(dbContext, owner, cutoff, token),
             "Deleting messages",
             "Outbox",
             cancellationToken).ConfigureAwait(false);
@@ -85,7 +84,7 @@ internal sealed class PersistenceRetentionService(
         await RunCleanupAsync(
             options.Outbox.PayloadRetention,
             utcNow,
-            outbox.CleanPayloadsAsync,
+            (cutoff, token) => ClearOutboxPayloadsCommand.ExecuteAsync(dbContext, owner, cutoff, token),
             "Clearing payloads",
             "Outbox",
             cancellationToken).ConfigureAwait(false);

@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
-using Tycho.Persistence.EFCore.Common;
+using Tycho.Persistence.EFCore.Entries;
 
 namespace Tycho.Persistence.EFCore.Inbox;
 
@@ -37,7 +37,7 @@ internal class InboxEntry
     public DateTime Updated { get; set; } = DateTime.UtcNow;
 
     [Required]
-    public uint ProcessingAttempts { get; set; } = 0;
+    public uint Attempts { get; set; } = 0;
 
     [Required]
     public Guid ClaimId { get; set; } = Guid.Empty;

@@ -1,12 +1,14 @@
 using System.Threading.Channels;
+using System.Data.Common;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Time.Testing;
 using Moq;
-using Tycho.Persistence.EFCore.Inbox;
-using Tycho.Persistence.EFCore.Outbox;
 using Tycho.Persistence.EFCore.Retention;
 using Tycho.Persistence.EFCore.UnitTests._Utils;
+using Tycho.Persistence.EFCore.Identity;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Retention;
 
@@ -14,12 +16,14 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
 {
     private readonly TestTimeProvider _clock = new();
     private readonly PersistenceRetentionSettings _options = new();
-    private readonly Mock<IInboxCleaner> _inbox = new();
-    private readonly Mock<IOutboxCleaner> _outbox = new();
+    private readonly Mock<CleanupCommandInterceptor> _inbox = new("Inbox");
+    private readonly Mock<CleanupCommandInterceptor> _outbox = new("Outbox");
     private readonly Mock<IServiceScopeFactory> _scopeFactory = new();
     private readonly Mock<ILogger<PersistenceRetentionService>> _logger = new();
     private readonly List<Mock<IServiceScope>> _scopes = [];
     private PersistenceRetentionService _sut = default!;
+    private TestDbContext _dbContext = default!;
+    private readonly PersistenceOwner _owner = new(PersistenceTestInternals.Create(typeof(PersistenceOwner)));
 
     public ValueTask InitializeAsync()
     {
@@ -27,6 +31,12 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
         _inbox.Setup(cleaner => cleaner.CleanPayloadsAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>())).ReturnsAsync(0);
         _outbox.Setup(cleaner => cleaner.CleanEntriesAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>())).ReturnsAsync(0);
         _outbox.Setup(cleaner => cleaner.CleanPayloadsAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>())).ReturnsAsync(0);
+        _inbox.CallBase = true;
+        _outbox.CallBase = true;
+        _dbContext = new TestDbContext(new DbContextOptionsBuilder<TestDbContext>()
+            .UseSqlite("Data Source=:memory:")
+            .AddInterceptors(_inbox.Object, _outbox.Object)
+            .Options);
         _scopeFactory.Setup(factory => factory.CreateScope()).Returns(CreateScope);
         _logger.Setup(item => item.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
         _sut = new PersistenceRetentionService(_scopeFactory.Object, _options, _clock, _logger.Object);
@@ -51,8 +61,6 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
         _inbox.Verify(cleaner => cleaner.CleanEntriesAsync(now.AddDays(-2), It.IsAny<CancellationToken>()), Times.Once);
         _outbox.Verify(cleaner => cleaner.CleanPayloadsAsync(now.AddDays(-3), It.IsAny<CancellationToken>()), Times.Once);
         _outbox.Verify(cleaner => cleaner.CleanEntriesAsync(now.AddDays(-4), It.IsAny<CancellationToken>()), Times.Once);
-        _inbox.VerifyNoOtherCalls();
-        _outbox.VerifyNoOtherCalls();
         Assert.Single(_scopes).As<IAsyncDisposable>().Verify(scope => scope.DisposeAsync(), Times.Once);
     }
 
@@ -152,8 +160,8 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
         // Assert
         Assert.Equal(_options.InitialDelay, initialDelay);
         _scopeFactory.Verify(factory => factory.CreateScope(), Times.Never);
-        _inbox.VerifyNoOtherCalls();
-        _outbox.VerifyNoOtherCalls();
+        _outbox.Verify(cleaner => cleaner.CleanEntriesAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()), Times.Never);
+        _outbox.Verify(cleaner => cleaner.CleanPayloadsAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()), Times.Never);
 
         // Act
         _clock.Advance(initialDelay);
@@ -206,7 +214,8 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
         // Assert
         Assert.Equal(_options.CleanupInterval, cleanupDelay);
         Assert.Single(_scopes).As<IAsyncDisposable>().Verify(scope => scope.DisposeAsync(), Times.Once);
-        _outbox.VerifyNoOtherCalls();
+        _outbox.Verify(cleaner => cleaner.CleanEntriesAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()), Times.Never);
+        _outbox.Verify(cleaner => cleaner.CleanPayloadsAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()), Times.Never);
         LogAssert.Logged(_logger, LogLevel.Error, 2201, "RetentionCleanupFailed", failure, ("RetryDelay", _options.CleanupInterval));
 
         // Act
@@ -276,7 +285,8 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
         Assert.True(cleanerToken.IsCancellationRequested);
         Assert.True(_sut.ExecuteTask.IsCompletedSuccessfully);
         Assert.Single(_scopes).As<IAsyncDisposable>().Verify(scope => scope.DisposeAsync(), Times.Once);
-        _outbox.VerifyNoOtherCalls();
+        _outbox.Verify(cleaner => cleaner.CleanEntriesAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()), Times.Never);
+        _outbox.Verify(cleaner => cleaner.CleanPayloadsAsync(It.IsAny<DateTime>(), It.IsAny<CancellationToken>()), Times.Never);
         _logger.Verify(item => item.Log(
             LogLevel.Error,
             It.IsAny<EventId>(),
@@ -332,8 +342,8 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
     private IServiceScope CreateScope()
     {
         var provider = new Mock<IServiceProvider>();
-        provider.Setup(services => services.GetService(typeof(IInboxCleaner))).Returns(_inbox.Object);
-        provider.Setup(services => services.GetService(typeof(IOutboxCleaner))).Returns(_outbox.Object);
+        provider.Setup(services => services.GetService(typeof(TychoDbContext))).Returns(_dbContext);
+        provider.Setup(services => services.GetService(typeof(PersistenceOwner))).Returns(_owner);
 
         var scope = new Mock<IServiceScope>();
         scope.SetupGet(item => item.ServiceProvider).Returns(provider.Object);
@@ -364,6 +374,33 @@ public sealed class PersistenceRetentionServiceTests : IAsyncLifetime
         finally
         {
             _sut.Dispose();
+            await _dbContext.DisposeAsync();
+        }
+    }
+
+    private sealed class TestDbContext(DbContextOptions<TestDbContext> options) : TychoDbContext(options);
+
+    public class CleanupCommandInterceptor(string store) : DbCommandInterceptor
+    {
+        public virtual Task<int> CleanEntriesAsync(DateTime cutoff, CancellationToken cancellationToken) => Task.FromResult(0);
+
+        public virtual Task<int> CleanPayloadsAsync(DateTime cutoff, CancellationToken cancellationToken) => Task.FromResult(0);
+
+        public override async ValueTask<InterceptionResult<int>> NonQueryExecutingAsync(
+            DbCommand command, CommandEventData eventData, InterceptionResult<int> result,
+            CancellationToken cancellationToken = default)
+        {
+            if (!command.CommandText.Contains(store + "\"", StringComparison.Ordinal))
+            {
+                return result;
+            }
+
+            DateTime cutoff = Assert.IsType<DateTime>(command.Parameters.Cast<DbParameter>()
+                .Single(parameter => parameter.Value is DateTime).Value);
+            int affected = command.CommandText.StartsWith("DELETE", StringComparison.Ordinal)
+                ? await CleanEntriesAsync(cutoff, cancellationToken)
+                : await CleanPayloadsAsync(cutoff, cancellationToken);
+            return InterceptionResult<int>.SuppressWithResult(affected);
         }
     }
 

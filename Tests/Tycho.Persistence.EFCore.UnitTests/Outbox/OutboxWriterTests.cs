@@ -9,7 +9,7 @@ using Tycho.Events.Outbox;
 using Tycho.Events.Serialization;
 using Tycho.Identity.Events;
 using Tycho.Identity.Structure;
-using Tycho.Persistence.EFCore.Common;
+using Tycho.Persistence.EFCore.Identity;
 using Tycho.Persistence.EFCore.Outbox;
 using Tycho.Persistence.EFCore.UnitTests._Data.Events;
 using Tycho.Persistence.EFCore.UnitTests._Utils;
@@ -52,7 +52,7 @@ public sealed class OutboxWriterTests : IAsyncLifetime
 
         using Internals internals = PersistenceTestInternals.Create(typeof(PersistenceOwner));
         _persistenceOwner = new PersistenceOwner(internals);
-        _sut = new OutboxWriter(_eventSerializer.Object, _outboxActivity, _dbContext, _persistenceOwner);
+        _sut = PersistenceTestOperations.CreateOutboxWriter(_eventSerializer.Object, _outboxActivity, _dbContext, _persistenceOwner);
     }
 
     [Fact]
@@ -148,7 +148,7 @@ public sealed class OutboxWriterTests : IAsyncLifetime
     public async Task Write_WithinTychoTransaction_NotifiesAfterCommit()
     {
         // Arrange
-        var transaction = new Tycho.Persistence.EFCore.Transactions.Transaction(_dbContext);
+        var transaction = PersistenceTestOperations.CreateTransaction(_dbContext);
 
         // Act
         await transaction.ExecuteAsync(async cancellationToken =>

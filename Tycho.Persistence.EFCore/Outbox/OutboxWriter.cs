@@ -1,12 +1,13 @@
+using Microsoft.EntityFrameworkCore.Storage;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Storage;
 using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Events.Serialization;
-using Tycho.Persistence.EFCore.Common;
+using Tycho.Persistence.EFCore.Identity;
+using Tycho.Persistence.EFCore.Operations;
 
 namespace Tycho.Persistence.EFCore.Outbox;
 
@@ -37,7 +38,7 @@ internal class OutboxWriter(
             };
         })];
 
-        _dbContext.Set<OutboxEntry>().AddRange(outboxEntries);
+        await StageOutboxEntriesCommand.ExecuteAsync(_dbContext, outboxEntries, cancellationToken).ConfigureAwait(false);
 
         if (System.Transactions.Transaction.Current is not null)
         {

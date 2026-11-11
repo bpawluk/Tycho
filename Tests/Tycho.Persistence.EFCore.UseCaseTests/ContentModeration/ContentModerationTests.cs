@@ -1,25 +1,38 @@
+using Tycho.Persistence.EFCore.UseCaseTests._Infrastructure;
+using Tycho.Persistence.EFCore.UseCaseTests._Utils;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Contract.Incoming;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Posts.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Contract;
-using Tycho.Persistence.EFCore.UseCaseTests._Utils;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration;
 
-public sealed class ContentModerationTests : IAsyncLifetime
+public sealed class ContentModerationTests(DatabaseServers servers) : IAsyncLifetime
 {
+    private UseCaseDatabases? _databases;
     private readonly TestData _testData = new();
     private IContentModerationApp _sut = null!;
 
-    public async ValueTask InitializeAsync()
+    public ValueTask InitializeAsync() => ValueTask.CompletedTask;
+
+    private async Task StartAppAsync()
     {
         _sut = new ContentModerationApp().CreateAppBuilder().Build();
         await _sut.StartAsync(TestContext.Current.CancellationToken);
     }
 
-    [Fact(Timeout = 30000)]
-    public async Task TychoUseCase_ContentModerationApp_WorksCorrectly()
+    [Theory(Timeout = 360000)]
+    [InlineData(DatabaseProvider.SQLite)]
+    [InlineData(DatabaseProvider.SqlServer)]
+    [InlineData(DatabaseProvider.PostgreSql)]
+    [InlineData(DatabaseProvider.MySql)]
+    public async Task TychoUseCase_ContentModerationApp_WorksCorrectly(DatabaseProvider provider)
     {
+        _databases = new UseCaseDatabases(servers, provider);
+        await _databases.InitializeAsync();
+        using var binding = _databases.Bind();
+        await StartAppAsync();
+
         await SetupUsers();
 
         GetUsersRequest.Response users = await _sut.ExecuteAsync(new GetUsersRequest(), TestContext.Current.CancellationToken);
@@ -90,11 +103,20 @@ public sealed class ContentModerationTests : IAsyncLifetime
     {
         try
         {
-            await _sut.StopAsync();
+            if (_sut is not null)
+                await _sut.StopAsync();
         }
         finally
         {
-            _sut.Dispose();
+            try
+            {
+                _sut?.Dispose();
+            }
+            finally
+            {
+                if (_databases is not null)
+                    await _databases.DisposeAsync();
+            }
         }
     }
 }

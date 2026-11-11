@@ -1,15 +1,18 @@
+using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Tycho.Events.Inbox;
 using Tycho.Events.Model;
-using Tycho.Persistence.EFCore.Common;
+using Tycho.Persistence.EFCore.Identity;
+using Tycho.Persistence.EFCore.Operations;
 
 namespace Tycho.Persistence.EFCore.Inbox;
 
-internal class InboxWriter(InboxActivity inboxActivity, TychoDbContext dbContext, PersistenceOwner owner) : IInboxWriter
+internal class InboxWriter(
+    InboxActivity inboxActivity,
+    TychoDbContext dbContext,
+    PersistenceOwner owner) : IInboxWriter
 {
-    private readonly TychoDbContext _dbContext = dbContext;
     private readonly InboxActivity _inboxActivity = inboxActivity;
 
     public async Task Write(SerializedEvent serializedEvent, CancellationToken cancellationToken = default)
@@ -23,23 +26,14 @@ internal class InboxWriter(InboxActivity inboxActivity, TychoDbContext dbContext
             Event = serializedEvent.EventId.ToString(),
             Payload = serializedEvent.Payload.ToString()!
         };
-        _dbContext.Set<InboxEntry>().Add(inboxEntry);
 
         try
         {
-            await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            await InsertInboxEntryCommand.ExecuteAsync(dbContext, inboxEntry, cancellationToken).ConfigureAwait(false);
         }
         catch (DbUpdateException)
         {
-            _dbContext.Entry(inboxEntry).State = EntityState.Detached;
-
-            InboxEntry? existing = await _dbContext
-                .Set<InboxEntry>()
-                .AsNoTracking()
-                .SingleOrDefaultAsync(x =>
-                    x.OwnerId == owner.Identifier &&
-                    x.EntryId == inboxEntry.EntryId, cancellationToken)
-                .ConfigureAwait(false);
+            InboxEntry? existing = await FindInboxEntryQuery.ExecuteAsync(dbContext, owner, inboxEntry.EntryId, cancellationToken).ConfigureAwait(false);
 
             if (existing is null ||
                 existing.PublishId != inboxEntry.PublishId ||

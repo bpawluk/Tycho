@@ -20,12 +20,12 @@ public sealed class PersistenceRetentionSettings
     /// <summary>
     /// Gets inbox retention settings.
     /// </summary>
-    public MessageRetentionSettings Inbox { get; init; } = new() { PayloadRetention = TimeSpan.FromDays(7) };
+    public EntryRetentionSettings Inbox { get; init; } = new() { PayloadRetention = TimeSpan.FromDays(7) };
 
     /// <summary>
     /// Gets outbox retention settings.
     /// </summary>
-    public MessageRetentionSettings Outbox { get; init; } = new() { FullCleanupRetention = TimeSpan.FromDays(7) };
+    public EntryRetentionSettings Outbox { get; init; } = new() { FullCleanupRetention = TimeSpan.FromDays(7) };
 
     internal bool IsRetentionEnabled => Inbox.IsEnabled || Outbox.IsEnabled;
 

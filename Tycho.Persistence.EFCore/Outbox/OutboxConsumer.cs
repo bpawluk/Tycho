@@ -1,17 +1,16 @@
 using System;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Identity.Events;
 using Tycho.Identity.Structure;
-using Tycho.Persistence.EFCore.Common;
+using Tycho.Persistence.EFCore.Entries;
+using Tycho.Persistence.EFCore.Identity;
 using Tycho.Persistence.EFCore.Logging;
+using Tycho.Persistence.EFCore.Operations;
 
 namespace Tycho.Persistence.EFCore.Outbox;
 
@@ -21,8 +20,6 @@ internal class OutboxConsumer(
     OutboxConsumerSettings settings,
     ILogger<OutboxConsumer>? logger = null) : IOutboxConsumer
 {
-    private readonly TychoDbContext _dbContext = dbContext;
-    private readonly PersistenceOwner _owner = owner;
     private readonly OutboxConsumerSettings _settings = settings;
     private readonly ILogger<OutboxConsumer> _logger = logger ?? NullLogger<OutboxConsumer>.Instance;
 
@@ -31,39 +28,17 @@ internal class OutboxConsumer(
         Guid claimId = Guid.NewGuid();
         DateTime utcNow = DateTime.UtcNow;
 
-        Expression<Func<OutboxEntry, bool>> canBeProcessed = entry =>
-            (entry.State == EntryState.New) ||
-            (entry.State == EntryState.Failed && entry.DeliveryAttempts < _settings.MaxDeliveryCount) ||
-            (entry.State == EntryState.InProcessing && entry.DeliveryAttempts < _settings.MaxDeliveryCount && entry.ClaimExpiration < utcNow);
-
-        int claimedEntries = await _dbContext
-            .Set<OutboxEntry>()
-            .Where(entry => entry.OwnerId == _owner.Identifier)
-            .Where(canBeProcessed)
-            .OrderBy(entry => entry.Updated)
-            .ThenBy(entry => entry.EntryId)
-            .Take(1)
-            .ExecuteUpdateAsync(setters => setters
-                .SetProperty(entry => entry.State, EntryState.InProcessing)
-                .SetProperty(entry => entry.Updated, utcNow)
-                .SetProperty(entry => entry.DeliveryAttempts, entry => entry.DeliveryAttempts + 1)
-                .SetProperty(entry => entry.ClaimId, claimId)
-                .SetProperty(entry => entry.ClaimExpiration, utcNow + _settings.DeliveryExpiration), cancellationToken)
+        var claimRequest = new ClaimRequest(claimId, utcNow, utcNow + _settings.DeliveryExpiration, _settings.MaxDeliveryCount);
+        ClaimResult<OutboxEntry> result = await ClaimOutboxEntryCommand
+            .ExecuteAsync(dbContext, owner, claimRequest, cancellationToken)
             .ConfigureAwait(false);
 
-        if (claimedEntries != 1)
+        if (result.Status == ClaimStatus.NotClaimed)
         {
             return null;
         }
 
-        OutboxEntry? entryToDeliver = await _dbContext
-            .Set<OutboxEntry>()
-            .AsNoTracking()
-            .SingleOrDefaultAsync(entry =>
-                entry.OwnerId == _owner.Identifier &&
-                entry.ClaimId == claimId, cancellationToken)
-            .ConfigureAwait(false);
-
+        OutboxEntry? entryToDeliver = result.Entry;
         if (entryToDeliver == null)
         {
             _logger.OutboxClaimedEntryMissing(claimId);
@@ -81,43 +56,17 @@ internal class OutboxConsumer(
                 entryToDeliver.Payload));
     }
 
-    public async Task<bool> MarkAsDeliveredAsync(Guid claimId, CancellationToken cancellationToken)
+    public async Task<bool> MarkAsDeliveredAsync(Guid entryId, Guid claimId, CancellationToken cancellationToken)
     {
-        DateTime currentTime = DateTime.UtcNow;
-
-        int updatedRowsCount = await _dbContext
-            .Set<OutboxEntry>()
-            .Where(entry =>
-                entry.OwnerId == _owner.Identifier &&
-                entry.State == EntryState.InProcessing &&
-                entry.ClaimId == claimId)
-            .ExecuteUpdateAsync(setters => setters
-                .SetProperty(entry => entry.State, EntryState.Processed)
-                .SetProperty(entry => entry.Updated, currentTime)
-                .SetProperty(entry => entry.ClaimId, Guid.Empty)
-                .SetProperty(entry => entry.ClaimExpiration, DateTime.MinValue), cancellationToken)
-            .ConfigureAwait(false);
-
-        return updatedRowsCount == 1;
+        return await CompleteOutboxClaimCommand
+            .ExecuteAsync(dbContext, owner, entryId, claimId, DateTime.UtcNow, cancellationToken)
+            .ConfigureAwait(false) == 1;
     }
 
-    public async Task<bool> MarkAsFailedAsync(Guid claimId, CancellationToken cancellationToken)
+    public async Task<bool> MarkAsFailedAsync(Guid entryId, Guid claimId, CancellationToken cancellationToken)
     {
-        DateTime currentTime = DateTime.UtcNow;
-
-        int updatedRowsCount = await _dbContext
-            .Set<OutboxEntry>()
-            .Where(entry =>
-                entry.OwnerId == _owner.Identifier &&
-                entry.State == EntryState.InProcessing &&
-                entry.ClaimId == claimId)
-            .ExecuteUpdateAsync(setters => setters
-                .SetProperty(entry => entry.State, EntryState.Failed)
-                .SetProperty(entry => entry.Updated, currentTime)
-                .SetProperty(entry => entry.ClaimId, Guid.Empty)
-                .SetProperty(entry => entry.ClaimExpiration, DateTime.MinValue), cancellationToken)
-            .ConfigureAwait(false);
-
-        return updatedRowsCount == 1;
+        return await FailOutboxClaimCommand
+            .ExecuteAsync(dbContext, owner, entryId, claimId, DateTime.UtcNow, cancellationToken)
+            .ConfigureAwait(false) == 1;
     }
 }

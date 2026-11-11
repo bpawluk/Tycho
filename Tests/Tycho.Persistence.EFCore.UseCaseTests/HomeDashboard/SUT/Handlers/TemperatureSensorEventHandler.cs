@@ -1,28 +1,27 @@
 using Tycho.Events;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Contract.Readings;
-using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Rooms;
-using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Rooms.Contract;
 using Tycho.Transactions;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Handlers;
 
 [TychoId("route-temperature-reading")]
-internal class TemperatureSensorEventHandler(IDownstairsModule downstairs, IUpstairsModule upstairs)
+internal class TemperatureSensorEventHandler(IHomeDashboardAppPublisher publisher)
     : ITransactionalEventHandler<SensorEvent<TemperatureReading>>
 {
     public Task HandleAsync(EventContext<SensorEvent<TemperatureReading>> context, CancellationToken cancellationToken)
     {
-        var request = new RegisterTemperatureSensorEventRequest(context.Payload);
-
+        // Stage forwarding in this handler's HomeDashboard outbox so it commits
+        // with inbox completion. Calling a room's request endpoint here publishes
+        // independently and would publish again if this transaction is retried.
         if (context.Payload.SensorId.StartsWith("downstairs-", StringComparison.Ordinal))
         {
-            return downstairs.ExecuteAsync(request, cancellationToken);
+            return publisher.PublishAsync(new DownstairsTemperatureSensorEvent(context.Payload), cancellationToken);
         }
 
         if (context.Payload.SensorId.StartsWith("upstairs-", StringComparison.Ordinal))
         {
-            return upstairs.ExecuteAsync(request, cancellationToken);
+            return publisher.PublishAsync(new UpstairsTemperatureSensorEvent(context.Payload), cancellationToken);
         }
 
         throw new ArgumentException($"Unknown room for sensor '{context.Payload.SensorId}'.", nameof(context));

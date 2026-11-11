@@ -1,5 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Tycho.Apps;
+using Tycho.Persistence.EFCore.UseCaseTests._Infrastructure;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Contract.Readings;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Handlers;
@@ -18,6 +21,12 @@ namespace Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT;
 [TychoId("home-dashboard")]
 public partial class HomeDashboardApp : TychoApp
 {
+    protected override void ConfigureHost(IServiceProvider? parentServiceProvider, HostApplicationBuilder appHostBuilder)
+    {
+        base.ConfigureHost(parentServiceProvider, appHostBuilder);
+        appHostBuilder.Logging.AddProvider(UseCaseDatabases.Current.Logs);
+    }
+
     protected override void DefineContract(IAppContract app)
     {
         app.Expects<SetReadingRequest>()
@@ -37,6 +46,14 @@ public partial class HomeDashboardApp : TychoApp
     {
         app.Expects<SensorEvent<TemperatureReading>>()
            .HandlesWith<TemperatureSensorEventHandler>();
+
+        app.Expects<DownstairsTemperatureSensorEvent>()
+           .MapsTo(reading => reading.SensorEvent)
+           .ForwardsTo<DownstairsModule>();
+
+        app.Expects<UpstairsTemperatureSensorEvent>()
+           .MapsTo(reading => reading.SensorEvent)
+           .ForwardsTo<UpstairsModule>();
 
         app.Expects<SensorEvent<AirQualityReading>>()
            .ForwardsTo<VentilationModule>();

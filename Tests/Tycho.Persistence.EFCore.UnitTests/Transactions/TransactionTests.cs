@@ -30,7 +30,7 @@ public sealed class TransactionTests : IAsyncLifetime
         _dbContext = new TestDbContext(_dbOptions);
         await _dbContext.Database.EnsureCreatedAsync();
 
-        _sut = new Transaction(_dbContext);
+        _sut = PersistenceTestOperations.CreateTransaction(_dbContext);
     }
 
     [Fact]
@@ -156,7 +156,7 @@ public sealed class TransactionTests : IAsyncLifetime
         await using var dbContext = new TestDbContext(options);
 
         int operationCount = 0;
-        var sut = new Transaction(dbContext);
+        var sut = PersistenceTestOperations.CreateTransaction(dbContext);
 
         // Assert
         Assert.True(dbContext.Database.CreateExecutionStrategy().RetriesOnFailure);
@@ -189,7 +189,7 @@ public sealed class TransactionTests : IAsyncLifetime
         IExecutionStrategy outerStrategy = dbContext.Database.CreateExecutionStrategy();
 
         int operationCount = 0;
-        var sut = new Transaction(dbContext);
+        var sut = PersistenceTestOperations.CreateTransaction(dbContext);
 
         // Act
         Task Act() => outerStrategy.ExecuteAsync(() => sut.ExecuteAsync(cancellationToken =>
@@ -250,7 +250,7 @@ public sealed class TransactionTests : IAsyncLifetime
 
         var logger = new Mock<ILogger<Transaction>>();
         logger.Setup(l => l.IsEnabled(LogLevel.Error)).Returns(true);
-        var sut = new Transaction(_dbContext, logger.Object);
+        var sut = PersistenceTestOperations.CreateTransaction(_dbContext, logger.Object);
 
         // Act
         int result = await sut.ExecuteAsync(cancellationToken =>
@@ -273,7 +273,7 @@ public sealed class TransactionTests : IAsyncLifetime
         var commitFailure = new InvalidOperationException("commit failure");
         Mock<IDbContextTransaction> transaction = InjectCleanupFailures(commitFailure: commitFailure);
 
-        var sut = new Transaction(_dbContext);
+        var sut = PersistenceTestOperations.CreateTransaction(_dbContext);
 
         // Act
         Task Act() => sut.ExecuteAsync(cancellationToken =>
@@ -302,7 +302,7 @@ public sealed class TransactionTests : IAsyncLifetime
 
         var logger = new Mock<ILogger<Transaction>>();
         logger.Setup(l => l.IsEnabled(LogLevel.Error)).Returns(true);
-        var sut = new Transaction(_dbContext, logger.Object);
+        var sut = PersistenceTestOperations.CreateTransaction(_dbContext, logger.Object);
         using var cancellationSource = new CancellationTokenSource();
 
         // Act

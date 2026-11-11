@@ -16,8 +16,6 @@ internal class Entry(int contentId, string feedPath, EntryType type)
 
     public uint Score { get; private set; } = 0;
 
-    public uint? DiscussionWeight { get; private set; }
-
     public string SubfeedPath => $"{FeedPath}/{Id}";
 
     public void UpdateScore(uint newScore)

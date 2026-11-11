@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using Tycho.Persistence.EFCore;
+using Tycho.Persistence.EFCore.UseCaseTests._Infrastructure;
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Domain;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Persistence;
 
-internal class InventoryDbContext : TychoDbContext
+internal class InventoryDbContext : UseCaseDbContext<InventoryDbContext>
 {
     public DbSet<Item> Items { get; set; } = null!;
 
@@ -12,6 +12,7 @@ internal class InventoryDbContext : TychoDbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.Entity<Item>().Property(item => item.Id).ValueGeneratedNever();
         modelBuilder.Entity<Item>().OwnsOne(item => item.Availability);
 
         modelBuilder.Entity<Item>().OwnsMany(
@@ -22,14 +23,6 @@ internal class InventoryDbContext : TychoDbContext
                 reservation.WithOwner().HasForeignKey(ReservationShadowProperties.ItemId);
                 reservation.HasKey(r => r.Code);
             });
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        base.OnConfiguring(optionsBuilder);
-
-        string dbPath = Path.Combine(Directory.GetCurrentDirectory(), "OnlineStore.Inventory.db");
-        optionsBuilder.UseSqlite($"Data Source={dbPath};Pooling=False");
     }
 
     private static class ReservationShadowProperties

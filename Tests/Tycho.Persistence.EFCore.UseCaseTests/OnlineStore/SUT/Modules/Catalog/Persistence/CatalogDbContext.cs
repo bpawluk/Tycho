@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using Tycho.Persistence.EFCore;
+using Tycho.Persistence.EFCore.UseCaseTests._Infrastructure;
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Domain;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Persistence;
 
-internal class CatalogDbContext : TychoDbContext
+internal class CatalogDbContext : UseCaseDbContext<CatalogDbContext>
 {
     public DbSet<Product> Products { get; set; } = null!;
 
@@ -13,13 +13,5 @@ internal class CatalogDbContext : TychoDbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<Product>().OwnsOne(product => product.Availability);
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        base.OnConfiguring(optionsBuilder);
-
-        string dbPath = Path.Combine(Directory.GetCurrentDirectory(), "OnlineStore.Catalog.db");
-        optionsBuilder.UseSqlite($"Data Source={dbPath};Pooling=False");
     }
 }

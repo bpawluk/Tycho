@@ -53,12 +53,12 @@ namespace Tycho.Events.Outbox.InMemory
             return Task.FromResult<OutboxEvent?>(null);
         }
 
-        public Task<bool> MarkAsDeliveredAsync(Guid claimId, CancellationToken cancellationToken)
+        public Task<bool> MarkAsDeliveredAsync(Guid entryId, Guid claimId, CancellationToken cancellationToken)
         {
             return Task.FromResult(true);
         }
 
-        public Task<bool> MarkAsFailedAsync(Guid claimId, CancellationToken cancellationToken)
+        public Task<bool> MarkAsFailedAsync(Guid entryId, Guid claimId, CancellationToken cancellationToken)
         {
             return Task.FromResult(true);
         }

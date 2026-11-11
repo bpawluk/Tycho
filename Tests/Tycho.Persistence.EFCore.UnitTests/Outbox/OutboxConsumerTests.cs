@@ -5,7 +5,8 @@ using Moq;
 using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Identity.Structure;
-using Tycho.Persistence.EFCore.Common;
+using Tycho.Persistence.EFCore.Entries;
+using Tycho.Persistence.EFCore.Identity;
 using Tycho.Persistence.EFCore.Outbox;
 using Tycho.Persistence.EFCore.UnitTests._Utils;
 using Tycho.Structure;
@@ -37,7 +38,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         await _dbContext.Database.EnsureCreatedAsync();
 
         var persistenceOwner = new PersistenceOwner(PersistenceTestInternals.Create(typeof(PersistenceOwner)));
-        _sut = new OutboxConsumer(_dbContext, persistenceOwner, _settings);
+        _sut = PersistenceTestOperations.CreateOutboxConsumer(_dbContext, persistenceOwner, _settings);
     }
 
     [Fact]
@@ -48,7 +49,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         await SeedEntries(entry);
 
         using Internals otherInternals = PersistenceTestInternals.Create(typeof(PersistenceOwner), typeof(OutboxConsumerTests));
-        var otherConsumer = new OutboxConsumer(_dbContext, new PersistenceOwner(otherInternals), _settings);
+        var otherConsumer = PersistenceTestOperations.CreateOutboxConsumer(_dbContext, new PersistenceOwner(otherInternals), _settings);
 
         // Act & Assert
         Assert.Null(await otherConsumer.TryReadAsync(TestContext.Current.CancellationToken));
@@ -121,7 +122,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         logger.Setup(item => item.IsEnabled(LogLevel.Warning)).Returns(true);
 
         var owner = new PersistenceOwner(PersistenceTestInternals.Create(typeof(PersistenceOwner)));
-        var consumer = new OutboxConsumer(racingContext, owner, _settings, logger.Object);
+        var consumer = PersistenceTestOperations.CreateOutboxConsumer(racingContext, owner, _settings, logger.Object);
 
         // Act
         OutboxEvent? result = await consumer.TryReadAsync(CancellationToken.None);
@@ -285,14 +286,14 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         await SeedEntries(entry);
 
         // Act
-        bool result = await _sut.MarkAsDeliveredAsync(claimId, CancellationToken.None);
+        bool result = await _sut.MarkAsDeliveredAsync(entryId, claimId, CancellationToken.None);
 
         // Assert
         Assert.True(result);
 
         OutboxEntry persistedEntry = await LoadEntry(entryId);
         Assert.Equal(EntryState.Processed, persistedEntry.State);
-        Assert.Equal(entry.DeliveryAttempts, persistedEntry.DeliveryAttempts);
+        Assert.Equal(entry.Attempts, persistedEntry.Attempts);
         Assert.Equal(Guid.Empty, persistedEntry.ClaimId);
         Assert.Equal(DateTime.MinValue, persistedEntry.ClaimExpiration);
     }
@@ -308,7 +309,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         await SeedEntries(entry);
 
         // Act
-        bool result = await _sut.MarkAsDeliveredAsync(claimId, CancellationToken.None);
+        bool result = await _sut.MarkAsDeliveredAsync(entryId, claimId, CancellationToken.None);
 
         // Assert
         Assert.False(result);
@@ -329,7 +330,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         await SeedEntries(entry);
 
         // Act
-        bool result = await _sut.MarkAsDeliveredAsync(invalidClaimId, CancellationToken.None);
+        bool result = await _sut.MarkAsDeliveredAsync(entryId, invalidClaimId, CancellationToken.None);
 
         // Assert
         Assert.False(result);
@@ -349,14 +350,14 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         await SeedEntries(entry);
 
         // Act
-        bool result = await _sut.MarkAsFailedAsync(claimId, CancellationToken.None);
+        bool result = await _sut.MarkAsFailedAsync(entryId, claimId, CancellationToken.None);
 
         // Assert
         Assert.True(result);
 
         OutboxEntry persistedEntry = await LoadEntry(entryId);
         Assert.Equal(EntryState.Failed, persistedEntry.State);
-        Assert.Equal(entry.DeliveryAttempts, persistedEntry.DeliveryAttempts);
+        Assert.Equal(entry.Attempts, persistedEntry.Attempts);
         Assert.Equal(Guid.Empty, persistedEntry.ClaimId);
         Assert.Equal(DateTime.MinValue, persistedEntry.ClaimExpiration);
     }
@@ -372,7 +373,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         await SeedEntries(entry);
 
         // Act
-        bool result = await _sut.MarkAsFailedAsync(claimId, CancellationToken.None);
+        bool result = await _sut.MarkAsFailedAsync(entryId, claimId, CancellationToken.None);
 
         // Assert
         Assert.False(result);
@@ -393,13 +394,31 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         await SeedEntries(entry);
 
         // Act
-        bool result = await _sut.MarkAsFailedAsync(invalidClaimId, CancellationToken.None);
+        bool result = await _sut.MarkAsFailedAsync(entryId, invalidClaimId, CancellationToken.None);
 
         // Assert
         Assert.False(result);
 
         OutboxEntry persistedEntry = await LoadEntry(entryId);
         AssertEntryUnchanged(entry, persistedEntry);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Transition_WithWrongEntryId_DoesNotModifyClaim(bool fail)
+    {
+        Guid entryId = Guid.NewGuid();
+        Guid claimId = Guid.NewGuid();
+        OutboxEntry entry = CreateEntry(entryId, EntryState.InProcessing, 1, claimId, DateTime.UtcNow.AddMinutes(1));
+        await SeedEntries(entry);
+
+        bool result = fail
+            ? await _sut.MarkAsFailedAsync(Guid.NewGuid(), claimId, TestContext.Current.CancellationToken)
+            : await _sut.MarkAsDeliveredAsync(Guid.NewGuid(), claimId, TestContext.Current.CancellationToken);
+
+        Assert.False(result);
+        AssertEntryUnchanged(entry, await LoadEntry(entryId));
     }
 
     private async Task SeedEntries(params OutboxEntry[] entries)
@@ -424,7 +443,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
     private static void AssertClaimedEntry(OutboxEntry entry, Guid claimId, uint expectedDeliveryAttempts, DateTime readStartedAt)
     {
         Assert.Equal(EntryState.InProcessing, entry.State);
-        Assert.Equal(expectedDeliveryAttempts, entry.DeliveryAttempts);
+        Assert.Equal(expectedDeliveryAttempts, entry.Attempts);
         Assert.Equal(claimId, entry.ClaimId);
         Assert.True(entry.ClaimExpiration > readStartedAt);
     }
@@ -432,7 +451,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
     private static void AssertEntryUnchanged(OutboxEntry expected, OutboxEntry actual)
     {
         Assert.Equal(expected.State, actual.State);
-        Assert.Equal(expected.DeliveryAttempts, actual.DeliveryAttempts);
+        Assert.Equal(expected.Attempts, actual.Attempts);
         Assert.Equal(expected.ClaimId, actual.ClaimId);
     }
 
@@ -467,7 +486,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
             State = state,
             Created = now.AddMinutes(-1),
             Updated = now,
-            DeliveryAttempts = deliveryAttempts,
+            Attempts = deliveryAttempts,
             ClaimId = claimId,
             ClaimExpiration = claimExpiration
         };

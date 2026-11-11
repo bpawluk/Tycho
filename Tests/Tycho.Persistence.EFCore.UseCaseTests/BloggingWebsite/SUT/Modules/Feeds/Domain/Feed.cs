@@ -22,78 +22,42 @@ internal class Feed(string path, EntryType entriesType, FeedsDbContext feedsDbCo
         return newEntry;
     }
 
-    public async Task<IReadOnlyList<Entry>> GetLatestEntries(CancellationToken cancellationToken)
+    public Task<IReadOnlyList<FeedEntry>> GetLatestEntries(CancellationToken cancellationToken)
+        => GetEntries(FeedOrder.Latest, cancellationToken);
+
+    public Task<IReadOnlyList<FeedEntry>> GetMostLikedEntries(CancellationToken cancellationToken)
+        => GetEntries(FeedOrder.MostLiked, cancellationToken);
+
+    public Task<IReadOnlyList<FeedEntry>> GetMostDiscussedEntries(CancellationToken cancellationToken)
+        => GetEntries(FeedOrder.MostDiscussed, cancellationToken);
+
+    private async Task<IReadOnlyList<FeedEntry>> GetEntries(FeedOrder order, CancellationToken cancellationToken)
     {
-        return await feedsDbContext.Entries
-            .FromSqlRaw(@"
-                SELECT 
-                    entry.Id,
-                    entry.Version,
-                    entry.ContentId,
-                    entry.FeedPath,
-                    entry.Type,
-                    entry.Created,
-                    entry.Score,
-                    COUNT(subentry.Id) AS DiscussionWeight
-                FROM Entries AS entry
-                LEFT JOIN Entries 
-                    AS subentry
-                    ON subentry.FeedPath LIKE entry.FeedPath || '/' || entry.Id || '%'
-                WHERE 
-                    entry.Type = {0} AND 
-                    entry.FeedPath = {1}
-                GROUP BY entry.Id
-                ORDER BY entry.Created DESC;", EntriesType, _path)
+        var entries = feedsDbContext.Entries
+            .AsNoTracking()
+            .Where(entry => entry.Type == EntriesType && entry.FeedPath == _path)
+            .Select(entry => new
+            {
+                Entry = entry,
+                DiscussionWeight = (uint)feedsDbContext.Entries.Count(subentry =>
+                    EF.Functions.Like(subentry.FeedPath, entry.FeedPath + "/" + entry.Id.ToString() + "%"))
+            });
+
+        var sorted = order switch
+        {
+            FeedOrder.Latest => entries.OrderByDescending(item => item.Entry.Created),
+            FeedOrder.MostLiked => entries.OrderByDescending(item => item.Entry.Score),
+            FeedOrder.MostDiscussed => entries.OrderByDescending(item => item.DiscussionWeight),
+            _ => throw new ArgumentOutOfRangeException(nameof(order))
+        };
+
+        return await sorted
+            .Select(item => new FeedEntry(item.Entry.Id, item.Entry.ContentId,
+                item.Entry.Created, item.Entry.Score, item.DiscussionWeight))
             .ToArrayAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyList<Entry>> GetMostLikedEntries(CancellationToken cancellationToken)
-    {
-        return await feedsDbContext.Entries
-            .FromSqlRaw(@"
-                SELECT 
-                    entry.Id,
-                    entry.Version,
-                    entry.ContentId,
-                    entry.FeedPath,
-                    entry.Type,
-                    entry.Created,
-                    entry.Score,
-                    COUNT(subentry.Id) AS DiscussionWeight
-                FROM Entries AS entry
-                LEFT JOIN Entries 
-                    AS subentry
-                    ON subentry.FeedPath LIKE entry.FeedPath || '/' || entry.Id || '%'
-                WHERE 
-                    entry.Type = {0} AND 
-                    entry.FeedPath = {1}
-                GROUP BY entry.Id
-                ORDER BY entry.Score DESC;", EntriesType, _path)
-            .ToArrayAsync(cancellationToken);
-    }
-
-    public async Task<IReadOnlyList<Entry>> GetMostDiscussedEntries(CancellationToken cancellationToken)
-    {
-        return await feedsDbContext.Entries
-            .FromSqlRaw(@"
-                SELECT 
-                    entry.Id,
-                    entry.Version,
-                    entry.ContentId,
-                    entry.FeedPath,
-                    entry.Type,
-                    entry.Created,
-                    entry.Score,
-                    COUNT(subentry.Id) AS DiscussionWeight
-                FROM Entries AS entry
-                LEFT JOIN Entries 
-                    AS subentry
-                    ON subentry.FeedPath LIKE entry.FeedPath || '/' || entry.Id || '%'
-                WHERE 
-                    entry.Type = {0} AND 
-                    entry.FeedPath = {1}
-                GROUP BY entry.Id
-                ORDER BY DiscussionWeight DESC;", EntriesType, _path)
-            .ToArrayAsync(cancellationToken);
-    }
+    private enum FeedOrder { Latest, MostLiked, MostDiscussed }
 }
+
+internal record FeedEntry(int Id, int ContentId, DateTime Created, uint Score, uint DiscussionWeight);

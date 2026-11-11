@@ -38,12 +38,12 @@ namespace Tycho.Events.Inbox.InMemory
             return Task.FromResult<InboxEvent?>(null);
         }
 
-        public Task<bool> MarkAsHandledAsync(Guid claimId, CancellationToken cancellationToken = default)
+        public Task<bool> MarkAsHandledAsync(Guid entryId, Guid claimId, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(true);
         }
 
-        public Task<bool> MarkAsFailedAsync(Guid claimId, CancellationToken cancellationToken = default)
+        public Task<bool> MarkAsFailedAsync(Guid entryId, Guid claimId, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(true);
         }

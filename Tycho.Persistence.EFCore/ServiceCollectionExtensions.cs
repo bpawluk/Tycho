@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Tycho.Events.Inbox;
 using Tycho.Events.Outbox;
-using Tycho.Persistence.EFCore.Common;
+using Tycho.Persistence.EFCore.Identity;
 using Tycho.Persistence.EFCore.Inbox;
 using Tycho.Persistence.EFCore.Outbox;
 using Tycho.Persistence.EFCore.Retention;
@@ -33,6 +33,7 @@ public static class ServiceCollectionExtensions
 
         var settings = new PersistenceSettings();
         configure?.Invoke(settings);
+
         PersistenceSettings snapshot = settings.Copy();
         snapshot.Validate();
         services.Replace(ServiceDescriptor.Transient(_ => snapshot.InboxConsumer.Copy()));
@@ -64,14 +65,12 @@ public static class ServiceCollectionExtensions
 
         var settings = new PersistenceRetentionSettings();
         configure?.Invoke(settings);
+
         PersistenceRetentionSettings snapshot = settings.Copy();
         snapshot.Validate();
         services.Replace(ServiceDescriptor.Transient(_ => snapshot.Copy()));
 
-        services.TryAddScoped<IInboxCleaner, InboxCleaner>();
-        services.TryAddScoped<IOutboxCleaner, OutboxCleaner>();
 
-        // Repeated registration replaces configuration without scheduling duplicate workers.
         for (int i = services.Count - 1; i >= 0; i--)
         {
             if (services[i].ServiceType == typeof(IHostedService) &&

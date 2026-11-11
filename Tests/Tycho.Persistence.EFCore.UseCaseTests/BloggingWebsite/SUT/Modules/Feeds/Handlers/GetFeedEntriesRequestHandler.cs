@@ -16,7 +16,7 @@ internal class GetFeedEntriesRequestHandler(FeedsDbContext dbContext, ContentRep
         var feedProvider = new FeedProvider(dbContext);
         Feed feed = await feedProvider.GetFeed(feedId, cancellationToken);
 
-        IReadOnlyList<Entry> feedEntries = requestData.Feed.Order switch
+        IReadOnlyList<FeedEntry> feedEntries = requestData.Feed.Order switch
         {
             FeedOrder.Latest => await feed.GetLatestEntries(cancellationToken),
             FeedOrder.MostLiked => await feed.GetMostLikedEntries(cancellationToken),
@@ -37,7 +37,7 @@ internal class GetFeedEntriesRequestHandler(FeedsDbContext dbContext, ContentRep
                     content.Value,
                     entry.Created,
                     entry.Score,
-                    entry.DiscussionWeight!.Value);
+                    entry.DiscussionWeight);
             })];
 
         return new Response(responseEntries);

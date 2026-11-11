@@ -100,7 +100,7 @@ public class InMemoryInboxTests
         var cancelationToken = new CancellationToken();
 
         // Act
-        bool result = await _sut.MarkAsHandledAsync(claimId, cancelationToken);
+        bool result = await _sut.MarkAsHandledAsync(Guid.NewGuid(), claimId, cancelationToken);
 
         // Assert
         Assert.True(result);
@@ -114,7 +114,7 @@ public class InMemoryInboxTests
         var cancelationToken = new CancellationToken();
 
         // Act
-        bool result = await _sut.MarkAsFailedAsync(claimId, cancelationToken);
+        bool result = await _sut.MarkAsFailedAsync(Guid.NewGuid(), claimId, cancelationToken);
 
         // Assert
         Assert.True(result);
