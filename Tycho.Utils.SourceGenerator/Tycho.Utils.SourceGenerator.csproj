@@ -13,8 +13,8 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="5.9.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" PrivateAssets="all" />
-    <PackageReference Include="PolySharp" Version="1.16.0" PrivateAssets="all" />
-    <PackageReference Include="Scriban" Version="7.5.0" IncludeAssets="build" PrivateAssets="all" />
+    <PackageReference Include="PolySharp" Version="1.17.0" PrivateAssets="all" />
+    <PackageReference Include="Scriban" Version="7.6.1" IncludeAssets="build" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
