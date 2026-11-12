@@ -4,7 +4,7 @@ using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Admin.Persistence;
 
-internal class AdminDbContext : UseCaseDbContext<AdminDbContext>
+internal class AdminDbContext : TestDbContext<AdminDbContext>
 {
     public DbSet<AdminAction> AdminActions { get; set; } = null!;
 }

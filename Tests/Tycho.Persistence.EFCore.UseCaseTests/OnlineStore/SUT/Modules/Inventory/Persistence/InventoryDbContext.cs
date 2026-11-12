@@ -4,7 +4,7 @@ using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Do
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Inventory.Persistence;
 
-internal class InventoryDbContext : UseCaseDbContext<InventoryDbContext>
+internal class InventoryDbContext : TestDbContext<InventoryDbContext>
 {
     public DbSet<Item> Items { get; set; } = null!;
 

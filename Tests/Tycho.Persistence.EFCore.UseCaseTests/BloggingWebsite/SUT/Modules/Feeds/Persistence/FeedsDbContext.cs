@@ -4,7 +4,7 @@ using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Do
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Feeds.Persistence;
 
-internal class FeedsDbContext : UseCaseDbContext<FeedsDbContext>
+internal class FeedsDbContext : TestDbContext<FeedsDbContext>
 {
     public DbSet<Entry> Entries { get; set; } = null!;
 

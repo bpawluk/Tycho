@@ -4,7 +4,7 @@ using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Doma
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Persistence;
 
-internal class CatalogDbContext : UseCaseDbContext<CatalogDbContext>
+internal class CatalogDbContext : TestDbContext<CatalogDbContext>
 {
     public DbSet<Product> Products { get; set; } = null!;
 

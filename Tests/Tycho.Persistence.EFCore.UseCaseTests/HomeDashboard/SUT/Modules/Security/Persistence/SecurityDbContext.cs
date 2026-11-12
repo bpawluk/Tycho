@@ -4,7 +4,7 @@ using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Security.D
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Security.Persistence;
 
-internal class SecurityDbContext : UseCaseDbContext<SecurityDbContext>
+internal class SecurityDbContext : TestDbContext<SecurityDbContext>
 {
     public DbSet<SecurityEventEntry> SecurityEvents { get; set; } = null!;
 }

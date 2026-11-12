@@ -4,7 +4,7 @@ using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Dom
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Ordering.Persistence;
 
-internal class OrderingDbContext : UseCaseDbContext<OrderingDbContext>
+internal class OrderingDbContext : TestDbContext<OrderingDbContext>
 {
     public DbSet<Order> Orders { get; set; } = null!;
 }

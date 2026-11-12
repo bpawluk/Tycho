@@ -4,7 +4,7 @@ using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Domai
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Persistence;
 
-internal class BasketDbContext : UseCaseDbContext<BasketDbContext>
+internal class BasketDbContext : TestDbContext<BasketDbContext>
 {
     public DbSet<Domain.Basket> Baskets { get; set; }
 

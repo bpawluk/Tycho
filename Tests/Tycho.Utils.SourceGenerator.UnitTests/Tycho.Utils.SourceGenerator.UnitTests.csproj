@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Tycho.Utils.SourceGenerator\Tycho.Utils.SourceGenerator.csproj" />
+    <ProjectReference Include="..\..\Tycho.Utils.SourceGenerator\Tycho.Utils.SourceGenerator.csproj" />
   </ItemGroup>
 
   <ItemGroup>

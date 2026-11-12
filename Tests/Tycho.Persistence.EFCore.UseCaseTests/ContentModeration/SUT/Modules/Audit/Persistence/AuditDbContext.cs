@@ -4,7 +4,7 @@ using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Audit.
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Audit.Persistence;
 
-internal class AuditDbContext : UseCaseDbContext<AuditDbContext>
+internal class AuditDbContext : TestDbContext<AuditDbContext>
 {
     public DbSet<AuditEntry> AuditEntries { get; set; } = null!;
 }

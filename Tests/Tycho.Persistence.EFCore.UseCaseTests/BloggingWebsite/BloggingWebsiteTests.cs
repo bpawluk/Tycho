@@ -8,7 +8,7 @@ namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite;
 
 public sealed class BloggingWebsiteTests(DatabaseServers servers) : IAsyncLifetime
 {
-    private UseCaseDatabases? _databases;
+    private DatabaseSession? _databaseSession;
     private readonly TestData _testData = new();
     private IBloggingWebsiteApp _sut = null!;
 
@@ -27,11 +27,10 @@ public sealed class BloggingWebsiteTests(DatabaseServers servers) : IAsyncLifeti
     [InlineData(DatabaseProvider.MySql)]
     public async Task TychoUseCase_BloggingWebsiteApp_WorksCorrectly(DatabaseProvider provider)
     {
-        _databases = new UseCaseDatabases(servers, provider);
-        await _databases.InitializeAsync();
-        using var binding = _databases.Bind();
-        await StartAppAsync();
+        _databaseSession = await DatabaseSessionFactory.CreateAsync(servers, provider);
+        using IDisposable binding = DatabaseSessionScope.Bind(_databaseSession);
 
+        await StartAppAsync();
         await SetupPostedEntries();
 
         var getMostDiscussedArticles = new GetFeedEntriesRequest(GetFeedEntriesRequest.ArticlesFeedData.MostDiscussed());
@@ -115,8 +114,7 @@ public sealed class BloggingWebsiteTests(DatabaseServers servers) : IAsyncLifeti
     {
         try
         {
-            if (_sut is not null)
-                await _sut.StopAsync();
+            if (_sut is not null) await _sut.StopAsync();
         }
         finally
         {
@@ -126,8 +124,7 @@ public sealed class BloggingWebsiteTests(DatabaseServers servers) : IAsyncLifeti
             }
             finally
             {
-                if (_databases is not null)
-                    await _databases.DisposeAsync();
+                if (_databaseSession is not null) await _databaseSession.DisposeAsync();
             }
         }
     }

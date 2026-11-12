@@ -4,7 +4,7 @@ using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Comments.Persistence;
 
-internal class CommentsDbContext : UseCaseDbContext<CommentsDbContext>
+internal class CommentsDbContext : TestDbContext<CommentsDbContext>
 {
     public DbSet<Comment> Comments { get; set; } = null!;
 }

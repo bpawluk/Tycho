@@ -3,6 +3,6 @@ using Tycho.Persistence.EFCore.UseCaseTests._Infrastructure;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Persistence;
 
-internal class HomeDashboardDbContext : UseCaseDbContext<HomeDashboardDbContext>
+internal class HomeDashboardDbContext : TestDbContext<HomeDashboardDbContext>
 {
 }

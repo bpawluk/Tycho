@@ -4,7 +4,7 @@ using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Do
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Posts.Persistence;
 
-internal class PostsDbContext : UseCaseDbContext<PostsDbContext>
+internal class PostsDbContext : TestDbContext<PostsDbContext>
 {
     public DbSet<Post> Posts { get; set; } = null!;
 }

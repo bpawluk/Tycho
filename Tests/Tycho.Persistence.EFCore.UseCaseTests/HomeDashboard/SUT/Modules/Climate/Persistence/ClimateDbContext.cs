@@ -4,7 +4,7 @@ using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Climate.Do
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Climate.Persistence;
 
-internal class ClimateDbContext : UseCaseDbContext<ClimateDbContext>
+internal class ClimateDbContext : TestDbContext<ClimateDbContext>
 {
     public DbSet<TemperatureReadingEntry> TemperatureReadings { get; set; } = null!;
 }

@@ -4,7 +4,7 @@ using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Ventilatio
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Ventilation.Persistence;
 
-internal class VentilationDbContext : UseCaseDbContext<VentilationDbContext>
+internal class VentilationDbContext : TestDbContext<VentilationDbContext>
 {
     public DbSet<AirQualityReadingEntry> AirQualityReadings { get; set; } = null!;
 }

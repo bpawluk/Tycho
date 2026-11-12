@@ -4,7 +4,7 @@ using Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration.SUT.Modules.Users.Persistence;
 
-internal class UsersDbContext : UseCaseDbContext<UsersDbContext>
+internal class UsersDbContext : TestDbContext<UsersDbContext>
 {
     public DbSet<User> Users { get; set; } = null!;
 }

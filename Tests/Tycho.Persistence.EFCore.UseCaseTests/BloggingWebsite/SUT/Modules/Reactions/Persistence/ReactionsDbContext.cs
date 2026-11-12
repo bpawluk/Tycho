@@ -4,7 +4,7 @@ using Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reaction
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.BloggingWebsite.SUT.Modules.Reactions.Persistence;
 
-internal class ReactionsDbContext : UseCaseDbContext<ReactionsDbContext>
+internal class ReactionsDbContext : TestDbContext<ReactionsDbContext>
 {
     public DbSet<Target> Targets { get; set; } = null!;
 

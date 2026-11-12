@@ -31,7 +31,7 @@ dotnet test --project Tests/Tycho.Persistence.EFCore.UseCaseTests/Tycho.Persiste
 The module limit runs framework targets sequentially, reducing container memory
 usage. Test classes may run concurrently within each target.
 
-## Isolation and diagnostics
+## Isolation and cleanup
 
 An assembly fixture starts each server lazily and shares it across scenarios in
 one framework target. SQLite uses temporary files and needs no Docker server.
@@ -46,11 +46,12 @@ containers at the end. SQLite files are deleted rather than left in the working
 directory. A test-scoped async binding supplies provider options to all module
 contexts without sharing mutable configuration between parallel scenarios.
 
-Output includes provider/runtime, the last 128 SQL commands with parameter types,
-and the last 16 database command errors with their SQL. Sensitive-data logging is
-disabled; command traces contain parameter types rather than values. Commands have 30-second timeouts;
-eventual assertions have a 30-second deadline. The outer six-minute test deadline
-allows up to five minutes for a cold container start.
+Output identifies the provider/runtime. SQL command capture, application log
+capture, MySQL query-plan capture, and deadlock-report collection have been removed;
+they were diagnostic helpers and were not used by test assertions. HomeDashboard
+retains expected/actual temperature readings when its assertion fails. Commands
+have 30-second timeouts; eventual assertions have a 30-second deadline. The outer
+six-minute test deadline allows up to five minutes for a cold container start.
 
 Images resolved on 2026-10-09 (refresh deliberately and rerun all targets):
 
@@ -115,9 +116,7 @@ Each executes one conditional update checking owner, entry ID, state, and claim;
 stale claims and mismatched entry IDs affect zero rows. No preliminary SELECT or
 provider-specific index hint is needed.
 This does not establish freedom from every deadlock or guarantee eventual progress
-under arbitrary contention. Set
-`TYCHO_MYSQL_DEADLOCK_DIAGNOSTICS=1` to capture engine reports and transition query
-plans; these opt-in diagnostics can contain test data values.
+under arbitrary contention.
 
 MySQL inbox/outbox claims use one parameterized
 `UPDATE ... WHERE ... ORDER BY Updated, EntryId LIMIT 1`. Table/schema names
@@ -202,8 +201,7 @@ The full solution run passed 1,434 tests with no failures or skips.
 Repeated .NET 10 runs also observed MySQL deadlocks in BloggingWebsite and
 ContentModeration, despite both scenarios subsequently passing. Passing application flows
 therefore do not establish freedom from deadlocks or reliable recovery under
-contention. Assertion timeouts report the unmet condition; inspect the captured
-database command failures when diagnosing them.
+contention. Assertion timeouts report the unmet condition.
 
 Concurrent framework runs reproduced a HomeDashboard downstairs temperature
 mismatch: five readings were stored instead of four after a deadlock during
@@ -217,7 +215,7 @@ HomeDashboard publisher. Mapped routes select the room's Climate module, while
 the outgoing messages are staged in HomeDashboard's EF outbox and commit with
 inbox completion. A rollback discards both. The assertion still requires the
 exact expected reading count and values. On a mismatch, output includes the
-expected and actual readings and captured background worker warnings/errors.
+expected and actual readings.
 This corrects the sample's transaction boundary; it does not remove MySQL
 deadlocks or make cross-module request side effects transactional.
 After the correction, all 48 provider cases passed with the three framework

@@ -9,7 +9,7 @@ namespace Tycho.Persistence.EFCore.UseCaseTests.ContentModeration;
 
 public sealed class ContentModerationTests(DatabaseServers servers) : IAsyncLifetime
 {
-    private UseCaseDatabases? _databases;
+    private DatabaseSession? _databaseSession;
     private readonly TestData _testData = new();
     private IContentModerationApp _sut = null!;
 
@@ -28,11 +28,10 @@ public sealed class ContentModerationTests(DatabaseServers servers) : IAsyncLife
     [InlineData(DatabaseProvider.MySql)]
     public async Task TychoUseCase_ContentModerationApp_WorksCorrectly(DatabaseProvider provider)
     {
-        _databases = new UseCaseDatabases(servers, provider);
-        await _databases.InitializeAsync();
-        using var binding = _databases.Bind();
-        await StartAppAsync();
+        _databaseSession = await DatabaseSessionFactory.CreateAsync(servers, provider);
+        using IDisposable binding = DatabaseSessionScope.Bind(_databaseSession);
 
+        await StartAppAsync();
         await SetupUsers();
 
         GetUsersRequest.Response users = await _sut.ExecuteAsync(new GetUsersRequest(), TestContext.Current.CancellationToken);
@@ -103,8 +102,7 @@ public sealed class ContentModerationTests(DatabaseServers servers) : IAsyncLife
     {
         try
         {
-            if (_sut is not null)
-                await _sut.StopAsync();
+            if (_sut is not null) await _sut.StopAsync();
         }
         finally
         {
@@ -114,8 +112,7 @@ public sealed class ContentModerationTests(DatabaseServers servers) : IAsyncLife
             }
             finally
             {
-                if (_databases is not null)
-                    await _databases.DisposeAsync();
+                if (_databaseSession is not null) await _databaseSession.DisposeAsync();
             }
         }
     }
