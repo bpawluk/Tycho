@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <IsTestProject>true</IsTestProject>
+    <!-- Enable test discovery when this placeholder contains tests. -->
+    <IsTestProject>false</IsTestProject>
   </PropertyGroup>
 
 </Project>
