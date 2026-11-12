@@ -1,6 +1,6 @@
 using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.Models.Tycho;
-using Tycho.Utils.SourceGenerator.UnitTests._Utils;
+using Tycho.Utils.SourceGenerator.TestUtils.Models;
 
 namespace Tycho.Utils.SourceGenerator.UnitTests.Models.Tycho;
 

@@ -1,9 +1,9 @@
 using Tycho.Utils.SourceGenerator.Models.System;
 using Tycho.Utils.SourceGenerator.Utils;
 
-namespace Tycho.Utils.SourceGenerator.UnitTests._Utils;
+namespace Tycho.Utils.SourceGenerator.TestUtils.Models;
 
-internal static class ModelHelpers
+public static class ModelHelpers
 {
     public static ImmutableEquatableArray<T> Items<T>(params T[] values) where T : IEquatable<T> => new(values);
 

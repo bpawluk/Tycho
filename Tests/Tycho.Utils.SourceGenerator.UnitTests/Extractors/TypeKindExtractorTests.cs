@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Tycho.Utils.SourceGenerator.Extractors;
-using Tycho.Utils.SourceGenerator.UnitTests._Utils;
+using Tycho.Utils.SourceGenerator.TestUtils.Compilation;
 using TypeKind = Tycho.Utils.SourceGenerator.Models.System.TypeKind;
 
 namespace Tycho.Utils.SourceGenerator.UnitTests.Extractors;

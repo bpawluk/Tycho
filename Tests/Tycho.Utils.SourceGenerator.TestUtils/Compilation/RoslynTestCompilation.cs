@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Tycho.Utils.SourceGenerator.Extractors;
 using Tycho.Utils.SourceGenerator.Utils;
 
-namespace Tycho.Utils.SourceGenerator.UnitTests._Utils;
+namespace Tycho.Utils.SourceGenerator.TestUtils.Compilation;
 
 internal sealed class RoslynTestCompilation
 {

@@ -2,9 +2,9 @@ using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace Tycho.Utils.SourceGenerator.IntegrationTests._Utils;
+namespace Tycho.Utils.SourceGenerator.TestUtils.Generators;
 
-internal static class RunHelpers
+public static class RunHelpers
 {
     public static GeneratorDriver CreateGeneratorDriver()
     {
@@ -52,7 +52,7 @@ internal static class RunHelpers
 
         driver = driver.RunGeneratorsAndUpdateCompilation(
             compilation,
-            out Compilation updatedCompilation,
+            out Microsoft.CodeAnalysis.Compilation updatedCompilation,
             out ImmutableArray<Diagnostic> generatorDiagnostics);
 
         HashSet<SyntaxTree> inputSyntaxTrees = [.. compilation.SyntaxTrees];

@@ -1,5 +1,5 @@
 using Microsoft.CodeAnalysis;
-using static Tycho.Utils.SourceGenerator.IntegrationTests._Utils.RunHelpers;
+using static Tycho.Utils.SourceGenerator.TestUtils.Generators.RunHelpers;
 
 namespace Tycho.Utils.SourceGenerator.IntegrationTests.SnapshotTests;
 
