@@ -8,7 +8,7 @@ using Tycho.Modules.Setup;
 using Tycho.Requests;
 using Tycho.Requests.Broker;
 using Tycho.Structure;
-using Tycho.UnitTests._Data.Modules;
+using Tycho.TestUtils.Modules;
 
 namespace Tycho.UnitTests.Modules.Setup;
 

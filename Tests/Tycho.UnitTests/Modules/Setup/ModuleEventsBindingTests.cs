@@ -11,7 +11,7 @@ using Tycho.Modules.Instance;
 using Tycho.Modules.Setup;
 using Tycho.Structure;
 using Tycho.Structure.Parent;
-using Tycho.UnitTests._Data.Modules;
+using Tycho.TestUtils.Modules;
 
 namespace Tycho.UnitTests.Modules.Setup;
 

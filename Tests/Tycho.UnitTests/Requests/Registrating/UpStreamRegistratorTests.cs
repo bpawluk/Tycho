@@ -6,9 +6,9 @@ using Tycho.Requests.Handling;
 using Tycho.Requests.Registrating;
 using Tycho.Requests.Registrating.Registrations;
 using Tycho.Structure;
-using Tycho.UnitTests._Data.Handlers;
-using Tycho.UnitTests._Data.Modules;
-using Tycho.UnitTests._Data.Requests;
+using Tycho.TestUtils.Handlers;
+using Tycho.TestUtils.Modules;
+using Tycho.TestUtils.Requests;
 
 namespace Tycho.UnitTests.Requests.Registrating;
 

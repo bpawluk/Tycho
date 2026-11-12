@@ -13,8 +13,8 @@ using Tycho.Persistence.EFCore.Inbox;
 using Tycho.Persistence.EFCore.TestUtils.Databases.Interceptors;
 using Tycho.Persistence.EFCore.TestUtils.Logging;
 using Tycho.Structure;
-using Tycho.Persistence.EFCore.TestUtils.Data.Events;
 using Tycho.Persistence.EFCore.TestUtils.Other;
+using Tycho.Persistence.EFCore.TestUtils.Events;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Inbox;
 

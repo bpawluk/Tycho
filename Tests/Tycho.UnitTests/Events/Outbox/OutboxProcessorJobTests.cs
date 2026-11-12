@@ -8,10 +8,10 @@ using Tycho.Events.Outbox;
 using Tycho.Identity.Events;
 using Tycho.Identity.Structure;
 using Tycho.Structure;
-using Tycho.UnitTests._Data.Events;
-using Tycho.UnitTests._Data.Handlers;
-using Tycho.UnitTests._Data.Modules;
-using Tycho.UnitTests._Utils;
+using Tycho.TestUtils.Events;
+using Tycho.TestUtils.Handlers;
+using Tycho.TestUtils.Modules;
+using Tycho.TestUtils.Logging;
 
 namespace Tycho.UnitTests.Events.Outbox;
 

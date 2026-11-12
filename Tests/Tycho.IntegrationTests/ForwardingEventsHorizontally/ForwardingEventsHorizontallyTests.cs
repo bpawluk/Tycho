@@ -1,5 +1,5 @@
 using Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT;
-using Tycho.IntegrationTests._Utils;
+using Tycho.TestUtils.Workflows;
 
 namespace Tycho.IntegrationTests.ForwardingEventsHorizontally;
 

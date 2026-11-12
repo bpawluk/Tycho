@@ -1,5 +1,5 @@
 using Tycho.IntegrationTests.SendingRequestsHorizontally.SUT;
-using Tycho.IntegrationTests._Utils;
+using Tycho.TestUtils.Workflows;
 
 namespace Tycho.IntegrationTests.SendingRequestsHorizontally;
 

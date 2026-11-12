@@ -1,5 +1,5 @@
 using Tycho.Identity.Events;
-using Tycho.UnitTests._Data.Events;
+using Tycho.TestUtils.Events;
 
 namespace Tycho.UnitTests.Identity.Events;
 

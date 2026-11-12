@@ -4,8 +4,8 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Tycho.Events.Outbox;
 using Tycho.Structure;
-using Tycho.UnitTests._Data.Modules;
-using Tycho.UnitTests._Utils;
+using Tycho.TestUtils.Modules;
+using Tycho.TestUtils.Logging;
 
 namespace Tycho.UnitTests.Events.Outbox;
 

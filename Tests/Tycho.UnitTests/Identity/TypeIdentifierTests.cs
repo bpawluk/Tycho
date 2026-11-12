@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using Tycho.Identity;
-using Tycho.UnitTests._Data.Events;
-using Tycho.UnitTests._Data.Modules;
+using Tycho.TestUtils.Events;
+using Tycho.TestUtils.Modules;
 
 namespace Tycho.UnitTests.Identity;
 

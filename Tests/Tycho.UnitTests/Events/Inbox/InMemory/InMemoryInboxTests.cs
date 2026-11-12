@@ -4,8 +4,8 @@ using Tycho.Events.Inbox.InMemory;
 using Tycho.Events.Model;
 using Tycho.Events.Serialization;
 using Tycho.Identity.Events;
-using Tycho.UnitTests._Data.Events;
-using Tycho.UnitTests._Data.Handlers;
+using Tycho.TestUtils.Events;
+using Tycho.TestUtils.Handlers;
 
 namespace Tycho.UnitTests.Events.Inbox.InMemory;
 

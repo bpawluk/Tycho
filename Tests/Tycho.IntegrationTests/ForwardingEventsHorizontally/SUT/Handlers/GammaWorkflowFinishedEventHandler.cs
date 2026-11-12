@@ -1,6 +1,6 @@
 using Tycho.Events;
 using Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Gamma;
-using Tycho.IntegrationTests._Utils;
+using Tycho.TestUtils.Workflows;
 
 namespace Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Handlers;
 

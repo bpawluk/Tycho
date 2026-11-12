@@ -2,7 +2,7 @@ using Moq;
 using Tycho.Apps.Instance;
 using Tycho.Requests;
 using Tycho.Requests.Broker;
-using Tycho.UnitTests._Data.Requests;
+using Tycho.TestUtils.Requests;
 
 namespace Tycho.UnitTests.Apps.Instance;
 

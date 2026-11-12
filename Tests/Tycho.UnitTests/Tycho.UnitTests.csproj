@@ -17,7 +17,6 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Diagnostics.Testing" Version="10.11.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.12.0" />
-    <PackageReference Include="Moq" Version="4.21.0" />
     <PackageReference Include="xunit.v3" Version="4.0.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="4.0.1">
       <PrivateAssets>all</PrivateAssets>
@@ -27,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Tycho\Tycho.csproj" />
+    <ProjectReference Include="..\Tycho.TestUtils\Tycho.TestUtils.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -8,9 +8,9 @@ using Tycho.Events.Model;
 using Tycho.Identity.Events;
 using Tycho.Structure;
 using Tycho.Transactions;
-using Tycho.UnitTests._Data.Events;
-using Tycho.UnitTests._Data.Handlers;
-using Tycho.UnitTests._Utils;
+using Tycho.TestUtils.Events;
+using Tycho.TestUtils.Handlers;
+using Tycho.TestUtils.Logging;
 
 namespace Tycho.UnitTests.Events.Inbox;
 

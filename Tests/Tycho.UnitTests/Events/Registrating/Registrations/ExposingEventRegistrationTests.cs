@@ -6,8 +6,8 @@ using Tycho.Events.Routing;
 using Tycho.Identity.Events;
 using Tycho.Identity.Structure;
 using Tycho.Structure.Parent;
-using Tycho.UnitTests._Data.Events;
-using Tycho.UnitTests._Data.Handlers;
+using Tycho.TestUtils.Events;
+using Tycho.TestUtils.Handlers;
 
 namespace Tycho.UnitTests.Events.Registrating.Registrations;
 

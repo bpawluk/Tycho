@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Tycho.Identity.Structure;
 using Tycho.Structure;
-using Tycho.UnitTests._Utils;
+using Tycho.TestUtils.Logging;
 
 namespace Tycho.UnitTests.Structure;
 

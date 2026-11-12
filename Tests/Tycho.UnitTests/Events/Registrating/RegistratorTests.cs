@@ -8,9 +8,9 @@ using Tycho.Identity.Events;
 using Tycho.Modules.Instance;
 using Tycho.Structure;
 using Tycho.Structure.Parent;
-using Tycho.UnitTests._Data.Events;
-using Tycho.UnitTests._Data.Handlers;
-using Tycho.UnitTests._Data.Modules;
+using Tycho.TestUtils.Events;
+using Tycho.TestUtils.Handlers;
+using Tycho.TestUtils.Modules;
 
 namespace Tycho.UnitTests.Events.Registrating;
 

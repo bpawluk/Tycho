@@ -1,4 +1,4 @@
-using Tycho.IntegrationTests._Utils;
+using Tycho.TestUtils.Workflows;
 using Tycho.Requests;
 
 namespace Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Handlers;

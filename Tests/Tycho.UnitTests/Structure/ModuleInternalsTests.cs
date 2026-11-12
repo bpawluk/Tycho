@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Tycho.Identity.Structure;
 using Tycho.Structure;
-using Tycho.UnitTests._Data.Modules;
+using Tycho.TestUtils.Modules;
 
 namespace Tycho.UnitTests.Structure;
 

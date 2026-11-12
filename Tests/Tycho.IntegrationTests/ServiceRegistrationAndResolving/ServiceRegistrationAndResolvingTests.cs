@@ -1,6 +1,6 @@
 using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT;
 using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules;
-using Tycho.IntegrationTests._Utils;
+using Tycho.TestUtils.Workflows;
 
 namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving;
 

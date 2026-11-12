@@ -7,9 +7,9 @@ using Tycho.Identity.Events;
 using Tycho.Identity.Structure;
 using Tycho.Processor;
 using Tycho.Structure;
-using Tycho.UnitTests._Data.Events;
-using Tycho.UnitTests._Data.Handlers;
-using Tycho.UnitTests._Data.Modules;
+using Tycho.TestUtils.Events;
+using Tycho.TestUtils.Handlers;
+using Tycho.TestUtils.Modules;
 
 namespace Tycho.UnitTests.Events.Outbox;
 

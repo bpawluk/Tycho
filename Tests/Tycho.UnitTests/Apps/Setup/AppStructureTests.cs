@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Hosting;
 using Tycho.Apps.Setup;
 using Tycho.Structure;
-using Tycho.UnitTests._Data.Modules;
+using Tycho.TestUtils.Modules;
 
 namespace Tycho.UnitTests.Apps.Setup;
 

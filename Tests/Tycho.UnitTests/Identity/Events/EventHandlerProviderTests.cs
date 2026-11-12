@@ -2,8 +2,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Tycho.Events;
 using Tycho.Identity.Events;
-using Tycho.UnitTests._Data.Events;
-using Tycho.UnitTests._Data.Handlers;
+using Tycho.TestUtils.Events;
+using Tycho.TestUtils.Handlers;
 
 namespace Tycho.UnitTests.Identity.Events;
 

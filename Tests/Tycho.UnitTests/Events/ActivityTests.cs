@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Tycho.Events.Inbox;
 using Tycho.Events.Outbox;
-using Tycho.UnitTests._Utils;
+using Tycho.TestUtils.Logging;
 
 namespace Tycho.UnitTests.Events;
 

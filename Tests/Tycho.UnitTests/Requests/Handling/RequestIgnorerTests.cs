@@ -1,5 +1,5 @@
 using Tycho.Requests.Handling;
-using Tycho.UnitTests._Data.Requests;
+using Tycho.TestUtils.Requests;
 
 namespace Tycho.UnitTests.Requests.Handling;
 

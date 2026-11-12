@@ -1,6 +1,6 @@
 using Tycho.Identity;
 using Tycho.Identity.Structure;
-using Tycho.UnitTests._Data.Modules;
+using Tycho.TestUtils.Modules;
 
 namespace Tycho.UnitTests.Identity.Structure;
 
