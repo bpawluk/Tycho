@@ -1,18 +1,18 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.EntityFrameworkCore;
-using Tycho.Persistence.EFCore.Outbox;
-using Tycho.Persistence.EFCore.Transactions;
 using System.Threading;
 using System.Threading.Tasks;
-using Default = Tycho.Persistence.EFCore.Operations.Implementations.Default;
-using PostgreSql = Tycho.Persistence.EFCore.Operations.Implementations.PostgreSql;
-using SqlServer = Tycho.Persistence.EFCore.Operations.Implementations.SqlServer;
-using MySql = Tycho.Persistence.EFCore.Operations.Implementations.MySql;
-using Tycho.Persistence.EFCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Tycho.Persistence.EFCore.Database;
 using Tycho.Persistence.EFCore.Entries;
+using Tycho.Persistence.EFCore.Identity;
+using Tycho.Persistence.EFCore.Outbox;
+using Tycho.Persistence.EFCore.Transactions;
+using Default = Tycho.Persistence.EFCore.Operations.Implementations.Default;
+using MySql = Tycho.Persistence.EFCore.Operations.Implementations.MySql;
+using PostgreSql = Tycho.Persistence.EFCore.Operations.Implementations.PostgreSql;
+using SqlServer = Tycho.Persistence.EFCore.Operations.Implementations.SqlServer;
 
 namespace Tycho.Persistence.EFCore.Operations;
 

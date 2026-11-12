@@ -51,7 +51,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         await SeedEntries(entry);
 
         using Internals otherInternals = PersistenceTestInternals.Create(typeof(PersistenceOwner), typeof(OutboxConsumerTests));
-        var otherConsumer = PersistenceTestOperations.CreateOutboxConsumer(_dbContext, new PersistenceOwner(otherInternals), _settings);
+        OutboxConsumer otherConsumer = PersistenceTestOperations.CreateOutboxConsumer(_dbContext, new PersistenceOwner(otherInternals), _settings);
 
         // Act & Assert
         Assert.Null(await otherConsumer.TryReadAsync(TestContext.Current.CancellationToken));
@@ -124,7 +124,7 @@ public sealed class OutboxConsumerTests : IAsyncLifetime
         logger.Setup(item => item.IsEnabled(LogLevel.Warning)).Returns(true);
 
         var owner = new PersistenceOwner(PersistenceTestInternals.Create(typeof(PersistenceOwner)));
-        var consumer = PersistenceTestOperations.CreateOutboxConsumer(racingContext, owner, _settings, logger.Object);
+        OutboxConsumer consumer = PersistenceTestOperations.CreateOutboxConsumer(racingContext, owner, _settings, logger.Object);
 
         // Act
         OutboxEvent? result = await consumer.TryReadAsync(CancellationToken.None);

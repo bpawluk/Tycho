@@ -4,8 +4,8 @@ using Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Handlers;
 using Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Modules.Alpha;
 using Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Modules.Beta;
 using Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.Modules.Gamma;
-using Tycho.TestUtils.Workflows;
 using Tycho.Requests;
+using Tycho.TestUtils.Workflows;
 using static Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT.RequestToMapWithResponse;
 
 namespace Tycho.IntegrationTests.ForwardingRequestsHorizontally.SUT;

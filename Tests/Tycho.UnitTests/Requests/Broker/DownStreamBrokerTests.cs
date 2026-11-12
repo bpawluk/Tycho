@@ -5,9 +5,9 @@ using Tycho.Requests;
 using Tycho.Requests.Broker;
 using Tycho.Requests.Registrating.Registrations;
 using Tycho.Structure;
-using Tycho.Transactions;
 using Tycho.TestUtils.Modules;
 using Tycho.TestUtils.Requests;
+using Tycho.Transactions;
 
 namespace Tycho.UnitTests.Requests.Broker;
 

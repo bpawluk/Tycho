@@ -11,10 +11,10 @@ using Tycho.Persistence.EFCore.Entries;
 using Tycho.Persistence.EFCore.Identity;
 using Tycho.Persistence.EFCore.Inbox;
 using Tycho.Persistence.EFCore.TestUtils.Databases.Interceptors;
-using Tycho.Persistence.EFCore.TestUtils.Logging;
-using Tycho.Structure;
-using Tycho.Persistence.EFCore.TestUtils.Other;
 using Tycho.Persistence.EFCore.TestUtils.Events;
+using Tycho.Persistence.EFCore.TestUtils.Logging;
+using Tycho.Persistence.EFCore.TestUtils.Other;
+using Tycho.Structure;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Inbox;
 
@@ -60,7 +60,7 @@ public sealed class InboxConsumerTests : IAsyncLifetime
         await SeedEntries(entry);
 
         using Internals otherInternals = PersistenceTestInternals.Create(typeof(PersistenceOwner), typeof(InboxConsumerTests));
-        var otherConsumer = PersistenceTestOperations.CreateInboxConsumer(_eventSerializerMock.Object, _dbContext, new PersistenceOwner(otherInternals), _settings);
+        InboxConsumer otherConsumer = PersistenceTestOperations.CreateInboxConsumer(_eventSerializerMock.Object, _dbContext, new PersistenceOwner(otherInternals), _settings);
 
         // Act & Assert
         Assert.Null(await otherConsumer.TryReadAsync(TestContext.Current.CancellationToken));
@@ -129,7 +129,7 @@ public sealed class InboxConsumerTests : IAsyncLifetime
         logger.Setup(item => item.IsEnabled(LogLevel.Warning)).Returns(true);
 
         var owner = new PersistenceOwner(PersistenceTestInternals.Create(typeof(PersistenceOwner)));
-        var consumer = PersistenceTestOperations.CreateInboxConsumer(_eventSerializerMock.Object, racingContext, owner, _settings, logger.Object);
+        InboxConsumer consumer = PersistenceTestOperations.CreateInboxConsumer(_eventSerializerMock.Object, racingContext, owner, _settings, logger.Object);
 
         // Act
         InboxEvent? result = await consumer.TryReadAsync(CancellationToken.None);

@@ -2,8 +2,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Tycho.Requests;
 using Tycho.Requests.Pipeline;
-using Tycho.Transactions;
 using Tycho.TestUtils.Requests;
+using Tycho.Transactions;
 
 namespace Tycho.UnitTests.Requests.Pipelines;
 

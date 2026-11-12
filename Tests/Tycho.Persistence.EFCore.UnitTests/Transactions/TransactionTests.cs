@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Tycho.Persistence.EFCore.Outbox;
-using Tycho.Persistence.EFCore.Transactions;
 using Tycho.Persistence.EFCore.TestUtils.Logging;
 using Tycho.Persistence.EFCore.TestUtils.Other;
+using Tycho.Persistence.EFCore.Transactions;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Transactions;
 
@@ -157,7 +157,7 @@ public sealed class TransactionTests : IAsyncLifetime
         await using var dbContext = new TestDbContext(options);
 
         int operationCount = 0;
-        var sut = PersistenceTestOperations.CreateTransaction(dbContext);
+        Transaction sut = PersistenceTestOperations.CreateTransaction(dbContext);
 
         // Assert
         Assert.True(dbContext.Database.CreateExecutionStrategy().RetriesOnFailure);
@@ -190,7 +190,7 @@ public sealed class TransactionTests : IAsyncLifetime
         IExecutionStrategy outerStrategy = dbContext.Database.CreateExecutionStrategy();
 
         int operationCount = 0;
-        var sut = PersistenceTestOperations.CreateTransaction(dbContext);
+        Transaction sut = PersistenceTestOperations.CreateTransaction(dbContext);
 
         // Act
         Task Act() => outerStrategy.ExecuteAsync(() => sut.ExecuteAsync(cancellationToken =>
@@ -251,7 +251,7 @@ public sealed class TransactionTests : IAsyncLifetime
 
         var logger = new Mock<ILogger<Transaction>>();
         logger.Setup(l => l.IsEnabled(LogLevel.Error)).Returns(true);
-        var sut = PersistenceTestOperations.CreateTransaction(_dbContext, logger.Object);
+        Transaction sut = PersistenceTestOperations.CreateTransaction(_dbContext, logger.Object);
 
         // Act
         int result = await sut.ExecuteAsync(cancellationToken =>
@@ -274,7 +274,7 @@ public sealed class TransactionTests : IAsyncLifetime
         var commitFailure = new InvalidOperationException("commit failure");
         Mock<IDbContextTransaction> transaction = InjectCleanupFailures(commitFailure: commitFailure);
 
-        var sut = PersistenceTestOperations.CreateTransaction(_dbContext);
+        Transaction sut = PersistenceTestOperations.CreateTransaction(_dbContext);
 
         // Act
         Task Act() => sut.ExecuteAsync(cancellationToken =>
@@ -303,7 +303,7 @@ public sealed class TransactionTests : IAsyncLifetime
 
         var logger = new Mock<ILogger<Transaction>>();
         logger.Setup(l => l.IsEnabled(LogLevel.Error)).Returns(true);
-        var sut = PersistenceTestOperations.CreateTransaction(_dbContext, logger.Object);
+        Transaction sut = PersistenceTestOperations.CreateTransaction(_dbContext, logger.Object);
         using var cancellationSource = new CancellationTokenSource();
 
         // Act

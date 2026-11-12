@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Tycho.Persistence.EFCore.Operations;
-using Tycho.Persistence.EFCore.Logging;
 using Tycho.Persistence.EFCore.Identity;
+using Tycho.Persistence.EFCore.Logging;
+using Tycho.Persistence.EFCore.Operations;
 
 namespace Tycho.Persistence.EFCore.Retention;
 

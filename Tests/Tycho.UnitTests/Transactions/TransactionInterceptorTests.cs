@@ -1,7 +1,7 @@
 using Moq;
 using Tycho.Requests;
-using Tycho.Transactions;
 using Tycho.TestUtils.Requests;
+using Tycho.Transactions;
 
 namespace Tycho.UnitTests.Transactions;
 

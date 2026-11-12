@@ -148,7 +148,7 @@ public sealed class OutboxWriterTests : IAsyncLifetime
     public async Task Write_WithinTychoTransaction_NotifiesAfterCommit()
     {
         // Arrange
-        var transaction = PersistenceTestOperations.CreateTransaction(_dbContext);
+        EFCore.Transactions.Transaction transaction = PersistenceTestOperations.CreateTransaction(_dbContext);
 
         // Act
         await transaction.ExecuteAsync(async cancellationToken =>

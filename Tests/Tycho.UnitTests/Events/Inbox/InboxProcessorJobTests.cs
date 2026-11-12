@@ -7,10 +7,10 @@ using Tycho.Events.Inbox;
 using Tycho.Events.Model;
 using Tycho.Identity.Events;
 using Tycho.Structure;
-using Tycho.Transactions;
 using Tycho.TestUtils.Events;
 using Tycho.TestUtils.Handlers;
 using Tycho.TestUtils.Logging;
+using Tycho.Transactions;
 
 namespace Tycho.UnitTests.Events.Inbox;
 

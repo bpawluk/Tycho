@@ -47,5 +47,7 @@ public abstract class DatabaseSession : IAsyncDisposable
         {
             throw new AggregateException("Database cleanup failed.", failures);
         }
+
+        GC.SuppressFinalize(this);
     }
 }

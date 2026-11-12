@@ -1,14 +1,14 @@
-using System.Threading.Channels;
 using System.Data.Common;
+using System.Threading.Channels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Time.Testing;
 using Moq;
+using Tycho.Persistence.EFCore.Identity;
 using Tycho.Persistence.EFCore.Retention;
 using Tycho.Persistence.EFCore.TestUtils.Logging;
-using Tycho.Persistence.EFCore.Identity;
 using Tycho.Persistence.EFCore.TestUtils.Other;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Retention;

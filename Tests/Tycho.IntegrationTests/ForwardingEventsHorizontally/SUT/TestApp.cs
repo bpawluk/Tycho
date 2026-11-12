@@ -5,8 +5,8 @@ using Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Handlers;
 using Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Alpha;
 using Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Beta;
 using Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT.Modules.Gamma;
-using Tycho.TestUtils.Workflows;
 using Tycho.Requests;
+using Tycho.TestUtils.Workflows;
 
 namespace Tycho.IntegrationTests.ForwardingEventsHorizontally.SUT;
 

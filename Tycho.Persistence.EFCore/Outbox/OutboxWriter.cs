@@ -1,8 +1,8 @@
-using Microsoft.EntityFrameworkCore.Storage;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Storage;
 using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Events.Serialization;

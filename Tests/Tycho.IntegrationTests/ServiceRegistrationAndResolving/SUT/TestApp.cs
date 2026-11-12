@@ -4,8 +4,8 @@ using Tycho.Events;
 using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Handlers;
 using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Modules;
 using Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT.Services;
-using Tycho.TestUtils.Workflows;
 using Tycho.Requests;
+using Tycho.TestUtils.Workflows;
 
 namespace Tycho.IntegrationTests.ServiceRegistrationAndResolving.SUT;
 

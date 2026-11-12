@@ -1,6 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Tycho.Events.Inbox;
 using Tycho.Events.Model;
 using Tycho.Persistence.EFCore.Identity;

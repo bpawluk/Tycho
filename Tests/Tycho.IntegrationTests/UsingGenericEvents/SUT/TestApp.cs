@@ -3,8 +3,8 @@ using Tycho.Apps;
 using Tycho.Events;
 using Tycho.IntegrationTests.UsingGenericEvents.SUT.Handlers;
 using Tycho.IntegrationTests.UsingGenericEvents.SUT.Modules;
-using Tycho.TestUtils.Workflows;
 using Tycho.Requests;
+using Tycho.TestUtils.Workflows;
 
 namespace Tycho.IntegrationTests.UsingGenericEvents.SUT;
 

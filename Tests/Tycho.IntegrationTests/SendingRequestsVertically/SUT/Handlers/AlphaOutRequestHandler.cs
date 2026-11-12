@@ -1,6 +1,6 @@
 using Tycho.IntegrationTests.SendingRequestsVertically.SUT.Modules.Alpha;
-using Tycho.TestUtils.Workflows;
 using Tycho.Requests;
+using Tycho.TestUtils.Workflows;
 
 namespace Tycho.IntegrationTests.SendingRequestsVertically.SUT.Handlers;
 

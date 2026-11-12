@@ -1,6 +1,6 @@
-using Tycho.Persistence.EFCore.TestUtils.Databases.Sessions;
-using Tycho.Persistence.EFCore.TestUtils.Databases;
 using Tycho.Persistence.EFCore.TestUtils.Assertions;
+using Tycho.Persistence.EFCore.TestUtils.Databases;
+using Tycho.Persistence.EFCore.TestUtils.Databases.Sessions;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Contract;
 using Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Modules.Climate.Contract;
