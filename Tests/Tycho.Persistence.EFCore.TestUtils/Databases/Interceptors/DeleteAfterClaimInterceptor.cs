@@ -1,9 +1,9 @@
 using System.Data.Common;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
-namespace Tycho.Persistence.EFCore.UnitTests._Utils;
+namespace Tycho.Persistence.EFCore.TestUtils.Databases.Interceptors;
 
-internal sealed class DeleteAfterClaimInterceptor(string tableName) : DbCommandInterceptor
+public sealed class DeleteAfterClaimInterceptor(string tableName) : DbCommandInterceptor
 {
     public bool WasTriggered { get; private set; }
 

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 
-namespace Tycho.Persistence.EFCore.UseCaseTests._Infrastructure;
+namespace Tycho.Persistence.EFCore.TestUtils.Databases.Sessions;
 
 internal sealed class PostgreSqlDatabaseSession(string serverConnectionString) : DatabaseSession
 {

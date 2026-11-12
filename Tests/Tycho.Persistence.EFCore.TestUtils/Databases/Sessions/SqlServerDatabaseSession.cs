@@ -1,7 +1,7 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
-namespace Tycho.Persistence.EFCore.UseCaseTests._Infrastructure;
+namespace Tycho.Persistence.EFCore.TestUtils.Databases.Sessions;
 
 internal sealed class SqlServerDatabaseSession(string serverConnectionString) : DatabaseSession
 {

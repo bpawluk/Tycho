@@ -6,7 +6,8 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Tycho.Persistence.EFCore.Outbox;
 using Tycho.Persistence.EFCore.Transactions;
-using Tycho.Persistence.EFCore.UnitTests._Utils;
+using Tycho.Persistence.EFCore.TestUtils.Logging;
+using Tycho.Persistence.EFCore.TestUtils.Other;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Transactions;
 

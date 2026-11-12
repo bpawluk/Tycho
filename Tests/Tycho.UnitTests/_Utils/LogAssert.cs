@@ -53,7 +53,7 @@ internal static class LogAssert
         }
     }
 
-    private static bool HasProperties(object state, (string Name, object? Value)[] properties)
+    private static bool HasProperties(object? state, (string Name, object? Value)[] properties)
     {
         return state is IEnumerable<KeyValuePair<string, object?>> values &&
                properties.All(property => values.Any(item => item.Key == property.Name && Equals(item.Value, property.Value)));

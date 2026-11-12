@@ -2,6 +2,7 @@
   <Folder Name="/Tests/" />
   <Folder Name="/Tests/Tycho.Persistence/">
     <Project Path="Tests/Tycho.Persistence.EFCore.IntegrationTests/Tycho.Persistence.EFCore.IntegrationTests.csproj" Id="a5c5d188-571a-46fa-94de-8e3306332397" />
+    <Project Path="Tests/Tycho.Persistence.EFCore.TestUtils/Tycho.Persistence.EFCore.TestUtils.csproj" Id="07a6ea47-d190-457b-8972-4cfc436c6ce0" />
     <Project Path="Tests/Tycho.Persistence.EFCore.UnitTests/Tycho.Persistence.EFCore.UnitTests.csproj" />
     <Project Path="Tests/Tycho.Persistence.EFCore.UseCaseTests/Tycho.Persistence.EFCore.UseCaseTests.csproj" />
   </Folder>

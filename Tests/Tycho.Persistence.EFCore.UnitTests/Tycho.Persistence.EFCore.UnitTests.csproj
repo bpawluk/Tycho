@@ -39,6 +39,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Tycho.Persistence.EFCore\Tycho.Persistence.EFCore.csproj" />
+    <ProjectReference Include="..\Tycho.Persistence.EFCore.TestUtils\Tycho.Persistence.EFCore.TestUtils.csproj" />
   </ItemGroup>
 
   <ItemGroup>

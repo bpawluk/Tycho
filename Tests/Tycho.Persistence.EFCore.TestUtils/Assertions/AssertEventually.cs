@@ -1,9 +1,7 @@
 extern alias TychoInternals;
-
-// Internal test access also exposes Tycho's compatibility attribute.
 using CallerArgumentExpressionAttribute = TychoInternals::System.Runtime.CompilerServices.CallerArgumentExpressionAttribute;
 
-namespace Tycho.Persistence.EFCore.UseCaseTests._Utils;
+namespace Tycho.Persistence.EFCore.TestUtils.Assertions;
 
 public class AssertEventually
 {

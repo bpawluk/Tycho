@@ -1,8 +1,10 @@
-namespace Tycho.Persistence.EFCore.UseCaseTests._Infrastructure;
+using Tycho.Persistence.EFCore.TestUtils.Databases.Sessions;
 
-internal static class DatabaseSessionFactory
+namespace Tycho.Persistence.EFCore.TestUtils.Databases;
+
+public static class DatabaseSessionFactory
 {
-    internal static async Task<DatabaseSession> CreateAsync(DatabaseServers servers, DatabaseProvider provider)
+    public static async Task<DatabaseSession> CreateAsync(DatabaseServers servers, DatabaseProvider provider)
     {
         CancellationToken cancellationToken = TestContext.Current.CancellationToken;
         DatabaseSession databases = provider switch

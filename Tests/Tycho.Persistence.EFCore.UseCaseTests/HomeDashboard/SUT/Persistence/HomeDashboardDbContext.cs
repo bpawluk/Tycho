@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Tycho.Persistence.EFCore.UseCaseTests._Infrastructure;
+using Tycho.Persistence.EFCore.TestUtils.Databases;
 
 namespace Tycho.Persistence.EFCore.UseCaseTests.HomeDashboard.SUT.Persistence;
 

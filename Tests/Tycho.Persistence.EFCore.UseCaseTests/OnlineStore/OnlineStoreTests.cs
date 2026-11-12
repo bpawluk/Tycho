@@ -1,5 +1,6 @@
-using Tycho.Persistence.EFCore.UseCaseTests._Infrastructure;
-using Tycho.Persistence.EFCore.UseCaseTests._Utils;
+using Tycho.Persistence.EFCore.TestUtils.Databases.Sessions;
+using Tycho.Persistence.EFCore.TestUtils.Databases;
+using Tycho.Persistence.EFCore.TestUtils.Assertions;
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT;
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Basket.Contract.Incoming;
 using Tycho.Persistence.EFCore.UseCaseTests.OnlineStore.SUT.Modules.Catalog.Contract.Incoming;

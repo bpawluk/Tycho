@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace Tycho.Persistence.EFCore.UnitTests._Utils;
+namespace Tycho.Persistence.EFCore.TestUtils.Logging;
 
-internal static class LogAssert
+public static class LogAssert
 {
     public static void Logged<T>(
         Mock<ILogger<T>> logger,
@@ -23,7 +23,7 @@ internal static class LogAssert
 #pragma warning restore CA1873
     }
 
-    private static bool HasProperties(object state, (string Name, object? Value)[] properties)
+    private static bool HasProperties(object? state, (string Name, object? Value)[] properties)
     {
         return state is IEnumerable<KeyValuePair<string, object?>> values &&
                properties.All(property => values.Any(item => item.Key == property.Name && Equals(item.Value, property.Value)));

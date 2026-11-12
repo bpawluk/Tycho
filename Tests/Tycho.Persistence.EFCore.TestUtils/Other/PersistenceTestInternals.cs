@@ -2,7 +2,7 @@ using Microsoft.Extensions.Hosting;
 using Tycho.Identity.Structure;
 using Tycho.Structure;
 
-namespace Tycho.Persistence.EFCore.UnitTests._Utils;
+namespace Tycho.Persistence.EFCore.TestUtils.Other;
 
 internal static class PersistenceTestInternals
 {

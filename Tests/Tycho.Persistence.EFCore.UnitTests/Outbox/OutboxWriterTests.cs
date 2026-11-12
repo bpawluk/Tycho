@@ -11,8 +11,8 @@ using Tycho.Identity.Events;
 using Tycho.Identity.Structure;
 using Tycho.Persistence.EFCore.Identity;
 using Tycho.Persistence.EFCore.Outbox;
-using Tycho.Persistence.EFCore.UnitTests._Data.Events;
-using Tycho.Persistence.EFCore.UnitTests._Utils;
+using Tycho.Persistence.EFCore.TestUtils.Data.Events;
+using Tycho.Persistence.EFCore.TestUtils.Other;
 using Tycho.Structure;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Outbox;

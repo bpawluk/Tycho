@@ -1,11 +1,8 @@
 using Testcontainers.MsSql;
 using Testcontainers.MySql;
 using Testcontainers.PostgreSql;
-using Tycho.Persistence.EFCore.UseCaseTests._Infrastructure;
 
-[assembly: AssemblyFixture(typeof(DatabaseServers))]
-
-namespace Tycho.Persistence.EFCore.UseCaseTests._Infrastructure;
+namespace Tycho.Persistence.EFCore.TestUtils.Databases;
 
 public sealed class DatabaseServers : IAsyncLifetime
 {

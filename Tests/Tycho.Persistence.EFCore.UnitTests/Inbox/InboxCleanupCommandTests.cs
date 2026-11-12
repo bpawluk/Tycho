@@ -4,7 +4,7 @@ using Tycho.Persistence.EFCore.Entries;
 using Tycho.Persistence.EFCore.Identity;
 using Tycho.Persistence.EFCore.Inbox;
 using Tycho.Persistence.EFCore.Operations;
-using Tycho.Persistence.EFCore.UnitTests._Utils;
+using Tycho.Persistence.EFCore.TestUtils.Other;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Inbox;
 

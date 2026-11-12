@@ -7,8 +7,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Time.Testing;
 using Moq;
 using Tycho.Persistence.EFCore.Retention;
-using Tycho.Persistence.EFCore.UnitTests._Utils;
+using Tycho.Persistence.EFCore.TestUtils.Logging;
 using Tycho.Persistence.EFCore.Identity;
+using Tycho.Persistence.EFCore.TestUtils.Other;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Retention;
 

@@ -7,7 +7,7 @@ using Tycho.Persistence.EFCore.Inbox;
 using Tycho.Persistence.EFCore.Outbox;
 using Tycho.Persistence.EFCore.Transactions;
 
-namespace Tycho.Persistence.EFCore.UnitTests._Utils;
+namespace Tycho.Persistence.EFCore.TestUtils.Other;
 
 // Keep the existing behavioral tests on real EF operations after extracting them
 // from consumers and writers; no database operation is mocked here.

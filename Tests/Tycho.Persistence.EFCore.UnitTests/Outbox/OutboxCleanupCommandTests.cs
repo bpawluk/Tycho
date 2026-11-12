@@ -2,9 +2,9 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Tycho.Persistence.EFCore.Outbox;
 using Tycho.Persistence.EFCore.Operations;
-using Tycho.Persistence.EFCore.UnitTests._Utils;
 using Tycho.Persistence.EFCore.Identity;
 using Tycho.Persistence.EFCore.Entries;
+using Tycho.Persistence.EFCore.TestUtils.Other;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Outbox;
 

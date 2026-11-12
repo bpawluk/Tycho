@@ -8,7 +8,9 @@ using Tycho.Identity.Structure;
 using Tycho.Persistence.EFCore.Entries;
 using Tycho.Persistence.EFCore.Identity;
 using Tycho.Persistence.EFCore.Outbox;
-using Tycho.Persistence.EFCore.UnitTests._Utils;
+using Tycho.Persistence.EFCore.TestUtils.Databases.Interceptors;
+using Tycho.Persistence.EFCore.TestUtils.Logging;
+using Tycho.Persistence.EFCore.TestUtils.Other;
 using Tycho.Structure;
 
 namespace Tycho.Persistence.EFCore.UnitTests.Outbox;

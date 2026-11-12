@@ -1,9 +1,9 @@
 using System.Collections.Concurrent;
 using Microsoft.EntityFrameworkCore;
 
-namespace Tycho.Persistence.EFCore.UseCaseTests._Infrastructure;
+namespace Tycho.Persistence.EFCore.TestUtils.Databases.Sessions;
 
-internal abstract class DatabaseSession : IAsyncDisposable
+public abstract class DatabaseSession : IAsyncDisposable
 {
     protected const int CommandTimeoutSeconds = 30;
     protected const int ConnectionTimeoutSeconds = 15;
