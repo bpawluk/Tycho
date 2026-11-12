@@ -1,0 +1,35 @@
+using Microsoft.Extensions.DependencyInjection;
+using Tycho.IntegrationTests.RunningStartupLogic.SUT.Handlers;
+using Tycho.IntegrationTests.RunningStartupLogic.SUT.Services;
+using Tycho.Modules;
+using Tycho.Requests;
+
+namespace Tycho.IntegrationTests.RunningStartupLogic.SUT.Modules;
+
+// Handles
+public record GetModuleValueRequest : IRequest<string>;
+
+[TychoDefinition]
+public class TestModule : TychoModule
+{
+    protected override void DefineContract(IModuleContract module)
+    {
+        module.Expects<GetModuleValueRequest, string>()
+              .HandlesWith<GetValueRequestHandler>();
+    }
+
+    protected override void DefineEvents(IModuleEvents module) { }
+
+    protected override void IncludeModules(IModuleStructure module) { }
+
+    protected override void RegisterServices(IServiceCollection app)
+    {
+        app.AddSingleton<TestService>();
+    }
+
+    protected override Task Startup(IServiceProvider app, CancellationToken cancellationToken)
+    {
+        app.GetRequiredService<TestService>().Value = "Test = Passed";
+        return Task.CompletedTask;
+    }
+}

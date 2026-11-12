@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Verify.SourceGenerators" Version="2.5.0" />
+    <PackageReference Include="Verify.XunitV3" Version="32.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Runtime-compiled test inputs need Tycho in the application dependency graph. -->
+    <ProjectReference Include="..\..\Tycho\Tycho.csproj" />
+    <ProjectReference Include="..\Tycho.Utils.SourceGenerator.TestUtils\Tycho.Utils.SourceGenerator.TestUtils.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="EdgeCaseTests\SUT\**\*.cs;IncrementalTests\SUT\**\*.cs;SnapshotTests\Input\**\*.cs" />
+    <Content Include="EdgeCaseTests\SUT\**\*.cs;IncrementalTests\SUT\**\*.cs;SnapshotTests\Input\**\*.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,16 @@
+using Tycho;
+using Tycho.Apps;
+using Microsoft.Extensions.DependencyInjection;
+
+#pragma warning disable CA1050
+
+[TychoDefinition]
+public class TestApp : TychoApp
+{
+    protected override void DefineContract(IAppContract app) { }
+    protected override void DefineEvents(IAppEvents app) { }
+    protected override void IncludeModules(IAppStructure app) { }
+    protected override void RegisterServices(IServiceCollection app) { }
+}
+
+#pragma warning restore CA1050

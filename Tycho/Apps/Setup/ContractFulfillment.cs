@@ -1,9 +1,7 @@
-﻿using System;
 using Tycho.Modules;
 using Tycho.Requests;
-using Tycho.Requests.Handling;
 using Tycho.Requests.Registrating;
-using Tycho.Structure.Internal;
+using Tycho.Structure;
 
 namespace Tycho.Apps.Setup
 {
@@ -17,77 +15,16 @@ namespace Tycho.Apps.Setup
             _registrator = new Registrator(internals);
         }
 
-        public IContractFulfillment Forward<TRequest, TTargetModule>()
-            where TRequest : class, IRequest
-            where TTargetModule : TychoModule
-        {
-            _registrator.ForwardDownStreamRequest<TSourceModule, TRequest, TTargetModule>();
-            return this;
-        }
-
-        public IContractFulfillment Forward<TRequest, TResponse, TTargetModule>()
-            where TRequest : class, IRequest<TResponse>
-            where TTargetModule : TychoModule
-        {
-            _registrator.ForwardDownStreamRequest<TSourceModule, TRequest, TResponse, TTargetModule>();
-            return this;
-        }
-
-        public IContractFulfillment ForwardAs<TRequest, TTargetRequest, TTargetModule>(
-            Func<TRequest, TTargetRequest> map)
-            where TRequest : class, IRequest
-            where TTargetRequest : class, IRequest
-            where TTargetModule : TychoModule
-        {
-            _registrator.ForwardMappedDownStreamRequest<TSourceModule, TRequest, TTargetRequest, TTargetModule>(map);
-            return this;
-        }
-
-        public IContractFulfillment ForwardAs<TRequest, TResponse, TTargetRequest, TTargetResponse, TTargetModule>(
-            Func<TRequest, TTargetRequest> mapRequest,
-            Func<TTargetResponse, TResponse> mapResponse)
-            where TRequest : class, IRequest<TResponse>
-            where TTargetRequest : class, IRequest<TTargetResponse>
-            where TTargetModule : TychoModule
-        {
-            _registrator.ForwardMappedDownStreamRequest<
-                TSourceModule,
-                TRequest, TResponse,
-                TTargetRequest, TTargetResponse,
-                TTargetModule>(mapRequest, mapResponse);
-            return this;
-        }
-
-        public IContractFulfillment Handle<TRequest, THandler>()
-            where TRequest : class, IRequest
-            where THandler : class, IRequestHandler<TRequest>
-        {
-            _registrator.HandleDownStreamRequest<TSourceModule, TRequest, THandler>();
-            return this;
-        }
-
-        public IContractFulfillment Handle<TRequest, TResponse, THandler>()
-            where TRequest : class, IRequest<TResponse>
-            where THandler : class, IRequestHandler<TRequest, TResponse>
-        {
-            _registrator.HandleDownStreamRequest<TSourceModule, TRequest, TResponse, THandler>();
-            return this;
-        }
-
-        public IContractFulfillment Ignore<TRequest>()
+        public IRequiredRequestBinding<TRequest> Fulfills<TRequest>()
             where TRequest : class, IRequest
         {
-            _registrator.HandleDownStreamRequest<TSourceModule, TRequest, RequestIgnorer<TRequest>>();
-            return this;
+            return new RequiredRequestBinding<TSourceModule, TRequest>(this, _registrator);
         }
 
-        public IContractFulfillment Ignore<TRequest, TResponse>()
+        public IRequiredRequestBinding<TRequest, TResponse> Fulfills<TRequest, TResponse>()
             where TRequest : class, IRequest<TResponse>
         {
-            _registrator.HandleDownStreamRequest<
-                TSourceModule, TRequest, TResponse, 
-                RequestIgnorer<TRequest, TResponse>>();
-            return this;
+            return new RequiredRequestBinding<TSourceModule, TRequest, TResponse>(this, _registrator);
         }
     }
 }

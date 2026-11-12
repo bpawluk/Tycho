@@ -1,0 +1,50 @@
+{{~#--------- Calculate indentation ---------#~}}
+{{~ ns_offset = namespace != "" ? 1 : 0 ~}}
+{{~ ct_count = array.size containing_types ~}}
+{{~ bi = ns_offset + ct_count ~}}
+{{~ i0 = string.pad_left "" (bi * 4) ~}}
+{{~ i1 = string.pad_left "" ((bi + 1) * 4) ~}}
+{{~ i2 = string.pad_left "" ((bi + 2) * 4) ~}}
+{{~#-----------------------------------------#~}}
+{{~#----------- Declare namespace -----------#~}}
+{{~ if namespace != "" ~}}
+namespace {{ namespace }}
+{
+{{~ end ~}}
+{{~#-----------------------------------------#~}}
+{{~#---------- Declare outer types ----------#~}}
+{{~ for containing_type in containing_types ~}}
+{{~ containing_type_indent = (ns_offset + for.index) * 4 ~}}
+{{ string.pad_left "" containing_type_indent }}{{ containing_type.declaration }}
+{{~ for constraint in containing_type.constraints ~}}
+{{ string.pad_left "" (containing_type_indent + 4) }}{{ constraint }}
+{{~ end ~}}
+{{ string.pad_left "" containing_type_indent }}{
+{{~ end ~}}
+{{~#-----------------------------------------#~}}
+{{~#---------------------------------------------------- APP FACADE ----------------------------------------------------#~}}
+{{ i0 }}internal class {{ classes.facade_class_with_type_params }} : {{ classes.facade_base_class }}, {{ interfaces.facade_interface }}
+{{~ for owner_constraint in owner_constraints ~}}
+{{   i1   }}{{ owner_constraint }}
+{{~ end ~}}
+{{ i0 }}{
+{{   i1   }}public {{ classes.facade_class }}({{ interfaces.instance_interface }} {{ parameters.app_parameter }}) : base({{ parameters.app_parameter }}) { }
+{{~ for request in requests ~}}
+
+{{   i1   }}public {{ classes.task_class }}{{ if request.has_response }}<{{ request.response_type }}>{{ end }} {{ methods.execute_async_method }}({{ request.request_type }} {{ parameters.request_data_parameter }}, {{ classes.cancellation_token_class }} {{ parameters.cancellation_token_parameter }})
+{{   i1   }}{
+{{     i2     }}return {{ methods.execute_async_method }}<{{ request.request_type }}{{ if request.has_response }}, {{ request.response_type }}{{ end }}>({{ parameters.request_data_parameter }}, {{ parameters.cancellation_token_parameter }});
+{{   i1   }}}    
+{{~ end ~}}
+{{ i0 }}}
+{{~#--------------------------------------------------------------------------------------------------------------------#~}}
+{{~#------- Close outer type brackets -------#~}}
+{{~ for containing_type in containing_types ~}}
+{{ string.pad_left "" ((bi - 1 - for.index) * 4) }}}
+{{~ end ~}}
+{{~#-----------------------------------------#~}}
+{{~#-------- Close namespace bracket --------#~}}
+{{~ if namespace != "" ~}}
+}
+{{~ end ~}}
+{{~#-----------------------------------------#~}}

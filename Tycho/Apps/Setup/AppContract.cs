@@ -1,9 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
-using Tycho.Modules;
 using Tycho.Requests;
 using Tycho.Requests.Registrating;
-using Tycho.Structure.Internal;
+using Tycho.Structure;
 
 namespace Tycho.Apps.Setup
 {
@@ -16,65 +13,17 @@ namespace Tycho.Apps.Setup
             _registrator = new Registrator(internals);
         }
 
-        public IAppContract Forwards<TRequest, TModule>()
+        public IAppRequestBinding<TRequest> Expects<TRequest>()
             where TRequest : class, IRequest
-            where TModule : TychoModule
         {
-            _registrator.ForwardUpStreamRequest<TRequest, TModule>();
-            return this;
+            return new AppRequestBinding<TRequest>(this, _registrator);
         }
 
-        public IAppContract Forwards<TRequest, TResponse, TModule>()
+        public IAppRequestBinding<TRequest, TResponse> Expects<TRequest, TResponse>()
             where TRequest : class, IRequest<TResponse>
-            where TModule : TychoModule
         {
-            _registrator.ForwardUpStreamRequest<TRequest, TResponse, TModule>();
-            return this;
+            return new AppRequestBinding<TRequest, TResponse>(this, _registrator);
         }
 
-        public IAppContract ForwardsAs<TRequest, TTargetRequest, TModule>(
-            Func<TRequest, TTargetRequest> map)
-            where TRequest : class, IRequest
-            where TTargetRequest : class, IRequest
-            where TModule : TychoModule
-        {
-            _registrator.ForwardMappedUpStreamRequest<TRequest, TTargetRequest, TModule>(map);
-            return this;
-        }
-
-        public IAppContract ForwardsAs<TRequest, TResponse, TTargetRequest, TTargetResponse, TModule>(
-            Func<TRequest, TTargetRequest> mapRequest,
-            Func<TTargetResponse, TResponse> mapResponse)
-            where TRequest : class, IRequest<TResponse>
-            where TTargetRequest : class, IRequest<TTargetResponse>
-            where TModule : TychoModule
-        {
-            _registrator.ForwardMappedUpStreamRequest<
-                TRequest, TResponse, 
-                TTargetRequest, TTargetResponse, 
-                TModule>(mapRequest, mapResponse);
-            return this;
-        }
-
-        public IAppContract Handles<TRequest, THandler>()
-            where TRequest : class, IRequest
-            where THandler : class, IRequestHandler<TRequest>
-        {
-            _registrator.HandleUpStreamRequest<TRequest, THandler>();
-            return this;
-        }
-
-        public IAppContract Handles<TRequest, TResponse, THandler>()
-            where TRequest : class, IRequest<TResponse>
-            where THandler : class, IRequestHandler<TRequest, TResponse>
-        {
-            _registrator.HandleUpStreamRequest<TRequest, TResponse, THandler>();
-            return this;
-        }
-
-        public Task Build()
-        {
-            return Task.CompletedTask;
-        }
     }
 }

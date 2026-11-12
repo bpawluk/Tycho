@@ -1,0 +1,28 @@
+<Project>
+  
+  <PropertyGroup>
+    <Major>6</Major>
+    <Minor>0</Minor>
+    <Patch>0</Patch>
+    <VersionPrefix>$(Major).$(Minor).$(Patch)-rc.7</VersionPrefix>
+    <AssemblyVersion>$(Major).0.0.0</AssemblyVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Authors>Bartosz Pawluk</Authors>
+    <Title>$(AssemblyName)</Title>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Copyright>Copyright Bartosz Pawluk</Copyright>
+    <PackageProjectUrl>https://github.com/bpawluk/Tycho</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/bpawluk/Tycho</RepositoryUrl>
+    <PackageIcon>logo-128x128.png</PackageIcon>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)..\Assets\logo-128x128.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  
+</Project>

@@ -1,0 +1,22 @@
+<Solution>
+  <Folder Name="/Tests/" />
+  <Folder Name="/Tests/Tycho.Persistence/">
+    <Project Path="Tests/Tycho.Persistence.EFCore.IntegrationTests/Tycho.Persistence.EFCore.IntegrationTests.csproj" Id="a5c5d188-571a-46fa-94de-8e3306332397" />
+    <Project Path="Tests/Tycho.Persistence.EFCore.TestUtils/Tycho.Persistence.EFCore.TestUtils.csproj" Id="07a6ea47-d190-457b-8972-4cfc436c6ce0" />
+    <Project Path="Tests/Tycho.Persistence.EFCore.UnitTests/Tycho.Persistence.EFCore.UnitTests.csproj" />
+    <Project Path="Tests/Tycho.Persistence.EFCore.UseCaseTests/Tycho.Persistence.EFCore.UseCaseTests.csproj" />
+  </Folder>
+  <Folder Name="/Tests/Tycho.Utils/">
+    <Project Path="Tests/Tycho.Utils.SourceGenerator.TestUtils/Tycho.Utils.SourceGenerator.TestUtils.csproj" />
+    <Project Path="Tests/Tycho.Utils.SourceGenerator.IntegrationTests/Tycho.Utils.SourceGenerator.IntegrationTests.csproj" Id="a0451a68-9603-4b42-bb98-3d6cd214b66c" />
+    <Project Path="Tests/Tycho.Utils.SourceGenerator.UnitTests/Tycho.Utils.SourceGenerator.UnitTests.csproj" Id="8d76f73f-648e-49b5-812a-e1a0fb712904" />
+  </Folder>
+  <Folder Name="/Tests/Tycho/">
+    <Project Path="Tests/Tycho.TestUtils/Tycho.TestUtils.csproj" />
+    <Project Path="Tests/Tycho.IntegrationTests/Tycho.IntegrationTests.csproj" />
+    <Project Path="Tests/Tycho.UnitTests/Tycho.UnitTests.csproj" />
+  </Folder>
+  <Project Path="Tycho.Persistence.EFCore/Tycho.Persistence.EFCore.csproj" />
+  <Project Path="Tycho.Utils.SourceGenerator/Tycho.Utils.SourceGenerator.csproj" Id="2bbbd5bf-f0f2-47ff-a3ff-8fedd4b66ab5" />
+  <Project Path="Tycho/Tycho.csproj" />
+</Solution>

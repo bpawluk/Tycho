@@ -1,0 +1,40 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Tycho.Events.Model;
+using Tycho.Events.Registrating.Registrations;
+
+namespace Tycho.Events.Routing
+{
+    internal class ScopedEventRouter : IEventRouter
+    {
+        private readonly IServiceProvider _serviceProvider;
+
+        public ScopedEventRouter(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
+        public async Task<IReadOnlyCollection<RoutedEvent>> RouteAsync<TEvent>(
+            Guid publishId,
+            TEvent eventPayload,
+            CancellationToken cancellationToken)
+            where TEvent : class, IEvent
+        {
+            IEnumerable<IEventRegistration<TEvent>> registrations = _serviceProvider.GetServices<IEventRegistration<TEvent>>();
+            var routedEvents = new List<RoutedEvent>();
+
+            foreach (IEventRegistration<TEvent> registration in registrations)
+            {
+                IReadOnlyCollection<RoutedEvent> registrationEvents = await registration
+                    .RouteAsync(publishId, eventPayload, cancellationToken)
+                    .ConfigureAwait(false);
+                routedEvents.AddRange(registrationEvents);
+            }
+
+            return routedEvents;
+        }
+    }
+}

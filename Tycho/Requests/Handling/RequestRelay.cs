@@ -1,37 +1,38 @@
-﻿using System.Threading;
+using System.Threading;
 using System.Threading.Tasks;
+using Tycho.Requests.Broker;
 
 namespace Tycho.Requests.Handling
 {
     internal abstract class RequestRelay<TRequest> : IRequestHandler<TRequest>
         where TRequest : class, IRequest
     {
-        private readonly IRequestExecutor _targetExecutor;
+        private readonly IRequestBroker _targetBroker;
 
-        public RequestRelay(IRequestExecutor targetExecutor)
+        public RequestRelay(IRequestBroker targetBroker)
         {
-            _targetExecutor = targetExecutor;
+            _targetBroker = targetBroker;
         }
 
-        public Task Handle(TRequest requestData, CancellationToken cancellationToken)
+        public Task HandleAsync(TRequest requestData, CancellationToken cancellationToken)
         {
-            return _targetExecutor.Execute(requestData, cancellationToken);
+            return _targetBroker.ExecuteAsync(requestData, cancellationToken);
         }
     }
 
     internal abstract class RequestRelay<TRequest, TResponse> : IRequestHandler<TRequest, TResponse>
         where TRequest : class, IRequest<TResponse>
     {
-        private readonly IRequestExecutor _targetExecutor;
+        private readonly IRequestBroker _targetBroker;
 
-        public RequestRelay(IRequestExecutor targetExecutor)
+        public RequestRelay(IRequestBroker targetBroker)
         {
-            _targetExecutor = targetExecutor;
+            _targetBroker = targetBroker;
         }
 
-        public Task<TResponse> Handle(TRequest requestData, CancellationToken cancellationToken)
+        public Task<TResponse> HandleAsync(TRequest requestData, CancellationToken cancellationToken)
         {
-            return _targetExecutor.Execute<TRequest, TResponse>(requestData, cancellationToken);
+            return _targetBroker.ExecuteAsync<TRequest, TResponse>(requestData, cancellationToken);
         }
     }
 }

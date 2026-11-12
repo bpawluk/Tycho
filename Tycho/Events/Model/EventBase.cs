@@ -1,0 +1,27 @@
+using System;
+using Tycho.Identity.Events;
+
+namespace Tycho.Events.Model
+{
+    /// <summary>
+    /// Represents a base class for Tycho events.
+    /// </summary>
+    public abstract class EventBase
+    {
+        internal Guid Id { get; }
+
+        internal Guid PublishId { get; }
+
+        internal EventIdentity EventId { get; }
+
+        internal EventHandlerIdentity HandlerId { get; }
+
+        internal EventBase(Guid id, Guid publishId, EventIdentity eventId, EventHandlerIdentity handlerId)
+        {
+            Id = id;
+            PublishId = publishId;
+            EventId = eventId;
+            HandlerId = handlerId;
+        }
+    }
+}

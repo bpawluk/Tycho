@@ -1,0 +1,29 @@
+using Microsoft.Extensions.DependencyInjection;
+using Tycho.Modules;
+
+namespace Tycho.IntegrationTests.RunningCleanupLogic.SUT.Modules;
+
+[TychoDefinition]
+public class BetaModule : TychoModule
+{
+    protected override void DefineContract(IModuleContract module) { }
+
+    protected override void DefineEvents(IModuleEvents module) { }
+
+    protected override void IncludeModules(IModuleStructure module)
+    {
+        module.Uses<GammaModule>();
+    }
+
+    protected override void RegisterServices(IServiceCollection module)
+    {
+        module.AddSingleton(TestResult.Instance);
+    }
+
+    protected override Task Cleanup(IServiceProvider module, CancellationToken cancellationToken)
+    {
+        TestResult result = module.GetRequiredService<TestResult>();
+        result.BetaModuleCleanupPerformed = true;
+        return base.Cleanup(module, cancellationToken);
+    }
+}

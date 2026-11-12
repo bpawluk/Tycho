@@ -1,0 +1,107 @@
+using Moq;
+using Tycho.Events.Model;
+using Tycho.Events.Outbox;
+using Tycho.Events.Publishing;
+using Tycho.Events.Routing;
+using Tycho.Identity.Events;
+using Tycho.Identity.Structure;
+using Tycho.TestUtils.Events;
+using Tycho.TestUtils.Handlers;
+
+namespace Tycho.UnitTests.Events.Publishing;
+
+public class EventPublisherTests
+{
+    private readonly Mock<IEventRouter> _eventRouterMock;
+    private readonly Mock<IOutboxWriter> _outboxWriterMock;
+
+    private readonly IEventPublisher _sut;
+
+    public EventPublisherTests()
+    {
+        _eventRouterMock = new Mock<IEventRouter>();
+        _outboxWriterMock = new Mock<IOutboxWriter>();
+        _sut = new EventPublisher(_eventRouterMock.Object, _outboxWriterMock.Object);
+    }
+
+    [Fact]
+    public async Task PublishAsync_WithMissingPayload_ThrowsArgumentNullException()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken();
+
+        // Act
+        Task Act() => _sut.PublishAsync<TestEvent>(null!, cancellationToken);
+
+        // Assert
+        await Assert.ThrowsAsync<ArgumentNullException>(Act);
+    }
+
+    [Fact]
+    public async Task PublishAsync_WithMultipleRoutedEvents_WritesAllToOutbox()
+    {
+        // Arrange
+        var eventPayload = new TestEvent();
+        var cancellationToken = new CancellationToken();
+        var routedEvents = new List<RoutedEvent>
+        {
+            CreateRoutedEvent(eventPayload),
+            CreateRoutedEvent(eventPayload),
+        };
+
+        _eventRouterMock.Setup(eb => eb.RouteAsync(It.IsAny<Guid>(), eventPayload, cancellationToken))
+                        .ReturnsAsync(routedEvents);
+
+        // Act
+        await _sut.PublishAsync(eventPayload, cancellationToken);
+
+        // Assert
+        _outboxWriterMock.Verify(ow => ow.Write(routedEvents, cancellationToken), Times.Once);
+    }
+
+    [Fact]
+    public async Task PublishAsync_WithNoRoutedEvents_DoesNotWriteToOutbox()
+    {
+        // Arrange
+        var eventPayload = new TestEvent();
+        var routedEvents = new List<RoutedEvent>();
+        var cancellationToken = new CancellationToken();
+
+        _eventRouterMock.Setup(eb => eb.RouteAsync(It.IsAny<Guid>(), eventPayload, cancellationToken))
+                        .ReturnsAsync(routedEvents);
+
+        // Act
+        await _sut.PublishAsync(eventPayload, cancellationToken);
+
+        // Assert
+        _outboxWriterMock.Verify(
+            ow => ow.Write(It.IsAny<IReadOnlyCollection<RoutedEvent>>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task PublishAsync_WithNullRoutedEvents_DoesNotWriteToOutbox()
+    {
+        // Arrange
+        var eventPayload = new TestEvent();
+        var cancellationToken = new CancellationToken();
+
+        _eventRouterMock.Setup(eb => eb.RouteAsync(It.IsAny<Guid>(), eventPayload, cancellationToken))
+                        .ReturnsAsync((IReadOnlyCollection<RoutedEvent>)null!);
+
+        // Act
+        await _sut.PublishAsync(eventPayload, cancellationToken);
+
+        // Assert
+        _outboxWriterMock.Verify(
+            ow => ow.Write(It.IsAny<IReadOnlyCollection<RoutedEvent>>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    private static RoutedEvent<TestEvent> CreateRoutedEvent(TestEvent? payload = null)
+    {
+        var eventId = EventIdentity.Create<TestEvent>();
+        var handlerId = EventHandlerIdentity.Create<TestEventHandler>();
+        return new RoutedEvent<TestEvent>(Guid.NewGuid(), Guid.NewGuid(), eventId, handlerId, InstanceIdentity.Parse("test-endpoint"), payload ?? new TestEvent());
+    }
+}
