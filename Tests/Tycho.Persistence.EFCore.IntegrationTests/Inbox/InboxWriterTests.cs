@@ -1,4 +1,3 @@
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Tycho.Events.Inbox;
 using Tycho.Events.Model;
@@ -6,14 +5,14 @@ using Tycho.Identity.Events;
 using Tycho.Persistence.EFCore.Entries;
 using Tycho.Persistence.EFCore.Identity;
 using Tycho.Persistence.EFCore.Inbox;
+using Tycho.Persistence.EFCore.TestUtils.Databases;
 using Tycho.Persistence.EFCore.TestUtils.Events;
 using Tycho.Persistence.EFCore.TestUtils.Other;
 
-namespace Tycho.Persistence.EFCore.UnitTests.Inbox;
+namespace Tycho.Persistence.EFCore.IntegrationTests.Inbox;
 
-public sealed class InboxWriterTests : IAsyncLifetime
+public sealed class InboxWriterTests(DatabaseServers servers) : DatabaseTest(servers)
 {
-    private SqliteConnection _connection = default!;
     private DbContextOptions<TestDbContext> _dbContextOptions = default!;
     private TestDbContext _dbContext = default!;
     private InboxActivity _inboxActivity = default!;
@@ -22,13 +21,11 @@ public sealed class InboxWriterTests : IAsyncLifetime
 
     private int _inboxActivityNotificationCount;
 
-    public async ValueTask InitializeAsync()
+    private async Task SetupAsync(DatabaseProvider provider)
     {
-        _connection = new SqliteConnection("Data Source=:memory:");
-        await _connection.OpenAsync();
+        await InitializeDatabaseAsync(provider);
 
-        _dbContextOptions = new DbContextOptionsBuilder<TestDbContext>()
-            .UseSqlite(_connection)
+        _dbContextOptions = Options<TestDbContext>()
             .Options;
 
         _dbContext = new TestDbContext(_dbContextOptions);
@@ -38,13 +35,18 @@ public sealed class InboxWriterTests : IAsyncLifetime
         _inboxActivity.NewEntriesAdded += (_, _) => _inboxActivityNotificationCount++;
 
         _persistenceOwner = new PersistenceOwner(PersistenceTestInternals.Create(typeof(PersistenceOwner)));
-        _sut = PersistenceTestOperations.CreateInboxWriter(_inboxActivity, _dbContext, _persistenceOwner);
+        _sut = new InboxWriter(_inboxActivity, _dbContext, _persistenceOwner);
     }
 
-    [Fact]
-    public async Task Write_WithNewEntry_PersistsEntryAndNotifiesActivity()
+    [Theory(Timeout = 360000)]
+    [InlineData(DatabaseProvider.SQLite)]
+    [InlineData(DatabaseProvider.SqlServer)]
+    [InlineData(DatabaseProvider.PostgreSql)]
+    [InlineData(DatabaseProvider.MySql)]
+    public async Task Write_WithNewEntry_PersistsEntryAndNotifiesActivity(DatabaseProvider provider)
     {
         // Arrange
+        await SetupAsync(provider);
         SerializedEvent serializedEvent = CreateSerializedEvent();
 
         // Act
@@ -60,14 +62,19 @@ public sealed class InboxWriterTests : IAsyncLifetime
         Assert.Equal(1, _inboxActivityNotificationCount);
     }
 
-    [Fact]
-    public async Task Write_WithMatchingExistingEntry_TreatsReceiptAsSuccessful()
+    [Theory(Timeout = 360000)]
+    [InlineData(DatabaseProvider.SQLite)]
+    [InlineData(DatabaseProvider.SqlServer)]
+    [InlineData(DatabaseProvider.PostgreSql)]
+    [InlineData(DatabaseProvider.MySql)]
+    public async Task Write_WithMatchingExistingEntry_TreatsReceiptAsSuccessful(DatabaseProvider provider)
     {
         // Arrange
+        await SetupAsync(provider);
         SerializedEvent serializedEvent = CreateSerializedEvent();
         await _sut.Write(serializedEvent, TestContext.Current.CancellationToken);
         await using var retryDbContext = new TestDbContext(_dbContextOptions);
-        InboxWriter retryWriter = PersistenceTestOperations.CreateInboxWriter(_inboxActivity, retryDbContext, _persistenceOwner);
+        InboxWriter retryWriter = new InboxWriter(_inboxActivity, retryDbContext, _persistenceOwner);
 
         // Act
         await retryWriter.Write(serializedEvent, TestContext.Current.CancellationToken);
@@ -78,15 +85,20 @@ public sealed class InboxWriterTests : IAsyncLifetime
         Assert.Equal(2, _inboxActivityNotificationCount);
     }
 
-    [Fact]
-    public async Task Write_WithExistingEntryForDifferentPublishId_RethrowsPersistenceFailure()
+    [Theory(Timeout = 360000)]
+    [InlineData(DatabaseProvider.SQLite)]
+    [InlineData(DatabaseProvider.SqlServer)]
+    [InlineData(DatabaseProvider.PostgreSql)]
+    [InlineData(DatabaseProvider.MySql)]
+    public async Task Write_WithExistingEntryForDifferentPublishId_RethrowsPersistenceFailure(DatabaseProvider provider)
     {
         // Arrange
+        await SetupAsync(provider);
         SerializedEvent persistedEvent = CreateSerializedEvent();
         await _sut.Write(persistedEvent, TestContext.Current.CancellationToken);
         SerializedEvent conflictingEvent = CreateSerializedEvent(id: persistedEvent.Id);
         await using var retryDbContext = new TestDbContext(_dbContextOptions);
-        InboxWriter retryWriter = PersistenceTestOperations.CreateInboxWriter(_inboxActivity, retryDbContext, _persistenceOwner);
+        InboxWriter retryWriter = new InboxWriter(_inboxActivity, retryDbContext, _persistenceOwner);
 
         // Act
         Task act() => retryWriter.Write(conflictingEvent, TestContext.Current.CancellationToken);
@@ -98,10 +110,15 @@ public sealed class InboxWriterTests : IAsyncLifetime
         Assert.Equal(1, _inboxActivityNotificationCount);
     }
 
-    [Fact]
-    public async Task Write_WithExistingEntryContainingDifferentPayload_KeepsFirstPayload()
+    [Theory(Timeout = 360000)]
+    [InlineData(DatabaseProvider.SQLite)]
+    [InlineData(DatabaseProvider.SqlServer)]
+    [InlineData(DatabaseProvider.PostgreSql)]
+    [InlineData(DatabaseProvider.MySql)]
+    public async Task Write_WithExistingEntryContainingDifferentPayload_KeepsFirstPayload(DatabaseProvider provider)
     {
         // Arrange
+        await SetupAsync(provider);
         SerializedEvent persistedEvent = CreateSerializedEvent();
         await _sut.Write(persistedEvent, TestContext.Current.CancellationToken);
         SerializedEvent conflictingEvent = CreateSerializedEvent(
@@ -109,7 +126,7 @@ public sealed class InboxWriterTests : IAsyncLifetime
             persistedEvent.PublishId,
             "different payload");
         await using var retryDbContext = new TestDbContext(_dbContextOptions);
-        InboxWriter retryWriter = PersistenceTestOperations.CreateInboxWriter(_inboxActivity, retryDbContext, _persistenceOwner);
+        InboxWriter retryWriter = new InboxWriter(_inboxActivity, retryDbContext, _persistenceOwner);
 
         // Act
         await retryWriter.Write(conflictingEvent, TestContext.Current.CancellationToken);
@@ -121,17 +138,22 @@ public sealed class InboxWriterTests : IAsyncLifetime
         Assert.Equal(2, _inboxActivityNotificationCount);
     }
 
-    [Fact]
-    public async Task Write_WithClearedExistingPayload_PreservesDeduplication()
+    [Theory(Timeout = 360000)]
+    [InlineData(DatabaseProvider.SQLite)]
+    [InlineData(DatabaseProvider.SqlServer)]
+    [InlineData(DatabaseProvider.PostgreSql)]
+    [InlineData(DatabaseProvider.MySql)]
+    public async Task Write_WithClearedExistingPayload_PreservesDeduplication(DatabaseProvider provider)
     {
         // Arrange
+        await SetupAsync(provider);
         SerializedEvent serializedEvent = CreateSerializedEvent();
         await _sut.Write(serializedEvent, TestContext.Current.CancellationToken);
         await _dbContext.Set<InboxEntry>().ExecuteUpdateAsync(setters => setters
             .SetProperty(entry => entry.State, EntryState.Processed)
             .SetProperty(entry => entry.Payload, "{}"), TestContext.Current.CancellationToken);
         await using var retryDbContext = new TestDbContext(_dbContextOptions);
-        InboxWriter retryWriter = PersistenceTestOperations.CreateInboxWriter(_inboxActivity, retryDbContext, _persistenceOwner);
+        InboxWriter retryWriter = new InboxWriter(_inboxActivity, retryDbContext, _persistenceOwner);
 
         // Act
         await retryWriter.Write(serializedEvent, TestContext.Current.CancellationToken);
@@ -144,14 +166,19 @@ public sealed class InboxWriterTests : IAsyncLifetime
         Assert.Empty(retryDbContext.ChangeTracker.Entries());
     }
 
-    [Fact]
-    public async Task Write_WhenUpdateFailsWithoutExistingEntry_RethrowsPersistenceFailure()
+    [Theory(Timeout = 360000)]
+    [InlineData(DatabaseProvider.SQLite)]
+    [InlineData(DatabaseProvider.SqlServer)]
+    [InlineData(DatabaseProvider.PostgreSql)]
+    [InlineData(DatabaseProvider.MySql)]
+    public async Task Write_WhenUpdateFailsWithoutExistingEntry_RethrowsPersistenceFailure(DatabaseProvider provider)
     {
         // Arrange
+        await SetupAsync(provider);
         var persistenceFailure = new DbUpdateException("persistence failure");
         await using FailingDbContext dbContext = CreateFailingDbContext();
         dbContext.SaveFailure = persistenceFailure;
-        InboxWriter sut = PersistenceTestOperations.CreateInboxWriter(_inboxActivity, dbContext, _persistenceOwner);
+        InboxWriter sut = new InboxWriter(_inboxActivity, dbContext, _persistenceOwner);
 
         // Act
         Task act() => sut.Write(CreateSerializedEvent(), TestContext.Current.CancellationToken);
@@ -163,14 +190,19 @@ public sealed class InboxWriterTests : IAsyncLifetime
         Assert.Equal(0, _inboxActivityNotificationCount);
     }
 
-    [Fact]
-    public async Task Write_WhenPersistenceFailsWithUnexpectedException_DoesNotNotifyActivity()
+    [Theory(Timeout = 360000)]
+    [InlineData(DatabaseProvider.SQLite)]
+    [InlineData(DatabaseProvider.SqlServer)]
+    [InlineData(DatabaseProvider.PostgreSql)]
+    [InlineData(DatabaseProvider.MySql)]
+    public async Task Write_WhenPersistenceFailsWithUnexpectedException_DoesNotNotifyActivity(DatabaseProvider provider)
     {
         // Arrange
+        await SetupAsync(provider);
         var persistenceFailure = new InvalidOperationException("persistence failure");
         await using FailingDbContext dbContext = CreateFailingDbContext();
         dbContext.SaveFailure = persistenceFailure;
-        InboxWriter sut = PersistenceTestOperations.CreateInboxWriter(_inboxActivity, dbContext, _persistenceOwner);
+        InboxWriter sut = new InboxWriter(_inboxActivity, dbContext, _persistenceOwner);
 
         // Act
         Task act() => sut.Write(CreateSerializedEvent(), TestContext.Current.CancellationToken);
@@ -181,22 +213,25 @@ public sealed class InboxWriterTests : IAsyncLifetime
         Assert.Equal(0, _inboxActivityNotificationCount);
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task Write_WhenUpdateFailsWithPartiallyMatchingEntry_RethrowsPersistenceFailure(bool sameOwner)
+    [Theory(Timeout = 360000)]
+    [InlineData(DatabaseProvider.SQLite)]
+    [InlineData(DatabaseProvider.SqlServer)]
+    [InlineData(DatabaseProvider.PostgreSql)]
+    [InlineData(DatabaseProvider.MySql)]
+    public async Task Write_WhenUpdateFailsWithSameOwnerOnlyEntry_RethrowsPersistenceFailure(DatabaseProvider provider)
     {
         // Arrange
+        await SetupAsync(provider);
         SerializedEvent serializedEvent = CreateSerializedEvent();
         await using FailingDbContext dbContext = CreateFailingDbContext();
-        InboxEntry decoy = CreateDecoyEntry(serializedEvent, sameOwner);
+        InboxEntry decoy = CreateDecoyEntry(serializedEvent, sameOwner: true);
         dbContext.Set<InboxEntry>().Add(decoy);
         await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
         dbContext.ChangeTracker.Clear();
 
         var persistenceFailure = new DbUpdateException("persistence failure");
         dbContext.SaveFailure = persistenceFailure;
-        InboxWriter sut = PersistenceTestOperations.CreateInboxWriter(_inboxActivity, dbContext, _persistenceOwner);
+        InboxWriter sut = new InboxWriter(_inboxActivity, dbContext, _persistenceOwner);
 
         // Act
         Task Act() => sut.Write(serializedEvent, TestContext.Current.CancellationToken);
@@ -211,22 +246,60 @@ public sealed class InboxWriterTests : IAsyncLifetime
         Assert.Equal(decoy.EntryId, persistedEntry.EntryId);
         Assert.Equal(decoy.Payload, persistedEntry.Payload);
         Assert.Equal(0, _inboxActivityNotificationCount);
-    }
+        }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task Write_WithMatchingEntryAndPartiallyMatchingDecoy_TreatsReceiptAsSuccessful(bool sameOwner)
+    [Theory(Timeout = 360000)]
+    [InlineData(DatabaseProvider.SQLite)]
+    [InlineData(DatabaseProvider.SqlServer)]
+    [InlineData(DatabaseProvider.PostgreSql)]
+    [InlineData(DatabaseProvider.MySql)]
+    public async Task Write_WhenUpdateFailsWithSameEntryIdOnlyEntry_RethrowsPersistenceFailure(DatabaseProvider provider)
     {
         // Arrange
+        await SetupAsync(provider);
+        SerializedEvent serializedEvent = CreateSerializedEvent();
+        await using FailingDbContext dbContext = CreateFailingDbContext();
+        InboxEntry decoy = CreateDecoyEntry(serializedEvent, sameOwner: false);
+        dbContext.Set<InboxEntry>().Add(decoy);
+        await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+        dbContext.ChangeTracker.Clear();
+
+        var persistenceFailure = new DbUpdateException("persistence failure");
+        dbContext.SaveFailure = persistenceFailure;
+        InboxWriter sut = new InboxWriter(_inboxActivity, dbContext, _persistenceOwner);
+
+        // Act
+        Task Act() => sut.Write(serializedEvent, TestContext.Current.CancellationToken);
+
+        // Assert
+        DbUpdateException exception = await Assert.ThrowsAsync<DbUpdateException>(Act);
+        Assert.Same(persistenceFailure, exception);
+        Assert.Empty(dbContext.ChangeTracker.Entries());
+        InboxEntry persistedEntry = await _dbContext.Set<InboxEntry>().AsNoTracking()
+            .SingleAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(decoy.OwnerId, persistedEntry.OwnerId);
+        Assert.Equal(decoy.EntryId, persistedEntry.EntryId);
+        Assert.Equal(decoy.Payload, persistedEntry.Payload);
+        Assert.Equal(0, _inboxActivityNotificationCount);
+        }
+
+    [Theory(Timeout = 360000)]
+    [InlineData(DatabaseProvider.SQLite)]
+    [InlineData(DatabaseProvider.SqlServer)]
+    [InlineData(DatabaseProvider.PostgreSql)]
+    [InlineData(DatabaseProvider.MySql)]
+    public async Task Write_WithMatchingEntryAndSameOwnerOnlyDecoy_TreatsReceiptAsSuccessful(DatabaseProvider provider)
+    {
+        // Arrange
+        await SetupAsync(provider);
         SerializedEvent serializedEvent = CreateSerializedEvent();
         await _sut.Write(serializedEvent, TestContext.Current.CancellationToken);
         await using var retryDbContext = new TestDbContext(_dbContextOptions);
-        InboxEntry decoy = CreateDecoyEntry(serializedEvent, sameOwner);
+        InboxEntry decoy = CreateDecoyEntry(serializedEvent, sameOwner: true);
         retryDbContext.Set<InboxEntry>().Add(decoy);
         await retryDbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
         retryDbContext.ChangeTracker.Clear();
-        InboxWriter retryWriter = PersistenceTestOperations.CreateInboxWriter(_inboxActivity, retryDbContext, _persistenceOwner);
+        InboxWriter retryWriter = new InboxWriter(_inboxActivity, retryDbContext, _persistenceOwner);
 
         // Act
         await retryWriter.Write(serializedEvent, TestContext.Current.CancellationToken);
@@ -243,12 +316,46 @@ public sealed class InboxWriterTests : IAsyncLifetime
                 TestContext.Current.CancellationToken);
         Assert.Equal(decoy.Payload, persistedDecoy.Payload);
         Assert.Equal(2, _inboxActivityNotificationCount);
-    }
+        }
+
+    [Theory(Timeout = 360000)]
+    [InlineData(DatabaseProvider.SQLite)]
+    [InlineData(DatabaseProvider.SqlServer)]
+    [InlineData(DatabaseProvider.PostgreSql)]
+    [InlineData(DatabaseProvider.MySql)]
+    public async Task Write_WithMatchingEntryAndSameEntryIdOnlyDecoy_TreatsReceiptAsSuccessful(DatabaseProvider provider)
+    {
+        // Arrange
+        await SetupAsync(provider);
+        SerializedEvent serializedEvent = CreateSerializedEvent();
+        await _sut.Write(serializedEvent, TestContext.Current.CancellationToken);
+        await using var retryDbContext = new TestDbContext(_dbContextOptions);
+        InboxEntry decoy = CreateDecoyEntry(serializedEvent, sameOwner: false);
+        retryDbContext.Set<InboxEntry>().Add(decoy);
+        await retryDbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+        retryDbContext.ChangeTracker.Clear();
+        InboxWriter retryWriter = new InboxWriter(_inboxActivity, retryDbContext, _persistenceOwner);
+
+        // Act
+        await retryWriter.Write(serializedEvent, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(2, await CountPersistedEntries());
+        Assert.Empty(retryDbContext.ChangeTracker.Entries());
+        InboxEntry persistedEntry = await _dbContext.Set<InboxEntry>().AsNoTracking()
+            .SingleAsync(entry => entry.OwnerId == _persistenceOwner.Identifier && entry.EntryId == serializedEvent.Id,
+                TestContext.Current.CancellationToken);
+        Assert.Equal(serializedEvent.Payload, persistedEntry.Payload);
+        InboxEntry persistedDecoy = await _dbContext.Set<InboxEntry>().AsNoTracking()
+            .SingleAsync(entry => entry.OwnerId == decoy.OwnerId && entry.EntryId == decoy.EntryId,
+                TestContext.Current.CancellationToken);
+        Assert.Equal(decoy.Payload, persistedDecoy.Payload);
+        Assert.Equal(2, _inboxActivityNotificationCount);
+        }
 
     private FailingDbContext CreateFailingDbContext()
     {
-        DbContextOptions<FailingDbContext> options = new DbContextOptionsBuilder<FailingDbContext>()
-            .UseSqlite(_connection)
+        DbContextOptions<FailingDbContext> options = Options<FailingDbContext>()
             .Options;
         return new FailingDbContext(options);
     }
@@ -292,10 +399,16 @@ public sealed class InboxWriterTests : IAsyncLifetime
             payload);
     }
 
-    public async ValueTask DisposeAsync()
+    public override async ValueTask DisposeAsync()
     {
-        await _dbContext.DisposeAsync();
-        await _connection.DisposeAsync();
+        try
+        {
+            if (_dbContext is not null) await _dbContext.DisposeAsync();
+        }
+        finally
+        {
+            await base.DisposeAsync();
+        }
     }
 
     private sealed class TestDbContext(DbContextOptions<TestDbContext> options) : TychoDbContext(options);

@@ -38,6 +38,9 @@
       <_Parameter1>Tycho.Persistence.EFCore.UnitTests, PublicKey=$(TychoPublicKey)</_Parameter1>
     </AssemblyAttribute>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Tycho.Persistence.EFCore.IntegrationTests, PublicKey=$(TychoPublicKey)</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>Tycho.Persistence.EFCore.UseCaseTests, PublicKey=$(TychoPublicKey)</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>

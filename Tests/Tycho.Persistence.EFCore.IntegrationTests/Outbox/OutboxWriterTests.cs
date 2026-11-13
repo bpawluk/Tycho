@@ -1,8 +1,7 @@
 using System.Transactions;
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using Tycho.Events.Model;
 using Tycho.Events.Outbox;
@@ -11,15 +10,15 @@ using Tycho.Identity.Events;
 using Tycho.Identity.Structure;
 using Tycho.Persistence.EFCore.Identity;
 using Tycho.Persistence.EFCore.Outbox;
+using Tycho.Persistence.EFCore.TestUtils.Databases;
 using Tycho.Persistence.EFCore.TestUtils.Events;
 using Tycho.Persistence.EFCore.TestUtils.Other;
 using Tycho.Structure;
 
-namespace Tycho.Persistence.EFCore.UnitTests.Outbox;
+namespace Tycho.Persistence.EFCore.IntegrationTests.Outbox;
 
-public sealed class OutboxWriterTests : IAsyncLifetime
+public sealed class OutboxWriterTests(DatabaseServers servers) : DatabaseTest(servers)
 {
-    private SqliteConnection _connection = default!;
     private TestDbContext _dbContext = default!;
     private Mock<IEventSerializer> _eventSerializer = default!;
     private OutboxActivity _outboxActivity = default!;
@@ -27,15 +26,13 @@ public sealed class OutboxWriterTests : IAsyncLifetime
     private PersistenceOwner _persistenceOwner = default!;
     private int _notificationCount;
 
-    public async ValueTask InitializeAsync()
+    private async Task SetupAsync(DatabaseProvider provider)
     {
-        _connection = new SqliteConnection("Data Source=:memory:");
-        await _connection.OpenAsync(TestContext.Current.CancellationToken);
+        await InitializeDatabaseAsync(provider);
 
         _outboxActivity = new OutboxActivity();
         _outboxActivity.NewEntriesAdded += (_, _) => _notificationCount++;
-        DbContextOptions<TestDbContext> options = new DbContextOptionsBuilder<TestDbContext>()
-            .UseSqlite(_connection)
+        DbContextOptions<TestDbContext> options = Options<TestDbContext>()
             .Options;
         _dbContext = new TestDbContext(options);
         await _dbContext.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
@@ -52,13 +49,18 @@ public sealed class OutboxWriterTests : IAsyncLifetime
 
         using Internals internals = PersistenceTestInternals.Create(typeof(PersistenceOwner));
         _persistenceOwner = new PersistenceOwner(internals);
-        _sut = PersistenceTestOperations.CreateOutboxWriter(_eventSerializer.Object, _outboxActivity, _dbContext, _persistenceOwner);
+        _sut = new OutboxWriter(_eventSerializer.Object, _outboxActivity, _dbContext, _persistenceOwner);
     }
 
-    [Fact]
-    public async Task Write_WithoutTransaction_SavesEntriesAndNotifies()
+    [Theory(Timeout = 360000)]
+    [InlineData(DatabaseProvider.SQLite)]
+    [InlineData(DatabaseProvider.SqlServer)]
+    [InlineData(DatabaseProvider.PostgreSql)]
+    [InlineData(DatabaseProvider.MySql)]
+    public async Task Write_WithoutTransaction_SavesEntriesAndNotifies(DatabaseProvider provider)
     {
         // Arrange
+        await SetupAsync(provider);
         RoutedEvent[] events =
         [
             CreateRoutedEvent("module:first"),
@@ -92,12 +94,15 @@ public sealed class OutboxWriterTests : IAsyncLifetime
         }
     }
 
-    [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task Write_WithinExplicitTransaction_DefersSavingAndNotifiesOnceAfterCommit(bool commitAsync)
+    [Theory(Timeout = 360000)]
+    [InlineData(DatabaseProvider.SQLite)]
+    [InlineData(DatabaseProvider.SqlServer)]
+    [InlineData(DatabaseProvider.PostgreSql)]
+    [InlineData(DatabaseProvider.MySql)]
+    public async Task Write_WithinExplicitTransactionWithAsyncCommit_DefersSavingAndNotifiesOnceAfterCommit(DatabaseProvider provider)
     {
         // Arrange
+        await SetupAsync(provider);
         await using IDbContextTransaction transaction =
             await _dbContext.Database.BeginTransactionAsync(TestContext.Current.CancellationToken);
 
@@ -113,23 +118,51 @@ public sealed class OutboxWriterTests : IAsyncLifetime
         await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
         Assert.Equal(0, _notificationCount);
 
-        if (commitAsync)
-        {
-            await transaction.CommitAsync(TestContext.Current.CancellationToken);
-        }
-        else
-        {
-            transaction.Commit();
-        }
+        await transaction.CommitAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(1, _notificationCount);
         Assert.Equal(2, await CountPersistedEntries());
-    }
+        }
 
-    [Fact]
-    public async Task Write_WithinExplicitTransaction_DoesNotNotifyOrPersistAfterRollback()
+    [Theory(Timeout = 360000)]
+    [InlineData(DatabaseProvider.SQLite)]
+    [InlineData(DatabaseProvider.SqlServer)]
+    [InlineData(DatabaseProvider.PostgreSql)]
+    [InlineData(DatabaseProvider.MySql)]
+    public async Task Write_WithinExplicitTransactionWithSyncCommit_DefersSavingAndNotifiesOnceAfterCommit(DatabaseProvider provider)
     {
         // Arrange
+        await SetupAsync(provider);
+        await using IDbContextTransaction transaction =
+            await _dbContext.Database.BeginTransactionAsync(TestContext.Current.CancellationToken);
+
+        // Act
+        await _sut.Write([CreateRoutedEvent()], TestContext.Current.CancellationToken);
+        await _sut.Write([CreateRoutedEvent()], TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(2, _dbContext.ChangeTracker.Entries<OutboxEntry>()
+            .Count(entry => entry.State == EntityState.Added));
+        Assert.Equal(0, _notificationCount);
+
+        await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(0, _notificationCount);
+
+        transaction.Commit();
+
+        Assert.Equal(1, _notificationCount);
+        Assert.Equal(2, await CountPersistedEntries());
+        }
+
+    [Theory(Timeout = 360000)]
+    [InlineData(DatabaseProvider.SQLite)]
+    [InlineData(DatabaseProvider.SqlServer)]
+    [InlineData(DatabaseProvider.PostgreSql)]
+    [InlineData(DatabaseProvider.MySql)]
+    public async Task Write_WithinExplicitTransaction_DoesNotNotifyOrPersistAfterRollback(DatabaseProvider provider)
+    {
+        // Arrange
+        await SetupAsync(provider);
         await using IDbContextTransaction transaction =
             await _dbContext.Database.BeginTransactionAsync(TestContext.Current.CancellationToken);
 
@@ -144,11 +177,16 @@ public sealed class OutboxWriterTests : IAsyncLifetime
         Assert.Equal(0, await CountPersistedEntries());
     }
 
-    [Fact]
-    public async Task Write_WithinTychoTransaction_NotifiesAfterCommit()
+    [Theory(Timeout = 360000)]
+    [InlineData(DatabaseProvider.SQLite)]
+    [InlineData(DatabaseProvider.SqlServer)]
+    [InlineData(DatabaseProvider.PostgreSql)]
+    [InlineData(DatabaseProvider.MySql)]
+    public async Task Write_WithinTychoTransaction_NotifiesAfterCommit(DatabaseProvider provider)
     {
         // Arrange
-        EFCore.Transactions.Transaction transaction = PersistenceTestOperations.CreateTransaction(_dbContext);
+        await SetupAsync(provider);
+        EFCore.Transactions.Transaction transaction = new EFCore.Transactions.Transaction(_dbContext);
 
         // Act
         await transaction.ExecuteAsync(async cancellationToken =>
@@ -162,9 +200,16 @@ public sealed class OutboxWriterTests : IAsyncLifetime
         Assert.Equal(1, await CountPersistedEntries());
     }
 
-    [Fact]
-    public async Task Write_WithinAmbientTransaction_DefersSavingAndNotification()
+    [Theory(Timeout = 360000)]
+    [InlineData(DatabaseProvider.SQLite)]
+    [InlineData(DatabaseProvider.SqlServer)]
+    [InlineData(DatabaseProvider.PostgreSql)]
+    [InlineData(DatabaseProvider.MySql)]
+    public async Task Write_WithinAmbientTransaction_DefersSavingAndNotification(DatabaseProvider provider)
     {
+        // Arrange
+        await SetupAsync(provider);
+
         // Act
         using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
@@ -180,10 +225,15 @@ public sealed class OutboxWriterTests : IAsyncLifetime
         Assert.Equal(0, _notificationCount);
     }
 
-    [Fact]
-    public async Task Write_WhenSerializationFails_DoesNotTrackPartialEntriesOrNotify()
+    [Theory(Timeout = 360000)]
+    [InlineData(DatabaseProvider.SQLite)]
+    [InlineData(DatabaseProvider.SqlServer)]
+    [InlineData(DatabaseProvider.PostgreSql)]
+    [InlineData(DatabaseProvider.MySql)]
+    public async Task Write_WhenSerializationFails_DoesNotTrackPartialEntriesOrNotify(DatabaseProvider provider)
     {
         // Arrange
+        await SetupAsync(provider);
         int serializationCount = 0;
         _eventSerializer.Setup(serializer => serializer.Serialize(It.IsAny<RoutedEvent>()))
             .Returns((RoutedEvent routedEvent) =>
@@ -224,10 +274,16 @@ public sealed class OutboxWriterTests : IAsyncLifetime
         InstanceIdentity.Parse(destination),
         new TestEvent());
 
-    public async ValueTask DisposeAsync()
+    public override async ValueTask DisposeAsync()
     {
-        await _dbContext.DisposeAsync();
-        await _connection.DisposeAsync();
+        try
+        {
+            if (_dbContext is not null) await _dbContext.DisposeAsync();
+        }
+        finally
+        {
+            await base.DisposeAsync();
+        }
     }
 
     private sealed class TestDbContext(DbContextOptions<TestDbContext> options) : TychoDbContext(options);
