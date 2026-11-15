@@ -1,45 +1,47 @@
+using System.Security.Cryptography;
+using System.Text;
+using DotNet.Testcontainers.Containers;
 using Testcontainers.MsSql;
 using Testcontainers.MySql;
 using Testcontainers.PostgreSql;
 
 namespace Tycho.Persistence.EFCore.TestUtils.Databases;
 
-public sealed class DatabaseServers : IAsyncLifetime
+public sealed class DatabaseServers : IDisposable
 {
     internal const string SqlServerImage = "mcr.microsoft.com/mssql/server:2022-latest@sha256:4402d880dd4c34bfa7d8705e56a86cd6c88da80a1f6bbbe741f999e76264a090";
     internal const string PostgreSqlImage = "postgres:17-bookworm@sha256:3645570cccdfa447589da9f57dd740faa29b30938e861289a5574b6ca6b03826";
     internal const string MySqlImage = "mysql:8.4@sha256:6ea90827b1100f8f2ae306a539f86d2c264a26ed435a2a9f75551dd5c3aeb242";
 
+    private const string ReuseLabel = "tycho.tests.database";
+    private const string Password = "tycho.tests.password.01";
+    private const string Version = "v1";
+
     private static readonly TimeSpan s_startupTimeout = TimeSpan.FromMinutes(5);
     private readonly SemaphoreSlim _startupLock = new(1);
-
-    private MsSqlContainer? _sqlServer;
-    private string? _sqlServerConnectionString;
-
-    private PostgreSqlContainer? _postgreSql;
-    private string? _postgreSqlConnectionString;
-
-    private MySqlContainer? _mySql;
-    private string? _mySqlConnectionString;
-
-    // The servers are started lazily in GetConnectionStringAsync to prevent starting containers that are not needed in a given test run.
-    public ValueTask InitializeAsync() => ValueTask.CompletedTask;
+    private readonly Dictionary<DatabaseProvider, IDatabaseContainer> _containers = [];
 
     internal async Task<string> GetConnectionStringAsync(DatabaseProvider provider, CancellationToken cancellationToken)
     {
-        await _startupLock.WaitAsync(cancellationToken);
+        using var startup = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        startup.CancelAfter(s_startupTimeout);
+
+        await _startupLock.WaitAsync(startup.Token);
         try
         {
-            using var startup = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            startup.CancelAfter(s_startupTimeout);
-
-            return provider switch
+            if (_containers.TryGetValue(provider, out IDatabaseContainer? existing))
             {
-                DatabaseProvider.SqlServer => await GetSqlServerConnectionStringAsync(startup.Token),
-                DatabaseProvider.PostgreSql => await GetPostgreSqlConnectionStringAsync(startup.Token),
-                DatabaseProvider.MySql => await GetMySqlConnectionStringAsync(startup.Token),
-                _ => throw new ArgumentOutOfRangeException(nameof(provider))
-            };
+                return existing.GetConnectionString();
+            }
+
+            string name = GetContainerName(provider);
+            using FileStream sharedStartupLock = await ContainerStartupLock.AcquireAsync(name, startup.Token);
+
+            IDatabaseContainer container = BuildContainer(provider, name);
+            await container.StartAsync(startup.Token);
+            _containers.Add(provider, container);
+
+            return container.GetConnectionString();
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
@@ -53,75 +55,46 @@ public sealed class DatabaseServers : IAsyncLifetime
         }
     }
 
-    private async Task<string> GetSqlServerConnectionStringAsync(CancellationToken cancellationToken)
+    private static string GetContainerName(DatabaseProvider provider)
     {
-        if (_sqlServerConnectionString is not null)
+        string image = provider switch
         {
-            return _sqlServerConnectionString;
-        }
-
-        _sqlServer ??= new MsSqlBuilder(SqlServerImage).Build();
-        await _sqlServer.StartAsync(cancellationToken);
-
-        _sqlServerConnectionString = _sqlServer.GetConnectionString();
-        return _sqlServerConnectionString;
+            DatabaseProvider.SqlServer => SqlServerImage,
+            DatabaseProvider.PostgreSql => PostgreSqlImage,
+            DatabaseProvider.MySql => MySqlImage,
+            _ => throw new ArgumentOutOfRangeException(nameof(provider))
+        };
+        string imageHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(image)))[..12].ToLowerInvariant();
+        return $"tycho-tests-{provider.ToString().ToLowerInvariant()}-{Version}-{imageHash}";
     }
 
-    private async Task<string> GetPostgreSqlConnectionStringAsync(CancellationToken cancellationToken)
+    private static IDatabaseContainer BuildContainer(DatabaseProvider provider, string name) => provider switch
     {
-        if (_postgreSqlConnectionString is not null)
-        {
-            return _postgreSqlConnectionString;
-        }
+        DatabaseProvider.SqlServer => new MsSqlBuilder(SqlServerImage)
+            .WithDatabase("master")
+            .WithPassword(Password)
+            .WithName(name)
+            .WithLabel(ReuseLabel, provider.ToString())
+            .WithReuse(true)
+            .Build(),
+        DatabaseProvider.PostgreSql => new PostgreSqlBuilder(PostgreSqlImage)
+            .WithDatabase("postgres")
+            .WithUsername("postgres")
+            .WithPassword(Password)
+            .WithName(name)
+            .WithLabel(ReuseLabel, provider.ToString())
+            .WithReuse(true)
+            .Build(),
+        DatabaseProvider.MySql => new MySqlBuilder(MySqlImage)
+            .WithDatabase("tycho")
+            .WithUsername("root")
+            .WithPassword(Password)
+            .WithName(name)
+            .WithLabel(ReuseLabel, provider.ToString())
+            .WithReuse(true)
+            .Build(),
+        _ => throw new ArgumentOutOfRangeException(nameof(provider))
+    };
 
-        _postgreSql ??= new PostgreSqlBuilder(PostgreSqlImage).Build();
-        await _postgreSql.StartAsync(cancellationToken);
-
-        _postgreSqlConnectionString = _postgreSql.GetConnectionString();
-        return _postgreSqlConnectionString;
-    }
-
-    private async Task<string> GetMySqlConnectionStringAsync(CancellationToken cancellationToken)
-    {
-        if (_mySqlConnectionString is not null)
-        {
-            return _mySqlConnectionString;
-        }
-
-        _mySql ??= new MySqlBuilder(MySqlImage).WithUsername("root").Build();
-        await _mySql.StartAsync(cancellationToken);
-
-        _mySqlConnectionString = _mySql.GetConnectionString();
-        return _mySqlConnectionString;
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        var failures = new List<Exception>();
-        IAsyncDisposable?[] containers = [_sqlServer, _postgreSql, _mySql];
-
-        foreach (IAsyncDisposable? container in containers)
-        {
-            if (container is null)
-            {
-                continue;
-            }
-
-            try
-            {
-                await container.DisposeAsync();
-            }
-            catch (Exception exception)
-            {
-                failures.Add(exception);
-            }
-        }
-
-        _startupLock.Dispose();
-
-        if (failures.Count > 0)
-        {
-            throw new AggregateException("Database server cleanup failed.", failures);
-        }
-    }
+    public void Dispose() => _startupLock.Dispose();
 }
