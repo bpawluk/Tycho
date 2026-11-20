@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Requests;
@@ -20,7 +21,7 @@ namespace Tycho.Structure.Parent
         [ReferencedBySourceGenerator]
         public ParentBase(IParentReference parentReference)
         {
-            _parentReference = parentReference;
+            _parentReference = parentReference ?? throw new ArgumentNullException(nameof(parentReference));
         }
 
         /// <summary>

@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Utils;
@@ -19,7 +20,7 @@ namespace Tycho.Events.Publishing
         [ReferencedBySourceGenerator]
         public PublisherBase(IEventPublisher genericPublisher)
         {
-            _genericPublisher = genericPublisher;
+            _genericPublisher = genericPublisher ?? throw new ArgumentNullException(nameof(genericPublisher));
         }
 
         /// <summary>
