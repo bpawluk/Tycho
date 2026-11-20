@@ -4,7 +4,7 @@
     "test-projects": [
       "../Tests/Tycho.UnitTests/Tycho.UnitTests.csproj",
       "../Tests/Tycho.IntegrationTests/Tycho.IntegrationTests.csproj",
-      "../Tests/Tycho.Persistence.EFCore.UseCaseTests/Tycho.Persistence.EFCore.UseCaseTests.csproj",
+      "../Tests/Tycho.Persistence.EFCore.UseCaseTests/Tycho.Persistence.EFCore.UseCaseTests.csproj"
     ],
     "test-runner": "mtp",
     "mutation-level": "Standard",
