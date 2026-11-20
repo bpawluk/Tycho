@@ -16,7 +16,7 @@ namespace Tycho.Events.Serialization
         {
             if (eventData != null)
             {
-                return JsonSerializer.Serialize(eventData, eventData.GetType(), _settings.JsonOptions);
+                return JsonSerializer.Serialize(eventData, _settings.JsonOptions);
             }
             throw new ArgumentNullException(nameof(eventData), "Cannot serialize null event data");
         }

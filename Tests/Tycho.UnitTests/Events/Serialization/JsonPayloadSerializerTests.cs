@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Tycho.Events;
 using Tycho.Events.Serialization;
 using Tycho.TestUtils.Events;
@@ -110,6 +111,33 @@ public class JsonPayloadSerializerTests
         // Assert
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(Act);
         Assert.Contains(nameof(TestEvent), exception.Message);
+    }
+
+    [Fact]
+    public void RoundTrip_WithDeclaredPolymorphicContract_PreservesDerivedPayload()
+    {
+        // Arrange
+        BasePayload original = new DerivedPayload { Name = "event", Detail = "derived detail" };
+
+        // Act
+        string json = _sut.Serialize(original);
+        BasePayload restored = _sut.Deserialize<BasePayload>(json);
+
+        // Assert
+        DerivedPayload derived = Assert.IsType<DerivedPayload>(restored);
+        Assert.Equal("event", derived.Name);
+        Assert.Equal("derived detail", derived.Detail);
+    }
+
+    [JsonDerivedType(typeof(DerivedPayload), "derived")]
+    public class BasePayload : IEvent
+    {
+        public string Name { get; set; } = "name";
+    }
+
+    public sealed class DerivedPayload : BasePayload
+    {
+        public string Detail { get; set; } = "detail";
     }
 
     private static string GetSerializedPayload(object toSerialize)
