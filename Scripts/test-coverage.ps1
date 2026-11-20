@@ -12,14 +12,12 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$env:DOTNET_CLI_UI_LANGUAGE = "en-US"
-
 $scriptDirectory = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
 $repoRoot = Split-Path -Path $scriptDirectory -Parent
 
 Push-Location $repoRoot
-$previousGlobalizationInvariant = $env:DOTNET_SYSTEM_GLOBALIZATION_INVARIANT
 try {
+  $env:DOTNET_CLI_UI_LANGUAGE = "en-US"
   $env:DOTNET_SYSTEM_GLOBALIZATION_INVARIANT = "0" # Required for SQL Server tests to run correctly
 
   $solutionPath = Join-Path $repoRoot $Solution
@@ -79,6 +77,7 @@ try {
   Write-Host "Coverage report generated successfully: $reportPath"
 }
 finally {
-  $env:DOTNET_SYSTEM_GLOBALIZATION_INVARIANT = $previousGlobalizationInvariant
+  $env:DOTNET_CLI_UI_LANGUAGE = $null
+  $env:DOTNET_SYSTEM_GLOBALIZATION_INVARIANT = $null
   Pop-Location
 }

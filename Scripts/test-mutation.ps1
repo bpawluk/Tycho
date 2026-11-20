@@ -46,10 +46,11 @@ if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
   throw "Tool manifest not found: $manifestPath"
 }
 
-$previousLanguage = $env:DOTNET_CLI_UI_LANGUAGE
-$env:DOTNET_CLI_UI_LANGUAGE = "en-US"
 Push-Location $repoRoot
 try {
+  $env:DOTNET_CLI_UI_LANGUAGE = "en-US"
+  $env:DOTNET_SYSTEM_GLOBALIZATION_INVARIANT = "0" # Required for SQL Server tests to run correctly
+
   Write-Host "Restoring local .NET tools from $manifestPath"
   dotnet tool restore --tool-manifest $manifestPath
   if ($LASTEXITCODE -ne 0) {
@@ -104,6 +105,7 @@ try {
   }
 }
 finally {
+  $env:DOTNET_CLI_UI_LANGUAGE = $null
+  $env:DOTNET_SYSTEM_GLOBALIZATION_INVARIANT = $null
   Pop-Location
-  $env:DOTNET_CLI_UI_LANGUAGE = $previousLanguage
 }
