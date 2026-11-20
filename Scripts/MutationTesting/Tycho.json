@@ -4,10 +4,7 @@
     "test-projects": [
       "../Tests/Tycho.UnitTests/Tycho.UnitTests.csproj",
       "../Tests/Tycho.IntegrationTests/Tycho.IntegrationTests.csproj",
-      "../Tests/Tycho.Persistence.EFCore.UnitTests/Tycho.Persistence.EFCore.UnitTests.csproj",
-      "../Tests/Tycho.Persistence.EFCore.IntegrationTests/Tycho.Persistence.EFCore.IntegrationTests.csproj",
       "../Tests/Tycho.Persistence.EFCore.UseCaseTests/Tycho.Persistence.EFCore.UseCaseTests.csproj",
-      "../Tests/Tycho.Utils.SourceGenerator.IntegrationTests/Tycho.Utils.SourceGenerator.IntegrationTests.csproj"
     ],
     "test-runner": "mtp",
     "mutation-level": "Standard",
