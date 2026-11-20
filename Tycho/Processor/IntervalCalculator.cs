@@ -12,22 +12,8 @@ namespace Tycho.Processor
 
         public IntervalCalculator(TimeSpan initial, TimeSpan maximal, double multiplier)
         {
-            if (initial <= TimeSpan.Zero)
-            {
-                throw new ArgumentOutOfRangeException(nameof(initial));
-            }
             _initial = initial;
-
-            if (maximal < initial)
-            {
-                throw new ArgumentOutOfRangeException(nameof(maximal));
-            }
             _maximal = maximal;
-
-            if (double.IsNaN(multiplier) || double.IsInfinity(multiplier) || multiplier <= 1)
-            {
-                throw new ArgumentOutOfRangeException(nameof(multiplier));
-            }
             _multiplier = multiplier;
 
             Current = initial;

@@ -80,6 +80,28 @@ public sealed class OutboxSettingsTests
         Assert.Equal("PollingIntervalMultiplier", exception.ParamName);
     }
 
+    [Theory]
+    [InlineData("InitialPollingInterval")]
+    [InlineData("MaxPollingInterval")]
+    [InlineData("MessageProcessingTimeout")]
+    public void Validate_RejectsTimerValuesBeyondSupportedRange(string property)
+    {
+        var settings = new OutboxSettings();
+        TimeSpan excessive = TimeSpan.FromDays(100);
+        if (property == "InitialPollingInterval") settings.InitialPollingInterval = excessive;
+        if (property == "MaxPollingInterval") settings.MaxPollingInterval = excessive;
+        if (property == "MessageProcessingTimeout") settings.MessageProcessingTimeout = excessive;
+        ArgumentOutOfRangeException exception = Assert.Throws<ArgumentOutOfRangeException>(settings.Validate);
+        Assert.Equal(property, exception.ParamName);
+    }
+
+    [Fact]
+    public void Validate_RejectsSubMillisecondPolling()
+    {
+        var settings = new OutboxSettings { InitialPollingInterval = TimeSpan.FromTicks(1) };
+        Assert.Throws<ArgumentOutOfRangeException>(settings.Validate);
+    }
+
     [Fact]
     public void Validate_AcceptsInfiniteTimeout()
     {

@@ -41,15 +41,18 @@ public sealed class EventProcessingSettingsTests
     }
 
     [Theory]
-    [InlineData("Inbox")]
-    [InlineData("Outbox")]
-    [InlineData("Json")]
-    public void Configure_InvalidSettingsDoesNotPartiallyReplaceRegistrations(string invalid)
+    [InlineData("Inbox", "ConcurrencyLimit")]
+    [InlineData("Outbox", "ConcurrencyLimit")]
+    [InlineData("Json", "JsonOptions")]
+    [InlineData("InboxTimeout", "MessageProcessingTimeout")]
+    [InlineData("OutboxTimeout", "MessageProcessingTimeout")]
+    public void Configure_ValidatesAfterCallbackBeforeReplacingRegistrations(string invalid, string expectedParameter)
     {
         // Arrange
         var services = new ServiceCollection();
         services.ConfigureTychoEventProcessing(_ => { });
         ServiceDescriptor[] original = [.. services];
+        bool callbackCompleted = false;
 
         // Act
         Exception? exception = Record.Exception(() => services.ConfigureTychoEventProcessing(options =>
@@ -57,10 +60,15 @@ public sealed class EventProcessingSettingsTests
             if (invalid == "Inbox") options.Inbox.ConcurrencyLimit = 0;
             if (invalid == "Outbox") options.Outbox.ConcurrencyLimit = 0;
             if (invalid == "Json") options.PayloadSerializer.JsonOptions = null!;
+            if (invalid == "InboxTimeout") options.Inbox.MessageProcessingTimeout = TimeSpan.FromDays(100);
+            if (invalid == "OutboxTimeout") options.Outbox.MessageProcessingTimeout = TimeSpan.FromDays(100);
+            callbackCompleted = true;
         }));
 
         // Assert
-        Assert.IsType<ArgumentException>(exception, exactMatch: false);
+        Assert.True(callbackCompleted);
+        ArgumentException validationException = Assert.IsAssignableFrom<ArgumentException>(exception);
+        Assert.Equal(expectedParameter, validationException.ParamName);
         Assert.Equal(original, [.. services]);
     }
 

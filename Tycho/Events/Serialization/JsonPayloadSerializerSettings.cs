@@ -25,7 +25,7 @@ namespace Tycho.Events.Serialization
         {
             return new()
             {
-                JsonOptions = new JsonSerializerOptions(JsonOptions)
+                JsonOptions = JsonOptions is null ? null! : new JsonSerializerOptions(JsonOptions)
             };
         }
     }

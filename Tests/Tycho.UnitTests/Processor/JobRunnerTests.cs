@@ -5,35 +5,6 @@ namespace Tycho.UnitTests.Processor;
 
 public sealed class JobRunnerTests
 {
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    public void Constructor_WhenConcurrencyIsNotPositive_Throws(int maximalConcurrency)
-    {
-        // Act
-        ArgumentOutOfRangeException exception = Assert.Throws<ArgumentOutOfRangeException>(
-            () => new JobRunner(maximalConcurrency, TimeSpan.FromSeconds(1), _ => { }));
-
-        // Assert
-        Assert.Equal("maximalConcurrency", exception.ParamName);
-    }
-
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-2)]
-    public void Constructor_WhenTimeoutIsInvalid_Throws(int timeoutMilliseconds)
-    {
-        // Arrange
-        TimeSpan timeout = TimeSpan.FromMilliseconds(timeoutMilliseconds);
-
-        // Act
-        ArgumentOutOfRangeException exception = Assert.Throws<ArgumentOutOfRangeException>(
-            () => new JobRunner(1, timeout, _ => { }));
-
-        // Assert
-        Assert.Equal("jobTimeout", exception.ParamName);
-    }
-
     [Fact]
     public void Constructor_WhenErrorHandlerIsNull_Throws()
     {
@@ -516,6 +487,44 @@ public sealed class JobRunnerTests
         {
             await CompleteAndStopAsync(runner, job);
         }
+    }
+
+    [Fact(Timeout = 10_000)]
+    public async Task Run_WhenTimerSetupFails_ReportsErrorAndReleasesCapacity()
+    {
+        var errors = new ErrorRecorder();
+        using var runner = new JobRunner(1, TimeSpan.FromDays(100), errors.Record);
+        var job = new ControlledJob();
+
+        // Bypass settings validation deliberately to exercise the worker's cleanup boundary.
+        runner.Run(job);
+        Exception reported = await errors.First.WaitAsync(TestContext.Current.CancellationToken);
+        await runner.WaitForCapacityAsync(TestContext.Current.CancellationToken);
+        await runner.StopAsync(TestContext.Current.CancellationToken);
+
+        Assert.IsType<ArgumentOutOfRangeException>(reported);
+        Assert.False(job.Started.IsCompleted);
+        Assert.Equal(1, errors.Count);
+    }
+
+    [Fact(Timeout = 10_000)]
+    public async Task Constructor_WithMaximumSupportedTimeout_RunsAndReleasesCapacity()
+    {
+        var errors = new ErrorRecorder();
+        using var runner = new JobRunner(1, TimeSpan.FromMilliseconds(int.MaxValue), errors.Record);
+        var job = new ControlledJob();
+        runner.Run(job);
+        try
+        {
+            await job.Started.WaitAsync(TestContext.Current.CancellationToken);
+            job.Complete();
+            await runner.WaitForCapacityAsync(TestContext.Current.CancellationToken);
+        }
+        finally
+        {
+            await CompleteAndStopAsync(runner, job);
+        }
+        Assert.Equal(0, errors.Count);
     }
 
     private static async Task CompleteAndStopAsync(JobRunner runner, params ControlledJob[] jobs)

@@ -13,6 +13,5 @@ namespace Tycho.Processor
         public double IntervalMultiplier { get; set; }
 
         public TimeSpan MaxInterval { get; set; }
-
     }
 }

@@ -36,6 +36,7 @@ public static class ServiceCollectionExtensions
 
         PersistenceSettings snapshot = settings.Copy();
         snapshot.Validate();
+
         services.Replace(ServiceDescriptor.Transient(_ => snapshot.InboxConsumer.Copy()));
         services.Replace(ServiceDescriptor.Transient(_ => snapshot.OutboxConsumer.Copy()));
 
@@ -68,8 +69,8 @@ public static class ServiceCollectionExtensions
 
         PersistenceRetentionSettings snapshot = settings.Copy();
         snapshot.Validate();
-        services.Replace(ServiceDescriptor.Transient(_ => snapshot.Copy()));
 
+        services.Replace(ServiceDescriptor.Transient(_ => snapshot.Copy()));
 
         for (int i = services.Count - 1; i >= 0; i--)
         {

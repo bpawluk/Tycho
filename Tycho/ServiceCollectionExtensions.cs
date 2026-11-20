@@ -31,8 +31,10 @@ namespace Tycho
 
             var settings = new EventProcessingSettings();
             configure(settings);
+
             EventProcessingSettings snapshot = settings.Copy();
             snapshot.Validate();
+
             services.Replace(ServiceDescriptor.Transient(_ => snapshot.Inbox.Copy()));
             services.Replace(ServiceDescriptor.Transient(_ => snapshot.Outbox.Copy()));
             services.Replace(ServiceDescriptor.Transient(_ => snapshot.PayloadSerializer.Copy()));

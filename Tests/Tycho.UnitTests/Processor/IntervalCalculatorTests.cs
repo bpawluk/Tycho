@@ -17,54 +17,6 @@ public sealed class IntervalCalculatorTests
         Assert.Equal(initial, sut.Current);
     }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    public void Constructor_WhenInitialIsNotPositive_ThrowsForInitial(long initialTicks)
-    {
-        // Arrange
-        TimeSpan initial = TimeSpan.FromTicks(initialTicks);
-
-        // Act
-        ArgumentOutOfRangeException exception = Assert.Throws<ArgumentOutOfRangeException>(
-            () => new IntervalCalculator(initial, TimeSpan.FromTicks(100), 2));
-
-        // Assert
-        Assert.Equal("initial", exception.ParamName);
-    }
-
-    [Fact]
-    public void Constructor_WhenMaximumIsBelowInitial_ThrowsForMaximum()
-    {
-        // Arrange
-        TimeSpan initial = TimeSpan.FromTicks(10);
-        TimeSpan maximal = TimeSpan.FromTicks(9);
-
-        // Act
-        ArgumentOutOfRangeException exception = Assert.Throws<ArgumentOutOfRangeException>(
-            () => new IntervalCalculator(initial, maximal, 2));
-
-        // Assert
-        Assert.Equal("maximal", exception.ParamName);
-    }
-
-    [Theory]
-    [InlineData(1.0)]
-    [InlineData(0.0)]
-    [InlineData(-1.0)]
-    [InlineData(double.NaN)]
-    [InlineData(double.PositiveInfinity)]
-    [InlineData(double.NegativeInfinity)]
-    public void Constructor_WhenMultiplierIsInvalid_ThrowsForMultiplier(double multiplier)
-    {
-        // Act
-        ArgumentOutOfRangeException exception = Assert.Throws<ArgumentOutOfRangeException>(
-            () => new IntervalCalculator(TimeSpan.FromTicks(10), TimeSpan.FromTicks(100), multiplier));
-
-        // Assert
-        Assert.Equal("multiplier", exception.ParamName);
-    }
-
     [Fact]
     public void Constructor_WhenMaximumEqualsInitial_AcceptsInterval()
     {

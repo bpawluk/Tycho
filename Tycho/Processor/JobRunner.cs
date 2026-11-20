@@ -21,16 +21,6 @@ namespace Tycho.Processor
 
         public JobRunner(int maximalConcurrency, TimeSpan jobTimeout, Action<Exception> onError)
         {
-            if (maximalConcurrency <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(maximalConcurrency));
-            }
-
-            if (jobTimeout <= TimeSpan.Zero && jobTimeout != Timeout.InfiniteTimeSpan)
-            {
-                throw new ArgumentOutOfRangeException(nameof(jobTimeout));
-            }
-
             _jobTimeout = jobTimeout;
             _onError = onError ?? throw new ArgumentNullException(nameof(onError));
             _capacity = new SemaphoreSlim(maximalConcurrency, maximalConcurrency);
@@ -98,15 +88,15 @@ namespace Tycho.Processor
         private async Task RunJobAsync(IJob job)
         {
             using CancellationTokenSource timeoutCts = new();
-            using CancellationTokenSource jobCts = CancellationTokenSource.CreateLinkedTokenSource(_processingCts.Token, timeoutCts.Token);
-
-            if (_jobTimeout != Timeout.InfiniteTimeSpan)
-            {
-                timeoutCts.CancelAfter(_jobTimeout);
-            }
-
             try
             {
+                using CancellationTokenSource jobCts = CancellationTokenSource.CreateLinkedTokenSource(_processingCts.Token, timeoutCts.Token);
+
+                if (_jobTimeout != Timeout.InfiniteTimeSpan)
+                {
+                    timeoutCts.CancelAfter(_jobTimeout);
+                }
+
                 await job.ExecuteAsync(jobCts.Token).ConfigureAwait(false);
             }
             catch (OperationCanceledException) when (_processingCts.IsCancellationRequested)

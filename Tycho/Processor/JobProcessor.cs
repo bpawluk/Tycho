@@ -22,16 +22,16 @@ namespace Tycho.Processor
 
         public event EventHandler<Exception>? OnJobProcessorError;
 
-        public JobProcessor(
-            IJobFactory jobFactory,
-            JobProcessorSettings jobProcessorSettings)
+        public JobProcessor(IJobFactory jobFactory, JobProcessorSettings jobProcessorSettings)
         {
+            _processingSuspender = new ProcessingSuspender();
             _jobFactory = jobFactory;
+
             _jobRunner = new JobRunner(
                 jobProcessorSettings.ConcurrencyLimit,
                 jobProcessorSettings.JobProcessingTimeout,
                 ReportError);
-            _processingSuspender = new ProcessingSuspender();
+
             _idleTimeCalculator = new IntervalCalculator(
                 jobProcessorSettings.InitialInterval,
                 jobProcessorSettings.MaxInterval,

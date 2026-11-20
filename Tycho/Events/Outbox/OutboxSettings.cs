@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 
 namespace Tycho.Events.Outbox
 {
@@ -52,24 +53,25 @@ namespace Tycho.Events.Outbox
                 throw new ArgumentOutOfRangeException(nameof(ConcurrencyLimit));
             }
 
-            if (InitialPollingInterval <= TimeSpan.Zero)
+            TimeSpan maximumInterval = TimeSpan.FromMilliseconds(int.MaxValue);
+            if (InitialPollingInterval < TimeSpan.FromMilliseconds(1) || InitialPollingInterval > maximumInterval)
             {
-                throw new ArgumentOutOfRangeException(nameof(InitialPollingInterval));
+                throw new ArgumentOutOfRangeException(nameof(InitialPollingInterval), "The initial polling interval must be between one millisecond and Int32.MaxValue milliseconds.");
             }
 
-            if (MaxPollingInterval < InitialPollingInterval)
+            if (MaxPollingInterval < TimeSpan.FromMilliseconds(1) || MaxPollingInterval > maximumInterval || MaxPollingInterval < InitialPollingInterval)
             {
-                throw new ArgumentOutOfRangeException(nameof(MaxPollingInterval));
+                throw new ArgumentOutOfRangeException(nameof(MaxPollingInterval), "The maximum polling interval must be between the initial polling interval and Int32.MaxValue milliseconds.");
             }
 
             if (double.IsNaN(PollingIntervalMultiplier) || double.IsInfinity(PollingIntervalMultiplier) || PollingIntervalMultiplier <= 1)
             {
-                throw new ArgumentOutOfRangeException(nameof(PollingIntervalMultiplier));
+                throw new ArgumentOutOfRangeException(nameof(PollingIntervalMultiplier), "The polling interval multiplier must be a finite number greater than one.");
             }
 
-            if (MessageProcessingTimeout <= TimeSpan.Zero && MessageProcessingTimeout != System.Threading.Timeout.InfiniteTimeSpan)
+            if (MessageProcessingTimeout != Timeout.InfiniteTimeSpan && (MessageProcessingTimeout <= TimeSpan.Zero || MessageProcessingTimeout > maximumInterval))
             {
-                throw new ArgumentOutOfRangeException(nameof(MessageProcessingTimeout));
+                throw new ArgumentOutOfRangeException(nameof(MessageProcessingTimeout), "Timeouts must be positive and at most Int32.MaxValue milliseconds, or infinite.");
             }
         }
 
