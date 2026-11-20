@@ -9,6 +9,7 @@ using Tycho.Modules.Instance;
 using Tycho.Modules.Setup;
 using Tycho.Requests.Broker;
 using Tycho.Structure;
+using Tycho.Utils;
 
 namespace Tycho.Apps.Setup
 {
@@ -32,6 +33,7 @@ namespace Tycho.Apps.Setup
         public IAppStructure Uses<TModule>(Action<IContractFulfillment> contractFulfillment, string? instanceSuffix = null)
             where TModule : TychoModule, new()
         {
+            contractFulfillment.ThrowIfNull();
             Use<TModule>(contractFulfillment, null, instanceSuffix);
             return this;
         }
@@ -39,6 +41,7 @@ namespace Tycho.Apps.Setup
         public IAppStructure Uses<TModule>(IModuleSettings settings, string? instanceSuffix = null)
             where TModule : TychoModule, new()
         {
+            settings.ThrowIfNull();
             Use<TModule>(null, settings, instanceSuffix);
             return this;
         }
@@ -49,6 +52,8 @@ namespace Tycho.Apps.Setup
             string? instanceSuffix = null)
             where TModule : TychoModule, new()
         {
+            contractFulfillment.ThrowIfNull();
+            settings.ThrowIfNull();
             Use<TModule>(contractFulfillment, settings, instanceSuffix);
             return this;
         }
@@ -102,7 +107,7 @@ namespace Tycho.Apps.Setup
             Type submoduleType = submodule.GetType();
             if (!_submoduleTypes.Add(submoduleType))
             {
-                throw new InvalidOperationException($"{submoduleType.Name} is already defined as a submodule for this module");
+                throw new InvalidOperationException($"{submoduleType.Name} is already defined as a module for this application");
             }
             _submodules.Add(submodule);
         }

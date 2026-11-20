@@ -7,7 +7,7 @@ namespace Tycho
     /// Marks a class as a Tycho definition.
     /// </summary>
     [ReferencedBySourceGenerator]
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class TychoDefinitionAttribute : Attribute
     {
     }

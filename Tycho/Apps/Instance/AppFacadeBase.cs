@@ -22,7 +22,7 @@ namespace Tycho.Apps.Instance
         [ReferencedBySourceGenerator]
         public AppFacadeBase(IApp app)
         {
-            _app = app;
+            _app = app ?? throw new ArgumentNullException(nameof(app));
         }
 
         /// <summary>
@@ -57,10 +57,10 @@ namespace Tycho.Apps.Instance
         }
 
         /// <inheritdoc/>
-        public Task StartAsync(CancellationToken cancellationToken) => _app.StartAsync(cancellationToken);
+        public Task StartAsync(CancellationToken cancellationToken = default) => _app.StartAsync(cancellationToken);
 
         /// <inheritdoc/>
-        public Task StopAsync(CancellationToken cancellationToken) => _app.StopAsync(cancellationToken);
+        public Task StopAsync(CancellationToken cancellationToken = default) => _app.StopAsync(cancellationToken);
 
         /// <inheritdoc/>
         public void Dispose() => _app.Dispose();

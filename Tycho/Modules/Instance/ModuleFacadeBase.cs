@@ -18,11 +18,11 @@ namespace Tycho.Modules.Instance
         /// <summary>
         /// Initializes a new instance of the <see cref="ModuleFacadeBase"/> class.
         /// </summary>
-        /// <param name="_module">The running module instance used to execute requests.</param>
+        /// <param name="module">The running module instance used to execute requests.</param>
         [ReferencedBySourceGenerator]
-        public ModuleFacadeBase(IModule _module)
+        public ModuleFacadeBase(IModule module)
         {
-            this._module = _module;
+            _module = module ?? throw new ArgumentNullException(nameof(module));
         }
 
         /// <summary>
