@@ -1,13 +1,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
 using Tycho.Persistence.EFCore.Entries;
 
 namespace Tycho.Persistence.EFCore.Inbox;
 
-[PrimaryKey(nameof(OwnerId), nameof(EntryId))]
-[Index(nameof(OwnerId), nameof(ClaimId))]
-[Index(nameof(OwnerId), nameof(State), nameof(Updated))]
 internal class InboxEntry
 {
     [Required, MaxLength(32)]

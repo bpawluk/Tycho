@@ -23,7 +23,7 @@ public sealed class HomeDashboardTests(DatabaseServers servers) : IAsyncLifetime
         await _sut.StartAsync(TestContext.Current.CancellationToken);
     }
 
-    [Theory(Timeout = 360000)]
+    [Theory(Timeout = 300000)]
     [InlineData(DatabaseProvider.SQLite)]
     [InlineData(DatabaseProvider.SqlServer)]
     [InlineData(DatabaseProvider.PostgreSql)]

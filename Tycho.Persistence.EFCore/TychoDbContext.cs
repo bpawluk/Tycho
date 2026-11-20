@@ -1,5 +1,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Tycho.Persistence.EFCore.Database;
 using Tycho.Persistence.EFCore.Inbox;
 using Tycho.Persistence.EFCore.Outbox;
 using Tycho.Persistence.EFCore.Transactions;
@@ -11,6 +13,9 @@ namespace Tycho.Persistence.EFCore;
 /// </summary>
 public abstract class TychoDbContext : DbContext
 {
+    private static bool ShouldUseStateUpdatedIndex => true;
+    private bool ShouldUseClaimIdIndex => Database.ProviderName is not (Providers.SqlServer or Providers.PostgreSql);
+
     internal TransactionInterceptor TransactionInterceptor { get; } = new();
 
     /// <summary>
@@ -45,8 +50,24 @@ public abstract class TychoDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.Entity<InboxEntry>().ToTable(InboxTableName, Schema);
-        modelBuilder.Entity<OutboxEntry>().ToTable(OutboxTableName, Schema);
+
+        EntityTypeBuilder<InboxEntry> inbox = modelBuilder.Entity<InboxEntry>().ToTable(InboxTableName, Schema);
+        EntityTypeBuilder<OutboxEntry> outbox = modelBuilder.Entity<OutboxEntry>().ToTable(OutboxTableName, Schema);
+
+        inbox.HasKey(entry => new { entry.OwnerId, entry.EntryId });
+        outbox.HasKey(entry => new { entry.OwnerId, entry.EntryId });
+
+        if (ShouldUseClaimIdIndex)
+        {
+            inbox.HasIndex(entry => new { entry.OwnerId, entry.ClaimId });
+            outbox.HasIndex(entry => new { entry.OwnerId, entry.ClaimId });
+        }
+
+        if (ShouldUseStateUpdatedIndex)
+        {
+            inbox.HasIndex(entry => new { entry.OwnerId, entry.State, entry.Updated });
+            outbox.HasIndex(entry => new { entry.OwnerId, entry.State, entry.Updated });
+        }
     }
 
     private string GetDbContextName()
