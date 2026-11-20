@@ -3,6 +3,7 @@
     "project": "Tycho.Persistence.EFCore.csproj",
     "test-projects": [
       "../Tests/Tycho.Persistence.EFCore.UnitTests/Tycho.Persistence.EFCore.UnitTests.csproj",
+      "../Tests/Tycho.Persistence.EFCore.IntegrationTests/Tycho.Persistence.EFCore.IntegrationTests.csproj",
       "../Tests/Tycho.Persistence.EFCore.UseCaseTests/Tycho.Persistence.EFCore.UseCaseTests.csproj"
     ],
     "target-framework": "net10.0",

@@ -2,7 +2,7 @@
   "stryker-config": {
     "project": "Tycho.Utils.SourceGenerator.csproj",
     "test-projects": [
-      "../Tycho.Utils.SourceGenerator.UnitTests/Tycho.Utils.SourceGenerator.UnitTests.csproj",
+      "../Tests/Tycho.Utils.SourceGenerator.UnitTests/Tycho.Utils.SourceGenerator.UnitTests.csproj",
       "../Tests/Tycho.Utils.SourceGenerator.IntegrationTests/Tycho.Utils.SourceGenerator.IntegrationTests.csproj"
     ],
     "test-runner": "mtp",
