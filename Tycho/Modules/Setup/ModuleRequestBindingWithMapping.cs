@@ -1,6 +1,6 @@
 using System;
 using Tycho.Requests;
-using Tycho.Requests.Registrating;
+using Tycho.Requests.Registration;
 
 namespace Tycho.Modules.Setup
 {
@@ -22,7 +22,7 @@ namespace Tycho.Modules.Setup
         public IModuleContract ForwardsTo<TModule>()
             where TModule : TychoModule
         {
-            _registrator.ForwardMappedUpStreamRequest<TRequest, TTargetRequest, TModule>(_mapRequest);
+            _registrator.ForwardMappedUpstreamRequest<TRequest, TTargetRequest, TModule>(_mapRequest);
             return _contract;
         }
     }
@@ -52,7 +52,7 @@ namespace Tycho.Modules.Setup
         public IModuleContract ForwardsTo<TModule>()
             where TModule : TychoModule
         {
-            _registrator.ForwardMappedUpStreamRequest<
+            _registrator.ForwardMappedUpstreamRequest<
                 TRequest, TResponse,
                 TTargetRequest, TTargetResponse,
                 TModule>(_mapRequest, _mapResponse);

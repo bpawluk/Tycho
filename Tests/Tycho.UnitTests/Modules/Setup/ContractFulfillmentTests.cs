@@ -20,7 +20,7 @@ public sealed class ContractFulfillmentTests : IDisposable
         typeof(ContractFulfillmentTests));
     private readonly Mock<IRequestBroker> _destination = new(MockBehavior.Strict);
     private readonly ContractFulfillment<TestModule> _sut;
-    private readonly DownStreamBroker<TestModule> _broker;
+    private readonly DownstreamRequestBroker<TestModule> _broker;
 
     public ContractFulfillmentTests()
     {
@@ -28,7 +28,7 @@ public sealed class ContractFulfillmentTests : IDisposable
             .AddSingleton(_internals)
             .AddSingleton(Mock.Of<IModule<OtherModule>>(module => module.RequestBroker == _destination.Object));
         _sut = new ContractFulfillment<TestModule>(_internals);
-        _broker = new DownStreamBroker<TestModule>(_internals);
+        _broker = new DownstreamRequestBroker<TestModule>(_internals);
     }
 
     [Fact]

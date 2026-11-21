@@ -8,7 +8,7 @@ using Tycho.Events.Inbox.InMemory;
 using Tycho.Events.Outbox;
 using Tycho.Events.Outbox.InMemory;
 using Tycho.Events.Publishing;
-using Tycho.Events.Registrating;
+using Tycho.Events.Registration;
 using Tycho.Events.Routing;
 using Tycho.Events.Serialization;
 using Tycho.Structure;

@@ -19,7 +19,7 @@ namespace Tycho.Apps.Instance
         public App(Internals internals)
         {
             _internals = internals;
-            _requestBroker = new UpStreamBroker(_internals);
+            _requestBroker = new UpstreamRequestBroker(_internals);
         }
 
         public Task StartAsync(CancellationToken cancellationToken) => _internals.StartAsync(cancellationToken);

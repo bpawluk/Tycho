@@ -23,7 +23,7 @@ namespace Tycho.Modules.Instance
         {
             _internals = internals;
             _eventRouter = new EventRouter(_internals);
-            _requestBroker = new UpStreamBroker(_internals);
+            _requestBroker = new UpstreamRequestBroker(_internals);
         }
 
         public Task StartAsync(CancellationToken cancellationToken) => _internals.StartAsync(cancellationToken);

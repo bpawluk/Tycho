@@ -95,7 +95,7 @@ namespace Tycho.Apps.Setup
             var fulfiller = new ContractFulfillment<TModule>(_internals);
             contractFulfillment?.Invoke(fulfiller);
 
-            submodule.FulfillContract(new DownStreamBroker<TModule>(_internals));
+            submodule.FulfillContract(new DownstreamRequestBroker<TModule>(_internals));
             submodule.PassEventRouter(new EventRouter(_internals));
             submodule.WithInstanceSuffix(instanceSuffix);
 

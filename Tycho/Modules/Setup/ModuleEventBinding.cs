@@ -1,6 +1,6 @@
 using System;
 using Tycho.Events;
-using Tycho.Events.Registrating;
+using Tycho.Events.Registration;
 using Tycho.Utils;
 
 namespace Tycho.Modules.Setup

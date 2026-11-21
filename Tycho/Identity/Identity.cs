@@ -23,9 +23,15 @@ namespace Tycho.Identity
 
         public static bool operator ==(Identity? left, Identity? right)
         {
-            if (ReferenceEquals(left, right)) return true;
+            if (ReferenceEquals(left, right))
+            {
+                return true;
+            }
 
-            if (left is null || right is null) return false;
+            if (left is null || right is null)
+            {
+                return false;
+            }
 
             return string.Equals(left.Value, right.Value, StringComparison.Ordinal);
         }

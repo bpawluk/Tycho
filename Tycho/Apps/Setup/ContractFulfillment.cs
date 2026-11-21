@@ -1,6 +1,6 @@
 using Tycho.Modules;
 using Tycho.Requests;
-using Tycho.Requests.Registrating;
+using Tycho.Requests.Registration;
 using Tycho.Structure;
 
 namespace Tycho.Apps.Setup

@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Tycho.Events.Model;
-using Tycho.Events.Registrating.Registrations;
+using Tycho.Events.Registration.Registrations;
 
 namespace Tycho.Events.Routing
 {

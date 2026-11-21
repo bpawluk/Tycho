@@ -1,6 +1,6 @@
 using System;
 using Tycho.Requests;
-using Tycho.Requests.Registrating;
+using Tycho.Requests.Registration;
 
 namespace Tycho.Modules.Setup
 {
@@ -22,14 +22,14 @@ namespace Tycho.Modules.Setup
 
         public IContractFulfillment Exposes()
         {
-            _registrator.ExposeMappedDownStreamRequest<TSourceModule, TRequest, TTargetRequest>(_mapRequest);
+            _registrator.ExposeMappedDownstreamRequest<TSourceModule, TRequest, TTargetRequest>(_mapRequest);
             return _root;
         }
 
         public IContractFulfillment ForwardsTo<TModule>()
             where TModule : TychoModule
         {
-            _registrator.ForwardMappedDownStreamRequest<TSourceModule, TRequest, TTargetRequest, TModule>(_mapRequest);
+            _registrator.ForwardMappedDownstreamRequest<TSourceModule, TRequest, TTargetRequest, TModule>(_mapRequest);
             return _root;
         }
     }
@@ -59,7 +59,7 @@ namespace Tycho.Modules.Setup
 
         public IContractFulfillment Exposes()
         {
-            _registrator.ExposeMappedDownStreamRequest<
+            _registrator.ExposeMappedDownstreamRequest<
                 TSourceModule,
                 TRequest, TResponse,
                 TTargetRequest, TTargetResponse>(_mapRequest, _mapResponse);
@@ -69,7 +69,7 @@ namespace Tycho.Modules.Setup
         public IContractFulfillment ForwardsTo<TModule>()
             where TModule : TychoModule
         {
-            _registrator.ForwardMappedDownStreamRequest<
+            _registrator.ForwardMappedDownstreamRequest<
                 TSourceModule,
                 TRequest, TResponse,
                 TTargetRequest, TTargetResponse,

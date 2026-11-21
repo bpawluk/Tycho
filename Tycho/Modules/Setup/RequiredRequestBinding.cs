@@ -1,6 +1,6 @@
 using System;
 using Tycho.Requests;
-using Tycho.Requests.Registrating;
+using Tycho.Requests.Registration;
 using Tycho.Utils;
 
 namespace Tycho.Modules.Setup
@@ -20,27 +20,27 @@ namespace Tycho.Modules.Setup
 
         public IContractFulfillment Exposes()
         {
-            _registrator.ExposeDownStreamRequest<TSourceModule, TRequest>();
+            _registrator.ExposeDownstreamRequest<TSourceModule, TRequest>();
             return _root;
         }
 
         public IContractFulfillment Ignores()
         {
-            _registrator.IgnoreDownStreamRequest<TSourceModule, TRequest>();
+            _registrator.IgnoreDownstreamRequest<TSourceModule, TRequest>();
             return _root;
         }
 
         public IContractFulfillment HandlesWith<THandler>()
             where THandler : class, IRequestHandler<TRequest>
         {
-            _registrator.HandleDownStreamRequest<TSourceModule, TRequest, THandler>();
+            _registrator.HandleDownstreamRequest<TSourceModule, TRequest, THandler>();
             return _root;
         }
 
         public IContractFulfillment ForwardsTo<TModule>()
             where TModule : TychoModule
         {
-            _registrator.ForwardDownStreamRequest<TSourceModule, TRequest, TModule>();
+            _registrator.ForwardDownstreamRequest<TSourceModule, TRequest, TModule>();
             return _root;
         }
 
@@ -67,27 +67,27 @@ namespace Tycho.Modules.Setup
 
         public IContractFulfillment Exposes()
         {
-            _registrator.ExposeDownStreamRequest<TSourceModule, TRequest, TResponse>();
+            _registrator.ExposeDownstreamRequest<TSourceModule, TRequest, TResponse>();
             return _root;
         }
 
         public IContractFulfillment Ignores()
         {
-            _registrator.IgnoreDownStreamRequest<TSourceModule, TRequest, TResponse>();
+            _registrator.IgnoreDownstreamRequest<TSourceModule, TRequest, TResponse>();
             return _root;
         }
 
         public IContractFulfillment HandlesWith<THandler>()
             where THandler : class, IRequestHandler<TRequest, TResponse>
         {
-            _registrator.HandleDownStreamRequest<TSourceModule, TRequest, TResponse, THandler>();
+            _registrator.HandleDownstreamRequest<TSourceModule, TRequest, TResponse, THandler>();
             return _root;
         }
 
         public IContractFulfillment ForwardsTo<TModule>()
             where TModule : TychoModule
         {
-            _registrator.ForwardDownStreamRequest<TSourceModule, TRequest, TResponse, TModule>();
+            _registrator.ForwardDownstreamRequest<TSourceModule, TRequest, TResponse, TModule>();
             return _root;
         }
 
