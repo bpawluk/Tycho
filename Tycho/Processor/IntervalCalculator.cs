@@ -30,7 +30,8 @@ namespace Tycho.Processor
                 return;
             }
 
-            Current = TimeSpan.FromTicks((long)increasedTicks);
+            long nextTicks = Math.Max(Current.Ticks + 1, (long)Math.Ceiling(increasedTicks));
+            Current = TimeSpan.FromTicks(nextTicks);
         }
 
         public void Reset()

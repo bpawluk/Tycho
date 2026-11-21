@@ -44,7 +44,7 @@ public sealed class IntervalCalculatorTests
     }
 
     [Fact]
-    public void Increase_WhenProductHasFractionalTicks_TruncatesFraction()
+    public void Increase_WhenProductHasFractionalTicks_RoundsUp()
     {
         // Arrange
         var sut = new IntervalCalculator(TimeSpan.FromTicks(3), TimeSpan.FromTicks(100), 1.5);
@@ -53,7 +53,27 @@ public sealed class IntervalCalculatorTests
         sut.Increase();
 
         // Assert
-        Assert.Equal(TimeSpan.FromTicks(4), sut.Current);
+        Assert.Equal(TimeSpan.FromTicks(5), sut.Current);
+    }
+
+    [Fact]
+    public void Increase_WhenMultiplierIsCloseToOne_AdvancesUntilMaximum()
+    {
+        // Arrange
+        TimeSpan initial = TimeSpan.FromMilliseconds(1);
+        TimeSpan next = initial + TimeSpan.FromTicks(1);
+        TimeSpan maximal = initial + TimeSpan.FromTicks(2);
+        var sut = new IntervalCalculator(initial, maximal, Math.BitIncrement(1.0));
+
+        // Act & Assert
+        sut.Increase();
+        Assert.Equal(next, sut.Current);
+
+        sut.Increase();
+        Assert.Equal(maximal, sut.Current);
+
+        sut.Increase();
+        Assert.Equal(maximal, sut.Current);
     }
 
     [Theory]
