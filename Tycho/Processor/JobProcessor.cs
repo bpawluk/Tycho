@@ -98,21 +98,26 @@ namespace Tycho.Processor
                 IsStopped = true;
             }
 
-            if (shouldCancelProcessing)
-            {
-                _processingCts.Cancel();
-            }
-
             try
             {
-                if (processingTask != null)
+                if (shouldCancelProcessing)
                 {
-                    await processingTask.WaitWithCancellationAsync(cancellationToken).ConfigureAwait(false);
+                    _processingCts.Cancel();
                 }
             }
             finally
             {
-                await _jobRunner.StopAsync(cancellationToken).ConfigureAwait(false);
+                try
+                {
+                    if (processingTask != null)
+                    {
+                        await processingTask.WaitWithCancellationAsync(cancellationToken).ConfigureAwait(false);
+                    }
+                }
+                finally
+                {
+                    await _jobRunner.StopAsync(cancellationToken).ConfigureAwait(false);
+                }
             }
         }
 

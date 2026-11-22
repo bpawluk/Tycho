@@ -495,6 +495,44 @@ public sealed class JobProcessorTests
     }
 
     [Fact(Timeout = 10_000)]
+    public async Task StopAsync_WhenCancellationCallbackThrows_WaitsForProcessingBeforeStoppingRunner()
+    {
+        // Arrange
+        await using var harness = new ProcessorHarness();
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
+        TaskCompletionSource<bool> release = NewSignal();
+        harness.Factory.Enqueue(async token =>
+        {
+            await release.Task;
+            token.ThrowIfCancellationRequested();
+            return null;
+        });
+        harness.Processor.Start();
+        CancellationToken processingToken = await harness.Factory.NextCallAsync(cancellationToken);
+        var callbackFailure = new InvalidOperationException("Cancellation callback failed.");
+        using CancellationTokenRegistration registration = processingToken.Register(() => throw callbackFailure);
+
+        try
+        {
+            // Act
+            Task stop = harness.Processor.StopAsync(cancellationToken);
+
+            // Assert
+            Assert.False(stop.IsCompleted);
+            Assert.Equal(0, harness.Runner.StopCount);
+
+            release.SetResult(true);
+            AggregateException exception = await Assert.ThrowsAsync<AggregateException>(() => stop.WaitAsync(cancellationToken));
+            Assert.Same(callbackFailure, Assert.Single(exception.InnerExceptions));
+            Assert.Equal(1, harness.Runner.StopCount);
+        }
+        finally
+        {
+            release.TrySetResult(true);
+        }
+    }
+
+    [Fact(Timeout = 10_000)]
     public async Task StopAsync_WhileCreatingJob_CancelsProcessingWithoutError()
     {
         // Arrange

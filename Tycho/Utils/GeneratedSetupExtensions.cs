@@ -13,42 +13,34 @@ namespace Tycho.Utils
 
         public static void AddGeneratedSetup(this TychoApp appInstance, IServiceCollection appServices)
         {
-            Type appType = appInstance.GetType();
-            try
-            {
-                AddGeneratedSetup(appType, appServices);
-            }
-            catch
-            {
-                throw new NotImplementedException(
-                    $"Failed to provide automated setup for {appType.Name} app. " +
-                     "Make sure your app definition is marked with TychoDefinition attribute");
-            }
+            AddGeneratedSetup(appInstance.GetType(), appServices);
         }
 
         public static void AddGeneratedSetup(this TychoModule moduleInstance, IServiceCollection moduleServices)
         {
-            Type moduleType = moduleInstance.GetType();
-            try
-            {
-                AddGeneratedSetup(moduleType, moduleServices);
-            }
-            catch
-            {
-                throw new NotImplementedException(
-                    $"Failed to provide automated setup for {moduleType.Name} module. " +
-                     "Make sure your module definition is marked with TychoDefinition attribute");
-            }
+            AddGeneratedSetup(moduleInstance.GetType(), moduleServices);
         }
 
         private static void AddGeneratedSetup(Type ownerType, IServiceCollection services)
         {
-            Type setupType = GetGeneratedSetupType(ownerType);
-            MethodInfo setupMethod = setupType.GetMethod(GeneratedSetupMethod, BindingFlags.Public | BindingFlags.Static);
-            setupMethod.Invoke(null, new object[] { services });
+            Type setupType = GetGeneratedSetupType(ownerType) ?? throw new NotImplementedException(
+                $"Generated setup was not found for '{ownerType.FullName}'. " +
+                $"Make sure the definition is marked with TychoDefinitionAttribute.");
+
+            MethodInfo setupMethod = setupType.GetMethod(GeneratedSetupMethod, BindingFlags.Public | BindingFlags.Static) ?? throw new NotImplementedException(
+                $"Generated setup type '{setupType.FullName}' is missing the public static '{GeneratedSetupMethod}' method.");
+
+            try
+            {
+                setupMethod.Invoke(null, new object[] { services });
+            }
+            catch (TargetInvocationException exception)
+            {
+                throw new InvalidOperationException($"Generated setup for '{ownerType.FullName}' failed.", exception.InnerException ?? exception);
+            }
         }
 
-        private static Type GetGeneratedSetupType(Type ownerType)
+        private static Type? GetGeneratedSetupType(Type ownerType)
         {
             Type ownerTypeDefinition = ownerType.IsGenericType ? ownerType.GetGenericTypeDefinition() : ownerType;
 
@@ -62,9 +54,9 @@ namespace Tycho.Utils
                 ? $"{ownerTypeDefinition.FullName[..fullNameReplacePosition]}{generatedSetupTypeName}"
                 : generatedSetupTypeName;
 
-            Type generatedSetupType = ownerType.Assembly.GetType(generatedSetupTypeFullName, true);
+            Type? generatedSetupType = ownerType.Assembly.GetType(generatedSetupTypeFullName);
 
-            return generatedSetupType.ContainsGenericParameters
+            return generatedSetupType is { ContainsGenericParameters: true }
                 ? generatedSetupType.MakeGenericType(ownerType.GetGenericArguments())
                 : generatedSetupType;
         }
