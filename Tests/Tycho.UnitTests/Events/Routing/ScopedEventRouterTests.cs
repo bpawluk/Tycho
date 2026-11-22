@@ -17,6 +17,24 @@ public sealed class ScopedEventRouterTests : IDisposable
     private readonly List<Internals> _hosts = [];
 
     [Fact]
+    public async Task RouteAsync_WithCancelledToken_ThrowsBeforeResolvingRegistrations()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken(canceled: true);
+        var serviceProviderMock = new Mock<IServiceProvider>(MockBehavior.Strict);
+        var sut = new ScopedEventRouter(serviceProviderMock.Object);
+        var publishId = Guid.NewGuid();
+        var eventPayload = new TestEvent();
+
+        // Act
+        Task Act() => sut.RouteAsync(publishId, eventPayload, cancellationToken);
+
+        // Assert
+        await Assert.ThrowsAsync<OperationCanceledException>(Act);
+        serviceProviderMock.VerifyNoOtherCalls();
+    }
+
+    [Fact]
     public async Task RouteAsync_WithNoRegistrations_ReturnsEmpty()
     {
         // Arrange

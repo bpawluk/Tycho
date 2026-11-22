@@ -1,13 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Tycho.Events.Model;
 using Tycho.Events.Outbox;
 using Tycho.Events.Serialization;
 using Tycho.Persistence.EFCore.Identity;
-using Tycho.Persistence.EFCore.Operations;
 
 namespace Tycho.Persistence.EFCore.Outbox;
 
@@ -23,9 +24,14 @@ internal class OutboxWriter(
 
     public async Task Write(IReadOnlyCollection<RoutedEvent> routedEvents, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(routedEvents);
+        cancellationToken.ThrowIfCancellationRequested();
+
         OutboxEntry[] outboxEntries = [.. routedEvents.Select(routedEvent =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             SerializedRoutedEvent serializedEvent = _eventSerializer.Serialize(routedEvent);
+
             return new OutboxEntry
             {
                 OwnerId = owner.Identifier,
@@ -38,7 +44,8 @@ internal class OutboxWriter(
             };
         })];
 
-        await StageOutboxEntriesCommand.ExecuteAsync(_dbContext, outboxEntries, cancellationToken).ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
+        _dbContext.Set<OutboxEntry>().AddRange(outboxEntries);
 
         if (System.Transactions.Transaction.Current is not null)
         {
@@ -51,7 +58,19 @@ internal class OutboxWriter(
             return;
         }
 
-        await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch
+        {
+            foreach (OutboxEntry entry in outboxEntries)
+            {
+                _dbContext.Entry(entry).State = EntityState.Detached;
+            }
+
+            throw;
+        }
         _outboxActivity.NotifyNewEntriesAdded();
     }
 }

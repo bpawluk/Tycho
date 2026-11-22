@@ -59,7 +59,7 @@ internal class InboxConsumer(
         {
             try
             {
-                bool markedAsFailed = await MarkAsFailedAsync(entryToDeliver.EntryId, claimId, cancellationToken).ConfigureAwait(false);
+                bool markedAsFailed = await MarkAsFailedAsync(entryToDeliver.EntryId, claimId, CancellationToken.None).ConfigureAwait(false);
                 if (!markedAsFailed)
                 {
                     logger?.InboxMessageStatusUpdateFailed(entryToDeliver.EntryId, claimId);

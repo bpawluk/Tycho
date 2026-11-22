@@ -24,7 +24,7 @@ internal static class ClaimInboxEntryCommand
         }
 
         InboxEntry? entry = await Default.ReadClaimedInboxEntryQuery
-            .ExecuteAsync(dbContext, owner, request.ClaimId, cancellationToken)
+            .ExecuteAsync(dbContext, owner, request.ClaimId, CancellationToken.None)
             .ConfigureAwait(false);
 
         return entry is null ? ClaimResult<InboxEntry>.ClaimedButMissing() : ClaimResult<InboxEntry>.Claimed(entry);

@@ -94,7 +94,7 @@ public class InboxProcessorJobTests
         VerifyTransactionExecution(Times.Never(), cancellationToken);
         _handlerFactoryMock.Verify(factory => factory(), Times.Never);
         _inboxConsumerMock.Verify(inbox => inbox.MarkAsHandledAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), cancellationToken), Times.Never);
-        _inboxConsumerMock.Verify(inbox => inbox.MarkAsFailedAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), cancellationToken), Times.Never);
+        _inboxConsumerMock.Verify(inbox => inbox.MarkAsFailedAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), CancellationToken.None), Times.Never);
         LogAssert.Logged(_logger, LogLevel.Warning, 1305, "InboxJobIsMissing");
     }
 
@@ -115,8 +115,31 @@ public class InboxProcessorJobTests
             It.Is<EventContext<TestEvent>>(context =>
                 context.Id == routedEvent.Id && context.Payload == routedEvent.Payload),
             cancellationToken), Times.Once);
-        _inboxConsumerMock.Verify(inbox => inbox.MarkAsHandledAsync(inboxEvent.EventId, inboxEvent.ClaimId, cancellationToken), Times.Once);
-        _inboxConsumerMock.Verify(inbox => inbox.MarkAsFailedAsync(inboxEvent.EventId, inboxEvent.ClaimId, cancellationToken), Times.Never);
+        _inboxConsumerMock.Verify(inbox => inbox.MarkAsHandledAsync(inboxEvent.EventId, inboxEvent.ClaimId, CancellationToken.None), Times.Once);
+        _inboxConsumerMock.Verify(inbox => inbox.MarkAsFailedAsync(inboxEvent.EventId, inboxEvent.ClaimId, CancellationToken.None), Times.Never);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenNontransactionalHandlerCompletesAfterCancellation_MarksClaimAsHandled()
+    {
+        // Arrange
+        InboxEvent inboxEvent = CreateInboxEvent(out _);
+        using var cancellation = new CancellationTokenSource();
+        _handlerMock.Setup(handler => handler.HandleAsync(It.IsAny<EventContext<TestEvent>>(), cancellation.Token))
+            .Returns(() =>
+            {
+                cancellation.Cancel();
+                return Task.CompletedTask;
+            });
+        InboxProcessorJob sut = CreateSut();
+        sut.ForEvent(inboxEvent);
+
+        // Act
+        await sut.ExecuteAsync(cancellation.Token);
+
+        // Assert
+        _inboxConsumerMock.Verify(inbox => inbox.MarkAsHandledAsync(
+            inboxEvent.EventId, inboxEvent.ClaimId, CancellationToken.None), Times.Once);
     }
 
     [Fact]
@@ -157,7 +180,7 @@ public class InboxProcessorJobTests
         VerifyTransactionExecution(Times.Once(), cancellationToken);
         _transactionalHandlerMock.Verify(handler => handler.HandleAsync(It.IsAny<EventContext<TestEvent>>(), cancellationToken), Times.Once);
         _inboxConsumerMock.Verify(inbox => inbox.MarkAsHandledAsync(inboxEvent.EventId, inboxEvent.ClaimId, cancellationToken), Times.Once);
-        _inboxConsumerMock.Verify(inbox => inbox.MarkAsFailedAsync(inboxEvent.EventId, inboxEvent.ClaimId, cancellationToken), Times.Never);
+        _inboxConsumerMock.Verify(inbox => inbox.MarkAsFailedAsync(inboxEvent.EventId, inboxEvent.ClaimId, CancellationToken.None), Times.Never);
     }
 
     [Fact]
@@ -181,8 +204,29 @@ public class InboxProcessorJobTests
         // Assert
         VerifyTransactionExecution(Times.Once(), cancellationToken);
         _inboxConsumerMock.Verify(inbox => inbox.MarkAsHandledAsync(inboxEvent.EventId, inboxEvent.ClaimId, cancellationToken), Times.Never);
-        _inboxConsumerMock.Verify(inbox => inbox.MarkAsFailedAsync(inboxEvent.EventId, inboxEvent.ClaimId, cancellationToken), Times.Once);
+        _inboxConsumerMock.Verify(inbox => inbox.MarkAsFailedAsync(inboxEvent.EventId, inboxEvent.ClaimId, CancellationToken.None), Times.Once);
         LogAssert.Logged(_logger, LogLevel.Error, 1303, "InboxMessageProcessingFailed", failure, ("EntryId", inboxEvent.EventId));
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenNontransactionalHandlerLosesClaim_LogsClaimWithoutMarkingFailure()
+    {
+        // Arrange
+        InboxEvent inboxEvent = CreateInboxEvent(out _);
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
+        _inboxConsumerMock
+            .Setup(inbox => inbox.MarkAsHandledAsync(inboxEvent.EventId, inboxEvent.ClaimId, CancellationToken.None))
+            .ReturnsAsync(false);
+        InboxProcessorJob sut = CreateSut();
+
+        // Act
+        await sut.ForEvent(inboxEvent).ExecuteAsync(cancellationToken);
+
+        // Assert
+        LogAssert.Logged(_logger, LogLevel.Warning, 1304, "InboxMessageStatusUpdateFailed", null,
+            ("EntryId", inboxEvent.EventId), ("ClaimId", inboxEvent.ClaimId));
+        _inboxConsumerMock.Verify(inbox => inbox.MarkAsFailedAsync(
+            It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -197,7 +241,7 @@ public class InboxProcessorJobTests
             .ReturnsAsync(false);
 
         _inboxConsumerMock
-            .Setup(inbox => inbox.MarkAsFailedAsync(inboxEvent.EventId, inboxEvent.ClaimId, cancellationToken))
+            .Setup(inbox => inbox.MarkAsFailedAsync(inboxEvent.EventId, inboxEvent.ClaimId, CancellationToken.None))
             .ReturnsAsync(false);
 
         InboxProcessorJob sut = CreateSut(useTransactionalHandler: true);
@@ -208,7 +252,7 @@ public class InboxProcessorJobTests
         // Assert
         VerifyTransactionExecution(Times.Once(), cancellationToken);
         _inboxConsumerMock.Verify(inbox => inbox.MarkAsHandledAsync(inboxEvent.EventId, inboxEvent.ClaimId, cancellationToken), Times.Once);
-        _inboxConsumerMock.Verify(inbox => inbox.MarkAsFailedAsync(inboxEvent.EventId, inboxEvent.ClaimId, cancellationToken), Times.Once);
+        _inboxConsumerMock.Verify(inbox => inbox.MarkAsFailedAsync(inboxEvent.EventId, inboxEvent.ClaimId, CancellationToken.None), Times.Once);
         LogAssert.Logged(_logger, LogLevel.Warning, 1304, "InboxMessageStatusUpdateFailed", null, ("EntryId", inboxEvent.EventId), ("ClaimId", inboxEvent.ClaimId));
     }
 
@@ -225,7 +269,7 @@ public class InboxProcessorJobTests
 
         // Assert
         _inboxConsumerMock.Verify(inbox => inbox.MarkAsHandledAsync(inboxEvent.EventId, inboxEvent.ClaimId, cancellationToken), Times.Never);
-        _inboxConsumerMock.Verify(inbox => inbox.MarkAsFailedAsync(inboxEvent.EventId, inboxEvent.ClaimId, cancellationToken), Times.Once);
+        _inboxConsumerMock.Verify(inbox => inbox.MarkAsFailedAsync(inboxEvent.EventId, inboxEvent.ClaimId, CancellationToken.None), Times.Once);
     }
 
     [Fact]
@@ -245,7 +289,7 @@ public class InboxProcessorJobTests
             int instance = ++inboxInstance;
             calls.Add($"inbox-{instance}-created");
             var inbox = new Mock<IInboxConsumer>();
-            inbox.Setup(consumer => consumer.MarkAsFailedAsync(inboxEvent.EventId, inboxEvent.ClaimId, cancellationToken))
+            inbox.Setup(consumer => consumer.MarkAsFailedAsync(inboxEvent.EventId, inboxEvent.ClaimId, CancellationToken.None))
                 .Callback(() => calls.Add("claim-failed"))
                 .ReturnsAsync(true);
             inbox.As<IAsyncDisposable>().Setup(value => value.DisposeAsync())

@@ -65,15 +65,20 @@ public sealed class IntervalCalculatorTests
         TimeSpan maximal = initial + TimeSpan.FromTicks(2);
         var sut = new IntervalCalculator(initial, maximal, Math.BitIncrement(1.0));
 
-        // Act & Assert
+        // Act
         sut.Increase();
-        Assert.Equal(next, sut.Current);
+        TimeSpan first = sut.Current;
 
         sut.Increase();
-        Assert.Equal(maximal, sut.Current);
+        TimeSpan second = sut.Current;
 
         sut.Increase();
-        Assert.Equal(maximal, sut.Current);
+        TimeSpan third = sut.Current;
+
+        // Assert
+        Assert.Equal(next, first);
+        Assert.Equal(maximal, second);
+        Assert.Equal(maximal, third);
     }
 
     [Theory]

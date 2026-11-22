@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Events.Model;
 using Tycho.Events.Serialization;
+using Tycho.Utils;
 
 namespace Tycho.Events.Inbox.InMemory
 {
@@ -22,13 +23,19 @@ namespace Tycho.Events.Inbox.InMemory
 
         public Task Write(SerializedEvent serializedEvent, CancellationToken cancellationToken = default)
         {
+            serializedEvent.ThrowIfNull();
+            cancellationToken.ThrowIfCancellationRequested();
+
             _entries.Enqueue(serializedEvent);
             _inboxActivity.NotifyNewEntriesAdded();
+
             return Task.CompletedTask;
         }
 
         public Task<InboxEvent?> TryReadAsync(CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             if (_entries.TryDequeue(out SerializedEvent? nextEntry))
             {
                 Event deserializedEvent = _eventSerializer.Deserialize(nextEntry);
@@ -40,11 +47,13 @@ namespace Tycho.Events.Inbox.InMemory
 
         public Task<bool> MarkAsHandledAsync(Guid entryId, Guid claimId, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             return Task.FromResult(true);
         }
 
         public Task<bool> MarkAsFailedAsync(Guid entryId, Guid claimId, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             return Task.FromResult(true);
         }
     }

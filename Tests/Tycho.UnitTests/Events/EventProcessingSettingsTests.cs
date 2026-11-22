@@ -67,7 +67,7 @@ public sealed class EventProcessingSettingsTests
 
         // Assert
         Assert.True(callbackCompleted);
-        ArgumentException validationException = Assert.IsAssignableFrom<ArgumentException>(exception);
+        ArgumentException validationException = Assert.IsType<ArgumentException>(exception, exactMatch: false);
         Assert.Equal(expectedParameter, validationException.ParamName);
         Assert.Equal(original, [.. services]);
     }

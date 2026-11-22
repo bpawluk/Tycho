@@ -9,12 +9,14 @@ internal static class InsertInboxEntryCommand
 {
     public static async Task ExecuteAsync(TychoDbContext dbContext, InboxEntry entry, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         dbContext.Set<InboxEntry>().Add(entry);
+
         try
         {
             await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
-        catch (DbUpdateException)
+        catch
         {
             dbContext.Entry(entry).State = EntityState.Detached;
             throw;

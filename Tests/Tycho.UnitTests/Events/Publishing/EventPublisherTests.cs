@@ -25,6 +25,22 @@ public class EventPublisherTests
     }
 
     [Fact]
+    public async Task PublishAsync_WithCancelledToken_ThrowsWithoutRoutingOrWriting()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken(canceled: true);
+        var eventPayload = new TestEvent();
+
+        // Act
+        Task Act() => _sut.PublishAsync(eventPayload, cancellationToken);
+
+        // Assert
+        await Assert.ThrowsAsync<OperationCanceledException>(Act);
+        _eventRouterMock.VerifyNoOtherCalls();
+        _outboxWriterMock.VerifyNoOtherCalls();
+    }
+
+    [Fact]
     public async Task PublishAsync_WithMissingPayload_ThrowsArgumentNullException()
     {
         // Arrange

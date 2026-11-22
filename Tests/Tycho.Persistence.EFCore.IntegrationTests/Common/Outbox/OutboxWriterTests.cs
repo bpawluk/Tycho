@@ -1,6 +1,7 @@
 using System.Transactions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Storage;
 using Moq;
 using Tycho.Events.Model;
@@ -8,6 +9,7 @@ using Tycho.Events.Outbox;
 using Tycho.Events.Serialization;
 using Tycho.Identity.Events;
 using Tycho.Identity.Structure;
+using Tycho.Persistence.EFCore.Entries;
 using Tycho.Persistence.EFCore.Identity;
 using Tycho.Persistence.EFCore.Outbox;
 using Tycho.Persistence.EFCore.TestUtils.Events;
@@ -48,6 +50,60 @@ public abstract class OutboxWriterTests : IntegrationTestsBase
         _sut = new OutboxWriter(_eventSerializer.Object, _outboxActivity, _dbContext, _persistenceOwner);
     }
 
+    [Fact]
+    public async Task Write_WithNullCollectionAndCancelledToken_ThrowsArgumentNullException()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken(canceled: true);
+
+        // Act
+        Task Act() => _sut.Write(null!, cancellationToken);
+
+        // Assert
+        await Assert.ThrowsAsync<ArgumentNullException>("routedEvents", Act);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Write_WhenSaveFails_DetachesOnlyNewEntriesAndPropagatesFailure(bool cancelSave)
+    {
+        // Arrange
+        using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        Exception saveFailure = cancelSave
+            ? new OperationCanceledException(cancellation.Token)
+            : new InvalidOperationException("Save failed.");
+
+        var interceptor = new Mock<SaveChangesInterceptor> { CallBase = true };
+        interceptor
+            .Setup(value => value.SavingChangesAsync(It.IsAny<DbContextEventData>(), It.IsAny<InterceptionResult<int>>(), cancellation.Token))
+            .Returns(() =>
+            {
+                if (cancelSave)
+                {
+                    cancellation.Cancel();
+                }
+
+                return ValueTask.FromException<InterceptionResult<int>>(saveFailure);
+            });
+
+        await using var dbContext = new TestDbContext(Database.CreateOptionsBuilder<TestDbContext>().AddInterceptors(interceptor.Object).Options);
+        var existingEntry = new OutboxEntry { OwnerId = _persistenceOwner.Identifier, EntryId = Guid.NewGuid() };
+        dbContext.Set<OutboxEntry>().Add(existingEntry);
+        var sut = new OutboxWriter(_eventSerializer.Object, _outboxActivity, dbContext, _persistenceOwner);
+        RoutedEvent[] routedEvents = [CreateRoutedEvent(), CreateRoutedEvent()];
+
+        // Act
+        Exception? actual = await Record.ExceptionAsync(() => sut.Write(routedEvents, cancellation.Token));
+
+        // Assert
+        Assert.Same(saveFailure, actual);
+        EntityEntry<OutboxEntry> remainingEntry = Assert.Single(dbContext.ChangeTracker.Entries<OutboxEntry>());
+        Assert.Same(existingEntry, remainingEntry.Entity);
+        Assert.Equal(EntityState.Added, remainingEntry.State);
+        Assert.Equal(0, _notificationCount);
+    }
+
     [Fact(Timeout = 60000)]
     public async Task Write_WithoutTransaction_SavesEntriesAndNotifies()
     {
@@ -82,7 +138,47 @@ public abstract class OutboxWriterTests : IntegrationTestsBase
             Assert.Equal(routedEvent.HandlerId.Value, entry.Handler);
             Assert.Equal(routedEvent.DestinationId.Value, entry.Destination);
             Assert.Equal("{}", entry.Payload);
+            Assert.Equal(EntryState.New, entry.State);
         }
+    }
+
+    [Fact(Timeout = 60000)]
+    public async Task Write_WhenSerializationCancels_ThrowsWithoutStagingEntriesInActiveTransaction()
+    {
+        // Arrange
+        using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        RoutedEvent routed = CreateRoutedEvent();
+        _eventSerializer.Setup(serializer => serializer.Serialize(routed))
+            .Returns(() =>
+            {
+                cancellation.Cancel();
+                return new SerializedRoutedEvent(routed.Id, routed.PublishId, routed.EventId, routed.HandlerId, routed.DestinationId, "{}");
+            });
+        await using IDbContextTransaction transaction =
+            await _dbContext.Database.BeginTransactionAsync(TestContext.Current.CancellationToken);
+
+        // Act
+        Task Act() => _sut.Write([routed], cancellation.Token);
+
+        // Assert
+        await Assert.ThrowsAsync<OperationCanceledException>(Act);
+        Assert.Empty(_dbContext.ChangeTracker.Entries<OutboxEntry>());
+        Assert.Equal(0, _notificationCount);
+    }
+
+    [Fact(Timeout = 60000)]
+    public async Task Write_WithEmptyBatch_DoesNotStageEntries()
+    {
+        // Arrange
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
+        await using IDbContextTransaction transaction =
+            await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+
+        // Act
+        await _sut.Write([], cancellationToken);
+
+        // Assert
+        Assert.Empty(_dbContext.ChangeTracker.Entries<OutboxEntry>());
     }
 
     [Fact(Timeout = 60000)]
@@ -99,6 +195,7 @@ public abstract class OutboxWriterTests : IntegrationTestsBase
         // Assert
         Assert.Equal(2, _dbContext.ChangeTracker.Entries<OutboxEntry>()
             .Count(entry => entry.State == EntityState.Added));
+        Assert.Equal(0, await CountPersistedEntries());
         Assert.Equal(0, _notificationCount);
 
         await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);

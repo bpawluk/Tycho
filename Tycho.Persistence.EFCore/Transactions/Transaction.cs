@@ -21,17 +21,21 @@ internal sealed class Transaction(TychoDbContext dbContext, ILogger<Transaction>
     public async Task ExecuteAsync(Func<CancellationToken, Task> operation, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(operation);
+        cancellationToken.ThrowIfCancellationRequested();
+
         async Task<bool> ExecuteWithStubResult(CancellationToken token)
         {
             await operation(token).ConfigureAwait(false);
             return true;
         }
+
         await ExecuteAsync(ExecuteWithStubResult, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<TResult> ExecuteAsync<TResult>(Func<CancellationToken, Task<TResult>> operation, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(operation);
+        cancellationToken.ThrowIfCancellationRequested();
 
         if (ExecutionStrategy.Current?.RetriesOnFailure == true)
         {
@@ -62,7 +66,10 @@ internal sealed class Transaction(TychoDbContext dbContext, ILogger<Transaction>
         IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
             TResult result = await operation(cancellationToken).ConfigureAwait(false);
+
+            cancellationToken.ThrowIfCancellationRequested();
             await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
             cancellationToken.ThrowIfCancellationRequested();

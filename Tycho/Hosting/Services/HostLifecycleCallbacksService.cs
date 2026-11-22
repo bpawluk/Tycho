@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +21,11 @@ namespace Tycho.Hosting.Services
         [EntryPoint]
         public async Task StartingAsync(CancellationToken cancellationToken)
         {
-            await using AsyncServiceScope scope = _scopeFactory.CreateAsyncScope();
+            cancellationToken.ThrowIfCancellationRequested();
+
+            AsyncServiceScope scope = _scopeFactory.CreateAsyncScope();
+            await using ConfiguredAsyncDisposable scopeDisposal = scope.ConfigureAwait(false);
+
             await _callbacks.Startup(scope.ServiceProvider, cancellationToken).ConfigureAwait(false);
         }
 
@@ -35,8 +40,10 @@ namespace Tycho.Hosting.Services
         [EntryPoint]
         public async Task StoppedAsync(CancellationToken cancellationToken)
         {
-            await using AsyncServiceScope scope = _scopeFactory.CreateAsyncScope();
-            await _callbacks.Cleanup(scope.ServiceProvider, cancellationToken).ConfigureAwait(false);
+            AsyncServiceScope scope = _scopeFactory.CreateAsyncScope();
+            await using ConfiguredAsyncDisposable scopeDisposal = scope.ConfigureAwait(false);
+
+            await _callbacks.Cleanup(scope.ServiceProvider, CancellationToken.None).ConfigureAwait(false);
         }
     }
 }

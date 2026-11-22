@@ -15,6 +15,7 @@ namespace Tycho.Requests.Pipeline
         {
             async Task<NoResponse> TerminalHandler(TRequest data, CancellationToken token)
             {
+                token.ThrowIfCancellationRequested();
                 await handler.HandleAsync(data, token).ConfigureAwait(false);
                 return NoResponse.Value;
             }
@@ -25,7 +26,13 @@ namespace Tycho.Requests.Pipeline
         public static RequestPipeline<TRequest, TResponse> Build<TRequest, TResponse>(IServiceProvider serviceProvider, IRequestHandler<TRequest, TResponse> handler)
             where TRequest : class, IRequest<TResponse>
         {
-            return Build<TRequest, TResponse>(serviceProvider, handler.HandleAsync, handler is ITransactionalRequestHandler);
+            Task<TResponse> TerminalHandler(TRequest data, CancellationToken token)
+            {
+                token.ThrowIfCancellationRequested();
+                return handler.HandleAsync(data, token);
+            }
+
+            return Build<TRequest, TResponse>(serviceProvider, TerminalHandler, handler is ITransactionalRequestHandler);
         }
 
         private static RequestPipeline<TRequest, TResponse> Build<TRequest, TResponse>(IServiceProvider serviceProvider, RequestHandlerDelegate<TRequest, TResponse> terminalHandler, bool isTransactional)

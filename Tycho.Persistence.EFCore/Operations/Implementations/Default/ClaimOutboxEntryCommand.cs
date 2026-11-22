@@ -24,7 +24,7 @@ internal static class ClaimOutboxEntryCommand
         }
 
         OutboxEntry? entry = await ReadClaimedOutboxEntryQuery
-            .ExecuteAsync(dbContext, owner, request.ClaimId, cancellationToken)
+            .ExecuteAsync(dbContext, owner, request.ClaimId, CancellationToken.None)
             .ConfigureAwait(false);
 
         return entry is null ? ClaimResult<OutboxEntry>.ClaimedButMissing() : ClaimResult<OutboxEntry>.Claimed(entry);

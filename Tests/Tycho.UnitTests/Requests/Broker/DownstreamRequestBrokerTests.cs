@@ -38,6 +38,34 @@ public class DownstreamRequestBrokerTests
         _internals.GetHostBuilder().Services.AddSingleton(_transactionMock.Object);
     }
 
+    [Fact]
+    public async Task Execute_RequestWithoutResponseWithCancelledToken_ThrowsBeforeCreatingScope()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken(canceled: true);
+        var request = new TestRequest();
+
+        // Act
+        Task Act() => _sut.ExecuteAsync(request, cancellationToken);
+
+        // Assert
+        await Assert.ThrowsAsync<OperationCanceledException>(Act);
+    }
+
+    [Fact]
+    public async Task Execute_RequestWithResponseAndCancelledToken_ThrowsBeforeCreatingScope()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken(canceled: true);
+        var request = new TestRequestWithResponse();
+
+        // Act
+        Task Act() => _sut.ExecuteAsync<TestRequestWithResponse, string>(request, cancellationToken);
+
+        // Assert
+        await Assert.ThrowsAsync<OperationCanceledException>(Act);
+    }
+
     [Theory]
     [InlineData(true)]
     [InlineData(false)]

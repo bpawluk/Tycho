@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,7 +32,9 @@ internal sealed class PersistenceRetentionService(
             {
                 try
                 {
-                    await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
+                    AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
+                    await using ConfiguredAsyncDisposable scopeDisposal = scope.ConfigureAwait(false);
+
                     await CleanupAsync(scope.ServiceProvider, clock.GetUtcNow().UtcDateTime, stoppingToken).ConfigureAwait(false);
                 }
                 catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
@@ -98,6 +101,8 @@ internal sealed class PersistenceRetentionService(
         string store,
         CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         if (retention is not TimeSpan duration)
         {
             return;

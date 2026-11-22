@@ -199,7 +199,7 @@ public class OutboxProcessorJobTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WithAssignedEvent_WhenMarkingAsDeliveredThrows_MarksEventAsFailed()
+    public async Task ExecuteAsync_WhenMarkingAsDeliveredThrows_PropagatesWithoutMarkingDeliveryFailed()
     {
         // Arrange
         OutboxEvent outboxEvent = CreateOutboxEvent();
@@ -213,14 +213,40 @@ public class OutboxProcessorJobTests
             .Setup(o => o.MarkAsDeliveredAsync(outboxEvent.EventId, outboxEvent.ClaimId, cancellationToken))
             .ThrowsAsync(new Exception("outbox failure"));
 
-        // Act
         _sut.ForEvent(outboxEvent);
-        await _sut.ExecuteAsync(cancellationToken);
+
+        // Act
+        Task Act() => _sut.ExecuteAsync(cancellationToken);
 
         // Assert
+        await Assert.ThrowsAsync<Exception>(Act);
         _delivererMock.Verify(b => b.DeliverAsync(outboxEvent.RoutedEvent, cancellationToken), Times.Once);
         _outboxConsumerMock.Verify(o => o.MarkAsDeliveredAsync(outboxEvent.EventId, outboxEvent.ClaimId, cancellationToken), Times.Once);
-        _outboxConsumerMock.Verify(o => o.MarkAsFailedAsync(outboxEvent.EventId, outboxEvent.ClaimId, cancellationToken), Times.Once);
+        _outboxConsumerMock.Verify(o => o.MarkAsFailedAsync(outboxEvent.EventId, outboxEvent.ClaimId, It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenDeliveryCompletesAfterCancellation_MarksClaimAsDelivered()
+    {
+        // Arrange
+        OutboxEvent outboxEvent = CreateOutboxEvent();
+        using var cancellation = new CancellationTokenSource();
+
+        _delivererMock
+            .Setup(deliverer => deliverer.DeliverAsync(outboxEvent.RoutedEvent, cancellation.Token))
+            .Returns(() =>
+            {
+                cancellation.Cancel();
+                return Task.CompletedTask;
+            });
+        _sut.ForEvent(outboxEvent);
+
+        // Act
+        await _sut.ExecuteAsync(cancellation.Token);
+
+        // Assert
+        _outboxConsumerMock.Verify(outbox => outbox.MarkAsDeliveredAsync(
+            outboxEvent.EventId, outboxEvent.ClaimId, CancellationToken.None), Times.Once);
     }
 
     private static OutboxEvent CreateOutboxEvent()

@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,8 +35,10 @@ namespace Tycho.Requests.Broker
             where TRequest : class, IRequest
         {
             requestData.ThrowIfNull();
+            cancellationToken.ThrowIfCancellationRequested();
 
-            await using AsyncServiceScope scope = _internals.CreateAsyncScope();
+            AsyncServiceScope scope = _internals.CreateAsyncScope();
+            await using ConfiguredAsyncDisposable scopeDisposal = scope.ConfigureAwait(false);
 
             IUpstreamRequestRegistration<TRequest> registration = scope.ServiceProvider.GetRequiredService<IUpstreamRequestRegistration<TRequest>>();
             RequestPipeline<TRequest, NoResponse> pipeline = RequestPipelineBuilder.Build(scope.ServiceProvider, registration.Handler);
@@ -47,8 +50,10 @@ namespace Tycho.Requests.Broker
             where TRequest : class, IRequest<TResponse>
         {
             requestData.ThrowIfNull();
+            cancellationToken.ThrowIfCancellationRequested();
 
-            await using AsyncServiceScope scope = _internals.CreateAsyncScope();
+            AsyncServiceScope scope = _internals.CreateAsyncScope();
+            await using ConfiguredAsyncDisposable scopeDisposal = scope.ConfigureAwait(false);
 
             IUpstreamRequestRegistration<TRequest, TResponse> registration = scope.ServiceProvider.GetRequiredService<IUpstreamRequestRegistration<TRequest, TResponse>>();
             RequestPipeline<TRequest, TResponse> pipeline = RequestPipelineBuilder.Build(scope.ServiceProvider, registration.Handler);

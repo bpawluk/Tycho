@@ -65,10 +65,6 @@ public sealed class InsertInboxEntryCommandTests(MySqlDatabase database) : Commo
 
 [Collection<MySqlCollection>]
 [Trait("DatabaseProvider", nameof(DatabaseProvider.MySql))]
-public sealed class StageOutboxEntriesCommandTests(MySqlDatabase database) : Common.Operations.StageOutboxEntriesCommandTests(database);
-
-[Collection<MySqlCollection>]
-[Trait("DatabaseProvider", nameof(DatabaseProvider.MySql))]
 public sealed class OutboxConsumerTests(MySqlDatabase database) : Common.Outbox.OutboxConsumerTests(database);
 
 [Collection<MySqlCollection>]

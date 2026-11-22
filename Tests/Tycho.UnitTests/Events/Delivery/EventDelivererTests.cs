@@ -12,6 +12,21 @@ namespace Tycho.UnitTests.Events.Delivery;
 public sealed class EventDelivererTests
 {
     [Fact]
+    public async Task DeliverAsync_WithNullEventAndCancelledToken_ThrowsArgumentNullException()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken(canceled: true);
+        var controlPlane = new ControlPlane(InstanceIdentity.Create(typeof(EventDelivererTests)));
+        var sut = new EventDeliverer(controlPlane);
+
+        // Act
+        Task Act() => sut.DeliverAsync(null!, cancellationToken);
+
+        // Assert
+        await Assert.ThrowsAsync<ArgumentNullException>("routedEvent", Act);
+    }
+
+    [Fact]
     public async Task DeliverAsync_WithRegisteredDestination_AcceptsOnlyAtThatEndpoint()
     {
         // Arrange

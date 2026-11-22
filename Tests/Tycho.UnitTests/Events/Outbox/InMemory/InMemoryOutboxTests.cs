@@ -24,6 +24,106 @@ public class InMemoryOutboxTests
     }
 
     [Fact]
+    public async Task Write_WithNullInputAndCancelledToken_ThrowsArgumentNullException()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken(canceled: true);
+
+        // Act
+        Task Act() => _sut.Write(null!, cancellationToken);
+
+        // Assert
+        await Assert.ThrowsAsync<ArgumentNullException>("routedEvents", Act);
+    }
+
+    [Fact]
+    public async Task Write_WithCancelledToken_ThrowsWithoutEnqueueing()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken(canceled: true);
+        RoutedEvent routedEvent = CreateRoutedEvent();
+
+        // Act
+        Task Act() => _sut.Write([routedEvent], cancellationToken);
+
+        // Assert
+        await Assert.ThrowsAsync<OperationCanceledException>(Act);
+        Assert.Null(await _sut.TryReadAsync(TestContext.Current.CancellationToken));
+        _eventSerializerMock.VerifyNoOtherCalls();
+    }
+
+    [Fact]
+    public async Task TryReadAsync_WithCancelledToken_ThrowsWithoutDequeuing()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken(canceled: true);
+        (SerializedRoutedEvent expected, RoutedEvent routed) = CreateSerializedAndRoutedEventPair();
+        await _sut.Write([routed], TestContext.Current.CancellationToken);
+
+        // Act
+        Task Act() => _sut.TryReadAsync(cancellationToken);
+
+        // Assert
+        await Assert.ThrowsAsync<OperationCanceledException>(Act);
+        OutboxEvent remaining = Assert.IsType<OutboxEvent>(await _sut.TryReadAsync(TestContext.Current.CancellationToken));
+        Assert.Same(expected, remaining.RoutedEvent);
+    }
+
+    [Fact]
+    public async Task MarkAsDeliveredAsync_WithCancelledToken_ThrowsOperationCanceledException()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken(canceled: true);
+        var entryId = Guid.NewGuid();
+        var claimId = Guid.NewGuid();
+
+        // Act
+        Task Act() => _sut.MarkAsDeliveredAsync(entryId, claimId, cancellationToken);
+
+        // Assert
+        await Assert.ThrowsAsync<OperationCanceledException>(Act);
+    }
+
+    [Fact]
+    public async Task MarkAsFailedAsync_WithCancelledToken_ThrowsOperationCanceledException()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken(canceled: true);
+        var entryId = Guid.NewGuid();
+        var claimId = Guid.NewGuid();
+
+        // Act
+        Task Act() => _sut.MarkAsFailedAsync(entryId, claimId, cancellationToken);
+
+        // Assert
+        await Assert.ThrowsAsync<OperationCanceledException>(Act);
+    }
+
+    [Fact]
+    public async Task Write_WhenSerializationCancels_ThrowsWithoutEnqueueingOrNotifying()
+    {
+        // Arrange
+        using var cancellation = new CancellationTokenSource();
+        (SerializedRoutedEvent serialized, RoutedEvent routed) = CreateSerializedAndRoutedEventPair();
+        _eventSerializerMock.Setup(serializer => serializer.Serialize(routed))
+            .Returns(() =>
+            {
+                cancellation.Cancel();
+                return serialized;
+            });
+        bool notified = false;
+        _outboxActivity.NewEntriesAdded += (_, _) => notified = true;
+
+        // Act
+        Task Act() => _sut.Write([routed], cancellation.Token);
+
+        // Assert
+        await Assert.ThrowsAsync<OperationCanceledException>(Act);
+        Assert.Null(await _sut.TryReadAsync(TestContext.Current.CancellationToken));
+        Assert.False(notified);
+    }
+
+    [Fact]
     public async Task Write_WithRoutedEvents_EnqueuesEntries()
     {
         // Arrange

@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,15 +22,17 @@ namespace Tycho.Events.Delivery
         [EntryPoint]
         public async Task AcceptAsync(SerializedRoutedEvent routedEvent, CancellationToken cancellationToken)
         {
+            routedEvent.ThrowIfNull();
             if (routedEvent.DestinationId != _internals.OwnerId)
             {
                 throw new InvalidOperationException(
                     $"Routed event destination '{routedEvent.DestinationId}' " +
                     $"does not match '{_internals.OwnerId}' endpoint.");
             }
-
             cancellationToken.ThrowIfCancellationRequested();
-            await using AsyncServiceScope scope = _internals.CreateAsyncScope();
+
+            AsyncServiceScope scope = _internals.CreateAsyncScope();
+            await using ConfiguredAsyncDisposable scopeDisposal = scope.ConfigureAwait(false);
 
             IInboxWriter inbox = scope.ServiceProvider.GetRequiredService<IInboxWriter>();
             await inbox.Write(routedEvent, cancellationToken).ConfigureAwait(false);

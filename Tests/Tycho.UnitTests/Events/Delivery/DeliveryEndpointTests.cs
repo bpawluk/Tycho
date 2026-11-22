@@ -28,6 +28,19 @@ public sealed class DeliveryEndpointTests : IDisposable
     }
 
     [Fact]
+    public async Task AcceptAsync_WithNullEventAndCancelledToken_ThrowsArgumentNullException()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken(canceled: true);
+
+        // Act
+        Task Act() => _sut.AcceptAsync(null!, cancellationToken);
+
+        // Assert
+        await Assert.ThrowsAsync<ArgumentNullException>("routedEvent", Act);
+    }
+
+    [Fact]
     public async Task AcceptAsync_WithMatchingDestination_WritesOriginalEventAndTokenToInbox()
     {
         // Arrange

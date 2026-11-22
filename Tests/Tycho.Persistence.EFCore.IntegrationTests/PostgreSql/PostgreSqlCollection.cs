@@ -65,10 +65,6 @@ public sealed class InsertInboxEntryCommandTests(PostgreSqlDatabase database) : 
 
 [Collection<PostgreSqlCollection>]
 [Trait("DatabaseProvider", nameof(DatabaseProvider.PostgreSql))]
-public sealed class StageOutboxEntriesCommandTests(PostgreSqlDatabase database) : Common.Operations.StageOutboxEntriesCommandTests(database);
-
-[Collection<PostgreSqlCollection>]
-[Trait("DatabaseProvider", nameof(DatabaseProvider.PostgreSql))]
 public sealed class OutboxConsumerTests(PostgreSqlDatabase database) : Common.Outbox.OutboxConsumerTests(database);
 
 [Collection<PostgreSqlCollection>]

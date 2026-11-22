@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,10 +40,15 @@ namespace Tycho.Events.Outbox
         [EntryPoint]
         public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            await using AsyncServiceScope scope = _internals.CreateAsyncScope();
+            cancellationToken.ThrowIfCancellationRequested();
+
+            AsyncServiceScope scope = _internals.CreateAsyncScope();
+            await using ConfiguredAsyncDisposable scopeDisposal = scope.ConfigureAwait(false);
+
             ILogger<OutboxProcessorJob>? logger = scope.ServiceProvider.GetService<ILogger<OutboxProcessorJob>>();
 
-            if (_event is null)
+            OutboxEvent? outboxEvent = _event;
+            if (outboxEvent is null)
             {
                 logger?.OutboxJobIsMissing();
                 return;
@@ -50,30 +56,39 @@ namespace Tycho.Events.Outbox
 
             IOutboxConsumer outbox = scope.ServiceProvider.GetRequiredService<IOutboxConsumer>();
 
+            bool delivered = await TryDeliverAsync(outboxEvent, scope.ServiceProvider, logger, cancellationToken).ConfigureAwait(false);
+            bool statusUpdated = delivered
+                ? await outbox.MarkAsDeliveredAsync(outboxEvent.EventId, outboxEvent.ClaimId, CancellationToken.None).ConfigureAwait(false)
+                : await outbox.MarkAsFailedAsync(outboxEvent.EventId, outboxEvent.ClaimId, CancellationToken.None).ConfigureAwait(false);
+
+            if (!statusUpdated)
+            {
+                logger?.OutboxMessageStatusUpdateFailed(outboxEvent.EventId, outboxEvent.ClaimId);
+            }
+        }
+
+        private static async Task<bool> TryDeliverAsync(
+            OutboxEvent outboxEvent,
+            IServiceProvider services,
+            ILogger<OutboxProcessorJob>? logger,
+            CancellationToken cancellationToken)
+        {
             try
             {
-                IEventDeliverer deliverer = scope.ServiceProvider.GetRequiredService<IEventDeliverer>();
-                await deliverer.DeliverAsync(_event.RoutedEvent, cancellationToken).ConfigureAwait(false);
+                IEventDeliverer deliverer = services.GetRequiredService<IEventDeliverer>();
+                cancellationToken.ThrowIfCancellationRequested();
 
-                bool markedAsDelivered = await outbox.MarkAsDeliveredAsync(_event.EventId, _event.ClaimId, cancellationToken).ConfigureAwait(false);
-                if (!markedAsDelivered)
-                {
-                    logger?.OutboxMessageStatusUpdateFailed(_event.EventId, _event.ClaimId);
-                }
+                await deliverer.DeliverAsync(outboxEvent.RoutedEvent, cancellationToken).ConfigureAwait(false);
+                return true;
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                logger?.OutboxMessageDeliveryFailed(_event.EventId, ex);
-
-                bool markedAsFailed = await outbox.MarkAsFailedAsync(_event.EventId, _event.ClaimId, cancellationToken).ConfigureAwait(false);
-                if (!markedAsFailed)
-                {
-                    logger?.OutboxMessageStatusUpdateFailed(_event.EventId, _event.ClaimId);
-                }
+                logger?.OutboxMessageDeliveryFailed(outboxEvent.EventId, exception);
+                return false;
             }
         }
     }

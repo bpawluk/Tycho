@@ -13,6 +13,23 @@ namespace Tycho.UnitTests.Events.Routing;
 
 public sealed class EventRouterTests
 {
+    [Fact]
+    public async Task RouteAsync_WithCancelledToken_ThrowsBeforeCreatingScope()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken(canceled: true);
+        using var internals = new AppInternals(Host.CreateEmptyApplicationBuilder(default), typeof(EventRouterTests));
+        var sut = new EventRouter(internals);
+        var publishId = Guid.NewGuid();
+        var eventPayload = new TestEvent();
+
+        // Act
+        Task Act() => sut.RouteAsync(publishId, eventPayload, cancellationToken);
+
+        // Assert
+        await Assert.ThrowsAsync<OperationCanceledException>(Act);
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]

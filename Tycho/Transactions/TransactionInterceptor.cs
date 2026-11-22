@@ -19,6 +19,7 @@ namespace Tycho.Transactions
             TRequest requestData,
             CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             return _transaction.ExecuteAsync(
                 token => next(requestData, token),
                 cancellationToken);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +26,11 @@ namespace Tycho.Events.Routing
             CancellationToken cancellationToken)
             where TEvent : class, IEvent
         {
-            await using AsyncServiceScope scope = _internals.CreateAsyncScope();
+            cancellationToken.ThrowIfCancellationRequested();
+
+            AsyncServiceScope scope = _internals.CreateAsyncScope();
+            await using ConfiguredAsyncDisposable scopeDisposal = scope.ConfigureAwait(false);
+
             IEventRouter scopedRouter = scope.ServiceProvider.GetRequiredService<IEventRouter>();
             return await scopedRouter.RouteAsync(publishId, eventPayload, cancellationToken).ConfigureAwait(false);
         }

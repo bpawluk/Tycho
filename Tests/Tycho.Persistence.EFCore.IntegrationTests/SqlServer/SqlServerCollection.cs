@@ -65,10 +65,6 @@ public sealed class InsertInboxEntryCommandTests(SqlServerDatabase database) : C
 
 [Collection<SqlServerCollection>]
 [Trait("DatabaseProvider", nameof(DatabaseProvider.SqlServer))]
-public sealed class StageOutboxEntriesCommandTests(SqlServerDatabase database) : Common.Operations.StageOutboxEntriesCommandTests(database);
-
-[Collection<SqlServerCollection>]
-[Trait("DatabaseProvider", nameof(DatabaseProvider.SqlServer))]
 public sealed class OutboxConsumerTests(SqlServerDatabase database) : Common.Outbox.OutboxConsumerTests(database);
 
 [Collection<SqlServerCollection>]

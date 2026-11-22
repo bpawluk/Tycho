@@ -1,4 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Moq;
 using Tycho.Events.Inbox;
 using Tycho.Events.Model;
 using Tycho.Identity.Events;
@@ -32,6 +35,76 @@ public abstract class InboxWriterTests : IntegrationTestsBase
 
         _persistenceOwner = new PersistenceOwner(PersistenceTestInternals.Create(typeof(PersistenceOwner)));
         _sut = new InboxWriter(_inboxActivity, _dbContext, _persistenceOwner);
+    }
+
+    [Fact]
+    public async Task Write_WithNullEventAndCancelledToken_ThrowsArgumentNullException()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken(canceled: true);
+
+        // Act
+        Task Act() => _sut.Write(null!, cancellationToken);
+
+        // Assert
+        await Assert.ThrowsAsync<ArgumentNullException>("serializedEvent", Act);
+    }
+
+    [Fact]
+    public async Task Write_WithCancelledToken_ThrowsWithoutTrackingEntryOrNotifying()
+    {
+        // Arrange
+        var cancellationToken = new CancellationToken(canceled: true);
+        SerializedEvent serializedEvent = CreateSerializedEvent();
+
+        // Act
+        Task Act() => _sut.Write(serializedEvent, cancellationToken);
+
+        // Assert
+        await Assert.ThrowsAsync<OperationCanceledException>(Act);
+        Assert.Empty(_dbContext.ChangeTracker.Entries<InboxEntry>());
+        Assert.Equal(0, _inboxActivityNotificationCount);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Write_WhenSaveFails_DetachesOnlyNewEntriesAndPropagatesFailure(bool cancelSave)
+    {
+        // Arrange
+        using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        Exception saveFailure = cancelSave
+            ? new OperationCanceledException(cancellation.Token)
+            : new InvalidOperationException("Save failed.");
+
+        var interceptor = new Mock<SaveChangesInterceptor> { CallBase = true };
+        interceptor
+            .Setup(value => value.SavingChangesAsync(It.IsAny<DbContextEventData>(), It.IsAny<InterceptionResult<int>>(), cancellation.Token))
+            .Returns(() =>
+            {
+                if (cancelSave)
+                {
+                    cancellation.Cancel();
+                }
+
+                return ValueTask.FromException<InterceptionResult<int>>(saveFailure);
+            });
+
+        await using var dbContext = new TestDbContext(Database.CreateOptionsBuilder<TestDbContext>().AddInterceptors(interceptor.Object).Options);
+        var existingEntry = new InboxEntry { OwnerId = _persistenceOwner.Identifier, EntryId = Guid.NewGuid() };
+        dbContext.Set<InboxEntry>().Add(existingEntry);
+        var sut = new InboxWriter(_inboxActivity, dbContext, _persistenceOwner);
+        SerializedEvent serializedEvent = CreateSerializedEvent();
+
+        // Act
+        Exception? actual = await Record.ExceptionAsync(() => sut.Write(serializedEvent, cancellation.Token));
+
+        // Assert
+        Assert.Same(saveFailure, actual);
+        EntityEntry<InboxEntry> remainingEntry = Assert.Single(dbContext.ChangeTracker.Entries<InboxEntry>());
+        Assert.Same(existingEntry, remainingEntry.Entity);
+        Assert.Equal(EntityState.Added, remainingEntry.State);
+        Assert.Equal(0, _inboxActivityNotificationCount);
     }
 
     [Fact(Timeout = 60000)]

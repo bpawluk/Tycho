@@ -21,6 +21,7 @@ namespace Tycho.Requests.Pipeline
 
         public Task<TResponse> ExecuteAsync(TRequest requestData, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             return _executeHandlerPipeline(requestData, cancellationToken);
         }
     }

@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Tycho.Events.Model;
 using Tycho.Structure;
+using Tycho.Utils;
 
 namespace Tycho.Events.Delivery
 {
@@ -16,6 +17,8 @@ namespace Tycho.Events.Delivery
 
         public async Task DeliverAsync(SerializedRoutedEvent routedEvent, CancellationToken cancellationToken)
         {
+            routedEvent.ThrowIfNull();
+            cancellationToken.ThrowIfCancellationRequested();
             await _controlPlane
                 .GetModule(routedEvent.DestinationId)
                 .Endpoint

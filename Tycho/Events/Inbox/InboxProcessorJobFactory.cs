@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +20,8 @@ namespace Tycho.Events.Inbox
         [EntryPoint]
         public async Task<IJob?> TryCreateJobAsync(CancellationToken cancellationToken)
         {
-            await using AsyncServiceScope scope = _internals.CreateAsyncScope();
+            AsyncServiceScope scope = _internals.CreateAsyncScope();
+            await using ConfiguredAsyncDisposable scopeDisposal = scope.ConfigureAwait(false);
 
             IInboxConsumer inbox = scope.ServiceProvider.GetRequiredService<IInboxConsumer>();
             InboxEvent? receivedEvent = await inbox.TryReadAsync(cancellationToken).ConfigureAwait(false);

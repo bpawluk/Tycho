@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,9 @@ internal class InboxWriter(
 
     public async Task Write(SerializedEvent serializedEvent, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(serializedEvent);
+        cancellationToken.ThrowIfCancellationRequested();
+
         var inboxEntry = new InboxEntry
         {
             OwnerId = owner.Identifier,
@@ -33,7 +37,9 @@ internal class InboxWriter(
         }
         catch (DbUpdateException)
         {
-            InboxEntry? existing = await FindInboxEntryQuery.ExecuteAsync(dbContext, owner, inboxEntry.EntryId, cancellationToken).ConfigureAwait(false);
+            InboxEntry? existing = await FindInboxEntryQuery
+                .ExecuteAsync(dbContext, owner, inboxEntry.EntryId, CancellationToken.None)
+                .ConfigureAwait(false);
 
             if (existing is null ||
                 existing.PublishId != inboxEntry.PublishId ||

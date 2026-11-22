@@ -177,7 +177,9 @@ namespace Tycho.Processor
         {
             await _jobRunner.WaitForCapacityAsync(_processingCts.Token).ConfigureAwait(false);
 
+            _processingCts.Token.ThrowIfCancellationRequested();
             IJob? job = await _jobFactory.TryCreateJobAsync(_processingCts.Token).ConfigureAwait(false);
+
             if (job == null)
             {
                 return false;

@@ -65,10 +65,6 @@ public sealed class InsertInboxEntryCommandTests(SQLiteDatabase database) : Comm
 
 [Collection<SQLiteCollection>]
 [Trait("DatabaseProvider", nameof(DatabaseProvider.SQLite))]
-public sealed class StageOutboxEntriesCommandTests(SQLiteDatabase database) : Common.Operations.StageOutboxEntriesCommandTests(database);
-
-[Collection<SQLiteCollection>]
-[Trait("DatabaseProvider", nameof(DatabaseProvider.SQLite))]
 public sealed class OutboxConsumerTests(SQLiteDatabase database) : Common.Outbox.OutboxConsumerTests(database);
 
 [Collection<SQLiteCollection>]

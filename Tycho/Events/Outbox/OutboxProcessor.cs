@@ -41,8 +41,11 @@ namespace Tycho.Events.Outbox
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             _outboxActivity.NewEntriesAdded += OnEntriesAdded;
             _jobProcessor.Start();
+
             return Task.CompletedTask;
         }
 

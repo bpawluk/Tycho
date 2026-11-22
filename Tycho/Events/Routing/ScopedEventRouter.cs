@@ -23,11 +23,15 @@ namespace Tycho.Events.Routing
             CancellationToken cancellationToken)
             where TEvent : class, IEvent
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             IEnumerable<IEventRegistration<TEvent>> registrations = _serviceProvider.GetServices<IEventRegistration<TEvent>>();
             var routedEvents = new List<RoutedEvent>();
 
             foreach (IEventRegistration<TEvent> registration in registrations)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 IReadOnlyCollection<RoutedEvent> registrationEvents = await registration
                     .RouteAsync(publishId, eventPayload, cancellationToken)
                     .ConfigureAwait(false);
