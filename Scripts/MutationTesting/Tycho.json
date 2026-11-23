@@ -1,0 +1,16 @@
+{
+  "stryker-config": {
+    "project": "Tycho.csproj",
+    "test-projects": [
+      "../Tests/Tycho.UnitTests/Tycho.UnitTests.csproj",
+      "../Tests/Tycho.IntegrationTests/Tycho.IntegrationTests.csproj",
+      "../Tests/Tycho.Persistence.EFCore.UseCaseTests/Tycho.Persistence.EFCore.UseCaseTests.csproj"
+    ],
+    "test-runner": "mtp",
+    "mutation-level": "Standard",
+    "mutate": ["**/*.cs", "!**/*.g.cs", "!**/obj/**", "!**/bin/**"],
+    "reporters": ["html", "json", "progress", "cleartext"],
+    "thresholds": { "high": 80, "low": 60, "break": 0 },
+    "break-on-initial-test-failure": true
+  }
+}

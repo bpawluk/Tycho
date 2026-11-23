@@ -1,0 +1,46 @@
+using System;
+using System.ComponentModel.DataAnnotations;
+using Tycho.Persistence.EFCore.Entries;
+
+namespace Tycho.Persistence.EFCore.Outbox;
+
+internal class OutboxEntry
+{
+    [Required, MaxLength(32)]
+    public string OwnerId { get; set; } = string.Empty;
+
+    public Guid EntryId { get; set; } = Guid.Empty;
+
+    [Required]
+    public Guid PublishId { get; set; } = Guid.Empty;
+
+    [Required]
+    public string Destination { get; set; } = string.Empty;
+
+    [Required]
+    public string Handler { get; set; } = string.Empty;
+
+    [Required]
+    public string Event { get; set; } = string.Empty;
+
+    [Required]
+    public string Payload { get; set; } = string.Empty;
+
+    [Required]
+    public EntryState State { get; set; } = EntryState.New;
+
+    [Required]
+    public DateTime Created { get; set; } = DateTime.UtcNow;
+
+    [Required]
+    public DateTime Updated { get; set; } = DateTime.UtcNow;
+
+    [Required]
+    public uint Attempts { get; set; } = 0;
+
+    [Required]
+    public Guid ClaimId { get; set; } = Guid.Empty;
+
+    [Required]
+    public DateTime ClaimExpiration { get; set; } = DateTime.MinValue;
+}

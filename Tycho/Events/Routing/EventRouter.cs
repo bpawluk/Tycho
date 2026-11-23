@@ -1,18 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Tycho.Structure.Internal;
+using Tycho.Events.Model;
+using Tycho.Structure;
+using Tycho.Utils;
 
 namespace Tycho.Events.Routing
 {
-    internal interface IEventRouter
-    {
-        IReadOnlyCollection<HandlerIdentity> IdentifyHandlers<TEvent>()
-            where TEvent : class, IEvent;
-
-        IEventHandler? FindHandler(HandlerIdentity handlerIdentity);
-    }
-
     internal class EventRouter : IEventRouter
     {
         private readonly Internals _internals;
@@ -22,25 +19,20 @@ namespace Tycho.Events.Routing
             _internals = internals;
         }
 
-        public IReadOnlyCollection<HandlerIdentity> IdentifyHandlers<TEvent>()
+        [EntryPoint]
+        public async Task<IReadOnlyCollection<RoutedEvent>> RouteAsync<TEvent>(
+            Guid publishId,
+            TEvent eventPayload,
+            CancellationToken cancellationToken)
             where TEvent : class, IEvent
         {
-            var sources = _internals.GetServices<IHandlersSource>();
-            return sources.SelectMany(source => source.IdentifyHandlers<TEvent>()).ToArray();
-        }
+            cancellationToken.ThrowIfCancellationRequested();
 
-        public IEventHandler? FindHandler(HandlerIdentity handlerIdentity)
-        {
-            foreach (var source in _internals.GetServices<IHandlersSource>())
-            {
-                var handler = source.FindHandler(handlerIdentity);
-                if (handler != null)
-                {
-                    return handler;
-                }
-            }
+            AsyncServiceScope scope = _internals.CreateAsyncScope();
+            await using ConfiguredAsyncDisposable scopeDisposal = scope.ConfigureAwait(false);
 
-            return null;
+            IEventRouter scopedRouter = scope.ServiceProvider.GetRequiredService<IEventRouter>();
+            return await scopedRouter.RouteAsync(publishId, eventPayload, cancellationToken).ConfigureAwait(false);
         }
     }
 }

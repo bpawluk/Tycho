@@ -1,0 +1,45 @@
+using Microsoft.Extensions.Hosting;
+using Tycho.Identity.Structure;
+using Tycho.Modules.Setup;
+using Tycho.Structure;
+using Tycho.TestUtils.Modules;
+
+namespace Tycho.UnitTests.Modules.Setup;
+
+public class ModuleStructureTests
+{
+    private readonly Internals _internals;
+    private readonly ModuleStructure _sut;
+
+    public ModuleStructureTests()
+    {
+        _internals = new ModuleInternals(
+            Host.CreateEmptyApplicationBuilder(default),
+            new ControlPlane(InstanceIdentity.Create(typeof(ModuleStructureTests))),
+            typeof(ModuleStructureTests));
+        _sut = new ModuleStructure(_internals);
+    }
+
+    [Fact]
+    public void Uses_SameModuleTwice_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        _sut.Uses<TestModule>();
+
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(() => _sut.Uses<TestModule>());
+    }
+
+    [Fact]
+    public void Uses_WithContractFulfillmentAction_InvokesTheAction()
+    {
+        // Arrange
+        bool actionInvoked = false;
+
+        // Act
+        _sut.Uses<TestModule>(_ => { actionInvoked = true; });
+
+        // Assert
+        Assert.True(actionInvoked);
+    }
+}

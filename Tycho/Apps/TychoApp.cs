@@ -1,124 +1,125 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Tycho.Apps.Setup;
-using Tycho.Structure;
+using Tycho.Hosting;
+using Tycho.Hosting.Files;
+using Tycho.Utils;
 
 namespace Tycho.Apps
 {
     /// <summary>
-    /// Base class for defining a Tycho application
+    /// Base class for defining a Tycho application.
     /// </summary>
+    [ReferencedBySourceGenerator]
     public abstract class TychoApp
     {
-        private readonly object _runLock;
-        private readonly AppBuilder _builder;
-
-        private bool _wasAlreadyRun = false;
-
-        protected IConfiguration Configuration => _builder.Globals.Configuration;
-
-        public TychoApp()
-        { 
-            _runLock = new object();
-            _builder = new AppBuilder(GetType());
-        }
-
         /// <summary>
-        /// Use this method to define requests handled by the application
+        /// Defines the requests handled by the application.
         /// </summary>
-        /// <param name="app">An interface to define the requests</param>
+        [ReferencedBySourceGenerator]
         protected abstract void DefineContract(IAppContract app);
 
         /// <summary>
-        /// Use this method to define events handled and routed by the application
+        /// Defines the events handled and routed by the application.
         /// </summary>
-        /// <param name="app">An interface to define the events</param>
+        [ReferencedBySourceGenerator]
         protected abstract void DefineEvents(IAppEvents app);
 
         /// <summary>
-        /// Use this method to define modules used by the application
+        /// Defines the modules used by the application.
         /// </summary>
-        /// <param name="app">An interface to include the modules</param>
+        [ReferencedBySourceGenerator]
         protected abstract void IncludeModules(IAppStructure app);
 
         /// <summary>
-        /// Use this method to define services required by the application
+        /// Registers services required by the application.
         /// </summary>
-        /// <param name="app">An interface to register the services</param>
         protected abstract void RegisterServices(IServiceCollection app);
 
         /// <summary>
-        /// Override this method if you need to execute code before the application runs
+        /// Creates the internal host builder used by the application.
         /// </summary>
-        /// <param name="app">A provider of the services configured for the application</param>
-        protected virtual Task Startup(IServiceProvider app)
+        protected virtual HostApplicationBuilder CreateHostBuilder()
         {
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Override this method if you need to execute code before the application is disposed
-        /// </summary>
-        /// <param name="app">A provider of the services configured for the application</param>
-        protected virtual Task Cleanup(IServiceProvider app)
-        {
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Supplies global configuration for the application and its modules
-        /// </summary>
-        /// <param name="globalConfiguration">Configuration to be used</param>
-        public TychoApp WithConfiguration(IConfiguration globalConfiguration)
-        {
-            _builder.WithConfiguration(globalConfiguration);
-            return this;
-        }
-
-        /// <summary>
-        /// Configures logging for the application and its modules
-        /// </summary>
-        /// <param name="loggingSetup">Logging setup to be used</param>
-        public TychoApp WithLogging(Action<ILoggingBuilder> loggingSetup)
-        {
-            _builder.WithLogging(loggingSetup);
-            return this;
-        }
-
-        /// <summary>
-        /// Builds the application according to the definition and runs it
-        /// </summary>
-        /// <returns>A fresh and ready to use instance of the application</returns>
-        /// <exception cref="InvalidOperationException"/>
-        public async Task<IApp> Run()
-        {
-            EnsureItIsRunOnlyOnce();
-
-            _builder.WithCleanup(Cleanup).Init();
-            RegisterServices(_builder.Services);
-            DefineContract(_builder.Contract);
-            DefineEvents(_builder.Events);
-            IncludeModules(_builder.Structure);
-
-            var app = await _builder.Build().ConfigureAwait(false);
-            await Startup(app.Internals).ConfigureAwait(false);
-
-            return app;
-        }
-
-        private void EnsureItIsRunOnlyOnce()
-        {
-            lock (_runLock)
+            return Host.CreateEmptyApplicationBuilder(new HostApplicationBuilderSettings
             {
-                if (_wasAlreadyRun)
-                {
-                    throw new InvalidOperationException("This app has already been run");
-                }
-                _wasAlreadyRun = true;
+                ApplicationName = GetType().Assembly.GetName().Name,
+            });
+        }
+
+        /// <summary>
+        /// Configures the internal application host.
+        /// </summary>
+        protected virtual void ConfigureHost(IServiceProvider? parentServiceProvider, HostApplicationBuilder appHostBuilder)
+        {
+            appHostBuilder.Services.RemoveAll<IHostLifetime>();
+            appHostBuilder.Services.AddSingleton<IHostLifetime, StandaloneHostLifetime>();
+
+            if (parentServiceProvider == null)
+            {
+                return;
             }
+
+            IHostEnvironment parentEnvironment = parentServiceProvider.GetRequiredService<IHostEnvironment>();
+            appHostBuilder.Environment.EnvironmentName = parentEnvironment.EnvironmentName;
+            appHostBuilder.Environment.ContentRootPath = parentEnvironment.ContentRootPath;
+
+            IFileProvider parentFileProvider = parentEnvironment.ContentRootFileProvider;
+            appHostBuilder.Environment.ContentRootFileProvider =
+                parentFileProvider is NonDisposingFileProvider
+                    ? parentFileProvider
+                    : new NonDisposingFileProvider(parentFileProvider);
+
+            IConfiguration parentConfiguration = parentServiceProvider.GetRequiredService<IConfiguration>();
+            appHostBuilder.Configuration.AddConfiguration(parentConfiguration, shouldDisposeConfiguration: false);
+            appHostBuilder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                [HostDefaults.ApplicationKey] = appHostBuilder.Environment.ApplicationName,
+                [HostDefaults.EnvironmentKey] = appHostBuilder.Environment.EnvironmentName,
+                [HostDefaults.ContentRootKey] = appHostBuilder.Environment.ContentRootPath,
+            });
+
+            ILoggerFactory parentLoggerFactory = parentServiceProvider.GetRequiredService<ILoggerFactory>();
+            appHostBuilder.Services.AddSingleton(parentLoggerFactory);
+        }
+
+        /// <summary>
+        /// Runs application startup logic.
+        /// </summary>
+        protected virtual Task Startup(IServiceProvider app, CancellationToken cancellationToken) => Task.CompletedTask;
+
+        /// <summary>
+        /// Runs application cleanup logic.
+        /// </summary>
+        protected virtual Task Cleanup(IServiceProvider app, CancellationToken cancellationToken) => Task.CompletedTask;
+
+        /// <summary>
+        /// Creates the base application builder.
+        /// </summary>
+        [ReferencedBySourceGenerator]
+        public IAppBuilderBase CreateAppBuilderBase()
+        {
+            return new AppBuilderBase(GetType())
+                .WithHostBuilder(CreateHostBuilder)
+                .WithHostConfiguration(ConfigureHost)
+                .WithContract(DefineContract)
+                .WithEvents(DefineEvents)
+                .WithStructure(IncludeModules)
+                .WithServices(services =>
+                {
+                    this.AddGeneratedSetup(services);
+                    RegisterServices(services);
+                })
+                .WithStartup(Startup)
+                .WithCleanup(Cleanup);
         }
     }
 }
