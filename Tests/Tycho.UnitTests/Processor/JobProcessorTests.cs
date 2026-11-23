@@ -749,6 +749,25 @@ public sealed class JobProcessorTests
         }
     }
 
+    [Fact(Timeout = 10_000)]
+    public async Task StopAsync_WhenReadReturnsAfterStop_DoesNotRunJob()
+    {
+        // Arrange
+        await using var harness = new ProcessorHarness();
+        var read = new TaskCompletionSource<IJob?>(TaskCreationOptions.RunContinuationsAsynchronously);
+        harness.Factory.Enqueue(_ => read.Task);
+        harness.Processor.Start();
+        await harness.Factory.NextCallAsync(TestContext.Current.CancellationToken);
+
+        // Act
+        Task stop = harness.Processor.StopAsync(CancellationToken.None);
+        read.SetResult(new SignalingJob());
+
+        // Assert
+        await stop.WaitAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(0, harness.Runner.RunCount);
+    }
+
     private static TaskCompletionSource<bool> NewSignal() =>
         new(TaskCreationOptions.RunContinuationsAsynchronously);
 

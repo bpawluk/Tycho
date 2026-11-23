@@ -167,8 +167,16 @@ namespace Tycho.Processor
                 return false;
             }
 
-            _jobRunner.Run(job);
-            return true;
+            lock (_sync)
+            {
+                if (!IsStopped)
+                {
+                    _jobRunner.Run(job);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private async Task BeginStoppingAsync()
