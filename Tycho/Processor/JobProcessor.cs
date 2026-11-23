@@ -12,13 +12,15 @@ namespace Tycho.Processor
         private readonly IProcessingSuspender _processingSuspender;
         private readonly IIntervalCalculator _idleTimeCalculator;
 
-        private readonly CancellationTokenSource _processingCts = new();
         private readonly object _sync = new();
+        private readonly CancellationTokenSource _processingCts = new();
+
         private Task? _processingTask;
+        private Task? _stopTask;
 
         private bool WasStarted => _processingTask != null;
+        private bool IsStopped => _stopTask != null;
         private bool IsRunning => WasStarted && !_processingTask!.IsCompleted && !IsStopped;
-        private bool IsStopped { get; set; }
 
         public event EventHandler<Exception>? OnJobProcessorError;
 
@@ -86,38 +88,12 @@ namespace Tycho.Processor
             _processingSuspender.TryResume();
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken)
+        public Task StopAsync(CancellationToken cancellationToken)
         {
-            Task? processingTask;
-            bool shouldCancelProcessing;
-
             lock (_sync)
             {
-                processingTask = _processingTask;
-                shouldCancelProcessing = !IsStopped;
-                IsStopped = true;
-            }
-
-            try
-            {
-                if (shouldCancelProcessing)
-                {
-                    _processingCts.Cancel();
-                }
-            }
-            finally
-            {
-                try
-                {
-                    if (processingTask != null)
-                    {
-                        await processingTask.WaitWithCancellationAsync(cancellationToken).ConfigureAwait(false);
-                    }
-                }
-                finally
-                {
-                    await _jobRunner.StopAsync(cancellationToken).ConfigureAwait(false);
-                }
+                _stopTask ??= Task.Run(BeginStoppingAsync);
+                return _stopTask.WaitWithCancellationAsync(cancellationToken);
             }
         }
 
@@ -201,6 +177,28 @@ namespace Tycho.Processor
                 OnJobProcessorError?.Invoke(this, exception);
             }
             catch { }
+        }
+
+        private async Task BeginStoppingAsync()
+        {
+            try
+            {
+                _processingCts.Cancel();
+            }
+            finally
+            {
+                try
+                {
+                    if (_processingTask != null)
+                    {
+                        await _processingTask.ConfigureAwait(false);
+                    }
+                }
+                finally
+                {
+                    await _jobRunner.StopAsync(CancellationToken.None).ConfigureAwait(false);
+                }
+            }
         }
 
         public void Dispose()

@@ -111,7 +111,7 @@ public sealed class JobProcessorTests
         await harness.Processor.StopAsync(cancellationToken);
 
         // Assert
-        Assert.Equal(cancellationToken, await harness.Runner.NextStopAsync(cancellationToken));
+        Assert.Equal(CancellationToken.None, await harness.Runner.NextStopAsync(cancellationToken));
         Assert.Equal(0, harness.Factory.CallCount);
     }
 
@@ -522,14 +522,14 @@ public sealed class JobProcessorTests
         Assert.True(processingToken.IsCancellationRequested);
         Assert.Equal(0, harness.Factory.CallCount);
         Assert.Equal(0, harness.ErrorCount);
-        Assert.Equal(cancellationToken, await harness.Runner.NextStopAsync(cancellationToken));
+        Assert.Equal(CancellationToken.None, await harness.Runner.NextStopAsync(cancellationToken));
     }
 
     [Fact(Timeout = 10_000)]
     public async Task StopAsync_WhenCancellationCallbackThrows_WaitsForProcessingBeforeStoppingRunner()
     {
         // Arrange
-        await using var harness = new ProcessorHarness();
+        using var harness = new ProcessorHarness();
         CancellationToken cancellationToken = TestContext.Current.CancellationToken;
         TaskCompletionSource<bool> release = NewSignal();
         harness.Factory.Enqueue(async token =>
@@ -578,7 +578,7 @@ public sealed class JobProcessorTests
         // Assert
         Assert.True(processingToken.IsCancellationRequested);
         Assert.Equal(0, harness.ErrorCount);
-        Assert.Equal(cancellationToken, await harness.Runner.NextStopAsync(cancellationToken));
+        Assert.Equal(CancellationToken.None, await harness.Runner.NextStopAsync(cancellationToken));
     }
 
     [Fact(Timeout = 10_000)]
@@ -596,7 +596,7 @@ public sealed class JobProcessorTests
 
         // Assert
         Assert.Equal(0, harness.ErrorCount);
-        Assert.Equal(cancellationToken, await harness.Runner.NextStopAsync(cancellationToken));
+        Assert.Equal(CancellationToken.None, await harness.Runner.NextStopAsync(cancellationToken));
     }
 
     [Fact(Timeout = 10_000)]
@@ -664,7 +664,7 @@ public sealed class JobProcessorTests
             release.SetResult(true);
             await firstStop.WaitAsync(cancellationToken);
             await secondStop.WaitAsync(cancellationToken);
-            Assert.Equal(2, harness.Runner.StopCount);
+            Assert.Equal(1, harness.Runner.StopCount);
         }
         finally
         {
@@ -699,7 +699,6 @@ public sealed class JobProcessorTests
 
             // Assert
             await Assert.ThrowsAnyAsync<OperationCanceledException>(() => firstStop);
-            Assert.Equal(waitCancellation.Token, await harness.Runner.NextStopAsync(cancellationToken));
             Task continuedStop = harness.Processor.StopAsync(cancellationToken);
             Assert.False(continuedStop.IsCompleted);
             release.SetResult(true);
