@@ -526,7 +526,7 @@ public sealed class JobProcessorTests
     }
 
     [Fact(Timeout = 10_000)]
-    public async Task StopAsync_WhenCancellationCallbackThrows_WaitsForProcessingBeforeStoppingRunner()
+    public async Task StopAsync_WhenCancellationCallbackThrows_WaitsForProcessingAndStopsRunner()
     {
         // Arrange
         using var harness = new ProcessorHarness();
@@ -550,7 +550,7 @@ public sealed class JobProcessorTests
 
             // Assert
             Assert.False(stop.IsCompleted);
-            Assert.Equal(0, harness.Runner.StopCount);
+            Assert.Equal(CancellationToken.None, await harness.Runner.NextStopAsync(cancellationToken));
 
             release.SetResult(true);
             AggregateException exception = await Assert.ThrowsAsync<AggregateException>(() => stop.WaitAsync(cancellationToken));
@@ -600,7 +600,7 @@ public sealed class JobProcessorTests
     }
 
     [Fact(Timeout = 10_000)]
-    public async Task StopAsync_WhenIterationIgnoresCancellation_WaitsBeforeStoppingRunner()
+    public async Task StopAsync_WhenIterationIgnoresCancellation_StopsRunnerBeforeReadFinishes()
     {
         // Arrange
         await using var harness = new ProcessorHarness();
@@ -623,7 +623,7 @@ public sealed class JobProcessorTests
             // Assert
             await WaitForCancellationAsync(processingToken, cancellationToken);
             Assert.False(stop.IsCompleted);
-            Assert.Equal(0, harness.Runner.StopCount);
+            Assert.Equal(CancellationToken.None, await harness.Runner.NextStopAsync(cancellationToken));
 
             release.SetResult(true);
             await stop.WaitAsync(cancellationToken);

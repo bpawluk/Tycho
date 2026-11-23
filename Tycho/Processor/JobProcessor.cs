@@ -181,24 +181,12 @@ namespace Tycho.Processor
 
         private async Task BeginStoppingAsync()
         {
-            try
-            {
-                _processingCts.Cancel();
-            }
-            finally
-            {
-                try
-                {
-                    if (_processingTask != null)
-                    {
-                        await _processingTask.ConfigureAwait(false);
-                    }
-                }
-                finally
-                {
-                    await _jobRunner.StopAsync(CancellationToken.None).ConfigureAwait(false);
-                }
-            }
+            await Task
+                .WhenAll(
+                    Task.Run(() => _processingCts.Cancel()),
+                    _jobRunner.StopAsync(CancellationToken.None),
+                    _processingTask ?? Task.CompletedTask)
+                .ConfigureAwait(false);
         }
 
         public void Dispose()
