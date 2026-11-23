@@ -31,12 +31,16 @@ internal class InboxConsumer(
         DateTime utcNow = DateTime.UtcNow;
 
         var claimRequest = new ClaimRequest(claimId, utcNow, utcNow + _settings.ProcessingExpiration, _settings.MaxProcessingCount);
-        ClaimResult<InboxEntry> result = await ClaimInboxEntryCommand.ExecuteAsync(dbContext, owner, claimRequest, cancellationToken).ConfigureAwait(false);
+        ClaimResult<InboxEntry> result = await ClaimInboxEntryCommand
+            .ExecuteAsync(dbContext, owner, claimRequest, cancellationToken)
+            .ConfigureAwait(false);
+
         if (result.Status == ClaimStatus.NotClaimed)
+        {
             return null;
+        }
 
         InboxEntry? entryToDeliver = result.Entry;
-
         if (entryToDeliver == null)
         {
             _logger.InboxClaimedEntryMissing(claimId);

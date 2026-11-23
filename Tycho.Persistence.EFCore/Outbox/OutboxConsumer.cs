@@ -45,15 +45,33 @@ internal class OutboxConsumer(
             return null;
         }
 
-        return new OutboxEvent(
-            claimId,
-            new SerializedRoutedEvent(
-                entryToDeliver.EntryId,
-                entryToDeliver.PublishId,
-                EventIdentity.Parse(entryToDeliver.Event),
-                EventHandlerIdentity.Parse(entryToDeliver.Handler),
-                InstanceIdentity.Parse(entryToDeliver.Destination),
-                entryToDeliver.Payload));
+        try
+        {
+            return new OutboxEvent(
+                claimId,
+                new SerializedRoutedEvent(
+                    entryToDeliver.EntryId,
+                    entryToDeliver.PublishId,
+                    EventIdentity.Parse(entryToDeliver.Event),
+                    EventHandlerIdentity.Parse(entryToDeliver.Handler),
+                    InstanceIdentity.Parse(entryToDeliver.Destination),
+                    entryToDeliver.Payload));
+        }
+        catch (Exception exception)
+        {
+            try
+            {
+                if (!await MarkAsFailedAsync(entryToDeliver.EntryId, claimId, CancellationToken.None).ConfigureAwait(false))
+                {
+                    _logger.OutboxMessageStatusUpdateFailed(entryToDeliver.EntryId, claimId);
+                }
+            }
+            catch (Exception failureException)
+            {
+                throw new AggregateException("Failed to decode an outbox entry and mark it as failed.", exception, failureException);
+            }
+            throw;
+        }
     }
 
     public async Task<bool> MarkAsDeliveredAsync(Guid entryId, Guid claimId, CancellationToken cancellationToken)

@@ -93,6 +93,22 @@ public abstract class OutboxConsumerTests : IntegrationTestsBase
         Assert.Null(result);
     }
 
+    [Fact(Timeout = 60000)]
+    public async Task TryReadAsync_WhenFinalClaimHasInvalidDestination_MarksEntryAsFailed()
+    {
+        // Arrange
+        _settings.MaxDeliveryCount = 1;
+        OutboxEntry entry = CreateEntry(Guid.NewGuid(), EntryState.New, 0, Guid.Empty, DateTime.MinValue);
+        entry.Destination = " ";
+        await SeedEntries(entry);
+
+        // Act
+        await Assert.ThrowsAsync<ArgumentException>(() => _sut.TryReadAsync(TestContext.Current.CancellationToken));
+
+        // Assert
+        Assert.Equal(EntryState.Failed, (await LoadEntry(entry.EntryId)).State);
+    }
+
     private async Task SeedEntries(params OutboxEntry[] entries)
     {
         _dbContext.Set<OutboxEntry>().AddRange(entries);
