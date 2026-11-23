@@ -585,6 +585,31 @@ public sealed class JobRunnerTests
         Assert.Equal(0, errors.Count);
     }
 
+    [Fact(Timeout = 10_000)]
+    public async Task Run_WhenTimeoutCallbackThrows_ReportsErrorAndReleasesCapacity()
+    {
+        // Arrange
+        var errors = new ErrorRecorder();
+        using var runner = new JobRunner(1, TimeSpan.FromMilliseconds(100), errors.Record);
+        var release = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var failure = new InvalidOperationException();
+        var job = new DelegateJob(async token =>
+        {
+            using var registration = token.Register(() => throw failure);
+            await release.Task;
+        });
+
+        // Act
+        runner.Run(job);
+        Exception reported = await errors.First.WaitAsync(TestContext.Current.CancellationToken);
+        release.SetResult(true);
+        await runner.WaitForCapacityAsync(TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Contains(failure, Assert.IsType<AggregateException>(reported).Flatten().InnerExceptions);
+        await runner.StopAsync(TestContext.Current.CancellationToken);
+    }
+
     private static async Task CompleteAndStopAsync(JobRunner runner, params ControlledJob[] jobs)
     {
         foreach (ControlledJob job in jobs)

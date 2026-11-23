@@ -97,12 +97,26 @@ namespace Tycho.Processor
             {
                 using CancellationTokenSource jobCts = CancellationTokenSource.CreateLinkedTokenSource(_processingCts.Token, timeoutCts.Token);
 
+                Timer? timeoutTimer = null;
                 if (_jobTimeout != Timeout.InfiniteTimeSpan)
                 {
-                    timeoutCts.CancelAfter(_jobTimeout);
+                    timeoutTimer = new Timer(_ =>
+                    {
+                        try
+                        {
+                            timeoutCts.Cancel();
+                        }
+                        catch (Exception exception)
+                        {
+                            ReportError(exception);
+                        }
+                    }, null, _jobTimeout, Timeout.InfiniteTimeSpan);
                 }
 
-                await job.ExecuteAsync(jobCts.Token).ConfigureAwait(false);
+                await using (timeoutTimer)
+                {
+                    await job.ExecuteAsync(jobCts.Token).ConfigureAwait(false);
+                }
             }
             catch (OperationCanceledException) when (_processingCts.IsCancellationRequested)
             {
