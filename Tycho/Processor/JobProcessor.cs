@@ -110,11 +110,7 @@ namespace Tycho.Processor
             }
             catch (Exception exception)
             {
-                try
-                {
-                    OnJobProcessorError?.Invoke(this, exception);
-                }
-                catch { }
+                ReportError(exception);
             }
         }
 
