@@ -113,10 +113,11 @@ public sealed class JobProcessorTests
         // Assert
         Assert.Equal(CancellationToken.None, await harness.Runner.NextStopAsync(cancellationToken));
         Assert.Equal(0, harness.Factory.CallCount);
+        Assert.False(harness.Runner.IsDisposed);
     }
 
     [Fact]
-    public void Dispose_DisposesRunner()
+    public async Task Dispose_DisposesRunner()
     {
         // Arrange
         var harness = new ProcessorHarness();
@@ -125,6 +126,7 @@ public sealed class JobProcessorTests
         harness.Processor.Dispose();
 
         // Assert
+        await harness.Runner.Disposed.WaitAsync(TestContext.Current.CancellationToken);
         Assert.True(harness.Runner.IsDisposed);
     }
 
@@ -673,7 +675,7 @@ public sealed class JobProcessorTests
     }
 
     [Fact(Timeout = 10_000)]
-    public async Task StopAsync_WhenCallerCancelsWait_ProcessingStillStops()
+    public async Task Dispose_AfterCancelledStopWait_WaitsForProcessingBeforeDisposingRunner()
     {
         // Arrange
         await using var harness = new ProcessorHarness();
@@ -696,13 +698,17 @@ public sealed class JobProcessorTests
 
             // Act
             waitCancellation.Cancel();
+            harness.Processor.Dispose();
 
             // Assert
             await Assert.ThrowsAnyAsync<OperationCanceledException>(() => firstStop);
             Task continuedStop = harness.Processor.StopAsync(cancellationToken);
             Assert.False(continuedStop.IsCompleted);
+            Assert.False(harness.Runner.IsDisposed);
             release.SetResult(true);
             await continuedStop.WaitAsync(cancellationToken);
+            await harness.Runner.Disposed.WaitAsync(cancellationToken);
+            Assert.True(harness.Runner.IsDisposed);
             Assert.Equal(0, harness.ErrorCount);
         }
         finally
@@ -845,7 +851,11 @@ public sealed class JobProcessorTests
 
         public int StopCount => Volatile.Read(ref _stopCount);
 
-        public bool IsDisposed { get; private set; }
+        private readonly TaskCompletionSource<bool> _disposed = NewSignal();
+
+        public Task Disposed => _disposed.Task;
+
+        public bool IsDisposed => Disposed.IsCompleted;
 
         public ValueTask<CancellationToken> NextCapacityWaitAsync(CancellationToken cancellationToken) =>
             _capacityWaits.Reader.ReadAsync(cancellationToken);
@@ -876,7 +886,7 @@ public sealed class JobProcessorTests
             return Task.CompletedTask;
         }
 
-        public void Dispose() => IsDisposed = true;
+        public void Dispose() => _disposed.TrySetResult(true);
     }
 
     private sealed class GatedSuspender : IProcessingSuspender

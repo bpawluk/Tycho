@@ -17,6 +17,7 @@ namespace Tycho.Processor
 
         private Task? _processingTask;
         private Task? _stopTask;
+        private Task? _disposeTask;
 
         private bool WasStarted => _processingTask != null;
         private bool IsStopped => _stopTask != null;
@@ -170,15 +171,6 @@ namespace Tycho.Processor
             return true;
         }
 
-        private void ReportError(Exception exception)
-        {
-            try
-            {
-                OnJobProcessorError?.Invoke(this, exception);
-            }
-            catch { }
-        }
-
         private async Task BeginStoppingAsync()
         {
             await Task
@@ -189,10 +181,42 @@ namespace Tycho.Processor
                 .ConfigureAwait(false);
         }
 
+        private async Task DisposeAfterStopAsync()
+        {
+            try
+            {
+                await _stopTask!.ConfigureAwait(false);
+            }
+            catch (Exception exception)
+            {
+                ReportError(exception);
+            }
+            finally
+            {
+                _processingCts.Dispose();
+                _jobRunner.Dispose();
+            }
+        }
+
+        private void ReportError(Exception exception)
+        {
+            try
+            {
+                OnJobProcessorError?.Invoke(this, exception);
+            }
+            catch { }
+        }
+
         public void Dispose()
         {
-            _processingCts.Dispose();
-            _jobRunner.Dispose();
+            lock (_sync)
+            {
+                if (_disposeTask == null)
+                {
+                    _ = StopAsync(CancellationToken.None);
+                    _disposeTask = Task.Run(DisposeAfterStopAsync);
+                }
+            }
         }
     }
 }
