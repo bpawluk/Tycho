@@ -39,25 +39,30 @@ namespace Tycho.Processor
                 throw new ArgumentNullException(nameof(job));
             }
 
-            if (!_capacity.Wait(0))
-            {
-                throw new InvalidOperationException("No job execution capacity is available.");
-            }
-
             Task task;
-
-            try
-            {
-                task = Task.Run(() => RunJobAsync(job));
-            }
-            catch
-            {
-                _capacity.Release();
-                throw;
-            }
 
             lock (_sync)
             {
+                if (_stopTask != null)
+                {
+                    throw new InvalidOperationException("Job runner was stopped.");
+                }
+
+                if (!_capacity.Wait(0))
+                {
+                    throw new InvalidOperationException("No job execution capacity is available.");
+                }
+
+                try
+                {
+                    task = Task.Run(() => RunJobAsync(job));
+                }
+                catch
+                {
+                    _capacity.Release();
+                    throw;
+                }
+
                 _runningJobs.Add(task);
             }
             _ = RemoveWhenCompletedAsync(task);

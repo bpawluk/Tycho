@@ -169,6 +169,64 @@ public sealed class JobRunnerTests
     }
 
     [Fact(Timeout = 10_000)]
+    public async Task Run_AfterEmptyStop_RejectsJobWithoutStartingIt()
+    {
+        // Arrange
+        using var runner = new JobRunner(1, Timeout.InfiniteTimeSpan, _ => { });
+        var rejected = new ControlledJob();
+        await runner.StopAsync(TestContext.Current.CancellationToken);
+
+        try
+        {
+            // Act
+            Exception? rejection = Record.Exception(() => runner.Run(rejected));
+            await runner.StopAsync(TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Equal("Job runner was stopped.", Assert.IsType<InvalidOperationException>(rejection).Message);
+            Assert.False(rejected.Started.IsCompleted);
+        }
+        finally
+        {
+            await CompleteAndStopAsync(runner, rejected);
+        }
+    }
+
+    [Fact(Timeout = 10_000)]
+    public async Task Run_WhenStopIsCancellingAdmittedJob_RejectsNewJobAndWaitsForAdmittedJob()
+    {
+        // Arrange
+        using var runner = new JobRunner(2, Timeout.InfiniteTimeSpan, _ => { });
+        var admitted = new ControlledJob(observeCancellation: false);
+        var rejected = new ControlledJob();
+        runner.Run(admitted);
+
+        try
+        {
+            CancellationToken jobToken = await admitted.Started.WaitAsync(TestContext.Current.CancellationToken);
+            Exception? rejection = null;
+            using CancellationTokenRegistration registration =
+                jobToken.Register(() => rejection = Record.Exception(() => runner.Run(rejected)));
+
+            // Act
+            Task firstStop = runner.StopAsync(CancellationToken.None);
+            Task secondStop = runner.StopAsync(CancellationToken.None);
+
+            // Assert
+            Assert.Equal("Job runner was stopped.", Assert.IsType<InvalidOperationException>(rejection).Message);
+            Assert.False(rejected.Started.IsCompleted);
+            Assert.False(firstStop.IsCompleted);
+            Assert.False(secondStop.IsCompleted);
+            admitted.Complete();
+            await Task.WhenAll(firstStop, secondStop).WaitAsync(TestContext.Current.CancellationToken);
+        }
+        finally
+        {
+            await CompleteAndStopAsync(runner, admitted, rejected);
+        }
+    }
+
+    [Fact(Timeout = 10_000)]
     public async Task Run_WithTwoSlots_AcceptsAnotherJobAfterOneFinishes()
     {
         // Arrange
