@@ -83,5 +83,7 @@ internal static partial class LogMessages
         Message = "Outbox claim {ClaimId} succeeded, but the entry could not be read.")]
     internal static partial void OutboxClaimedEntryMissing(this ILogger logger, Guid claimId);
 
+    [LoggerMessage(2402, LogLevel.Warning, "Failed to update outbox message {EntryId} for claim {ClaimId}.")]
+    internal static partial void OutboxMessageStatusUpdateFailed(this ILogger logger, Guid entryId, Guid claimId);
     #endregion
 }
