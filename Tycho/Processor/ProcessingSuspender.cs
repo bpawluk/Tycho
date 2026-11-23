@@ -6,47 +6,36 @@ namespace Tycho.Processor
 {
     internal sealed class ProcessingSuspender : IProcessingSuspender
     {
-        private CancellationTokenSource? _currentPauseCts;
+        private readonly SemaphoreSlim _wakeSignal = new(0, 1);
+        private readonly object _resumeLock = new();
+        private int _suspensionActive;
 
         public async Task<SuspendResult> SuspendAsync(TimeSpan duration, CancellationToken cancellationToken)
         {
-            var currentPauseCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
-            if (Interlocked.CompareExchange(ref _currentPauseCts, currentPauseCts, null) != null)
+            if (Interlocked.CompareExchange(ref _suspensionActive, 1, 0) != 0)
             {
-                currentPauseCts.Dispose();
                 throw new InvalidOperationException("Only one suspension can be active at a time.");
             }
 
             try
             {
-                await Task.Delay(duration, currentPauseCts.Token).ConfigureAwait(false);
-            }
-            catch (OperationCanceledException)
-            {
-                // Propagate cancellation from the caller, but swallow cancellation caused by resuming.
-                cancellationToken.ThrowIfCancellationRequested();
-                return SuspendResult.Interrupted;
+                bool signaled = await _wakeSignal.WaitAsync(duration, cancellationToken).ConfigureAwait(false);
+                return signaled ? SuspendResult.Interrupted : SuspendResult.Completed;
             }
             finally
             {
-                Interlocked.CompareExchange(ref _currentPauseCts, null, currentPauseCts);
-                currentPauseCts.Dispose();
+                Volatile.Write(ref _suspensionActive, 0);
             }
-
-            return SuspendResult.Completed;
         }
 
         public void TryResume()
         {
-            CancellationTokenSource? currentPauseCts = Volatile.Read(ref _currentPauseCts);
-            try
+            lock (_resumeLock)
             {
-                currentPauseCts?.Cancel();
-            }
-            catch (ObjectDisposedException)
-            {
-                // The token was disposed between Volatile.Read and Cancel().
+                if (_wakeSignal.CurrentCount == 0)
+                {
+                    _wakeSignal.Release();
+                }
             }
         }
     }

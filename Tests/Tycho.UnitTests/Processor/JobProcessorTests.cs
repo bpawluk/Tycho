@@ -237,6 +237,37 @@ public sealed class JobProcessorTests
     }
 
     [Fact(Timeout = 10_000)]
+    public async Task ProcessLoop_WhenPingFollowsEmptyRead_PollsAgainWithoutIncreasingInterval()
+    {
+        // Arrange
+        var suspender = new GatedSuspender();
+        await using var harness = new ProcessorHarness(suspender);
+        harness.Interval.OnCurrent = () => Timeout.InfiniteTimeSpan;
+        harness.Factory.EnqueueJob(null);
+        var job = new SignalingJob();
+        CancellationToken token = TestContext.Current.CancellationToken;
+
+        try
+        {
+            // Act
+            harness.Processor.Start();
+            await suspender.Entered.Task.WaitAsync(TimeSpan.FromSeconds(5), token);
+            harness.Factory.EnqueueJob(job);
+            harness.Processor.Ping();
+            suspender.Proceed.TrySetResult(true);
+            IJob runJob = await harness.Runner.NextRunAsync(token).AsTask().WaitAsync(TimeSpan.FromSeconds(5), token);
+
+            // Assert
+            Assert.Same(job, runJob);
+            Assert.Equal(0, harness.Interval.IncreaseCount);
+        }
+        finally
+        {
+            suspender.Proceed.TrySetResult(true);
+        }
+    }
+
+    [Fact(Timeout = 10_000)]
     public async Task ProcessLoop_WhenJobFollowsIdleIteration_ResetsInterval()
     {
         // Arrange
@@ -728,9 +759,9 @@ public sealed class JobProcessorTests
         private readonly ConcurrentQueue<(object? Sender, Exception Error)> _errors = new();
         private readonly Channel<(object? Sender, Exception Error)> _errorEvents = Channel.CreateUnbounded<(object?, Exception)>();
 
-        public ProcessorHarness()
+        public ProcessorHarness(IProcessingSuspender? suspender = null)
         {
-            Processor = new JobProcessor(Factory, Runner, Suspender, Interval);
+            Processor = new JobProcessor(Factory, Runner, suspender ?? Suspender, Interval);
             Processor.OnJobProcessorError += (sender, error) =>
             {
                 _errors.Enqueue((sender, error));
@@ -847,6 +878,24 @@ public sealed class JobProcessorTests
         }
 
         public void Dispose() => IsDisposed = true;
+    }
+
+    private sealed class GatedSuspender : IProcessingSuspender
+    {
+        private readonly ProcessingSuspender _inner = new();
+
+        public TaskCompletionSource<bool> Entered { get; } = NewSignal();
+
+        public TaskCompletionSource<bool> Proceed { get; } = NewSignal();
+
+        public async Task<SuspendResult> SuspendAsync(TimeSpan duration, CancellationToken cancellationToken)
+        {
+            Entered.TrySetResult(true);
+            await Proceed.Task.WaitAsync(cancellationToken);
+            return await _inner.SuspendAsync(duration, cancellationToken);
+        }
+
+        public void TryResume() => _inner.TryResume();
     }
 
     private sealed class RecordingSuspender : IProcessingSuspender

@@ -172,12 +172,80 @@ public sealed class ProcessingSuspenderTests
     }
 
     [Fact]
-    public void TryResume_WithoutActiveSuspension_DoesNotThrow()
+    public async Task SuspendAsync_WhenSignaledBeforeSuspension_ReturnsInterrupted()
     {
         // Arrange
         var sut = new ProcessingSuspender();
+        using var cleanup = new CancellationTokenSource();
+
+        try
+        {
+            // Act
+            sut.TryResume();
+            SuspendResult result = await sut
+                .SuspendAsync(Timeout.InfiniteTimeSpan, cleanup.Token)
+                .WaitAsync(s_waitTimeout, TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Equal(SuspendResult.Interrupted, result);
+        }
+        finally
+        {
+            cleanup.Cancel();
+        }
+    }
+
+    [Fact]
+    public async Task SuspendAsync_WhenSignaledTwiceAfterTimeout_ConsumesOneWakeUp()
+    {
+        // Arrange
+        var sut = new ProcessingSuspender();
+        CancellationToken token = TestContext.Current.CancellationToken;
+        SuspendResult timeout = await sut.SuspendAsync(TimeSpan.FromMilliseconds(1), token);
 
         // Act
         sut.TryResume();
+        sut.TryResume();
+        SuspendResult first = await sut.SuspendAsync(TimeSpan.Zero, token);
+        SuspendResult second = await sut.SuspendAsync(TimeSpan.Zero, token);
+
+        // Assert
+        Assert.Equal(SuspendResult.Completed, timeout);
+        Assert.Equal(SuspendResult.Interrupted, first);
+        Assert.Equal(SuspendResult.Completed, second);
+    }
+
+    [Fact]
+    public async Task SuspendAsync_WhenCallerAlreadyCanceled_PreservesBufferedWakeUp()
+    {
+        // Arrange
+        var sut = new ProcessingSuspender();
+        sut.TryResume();
+        var canceledToken = new CancellationToken(canceled: true);
+
+        // Act
+        Task<SuspendResult> attempt = sut.SuspendAsync(TimeSpan.Zero, canceledToken);
+
+        // Assert
+        OperationCanceledException exception = await Assert.ThrowsAnyAsync<OperationCanceledException>(() => attempt);
+        Assert.Equal(canceledToken, exception.CancellationToken);
+        Assert.Equal(SuspendResult.Interrupted,
+            await sut.SuspendAsync(TimeSpan.Zero, TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task SuspendAsync_WhenDurationIsInvalid_PreservesBufferedWakeUp()
+    {
+        // Arrange
+        var sut = new ProcessingSuspender();
+        sut.TryResume();
+
+        // Act
+        Task<SuspendResult> attempt = sut.SuspendAsync(TimeSpan.FromMilliseconds(-2), CancellationToken.None);
+
+        // Assert
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => attempt);
+        Assert.Equal(SuspendResult.Interrupted,
+            await sut.SuspendAsync(TimeSpan.Zero, TestContext.Current.CancellationToken));
     }
 }
